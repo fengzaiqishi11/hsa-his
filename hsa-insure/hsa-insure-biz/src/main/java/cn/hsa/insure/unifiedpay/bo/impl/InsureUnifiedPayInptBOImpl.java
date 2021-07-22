@@ -363,13 +363,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
              * 利用深拷贝 赋值对象
              */
             if("1".equals(hnFeedetlSn)){
-              List<Map<String,Object>> feedStnMapList = new ArrayList<>();
-              Map<String,Object> deepMap = null;
-              for(Map<String,Object> item : mapList){
-                  deepMap = new HashMap<>();
-                  deepMap.putAll(item); // 深拷贝对象
-                  feedStnMapList.add(deepMap);
-              }
+                List<Map<String,Object>> feedStnMapList = new ArrayList<>();
+                Map<String,Object> deepMap = null;
+                for(Map<String,Object> item : mapList){
+                    deepMap = new HashMap<>();
+                    deepMap.putAll(item); // 深拷贝对象
+                    feedStnMapList.add(deepMap);
+                }
                 feedStnMapList.stream().forEach(item->{
                     item.put("feedetl_sn",MapUtils.get(item,"feedetl_sn").toString());
                 });
@@ -598,6 +598,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
+        //判断医保费用是否上传
+        inptVisitDTO.setHospCode(hospCode);
+        InsureConfigurationDTO insureConfigurationDTO1 = new InsureConfigurationDTO();
+        insureConfigurationDTO1 = insureConfigurationDAO.queryInsurePrimaryPrice(inptVisitDTO);
+        if(insureConfigurationDTO1.getPrimaryPrice() == null || ("0").equals(insureConfigurationDTO1.getPrimaryPrice())){
+            throw new AppException("该病人医保费用未上传，请上传医保费用。");
+        }
+
         String  insureAccoutFlag  =  inptVisitDTO.getIsUseAccount();
         Map<String,Object> paramMap = new HashMap<String,Object>();
         String omsgid = "" ;
@@ -726,6 +734,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         }
         Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
         Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");
+        Map <String,Object> setlinfoDataMap = (Map<String, Object>) outMap.get("setlinfo");
         if("settle".equals(map.get("action") == null ? "" :map.get("action").toString())) {
             settleDataMap.put("action","settle");
             settleDataMap.put("omsgid",omsgid);
@@ -737,6 +746,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         settleDataMap.put("hospCode",hospCode);
         settleDataMap.put("visitId",inptVisitDTO.getId());
         settleDataMap.put("resultJson",resultJson);
+        setlinfoDataMap.put("age",setlinfoDataMap.get("age").toString());
         return  updateInptTrialSettleInfo(settleDataMap,hospCode,insureConfigurationDTO.getRegCode());
 
     }
@@ -813,6 +823,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("bka843",null);//特惠保
         paramMap.put("bka844",null);//医院减免
         paramMap.put("bka845",null);//政府兜底
+        paramMap.put("setlinfo",outDataMap.get("setlinfo").toString());
         paramMap.put("resultJson",outDataMap.get("resultJson").toString());
         if("settle".equals(outDataMap.get("action") == null ? "" :outDataMap.get("action").toString())) {
             paramMap.put("action","settle");

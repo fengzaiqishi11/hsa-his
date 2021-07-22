@@ -2,11 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hsa.module.insure.module.dao.InsureGetInfoDAO">
 
-     <select id="getSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
+    <select id="getSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select
             a.id,
             a.visit_id,
             d.mib_id,
+             ifnull((select settle_no from insure_setl_info where insure_setl_info.settle_id = a.insureSettleId and insure_setl_info.visit_id = a.visit_id limit 1),0) as settleNo,
             (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
             (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
             d.medical_reg_no,
@@ -28,12 +29,12 @@
             b.contact_address,
             b.contact_phone,
             b.insure_code,
-            '1' as aka130,
+            a.aka130,
             b.patient_code,
             b.in_dept_id,
-            (select nation_code from base_dept bd where bd.id = b.in_dept_id and bd.hosp_code = b.hosp_code) as inDeptCode,
+            b.in_dept_name as inDeptCode,
             b.out_dept_id,
-            (select nation_code from base_dept bd where bd.id = b.in_dept_id and bd.hosp_code = b.hosp_code) as outDeptCode,
+            b.out_dept_name as outDeptCode,
             b.out_mode_code,
             a.insureSettleId,
             a.personal_price,
@@ -41,10 +42,49 @@
             a.settleway,
             a.insure_org_code,
             a.crte_time,
-            d.insuplc_admdvs
+            d.insuplc_admdvs,
+            b.in_time,
+            b.out_time,
+            f.hi_setl_lv,
+            f.crte_time as dclaTime,
+            e.baby_age_month,
+            b.address,
+            e.work,
+            e.work_phone,
+            e.work_address,
+            e.work_post_code,
+            f.sp_psn_type,
+            e.baby_birth_weight,
+            e.baby_in_weight,
+            e.in_way,
+            e.turn_dept_ids,
+            e.in_days,
+            b.outpt_disease_name,
+            d.visit_icd_code,
+            e.in_situation_name,
+            d.accessory_diagnosis_name,
+            e.inpt_before_day,
+            e.inpt_before_hour,
+            e.inpt_before_minute,
+            e.inpt_last_day,
+            e.inpt_last_hour,
+            e.inpt_last_minute,
+            e.out_mode_name,
+            e.is_inpt,
+            e.zg_doctor_name,
+            e.zg_doctor_id,
+            g.start_time,
+            g.end_time,
+            a.omsgid,
+            h.invoice_detail_id,
+            h.invoice_no
         from insure_individual_settle a
-        left join inpt_visit b on a.visit_id = b.id
-        left join insure_individual_visit d on a.visit_id = d.visit_id
+        left join inpt_visit b on a.visit_id = b.id and a.hosp_code=b.hosp_code
+        left join insure_individual_visit d on a.visit_id = d.visit_id and a.hosp_code=d.hosp_code
+        left join mris_base_info e on a.visit_id=e.visit_id and a.hosp_code=e.hosp_code
+        left join insure_setl_info f on a.visit_id=f.visit_id and a.hosp_code=f.hosp_code
+        left join inpt_settle g on a.visit_id=g.visit_id and a.hosp_code=g.hosp_code
+        left join inpt_settle_invoice h on a.visit_id=h.visit_id and a.hosp_code=h.hosp_code
         where a.insureSettleId = #{insureSettleId} and a.state = '0'
         order by a.visit_id
     </select>
@@ -58,6 +98,7 @@
             a.insureSettleId,
             a.hosp_code,
             d.mib_id,
+            ifnull((select settle_no from insure_setl_info where insure_setl_info.settle_id = a.settle_id and insure_setl_info.visit_id = a.visit_id limit 1),0) as settleNo,
             (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
             b.out_profile as inProfile,
             b.name,
@@ -83,7 +124,9 @@
             a.settleway,
             a.insure_org_code,
             a.crte_time,
-            d.insuplc_admdvs
+            d.insuplc_admdvs,
+            d.visit_time,
+            d.visit_drpt_name
         from insure_individual_settle a
         left join outpt_visit b on a.visit_id = b.id
         left join insure_individual_visit d on a.visit_id = d.visit_id
@@ -96,14 +139,16 @@
     </select>
 
     <select id="queryOpspdiseinfo" resultType="cn.hsa.module.insure.module.dto.OpspdiseInfoDTO">
-        select b.insure_illness_name as name, b.insure_illness_code as diseaseId from outpt_diagnose a, insure_disease_match b where a.visit_id = #{visitId}
-        and a.disease_id = b.hosp_illness_id and a.hosp_code = #{hospCode} and b.insure_illness_code is not null
+        select disease_id, b.name,c.oper_disease_icd9, c.oper_disease_name from (outpt_diagnose a, base_disease b)
+        left join oper_info_record c on a.visit_id = c.visit_id and c.hosp_code = a.hosp_code
+        where a.visit_id = #{visitId} and a.disease_id = b.id and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
     </select>
 
     <select id="queryDiseinfo" resultType="cn.hsa.module.insure.module.dto.DiseInfoDTO">
-        select a.disease_id, a.type_code, a.is_main, b.insure_illness_name as name from inpt_diagnose a, insure_disease_match b
-        where a.visit_id = #{visitId} and a.disease_id = b.hosp_illness_id and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
-          and b.insure_illness_code is not null
+        select a.disease_id, a.type_code, a.is_main, b.name,b.code,c.oper_disease_icd9, c.oper_disease_name,
+        c.oper_plan_time, c.doctor_id, c.doctor_name, c.rank from (inpt_diagnose a, base_disease b)
+        left join oper_info_record c on a.visit_id = c.visit_id and c.hosp_code = a.hosp_code
+        where a.visit_id = #{visitId} and a.disease_id = b.id and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
     </select>
 
     <select id="queryIteminfo" resultType="cn.hsa.module.insure.module.dto.ItemInfoDTO">
@@ -116,7 +161,10 @@
     </select>
 
     <select id="queryOprninfo" resultType="cn.hsa.module.insure.module.dto.OprninfoDTO">
-        select oper_disease_icd9, oper_disease_name, oper_plan_time, doctor_id, doctor_name, rank from oper_info_record where visit_id = #{visitId} -- 手术类型
+        select oper_disease_icd9, oper_disease_name, oper_plan_time, doctor_id, doctor_name,
+        assistant_id1,assistant_name1,assistant_id2,assistant_name2,assistant_id3,assistant_name3,
+        ana_id1,ana_name1,ana_id2,ana_name2,ana_id3,ana_name3,ana_code,rank
+        from oper_info_record where visit_id = #{visitId} and hosp_code = #{hospCode}-- 手术类型
     </select>
 
     <select id="queryIcuinfo" resultType="cn.hsa.module.insure.module.dto.IcuInfoDTO">
@@ -148,41 +196,41 @@
     </select>
 
     <select id="queryVisit" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-      select * from (
-         select id,1 as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
-         nation_code, cert_no, birthday,  patient_code, crte_time from inpt_visit where
-         patient_code = '0'
+        select * from (
+        select id,1 as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
+        nation_code, cert_no, birthday,  patient_code, crte_time from inpt_visit where
+        patient_code = '0'
         <if test="name != null and name != ''">
-           and ( name like concat('%',#{name},'%')
+            and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
         </if>
         order by crte_time ) m
-         union all
+        union all
         select * from (
-         select id,2 as lx,register_no as visitNo, name, gender_code, age, age_unit_code,
-         nation_code, cert_no, birthday,  patient_code, crte_time from outpt_visit where
-         patient_code = '0'
+        select id,2 as lx,register_no as visitNo, name, gender_code, age, age_unit_code,
+        nation_code, cert_no, birthday,  patient_code, crte_time from outpt_visit where
+        patient_code = '0'
         <if test="name != null and name != ''">
-           and ( name like concat('%',#{name},'%')
+            and ( name like concat('%',#{name},'%')
             or register_no like concat('%',#{name},'%'))
         </if>
         order by crte_time ) n
     </select>
 
     <insert id="insertCost" keyProperty="" useGeneratedKeys="true">
-    <foreach collection="list" item="entity" separator=";">
-    insert into insure_upload_cost(id, hosp_code, visit_id, mdtrt_sn, ipt_otp_no, med_type,
-    chrg_bchno, feedetl_sn, psn_cert_type, certno, psn_name, fee_ocur_time, cnt, pric, det_item_fee_sumamt,
-    med_list_codg, medins_list_codg, medins_list_name, med_chrgitm_type, prodname, bilg_dept_codg, bilg_dept_name,
-    bilg_dr_codg, bilg_dr_name, crte_id, crte_name, crte_time, org_code, cost_id)
-    values
-        (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.mdtrtSn}, #{entity.iptOtpNo},
-        #{entity.medType}, #{entity.chrgBchno}, #{entity.feedetlSn}, #{entity.psnCertType}, #{entity.certno},
-        #{entity.psnName}, #{entity.feeOcurTime}, #{entity.cnt}, #{entity.pric}, #{entity.detItemFeeSumamt},
-        #{entity.medListCodg}, #{entity.medinsListCodg}, #{entity.medinsListName}, #{entity.medChrgitmType},
-        #{entity.prodname}, #{entity.bilgDeptCodg}, #{entity.bilgDeptName}, #{entity.bilgDrCodg},
-        #{entity.bilgDrName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.orgCode}, #{entity.costId})
-    </foreach>
+        <foreach collection="list" item="entity" separator=";">
+            insert into insure_upload_cost(id, hosp_code, visit_id, mdtrt_sn, ipt_otp_no, med_type,
+            chrg_bchno, feedetl_sn, psn_cert_type, certno, psn_name, fee_ocur_time, cnt, pric, det_item_fee_sumamt,
+            med_list_codg, medins_list_codg, medins_list_name, med_chrgitm_type, prodname, bilg_dept_codg, bilg_dept_name,
+            bilg_dr_codg, bilg_dr_name, crte_id, crte_name, crte_time, org_code, cost_id)
+            values
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.mdtrtSn}, #{entity.iptOtpNo},
+            #{entity.medType}, #{entity.chrgBchno}, #{entity.feedetlSn}, #{entity.psnCertType}, #{entity.certno},
+            #{entity.psnName}, #{entity.feeOcurTime}, #{entity.cnt}, #{entity.pric}, #{entity.detItemFeeSumamt},
+            #{entity.medListCodg}, #{entity.medinsListCodg}, #{entity.medinsListName}, #{entity.medChrgitmType},
+            #{entity.prodname}, #{entity.bilgDeptCodg}, #{entity.bilgDeptName}, #{entity.bilgDrCodg},
+            #{entity.bilgDrName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.orgCode}, #{entity.costId})
+        </foreach>
     </insert>
 
     <!--通过实体作为筛选条件查询-->
@@ -223,5 +271,15 @@
     <select id="getSetlInfoLocal" resultType="java.lang.String">
         select id from insure_setl_info where settle_id = #{settleId}
     </select>
+    <select id="selectIsSetlleFee" resultType="java.util.Map">
 
+        select id, hosp_code, visit_id, cost_id, settle_id, is_hospital,
+               item_type, item_code, item_name, guest_ratio as selfpay_prop, primary_price, apply_last_price,
+               order_no, transmit_code, crte_id, crte_name, crte_time, rxSn, overlmtSelfpayAmt,
+               chrgItemLv as chrgitm_lv, fulamtOwnpayFlag, ownpayRea, hiLmtpric, fulamt_ownpay_amt, overlmt_selfpay,
+               preselfpay_amt, inscp_scp_amt, medChrgitmType as med_chrgitm_type, overlmt_amt, lmt_used_flag, pric_uplmt_amt,
+               insure_settle_id, insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt
+        from insure_individual_cost where visit_id = #{visitId} and hosp_code =#{hospCode}
+        and insure_settle_id = #{insureSettleId}
+    </select>
 </mapper>

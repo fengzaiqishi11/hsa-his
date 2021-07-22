@@ -65,6 +65,18 @@ public interface InptSettlementService {
     WrapperResponse saveSettle(Map param);
 
     /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
+    @PostMapping("/service/inpt/inptSettlement/insureUnifiedPayInpt")
+    WrapperResponse insureUnifiedPayInpt(Map param);
+
+    /**
      * @Method: querySettle
      * @Description: 获取住院发票数据
      * @Param: [params]

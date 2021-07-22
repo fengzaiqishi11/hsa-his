@@ -1,0 +1,105 @@
+package cn.hsa.module.insure.module.bo;
+
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.insure.insureIndividualVisit.bo
+ * @Class_name: InsureIndividualVisitBO
+ * @Describe(描述): 医保就诊信息表 BO层
+ * @Author: Ou·Mr
+ * @Eamil: oubo@powersi.com.cn
+ * @Date: 2020/11/18 19:26
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ */
+public interface InsureIndividualVisitBO {
+
+    /**
+     * @Menthod addInsureIndividualVisit
+     * @Desrciption 新增医保就诊信息
+     * @param param 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/11/18 20:16
+     * @Return int 受影响行数
+     */
+    InsureIndividualVisitDO addInsureIndividualVisit(Map<String,Object> param);
+
+    /**
+     * @Menthod findByCondition
+     * @Desrciption 查询医保就诊信息
+     * @param insureIndividualVisitDTO 查询条件
+     * @Author Ou·Mr
+     * @Date 2020/11/29 15:57 
+     * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO>
+     */
+    List<InsureIndividualVisitDTO> findByCondition(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Menthod editInsureIndividualVisit
+     * @Desrciption 编辑医保就诊信息
+     * @param insureIndividualVisitDO 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/12/1 15:01 
+     * @Return int 受影响行数
+     */
+    int editInsureIndividualVisit(InsureIndividualVisitDO insureIndividualVisitDO);
+
+    /**
+     * @Menthod insertIndividualVisit
+     * @Desrciption 新增医保就诊信息
+     * @param insureIndividualVisitDTO 请求参数
+     * @Author 廖继广
+     * @Date 2020/12/21 14:58
+     * @Return Boolean
+     */
+    Boolean insertIndividualVisit(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Menthod deleteByVisitId
+     * @Desrciption 根据就诊id删除
+     * @param visitId 请求参数
+     * @Author 廖继广
+     * @Date 2020/12/21 14:58
+     * @Return Boolean
+     */
+    Boolean deleteByVisitId(String visitId);
+
+
+    /**
+     * @param insureVisitParam
+     * @Method getInsureIndividualVisitById
+     * @Desrciption 根据就诊id和医院编码查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/3/4 8:58
+     * @Return
+     */
+    InsureIndividualVisitDTO getInsureIndividualVisitById(Map<String, Object> insureVisitParam);
+
+    /**
+     * @param map
+     * @Method deleteInsureVisitById
+     * @Desrciption 退费以后，取消门诊挂号登记
+     * @Param
+     * @Author fuhui
+     * @Date 2021/3/16 19:50
+     * @Return
+     */
+    Boolean deleteInsureVisitById(Map<String, Object> map);
+
+    /**
+     * @param inptVisitDTO
+     * @Method updateInsureInidivdual
+     * @Desrciption 修改医保病人信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/5/20 22:41
+     * @Return
+     */
+    Boolean updateInsureInidivdual(InptVisitDTO inptVisitDTO);
+}

@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrpatient.dao.EmrPatientDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" id="EmrPatientDTOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="classifyTemplateId" column="classify_template_id" jdbcType="VARCHAR"/>
+        <result property="patientRecordId" column="patient_record_id" jdbcType="VARCHAR"/>
+        <result property="patientHtmlId" column="patient_html_id" jdbcType="VARCHAR"/>
+        <result property="scPatientRecordId" column="sc_patient_record_id" jdbcType="VARCHAR"/>
+        <result property="scPatientHtmlId" column="sc_patient_html_id" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="reviewId" column="review_id" jdbcType="VARCHAR"/>
+        <result property="reviewName" column="review_name" jdbcType="VARCHAR"/>
+        <result property="reviewTime" column="review_time" jdbcType="TIMESTAMP"/>
+        <result property="isSpecify" column="is_specify" jdbcType="VARCHAR"/>
+        <result property="specifyId" column="specify_id" jdbcType="VARCHAR"/>
+        <result property="specifyName" column="specify_name" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditOption" column="audit_option" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="recordTime" column="record_time" jdbcType="TIMESTAMP"/>
+        <result property="html" column="html" jdbcType="BLOB"/>
+        <result property="isAudit" column="is_audit" jdbcType="VARCHAR"/>
+        <result property="haveHistory" column="haveHistory" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个病历内容，带出病历是否需要审核，是否有历史记录 '0'无记录， '1' 有记录-->
+    <select id="getEmrPatientDTO" resultMap="EmrPatientDTOMap">
+        select
+          p.*, h.html, c.is_audit, if(p.sc_patient_html_id is null, '0', '1') as haveHistory
+        from emr_patient p left join emr_patient_html h on p.patient_html_id = h.id join emr_classify_template t on p.classify_template_id = t.id
+        join emr_classify c on c.code = t.classify_code
+        where p.id = #{id} and c.hosp_code = t.hosp_code and c.dept_id = t.dept_id
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertEmrPatient" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+        insert into emr_patient(id, hosp_code, visit_id, classify_template_id,
+        patient_record_id, patient_html_id, sc_patient_record_id, sc_patient_html_id, dept_id, audit_code, review_id, review_name, review_time, is_specify, specify_id, specify_name, audit_id, audit_name, audit_time, audit_option, crte_id, crte_name, crte_time, record_time)
+        values (#{id}, #{hospCode}, #{visitId}, #{classifyTemplateId},
+         #{patientRecordId}, #{patientHtmlId}, #{scPatientRecordId}, #{scPatientHtmlId}, #{deptId}, #{auditCode}, #{reviewId}, #{reviewName}, #{reviewTime}, #{isSpecify}, #{specifyId}, #{specifyName}, #{auditId}, #{auditName}, #{auditTime}, #{auditOption}, #{crteId}, #{crteName}, #{crteTime}, #{recordTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateEmrPatient">
+        update emr_patient
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="classifyTemplateId != null and classifyTemplateId != ''">
+                classify_template_id = #{classifyTemplateId},
+            </if>
+            <if test="patientRecordId != null and patientRecordId != ''">
+                patient_record_id = #{patientRecordId},
+            </if>
+            <if test="patientHtmlId != null and patientHtmlId != ''">
+                patient_html_id = #{patientHtmlId},
+            </if>
+            <if test="scPatientRecordId != null and scPatientRecordId != ''">
+                sc_patient_record_id = #{scPatientRecordId},
+            </if>
+            <if test="scPatientHtmlId != null and scPatientHtmlId != ''">
+                sc_patient_html_id = #{scPatientHtmlId},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="reviewId != null and reviewId != ''">
+                review_id = #{reviewId},
+            </if>
+            <if test="reviewName != null and reviewName != ''">
+                review_name = #{reviewName},
+            </if>
+            <if test="reviewTime != null">
+                review_time = #{reviewTime},
+            </if>
+            <if test="isSpecify != null and isSpecify != ''">
+                is_specify = #{isSpecify},
+            </if>
+            <if test="specifyId != null and specifyId != ''">
+                specify_id = #{specifyId},
+            </if>
+            <if test="specifyName != null and specifyName != ''">
+                specify_name = #{specifyName},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="auditOption != null and auditOption != ''">
+                audit_option = #{auditOption},
+            </if>
+            <if test="recordTime != null">
+                record_time = #{recordTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键修改数据-->
+    <update id="updateEmrPatientSpecify" parameterType="cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO">
+        update emr_patient
+        <set>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="reviewId != null and reviewId != ''">
+                review_id = #{reviewId},
+            </if>
+            <if test="reviewName != null and reviewName != ''">
+                review_name = #{reviewName},
+            </if>
+            <if test="reviewTime != null">
+                review_time = #{reviewTime},
+            </if>
+            <if test="isSpecify != null and isSpecify != ''">
+                is_specify = #{isSpecify},
+            </if>
+            <if test="specifyId != null and specifyId != ''">
+                specify_id = #{specifyId},
+            </if>
+            <if test="specifyName != null and specifyName != ''">
+                specify_name = #{specifyName},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="auditOption != null and auditOption != ''">
+                audit_option = #{auditOption},
+            </if>
+        </set>
+        where id = #{patientId}
+    </update>
+
+    <!--获取病历树 (病人本次就诊已经创建的病历) 其中sort保存的病历主键, deptId保存的病历模板主键-->
+    <select id="getEmrPatientsTreeByVisitId" resultType="cn.hsa.base.TreeMenuNode">
+      select c.code as id, if(c.is_end = '1', concat_ws('', c.name, p.record_time), c.name) as label, if(c.up_code = '' or c.up_code is null,'-1', c.up_code) as parentId,
+        p.id as sort, t.id as deptId, p.crte_id as crteId, p.audit_code as status
+        from
+            emr_patient p left join emr_classify_template t on p.classify_template_id = t.id
+            left join emr_classify c on c.code = t.classify_code join emr_classify y on t.classify_code = y.code
+        where c.dept_id = t.dept_id and p.hosp_code = #{hospCode} and p.visit_id = #{visitId} and y.dept_id = #{deptId}
+        order by p.record_time, y.seq
+    </select>
+
+    <!--获取当前科室当前病人可用病历模板 -->
+    <select id="getEmrClassifyTemplate" resultType="cn.hsa.base.TreeMenuNode">
+        select t.classify_code as id , c.name as label, if(c.up_code = '' or c.up_code is null,'-1', c.up_code) as parentId, c.is_end as sort, t.id as templateId,
+        c.valid_time as validTime
+        from emr_classify c join emr_classify_template t on c.code = t.classify_code and c.type_code = #{deptType} join base_dept b on b.id = c.dept_id
+        where c.hosp_code = t.hosp_code and c.dept_id = #{deptId} and c.hosp_code = #{hospCode} and c.dept_id = t.dept_id and c.is_valid = '1'
+
+        and  b.type_code = c.type_code
+
+        and c.code not in (select m.classify_code from emr_classify_template m join emr_patient p on m.id = p.classify_template_id
+        join emr_classify f on f.code = m.classify_code where p.hosp_code = #{hospCode} and p.dept_id = #{deptId} and f.hosp_code = p.hosp_code and f.dept_id = p.dept_id
+        and f.is_unique = '1' and p.visit_id = #{visitId} and f.type_code = #{deptType}
+        )
+
+        and (c.gender_code = (select v.gender_code from inpt_visit v where v.id = #{visitId}) or c.gender_code = '' or c.gender_code is null )
+        <if test="isCommon != null and isCommon != ''">
+            and c.is_common = '1'
+        </if>
+    </select>
+
+
+    <!-- 根据模板ID查询模板使用的元素，以及元素关联的病人信息 -->
+    <select id="getEmrElementDTO" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrelement.dto.EmrElementDTO" >
+        <!--select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name from emr_element e join emr_classify_element c on e.code = c.element_code
+        join emr_classify_template t on c.classinfo_code = t.classify_code join emr_patient p on p.id = #{id}
+        where  t.id = p.classify_template_id and t.dept_id = c.dept_id and t.hosp_code = c.hosp_code and c.classinfo_code = t.classify_code-->
+        select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name from emr_element e join emr_classify_element c on e.code = c.element_code
+        join emr_classify_template t on c.classinfo_code = t.classify_code
+        where  t.id = #{classifyTemplateId} and t.hosp_code = #{hospCode} and c.dept_id = #{deptId} and  t.dept_id = c.dept_id and t.hosp_code = c.hosp_code
+    </select>
+
+    <!-- 根据就诊ID查询住院病人基本信息 -->
+    <select id="getInptVisit" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.util.Map">
+        select v.* from inpt_visit v where v.id = #{visitId} and v.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据就诊ID查询门诊病人基本信息 -->
+    <select id="getOutptVisit" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.util.Map">
+        select v.* from outpt_visit v where v.id = #{visitId} and v.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据就诊ID查询病人拥有的病历中未审核的病历数 -->
+    <select id="selectNoAudit" parameterType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO" resultType="java.lang.Integer">
+        select count(*) from emr_patient where visit_id = #{visitId} and audit_code = '1'
+    </select>
+
+
+    <!-- 查询当前科室所有的病人信息 -->
+    <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        g.archive_state as isArchive
+        from inpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        where v.hosp_code = #{hospCode}
+        <if test="inDeptId != null and inDeptId != ''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="ryStartTime != null and ryEndTime != null">
+            and DATE_FORMAT(v.in_time,'%Y-%m-%d') &gt;= #{ryStartTime} and DATE_FORMAT(v.in_time,'%Y-%m-%d') &lt;= #{ryEndTime}
+        </if>
+        <if test="ryStartTime == null and ryEndTime != null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') <= #{ryEndTime}
+            ]]>
+        </if>
+        <if test="ryStartTime != null and ryEndTime == null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') >= #{ryStartTime}
+            ]]>
+        </if>
+        <if test="name != null and name != ''">
+            and (v.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            or v.bed_name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            or v.age like concat('%', #{name,jdbcType=VARCHAR}, '%') )
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test='zgbrQuery =="1"'>
+            and v.zg_doctor_id = #{zgDoctorId}
+        </if>
+        order by v.in_time desc
+    </select>
+
+    <select id="selectOutptVisits" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        g.archive_state as isArchive, v.dept_name as inDeptName, v.crte_time as inTime
+        from outpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        where v.hosp_code = #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and v.dept_id = #{deptId}
+        </if>
+<!--        <if test="doctorName != null and doctorName != ''">
+            and v.doctor_name = #{doctorName}
+        </if>-->
+        <if test="ryStartTime != null and ryEndTime != null">
+            and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &gt;= #{ryStartTime} and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &lt;= #{ryEndTime}
+        </if>
+        <if test="ryStartTime == null and ryEndTime != null">
+            <![CDATA[
+                and DATE_FORMAT(v.visit_time, '%Y-%m-%d') <= #{ryEndTime}
+            ]]>
+        </if>
+        <if test="ryStartTime != null and ryEndTime == null">
+            <![CDATA[
+                and DATE_FORMAT(v.visit_time, '%Y-%m-%d') >= #{ryStartTime}
+            ]]>
+        </if>
+        <if test="name != null and name != ''">
+            and (v.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            or v.age like concat('%', #{name,jdbcType=VARCHAR}, '%') )
+        </if>
+        order by v.crte_time desc
+    </select>
+
+    <!-- 查询当前医院住院病人中有手术申请的所有病人 -->
+    <select id="selectInptOpreationVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        g.archive_state as isArchive
+        from inpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        where v.hosp_code = #{hospCode} and v.id in (select distinct visit_id from oper_info_record where hosp_code = #{hospCode})
+        <if test="startDate != null and endDate != null">
+            and DATE_FORMAT(v.in_time,'%Y-%m-%d') between #{startDate} and #{endDate}
+        </if>
+        <if test="startDate == null and endDate != null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') <= #{endDate}
+            ]]>
+        </if>
+        <if test="startDate != null and endDate == null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') >= #{startDate}
+            ]]>
+        </if>
+        <if test="name != null and name != ''">
+            and (v.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            or v.bed_name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            or v.age like concat('%', #{name,jdbcType=VARCHAR}, '%') )
+        </if>
+        order by v.in_time desc
+    </select>
+
+    <!--根据病人病历记录的模板id，查询模板内容 -->
+    <select id="getEmrClassifyTemplateByTemplateId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO">
+        select t.* from emr_classify_template t join emr_patient p on p.id = #{id} where p.classify_template_id = t.id
+    </select>
+
+    <select id="getDeptUsers" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        SELECT s.id, s.code,s.name FROM sys_user s,
+            (select b.dept_code, a.work_type_code, a.hosp_code
+            from sys_user a right join sys_user_system b on a.code = b.user_code and a.hosp_code = b.hosp_code
+            where a.id = #{crteId} and a.hosp_code = #{hospCode}) u,
+        sys_user_system sy
+        where s.code = sy.user_code and sy.dept_code = u.dept_code and s.hosp_code = u.hosp_code and s.work_type_code &lt; u.work_type_code
+    </select>
+
+    <!-- 根据用户id查询用户信息 -->
+    <select id="getSysUserDTO" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        select * from sys_user where id = #{userId} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据就诊id查询当前病人是否已经创建了首次日常病程记录 -->
+    <select id="selectDailyCourseOfDisease" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.lang.Integer">
+        select count(*) from emr_patient p left join emr_classify_template t on p.classify_template_id = t.id join emr_classify c on c.code = t.classify_code
+        where p.visit_id = #{visitId} and c.hosp_code = t.hosp_code and c.dept_id = t.dept_id
+        and c.name like '首次病程记录%'
+
+    </select>
+
+    <!-- 查询当前病人的日常病程记录集合 -->
+    <!-- 查询当前病人的所有病程记录集合 -->
+    <select id="selectEmrPatientDTOs" resultType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+        <!-- select p.*,h.html from emr_patient p left join emr_classify_template t on p.classify_template_id = t.id join emr_classify c on c.code = t.classify_code join emr_patient_html h on h.id = p.patient_html_id
+        where p.visit_id = #{visitId} and c.hosp_code = t.hosp_code and c.dept_id = t.dept_id
+        and c.name like '%日常病程记录%' order by p.crte_time  -->
+        select p.*,h.html, c.name as classifyName, c.is_page_print as isPagePrint from emr_patient p left join emr_classify_template t on p.classify_template_id = t.id join emr_classify c on c.code = t.classify_code join emr_patient_html h on h.id = p.patient_html_id
+        where p.visit_id = #{visitId} and c.hosp_code = t.hosp_code and c.dept_id = t.dept_id
+        and c.up_code = (select code from emr_classify where dept_id is null and name like '病程记录%') order by p.record_time
+    </select>
+
+    <!-- 根据元素编码，医院编码，元素关联的码表key，查询码表name -->
+    <select id="selectElementValue" resultType="java.lang.String" parameterType="java.lang.String">
+        select d.name from emr_element e join sys_code_detail d on e.sys_code_ref = d.c_code
+        where e.code = #{key} and e.hosp_code = #{hospCode} and d.hosp_code = #{hospCode} and d.value = #{value}
+    </select>
+
+    <!-- 查询指定元素编码集合中必填属性为是的元素名称  -->
+    <select id="checkRequired" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrelement.dto.EmrElementDTO">
+        select name from emr_element where hosp_code = #{hospCode} and code in ( ${elementCodes} )
+        and is_require = '1'
+    </select>
+
+    <select id="getTemplateByCodeAndDept" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+        select template_html as html from emr_classify_template where hosp_code = #{hospCode} and id = #{classifyTemplateId}
+    </select>
+
+    <!-- 根据病历主键删除病历 -->
+    <delete id="deleteEmrPatient" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+        delete from emr_patient where id = #{id} and hosp_code = #{hospCode} and crte_id = #{crteId}
+    </delete>
+
+    <!-- 查询病历分类【病历记录时间】属性绑定的值 -->
+    <select id="getEmrClassifyRecordTime" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.lang.String">
+        select record_time_code from  emr_classify where dept_id = #{deptId} and hosp_code = #{hospCode}
+        <choose>
+            <when test="classifyCode != null and classifyCode != ''">
+                and code = #{classifyCode}
+            </when>
+            <otherwise>
+               and code = (select classify_code from emr_classify_template where id = #{classifyTemplateId} and hosp_code = #{hospCode})
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 根据就诊id查询患者并别 -->
+    <select id="getInptVisitSex" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.lang.String">
+        select gender_code from inpt_visit where id = #{visitId} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 查询性别约束为女的元素 -->
+    <select id="selectGirlElementMap" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrelement.dto.EmrElementDTO">
+        select e.code, e.type_code from emr_element e join emr_classify_element c on e.code = c.element_code
+        where e.hosp_code = #{hospCode} and c.hosp_code = #{hospCode} and c.classinfo_code = #{classifyCode}
+            and c.dept_id is null and e.gender_code = '2'
+    </select>
+
+    <!-- 查询性别约束为男的元素 -->
+    <select id="selectBoyElementMap" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrelement.dto.EmrElementDTO">
+        select e.code, e.type_code from emr_element e join emr_classify_element c on e.code = c.element_code
+        where e.hosp_code = #{hospCode} and c.hosp_code = #{hospCode} and c.classinfo_code = #{classifyCode}
+            and c.dept_id is null and e.gender_code = '1'
+    </select>
+
+
+    <!--获取当前科室当前病人可用病历模板 -->
+    <select id="selectClassifyTemplate" resultType="cn.hsa.base.TreeMenuNode">
+        select t.classify_code as id , c.name as label, if(c.up_code = '' or c.up_code is null,'-1', c.up_code) as parentId, c.is_end as sort, t.id as templateId
+        from emr_classify c join emr_classify_template t on c.code = t.classify_code
+        where c.hosp_code = t.hosp_code and c.dept_id = #{deptId} and c.hosp_code = #{hospCode} and c.dept_id = t.dept_id and c.is_valid = '1'
+
+    </select>
+
+    <select id="getCustomClassifyTemplates" parameterType="java.util.Map" resultType="cn.hsa.base.TreeMenuNode">
+        select concat(d.classify_code, '01') as id, d.template_name as label, d.classify_code as parentId, d.id as templateId, d.crte_name as crteId
+        from emr_doc_template d
+        join emr_classify c on c.code = d.classify_code and c.hosp_code = d.hosp_code and c.dept_id = #{deptId}
+        join base_dept b on b.id = c.dept_id and b.hosp_code = d.hosp_code and c.type_code = b.type_code
+        where d.hosp_code = #{hospCode}
+            <if test="gxfw != null and gxfw == '1'.toString()">
+                and d.crte_id = #{userId} and d.gxfw = '1'
+            </if>
+            <if test="gxfw != null and gxfw =='2'.toString()">
+                and d.dept_id = #{deptId} and d.gxfw = '2'
+            </if>
+            <if test="gxfw != null and gxfw =='3'.toString()">
+                and d.gxfw = '3'
+            </if>
+    </select>
+
+    <!--获取当前科室（区分门诊或住院）可用病历模板 -->
+    <select id="getEmrClassifyTemplateMZorZY" resultType="cn.hsa.base.TreeMenuNode">
+        select t.classify_code as id , c.name as label, if(c.up_code = '' or c.up_code is null,'-1', c.up_code) as parentId, c.is_end as sort, t.id as templateId
+        from emr_classify c join emr_classify_template t on c.code = t.classify_code
+				join base_dept b on b.id = c.dept_id
+        where c.hosp_code = t.hosp_code and c.dept_id = #{deptId} and c.hosp_code = #{hospCode} and c.dept_id = t.dept_id and c.is_valid = '1'
+        and  b.type_code = c.type_code
+    </select>
+    <!--获取当前患者住过院的visitid-->
+    <select id="getPatientInHospVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+    select id from inpt_visit v
+    where v.profile_id = (SELECT profile_id from inpt_visit where id =#{visitId} and hosp_code =#{hospCode} limit 1)
+    and v.hosp_code =#{hospCode}
+    ORDER BY v.crte_time
+    </select>
+
+    <!--获取当前患者门诊就诊的visitid-->
+    <select id="getPatientOutHospVisitId" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+    select id from outpt_visit v
+    where v.profile_id = (SELECT profile_id from outpt_visit where id =#{visitId} and hosp_code =#{hospCode} limit 1)
+    and v.hosp_code =#{hospCode}
+    ORDER BY v.crte_time
+    </select>
+
+</mapper>

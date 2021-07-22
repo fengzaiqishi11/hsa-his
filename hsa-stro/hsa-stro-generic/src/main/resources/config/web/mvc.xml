@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+    <!--自定义注解@HsafRestPath,支持Swagger-->
+    <!--
+      自定义注解@HsafRestPath，把普通的java方法注册为SpringMVC的Controller，前端可通过restful方式访问该方法，支持get、post两种请求协议
+      参数支持简单数据、基本类型、复杂对象（参数为复杂对象时，参数个数只能有一个）、数组参数；返回的对象统一通过json数据进行封装
+      注解的使用方式为，直接在类或者方法上设置，如：@HsafRestPath(value="/getuser",method=RequestMethod.POST)，
+      注册到mvc组件工厂时，url路径为 “类路径+方法路径”
+    -->
+    <bean class="cn.hsa.hsaf.core.framework.web.HsafRequestMappingHandlerMapping">
+        <property name="order" value="5"/>
+        <!-- order决定了资源的加载顺序，如果没设置的话会以最低优先级加载，可能会被其他加载器优先加载导致请求时找不到url报404错误 -->
+        <!-- 此处可以添加拦截器，拦截器必须实现org.springframework.web.servlet.HandlerInterceptor接口
+        <property name="interceptors">
+            <list>
+              <bean class="com.newbies.springbootdemo.service.MyInterceptor"></bean>
+            </list>
+        </property>
+        -->
+    </bean>
+    <bean class="cn.hsa.hsaf.core.framework.web.HsafRequestMappingHandlerAdapter">
+        <property name="order" value="5"/>
+    </bean>
+
+    <!-- MVC层统一的异常拦截处理 -->
+    <bean id="exceptionResolver" class="cn.hsa.hsaf.core.framework.web.exception.HsafHandlerExceptionResolver">
+        <!-- 返回视图类型，仅支持“json|page”两种 -->
+        <property name="viewType" value="json"/>
+        <!-- 返回json串中的message字段内容，如果不配置的话，会返回异常的ex.getMessage() -->
+        <property name="defaultErrorMessage" value="服务端处理异常，请联系系统管理员排查！"/>
+        <!-- 缺省返回的错误view（仅page时有效，当exceptionMappings无匹配映射时） -->
+        <property name="defaultErrorView" value="error"/>
+        <!-- 错误码跟错误view的映射关系（仅page时有效），如果没找到映射关系，则缺省用defaultErrorView -->
+        <property name="exceptionMappings">
+            <map>
+                <entry key="-1" value="error"/>
+                <entry key="101010" value="ex_page"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 不可捕获异常的统一拦截处理 -->
+    <bean id="hsafUncaughtExceptionHandler"
+          class="cn.hsa.hsaf.core.framework.web.exception.HsafUncaughtExceptionHandler"/>
+    <bean id="hsafUncaughtExceptionHandlerAspect"
+          class="cn.hsa.hsaf.core.framework.web.exception.HsafUncaughtExceptionHandlerAspect"/>
+    <aop:config>
+        <aop:aspect ref="hsafUncaughtExceptionHandlerAspect">
+            <!-- 切面为Controller下的所有方法 -->
+            <aop:pointcut id="performance" expression="execution(* cn.hsa..controller.*(..))"/>
+            <aop:before method="doBefore" pointcut-ref="performance"/>
+        </aop:aspect>
+    </aop:config>
+
+    <!--  HSAF统一日志记录  -->
+    <bean id="hsafLogHandler" class="cn.hsa.base.HsafLogHandlers"/>
+    <aop:config>
+        <aop:aspect id="aspect" ref="hsafLogHandler" order="10000">
+            <aop:pointcut expression="execution(public * cn.hsa..*Controller.*(..))" id="controller"/>
+            <aop:before method="doControllerBefore" pointcut-ref="controller"/>
+            <aop:around method="doControllerAround" pointcut-ref="controller"/>
+            <aop:after-returning method="doControllerAfterReturning" returning="ret" pointcut-ref="controller"/>
+        </aop:aspect>
+    </aop:config>
+    <aop:config>
+        <aop:aspect id="aspect" ref="hsafLogHandler"
+                    order="10000"><!--  由于rpc  aop也是基于service层实现，所以此order必须大于rpc  aop的order  -->
+            <aop:pointcut expression="execution(public * cn.hsa..*ServiceImpl.*(..))" id="service"/>
+            <aop:before method="doServiceBefore" pointcut-ref="service"/>
+            <aop:around method="doServiceAround" pointcut-ref="service"/>
+            <aop:after-returning method="doServiceAfterReturning" returning="ret" pointcut-ref="service"/>
+        </aop:aspect>
+    </aop:config>
+</beans>

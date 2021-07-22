@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.classes.dao.OutptClassesDAO">
+
+    <resultMap type="cn.hsa.module.outpt.classes.dto.OutptClassesDTO" id="OutptClassesMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="startDate" column="start_date" jdbcType="VARCHAR"/>
+        <result property="endDate" column="end_date" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="OutptClassesMap">
+        select
+          id, hosp_code, name, start_date, end_date, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from outpt_classes
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="OutptClassesMap">
+        select
+        id, hosp_code, name, start_date, end_date, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from outpt_classes
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            and hosp_code = #{hospCode}
+        </where>
+    </select>
+
+    <select id="queryClassesByTime" resultMap="OutptClassesMap">
+        select
+        id, hosp_code, name, start_date, end_date, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from outpt_classes
+        <where>
+            is_valid = '1'
+            and  str_to_date(concat(#{nowDate},' ',start_date,':00'),'%Y-%m-%d %H:%i:%s') &lt; #{nowDateTime}
+            and  #{nowDateTime} &lt; str_to_date(concat(#{nowDate},' ',end_date,':00'),'%Y-%m-%d %H:%i:%s')
+            and hosp_code = #{hospCode}
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultMap="OutptClassesMap">
+        select
+        id, hosp_code, name, start_date, end_date, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from outpt_classes
+        <where>
+            <if test="bc != null and bc != ''">
+                and name like concat('%',#{bc},'%')
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            and hosp_code = #{hospCode}
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into outpt_classes(id, hosp_code, name, start_date, end_date, pym, wbm, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{name}, #{startDate}, #{endDate}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update outpt_classes
+        <set>
+                name = #{name},
+                start_date = #{startDate},
+                end_date = #{endDate},
+                pym = #{pym},
+                wbm = #{wbm}
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        delete from outpt_classes
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+    </delete>
+
+    <!--    判断编码是否存在-->
+    <select id="queryNameIsExist" resultType="java.lang.Integer">
+        select count(name) from outpt_classes
+        where
+        name = #{name}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--    判断编码是否已被使用(多条数据操作)-->
+    <select id="queryIdsIsExist" resultType="java.lang.Integer">
+        select count(cs_id) from outpt_classify_classes
+        where
+        <if test="ids != null and ids.size()>0">
+            cs_id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+        and is_valid = '1'
+    </select>
+
+    <!--    判断编码是否已被使用-->
+    <select id="queryIdIsExist" resultType="java.lang.Integer">
+        select count(cs_id) from outpt_classify_classes
+        where
+        cs_id = #{id} and hosp_Code = #{hospCode}
+        and is_valid = '1'
+    </select>
+
+
+</mapper>

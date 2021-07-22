@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.infusionExec.dao.OutptInfusionExecDAO">
+    <!--条件查询输液执行列表-->
+    <select id="queryPage" parameterType="java.util.Map"
+            resultType="cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO">
+        SELECT distinct
+        s.id as oir_id,
+        <!--d.id ,-->
+        a.id as opd_id,
+        a.group_no,
+        d.sign_code,
+        d.visit_id,
+        c.name,
+        c.gender_code,
+        c.age,
+        c.age_unit_code,
+        b.crte_time,
+        s.crte_time as register_time,
+        <!--d.plan_exec_date,-->
+        d.exec_id,
+        d.exec_time,
+        d.exec_name,
+        (SELECT name FROM base_dept where id =d.exec_dept_id and hosp_code = d.hosp_code) as exec_dept_name,
+        d.second_exec_id,
+        d.second_exec_name,
+        d.is_print,
+        d.remark,
+        a.content,
+        a.item_name,
+        a.spec,
+        a.num,
+        a.num_unit_code,
+        a.dosage,
+        a.dosage_unit_code,
+        a.usage_code,
+        b.doctor_name
+        FROM outpt_infusion_register s
+        left join outpt_prescribe_detail a on s.opd_id = a.id and s.hosp_code = a.hosp_code
+        left JOIN outpt_prescribe b on a.op_id = b.id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        left JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
+        left JOIN outpt_prescribe_exec d on a.id = d.opd_id and a.visit_id = d.visit_id and d.hosp_code = a.hosp_code
+        where a.hosp_code = #{outptPrescribeDetailsDTO.hospCode}
+        and a.exec_num > 0
+        and b.is_settle = '1'
+        and b.is_cancel = '0'
+        <!--AND a.id IN ( SELECT opd_id FROM outpt_infusion_register where hosp_code = c.hosp_code GROUP BY opd_id )-->
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            and a.usage_code in
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptPrescribeDetailsDTO.loginDeptId != null and outptPrescribeDetailsDTO.loginDeptId != ''">
+            and c.dept_id = #{outptPrescribeDetailsDTO.loginDeptId}
+        </if>
+        <if test="outptPrescribeDetailsDTO.keyword != null and outptPrescribeDetailsDTO.keyword != ''">
+            and (c.name like CONCAT('%',#{outptPrescribeDetailsDTO.keyword},'%') or c.visit_no like
+            CONCAT('%',#{outptPrescribeDetailsDTO.keyword},'%'))
+        </if>
+        <if test="outptPrescribeDetailsDTO.type != null and outptPrescribeDetailsDTO.type != ''">
+            and d.sign_code = #{outptPrescribeDetailsDTO.type}
+        </if>
+        <if test="outptPrescribeDetailsDTO.startTime != null and outptPrescribeDetailsDTO.startTime != ''">
+            and b.crte_time &gt;= STR_TO_DATE(#{outptPrescribeDetailsDTO.startTime},'%Y-%m-%d')
+        </if>
+        <if test="outptPrescribeDetailsDTO.endTime != null and outptPrescribeDetailsDTO.endTime != ''">
+            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{outptPrescribeDetailsDTO.endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by s.crte_time desc,b.crte_time desc
+    </select>
+    <select id="queryExec" parameterType="java.util.Map"
+            resultType="cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO">
+        SELECT
+            a.id ,
+            b.id as opd_id,
+            b.group_no,
+            a.sign_code,
+            a.visit_id,
+            c.name,
+            c.gender_code,
+            c.age,
+            c.age_unit_code,
+            d.crte_time,
+            d.doctor_name,
+            a.plan_exec_date,
+            a.exec_id,
+            a.exec_name,
+            a.exec_time,
+            (SELECT name FROM base_dept where id =a.exec_dept_id and hosp_code = a.hosp_code) as exec_dept_name,
+            a.second_exec_id,
+            a.second_exec_name,
+            a.is_print,
+            a.remark,
+            b.content,
+            b.item_name,
+            b.spec,
+            b.num,
+            b.num_unit_code,
+            b.dosage,
+            b.dosage_unit_code,
+            b.usage_code
+        FROM
+            outpt_prescribe_exec a
+                left JOIN outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.opd_id = b.id
+                left join outpt_visit c on a.visit_id = c.id and c.hosp_code = a.hosp_code
+                LEFT JOIN outpt_prescribe d on b.op_id = d.id and b.visit_id = d.visit_id and b.hosp_code = d.hosp_code
+        WHERE 1=1
+          and a.hosp_code = #{outptPrescribeDetailsDTO.hospCode}
+          and b.exec_num > 0
+          and d.is_settle = '1'
+          and d.is_cancel = '0'
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            and b.usage_code in
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptPrescribeDetailsDTO.loginDeptId != null and outptPrescribeDetailsDTO.loginDeptId != ''">
+            and c.dept_id = #{outptPrescribeDetailsDTO.loginDeptId}
+        </if>
+        <if test="outptPrescribeDetailsDTO.keyword != null and outptPrescribeDetailsDTO.keyword != ''">
+            and (c.name like CONCAT('%',#{outptPrescribeDetailsDTO.keyword},'%') or c.visit_no like
+            CONCAT('%',#{outptPrescribeDetailsDTO.keyword},'%'))
+        </if>
+        <if test="outptPrescribeDetailsDTO.type != null and outptPrescribeDetailsDTO.type != ''">
+            and a.sign_code = #{outptPrescribeDetailsDTO.type}
+        </if>
+        <if test="outptPrescribeDetailsDTO.startTime != null and outptPrescribeDetailsDTO.startTime != ''">
+            and d.crte_time &gt;= STR_TO_DATE(#{outptPrescribeDetailsDTO.startTime},'%Y-%m-%d')
+        </if>
+        <if test="outptPrescribeDetailsDTO.endTime != null and outptPrescribeDetailsDTO.endTime != ''">
+            and d.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{outptPrescribeDetailsDTO.endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by d.crte_time desc, a.plan_exec_date desc, b.group_no asc , b.group_seq_no asc
+    </select>
+
+    <!--批量输液执行-更新《处方执行表》执行信息-->
+    <update id="updatePreExec" parameterType="java.util.Map">
+        UPDATE outpt_prescribe_exec
+        SET sign_code = '2'
+        <if test="execId != null and execId != ''">
+            , exec_id = #{execId}
+        </if>
+        <if test="execName != null and execName != ''">
+            , exec_name = #{execName}
+        </if>
+        <if test="execDate != null">
+            , exec_time = #{execDate}
+        </if>
+        WHERE 1=1
+        <if test="opdIds != null and opdIds.size > 0 ">
+            and opd_id in
+            <foreach collection="opdIds" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+    <!--更新《处方明细表》执行信息-->
+    <update id="updatePreDet" parameterType="java.util.Map">
+        update outpt_prescribe_detail
+        set exec_id = #{execId}
+        <if test="execName != null and execName != ''">
+            , exec_name = #{execName}
+        </if>
+        <if test="execDate != null">
+            , exec_date = #{execDate}
+        </if>
+        where 1=1
+        <if test="opdIds != null and opdIds.size > 0 ">
+            and id in
+            <foreach collection="opdIds" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+    <!--更新《输液登记表》执行信息-->
+    <update id="updateInfuReg" parameterType="java.util.Map">
+        update outpt_infusion_register
+        set exec_id = #{execId}
+        <if test="execName != null and execName != ''">
+            , exec_name = #{execName}
+        </if>
+        <if test="execDate != null">
+            , exec_date = #{execDate}
+        </if>
+        where 1=1
+        and hosp_code = #{hospCode}
+        <if test="opdIds != null and opdIds.size > 0 ">
+            and opd_id in
+            <foreach collection="opdIds" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <!--批量取消输液执行-->
+    <update id="removeBatchExec" parameterType="java.util.Map">
+        update outpt_prescribe_exec
+        set sign_code = '3'
+        <if test="execId != null and execId != ''">
+            , exec_id = #{execId}
+        </if>
+        <if test="execName != null and execName != ''">
+            , exec_name = #{execName}
+        </if>
+        <if test="execDeptId != null and execDeptId != ''">
+            , exec_dept_id = #{execDeptId}
+        </if>
+        <if test="execDate != null">
+            , exec_time = #{execDate}
+        </if>
+        WHERE 1=1
+        and hosp_code = #{hospCode}
+        <if test="opdIds != null and opdIds.size > 0 ">
+            and opd_id in
+            <foreach collection="opdIds" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <!--更新《处方明细表》执行信息-->
+    <update id="updatePreDetBatch" parameterType="java.util.List">
+        <foreach collection="list1" item="item" separator=";">
+            update outpt_prescribe_detail
+            <set>
+                <if test="item.execId != null and item.execId != ''">
+                    exec_id = #{item.execId},
+                </if>
+                <if test="item.execName != null and item.execName != ''">
+                    exec_name = #{item.execName},
+                </if>
+                <if test="item.execTime != null ">
+                    exec_date = #{item.execTime},
+                </if>
+            </set>
+            where 1=1
+            and hosp_code = #{item.hospCode}
+            and id = #{item.opdId}
+        </foreach>
+    </update>
+    <!--更新《处方执行表》执行信息-->
+    <update id="updatePreExecBatch" parameterType="java.util.List">
+        <foreach collection="list2" item="item" separator=";">
+            update outpt_prescribe_exec
+            <set>
+                <if test="item.signCode != null and item.signCode != ''">
+                    sign_code = #{item.signCode},
+                </if>
+                <if test="item.execId != null and item.execId != ''">
+                    exec_id = #{item.execId},
+                </if>
+                <if test="item.execName != null and item.execName != ''">
+                    exec_name = #{item.execName},
+                </if>
+                <if test="item.execTime != null ">
+                    exec_time = #{item.execTime},
+                </if>
+                <if test="item.secondExecId != null and item.secondExecId != ''">
+                    second_exec_id = #{item.secondExecId},
+                </if>
+                <if test="item.secondExecName != null and item.secondExecName != ''">
+                    second_exec_name = #{item.secondExecName},
+                </if>
+            </set>
+            where 1=1
+            and hosp_code = #{item.hospCode}
+            <!--and opd_id = #{item.opdId}-->
+            and id = #{item.id}
+        </foreach>
+    </update>
+    <!--更新《输液登记表》执行信息-->
+    <update id="updateInfuRegBatch" parameterType="java.util.List">
+        <foreach collection="list3" item="item" separator=";">
+            update outpt_infusion_register
+            <set>
+                <if test="item.execId != null and item.execId != ''">
+                    exec_id = #{item.execId},
+                </if>
+                <if test="item.execName != null and item.execName != ''">
+                    exec_name = #{item.execName},
+                </if>
+                <if test="item.execTime != null ">
+                    exec_date = #{item.execTime},
+                </if>
+            </set>
+            where 1=1
+            and hosp_code = #{item.hospCode}
+            <!--and id = #{item.oirId}-->
+            and opd_id = #{item.opdId}
+        </foreach>
+    </update>
+    <!--删除《处方明细表》执行信息-->
+    <update id="deletePreDetBatch" parameterType="java.util.List">
+        <foreach collection="list4" item="item" separator=";">
+            update outpt_prescribe_detail
+            set exec_date = NULL , exec_id = NULL, exec_name = NULL
+            where hosp_code = #{item.hospCode}
+            and id = #{item.opdId}
+        </foreach>
+    </update>
+    <!--删除《处方执行表》执行信息-->
+    <update id="deletePreExecBatch" parameterType="java.util.List">
+        <foreach collection="list5" item="item" separator=";">
+            update outpt_prescribe_exec
+            set exec_time = NULL , exec_id = NULL, exec_name = NULL, sign_code = #{item.signCode}
+            where hosp_code = #{item.hospCode}
+            <!--and opd_id = #{item.opdId}-->
+            and id = #{item.id}
+        </foreach>
+    </update>
+    <!--删除《输液登记表》执行信息-->
+    <update id="deleteInfuRegBatch" parameterType="java.util.List">
+        <foreach collection="list6" item="item" separator=";">
+            update outpt_infusion_register
+            set exec_date = NULL , exec_id = NULL, exec_name = NULL
+            where hosp_code = #{item.hospCode}
+            <!--and id = #{item.oirId}-->
+            and opd_id = #{item.opdId}
+        </foreach>
+    </update>
+</mapper>

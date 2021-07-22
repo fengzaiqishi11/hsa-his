@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureItemMatchDAO">
+
+    <resultMap type="cn.hsa.module.insure.module.dto.InsureItemMatchDTO" id="InsureItemMatchMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="insureRegCode" column="insure_reg_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="pqccItemId" column="pqcc_item_id" jdbcType="VARCHAR"/>
+        <result property="hospItemId" column="hosp_item_id" jdbcType="VARCHAR"/>
+        <result property="hospItemName" column="hosp_item_name" jdbcType="VARCHAR"/>
+        <result property="hospItemCode" column="hosp_item_code" jdbcType="VARCHAR"/>
+        <result property="hospItemType" column="hosp_item_type" jdbcType="VARCHAR"/>
+        <result property="hospItemSpec" column="hosp_item_spec" jdbcType="VARCHAR"/>
+        <result property="hospItemUnitCode" column="hosp_item_unit_code" jdbcType="VARCHAR"/>
+        <result property="hospItemPrepCode" column="hosp_item_prep_code" jdbcType="VARCHAR"/>
+        <result property="hospItemPrice" column="hosp_item_price" jdbcType="NUMERIC"/>
+        <result property="insureItemName" column="insure_item_name" jdbcType="VARCHAR"/>
+        <result property="insureItemCode" column="insure_item_code" jdbcType="VARCHAR"/>
+        <result property="insureItemType" column="insure_item_type" jdbcType="VARCHAR"/>
+        <result property="insureItemSpec" column="insure_item_spec" jdbcType="VARCHAR"/>
+        <result property="insureItemUnitCode" column="insure_item_unit_code" jdbcType="VARCHAR"/>
+        <result property="insureItemPrepCode" column="insure_item_prep_code" jdbcType="VARCHAR"/>
+        <result property="insureItemPrice" column="insure_item_price" jdbcType="NUMERIC"/>
+        <result property="deductible" column="deductible" jdbcType="VARCHAR"/>
+        <result property="standardCode" column="standard_code" jdbcType="VARCHAR"/>
+        <result property="checkPrice" column="check_price" jdbcType="NUMERIC"/>
+        <result property="manufacturer" column="manufacturer" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="isMatch" column="is_match" jdbcType="VARCHAR"/>
+        <result property="isTrans" column="is_trans" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="takeDate" column="take_date" jdbcType="TIMESTAMP"/>
+        <result property="loseDate" column="lose_date" jdbcType="TIMESTAMP"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="tcmdrugUsedWay" column="tcmdrug_used_way" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageOrAll" resultMap="InsureItemMatchMap"
+            parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select
+        id, hosp_code, insure_reg_code, item_code, pqcc_item_id, hosp_item_id, hosp_item_name,
+        hosp_item_code, hosp_item_type, hosp_item_spec, hosp_item_unit_code, hosp_item_prep_code, hosp_item_price,
+        insure_item_name, insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
+        insure_item_prep_code, insure_item_price, deductible, standard_code, check_price, manufacturer, audit_code,
+        is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name, crte_time,lmt_user_flag,
+               lim_user_explain,tcmdrug_used_way
+        from insure_item_match
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                and insure_reg_code = #{insureRegCode}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and item_code = #{itemCode}
+            </if>
+            <if test="pqccItemId != null and pqccItemId != ''">
+                and pqcc_item_id = #{pqccItemId}
+            </if>
+            <if test="hospItemId != null and hospItemId != ''">
+                and hosp_item_id = #{hospItemId}
+            </if>
+            <if test="hospItemName != null and hospItemName != ''">
+                and hosp_item_name = #{hospItemName}
+            </if>
+            <if test="hospItemCode != null and hospItemCode != ''">
+                and hosp_item_code = #{hospItemCode}
+            </if>
+            <if test="hospItemType != null and hospItemType != ''">
+                and hosp_item_type = #{hospItemType}
+            </if>
+            <if test="hospItemSpec != null and hospItemSpec != ''">
+                and hosp_item_spec = #{hospItemSpec}
+            </if>
+            <if test="hospItemUnitCode != null and hospItemUnitCode != ''">
+                and hosp_item_unit_code = #{hospItemUnitCode}
+            </if>
+            <if test="hospItemPrepCode != null and hospItemPrepCode != ''">
+                and hosp_item_prep_code = #{hospItemPrepCode}
+            </if>
+            <if test="hospItemPrice != null">
+                and hosp_item_price = #{hospItemPrice}
+            </if>
+            <if test="insureItemName != null and insureItemName != ''">
+                and insure_item_name = #{insureItemName}
+            </if>
+            <if test="insureItemCode != null and insureItemCode != ''">
+                and insure_item_code = #{insureItemCode}
+            </if>
+            <if test="insureItemType != null and insureItemType != ''">
+                and insure_item_type = #{insureItemType}
+            </if>
+            <if test="insureItemSpec != null and insureItemSpec != ''">
+                and insure_item_spec = #{insureItemSpec}
+            </if>
+            <if test="insureItemUnitCode != null and insureItemUnitCode != ''">
+                and insure_item_unit_code = #{insureItemUnitCode}
+            </if>
+            <if test="insureItemPrepCode != null and insureItemPrepCode != ''">
+                and insure_item_prep_code = #{insureItemPrepCode}
+            </if>
+            <if test="insureItemPrice != null">
+                and insure_item_price = #{insureItemPrice}
+            </if>
+            <if test="deductible != null and deductible != ''">
+                and deductible = #{deductible}
+            </if>
+            <if test="standardCode != null and standardCode != ''">
+                and standard_code = #{standardCode}
+            </if>
+            <if test="checkPrice != null">
+                and check_price = #{checkPrice}
+            </if>
+            <if test="manufacturer != null and manufacturer != ''">
+                and manufacturer = #{manufacturer}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="isMatch != null and isMatch != ''">
+                and is_match = #{isMatch}
+            </if>
+            <if test="isTrans != null and isTrans != ''">
+                and is_trans = #{isTrans}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="takeDate != null">
+                and take_date = #{takeDate}
+            </if>
+            <if test="loseDate != null">
+                and lose_date = #{loseDate}
+            </if>
+            <if test="pym != null and pym != ''">
+                and pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and wbm = #{wbm}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (hosp_item_name like '%${keyword}%'
+                or hosp_item_code like '%${keyword}%'
+                or pym like '%${keyword}%'
+                or wbm like '%${keyword}%'
+                or insure_item_name like '%${keyword}%'
+                or insure_item_code like '%${keyword}%')
+            </if>
+            <if test="downloadType == '01'.toString() and downloadType !=null">
+                and hosp_item_type = '1'
+            </if>
+            <if test="downloadType == '02'.toString() and downloadType !=null ">
+                and hosp_item_type in ('2','3')
+            </if>
+            <if test="typeCode !=null and typeCode !='' ">
+                and hosp_item_type =#{typeCode}
+            </if>
+            <if test="tcmdrugUsedWay !=null and tcmdrugUsedWay !='' ">
+                and tcmdrug_used_way =#{tcmdrug_used_way}
+            </if>
+        </where>
+        order by audit_code,crte_time desc
+    </select>
+
+    <select id="queryInsureMatchItemByItems" parameterType="java.util.Map" resultMap="InsureItemMatchMap">
+        select * from insure_item_match
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+          and audit_code = '1'
+          and hosp_item_id in
+        <foreach item="item" index="index" collection="xmid" open="("  close=")" separator=",">
+                 #{item}
+        </foreach>
+    </select>
+
+    <!--同步新增医院匹配药品数据-->
+    <insert id="insertHospDrug" keyProperty="id" useGeneratedKeys="true">
+        insert into insure_item_match(
+        id, hosp_code,insure_reg_code,item_code,
+        pqcc_item_id, hosp_item_id, hosp_item_name,
+        hosp_item_code, hosp_item_type, hosp_item_spec,
+        hosp_item_unit_code, hosp_item_prep_code,
+        hosp_item_price, standard_code, audit_code, is_match,
+        is_trans, is_valid, pym, wbm, crte_id,
+        crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.insureId},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.bigTypeCode},
+            #{item.insureCode},
+            #{item.id},
+            #{item.goodName},
+            #{item.code},
+            #{item.typeCode},
+            #{item.spec},
+            #{item.unitCode},
+            #{item.prepCode},
+            #{item.price},
+            #{item.insureCode},
+            '0',
+            '0',
+            '0',
+            '0',
+            #{item.goodPym},
+            #{item.goodWbm},
+            #{item.crteId},
+            #{item.crteName},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <!--同步新增医院匹配项目数据-->
+    <insert id="insertHospItem" keyProperty="id" useGeneratedKeys="true">
+        insert into insure_item_match(
+        id, hosp_code, insure_reg_code, item_code,
+        hosp_item_id, hosp_item_name, hosp_item_code,
+        hosp_item_type, hosp_item_spec, hosp_item_unit_code,
+        hosp_item_price, audit_code,is_match, is_trans, is_valid,
+        pym, wbm, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.insureId},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.bigTypeCode},
+            #{item.id},
+            #{item.name},
+            #{item.code},
+            #{item.typeCode},
+            #{item.spec},
+            #{item.unitCode},
+            #{item.price},
+            '0',
+            '0',
+            '0',
+            '0',
+            #{item.namePym},
+            #{item.nameWbm},
+            #{item.crteId},
+            #{item.crteName},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <!--同步新增医院匹配项目数据-->
+    <insert id="insertHospMaterial" keyProperty="id" useGeneratedKeys="true">
+        insert into insure_item_match(
+        id, hosp_code, insure_reg_code, item_code,
+        hosp_item_id, hosp_item_name, hosp_item_code,
+        hosp_item_type, hosp_item_spec, hosp_item_unit_code,
+        hosp_item_price, audit_code,is_match, is_trans, is_valid,
+        pym, wbm, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.insureId},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.bigTypeCode},
+            #{item.id},
+            #{item.name},
+            #{item.code},
+            #{item.typeCode},
+            #{item.spec},
+            #{item.unitCode},
+            #{item.price},
+            '0',
+            '0',
+            '0',
+            '0',
+            #{item.pym},
+            #{item.wbm},
+            #{item.crteId},
+            #{item.crteName},
+            now()
+            )
+        </foreach>
+    </insert>
+    <insert id="insertHandMatch" parameterType="map">
+        insert into insure_item_match(id, hosp_code, insure_reg_code, item_code,
+                                      molss_item_id, pqcc_item_id, hosp_item_id, hosp_item_name,
+                                      hosp_item_code, hosp_item_type, hosp_item_spec, hosp_item_unit_code,
+                                      hosp_item_prep_code, hosp_item_price, insure_item_name,
+                                      insure_item_code, insure_item_type, insure_item_spec,
+                                      insure_item_unit_code, insure_item_prep_code, insure_item_price,
+                                      deductible, standard_code, check_price, manufacturer, audit_code,
+                                      is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id,
+                                      crte_name, crte_time,tcmdrug_used_way)
+        values (#{id}, #{hospCode}, #{insureRegCode}, #{itemCode}, #{molssItemId}, #{pqccItemId},
+                #{hospItemId}, #{hospItemName}, #{hospItemCode}, #{hospItemType}, #{hospItemSpec},
+                #{hospItemUnitCode}, #{hospItemPrepCode}, #{hospItemPrice}, #{insureItemName},
+                #{insureItemCode}, #{insureItemType}, #{insureItemSpec}, #{insureItemUnitCode},
+                #{insureItemPrepCode}, #{insureItemPrice}, #{deductible}, #{standardCode}, #{checkPrice},
+                #{manufacturer}, #{auditCode}, #{isMatch}, #{isTrans}, #{isValid}, #{takeDate}, #{loseDate},
+                #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime},#{tcmdrugUsedWay})
+    </insert>
+    <insert id="insertMatchItem" parameterType="list">
+        insert into insure_item_match
+        (id, hosp_code, insure_reg_code, item_code, molss_item_id,
+        pqcc_item_id, hosp_item_id, hosp_item_name, hosp_item_code,
+        hosp_item_type, hosp_item_spec, hosp_item_unit_code, hosp_item_prep_code, hosp_item_price,
+        insure_item_name, insure_item_code, insure_item_type, insure_item_spec,
+        insure_item_unit_code, insure_item_prep_code, insure_item_price,
+        deductible, standard_code, check_price, manufacturer, audit_code,
+        is_match, is_trans, is_valid, take_date,
+        lose_date, pym, wbm, crte_id, crte_name, crte_time,tcmdrug_used_way) values
+        <foreach collection="insureItemMatchDTOList" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.insureRegCode}, #{item.itemCode}, #{item.molssItemId},
+            #{item.pqccItemId}, #{item.hospItemId}, #{item.hospItemName}, #{item.hospItemCode}, #{item.hospItemType},
+            #{item.hospItemSpec}, #{item.hospItemUnitCode}, #{item.hospItemPrepCode}, #{item.hospItemPrice},
+            #{item.insureItemName}, #{item.insureItemCode}, #{item.insureItemType}, #{item.insureItemSpec},
+            #{item.insureItemUnitCode}, #{item.insureItemPrepCode}, #{item.insureItemPrice}, #{item.deductible},
+            #{item.standardCode}, #{item.checkPrice}, #{item.manufacturer}, #{item.auditCode}, #{item.isMatch},
+            #{item.isTrans}, #{item.isValid},
+            #{item.takeDate}, #{item.loseDate}, #{item.pym}, #{item.wbm}, #{item.crteId}, #{item.crteName},
+            #{item.crteTime},#{item.tcmdrugUsedWay}
+            )
+        </foreach>
+    </insert>
+    <!--同步修改医院匹配药品数据-->
+    <update id="updateHospDrug">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_item_match
+            <set>
+                <if test="item.bigTypeCode != null and item.bigTypeCode != ''">
+                    item_code = #{item.bigTypeCode},
+                </if>
+                <if test="item.nationCode != null and item.nationCode != ''">
+                    pqcc_item_id = #{item.nationCode},
+                </if>
+                <if test="item.id != null and item.id != ''">
+                    hosp_item_id = #{item.id},
+                </if>
+                <if test="item.goodName != null and item.goodName != ''">
+                    hosp_item_name = #{item.goodName},
+                </if>
+                <if test="item.code != null and item.code != ''">
+                    hosp_item_code = #{item.code},
+                </if>
+                <if test="item.typeCode != null and item.typeCode != ''">
+                    hosp_item_type = #{item.typeCode},
+                </if>
+                <if test="item.spec != null and item.spec != ''">
+                    hosp_item_spec = #{item.spec},
+                </if>
+                <if test="item.unitCode != null and item.unitCode != ''">
+                    hosp_item_unit_code = #{item.unitCode},
+                </if>
+                <if test="item.prepCode != null and item.prepCode != ''">
+                    hosp_item_prep_code = #{item.prepCode},
+                </if>
+                <if test="item.price != null and item.price != ''">
+                    hosp_item_price = #{item.price},
+                </if>
+                <if test="item.insureCode != null and item.insureCode != ''">
+                    standard_code = #{item.insureCode},
+                </if>
+                <if test="item.goodPym != null and item.goodPym != ''">
+                    pym = #{item.goodPym},
+                </if>
+                <if test="item.goodWbm != null and item.goodWbm != ''">
+                    wbm = #{item.goodWbm},
+                </if>
+                <if test="item.tcmdrugUsedWay != null and item.tcmdrugUsedWay != ''">
+                    wbm = #{item.tcmdrugUsedWay},
+                </if>
+            </set>
+            where hosp_item_id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--同步修改医院匹配项目数据-->
+    <update id="updateHospItem">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_item_match
+            <set>
+                <if test="item.name != null and item.name != ''">
+                    hosp_item_name = #{item.name},
+                </if>
+                <if test="item.code != null and item.code != ''">
+                    hosp_item_code = #{item.code},
+                </if>
+                <if test="item.typeCode != null and item.typeCode != ''">
+                    hosp_item_type = #{item.typeCode},
+                </if>
+                <if test="item.spec != null and item.spec != ''">
+                    hosp_item_spec = #{item.spec},
+                </if>
+                <if test="item.unitCode != null and item.unitCode != ''">
+                    hosp_item_unit_code = #{item.unitCode},
+                </if>
+                <if test="item.price != null and item.price != ''">
+                    hosp_item_price = #{item.price},
+                </if>
+                <if test="item.namePym != null and item.namePym != ''">
+                    pym = #{item.namePym},
+                </if>
+                <if test="item.nameWbm != null and item.nameWbm != ''">
+                    wbm = #{item.nameWbm},
+                </if>
+                <if test="item.tcmdrugUsedWay != null and item.tcmdrugUsedWay != ''">
+                    wbm = #{item.tcmdrugUsedWay},
+                </if>
+            </set>
+            where hosp_item_id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--同步修改医院匹配项目数据-->
+    <update id="updateHospMaterial">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_item_match
+            <set>
+                <if test="item.name != null and item.name != ''">
+                    hosp_item_name = #{item.name},
+                </if>
+                <if test="item.code != null and item.code != ''">
+                    hosp_item_code = #{item.code},
+                </if>
+                <if test="item.typeCode != null and item.typeCode != ''">
+                    hosp_item_type = #{item.typeCode},
+                </if>
+                <if test="item.spec != null and item.spec != ''">
+                    hosp_item_spec = #{item.spec},
+                </if>
+                <if test="item.unitCode != null and item.unitCode != ''">
+                    hosp_item_unit_code = #{item.unitCode},
+                </if>
+                <if test="item.price != null and item.price != ''">
+                    hosp_item_price = #{item.price},
+                </if>
+                <if test="item.pym != null and item.pym != ''">
+                    pym = #{item.pym},
+                </if>
+                <if test="item.wbm != null and item.wbm != ''">
+                    wbm = #{item.wbm},
+                </if>
+                <if test="item.tcmdrugUsedWay != null and item.tcmdrugUsedWay != ''">
+                    wbm = #{item.tcmdrugUsedWay},
+                </if>
+            </set>
+            where hosp_item_id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+<!--    <update id="updateInsureItemMatchS" parameterType="java.util.List">-->
+<!--        update insure_item_match-->
+<!--        <trim prefix="set" suffixOverrides=",">-->
+<!--            item_code =-->
+<!--            <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                =#{item.hospItemCode}-->
+<!--                then #{item.itemCode}-->
+<!--                insure_item_code =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.insureItemCode}-->
+<!--                </foreach>-->
+<!--                insure_item_name =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.insureItemName}-->
+<!--                </foreach>-->
+<!--                insure_reg_code =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.insureRegCode}-->
+<!--                </foreach>-->
+<!--                is_valid =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.isValid}-->
+<!--                </foreach>-->
+<!--                is_match =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.isMatch}-->
+<!--                </foreach>-->
+<!--                audit_code =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode-->
+<!--                    =#{item.hospItemCode}-->
+<!--                    then #{item.auditCode}-->
+<!--                </foreach>-->
+<!--                is_trans =-->
+<!--                <foreach collection="list" item="item" open="case " close=" end,">-->
+<!--                    when hospCode =#{item.hospCode} and insureRegCode =#{item.insureRegCode} and hospItemCode =#{item.hospItemCode}-->
+<!--                    then #{item.isTrans}-->
+<!--                </foreach>-->
+<!--            </foreach>-->
+<!--        </trim>-->
+<!--        where-->
+<!--        <foreach collection="list" item="item" open="( " separator=") or (" close=" )">-->
+<!--            hosp_code=#{item.hospCode}-->
+<!--            and insure_reg_code=#{item.insureRegCode}-->
+<!--            and hosp_item_code =#{item.hospItemCode}-->
+<!--        </foreach>-->
+
+<!--    </update>-->
+<!--    同步修改医保药品、项目匹配项目数据-->
+        <update id="updateInsureItemMatchS" parameterType="java.util.List">
+            <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+                update insure_item_match
+                <set>
+                    <if test="item.itemCode != null and item.itemCode != ''">
+                        item_code = #{item.itemCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.molssItemId != null and item.molssItemId != ''">
+                        molss_item_id = #{item.molssItemId,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.pqccItemId != null and item.pqccItemId != ''">
+                        pqcc_item_id = #{item.pqccItemId,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemId != null and item.hospItemId != ''">
+                        hosp_item_id = #{item.hospItemId,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemName != null and item.hospItemName != ''">
+                        hosp_item_name = #{item.hospItemName,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemCode != null and item.hospItemCode != ''">
+                        hosp_item_code = #{item.hospItemCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemType != null and item.hospItemType != ''">
+                        hosp_item_type = #{item.hospItemType,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemSpec != null and item.hospItemSpec != ''">
+                        hosp_item_spec = #{item.hospItemSpec,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemUnitCode != null and item.hospItemUnitCode != ''">
+                        hosp_item_unit_code = #{item.hospItemUnitCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemPrepCode != null and item.hospItemPrepCode != ''">
+                        hosp_item_prep_code = #{item.hospItemPrepCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.hospItemPrice != null">
+                        hosp_item_price = #{item.hospItemPrice,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemName != null and item.insureItemName != ''">
+                        insure_item_name = #{item.insureItemName,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemCode != null and item.insureItemCode != ''">
+                        insure_item_code = #{item.insureItemCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemType != null and item.insureItemType != ''">
+                        insure_item_type = #{item.insureItemType,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemSpec != null and item.insureItemSpec != ''">
+                        insure_item_spec = #{item.insureItemSpec,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemUnitCode != null and item.insureItemUnitCode != ''">
+                        insure_item_unit_code = #{item.insureItemUnitCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemPrepCode != null and item.insureItemPrepCode != ''">
+                        insure_item_prep_code = #{item.insureItemPrepCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.insureItemPrice != null">
+                        insure_item_price = #{item.insureItemPrice,jdbcType=DECIMAL},
+                    </if>
+                    <if test="item.deductible != null and item.deductible != ''">
+                        deductible = #{item.deductible,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.standardCode != null and item.standardCode != ''">
+                        standard_code = #{item.standardCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.checkPrice != null">
+                        check_price = #{item.checkPrice,jdbcType=DECIMAL},
+                    </if>
+                    <if test="item.manufacturer != null and item.manufacturer != ''">
+                        manufacturer = #{item.manufacturer,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.auditCode != null and item.auditCode != ''">
+                        audit_code = #{item.auditCode,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.isMatch != null and item.isMatch != ''">
+                        is_match = #{item.isMatch,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.isTrans != null and item.isTrans != ''">
+                        is_trans = #{item.isTrans,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.isValid != null and item.isValid != ''">
+                        is_valid = #{item.isValid,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.takeDate != null">
+                        take_date = #{item.takeDate,jdbcType=TIMESTAMP},
+                    </if>
+                    <if test="item.loseDate != null">
+                        lose_date = #{item.loseDate,jdbcType=TIMESTAMP}
+                    </if>
+                </set>
+                where hosp_code = #{item.hospCode}
+                <if test="item.id != null and item.id != ''">
+                    and id = #{item.id,jdbcType=VARCHAR }
+                </if>
+                <if test="item.insureRegCode != null and item.insureRegCode != ''">
+                    and  insure_reg_code= #{item.insureRegCode,jdbcType=VARCHAR }
+                </if>
+                <if test="item.hospItemCode != null and item.hospItemCode != ''">
+                    and hosp_item_code= #{item.hospItemCode,jdbcType=VARCHAR }
+                </if>
+                <if test="item.tcmdrugUsedWay != null and item.tcmdrugUsedWay != ''">
+                    wbm = #{item.tcmdrugUsedWay},
+                </if>
+            </foreach>
+        </update>
+    <update id="deleteInsureMatch" parameterType="map">
+        delete
+        from insure_item_match
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+    <update id="modifyInsureItem" parameterType="java.util.List">
+            <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+                update insure_item_match
+                <set>
+                    <if test="item.isTrans != null and item.isTrans != ''">
+                        is_trans = #{item.isTrans,jdbcType=VARCHAR},
+                    </if>
+                    <if test="item.auditCode != null and item.auditCode != ''">
+                        audit_code = #{item.auditCode,jdbcType=VARCHAR},
+                    </if>
+                </set>
+
+                where hosp_code = #{item.hospCode}
+                <if test="item.id != null and item.id != ''">
+                    and id = #{item.id,jdbcType=VARCHAR }
+                </if>
+                <if test="item.insureRegCode != null and item.insureRegCode != ''">
+                    and  insure_reg_code= #{item.insureRegCode,jdbcType=VARCHAR }
+                </if>
+                <if test="item.hospItemCode != null and item.hospItemCode != ''">
+                    and hosp_item_code= #{item.hospItemCode,jdbcType=VARCHAR }
+                </if>
+                <if test="item.insureItemCode != null and item.insureItemCode != ''">
+                    and insure_item_code = #{item.insureItemCode,jdbcType=VARCHAR }
+                </if>
+            </foreach>
+    </update>
+    <update id="updateInsureItemMatch">
+            update insure_item_match
+            <set>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code = #{hospCode},
+                </if>
+                <if test="insureRegCode != null and insureRegCode != ''">
+                    insure_reg_code = #{insureRegCode},
+                </if>
+                <if test="itemCode != null and itemCode != ''">
+                    item_code = #{itemCode},
+                </if>
+                <if test="molssItemId != null and molssItemId != ''">
+                    molss_item_id = #{molssItemId},
+                </if>
+                <if test="pqccItemId != null and pqccItemId != ''">
+                    pqcc_item_id = #{pqccItemId},
+                </if>
+                <if test="hospItemId != null and hospItemId != ''">
+                    hosp_item_id = #{hospItemId},
+                </if>
+                <if test="hospItemName != null and hospItemName != ''">
+                    hosp_item_name = #{hospItemName},
+                </if>
+                <if test="hospItemCode != null and hospItemCode != ''">
+                    hosp_item_code = #{hospItemCode},
+                </if>
+                <if test="hospItemType != null and hospItemType != ''">
+                    hosp_item_type = #{hospItemType},
+                </if>
+                <if test="hospItemSpec != null and hospItemSpec != ''">
+                    hosp_item_spec = #{hospItemSpec},
+                </if>
+                <if test="hospItemUnitCode != null and hospItemUnitCode != ''">
+                    hosp_item_unit_code = #{hospItemUnitCode},
+                </if>
+                <if test="hospItemPrepCode != null and hospItemPrepCode != ''">
+                    hosp_item_prep_code = #{hospItemPrepCode},
+                </if>
+                <if test="hospItemPrice != null">
+                    hosp_item_price = #{hospItemPrice},
+                </if>
+                <if test="insureItemName != null and insureItemName != ''">
+                    insure_item_name = #{insureItemName},
+                </if>
+                <if test="insureItemCode != null and insureItemCode != ''">
+                    insure_item_code = #{insureItemCode},
+                </if>
+                <if test="insureItemType != null and insureItemType != ''">
+                    insure_item_type = #{insureItemType},
+                </if>
+                <if test="insureItemSpec != null and insureItemSpec != ''">
+                    insure_item_spec = #{insureItemSpec},
+                </if>
+                <if test="insureItemUnitCode != null and insureItemUnitCode != ''">
+                    insure_item_unit_code = #{insureItemUnitCode},
+                </if>
+                <if test="insureItemPrepCode != null and insureItemPrepCode != ''">
+                    insure_item_prep_code = #{insureItemPrepCode},
+                </if>
+                <if test="insureItemPrice != null">
+                    insure_item_price = #{insureItemPrice},
+                </if>
+                <if test="deductible != null and deductible != ''">
+                    deductible = #{deductible},
+                </if>
+                <if test="standardCode != null and standardCode != ''">
+                    standard_code = #{standardCode},
+                </if>
+                <if test="checkPrice != null">
+                    check_price = #{checkPrice},
+                </if>
+                <if test="manufacturer != null and manufacturer != ''">
+                    manufacturer = #{manufacturer},
+                </if>
+                <if test="auditCode != null and auditCode != ''">
+                    audit_code = #{auditCode},
+                </if>
+                <if test="isMatch != null and isMatch != ''">
+                    is_match = #{isMatch},
+                </if>
+                <if test="isTrans != null and isTrans != ''">
+                    is_trans = #{isTrans},
+                </if>
+                <if test="isValid != null and isValid != ''">
+                    is_valid = #{isValid},
+                </if>
+                <if test="takeDate != null">
+                    take_date = #{takeDate},
+                </if>
+                <if test="loseDate != null">
+                    lose_date = #{loseDate},
+                </if>
+                <if test="pym != null and pym != ''">
+                    pym = #{pym},
+                </if>
+                <if test="wbm != null and wbm != ''">
+                    wbm = #{wbm},
+                </if>
+                <if test="crteId != null and crteId != ''">
+                    crte_id = #{crteId},
+                </if>
+                <if test="crteName != null and crteName != ''">
+                    crte_name = #{crteName},
+                </if>
+                <if test="crteTime != null">
+                    crte_time = #{crteTime},
+                </if>
+                <if test="lmtUserFlag != null and lmtUserFlag != ''">
+                    lmt_user_flag = #{lmtUserFlag},
+                </if>
+                <if test="limUserExplain != null and limUserExplain != ''">
+                    lim_user_explain = #{limUserExplain},
+                </if>
+                <if test="tcmdrugUsedWay != null and tcmdrugUsedWay != ''">
+                    tcmdrug_used_way = #{tcmdrugUsedWay},
+                </if>
+            </set>
+            where id = #{id}
+        </update>
+    <delete id="deleteHospItem">
+        delete
+        from insure_item_match
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+    </delete>
+    <delete id="deleteInsureItemMatch">
+        delete  from insure_item_match where hosp_code =#{hospCode} and id =#{id}
+    </delete>
+    <delete id="deleteBatchInusreItemMatch">
+        delete from insure_item_match where  insure_item_code in
+        <foreach collection="insureItemMatchDTOList" item="item" index="index" separator=",">
+            #{item.insureItemCode}
+        </foreach>
+
+    </delete>
+    <delete id="deleteUnifiedInsureItemMatch">
+        delete  from insure_item_match where hosp_code =#{hospCode} and insure_reg_code =#{insureRegCode} and id =#{id}
+    </delete>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryInsureMatchItem" parameterType="java.util.Map" resultMap="InsureItemMatchMap">
+        select
+        id, hosp_code, insure_reg_code, item_code, pqcc_item_id, hosp_item_id, hosp_item_name,
+        hosp_item_code, hosp_item_type, hosp_item_spec, hosp_item_unit_code, hosp_item_prep_code, hosp_item_price,
+        insure_item_name, insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
+        insure_item_prep_code, insure_item_price, deductible, standard_code, check_price, manufacturer, audit_code,
+        is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name, crte_time,tcmdrug_used_way
+        from insure_item_match where hosp_code=#{hospCode} and is_match='1' and is_valid ='1'
+        and hosp_item_id=#{xmid} and insure_reg_code=#{insureRegCode}
+        <if test="itemCode !='' and itemCode !=null">
+            and item_code=#{itemCode}
+        </if>
+    </select>
+
+    <!--	根据项目id 查询出药品和对应的生产厂家-->
+    <select id="queryDrugAndProdcut" parameterType="map" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select a.type_code,a.big_type_code,a.code,
+        (select d.name from base_product d where d.code = a.prod_code) as prodName
+        from base_drug a where a.hosp_code = #{hospCode}
+        <if test="xmid !='' and xmid !=null">
+            and id =#{xmid}
+        </if>
+    </select>
+    <!--	根据项目id 查询出材料和对应的生产厂家-->
+    <select id="queryMaterialAndProduct" parameterType="map" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO">
+        select a.type_code,a.code,
+        (select d.name from base_product d where d.code = a.prod_code) as prodName
+        from base_material a where a.hosp_code = #{hospCode}
+        <if test="xmid !='' and xmid !=null">
+            and id =#{xmid}
+        </if>
+    </select>
+
+    <select id="queryByHospItemId" parameterType="java.util.Map" resultMap="InsureItemMatchMap">
+        SELECT
+        id,
+        hosp_code,
+        insure_reg_code,
+        item_code,
+        pqcc_item_id,
+        hosp_item_id,
+        hosp_item_name,
+        hosp_item_code,
+        hosp_item_type,
+        hosp_item_spec,
+        hosp_item_unit_code,
+        hosp_item_prep_code,
+        hosp_item_price,
+        insure_item_name,
+        insure_item_code,
+        insure_item_type,
+        insure_item_spec,
+        insure_item_unit_code,
+        insure_item_prep_code,
+        insure_item_price,
+        deductible,
+        standard_code,
+        check_price,
+        manufacturer,
+        audit_code,
+        is_match,
+        is_trans,
+        is_valid,
+        take_date,
+        lose_date,
+        pym,
+        wbm,
+        crte_id,
+        crte_name,
+        crte_time
+        FROM
+        insure_item_match
+        where
+        hosp_code = #{hospCode}
+        AND is_valid = #{isValid}
+        AND is_match = #{isMatch}
+        AND hosp_item_id in (
+        <foreach collection="itemIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="queryItemIsMatch" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select id,
+               insure_reg_code,
+               item_code,
+               hosp_item_id,
+               hosp_item_name,
+               hosp_item_code,
+               hosp_item_type,
+               insure_item_name,
+               insure_item_code,
+               insure_item_type,
+               audit_code,
+               is_match,
+               crte_id,
+               crte_name,
+               crte_time
+        from insure_item_match
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+          and hosp_item_id = #{hospItemId}
+          and hosp_item_code = #{hospItemCode}
+          and is_match = '1'
+    </select>
+
+    <select id="selectAllInsureItemMatchs" parameterType="java.util.Map" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select * from insure_item_match where hosp_item_code = #{hospCode} and insure_reg_code = #{insureRegCode} and insure_item_code is not null
+    </select>
+    <select id="selectById" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select * from insure_item_match where hosp_code =#{hospCode} and insure_reg_code =#{insureRegCode} and hosp_item_id =#{hospItemId}
+    </select>
+
+    <select id="selectInsureItemMatch" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select id, hosp_code, insure_reg_code, item_code, molss_item_id, pqcc_item_id,
+               hosp_item_id, hosp_item_name, hosp_item_code, hosp_item_type, hosp_item_spec,
+               hosp_item_unit_code, hosp_item_prep_code, hosp_item_price, insure_item_name,
+               insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
+               insure_item_prep_code, insure_item_price, deductible, standard_code, check_price,
+               manufacturer, audit_code,
+               is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name,
+               crte_time  from insure_item_match  where hosp_code =#{hospCode} and id = #{id}
+    </select>
+
+    <update id="updateInsureItemMatchInfo" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update insure_item_match
+                <set>
+                    insure_item_code = #{item.insureItemCode},
+                    insure_item_name = #{item.insureItemName},
+                    audit_code = '1',
+                    is_match = '1',
+                    is_trans = '1',
+                    is_valid = '1'
+                </set>
+            where
+                insure_reg_code = #{item.insureRegCode} and hosp_item_code = #{item.hospItemCode} and hosp_item_name = #{item.hospItemName} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+    
+    <select id="queryAllDrugsInfo" parameterType="java.util.Map" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select
+            a.id, a.hosp_code, a.bfc_code, a.type_code, a.big_type_code, a.code,
+            a.usual_name, a.good_name, a.spec,a.prep_code, a.dosage,a.dosage_unit_code,
+            a.out_unit_code, a.in_unit_code, a.rate_code, a.price, a.unit_code,
+            a.last_buy_price, a.last_split_buy_price,a.avg_buy_price,a.avg_sell_price,
+            a.split_ratio, a.split_unit_code, a.split_price, a.is_out, a.is_in,
+            a.is_lvp, a.usage_code,a.insure_code,a.nation_code, a.drug_remark,
+            a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
+            a.ddd, a.durg_code,a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic,
+            a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,a.usual_wbm,
+            a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time
+       from base_drug a
+      where a.hosp_code = #{hospCode} and a.is_valid = #{isValid}
+    </select>
+
+    <select id="queryAllItemsInfo" parameterType="java.util.Map" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+        select
+            a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name,
+            a.abbr, a.spec, a.price, a.one_price,a.two_price,a.three_price, a.unit_code,
+            a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+            a.is_supp_curtain,a.other_name,a.out_dept_code, a.in_dept_code, a.name_pym,
+            a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,a.crte_name, a.crte_time
+        from base_item a
+        where a.hosp_code = #{hospCode} and a.is_valid = #{isValid}
+    </select>
+
+    <select id="queryAllMaterialsInfo" parameterType="java.util.Map" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO">
+        select
+            bm.id, bm.hosp_code, bm.type_code, bm.bfc_code, bm.code,bm.nation_code,
+            bm.name, bm.spec, bm.price, bm.unit_code, bm.split_ratio, bm.split_unit_code,
+            bm.split_price,bm.is_supp_curtain, bm.use_code, bm.remark, bm.prod_code,
+            bm.reg_cert_no,bm.pym, bm.wbm, bm.is_valid, bm.crte_id, bm.crte_name,
+            bm.crte_time,bm.other_name,bm.last_buy_price,bm.last_split_buy_price,
+            bm.avg_buy_price,bm.avg_sell_price,bm.model
+        from base_material bm
+        where bm.hosp_code = #{hospCode} and bm.is_valid = #{isValid}
+    </select>
+
+</mapper>

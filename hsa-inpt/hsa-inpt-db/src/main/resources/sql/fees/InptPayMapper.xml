@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.inpt.fees.dao.InptPayDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="inptPayDtoMap" type="cn.hsa.module.inpt.fees.dto.InptPayDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="pay_code" property="payCode" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="service_price" property="servicePrice" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code, 
+        settle_id, 
+        visit_id, 
+        pay_code, 
+        price, 
+        order_no, 
+        service_price
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        ip.id, 
+        ip.hosp_code, 
+        ip.settle_id, 
+        ip.visit_id, 
+        ip.pay_code, 
+        ip.price, 
+        ip.order_no, 
+        ip.service_price
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultType="cn.hsa.module.inpt.fees.entity.InptPayDO" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        inpt_pay
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.inpt.fees.entity.InptPayDO">
+        insert into
+        inpt_pay
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          pay_code,
+          price,
+          order_no,
+          service_price
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{settleId,jdbcType=VARCHAR}, 
+          #{visitId,jdbcType=VARCHAR}, 
+          #{payCode,jdbcType=VARCHAR}, 
+          #{price,jdbcType=DECIMAL}, 
+          #{orderNo,jdbcType=VARCHAR}, 
+          #{servicePrice,jdbcType=DECIMAL}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.inpt.fees.entity.InptPayDO" >
+        insert into
+        inpt_pay
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                    settle_id, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                    pay_code, 
+                </if>
+                <if test="price != null">
+                    price, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                    order_no, 
+                </if>
+                <if test="servicePrice != null">
+                    service_price
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                        #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                        #{payCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="price != null">
+                        #{price,jdbcType=DECIMAL}, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                        #{orderNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="servicePrice != null">
+                        #{servicePrice,jdbcType=DECIMAL}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.inpt.fees.entity.InptPayDO" >
+        update
+        inpt_pay
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                pay_code = #{payCode,jdbcType=VARCHAR}, 
+                price = #{price,jdbcType=DECIMAL}, 
+                order_no = #{orderNo,jdbcType=VARCHAR}, 
+                service_price = #{servicePrice,jdbcType=DECIMAL}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.inpt.fees.entity.InptPayDO" >
+        update
+        inpt_pay
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="price != null">
+                price = #{price,jdbcType=DECIMAL}, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="servicePrice != null">
+                service_price = #{servicePrice,jdbcType=DECIMAL}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM inpt_pay WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM inpt_pay WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="inptPayDtoMap" parameterType="cn.hsa.module.inpt.fees.dto.InptPayDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM inpt_pay ip 
+        where
+        ip.hosp_code = #{hospCode}
+        <if test="settleId != null and settleId != ''">
+            AND ip.settle_id = #{settleId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            AND ip.visit_id = #{visitId}
+        </if>
+    </select>
+
+    <!-- 批量新增发票信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into
+        inpt_pay
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          pay_code,
+          price,
+          order_no,
+          service_price
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.payCode,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.orderNo,jdbcType=VARCHAR},
+            #{item.servicePrice,jdbcType=DECIMAL}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据结算id查询支付信息 -->
+    <select id="queryInptPayBySettleId" resultType="cn.hsa.module.inpt.fees.entity.InptPayDO" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        inpt_pay
+        where settle_id = #{settleId}
+    </select>
+
+</mapper>

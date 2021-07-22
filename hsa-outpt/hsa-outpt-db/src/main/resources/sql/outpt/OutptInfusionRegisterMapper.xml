@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.infusionRegister.dao.OutptInfusionRegisterDAO">
+    <resultMap id="outptVisitDTOMap" type="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        <id property="id" column="id" jdbcType="VARCHAR"></id>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"></result>
+        <result property="registerId" column="register_id" jdbcType="VARCHAR"></result>
+        <result property="registerNo" column="register_no" jdbcType="VARCHAR"></result>
+        <result property="name" column="name" jdbcType="VARCHAR"></result>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"></result>
+        <result property="age" column="age" jdbcType="BIGINT"></result>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"></result>
+        <result property="birthday" column="birthday" jdbcType="DATE"></result>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"></result>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"></result>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"></result>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"></result>
+        <result property="phone" column="phone" jdbcType="VARCHAR"></result>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"></result>
+        <result property="visitCode" column="visit_code" jdbcType="VARCHAR"></result>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"></result>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"></result>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"></result>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"></result>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"></result>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"></result>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"></result>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"></result>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"></result>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"></result>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"></result>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"></result>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"></result>
+        <result property="visitTime" column="visit_time" jdbcType="DATE"></result>
+        <result property="remark" column="remark" jdbcType="VARCHAR"></result>
+        <result property="pym" column="pym" jdbcType="VARCHAR"></result>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"></result>
+        <result property="isVisit" column="is_visit" jdbcType="VARCHAR"></result>
+        <result property="tranInCode" column="tran_in_code" jdbcType="VARCHAR"></result>
+        <result property="isFirstVisit" column="is_first_visit" jdbcType="VARCHAR"></result>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"></result>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"></result>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"></result>
+        <result property="diseaseId" column="disease_id" jdbcType="VARCHAR"></result>
+        <result property="diseaseName" column="disease_name" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <resultMap id="outptInfusionRegisterDTOMap"
+               type="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
+        <id property="id" column="id" jdbcType="VARCHAR"></id>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+        <result property="opdId" column="opd_id" jdbcType="VARCHAR"></result>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"></result>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"></result>
+        <result property="execDate" column="exec_date" jdbcType="DATE"></result>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"></result>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"></result>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"></result>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"></result>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"></result>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"></result>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <resultMap id="outptPrescribeDetailsDTOMap"
+               type="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        <id property="id" column="id" jdbcType="VARCHAR"></id>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+        <result property="opId" column="op_id" jdbcType="VARCHAR"></result>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"></result>
+        <result property="optId" column="opt_id" jdbcType="VARCHAR"></result>
+        <result property="optdGroupNo" column="optd_group_no" jdbcType="BIGINT"></result>
+        <result property="optdGroupSeqNo" column="optd_group_seq_no" jdbcType="BIGINT"></result>
+        <result property="optdId" column="optd_id" jdbcType="VARCHAR"></result>
+        <result property="groupNo" column="group_no" jdbcType="BIGINT"></result>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="BIGINT"></result>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"></result>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"></result>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"></result>
+        <result property="price" column="price" jdbcType="DECIMAL"></result>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"></result>
+        <result property="spec" column="spec" jdbcType="VARCHAR"></result>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"></result>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"></result>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"></result>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"></result>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"></result>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"></result>
+        <result property="useDays" column="use_days" jdbcType="BIGINT"></result>
+        <result property="num" column="num" jdbcType="DECIMAL"></result>
+        <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"></result>
+        <result property="totalNum" column="total_num" jdbcType="DECIMAL"></result>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"></result>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"></result>
+        <result property="isPositive" column="is_positive" jdbcType="VARCHAR"></result>
+        <result property="content" column="content" jdbcType="VARCHAR"></result>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"></result>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"></result>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"></result>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"></result>
+        <result property="execDate" column="exec_date" jdbcType="DATE"></result>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"></result>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"></result>
+        <result property="execNum" column="exec_num" jdbcType="BIGINT"></result>
+        <result property="technologyNo" column="technology_no" jdbcType="VARCHAR"></result>
+        <result property="skinDurgId" column="skin_durg_id" jdbcType="VARCHAR"></result>
+        <result property="skinPharId" column="skin_phar_id" jdbcType="VARCHAR"></result>
+        <result property="skinUnitCode" column="skin_unit_code" jdbcType="VARCHAR"></result>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"></result>
+        <result property="skinResultCode" column="skin_result_code" jdbcType="VARCHAR"></result>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"></result>
+        <result property="registerNum" column="register_num" jdbcType="INTEGER"></result>
+        <result property="rateName" column="rate_name" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <resultMap id="outptVisitDTOMaps" type="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        <id property="id" column="id" jdbcType="VARCHAR"></id>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"></result>
+        <result property="registerId" column="register_id" jdbcType="VARCHAR"></result>
+        <result property="registerNo" column="register_no" jdbcType="VARCHAR"></result>
+        <result property="name" column="name" jdbcType="VARCHAR"></result>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"></result>
+        <result property="age" column="age" jdbcType="BIGINT"></result>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"></result>
+        <result property="birthday" column="birthday" jdbcType="DATE"></result>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"></result>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"></result>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"></result>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"></result>
+        <result property="phone" column="phone" jdbcType="VARCHAR"></result>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"></result>
+        <result property="visitCode" column="visit_code" jdbcType="VARCHAR"></result>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"></result>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"></result>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"></result>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"></result>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"></result>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"></result>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"></result>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"></result>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"></result>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"></result>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"></result>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"></result>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"></result>
+        <result property="visitTime" column="visit_time" jdbcType="TIMESTAMP"></result>
+        <result property="remark" column="remark" jdbcType="VARCHAR"></result>
+        <result property="pym" column="pym" jdbcType="VARCHAR"></result>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"></result>
+        <result property="isVisit" column="is_visit" jdbcType="VARCHAR"></result>
+        <result property="tranInCode" column="tran_in_code" jdbcType="VARCHAR"></result>
+        <result property="isFirstVisit" column="is_first_visit" jdbcType="VARCHAR"></result>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"></result>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"></result>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"></result>
+        <collection property="outptPrescribeDetailsDTOList"
+                    ofType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO"
+                    javaType="java.util.List">
+            <id property="id" column="opd_id" jdbcType="VARCHAR"></id>
+            <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+            <result property="opId" column="op_id" jdbcType="VARCHAR"></result>
+            <result property="visitId" column="visit_id" jdbcType="VARCHAR"></result>
+            <result property="optId" column="opt_id" jdbcType="VARCHAR"></result>
+            <result property="optdGroupNo" column="optd_group_no" jdbcType="BIGINT"></result>
+            <result property="optdGroupSeqNo" column="optd_group_seq_no" jdbcType="BIGINT"></result>
+            <result property="optdId" column="optd_id" jdbcType="VARCHAR"></result>
+            <result property="groupNo" column="group_no" jdbcType="BIGINT"></result>
+            <result property="groupSeqNo" column="group_seq_no" jdbcType="BIGINT"></result>
+            <result property="itemCode" column="item_code" jdbcType="VARCHAR"></result>
+            <result property="itemId" column="item_id" jdbcType="VARCHAR"></result>
+            <result property="itemName" column="item_name" jdbcType="VARCHAR"></result>
+            <result property="price" column="price" jdbcType="DECIMAL"></result>
+            <result property="totalPrice" column="total_price" jdbcType="DECIMAL"></result>
+            <result property="spec" column="spec" jdbcType="VARCHAR"></result>
+            <result property="prepCode" column="prep_code" jdbcType="VARCHAR"></result>
+            <result property="dosage" column="dosage" jdbcType="DECIMAL"></result>
+            <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"></result>
+            <result property="usageCode" column="usage_code" jdbcType="VARCHAR"></result>
+            <result property="rateId" column="rate_id" jdbcType="VARCHAR"></result>
+            <result property="speedCode" column="speed_code" jdbcType="VARCHAR"></result>
+            <result property="useDays" column="use_days" jdbcType="BIGINT"></result>
+            <result property="num" column="num" jdbcType="DECIMAL"></result>
+            <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"></result>
+            <result property="totalNum" column="total_num" jdbcType="DECIMAL"></result>
+            <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"></result>
+            <result property="isSkin" column="is_skin" jdbcType="VARCHAR"></result>
+            <result property="isPositive" column="is_positive" jdbcType="VARCHAR"></result>
+            <result property="content" column="content" jdbcType="VARCHAR"></result>
+            <result property="pharId" column="phar_id" jdbcType="VARCHAR"></result>
+            <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"></result>
+            <result property="useCode" column="use_code" jdbcType="VARCHAR"></result>
+            <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"></result>
+            <result property="execDate" column="exec_date" jdbcType="DATE"></result>
+            <result property="execId" column="exec_id" jdbcType="VARCHAR"></result>
+            <result property="execName" column="exec_name" jdbcType="VARCHAR"></result>
+            <result property="execNum" column="exec_num" jdbcType="BIGINT"></result>
+            <result property="technologyNo" column="technology_no" jdbcType="VARCHAR"></result>
+            <result property="skinDurgId" column="skin_durg_id" jdbcType="VARCHAR"></result>
+            <result property="skinPharId" column="skin_phar_id" jdbcType="VARCHAR"></result>
+            <result property="skinUnitCode" column="skin_unit_code" jdbcType="VARCHAR"></result>
+            <result property="skinResultCode" column="skin_result_code" jdbcType="VARCHAR"></result>
+        </collection>
+    </resultMap>
+
+    <!--根据条件分页《未登记》查询患者列表-->
+    <select id="queryPageNoRegister" resultMap="outptVisitDTOMaps" parameterType="java.util.Map">
+        SELECT
+        a.id,
+        a.name,
+        a.age,
+        a.gender_code,
+        a.age_unit_code,
+        a.register_no,
+        a.visit_time,
+        a.dept_name,
+        a.doctor_name,
+        a.visit_no
+        FROM outpt_visit a
+        JOIN outpt_prescribe b ON a.id = b.visit_id and a.hosp_code = b.hosp_code
+        JOIN outpt_prescribe_detail c ON a.id = c.visit_id AND b.id = c.op_id and a.hosp_code = c.hosp_code
+        left JOIN (SELECT t1.opd_id, COUNT(t1.opd_id) as register_num, MAX(t1.hosp_code) as hosp_code FROM outpt_infusion_register t1 GROUP BY opd_id)  d on c.id = d.opd_id and a.hosp_code = d.hosp_code
+        WHERE a.is_visit = '1'
+        AND b.is_settle = '1'
+        AND b.is_cancel = '0'
+        AND c.exec_num > 0
+        and c.exec_num > IFNULL(d.register_num, 0)
+        AND a.hosp_code = #{outptInfusionRegisterDTO.hospCode}
+        <if test="outptInfusionRegisterDTO.visitTime != null and outptInfusionRegisterDTO.visitTime != ''">
+            AND DATE_FORMAT(a.visit_time,'%Y-%m-%d') = DATE_FORMAT(#{outptInfusionRegisterDTO.visitTime},'%Y-%m-%d')
+        </if>
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            AND c.usage_code IN
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptInfusionRegisterDTO.keyword != null and outptInfusionRegisterDTO.keyword != ''">
+            and a.name like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.cert_no = #{outptInfusionRegisterDTO.keyword}
+            or a.visit_no = #{outptInfusionRegisterDTO.keyword}
+        </if>
+        <if test="outptInfusionRegisterDTO.deptId != null and outptInfusionRegisterDTO.deptId != ''">
+            and a.dept_id = #{outptInfusionRegisterDTO.deptId}
+        </if>
+        group by a.id
+        ORDER BY a.crte_time DESC
+    </select>
+
+    <select id="queryPageByVisit" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO"
+            parameterType="java.util.Map">
+        SELECT
+        a.*
+        FROM outpt_visit a
+        JOIN outpt_prescribe b ON a.id = b.visit_id and a.hosp_code = b.hosp_code
+        JOIN outpt_prescribe_detail c ON a.id = c.visit_id AND b.id = c.op_id and a.hosp_code = c.hosp_code
+        WHERE a.is_visit = '1'
+        AND b.is_settle = '1'
+        AND b.is_cancel = '0'
+        AND c.exec_num > 0
+        AND a.hosp_code = #{outptInfusionRegisterDTO.hospCode}
+        <!--AND c.id NOT IN ( SELECT opd_id FROM outpt_infusion_register where a.hosp_code = hosp_code GROUP BY opd_id )-->
+        <if test="outptInfusionRegisterDTO.visitTime != null and outptInfusionRegisterDTO.visitTime != ''">
+            AND DATE_FORMAT(a.visit_time,'%Y-%m-%d') = DATE_FORMAT(#{outptInfusionRegisterDTO.visitTime},'%Y-%m-%d')
+        </if>
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            AND c.usage_code IN
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptInfusionRegisterDTO.keyword != null and outptInfusionRegisterDTO.keyword != ''">
+            and a.name like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.cert_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.visit_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+        </if>
+        <if test="outptInfusionRegisterDTO.deptId != null and outptInfusionRegisterDTO.deptId != ''">
+            and a.dept_id = #{outptInfusionRegisterDTO.deptId}
+        </if>
+        group by a.id
+        ORDER BY a.crte_time DESC
+    </select>
+
+    <select id="queryPage" resultMap="outptVisitDTOMap" parameterType="java.util.Map">
+        SELECT
+        a.*,
+        e.disease_id as disease_id,
+        (SELECT f.name from base_disease f where e.disease_id = f.id and e.hosp_code = f.hosp_code) as disease_name
+        FROM outpt_visit a
+        JOIN outpt_prescribe b ON a.id = b.visit_id and a.hosp_code = b.hosp_code
+        JOIN outpt_prescribe_detail c ON b.id = c.op_id AND a.id = c.visit_id and a.hosp_code = c.hosp_code and c.id not
+        in (SELECT opd_id FROM outpt_infusion_register where hosp_code = c.hosp_code GROUP BY opd_id)
+        JOIN outpt_prescribe_exec d ON c.id = d.opd_id AND a.id = d.visit_id and a.hosp_code = d.hosp_code
+        JOIN outpt_diagnose e on a.id = e.visit_id and a.hosp_code = e.hosp_code
+        WHERE a.is_visit = '1'
+        AND b.is_settle = '1'
+        AND b.is_cancel = '0'
+        AND (d.sign_code = '1' OR d.sign_code IS NULL)
+        and c.exec_num > 0
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            AND c.usage_code IN
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptInfusionRegisterDTO.keyword != null and outptInfusionRegisterDTO.keyword != ''">
+            and a.name like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.cert_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.visit_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+        </if>
+        AND a.hosp_code = #{outptInfusionRegisterDTO.hospCode}
+        AND DATE_FORMAT(a.crte_time,'%Y-%m-%d') = DATE_FORMAT(#{outptInfusionRegisterDTO.visitTime},'%Y-%m-%d')
+        ORDER BY a.crte_time desc
+    </select>
+
+    <!--根据条件分页《已登记》查询患者列表-->
+    <select id="queryPageByInfu" resultMap="outptVisitDTOMap" parameterType="java.util.Map">
+        SELECT distinct
+        a.*,b.order_no
+        FROM outpt_visit a
+        JOIN outpt_prescribe b ON a.id = b.visit_id and a.hosp_code = b.hosp_code
+        JOIN outpt_prescribe_detail c ON b.id = c.op_id AND a.id = c.visit_id and a.hosp_code = c.hosp_code
+        JOIN outpt_prescribe_exec d ON c.id = d.opd_id AND a.id = d.visit_id and a.hosp_code = d.hosp_code
+        WHERE a.is_visit = '1'
+        AND b.is_settle = '1'
+        AND b.is_cancel = '0'
+        AND (d.sign_code = '1' OR d.sign_code IS NULL)
+        AND c.exec_num > 0
+        AND c.id IN ( SELECT opd_id FROM outpt_infusion_register where hosp_code = a.hosp_code GROUP BY opd_id )
+        AND a.hosp_code = #{outptInfusionRegisterDTO.hospCode}
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            AND c.usage_code IN
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="outptInfusionRegisterDTO.keyword != null and outptInfusionRegisterDTO.keyword != ''">
+            and a.name like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.cert_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+            or a.visit_no like CONCAT('%',#{outptInfusionRegisterDTO.keyword},'%')
+        </if>
+        <if test="outptInfusionRegisterDTO.visitTime != null and outptInfusionRegisterDTO.visitTime != ''">
+            AND DATE_FORMAT(a.crte_time,'%Y-%m-%d') = DATE_FORMAT(#{outptInfusionRegisterDTO.visitTime},'%Y-%m-%d')
+        </if>
+        ORDER BY a.crte_time desc
+    </select>
+
+    <!--判断处方明细是否过登记-->
+    <select id="getByOptIds" parameterType="java.util.List" resultMap="outptInfusionRegisterDTOMap">
+        SELECT
+        a.*,
+        b.item_id,
+        b.item_name
+        FROM outpt_infusion_register a
+        JOIN outpt_prescribe_detail b ON a.opd_id = b.id AND a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        WHERE
+        b.id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getCountById" resultType="int" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select count(1)
+        from outpt_infusion_register
+        where visit_id = #{id}
+          and hosp_code = #{hospCode}
+    </select>
+
+    <!--输液登记-->
+    <insert id="saveByBatch" parameterType="java.util.List">
+        <foreach collection="dtoList" item="item" separator=";">
+            INSERT INTO outpt_infusion_register ( id, hosp_code, opd_id, visit_id, exec_dept_id, exec_date, exec_id,
+            exec_name, crte_id, crte_name, crte_time)
+            VALUES (#{item.id}, #{item.hospCode}, #{item.opdId}, #{item.visitId}, #{item.execDeptId}, #{item.execDate},
+            #{item.execId}, #{item.execName}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--根据患者visitId分页查询出对应的处方明细列表-->
+    <select id="getByVisitId" resultMap="outptPrescribeDetailsDTOMap" parameterType="java.util.Map">
+        SELECT
+        IFNULL(t1.register_num,0) as register_num,
+        a.*,
+        (select name from base_rate br where a.rate_id = br.id and a.hosp_code = br.hosp_code) as rate_name,
+        b.crte_time,
+        b.doctor_name,
+        b.order_no,
+        (select skin_result_code from outpt_skin_result osr where a.id = osr.opd_id and osr.hosp_code = a.hosp_code) as
+        skin_result_code
+        from outpt_prescribe_detail a
+        left JOIN outpt_prescribe b on a.op_id = b.id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        LEFT join (
+            SELECT
+                oir.opd_id,
+                IFNULL(count( oir.opd_id ),0) AS register_num,
+                oir.hosp_code
+            FROM
+                outpt_infusion_register oir
+            WHERE
+                oir.hosp_code = #{outptVisitDTO.hospCode}
+            GROUP BY
+                opd_id, hosp_code
+        ) t1 on a.id = t1.opd_id and a.hosp_code = t1.hosp_code
+        <!--left JOIN outpt_prescribe_exec c on a.id = c.opd_id and a.visit_id = c.visit_id and a.hosp_code = c.hosp_code-->
+        where b.is_settle = '1'
+        and b.is_cancel = '0'
+        <!--and (c.sign_code = '1' or c.sign_code is null)-->
+        and a.exec_num > 0
+        <!--and a.id not in (SELECT opd_id FROM outpt_infusion_register where hosp_code = a.hosp_code GROUP BY opd_id )-->
+        <!--and a.exec_num > (select COUNT(1) from outpt_infusion_register where hosp_code = a.hosp_code and opd_id = a.id GROUP BY opd_id)-->
+        <if test="usageCodeList != null and usageCodeList.size > 0">
+            and a.usage_code in
+            <foreach collection="usageCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        and a.visit_id = #{outptVisitDTO.id}
+        and a.hosp_code = #{outptVisitDTO.hospCode}
+        order by a.id asc, b.id asc
+    </select>
+
+    <!--根据配置的输液参数值和医院编码查询出输液的用法-->
+    <select id="findInfusionParam" resultType="string">
+        select value
+        from sys_parameter
+        where is_valid = '1'
+          and is_show = '1'
+          and hosp_code = #{hospCode}
+          and code = #{code}
+    </select>
+
+    <!--//根据处方明细id和就诊id查询登记次数-->
+    <select id="queryExecNum"
+            parameterType="java.util.Map"
+            resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
+        select id, hosp_code, opd_id, visit_id, exec_dept_id, exec_date, exec_id, exec_name, crte_id, crte_name,
+        crte_time
+        from outpt_infusion_register
+        where hosp_code = #{hospCode}
+        <if test="outptPrescribeDetailsDTOS != null and outptPrescribeDetailsDTOS.size > 0">
+            and opd_id in
+            <foreach collection="outptPrescribeDetailsDTOS" separator="," item="item" close=")" open="(">
+                #{item.id}
+            </foreach>
+        </if>
+    </select>
+
+    <!--根据就诊id查询已登记信息-->
+    <select id="queryRegisterInfo"
+            parameterType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO"
+            resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        SELECT
+        c.id,
+        c.name,
+        c.gender_code,
+        c.age,
+        c.age_unit_code,
+        c.visit_no,
+        (select op.order_no from outpt_prescribe op where b.op_id = op.id and b.hosp_code = op.hosp_code) as order_no,
+        b.op_id,
+        b.group_no,
+        b.content,
+        b.item_name,
+        b.spec,
+        b.num,
+        b.num_unit_code,
+        b.dosage,
+        b.dosage_unit_code,
+        b.usage_code,
+        c.dept_name,
+        a.crte_time as register_time,
+        a.crte_name as register_name
+        FROM
+        outpt_infusion_register a
+        left JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+        left JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
+        WHERE a.hosp_code = #{hospCode}
+        and a.visit_id = b.visit_id
+        and a.visit_id = #{visitId}
+        <if test="deptId != null and deptId != ''">
+            and c.dept_id = #{deptId}
+        </if>
+        ORDER BY a.crte_time desc
+    </select>
+</mapper>

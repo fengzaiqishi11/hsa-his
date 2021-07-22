@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharinbackdrug.dao.InBackDrugDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharwaitreceive.dto.PharWaitReceiveDTO" id="PharWaitReceiveMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizTypeCode" column="biz_type_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="backNum" column="back_num" jdbcType="INTEGER"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="INTEGER"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="distPharId" column="dist_phar_id" jdbcType="VARCHAR"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="applyDeptId" column="apply_dept_id" jdbcType="VARCHAR"/>
+        <result property="distributeCode" column="distribute_code" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="applyDeptName" column="applyDeptName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO" id="PharDistributeMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizTypeCode" column="biz_type_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="distWindowId" column="dist_window_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="orderTypeCode" column="order_type_code" jdbcType="VARCHAR"/>
+        <result property="orderTotalPrice" column="order_total_price" jdbcType="DECIMAL"/>
+        <result property="dispenseUserId" column="dispense_user_id" jdbcType="VARCHAR"/>
+        <result property="dispenseTime" column="dispense_time" jdbcType="TIMESTAMP"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="applyDeptId" column="apply_dept_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+
+    </resultMap>
+
+<!--    住院退药的sql-->
+
+    <!--查询有退药记录的人-->
+    <select id="queryInBackDrugPeoplePage" resultMap="PharWaitReceiveMap" >
+      select  a.visit_id, any_value(a.biz_id),any_value(a.group_no),any_value(b.name) as applyDeptName
+              from phar_wait_receive a left join base_dept b on a.apply_dept_id = b.id and a.hosp_code = b.hosp_code
+              where a.hosp_code = #{hospCode} and a.distribute_code = '1' and a.biz_type_code = '2'
+              and a.status_code = '0'  group by a.visit_id
+    </select>
+
+    <!--根据visit_id 就诊id 查询出此人的所有退药申请-->
+    <select id="queryInBackDrugDetailPage" resultMap="PharWaitReceiveMap">
+    select id, hosp_code, biz_type_code, biz_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec,
+           dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_price, total_price,
+            chinese_drug_num, cost_id, old_cost_id, status_code,dist_phar_id, dist_user_id, dist_time, usage_code,
+             use_code, apply_dept_id, crte_id, crte_name, crte_time,back_num,distribute_code
+              from phar_wait_receive where hosp_code = #{hospCode} and distribute_code = '1'  and visit_id = #{visitId}
+              and biz_type_code = '2' and status_code = '0'
+    </select>
+
+    <!--住院退药，将选中记录的状态改为发药-->
+    <update id="updateInBackDrug">
+    update phar_wait_receive
+     <set>
+         status_code = '2',
+         dist_user_id = #{distUserId},
+         dist_time = #{distTime},
+         dist_phar_id = #{distPharId}
+     </set>
+     where hosp_code = #{hospCode} and biz_type_code = '2' and distribute_code = '1' and id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+
+</mapper>

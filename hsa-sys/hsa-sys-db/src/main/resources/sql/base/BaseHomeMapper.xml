@@ -1,0 +1,1848 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.base.home.dao.BaseHomeDao">
+
+
+    <!--查询出药库当日的业务情况-->
+    <select id="getYkdrYwData" resultType="java.util.Map" parameterType="java.util.Map">
+            SELECT
+                ifnull((
+                    SELECT
+                        sum(l.num)
+                    FROM
+                    stro_in n,
+                    stro_in_detail l
+                    WHERE
+                    n.hosp_code = l.hosp_code
+                    AND n.id = l.in_id
+                    AND n.audit_code = '1'
+                    AND n.in_code in ('1','2')
+                    AND n.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                        AND n.stock_id = #{dept_id}
+                    </if>
+                    AND n.audit_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND n.audit_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+
+        ),0) rksl,
+                ifnull((
+                    SELECT
+                        sum(l.num)
+                    FROM
+                    stro_in n,
+                    stro_in_detail l
+                    WHERE
+                    n.hosp_code = l.hosp_code
+                    AND n.id = l.in_id
+                    AND n.audit_code = '1'
+                    AND n.in_code = '3'
+                    AND n.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND n.stock_id = #{dept_id}
+                    </if>
+                    AND n.audit_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND n.audit_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+
+                ),0) thsl,
+                ifnull((
+                    SELECT
+                        sum(l.num)
+                    FROM
+                        stro_out t,
+                        stro_out_detail l
+                    WHERE
+                        t.hosp_code = l.hosp_code
+                        AND t.id = l.out_id
+                        AND t.out_code in ('4','5','9')
+                        AND t.audit_code = '1'
+                        AND t.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND t.out_stock_id = #{dept_id}
+                        </if>
+                        AND t.audit_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                        AND t.audit_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+
+                ),0) cksl,
+                ifnull((
+                    SELECT
+                        sum(l.num)
+                    FROM
+                        stro_incdec c,
+                        stro_incdec_detail l
+                    WHERE
+                        l.hosp_code = l.hosp_code
+                        AND c.id = l.adjust_id
+                        AND audit_code = '1'
+                        AND c.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND c.biz_id = #{dept_id}
+                        </if>
+                        AND c.audit_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                        AND c.audit_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+                ),0) bssl
+    </select>
+
+
+    <!--统计库存数量低于库存下线，高于库存上线的数据-->
+    <select id="getKcSxxxYjData" parameterType="java.util.Map" resultType="java.util.Map">
+
+                SELECT
+                ifnull((
+                    SELECT
+                        count(1)
+                    FROM
+                        stro_stock k
+                    WHERE
+                        k.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND k.biz_id = #{dept_id}
+                        </if>
+                        AND k.num &lt; k.stock_min
+                ),0) xxyj,
+                ifnull((
+                    SELECT
+                        count(1)
+                    FROM
+                        stro_stock k
+                    WHERE
+                        k.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND k.biz_id = #{dept_id}
+                        </if>
+                        AND k.num > k.stock_max
+                ),0) sxyj,
+                ifnull(
+                    (
+                    SELECT
+                        count(1)
+                    FROM
+                        stro_stock k
+                    WHERE
+                        k.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND k.biz_id = #{dept_id}
+                        </if>
+                        AND k.num = 0
+                    ),
+                    0
+                    ) lkc
+
+    </select>
+
+
+    <!--查询出药库当日待办的事项-->
+    <select id="getYkDrDbsx" resultType="java.util.Map" parameterType="java.util.Map">
+
+        SELECT
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                stro_in n
+                WHERE n.audit_code = '0'
+                AND n.in_code in ('1','2')
+                AND n.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND n.stock_id = #{dept_id}
+                </if>
+            ),0) drkqrshsl,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    stro_out t
+                WHERE t.out_code in ('4','5')
+                    AND t.audit_code = '0'
+                    AND t.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND t.out_stock_id = #{dept_id}
+                    </if>
+            ),0) dckqrshsl,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    stro_incdec c
+                WHERE c.audit_code = '0'
+                    AND c.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND c.biz_id = #{dept_id}
+                    </if>
+            ),0) bsdshsl,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    stro_adjust t
+                WHERE t.audit_code = '0'
+                    AND t.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND t.biz_id = #{dept_id}
+                    </if>
+            ),0) tjdshsl,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    stro_inventory y
+                WHERE y.audit_code = '0'
+                    AND y.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND y.biz_id = #{dept_id}
+                    </if>
+            ),0) pddshsl
+
+    </select>
+
+
+    <!--查询出药库入库数量趋势图数据-->
+    <select id="getYkrkCstData" parameterType="java.util.Map" resultType="java.util.Map">
+            SELECT
+                sum(l.num) sl,
+                date_format(n.audit_time,'%Y-%m-%d') spsj
+            FROM
+            stro_in n,
+            stro_in_detail l
+            WHERE
+            n.hosp_code = l.hosp_code
+            AND n.id = l.in_id
+            AND n.audit_code = '1'
+            AND n.in_code in ('1','2')
+            AND n.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND n.stock_id = #{dept_id}
+            </if>
+            AND n.audit_time > #{interval_day}
+            group by date_format(n.audit_time,'%Y-%m-%d')
+
+    </select>
+
+    <!--查询出药库出库数量趋势图数据-->
+    <select id="getYkckCstData" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            sum(l.num) sl,
+            date_format(t.audit_time,'%Y-%m-%d') spsj
+        FROM
+            stro_out t,
+            stro_out_detail l
+        WHERE
+            t.hosp_code = l.hosp_code
+            AND t.id = l.out_id
+            AND t.out_code in ('4','5')
+            AND t.audit_code = '1'
+            AND t.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND t.out_stock_id = #{dept_id}
+            </if>
+            AND t.ok_audit_time > #{interval_day}
+         group by date_format(t.audit_time,'%Y-%m-%d')
+    </select>
+
+    <!--查询出药库饼图数据-->
+    <select id="getYkBtData" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+            ifnull((
+                SELECT
+                    sum(l.num) sl
+                FROM
+                stro_in n,
+                stro_in_detail l
+                WHERE
+                n.hosp_code = l.hosp_code
+                AND n.id = l.in_id
+                AND n.audit_code = '1'
+                AND n.in_code in ('1','2')
+                AND n.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND n.stock_id = #{dept_id}
+                </if>
+                AND n.audit_time > #{interval_day}
+                ),0)rksl,
+
+            ifnull((
+                SELECT
+                sum(l.num) sl
+            FROM
+                stro_out t,
+                stro_out_detail l
+            WHERE
+                t.hosp_code = l.hosp_code
+                AND t.id = l.out_id
+                AND t.out_code in ('4','5')
+                AND t.audit_code = '1'
+                AND t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.out_stock_id = #{dept_id}
+                </if>
+                AND t.ok_audit_time > #{interval_day}
+                ),0)cksl
+    </select>
+
+    <!--查询出药房当日的业务情况-->
+    <select id="getYfdrYwData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    outpt_prescribe e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    AND e.prescribe_type_code = '4'
+                    AND e.is_cancel = '0'
+                    <if test="dept_id != null">
+                    AND e.dept_id = #{dept_id}
+                    </if>
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) mz,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    outpt_prescribe e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    AND e.prescribe_type_code = '1'
+                    AND e.is_cancel = '0'
+                    <if test="dept_id != null">
+                    AND e.dept_id = #{dept_id}
+                    </if>
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) pt,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    outpt_prescribe e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    AND e.prescribe_type_code = '5'
+                    AND e.is_cancel = '0'
+                    <if test="dept_id != null">
+                    AND e.dept_id = #{dept_id}
+                    </if>
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) js,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    outpt_prescribe e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    AND e.prescribe_type_code = '3'
+                    AND e.is_cancel = '0'
+                    <if test="dept_id != null">
+                    AND e.dept_id = #{dept_id}
+                    </if>
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) ek,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    phar_in_wait_receive e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '3'
+                    AND e.num > 0
+                    AND e.dist_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.dist_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+                ),0) zyfyzs,
+            ifnull((
+                 SELECT
+                    sum( ifnull( e.num, 0 ) )
+                FROM
+                    phar_in_wait_receive e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '3'
+                    AND e.num > 0
+                    AND e.dist_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.dist_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) zyfys,
+            ifnull((
+                    SELECT
+                    abs(sum( ifnull( e.num, 0 ) ))
+                    FROM
+                    phar_in_wait_receive e
+                    WHERE
+                    e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                        AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code in('2','3')
+                    AND e.is_back = '1'
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+        ),0) zytys,
+            ifnull((
+                SELECT
+                    sum( ifnull( l.num, 0 ) - ifnull( l.total_back_num, 0 ))
+                FROM
+                    phar_out_distribute e,
+                    phar_out_distribute_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.distribute_id
+                    AND e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '0'
+                    AND e.dist_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.dist_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) mzfys,
+            ifnull((
+                SELECT
+                    abs(sum( ifnull( l.num, 0 ) ))
+                FROM
+                    phar_out_distribute e,
+                    phar_out_distribute_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.distribute_id
+                    AND e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '2'
+                    AND e.crte_time >= STR_TO_DATE( #{filter_date}, '%Y-%m-%d' )
+                    AND e.crte_time &lt; date_add( STR_TO_DATE( #{filter_date}, '%Y-%m-%d' ), INTERVAL 1 DAY )
+            ),0) mztys
+    </select>
+
+    <!--查询出药房当日待办的事项-->
+    <select id="getYfDrDbsx" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            (
+                select sum(if(sumNum>0,1,0)) from (
+                SELECT
+                    sum( num ) sumNum
+                FROM
+                    phar_in_receive_detail a
+                WHERE
+                    a.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND a.receive_id = #{dept_id}
+                    </if>
+                )tab
+            ) zywpy,
+           (
+                SELECT
+                    count(1)
+                FROM
+                phar_in_receive a
+                WHERE
+                 a.hosp_code = #{yybm}
+                AND a.status_code = '2'
+                <if test="dept_id != null">
+                AND a.phar_id = #{dept_id}
+                </if>
+            ) zywfy,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    phar_out_receive e,
+                    phar_out_receive_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.or_id
+                    AND e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '1'
+            ),0) mzwpy,
+            ifnull((
+                SELECT
+                    count(1)
+                FROM
+                    phar_out_receive e,
+                    phar_out_receive_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.or_id
+                    AND e.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND e.phar_id = #{dept_id}
+                    </if>
+                    AND e.status_code = '2'
+            ),0) mzwfy
+    </select>
+
+    <!--查询出药房门诊发药趋势图数据-->
+    <select id="getYfMzCstData" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            sum( ifnull( l.num, 0 ) - ifnull( l.total_back_num, 0 )) sl,
+            DATE_FORMAT(e.dist_time,'%Y-%m-%d') fysj
+        FROM
+            phar_out_distribute e,
+            phar_out_distribute_detail l
+        WHERE
+            e.hosp_code = l.hosp_code
+            AND e.id = l.distribute_id
+            AND e.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND e.phar_id = #{dept_id}
+            </if>
+            AND e.status_code = '0'
+            AND e.dist_time > #{interval_day}
+        group by DATE_FORMAT(e.dist_time,'%Y-%m-%d')
+    </select>
+
+    <!--查询出药房住院发药趋势图数据-->
+    <select id="getYfZyCstData" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            sum( ifnull( e.num, 0 ) ) sl,
+            DATE_FORMAT(e.dist_time,'%Y-%m-%d') fysj
+        FROM
+            phar_in_wait_receive e
+        WHERE
+            e.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND e.phar_id = #{dept_id}
+            </if>
+            AND e.status_code = '3'
+            AND e.num > 0
+            AND e.dist_time > #{interval_day}
+        group by DATE_FORMAT(e.dist_time,'%Y-%m-%d')
+    </select>
+
+    <!--查询出门诊发药退药数量-->
+    <select id="getMzFyTySl" parameterType="java.util.Map" resultType="java.util.Map">
+        select fysl,tysl,(fysl+tysl) zsl from (
+            SELECT
+                sum(if(e.status_code = '0',(ifnull( l.num, 0 ) - ifnull( l.total_back_num, 0 )),0)) fysl,
+                sum(if(e.status_code = '2',abs(ifnull( l.num, 0 )),0)) tysl
+            FROM
+                phar_out_distribute e,
+                phar_out_distribute_detail l
+            WHERE
+                e.hosp_code = l.hosp_code
+                AND e.id = l.distribute_id
+                AND e.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND e.phar_id = #{dept_id}
+                </if>
+                AND e.status_code = '0'
+                AND e.dist_time > #{interval_day}
+        )tab
+   </select>
+
+    <!--查询出住院发药退药数量-->
+    <select id="getZyFyTySl" parameterType="java.util.Map" resultType="java.util.Map">
+        select fysl,abs(tysl) tysl,(fysl+abs(tysl))zsl from (
+                select
+                    (SELECT
+                        sum( ifnull( e.num, 0 ) )
+                    FROM
+                        phar_in_wait_receive e
+                    WHERE
+                        e.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                        AND e.phar_id = #{dept_id}
+                        </if>
+                        AND e.status_code = '3'
+                        AND e.num > 0
+                        AND e.dist_time > #{interval_day}
+                        ) fysl,
+                    (SELECT
+                        sum( ifnull( e.num, 0 ) )
+                        FROM
+                        phar_in_wait_receive e
+                        WHERE
+                        e.hosp_code = #{yybm}
+                        <if test="dept_id != null">
+                            AND e.phar_id = #{dept_id}
+                        </if>
+                        AND e.status_code in('2','3')
+                        AND e.is_back = '1'
+                        AND e.crte_time > #{interval_day}
+                    )tysl
+            )tab
+    </select>
+
+    <!--入出院、住院医生、住院护士 系统的今日业务情况查询-->
+    <select id="getZyJryw" resultType="java.util.Map" parameterType="java.util.Map">
+        <![CDATA[
+            select
+                ifnull(ryrs,0) ryrs,
+                ifnull(cyrs,0) cyrs,
+                ifnull(zyrs,0) zyrs,
+                ifnull(swrs,0) swrs,
+                ifnull(bzrs,0) bzrs,
+                ifnull(bwrs,0) bwrs,
+                ifnull(ssrs,0) ssrs,
+                ifnull(ckrs,0) ckrs
+            from (
+            SELECT
+                SUM(IF(t.status_code = '2' AND t.in_time >= #{filter_date}, 1, 0)) ryrs,
+                SUM(IF(t.status_code in ('5','7') and t.out_time >= #{filter_date}, 1, 0)) cyrs,
+                SUM(IF(t.status_code = '2', 1, 0)) zyrs,
+                SUM(IF(t.out_situation_code = '4' and t.out_time >= #{filter_date}, 1, 0)) swrs,
+                SUM(IF(t.Illness_code = '2',1,0)) bzrs,
+                SUM(IF(t.Illness_code = '1',1,0)) bwrs,
+                SUM(
+                    (
+                    SELECT
+                        IF( count( 1 ) > 0, 1, 0 )
+                    FROM
+                        oper_info_record d
+                    WHERE
+                        d.visit_id = t.id
+                        AND d.status_code = '2'
+                        AND d.oper_plan_time >= #{filter_date}
+                        )
+                    ) ssrs,
+                SUM(( SELECT
+                        if(count( 1 ) >0,1,0)
+                        FROM
+                        inpt_settle e
+                        WHERE
+                        e.hosp_code = t.hosp_code
+                        AND e.visit_id = t.id
+                        AND e.is_settle = '1'
+                        AND e.settle_time >= #{filter_date}
+                        ))jsrs,
+                SUM(IF(
+                t.status_code = '2'
+                AND total_balance <= (select value from sys_parameter r where r.hosp_code = t.hosp_code and code = 'ZYCK_BJX' limit 1)
+                , 1, 0)) ckrs
+            FROM
+                inpt_visit t
+                ]]>
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+            )tab
+
+    </select>
+
+    <!--入出院、住院医生、住院护士 系统的今日预警查询-->
+    <select id="getZyJryj" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            (select ifnull(sum(tab.num),0) from (
+                SELECT
+                    1 num
+                FROM
+                    inpt_nurse_third d,
+                    inpt_visit t
+                WHERE
+                    d.hosp_code = t.hosp_code
+                    AND d.visit_id = t.id
+                    AND t.hosp_code = #{yybm}
+                    <if test="dept_id != null">
+                    AND t.in_dept_id = #{dept_id}
+                    </if>
+                    AND d.temperature >= 38
+                    AND t.status_code = '2'
+                    group by d.visit_id
+                )tab
+            )csbs,
+            (
+                SELECT
+                    count(1)
+                FROM
+                    inpt_advice e
+                WHERE
+                    e.hosp_code = #{yybm}
+                    AND e.is_reject = '1'
+                    AND e.check_time >= #{filter_date}
+                    <if test="dept_id != null">
+                    AND e.dept_id = #{dept_id}
+                    </if>
+            ) jsyzs
+
+    </select>
+
+
+    <!--入出系统 今日待办事项查询-->
+    <select id="getZyRcyJrdb" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+            (SELECT
+                count(1) wjsrs
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '5') wjsrs,
+            (SELECT
+                count(1)
+            FROM
+                outpt_visit a
+            WHERE
+                a.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND in_dept_id = #{dept_id}
+                </if>
+                AND a.tran_in_code = '1') wdj
+
+    </select>
+
+    <!--住院护士系统 今日待办事项查询-->
+    <select id="getZyhsJrdb" resultType="java.util.Map" parameterType="java.util.Map">
+
+        select
+        (
+            SELECT
+                count( 1 )
+            FROM
+                inpt_advice a
+                JOIN inpt_visit b ON a.hosp_code = b.hosp_code and a.visit_id = b.id
+            WHERE
+                a.is_submit = '1'
+                AND a.hosp_code = #{yybm}
+                AND (
+                (
+                ( a.is_stop = '0' OR a.is_stop IS NULL )
+                AND ( a.is_check = '0' OR a.is_check IS NULL )
+                )
+                OR ( a.is_stop = '1' AND ( a.is_stop_check = '0' OR a.is_stop_check IS NULL ) )
+                )
+                AND ( a.is_reject = '0' OR a.is_reject IS NULL )
+                AND a.is_stop = '0'
+                <if test="dept_id != null">
+                AND a.dept_id = #{dept_id}
+                </if>
+         ) yzwhs,
+        (
+            SELECT
+                count(1)
+            FROM
+                inpt_advice e
+            WHERE
+                e.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND e.dept_id = #{dept_id}
+                </if>
+                AND e.is_check = '1'
+                AND e.sign_code = '1'
+        ) yzwzx,
+        (
+            SELECT
+               count(1)
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '1'
+                AND (t.bed_id is null or t.bed_id = '')
+        )dacs,
+        (
+        SELECT
+            count(1)
+        FROM
+            phar_in_wait_receive a
+        WHERE
+            a.hosp_code = #{yybm}
+            AND a.status_code = '0'
+        ) dls,
+         (
+            SELECT
+                count(1)
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '2'
+                AND NOT EXISTS ( SELECT 1 FROM inpt_nurse_third d WHERE d.hosp_code = t.hosp_code AND d.visit_id = t.id )
+         ) wxscds,
+          (
+            SELECT
+                count(1)
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '2'
+                AND NOT EXISTS ( SELECT 1 FROM inpt_nurse_record d WHERE d.hosp_code = t.hosp_code AND d.visit_id = t.id and d.is_valid = '1')
+          ) wxjlds
+    </select>
+
+
+    <!--住院医生系统 今日待办事项查询-->
+    <select id="getZyysJrdb" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+        (
+        SELECT
+            count(1)
+        FROM
+            inpt_visit t
+        WHERE
+            t.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND t.in_dept_id = #{dept_id}
+            </if>
+            and ifnull(t.bed_id,'') != ''
+            AND NOT EXISTS ( SELECT 1 FROM inpt_advice e WHERE e.hosp_code = t.hosp_code AND e.visit_id = t.id)
+        ) wkyzs,
+        (
+        SELECT
+	        count( 1 )
+        FROM
+            inpt_visit t
+        WHERE
+            t.hosp_code = #{yybm}
+            <if test="dept_id != null">
+            AND t.in_dept_id = #{dept_id}
+            </if>
+            AND NOT EXISTS ( SELECT 1 FROM emr_patient p WHERE p.hosp_code = t.hosp_code AND p.visit_id = t.id )
+        ) wxbls,
+        (
+            SELECT
+                count(1)
+            FROM
+                inpt_advice e,
+                inpt_visit t
+            WHERE
+                e.hosp_code = t.hosp_code
+                AND e.visit_id = t.id
+                AND t.status_code = '2'
+                AND e.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND ifnull( t.bed_id, '' ) != ''
+              AND is_submit != 1
+        )wtjyzs
+    </select>
+
+    <!--住院每日入院人数查询-->
+    <select id="getZymrRyrs" resultType="java.util.Map" parameterType="java.util.Map">
+        	SELECT
+               count(1) rs,
+               DATE_FORMAT(t.in_time,'%Y-%m-%d') sj
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '2'
+                AND t.in_time > #{interval_day}
+                group by DATE_FORMAT(t.in_time,'%Y-%m-%d')
+    </select>
+
+    <!--住院每日出院人数查询-->
+    <select id="getZymrCyrs" resultType="java.util.Map" parameterType="java.util.Map">
+        	SELECT
+               count(1) rs,
+               DATE_FORMAT(t.out_time,'%Y-%m-%d') sj
+            FROM
+                inpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '7'
+                AND t.out_time > #{interval_day}
+                group by DATE_FORMAT(t.out_time,'%Y-%m-%d')
+    </select>
+
+    <!--住院入出院人数汇总查询-->
+    <select id="getZyRcyRshz" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+            (
+                SELECT
+                   count(1) rs
+                FROM
+                    inpt_visit t
+                WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '2'
+                AND t.in_time > #{interval_day}
+            ) ryrs,
+            (
+                SELECT
+                   count(1) rs
+                FROM
+                    inpt_visit t
+                WHERE
+                t.hosp_code = #{yybm}
+                <if test="dept_id != null">
+                AND t.in_dept_id = #{dept_id}
+                </if>
+                AND t.status_code = '7'
+                AND t.out_time > #{interval_day}
+            ) cyrs
+    </select>
+
+    <!-- ================================= 门诊   下   ========== -->
+
+    <!--统计当日门诊医生、护士、收费站的业务数据-->
+    <select id="getMzywDataByToday" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        IFNULL(
+        (
+            SELECT
+                count(1)
+            FROM
+                outpt_register r
+            WHERE
+                r.hosp_code = #{yybm}
+                AND r.is_cancel = '0'
+                AND r.register_time >= #{filter_date}
+                <if test="ksid != null">
+                    AND r.dept_id = #{ksid}
+                </if>
+        ),0) ghrs,
+        IFNULL((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.visit_time >= #{filter_date}
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        outpt_settle e
+                    WHERE
+                        e.hosp_code = t.hosp_code
+                        AND e.visit_id = t.id
+                        AND e.is_settle = '1'
+                )
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+        ),0) yjsrs,
+        ifnull((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.visit_time >= #{filter_date}
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        outpt_prescribe e
+                    WHERE
+                        e.hosp_code = t.hosp_code
+                        AND e.visit_id = t.id
+                        AND e.is_settle = '0'
+                        AND e.is_cancel = '0'
+                )
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+        ),0) ykfwjsrs,
+        ifnull((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t,
+                outpt_prescribe e
+            WHERE
+                e.hosp_code = t.hosp_code
+                AND e.visit_id = t.id
+                AND e.is_cancel = '0'
+                AND t.visit_time >= #{filter_date}
+                AND t.hosp_code = #{yybm}
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+        ),0) kjcfs,
+        ifnull((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.visit_time >= #{filter_date}
+                AND t.is_visit = '1'
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+        ),0) yjzrs,
+        ifnull((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.visit_time >= #{filter_date}
+                AND exists(
+                select 1 from outpt_infusion_register r where r.hosp_code = t.hosp_code and r.visit_id = t.id and r.exec_id is not null
+                )
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+        ),0) ysyrs,
+        ifnull((
+            select sum(num) from (
+                SELECT
+                    if(count( 1 )>0,1,0) num
+                FROM
+                    outpt_visit t,
+                    outpt_settle e
+                WHERE
+                    t.hosp_code = e.hosp_code
+                    AND t.id = e.visit_id
+                    AND e.is_settle = '1'
+                    AND e.settle_time >= #{filter_date}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    AND EXISTS (
+                        SELECT
+                            1
+                        FROM
+                            outin_invoice_detail l
+                        WHERE
+                            l.hosp_code = e.hosp_code
+                            AND l.settle_id = e.id
+                            AND l.status_code = '0'
+                    )
+                    GROUP BY
+                    t.id
+            )tab
+        ),0) ydfprs,
+        IFNULL((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit vt
+            WHERE
+                vt.hosp_code = #{yybm}
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        outpt_cost ct
+                    WHERE
+                        vt.hosp_code = ct.hosp_code
+                        AND vt.id = ct.visit_id
+                        AND ct.status_code = '1'
+                )
+                <if test="ksid != null">
+                    AND vt.dept_id  = #{ksid}
+                </if>
+        ),0) tfrs,
+        ifnull((
+            SELECT
+                count(1)
+            FROM
+                outpt_register r
+            WHERE
+                r.hosp_code = #{yybm}
+                AND r.register_time >= #{filter_date}
+                AND r.is_cancel = '1'
+            <if test="ksid != null">
+                AND r.dept_id = #{ksid}
+            </if>
+        ),0) tgrs
+    </select>
+
+    <!--统计门诊医生站当日待办事项-->
+    <select id="getMzyszDbsxByToday" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        ifnull((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit a, outpt_register b
+            WHERE
+                a.id = b.visit_id
+                AND a.hosp_code = b.hosp_code
+                AND a.hosp_code = #{yybm}
+                AND ifnull( a.is_visit, '0' ) = '0'
+                AND ifnull( b.is_cancel, '0' ) = '0'
+            <if test="userId != null">
+                AND a.doctor_id = #{userId}
+            </if>
+        ),0) grwjz,
+        IFNULL((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.is_visit = '1'
+                AND NOT EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        outpt_prescribe e
+                    WHERE
+                        e.hosp_code = t.hosp_code
+                        AND e.visit_id = t.id
+                        AND e.is_cancel = '0'
+                )
+            <if test="ksid != null">
+                AND t.dept_id = #{ksid}
+            </if>
+        ), 0) yjzwkf,
+        IFNULL((
+            SELECT
+                count( 1 )
+            FROM
+                outpt_visit a, outpt_register b
+            WHERE
+                a.id = b.visit_id
+                AND a.hosp_code = b.hosp_code
+                AND a.hosp_code = #{yybm}
+                AND ifnull( a.is_visit, '0' ) = '0'
+                AND ifnull( b.is_cancel, '0' ) = '0'
+            <if test="ksid != null and userId != null">
+                AND (a.doctor_id is null or a.doctor_id != #{userId})
+                AND a.dept_id = #{ksid}
+            </if>
+        ), 0) kswjz
+    </select>
+
+
+    <!--7日内门诊医生站-已接诊-趋势图数据-->
+    <select id="getMzyszQsYjzrsData" resultType="java.util.Map" parameterType="java.util.Map">
+
+         SELECT
+                count( 1 ) yjzrs,
+                DATE_FORMAT( t.visit_time, '%Y-%m-%d' ) jzsj
+            FROM
+                outpt_visit t
+            WHERE
+                t.hosp_code = #{yybm}
+                AND t.visit_time > #{interval_day}
+                AND t.is_visit = '1'
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+                group by DATE_FORMAT( t.visit_time, '%Y-%m-%d' )
+    </select>
+
+
+    <!--7日内门诊医生站-未接诊-趋势图数据-->
+    <select id="getMzyszQsWjzrsData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            count( 1 ) yjzrs,
+            DATE_FORMAT( t.visit_time, '%Y-%m-%d' ) jzsj
+        FROM
+            outpt_visit t
+        WHERE
+            t.hosp_code = #{yybm}
+            AND t.visit_time > #{interval_day}
+            AND t.is_visit = '0'
+            <if test="ksid != null">
+                AND t.dept_id = #{ksid}
+            </if>
+            group by DATE_FORMAT( t.visit_time, '%Y-%m-%d' )
+    </select>
+
+    <!--7日内门诊医生站饼图数据(已接诊、未接诊)-->
+    <select id="getMzyszBtData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            IFNULL((
+                    SELECT
+                        count( 1 ) yjzrs
+                    FROM
+                        outpt_visit t
+                    WHERE
+                        t.hosp_code = #{yybm}
+                        AND t.visit_time > #{interval_day}
+                        AND t.is_visit = '1'
+                        <if test="ksid != null">
+                            AND t.dept_id = #{ksid}
+                        </if>
+                   ), 0) yjzrs,
+            IFNULL((
+                    SELECT
+                        count( 1 ) yjzrs
+                    FROM
+                        outpt_visit t
+                    WHERE
+                        t.hosp_code = #{yybm}
+                        AND t.visit_time > #{interval_day}
+                        AND t.is_visit = '0'
+                        <if test="ksid != null">
+                            AND t.dept_id = #{ksid}
+                        </if>
+                   ), 0) wjzrs
+    </select>
+
+    <!--统计门诊护士站当日待办事项-->
+    <select id="getMzhszDbsxByToday" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        IFNULL((
+            SELECT
+            count( 1 )
+            FROM
+            (
+                SELECT
+                    t.id
+                FROM
+                    outpt_visit t,
+                    outpt_infusion_register r
+                WHERE
+                    r.hosp_code = t.hosp_code
+                    AND r.visit_id = t.id
+                    AND r.exec_id IS NULL
+                    AND t.hosp_code = #{yybm}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    GROUP BY
+                    t.id
+            ) tab
+        ), 0) wsyrs,
+        IFNULL((
+            SELECT
+                count( 1 )
+            FROM
+            (
+                SELECT
+                    t.id
+                FROM
+                    outpt_visit t,
+                    outpt_prescribe e,
+                    outpt_prescribe_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.op_id
+                    AND e.hosp_code = t.hosp_code
+                    AND e.visit_id = t.id
+                    AND l.is_skin = '1'
+                    AND t.hosp_code = #{yybm}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    AND NOT EXISTS ( SELECT 1 FROM outpt_skin_result lt WHERE lt.hosp_code = l.hosp_code AND lt.opd_id = l.id )
+                    GROUP BY
+                    t.id
+            ) tab
+        ), 0) wpsrs
+    </select>
+
+    <!--统计7日内门诊护士站趋势图数据-已输液人数-->
+    <select id="getMzhszQsYsyrsData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        count(1) ysyrs,
+        syrq
+        FROM
+            (
+            SELECT
+                t.id,
+                DATE_FORMAT( r.exec_date, '%Y-%m-%d' ) syrq
+            FROM
+                outpt_visit t,
+                outpt_infusion_register r
+            WHERE
+                r.hosp_code = t.hosp_code
+                AND r.visit_id = t.id
+                AND r.exec_id IS NOT NULL
+                AND t.hosp_code = #{yybm}
+                AND r.exec_date > #{interval_day}
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+                GROUP BY
+                DATE_FORMAT( r.exec_date, '%Y-%m-%d' ),
+                t.id
+        ) tab
+        group by syrq
+
+    </select>
+
+    <!--统计7日内门诊护士站趋势图数据-已皮试人数-->
+    <select id="getMzhszQsYpsrsData" resultType="java.util.Map" parameterType="java.util.Map">
+
+        SELECT
+            psrq,
+            count( 1 ) ypsrs
+        FROM
+        (
+            SELECT
+                DATE_FORMAT( e.crte_time, '%Y-%m-%d' ) psrq,
+            t.id
+            FROM
+                outpt_visit t,
+                outpt_prescribe e,
+                outpt_prescribe_detail l
+            WHERE
+                e.hosp_code = l.hosp_code
+                AND e.id = l.op_id
+                AND e.hosp_code = t.hosp_code
+                AND e.visit_id = t.id
+                AND l.is_skin = '1'
+                AND t.hosp_code = #{yybm}
+                AND e.crte_time > #{interval_day}
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+                AND EXISTS ( SELECT 1 FROM outpt_skin_result lt WHERE lt.hosp_code = l.hosp_code AND lt.opd_id = l.id )
+                GROUP BY
+                DATE_FORMAT( e.crte_time, '%Y-%m-%d' ),t.id
+        ) tab
+        group by psrq
+
+    </select>
+
+    <!--获取7日内门诊护士站饼图数据（已输液人数，已皮试人数）-->
+    <select id="getMzhszBtData" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        IFNULL((
+            SELECT
+                count(1) ysyrs
+            FROM(
+                SELECT
+                t.id,
+                DATE_FORMAT( r.exec_date, '%Y-%m-%d' ) syrq
+                FROM
+                outpt_visit t,
+                outpt_infusion_register r
+                WHERE
+                r.hosp_code = t.hosp_code
+                AND r.visit_id = t.id
+                AND r.exec_id IS NOT NULL
+                AND t.hosp_code = #{yybm}
+                AND r.exec_date > #{interval_day}
+                <if test="ksid != null">
+                    AND t.dept_id = #{ksid}
+                </if>
+                GROUP BY
+                DATE_FORMAT( r.exec_date, '%Y-%m-%d' ),
+                t.id
+            ) tab
+        ), 0) ysyrs,
+        IFNULL((
+            SELECT
+                count(1) ypsrs
+            FROM (
+                SELECT
+                    DATE_FORMAT( e.crte_time, '%Y-%m-%d' ) psrq,
+                    t.id
+                FROM
+                    outpt_visit t,
+                    outpt_prescribe e,
+                    outpt_prescribe_detail l
+                WHERE
+                    e.hosp_code = l.hosp_code
+                    AND e.id = l.op_id
+                    AND e.hosp_code = t.hosp_code
+                    AND e.visit_id = t.id
+                    AND l.is_skin = '1'
+                    AND t.hosp_code = #{yybm}
+                    AND e.crte_time > #{interval_day}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    AND EXISTS ( SELECT 1 FROM outpt_skin_result lt WHERE lt.hosp_code = l.hosp_code AND lt.opd_id = l.id )
+                    GROUP BY
+                    DATE_FORMAT( e.crte_time, '%Y-%m-%d' ),t.id
+            ) tab
+        ), 0) ypsrs
+    </select>
+
+    <!--统计门诊收费站当日待办事项-->
+    <select id="getMzsfzDbsxByToday" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        ifnull((
+        SELECT
+        count( 1 )
+        FROM
+        outpt_visit t
+        WHERE
+        t.hosp_code = #{yybm}
+        AND (
+            EXISTS (
+                SELECT
+                1
+                FROM
+                outpt_prescribe e
+                WHERE
+                e.hosp_code = t.hosp_code
+                AND e.visit_id = t.id
+                AND e.is_settle = '0'
+                AND e.is_cancel = '0'
+                AND is_submit = '1'
+            )
+            or EXISTS (
+                SELECT
+                1
+                FROM
+                outpt_cost
+                WHERE
+                hosp_code = t.hosp_code
+                AND source_code = '1'
+                AND visit_id = t.id
+                AND status_code = '0'
+                AND settle_code IN ( '0', '1' )
+            )
+        )
+        <if test="ksid != null">
+            AND t.dept_id = #{ksid}
+        </if>
+        ),0) ykfpwjs,
+        (
+            SELECT
+                gh + js
+            FROM
+            (
+                SELECT
+                (
+                SELECT
+                    count( 1 )
+                FROM
+                outpt_register_settle b
+                LEFT JOIN outpt_register a ON a.hosp_code = b.hosp_code and a.id = b.register_id
+                LEFT JOIN outin_invoice_detail c ON c.hosp_code = b.hosp_code and b.bill_id = c.invoice_id
+                AND b.bill_no = c.invoice_no
+                WHERE
+                b.hosp_code = #{yybm}
+                AND a.is_cancel != '1'
+                AND (b.bill_no IS NULL or (b.bill_no IS NOT NULL and c.status_code = '2'))
+                ) gh,
+                (
+                SELECT
+                    count( 1 )
+                FROM
+                    outpt_settle a
+                LEFT JOIN outpt_settle_invoice b ON a.hosp_code = b.hosp_code and a.id = b.settle_id AND a.visit_id = b.visit_id
+                LEFT JOIN outin_invoice_detail d ON d.hosp_code = b.hosp_code and d.id = b.invoice_detail_id
+                WHERE
+                a.status_code = '0'
+                AND a.is_settle = '1'
+                AND a.hosp_code = #{yybm}
+                AND (b.invoice_no IS NULL or (b.invoice_no IS not NULL and d.status_code = '2'))
+                ) js
+            ) tab
+        ) wdfp
+    </select>
+
+    <!--7日内门诊收费站-收费-趋势图数据-->
+    <select id="getMzsfzQsSffyData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            sum(le.reality_price) sffy,
+            date_format( le.settle_time, '%Y-%m-%d' ) jssj
+        FROM
+            outpt_visit t,
+            outpt_settle le
+        WHERE
+            t.hosp_code = le.hosp_code
+            AND t.id = le.visit_id
+            AND t.hosp_code = #{yybm}
+            <if test="ksid != null">
+                AND t.dept_id = #{ksid}
+            </if>
+            AND le.status_code = '0'
+            AND le.settle_time > #{interval_day}
+        GROUP BY
+        date_format( le.settle_time, '%Y-%m-%d' )
+
+    </select>
+
+    <!--7日内门诊收费站-退费-趋势图数据-->
+    <select id="getMzsfzQsTffyData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        abs(sum(if(le.status_code = '2',le.reality_price,0))) tffy,
+        date_format( le.settle_time, '%Y-%m-%d' ) jssj
+        FROM
+        outpt_visit t,
+        outpt_settle le
+        WHERE
+        t.hosp_code = le.hosp_code
+        AND t.id = le.visit_id
+        AND t.hosp_code = #{yybm}
+        <if test="ksid != null">
+            AND t.dept_id = #{ksid}
+        </if>
+        AND le.settle_time > #{interval_day}
+        GROUP BY
+        date_format( le.settle_time, '%Y-%m-%d' )
+    </select>
+
+    <!--7日内门诊收费站饼图数据(收费、退费)-->
+    <select id="getMzsfzBtData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            IFNULL((
+                SELECT
+                    sum(le.reality_price) sffy
+                FROM
+                    outpt_visit t,
+                    outpt_settle le
+                WHERE
+                    t.hosp_code = le.hosp_code
+                    AND t.id = le.visit_id
+                    AND t.hosp_code = #{yybm}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    AND le.status_code = '0'
+                    AND le.settle_time > #{interval_day}
+            ), 0) sffy,
+            IFNULL((
+                SELECT
+                    abs(sum(if(le.status_code = '2',le.reality_price,0)) + sum(if(le.status_code = '0',le.reality_price,0))) tffy
+                FROM
+                    outpt_visit t,
+                    outpt_settle le
+                WHERE
+                    t.hosp_code = le.hosp_code
+                    AND t.id = le.visit_id
+                    AND t.hosp_code = #{yybm}
+                    <if test="ksid != null">
+                        AND t.dept_id = #{ksid}
+                    </if>
+                    AND le.settle_time > #{interval_day}
+             ), 0) tffy
+    </select>
+
+
+    <!--统计门诊挂号数量趋势图数据-->
+    <select id="getMzghqsData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            count(1) ghrs,
+            DATE_FORMAT( r.register_time, '%Y-%m-%d' ) ghrq
+        FROM
+            outpt_visit t,
+            outpt_register r
+        WHERE
+            t.hosp_code = r.hosp_code
+            AND t.id = r.visit_id
+            AND t.hosp_code = #{yybm}
+            AND r.is_cancel = '0'
+            AND r.register_time > #{interval_day}
+            <if test="ksid != null">
+                and t.dept_id = #{ksid}
+            </if>
+        GROUP BY
+        DATE_FORMAT(r.register_time,'%Y-%m-%d')
+    </select>
+
+    <!--统计门诊挂号数量趋势图数据-->
+    <select id="getMztgqsData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        count(1) tgrs,
+        DATE_FORMAT( r.register_time, '%Y-%m-%d' ) ghrq
+        FROM
+        outpt_visit t,
+        outpt_register r
+        WHERE
+        t.hosp_code = r.hosp_code
+        AND t.id = r.visit_id
+        AND t.hosp_code = #{yybm}
+        AND r.is_cancel = '1'
+        AND r.register_time > #{interval_day}
+        <if test="ksid != null">
+            and t.dept_id = #{ksid}
+        </if>
+        GROUP BY
+        DATE_FORMAT(r.register_time,'%Y-%m-%d')
+    </select>
+
+    <!--统计门诊挂号、退挂占比饼图数据-->
+    <select id="getMzBtData" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            IFNULL((
+                SELECT
+                    count(1) ghrs
+                FROM
+                    outpt_visit t,
+                    outpt_register r
+                WHERE
+                    t.hosp_code = r.hosp_code
+                    AND t.id = r.visit_id
+                    AND t.hosp_code = #{yybm}
+                    AND r.is_cancel = '0'
+                    AND r.register_time > #{interval_day}
+                    <if test="ksid != null">
+                        and t.dept_id = #{ksid}
+                    </if>
+                   ),0) ghrs,
+            IFNULL((
+                SELECT
+                    count(1) ghrs
+                FROM
+                    outpt_visit t,
+                    outpt_register r
+                WHERE
+                    t.hosp_code = r.hosp_code
+                    AND t.id = r.visit_id
+                    AND t.hosp_code = #{yybm}
+                    AND r.is_cancel = '1'
+                    AND r.register_time > #{interval_day}
+                    <if test="ksid != null">
+                        and t.dept_id = #{ksid}
+                    </if>
+                   ),0) tgrs
+    </select>
+
+    <!--查询处方用药方式-->
+    <select id="findCsz" parameterType="java.lang.String" resultType="java.lang.String">
+        select csz from his_infomation_tab where spcode = #{code} limit 1
+    </select>
+
+
+
+    <!-- ====================== 全院首页 下==============  -->
+
+    <!--每日业务统计（人数）-->
+    <select id="selectBusinessStatisticByToday" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        a.mjzsl,
+        b.ryrs,
+        b.cyrs,
+        b.zyrs,
+        b.swrs,
+        b.bzrs,
+        b.bwrs,
+        b.ssrs
+        FROM
+        (
+        (
+            SELECT
+                count( 1 ) mjzsl
+            FROM
+                outpt_register r
+            WHERE
+                r.hosp_code = #{yybm}
+                AND r.register_time >= #{filter_date}
+            <if test="ksid != null">
+                AND r.dept_id  = #{ksid}
+            </if>
+        ) a,
+        (
+            SELECT
+                SUM(IF(t.in_time >= #{filter_date}, 1, 0)) ryrs,
+                SUM(IF(t.status_code in ('7','5') and t.out_time >= #{filter_date}, 1, 0)) cyrs,
+                SUM(IF(t.status_code = '2', 1, 0)) zyrs,
+                SUM(IF(t.out_situation_code = '4' and t.out_oper_time >= #{filter_date}, 1, 0)) swrs,
+                SUM(IF(t.Illness_code = '2',1,0)) bzrs,
+                SUM(IF(t.Illness_code = '1',1,0)) bwrs,
+                SUM(
+                    (
+                    SELECT
+                    IF( count( 1 ) > 0, 1, 0 )
+                    FROM
+                    oper_info_record d
+                    WHERE
+                    d.visit_id = t.id
+                    AND d.status_code = '2'
+                    AND d.oper_plan_time >= #{filter_date}
+                    )
+                ) ssrs
+            FROM
+                inpt_visit t
+            WHERE
+            t.hosp_code = #{yybm}
+            <if test="ksid != null">
+                AND t.in_dept_id = #{ksid}
+            </if>
+            ) b
+        )
+    </select>
+
+    <!--每日业务统计（金额）-->
+    <select id="selectStatisticMoneyByToday" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        IFNULL(
+        (
+            SELECT
+                sum(l.reality_price)
+            FROM
+                outpt_register r,outpt_register_detail l
+            WHERE
+                r.hosp_code = l.hosp_code
+                AND r.id = l.register_id
+                AND l.status_code = '0'
+                AND r.hosp_code = #{yybm}
+                AND r.register_time >= #{filter_date}
+            <if test="ksid != null">
+                AND r.dept_id = #{ksid}
+            </if>
+        ), 0) ghsr,
+        IFNULL((
+            SELECT
+                sum(t.reality_price)
+            FROM
+                outpt_cost t,outpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                AND t.settle_id = e.id
+                AND t.hosp_code = #{yybm}
+                AND e.status_code = '0'
+                AND e.settle_time >= #{filter_date}
+                <if test="ksid != null">
+                    AND t.source_dept_id = #{ksid}
+                </if>
+        ),0) mzjssr,
+        IFNULL((
+            SELECT
+                sum(e.reality_price)
+            FROM
+                inpt_visit t ,inpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                and t.id = e.visit_id
+                and e.status_code = '0'
+                and t.hosp_code = #{yybm}
+                and e.settle_time >= #{filter_date}
+                <if test="ksid != null">
+                    AND t.in_dept_id = #{ksid}
+                </if>
+        ),0) zyjssr,
+        IFNULL((
+            SELECT
+                sum(y.price)
+            FROM
+                inpt_visit t ,inpt_advance_pay y
+            WHERE
+                t.hosp_code = y.hosp_code
+                and t.id = y.visit_id
+                and y.status_code = '0'
+                and t.hosp_code = #{yybm}
+                and y.crte_time >= #{filter_date}
+                <if test="ksid != null">
+                    and t.in_dept_id = #{ksid}
+                </if>
+        ),0) zyyjj
+    </select>
+
+
+    <!--统计院领导首页一周门诊收入柱状图数据-->
+    <select id="getYldMzsrData" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+                sum(t.reality_price) mzsr,
+                DATE_FORMAT( e.settle_time, '%Y-%m-%d' ) jssj
+            FROM
+                outpt_cost t,outpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                AND t.settle_id = e.id
+                AND t.hosp_code = #{yybm}
+                AND e.status_code = '0'
+                AND e.settle_time > #{interval_day}
+            GROUP BY
+            DATE_FORMAT( e.settle_time, '%Y-%m-%d' )
+
+    </select>
+
+
+    <!--统计院领导首页一周住院收入柱状图数据-->
+    <select id="getYldZysrData" parameterType="java.util.Map" resultType="java.util.Map">
+         SELECT
+
+                ROUND( IFNULL(( sum( e.reality_price )), 0 ), 2 ) zysr,
+                DATE_FORMAT( e.settle_time, '%Y-%m-%d' ) jssj
+            FROM
+                inpt_visit t ,inpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                and t.id = e.visit_id
+                and e.status_code = '0'
+                and t.hosp_code = #{yybm}
+                and e.settle_time > #{interval_day}
+            GROUP BY
+                DATE_FORMAT(e.settle_time, '%Y-%m-%d')
+    </select>
+
+
+    <!--统计一周的门诊和住院收费-->
+    <select id="selectStatisticMoneyByWeek" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ifnull(
+        (
+            SELECT
+                sum(t.reality_price) mzsr
+            FROM
+                outpt_cost t,outpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                AND t.settle_id = e.id
+                AND t.hosp_code = #{yybm}
+                AND e.status_code = '0'
+                AND e.settle_time > #{interval_day}
+        ), 0) mzsr,
+        ifnull(
+        (
+            SELECT
+
+                ROUND( IFNULL(( sum( e.reality_price )), 0 ), 2 ) zysr
+            FROM
+                inpt_visit t ,inpt_settle e
+            WHERE
+                t.hosp_code = e.hosp_code
+                and t.id = e.visit_id
+                and e.status_code = '0'
+                and t.hosp_code = #{yybm}
+                and e.settle_time > #{interval_day}
+        ), 0) zysr
+    </select>
+
+    <!--统计一周的门诊和住院收费入(药品占比)-->
+    <select id="selectStatisticMoneyByWeekAndYp" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ifnull(
+        (
+        SELECT
+            sum(t.reality_price) mzsr
+        FROM
+            outpt_cost t,outpt_settle e
+        WHERE
+            t.hosp_code = e.hosp_code
+            AND t.settle_id = e.id
+            AND t.hosp_code = #{yybm}
+            AND e.status_code = '0'
+            AND t.item_code = '1'
+            AND e.settle_time > #{interval_day}
+            <if test="ksid != null">
+                and t.source_dept_id = #{ksid}
+            </if>
+        ), 0) mzypsr,
+        ifnull(
+        (
+        SELECT
+            ROUND( IFNULL(( sum( t.reality_price )), 0 ), 2 ) zysr
+        FROM
+            inpt_cost t ,inpt_settle e
+        WHERE
+            t.hosp_code = e.hosp_code
+            and t.settle_id = e.id
+            and e.status_code = '0'
+            AND t.item_code = '1'
+            and t.hosp_code = #{yybm}
+            and e.settle_time > #{interval_day}
+        <if test="ksid != null">
+            and t.source_dept_id = #{ksid}
+        </if>), 0) zyypsr
+    </select>
+
+
+</mapper>

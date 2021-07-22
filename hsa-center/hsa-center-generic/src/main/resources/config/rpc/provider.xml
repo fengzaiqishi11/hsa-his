@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 生产者：暴露接口 -->
+    <!-- ########################################### 信息中心服务consumer start ########################################### -->
+    <!-- 医院数据源生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" ref="centerDatasourceService_provider"/>
+    <dubbo:service interface="cn.hsa.module.center.sync.sevice.CenterSyncService" ref="centerSyncService_provider"/>
+    <!--平台用户-->
+    <dubbo:service interface="cn.hsa.module.center.user.service.CenterUserService" ref="centerUserService_provider"/>
+    <!-- 医院信息维护 -->
+    <dubbo:service interface="cn.hsa.module.center.hospital.service.CenterHospitalService" ref="centerHospitalService_provider"/>
+
+    <!-- 系统管理医院信息维护 -->
+    <dubbo:service interface="cn.hsa.module.center.syshospital.service.SysHospitalService" ref="sysHospitalService_provider"/>
+
+    <!-- 系统管理参数信息维护 -->
+    <dubbo:service interface="cn.hsa.module.center.parameter.service.CenterParameterService" ref="centerParameterService_provider"/>
+
+    <!-- 系统管理参数信息维护（sync） -->
+    <dubbo:service interface="cn.hsa.module.sync.syncparameter.service.SyncParameterService" ref="syncParameterService_provider"/>
+    <!-- 角色权限管理 -->
+    <dubbo:service interface="cn.hsa.module.center.role.service.CenterRoleService" ref="centerRoleService_provider"/>
+    <!-- 项目信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.syncitem.service.SyncItemService" ref="syncItemService_provider"/>
+
+    <!-- 药品信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.syncdrug.service.SyncDrugService" ref="syncDrugService_provider"/>
+
+    <!-- 疾病信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.syncdisease.service.SyncDiseaseService" ref="syncDiseaseService_provider"/>
+
+    <!-- 个人档案维护 -->
+    <dubbo:service interface="cn.hsa.module.center.profilefile.service.CenterProfileFileService" ref="centerProfileFileService_provider"/>
+
+    <!-- 门诊挂号子系统 ->个人档案维护 -->
+    <dubbo:service interface="cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService" ref="outptProfileFileService_provider"/>
+
+    <!--系统菜单管理同步-->
+    <dubbo:service interface="cn.hsa.module.sync.syncmenu.service.SyncMenuService" ref="syncMenuService_provider"/>
+
+    <!-- 系统管理子系统 -> 系统用户管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.syncsystem.service.SyncSystemService" ref="syncSystemService_provider"/>
+
+    <!--系统菜单管理中心-->
+    <dubbo:service interface="cn.hsa.module.center.centermenu.service.CenterMenuService" ref="centerMenuService_provider"/>
+
+    <!-- 医嘱频率生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.rate.service.SyncRateService" ref="centerRateService_provider"/>
+
+    <!-- 信息中心子系统 -> 财务分类消费者 -->
+    <dubbo:service interface="cn.hsa.module.sync.financeclassify.service.SyncFinanceClassifyService" ref="syncFinanceClassifyService_provider"/>
+
+    <!-- 信息中心子系统 -> 材料信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.material.service.SyncMaterialService" ref="syncMaterialService_provider"/>
+
+    <!-- 信息中心子系统 -> 医嘱信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.advice.service.SyncAdviceService" ref="syncAdviceService_provider"/>
+
+    <!-- 信息中心子系统 -> 生产企业信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sync.product.service.SyncProductService" ref="syncProductService_provider"/>
+
+    <!-- 信息中心子系统 -> 国家药品生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService" ref="nationStandardDrugService_provider"/>
+     <!-- 信息中心子系统 -> 国家药品(中药)生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugZYService" ref="nationStandardDrugZYService_provider"/>
+    <!-- 信息中心子系统 -> 生产企业信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.nationstandardmaterial.service.NationStandardMaterialService" ref="nationStandardMaterialService_provider"/>
+    <!-- 信息中心子系统 -> 生产企业信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.nationstandardItem.service.NationStandardItemService" ref="nationStandardItemService_provider"/>
+
+    <!-- ########################################### 信息中心服务consumer end ########################################### -->
+</beans>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.synccode.dao.SyncCodeDao">
+
+    <resultMap id="codeResultMap" type="cn.hsa.module.sync.synccode.entity.SyncCodeDo">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isTree" column="is_tree" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="showDefault" column="show_default" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="detailResultMap" type="cn.hsa.module.sync.synccode.dto.SyncCodeDetailDTO">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="code" column="c_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="upValue" column="up_value" jdbcType="VARCHAR"/>
+        <result property="upValueName" column="upValueName" jdbcType="VARCHAR"/>
+        <result property="isEnd" column="is_end" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getByCode" parameterType="java.lang.String" resultType="cn.hsa.module.sync.synccode.dto.SyncCodeSelectDTO">
+        select b.name cName,b.code cCode,a.id id,a.name label,a.value value,b.show_default showDefault
+        from sync_code b left join sync_code_detail a  on b.code=a.c_code and a.is_valid='1'
+        where b.is_valid='1'
+        <if test="codes!=null and codes.size()>0">
+            and b.code in
+            <foreach collection="codes" index="index" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        order by a.c_code,CAST(a.seq_no AS SIGNED)
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码-->
+    <select id="queryCodePage" resultMap="codeResultMap" parameterType="cn.hsa.module.sync.synccode.dto.SyncCodeDTO">
+        select * from sync_code
+        <where>
+            1=1 and is_valid='1'
+            <if test="keyword!=null and keyword!=''">
+                and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%'))
+                or (pym like CONCAT('%',#{keyword},'%')) or (wbm like CONCAT('%',#{keyword},'%')))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码值-->
+    <select id="queryCodeDetailPage" resultMap="detailResultMap" parameterType="cn.hsa.module.sync.synccode.dto.SyncCodeDetailDTO">
+        select a.id,a.c_code,a.name,a.VALUE,a.seq_no,a.pym,a.wbm,a.up_value,a.is_end,a.is_valid,a.is_end isEnd,
+        a.crte_id,a.crte_name,a.crte_time,(select name from sync_code_detail where c_code=a.c_code and value=a.up_value ) upValueName
+        from sync_code_detail a
+        where
+        1=1 and a.is_valid='1'
+        <if test="keyword!=null and keyword!=''">
+          and ((a.value like CONCAT('%',#{keyword},'%')) or (a.name like CONCAT('%',#{keyword},'%'))
+          or (a.pym like CONCAT('%',#{keyword},'%')) or (a.wbm like CONCAT('%',#{keyword},'%')))
+        </if>
+        <if test="code!=null and code!=''">
+          and a.c_code=#{code}
+        </if>
+        <if test="isEnd!=null and isEnd!=''">
+            and ((a.is_end is null) or (a.is_end is not null and a.is_end != '1'))
+        </if>
+        order by CAST(a.seq_no AS SIGNED)
+    </select>
+
+    <!--根据主键获取值域代码对象-->
+    <select id="getCodeById" resultMap="codeResultMap">
+        select * from sync_code where is_valid='1' and id=#{id}
+    </select>
+
+    <!--根据主键获取值域代码值对象-->
+    <select id="getCodeDetailById" resultMap="detailResultMap">
+        select * from sync_code_detail where is_valid='1' and id=#{id}
+    </select>
+
+    <select id="getMaxSeqno" resultType="java.lang.Integer">
+      select IFNULL(max(seq_no),0) from sync_code_detail where c_code=#{code}
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeCount" resultType="java.lang.Integer">
+        select count(1) as num from sync_code where code=#{code} and is_valid='1' and id!=#{id}
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeDetailCount" resultType="java.lang.Integer">
+        select count(1) as num from sync_code_detail where c_code=#{code} and is_valid='1' and id!=#{id} and value=#{value}
+    </select>
+
+    <!--新增值域代码-->
+    <insert id="insertCode" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_code(id,code,name,pym,wbm,is_tree,is_valid,crte_id,crte_name,crte_time,show_default)
+        values (#{id},#{code},#{name},#{pym},#{wbm},#{isTree},'1',#{crteId},#{crteName},#{crteTime},#{showDefault})
+    </insert>
+
+    <!--新增值域代码-->
+    <insert id="insertCodeDetail">
+        insert into sync_code_detail(id,c_code,name,value,seq_no,pym,wbm,up_value,is_end,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{code},#{name},#{value},#{seqNo},#{pym},#{wbm},#{upValue},#{isEnd},'1',#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--更新值域代码-->
+    <update id="updateCode" keyProperty="id" useGeneratedKeys="true">
+        update sync_code
+        <set>
+            name=#{name},value=#{value},is_end=#{isEnd},up_value=#{upValue},
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="seqNo!=null and seqNo!=''">
+                seq_no=#{seqNo},
+            </if>
+            <if test="seqNo==null or seqNo==''">
+                seq_no='0',
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--更新值域代码值-->
+    <update id="updateCodeDetail" keyProperty="id" useGeneratedKeys="true">
+        update sync_code_detail
+        <set>
+            <if test="code!=null and code!=''">
+                c_code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="value!=null and value!=''">
+                value=#{value},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark=#{remark},
+            </if>
+            <if test="seqNo!=null and seqNo!=''">
+                seq_no=#{seqNo},
+            </if>
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            <if test="upValue!=null and upValue!=''">
+                up_value=#{upValue},
+            </if>
+            <if test="isEnd!=null and isEnd!=''">
+                is_end=#{isEnd},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id = "updateCodeDetailByCode" >
+      update sync_code_detail set c_code = #{code} where c_code= #{oldCode}
+    </update>
+
+    <!--删除值域代码-->
+    <update id="deleteCodes" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sync.synccode.dto.SyncCodeDTO">
+        update sync_code
+        set is_valid = 0 where 1=1 and is_valid = 1
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--删除值域代码值-->
+    <update id="deleteCodeDetails" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sync.synccode.dto.SyncCodeDetailDTO">
+        update sync_code_detail
+        set is_valid = 0 where 1=1 and is_valid = 1
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getCodeTree" parameterType="java.lang.String" resultType="cn.hsa.base.TreeMenuNode">
+        select "-2" id, a.name label, "-1" parentId
+        from sync_code a
+        where a.is_valid='1' and a.code=#{code}
+        union all
+        select a.id, a.label, a.parentId from (
+            select b.value id, b.name label, ifnull(( CASE b.up_value WHEN '' THEN '-2' ELSE b.up_value END ),'-2') parentId
+            from sync_code a
+            join sync_code_detail b on a.code = b.c_code
+            where b.is_valid='1' and a.code=#{code}
+            order by b.seq_no
+        )a
+
+    </select>
+
+</mapper>

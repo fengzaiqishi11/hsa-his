@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 生产者：暴露接口 -->
+    <!-- 门急诊挂号子系统 -> 班次信息维护生产者 -->
+    <dubbo:service interface="cn.hsa.module.outpt.classes.service.OutptClassesService" ref="outptClassesService_provider"/>
+    <!-- 挂号类别设置 -->
+    <dubbo:service interface="cn.hsa.module.outpt.outptclassify.service.OutptClassifyService" ref="outptClassifyService_provider"/>
+    <!--门诊挂号查询-->
+    <dubbo:service interface="cn.hsa.module.outpt.outptquery.service.OutptRegisterQueryService" ref="outptRegisterQueryService_provider"/>
+    <!--门诊挂号-->
+    <dubbo:service interface="cn.hsa.module.outpt.register.service.OutptRegisterService" ref="outptRegisterService_provider"/>
+    <!-- 挂号类别排班设置 -->
+    <dubbo:service interface="cn.hsa.module.outpt.outptclassifyclasses.service.OutptClassifyClassesService" ref="outptClassifyClassesService_provider"/>
+    <!--门诊输液登记-->
+    <dubbo:service interface="cn.hsa.module.outpt.infusionRegister.service.OutptInfusionRegisterService" ref="outptInfusionRegisterService_provider"/>
+    <!--门诊输液执行-->
+    <dubbo:service interface="cn.hsa.module.outpt.infusionExec.service.OutptInfusionExecService" ref="outptInfusionExecService_provider"/>
+    <!--执行卡打印-->
+    <dubbo:service interface="cn.hsa.module.outpt.executioncardprint.service.OutptExecutionCardPrintService" ref="outptExecutionCardPrintService_provider"/>
+    <!-- 皮试处理结果 -->
+    <dubbo:service interface="cn.hsa.module.outpt.skin.service.OutptSkinService" ref="outptSkinService_provider"/>
+    <!--坐诊对列-->
+    <dubbo:service interface="cn.hsa.module.outpt.queue.service.OutptClassesQueueService" ref="outptClassesQueueService_provider"/>
+    <!--医生队列-->
+    <dubbo:service interface="cn.hsa.module.outpt.queue.service.OutptDoctorQueueService" ref="outptDoctorQueueService_provider"/>
+    <!--处方模板-->
+    <dubbo:service interface="cn.hsa.module.outpt.prescribe.service.OutptPrescribeTempService" ref="outptPrescribeTempService_provider"/>
+    <!--发票管理-->
+    <dubbo:service interface="cn.hsa.module.outpt.outinInvoice.service.OutinInvoiceService" ref="outinInvoiceService_provider"/>
+    <!--划价收费-->
+    <dubbo:service interface="cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService" ref="outptTmakePriceFormService_provider"/>
+    <!--门诊退费-->
+    <dubbo:service interface="cn.hsa.module.outpt.fees.service.OutptOutTmakePriceFormService" ref="outptOutTmakePriceFormService_provider"/>
+    <!--处方管理-->
+    <dubbo:service interface="cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService" ref="outptDoctorPrescribeService_provider"/>
+    <!--门诊就诊接口-->
+    <dubbo:service interface="cn.hsa.module.outpt.visit.service.OutptVisitService" ref="outptVisitService_provider"/>
+    <!--门诊日结缴款-->
+    <dubbo:service interface="cn.hsa.module.outpt.daily.service.OutinDailyService" ref="outinDailyService_provider"/>
+    <!--门诊采血-->
+    <dubbo:service interface="cn.hsa.module.outpt.collblood.service.OutptCollBloodService" ref="outptCollBloodService_provider"/>
+
+    <!--门诊电子病历模板-->
+    <dubbo:service interface="cn.hsa.module.outpt.outptmedicaltemplate.service.OutptMedicalTemplateService" ref="outptMedicalTemplateService_provider"/>
+
+
+    <!-- ################################################ 报表consumer start ################################################ -->
+
+    <!--病人费用台账-->
+    <dubbo:service interface="cn.hsa.module.outpt.statement.service.PatientCostLedgerService" ref="patientCostLedgerService_provider"/>
+    <!--病人手术补记账-->
+    <dubbo:service interface="cn.hsa.module.outpt.fees.service.OutptCostKeepAccountsService" ref="outptCostKeepAccounts_provider"/>
+
+    <!--统计报表(支付方式、医保结算)-->
+    <dubbo:service interface="cn.hsa.module.outpt.report.service.StatisticalReportService" ref="statisticalReportService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.outpt.lis.service.LisService" ref="lisService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.outpt.lis.service.PacsService" ref="pacsService_provider"/>
+
+    <!-- ################################################ 报表consumer end ################################################ -->
+
+    <dubbo:service interface="cn.hsa.module.medic.data.service.MedicalDataService" ref="medicalDataService_provider"/>
+    <!-- 门诊医生退费申请 -->
+    <dubbo:service interface="cn.hsa.module.outpt.outptrefundapply.service.OutptRefundApplyService" ref="outptRefundApplyService_provider"/>
+    <!--传染病上报-->
+    <dubbo:service interface="cn.hsa.module.outpt.infectious.service.OutptInfectiousDiseaExecService" ref="outptInfectiousExecService_provider"/>
+    <!-- 分诊队列 -->
+    <dubbo:service interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" ref="outptTriageVisitService_provider"/>
+    <!--分诊病人-->
+    <dubbo:service interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" ref="outptTriageVisitService_provider"/>
+</beans>

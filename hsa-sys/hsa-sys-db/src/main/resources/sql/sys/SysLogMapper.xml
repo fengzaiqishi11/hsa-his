@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.log.dao.SysLogDAO">
+
+    <!--新增值域代码-->
+    <insert id="insertLog" keyProperty="id" useGeneratedKeys="true">
+        insert into sys_log(id,hosp_code,hosp_name,user_id,user_name,user_code,dept_id,dept_name
+        ,dept_type,dept_type_identity,ip,request_path,request_param,code,crte_id,crte_name,crte_time)
+        values (#{id},#{hospCode},#{hospName},#{userId},#{userName},#{userCode},#{deptId},#{deptName}
+        ,#{deptType},#{deptTypeIdentity},#{ip},#{requestPath},#{requestParam},#{code},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+</mapper>

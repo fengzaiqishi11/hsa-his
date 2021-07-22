@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.longcost.dao.BedLongCostDAO">
+
+    <resultMap type="cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO" id="InptLongCostMap">
+        <result property="id" column="ilc_id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="ilc_hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="ilc_visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="ilc_baby_id" jdbcType="VARCHAR"/>
+        <result property="deptId" column="ilc_dept_id" jdbcType="VARCHAR"/>
+        <result property="itemId" column="ilc_item_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="ilc_item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="ilc_item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="ilc_price" jdbcType="NUMERIC"/>
+        <result property="num" column="ilc_num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="ilc_unit_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="ilc_total_price" jdbcType="NUMERIC"/>
+        <result property="lastExecTime" column="ilc_last_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="startTime" column="ilc_start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="ilc_end_time" jdbcType="TIMESTAMP"/>
+        <result property="sourceTypeCode" column="ilc_source_type_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="ilc_source_id" jdbcType="VARCHAR"/>
+        <result property="useCode" column="ilc_use_code" jdbcType="VARCHAR"/>
+        <result property="isCancel" column="ilc_is_cancel" jdbcType="VARCHAR"/>
+        <result property="cancelId" column="ilc_cancel_id" jdbcType="VARCHAR"/>
+        <result property="cancelName" column="ilc_cancel_name" jdbcType="VARCHAR"/>
+        <result property="cancelTime" column="ilc_cancel_time" jdbcType="TIMESTAMP"/>
+        <result property="cancelRemark" column="ilc_cancel_remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="ilc_crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="ilc_crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="ilc_crte_time" jdbcType="TIMESTAMP"/>
+
+        <!-- 一对一映射床位项目 -->
+        <association property="baseItem" javaType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+            <result property="id" column="bi_id" jdbcType="VARCHAR"/>
+            <result property="hospCode" column="bi_hosp_code" jdbcType="VARCHAR"/>
+            <result property="nationCode" column="bi_nation_code" jdbcType="VARCHAR"/>
+            <result property="typeCode" column="bi_type_code" jdbcType="VARCHAR"/>
+            <result property="bfcCode" column="bi_bfc_code" jdbcType="VARCHAR"/>
+            <result property="code" column="bi_code" jdbcType="VARCHAR"/>
+            <result property="name" column="bi_name" jdbcType="VARCHAR"/>
+            <result property="abbr" column="bi_abbr" jdbcType="VARCHAR"/>
+            <result property="spec" column="bi_spec" jdbcType="VARCHAR"/>
+            <result property="price" column="bi_price" jdbcType="NUMERIC"/>
+            <result property="onePrice" column="bi_one_price" jdbcType="NUMERIC"/>
+            <result property="twoPrice" column="bi_two_price" jdbcType="NUMERIC"/>
+            <result property="threePrice" column="bi_three_price" jdbcType="NUMERIC"/>
+            <result property="unitCode" column="bi_unit_code" jdbcType="VARCHAR"/>
+            <result property="intension" column="bi_intension" jdbcType="VARCHAR"/>
+            <result property="prompt" column="bi_prompt" jdbcType="VARCHAR"/>
+            <result property="except" column="bi_except" jdbcType="VARCHAR"/>
+            <result property="remark" column="bi_remark" jdbcType="VARCHAR"/>
+            <result property="isOut" column="bi_is_out" jdbcType="VARCHAR"/>
+            <result property="isIn" column="bi_is_in" jdbcType="VARCHAR"/>
+            <result property="isCg" column="bi_is_cg" jdbcType="VARCHAR"/>
+            <result property="isMs" column="bi_is_ms" jdbcType="VARCHAR"/>
+            <result property="isSuppCurtain" column="bi_is_supp_curtain" jdbcType="VARCHAR"/>
+            <result property="outDeptCode" column="bi_out_dept_code" jdbcType="VARCHAR"/>
+            <result property="inDeptCode" column="bi_in_dept_code" jdbcType="VARCHAR"/>
+            <result property="namePym" column="bi_name_pym" jdbcType="VARCHAR"/>
+            <result property="nameWbm" column="bi_name_wbm" jdbcType="VARCHAR"/>
+            <result property="abbrPym" column="bi_abbr_pym" jdbcType="VARCHAR"/>
+            <result property="abbrWbm" column="bi_abbr_wbm" jdbcType="VARCHAR"/>
+            <result property="isValid" column="bi_is_valid" jdbcType="VARCHAR"/>
+            <result property="crteId" column="bi_crte_id" jdbcType="VARCHAR"/>
+            <result property="crteName" column="bi_crte_name" jdbcType="VARCHAR"/>
+            <result property="crteTime" column="bi_crte_time" jdbcType="TIMESTAMP"/>
+            <result property="bfcId" column="bi_bfc_id" jdbcType="VARCHAR"/>
+        </association>
+
+        <!-- 一对一映射就诊人 -->
+        <association property="inptVisit" javaType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+            <result property="id" column="iv_id" jdbcType="VARCHAR"/>
+            <result property="hospCode" column="iv_hosp_code" jdbcType="VARCHAR"/>
+            <result property="profileId" column="iv_profile_id" jdbcType="VARCHAR"/>
+            <result property="inProfile" column="iv_in_profile" jdbcType="VARCHAR"/>
+            <result property="inNo" column="iv_in_no" jdbcType="VARCHAR"/>
+            <result property="name" column="iv_name" jdbcType="VARCHAR"/>
+            <result property="genderCode" column="iv_gender_code" jdbcType="VARCHAR"/>
+            <result property="age" column="iv_age" jdbcType="INTEGER"/>
+            <result property="ageUnitCode" column="iv_age_unit_code" jdbcType="VARCHAR"/>
+            <result property="birthday" column="iv_birthday" jdbcType="OTHER"/>
+            <result property="nationalityCation" column="iv_nationality_cation" jdbcType="VARCHAR"/>
+            <result property="occupationCode" column="iv_occupation_code" jdbcType="VARCHAR"/>
+            <result property="educationCode" column="iv_education_code" jdbcType="VARCHAR"/>
+            <result property="contactName" column="iv_contact_name" jdbcType="VARCHAR"/>
+            <result property="contactRelaCode" column="iv_contact_rela_code" jdbcType="VARCHAR"/>
+            <result property="contactAddress" column="iv_contact_address" jdbcType="VARCHAR"/>
+            <result property="contactPhone" column="iv_contact_phone" jdbcType="VARCHAR"/>
+            <result property="nationCode" column="iv_nation_code" jdbcType="VARCHAR"/>
+            <result property="certCode" column="iv_cert_code" jdbcType="VARCHAR"/>
+            <result property="certNo" column="iv_cert_no" jdbcType="VARCHAR"/>
+            <result property="marryCode" column="iv_marry_code" jdbcType="VARCHAR"/>
+            <result property="phone" column="iv_phone" jdbcType="VARCHAR"/>
+            <result property="address" column="iv_address" jdbcType="VARCHAR"/>
+            <result property="preferentialTypeId" column="iv_preferential_type_id" jdbcType="VARCHAR"/>
+            <result property="patientCode" column="iv_patient_code" jdbcType="VARCHAR"/>
+            <result property="receiveHospName" column="iv_receive_hosp_name" jdbcType="VARCHAR"/>
+            <result property="bedId" column="iv_bed_id" jdbcType="VARCHAR"/>
+            <result property="bedName" column="iv_bed_name" jdbcType="VARCHAR"/>
+            <result property="nursingCode" column="iv_nursing_code" jdbcType="VARCHAR"/>
+            <result property="dietType" column="iv_diet_type" jdbcType="VARCHAR"/>
+            <result property="illnessCode" column="iv_Illness_code" jdbcType="VARCHAR"/>
+            <result property="statusCode" column="iv_status_code" jdbcType="VARCHAR"/>
+            <result property="inWardId" column="iv_in_ward_id" jdbcType="VARCHAR"/>
+            <result property="inDeptId" column="iv_in_dept_id" jdbcType="VARCHAR"/>
+            <result property="inDeptName" column="iv_in_dept_name" jdbcType="VARCHAR"/>
+            <result property="inTime" column="iv_in_time" jdbcType="TIMESTAMP"/>
+            <result property="zzDoctorId" column="iv_zz_doctor_id" jdbcType="VARCHAR"/>
+            <result property="zzDoctorName" column="iv_zz_doctor_name" jdbcType="VARCHAR"/>
+            <result property="jzDoctorId" column="iv_jz_doctor_id" jdbcType="VARCHAR"/>
+            <result property="jzDoctorName" column="iv_jz_doctor_name" jdbcType="VARCHAR"/>
+            <result property="zgDoctorId" column="iv_zg_doctor_id" jdbcType="VARCHAR"/>
+            <result property="zgDoctorName" column="iv_zg_doctor_name" jdbcType="VARCHAR"/>
+            <result property="inRemark" column="iv_in_remark" jdbcType="VARCHAR"/>
+            <result property="inModeCode" column="iv_in_mode_code" jdbcType="VARCHAR"/>
+            <result property="inDiseaseId" column="iv_in_disease_id" jdbcType="VARCHAR"/>
+            <result property="inDiseaseName" column="iv_in_disease_name" jdbcType="VARCHAR"/>
+            <result property="inDiseaseIcd10" column="iv_in_disease_icd10" jdbcType="VARCHAR"/>
+            <result property="inSituationCode" column="iv_in_situation_code" jdbcType="VARCHAR"/>
+            <result property="outptVisitNo" column="iv_outpt_iv_no" jdbcType="VARCHAR"/>
+            <result property="outptDoctorId" column="iv_outpt_doctor_id" jdbcType="VARCHAR"/>
+            <result property="outptDoctorName" column="iv_outpt_doctor_name" jdbcType="VARCHAR"/>
+            <result property="outptDiseaseId" column="iv_outpt_disease_id" jdbcType="VARCHAR"/>
+            <result property="outptDiseaseName" column="iv_outpt_disease_name" jdbcType="VARCHAR"/>
+            <result property="outptDiseaseIcd10" column="iv_outpt_disease_icd10" jdbcType="VARCHAR"/>
+            <result property="outWardId" column="iv_out_ward_id" jdbcType="VARCHAR"/>
+            <result property="outDeptId" column="iv_out_dept_id" jdbcType="VARCHAR"/>
+            <result property="outDeptName" column="iv_out_dept_name" jdbcType="VARCHAR"/>
+            <result property="outTime" column="iv_out_time" jdbcType="TIMESTAMP"/>
+            <result property="outDiseaseId" column="iv_out_disease_id" jdbcType="VARCHAR"/>
+            <result property="outDiseaseName" column="iv_out_disease_name" jdbcType="VARCHAR"/>
+            <result property="outDiseaseIcd10" column="iv_out_disease_icd10" jdbcType="VARCHAR"/>
+            <result property="outOperId" column="iv_out_oper_id" jdbcType="VARCHAR"/>
+            <result property="outOperName" column="iv_out_oper_name" jdbcType="VARCHAR"/>
+            <result property="outOperTime" column="iv_out_oper_time" jdbcType="TIMESTAMP"/>
+            <result property="outSituationCode" column="iv_out_situation_code" jdbcType="VARCHAR"/>
+            <result property="outRemark" column="iv_out_remark" jdbcType="VARCHAR"/>
+            <result property="outModeCode" column="iv_out_mode_code" jdbcType="VARCHAR"/>
+            <result property="isArchive" column="iv_is_archive" jdbcType="VARCHAR"/>
+            <result property="archiveTime" column="iv_archive_time" jdbcType="TIMESTAMP"/>
+            <result property="archiveId" column="iv_archive_id" jdbcType="VARCHAR"/>
+            <result property="archiveName" column="iv_archive_name" jdbcType="VARCHAR"/>
+            <result property="insureCode" column="iv_insure_code" jdbcType="VARCHAR"/>
+            <result property="insureOrgCode" column="iv_insure_org_code" jdbcType="VARCHAR"/>
+            <result property="insureNo" column="iv_insure_no" jdbcType="VARCHAR"/>
+            <result property="insureBizCode" column="iv_insure_biz_code" jdbcType="VARCHAR"/>
+            <result property="insureTreatCode" column="iv_insure_treat_code" jdbcType="VARCHAR"/>
+            <result property="insurePatientId" column="iv_insure_patient_id" jdbcType="VARCHAR"/>
+            <result property="insureRemark" column="iv_insure_remark" jdbcType="VARCHAR"/>
+            <result property="totalAdvance" column="iv_total_advance" jdbcType="NUMERIC"/>
+            <result property="totalCost" column="iv_total_cost" jdbcType="NUMERIC"/>
+            <result property="totalBalance" column="iv_total_balance" jdbcType="NUMERIC"/>
+            <result property="crteId" column="iv_crte_id" jdbcType="VARCHAR"/>
+            <result property="crteName" column="iv_crte_name" jdbcType="VARCHAR"/>
+            <result property="crteTime" column="iv_crte_time" jdbcType="TIMESTAMP"/>
+        </association>
+    </resultMap>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryBedLongCost" resultMap="InptLongCostMap">
+        SELECT
+        ilc.id ilc_id,
+        ilc.hosp_code ilc_hosp_code,
+        ilc.visit_id ilc_visit_id,
+        ilc.baby_id ilc_baby_id,
+        ilc.dept_id ilc_dept_id,
+        ilc.item_id ilc_item_id,
+        ilc.item_code ilc_item_code,
+        ilc.item_name ilc_item_name,
+        ilc.price ilc_price,
+        ilc.num ilc_num,
+        ilc.unit_code ilc_unit_code,
+        ilc.use_code ilc_use_code,
+        ilc.total_price ilc_total_price,
+        ilc.last_exec_time ilc_last_exec_time,
+        ilc.start_time ilc_start_time,
+        ilc.end_time ilc_end_time,
+        ilc.source_type_code ilc_source_type_code,
+        ilc.source_id ilc_source_id,
+        ilc.is_cancel ilc_is_cancel,
+        ilc.cancel_id ilc_cancel_id,
+        ilc.cancel_name ilc_cancel_name,
+        ilc.cancel_time ilc_cancel_time,
+        ilc.cancel_remark ilc_cancel_remark,
+        ilc.crte_id ilc_crte_id,
+        ilc.crte_name ilc_crte_name,
+        ilc.crte_time ilc_crte_time,
+        iv.id iv_id,
+        iv.hosp_code iv_hosp_code,
+        iv.profile_id iv_profile_id,
+        iv.in_profile iv_in_profile,
+        iv.in_no iv_in_no,
+        iv.NAME iv_name,
+        iv.gender_code iv_gender_code,
+        iv.age iv_age,
+        iv.age_unit_code iv_age_unit_code,
+        iv.birthday iv_birthday,
+        iv.nationality_cation iv_nationality_cation,
+        iv.occupation_code iv_occupation_code,
+        iv.education_code iv_education_code,
+        iv.contact_name iv_contact_name,
+        iv.contact_rela_code iv_contact_rela_code,
+        iv.contact_address iv_contact_address,
+        iv.contact_phone iv_contact_phone,
+        iv.nation_code iv_nation_code,
+        iv.cert_code iv_cert_code,
+        iv.cert_no iv_cert_no,
+        iv.marry_code iv_marry_code,
+        iv.phone iv_phone,
+        iv.address iv_address,
+        iv.preferential_type_id iv_preferential_type_id,
+        iv.patient_code iv_patient_code,
+        iv.receive_hosp_name iv_receive_hosp_name,
+        iv.bed_id iv_bed_id,
+        iv.bed_name iv_bed_name,
+        iv.nursing_code iv_nursing_code,
+        iv.diet_type iv_diet_type,
+        iv.Illness_code iv_Illness_code,
+        iv.status_code iv_status_code,
+        iv.in_ward_id iv_in_ward_id,
+        iv.in_dept_id iv_in_dept_id,
+        iv.in_dept_name iv_in_dept_name,
+        iv.in_time iv_in_time,
+        iv.zz_doctor_id iv_zz_doctor_id,
+        iv.zz_doctor_name iv_zz_doctor_name,
+        iv.jz_doctor_id iv_jz_doctor_id,
+        iv.jz_doctor_name iv_jz_doctor_name,
+        iv.zg_doctor_id iv_zg_doctor_id,
+        iv.zg_doctor_name iv_zg_doctor_name,
+        iv.in_remark iv_in_remark,
+        iv.in_mode_code iv_in_mode_code,
+        iv.in_disease_id iv_in_disease_id,
+        iv.in_disease_name iv_in_disease_name,
+        iv.in_disease_icd10 iv_in_disease_icd10,
+        iv.in_situation_code iv_in_situation_code,
+        iv.outpt_visit_no iv_outpt_visit_no,
+        iv.outpt_doctor_id iv_outpt_doctor_id,
+        iv.outpt_doctor_name iv_outpt_doctor_name,
+        iv.outpt_disease_id iv_outpt_disease_id,
+        iv.outpt_disease_name iv_outpt_disease_name,
+        iv.outpt_disease_icd10 iv_outpt_disease_icd10,
+        iv.out_ward_id iv_out_ward_id,
+        iv.out_dept_id iv_out_dept_id,
+        iv.out_dept_name iv_out_dept_name,
+        iv.out_time iv_out_time,
+        iv.out_disease_id iv_out_disease_id,
+        iv.out_disease_name iv_out_disease_name,
+        iv.out_disease_icd10 iv_out_disease_icd10,
+        iv.out_oper_id iv_out_oper_id,
+        iv.out_oper_name iv_out_oper_name,
+        iv.out_oper_time iv_out_oper_time,
+        iv.out_situation_code iv_out_situation_code,
+        iv.out_remark iv_out_remark,
+        iv.out_mode_code iv_out_mode_code,
+        iv.is_archive iv_is_archive,
+        iv.archive_time iv_archive_time,
+        iv.archive_id iv_archive_id,
+        iv.archive_name iv_archive_name,
+        iv.insure_code iv_insure_code,
+        iv.insure_org_code iv_insure_org_code,
+        iv.insure_no iv_insure_no,
+        iv.insure_biz_code iv_insure_biz_code,
+        iv.insure_treat_code iv_insure_treat_code,
+        iv.insure_patient_id iv_insure_patient_id,
+        iv.insure_remark iv_insure_remark,
+        iv.total_advance iv_total_advance,
+        iv.total_cost iv_total_cost,
+        iv.total_balance iv_total_balance,
+        iv.crte_id iv_crte_id,
+        iv.crte_name iv_crte_name,
+        iv.crte_time iv_crte_time,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.id ELSE bi.id END ) bi_id,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.CODE ELSE bi.CODE END ) bi_code,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.NAME ELSE bi.NAME END ) bi_name,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.spec ELSE bi.spec END ) bi_spec,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.price ELSE bi.price END ) bi_price,
+        ( CASE WHEN ilc.item_code = '2' THEN bm.unit_code ELSE bi.unit_code END ) bi_unit_code,
+        ( CASE WHEN ilc.item_code = '2' THEN bfc2.id ELSE bfc.id END ) bi_bfc_id
+        FROM inpt_long_cost ilc
+        left JOIN inpt_visit iv ON ilc.hosp_code = iv.hosp_code AND ilc.visit_id = iv.id
+        left JOIN base_item bi ON ilc.hosp_code = bi.hosp_code AND ilc.item_id = bi.id
+        left join base_finance_classify bfc on ilc.hosp_code = bfc.hosp_code and bfc.code = bi.bfc_code
+        left JOIN base_material bm ON ilc.hosp_code = bm.hosp_code AND ilc.item_id = bm.id
+        left join base_finance_classify bfc2 on ilc.hosp_code = bfc2.hosp_code and bfc2.code = bm.bfc_code
+        WHERE ilc.hosp_code = #{hospCode}
+        AND ifnull(ilc.is_cancel,'0') = '0'
+        AND ilc.start_time &lt; #{endTime}
+        and (ilc.end_time is null or ilc.end_time &gt; date(#{endTime}))
+        AND ( ilc.last_exec_time IS NULL OR ilc.last_exec_time &lt; #{endTime} )
+        <if test="visitId != null and visitId != ''">
+            and ilc.visit_id = #{visitId}
+        </if>
+    </select>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update inpt_long_cost set last_exec_time = #{lastExecTime}
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 获取住院病人累计预交金 -->
+    <select id="queryTotalInptAdvancePay" resultType="java.util.Map">
+        select iap.visit_id, sum(price) total_price from inpt_advance_pay iap
+        where iap.hosp_code = #{hospCode} and iap.is_settle = '0' and iap.status_code = '0'
+        and iap.visit_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        group by iap.visit_id
+    </select>
+
+    <!-- 获取住院病人累计费用 -->
+    <select id="queryTotalInptCost" resultType="java.util.Map">
+        select ic.visit_id, sum(reality_price) total_price from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        group by ic.visit_id
+    </select>
+
+    <!-- 根据住院病人就诊ID，修改累计费用、累计余额 -->
+    <update id="updateVisitTotalMoney">
+        <foreach collection="list"  item="item" separator=";">
+            update inpt_visit
+            set total_cost = #{item.totalCost}, total_balance = #{item.totalBalance}, total_advance = #{item.totalAdvance}
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="queryLongCostByVistIdAndSoureTypeCode" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" resultType="cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO">
+        select  a.id,
+        a.hosp_code AS hospCode,
+        a.visit_id AS visitId,
+        a.baby_id AS babyId,
+        a.dept_id AS deptId,
+        a.item_code AS itemCode,
+        a.item_id AS itemId,
+        a.item_name AS itemName,
+        (case when a.item_code ='2' then e.bfc_id when a.item_code = '3' then d.bfc_id else '' end) as bfcId ,
+        (case when a.item_code ='2' then e.bfc_name when a.item_code = '3' then d.bfc_name else '' end) as bfcName ,
+        a.price,
+        a.num,
+        a.num as totalNum,
+        a.unit_code AS unitCode,
+        a.total_price AS totalPrice,
+        a.use_code as useCode,
+        a.last_exec_time AS lastExecTime,
+        a.charge_time AS chargeTime,
+        a.start_time AS startTime,
+        a.end_time AS endTime,
+        a.source_type_code AS sourceTypeCode,
+        a.source_id AS sourceId,
+        a.is_cancel AS isCancel,
+        a.cancel_id AS cancelId,
+        a.cancel_name AS cancelName,
+        a.cancel_time AS cancelTime,
+        a.cancel_remark AS cancelRemark,
+        a.crte_id AS crteId,
+        a.crte_name AS crteName,
+        a.crte_time AS crteTime
+        from inpt_long_cost a
+        left join (select b.id as item_id,f.id as bfc_id,f.name as bfc_name,b.hosp_code from base_item b ,base_finance_classify f where b.bfc_code = f.code and b.hosp_code = f.hosp_code ) d  on a.item_id = d.item_id and a.hosp_code = d.hosp_code
+        left join (select  b.id as item_id,f.id as bfc_id,f.name as bfc_name,b.hosp_code from base_material b ,base_finance_classify f where b.bfc_code = f.code and b.hosp_code = f.hosp_code) e on a.item_id = e.item_id and a.hosp_code = e.hosp_code
+        where a.visit_id =#{visitId}
+        and a.source_type_code = #{sourceCode}
+        <if test='queryBaby =="N"'>
+            and (a.baby_id is null or a.baby_id = '')
+        </if>
+        <if test="babyId != null and babyId != ''">
+            AND a.baby_id = #{babyId}
+        </if>
+    </select>
+
+    <!--新增长期费用表所有列-->
+    <insert id="insertLongCost">
+        insert into
+        inpt_long_cost(id, hosp_code, visit_id, baby_id, dept_id, item_code, item_id, item_name, use_code, price, num, unit_code, total_price, last_exec_time, start_time, end_time, source_type_code, source_id, is_cancel, cancel_id, cancel_name, cancel_time, cancel_remark, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.itemCode}, #{item.itemId}, #{item.itemName},#{item.useCode}, #{item.price}, #{item.num}, #{item.unitCode}, #{item.totalPrice}, #{item.lastExecTime}, #{item.startTime}, #{item.endTime}, #{item.sourceTypeCode}, #{item.sourceId}, #{item.isCancel}, #{item.cancelId}, #{item.cancelName}, #{item.cancelTime}, #{item.cancelRemark}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+
+    </insert>
+
+    <update id="updateAccountRepairLong">
+        update inpt_long_cost
+        set end_time = #{endTime},
+        is_cancel = '1',
+        cancel_id = #{cancelId},
+        cancel_name = #{cancelName},
+        cancel_time = #{cancelTime},
+        cancel_remark = #{cancelRemark}
+        where id = #{id}
+        and hosp_code = #{hospCode}
+    </update>
+
+</mapper>

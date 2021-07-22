@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.clinic.dao.BaseClinicDAO">
+
+    <resultMap id="baseClinicMap" type="cn.hsa.module.base.clinic.dto.BaseClinicDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="cn.hsa.module.base.clinic.dto.BaseClinicDTO">
+        INSERT INTO base_clinic(`id`, `hosp_code`, `name`, `number`, `address`, `is_valid`, `dept_id`, `pym`, `wbm`, `remark`, `crte_id`,
+                                `crte_name`, `crte_time`)
+                VALUES (#{id}, #{hospCode}, #{name}, #{number}, #{address}, #{isValid}, #{deptId}, #{pym}, #{wbm}, #{remark}, #{crteId},
+                                #{crteName}, #{crteTime})
+    </insert>
+
+    <update id="update" parameterType="cn.hsa.module.base.clinic.dto.BaseClinicDTO">
+        UPDATE base_clinic SET  `name` = #{name}, `number` = #{number}, `address` = #{address},  `dept_id` = #{deptId},
+                               `pym` = #{pym}, `wbm` = #{wbm}, `remark` = #{remark},  `crte_name` = #{crteName}, `crte_time` = #{crteTime}
+        WHERE `id` = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateIsValid" parameterType="cn.hsa.module.base.clinic.dto.BaseClinicDTO">
+        update base_clinic set is_valid = #{isValid}
+        where  hosp_code = #{hospCode}
+        and id in
+        <if test="clinicIdList != null and clinicIdList.size()>0">
+            <foreach collection="clinicIdList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+
+    <select id="getById" resultMap="baseClinicMap">
+        select * from base_clinic where id = #{id}
+    </select>
+
+    <select id="queryAll"  resultMap="baseClinicMap">
+        select bc.*,bd.`name` as deptName from base_clinic bc,base_dept bd
+        where bc.hosp_code = #{hospCode}
+        AND bd.hosp_code = bc.hosp_code and bc.dept_id = bd.id
+    <if test="keyword != null and keyword != ''">
+        and (bc.`name` like concat('%',#{keyword},'%')
+                or bc.`number` like concat('%',#{keyword},'%')
+                or bc.address like concat('%',#{keyword},'%')
+            )
+    </if>
+    <if test="deptId != null and deptId != ''">
+        and bc.dept_id = #{deptId}
+    </if>
+    </select>
+
+    <!--根据科室ID查询诊室信息-->
+    <select id="getBaseClinicDTOByDeptId" parameterType="cn.hsa.module.base.clinic.dto.BaseClinicDTO" resultType="cn.hsa.module.base.clinic.dto.BaseClinicDTO">
+        select * from base_clinic  where dept_id = #{deptId} and hosp_code = #{hospCode} and is_valid ='0'
+    </select>
+
+</mapper>

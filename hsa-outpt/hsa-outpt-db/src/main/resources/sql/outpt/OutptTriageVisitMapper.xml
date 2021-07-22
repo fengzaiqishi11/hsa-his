@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO">
+
+    <resultMap id="outinTriageVisitMap" type="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="registerId" column="register_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="dqId" column="dq_id" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="clinicId" column="clinic_id" jdbcType="VARCHAR"/>
+        <result property="triageId" column="triage_id" jdbcType="VARCHAR"/>
+        <result property="triageNo" column="triage_no" jdbcType="VARCHAR"/>
+        <result property="sortNo" column="sort_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="triageStartCode" column="triage_start_code" jdbcType="VARCHAR"/>
+        <result property="isCall" column="is_call" jdbcType="VARCHAR"/>
+        <result property="callTime" column="call_time" jdbcType="TIMESTAMP"/>
+        <result property="callNumber" column="call_number" jdbcType="INTEGER"/>
+        <result property="isLoss" column="is_loss" jdbcType="VARCHAR"/>
+        <result property="lossTime" column="loss_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="triagePeoId" column="triage_peo_id" jdbcType="VARCHAR"/>
+        <result property="triagePeoName" column="triage_peo_name" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 表查询字段 -->
+    <sql id="allColumns">
+        id	,hosp_code	,register_id	,visit_id	,dq_id	,doctor_id	,doctor_name,clinic_id	,
+        clinic_name,triage_id	,triage_no	,sort_no,name,triage_start_code	,is_call,call_time	,
+        call_number,is_loss,loss_time,remark,triage_peo_id	,triage_peo_name,
+        triage_peo_time	,crte_id,crte_name,crte_time,dept_id,dept_name
+    </sql>
+
+    <!-- 查询待叫病人数据以及正在叫的一条数据-->
+    <select id="queryPage" resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+        a.id,a.hosp_code,
+        a.register_id,a.visit_id,a.dq_id,a.doctor_id,a.doctor_name,a.clinic_id,
+        ifnull( a.clinic_name, bc.NAME ) AS clinic_name,
+        a.triage_id, a.triage_no,ifnull( a.sort_no, 0 ) AS sort_no,
+        a.NAME,a.triage_start_code,a.is_call,  a.call_time,a.call_number,
+        ifnull( a.is_loss, '0' ) AS is_loss, a.loss_time, a.remark,a.triage_peo_id,
+        a.triage_peo_name,a.triage_peo_time,a.crte_id, a.crte_name,
+        a.crte_time,a.dept_id,a.dept_name,b.visit_no,d.NAME AS gh_name,
+        c.register_time  AS register_time,b.age,b.age_unit_code,
+        b.gender_code AS sex,b.cert_no,
+        DATE_FORMAT( b.birthday, '%Y-%m-%d' ) AS birthday,b.marry_code,b.patient_code,b.visit_time,b.phone
+        FROM
+        outpt_triage_visit a
+        left join outpt_visit b on a.visit_id = b.id
+        left join outpt_register c on a.register_id = c.id
+        left join outpt_classify d on c.cf_id = d.id
+        left join base_clinic bc on a.clinic_id = bc.id
+        WHERE
+        a.hosp_code = #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="keyword != null and keyword == 'queue'.toString()">
+            and a.clinic_id is not null and a.triage_id is not null
+            and  a.triage_start_code != '4' and  a.triage_start_code != '5' and (is_loss = '0' or is_loss is null)
+        </if>
+        <if test="triageId != null and triageId != ''">
+            and  a.triage_id = #{triageId}
+        </if>
+        <choose>
+            <when test='triageStartCode != null and triageStartCode == "1" '>
+                    and a.triage_start_code = #{triageStartCode}
+            </when>
+            <otherwise>
+                    and a.triage_start_code != '1'
+            </otherwise>
+        </choose>
+        <if test="name != null and name != ''">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="endTime != null">
+            and date(c.register_time) &lt;= date(#{endTime})
+        </if>
+        <if test="startTime != null">
+            and date(c.register_time) &gt;= date(#{startTime})
+        </if>
+        order by  a.sort_no asc,c.register_time asc
+
+    </select>
+
+    <!-- interf提供给叫号系统的分诊病人信息 -->
+    <select id="queryNotCalledTriageList" resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+        a.id,a.hosp_code,
+        a.register_id,a.visit_id,a.dq_id,a.doctor_id,a.doctor_name,a.clinic_id,
+        ifnull( a.clinic_name, bc.NAME ) AS clinic_name,
+        a.triage_id, a.triage_no,ifnull( a.sort_no, 0 ) AS sort_no,
+        a.NAME,a.triage_start_code,a.is_call,  a.call_time,a.call_number,
+        ifnull( a.is_loss, '0' ) AS is_loss, a.loss_time, a.remark,a.triage_peo_id,
+        a.triage_peo_name,a.triage_peo_time,a.crte_id, a.crte_name,
+        a.crte_time,a.dept_id,a.dept_name,b.visit_no,d.NAME AS gh_name,
+        c.register_time  AS register_time,b.age,b.age_unit_code,
+        b.gender_code AS sex,b.cert_no,
+        DATE_FORMAT( b.birthday, '%Y-%m-%d' ) AS birthday,b.marry_code,b.patient_code,b.visit_time,b.phone
+        FROM
+        outpt_triage_visit a
+        left join outpt_visit b on a.visit_id = b.id
+        left join outpt_register c on a.register_id = c.id
+        left join outpt_classify d on c.cf_id = d.id
+        left join base_clinic bc on a.clinic_id = bc.id
+        WHERE
+        a.hosp_code = #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="triageId != null and triageId != ''">
+            and  a.triage_id = #{triageId}
+        </if>
+        and a.clinic_id is not null and a.triage_id is not null
+        and ( a.triage_start_code = '2')
+        and (is_loss = '0' or is_loss is null)
+        <if test="keyword != null and keyword != ''">
+            and c.register_time &gt;= date(#{keyword})
+        </if>
+        order by c.register_time asc, a.sort_no asc
+    </select>
+    <!-- 查询诊室已叫号的最新信息 -->
+    <select id="queryCalledTriageList"  resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+        a.id,a.hosp_code,
+        a.register_id,a.visit_id,a.dq_id,a.doctor_id,a.doctor_name,a.clinic_id,
+        ifnull( a.clinic_name, bc.NAME ) AS clinic_name,
+        a.triage_id, a.triage_no,ifnull( a.sort_no, 0 ) AS sort_no,
+        a.NAME,a.triage_start_code,a.is_call,  a.call_time,a.call_number,
+        ifnull( a.is_loss, '0' ) AS is_loss, a.loss_time, a.remark,a.triage_peo_id,
+        a.triage_peo_name,a.triage_peo_time,a.crte_id, a.crte_name,
+        a.crte_time,a.dept_id,a.dept_name,b.visit_no,d.NAME AS gh_name,
+        c.register_time  AS register_time,b.age,b.age_unit_code,
+        b.gender_code AS sex,b.cert_no,
+        DATE_FORMAT( b.birthday, '%Y-%m-%d' ) AS birthday,b.marry_code,b.patient_code,b.visit_time,b.phone
+        FROM
+        outpt_triage_visit a
+        left join outpt_visit b on a.visit_id = b.id
+        left join outpt_register c on a.register_id = c.id
+        left join outpt_classify d on c.cf_id = d.id
+        left join base_clinic bc on a.clinic_id = bc.id
+        WHERE
+        a.hosp_code = #{hospCode}
+        <if test="triageId != null and triageId != ''">
+            and  a.triage_id = #{triageId}
+        </if>
+        and a.clinic_id is not null and a.triage_id is not null
+        and a.triage_start_code = '3'
+        and (is_loss = '0' or is_loss is null)
+        <if test="keyword != null">
+            and c.register_time &gt;= date(#{keyword})
+        </if>
+        order by c.register_time desc
+    </select>
+
+    <!--修改分诊病人信息-->
+    <update id="updateOutptTriageVisitById" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        update outpt_triage_visit
+        <set>
+            <if test="registerId != null and registerId != '' ">
+                register_id =#{registerId} ,
+            </if>
+            <if test="visitId != null and visitId != '' ">
+                visit_id =#{visitId} ,
+            </if>
+            <if test="dqId != null and dqId != '' ">
+                dq_id =#{dqId} ,
+            </if>
+            <if test="triageId != null and triageId != '' ">
+                triage_id =#{triageId} ,
+            </if>
+            <if test="triageName != null and triageName != '' ">
+                triage_name =#{triageName} ,
+            </if>
+            <if test="triageNo != null and triageNo != '' ">
+                triage_no =#{triageNo} ,
+            </if>
+            <if test="clinicId != null and clinicId != '' ">
+                clinic_id =#{clinicId} ,
+            </if>
+            <if test="doctorId != null and doctorId != '' ">
+                doctor_id =#{doctorId} ,
+            </if>
+            <if test="doctorName != null and doctorName != '' ">
+                doctor_name =#{doctorName} ,
+            </if>
+            <if test="clinicName != null and clinicName != '' ">
+                clinic_name =#{clinicName} ,
+            </if>
+            <if test="deptId != null and deptId != '' ">
+                dept_id =#{deptId} ,
+            </if>
+            <if test="deptName != null and deptName != '' ">
+                dept_name =#{deptName} ,
+            </if>
+            <if test="sortNo != null and sortNo != '' ">
+                sort_no =#{sortNo} ,
+            </if>
+            <if test="name != null and name != '' ">
+                name =#{name} ,
+            </if>
+            <if test="triageStartCode != null and triageStartCode != '' ">
+                triage_start_code =#{triageStartCode} ,
+            </if>
+            <if test="isCall != null and isCall != '' ">
+                is_call =#{isCall} ,
+            </if>
+            <if test="callTime != null">
+                call_time =#{callTime} ,
+            </if>
+            <if test="callNumber != null and callNumber != '' ">
+                call_number =#{callNumber} ,
+            </if>
+            <if test="isLoss != null and isLoss != '' ">
+                is_loss =#{isLoss} ,
+            </if>
+            <if test="lossTime != null">
+                loss_time =#{lossTime} ,
+            </if>
+            <if test="remark != null and remark != '' ">
+                remark =#{remark} ,
+            </if>
+            <if test="triagePeoId != null and triagePeoId != '' ">
+                triage_peo_id =#{triagePeoId} ,
+            </if>
+            <if test="triagePeoName != null and triagePeoName != '' ">
+                triage_peo_name =#{triagePeoName} ,
+            </if>
+            <if test="triagePeoTime != null">
+                triage_peo_time =#{triagePeoTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+  <update id="updateOutptTriageVisitByRegisterId">
+        update outpt_triage_visit
+        <set>
+            call_number = CONVERT(CONVERT(ifNULL(call_number,0),SIGNED)+1,CHAR),
+            <if test="dqId != null and dqId != '' ">
+                dq_id =#{dqId} ,
+            </if>
+            <if test="triageId != null and triageId != '' ">
+                triage_id =#{triageId} ,
+            </if>
+            <if test="triageName != null and triageName != '' ">
+                triage_name =#{triageName} ,
+            </if>
+            <if test="triageNo != null and triageNo != '' ">
+                triage_no =#{triageNo} ,
+            </if>
+            <if test="clinicId != null and clinicId != '' ">
+                clinic_id =#{clinicId} ,
+            </if>
+            <if test="doctorId != null and doctorId != '' ">
+                doctor_id =#{doctorId} ,
+            </if>
+            <if test="triageStartCode != null and triageStartCode != ''">
+                triage_start_code =#{triageStartCode} ,
+            </if>
+            <if test="doctorName != null and doctorName != '' ">
+                doctor_name =#{doctorName} ,
+            </if>
+            <if test="clinicName != null and clinicName != '' ">
+                clinic_name =#{clinicName} ,
+            </if>
+            <if test="deptId != null and deptId != '' ">
+                dept_id =#{deptId} ,
+            </if>
+            <if test="deptName != null and deptName != '' ">
+                dept_name =#{deptName} ,
+            </if>
+            <if test="sortNo != null and sortNo != '' ">
+                sort_no =#{sortNo} ,
+            </if>
+            <if test="name != null and name != '' ">
+                name =#{name} ,
+            </if>
+            <if test="triageStartCode != null and triageStartCode != '' ">
+                triage_start_code =#{triageStartCode} ,
+            </if>
+            <if test="isCall != null and isCall != '' ">
+                is_call =#{isCall} ,
+            </if>
+            <if test="callTime != null">
+                call_time =#{callTime} ,
+            </if>
+            <if test="callNumber != null and callNumber != '' ">
+                call_number =#{callNumber} ,
+            </if>
+            <if test="isLoss != null and isLoss != '' ">
+                is_loss =#{isLoss} ,
+            </if>
+            <if test="lossTime != null">
+                loss_time =#{lossTime} ,
+            </if>
+            <if test="remark != null and remark != '' ">
+                remark =#{remark} ,
+            </if>
+            <if test="triagePeoId != null and triagePeoId != '' ">
+                triage_peo_id =#{triagePeoId} ,
+            </if>
+            <if test="triagePeoName != null and triagePeoName != '' ">
+                triage_peo_name =#{triagePeoName} ,
+            </if>
+            <if test="triagePeoTime != null">
+                triage_peo_time =#{triagePeoTime} ,
+            </if>
+        </set>
+        where register_id = #{registerId} and hosp_code = #{hospCode}
+
+    </update>
+  <update id="updateOutptTriageVisit">
+        update outpt_triage_visit
+        <set>
+            <if test="dqId != null and dqId != '' ">
+                dq_id =#{dqId} ,
+            </if>
+            <if test="triageId != null and triageId != '' ">
+                triage_id =#{triageId} ,
+            </if>
+            <if test="triageName != null and triageName != '' ">
+                triage_name =#{triageName} ,
+            </if>
+            <if test="triageNo != null and triageNo != '' ">
+                triage_no =#{triageNo} ,
+            </if>
+            <if test="clinicId != null and clinicId != '' ">
+                clinic_id =#{clinicId} ,
+            </if>
+            <if test="doctorId != null and doctorId != '' ">
+                doctor_id =#{doctorId} ,
+            </if>
+            <if test="triageStartCode != null and triageStartCode != ''">
+                triage_start_code =#{triageStartCode} ,
+            </if>
+            <if test="doctorName != null and doctorName != '' ">
+                doctor_name =#{doctorName} ,
+            </if>
+            <if test="clinicName != null and clinicName != '' ">
+                clinic_name =#{clinicName} ,
+            </if>
+            <if test="deptId != null and deptId != '' ">
+                dept_id =#{deptId} ,
+            </if>
+            <if test="deptName != null and deptName != '' ">
+                dept_name =#{deptName} ,
+            </if>
+            <if test="sortNo != null and sortNo != '' ">
+                sort_no =#{sortNo} ,
+            </if>
+            <if test="name != null and name != '' ">
+                name =#{name} ,
+            </if>
+            <if test="triageStartCode != null and triageStartCode != '' ">
+                triage_start_code =#{triageStartCode} ,
+            </if>
+            <if test="isCall != null and isCall != '' ">
+                is_call =#{isCall} ,
+            </if>
+            <if test="callTime != null and callTime != '' ">
+                call_time =#{callTime} ,
+            </if>
+            <if test="callNumber != null and callNumber != '' ">
+                call_number =#{callNumber} ,
+            </if>
+            <if test="isLoss != null and isLoss != '' ">
+                is_loss =#{isLoss} ,
+            </if>
+            <if test="lossTime != null and lossTime != '' ">
+                loss_time =#{lossTime} ,
+            </if>
+            <if test="remark != null and remark != '' ">
+                remark =#{remark} ,
+            </if>
+            <if test="triagePeoId != null and triagePeoId != '' ">
+                triage_peo_id =#{triagePeoId} ,
+            </if>
+            <if test="triagePeoName != null and triagePeoName != '' ">
+                triage_peo_name =#{triagePeoName} ,
+            </if>
+            <if test="triagePeoTime != null and triagePeoTime != '' ">
+                triage_peo_time =#{triagePeoTime} ,
+            </if>
+        </set>
+        where register_id = #{registerId} and hosp_code = #{hospCode}
+
+    </update>
+
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryOutptTriageVisitPage" resultMap="outinTriageVisitMap" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outpt_triage_visit WHERE
+        hosp_code = #{hospCode}
+        <if test="registerId !=null and registerId !=''">
+            and register_id = #{registerId}
+        </if>
+        <if test="visitId !=null and visitId !=''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="dqId !=null and dqId !=''">
+            and dq_id = #{dqId}
+        </if>
+        <if test="clinicId !=null and clinicId !=''">
+            and clinic_id = #{clinicId}
+        </if>
+        <if test="triageId !=null and triageId !=''">
+            and triage_id = #{triageId}
+        </if>
+        <if test="triageNo !=null and triageNo !=''">
+            and triage_no = #{triageNo}
+        </if>
+        <if test="name !=null and name !=''">
+            and name = #{name}
+        </if>
+        <if test="triageStartCode !=null and triageStartCode !=''">
+            and triage_start_code = #{triageStartCode}
+        </if>
+
+    </select>
+
+    <!-- 门诊医生叫号接口专用 -->
+    <select id="queryOutptTriageVisitInfo" resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+            a.id,
+            a.hosp_code,
+            a.register_id,
+            a.visit_id,
+            a.dq_id,
+            a.doctor_id,
+            a.doctor_name,
+            a.clinic_id,
+            ifnull( a.clinic_name, bc.NAME ) AS clinic_name,
+            a.triage_id,
+            a.triage_name,
+            a.triage_no,
+            ifnull( a.sort_no, 0 ) AS sort_no,
+            a.NAME,
+            a.triage_start_code,
+            a.is_call,
+            a.call_time,
+            a.call_number,
+            ifnull( a.is_loss, '0' ) AS is_loss,
+            a.loss_time,
+            a.remark,
+            a.triage_peo_id,
+            a.triage_peo_name,
+            a.triage_peo_time,
+            a.crte_id,
+            a.crte_name,
+            a.crte_time,
+            a.dept_id,
+            a.dept_name,
+            b.visit_no,
+            date( c.register_time ) AS register_time,
+            b.age,
+            b.age_unit_code,
+            b.gender_code AS sex,
+            b.cert_no,
+            DATE_FORMAT( b.birthday, '%Y-%m-%d' ) AS birthday,
+            b.marry_code,
+            b.patient_code,
+            b.phone
+        FROM
+            outpt_triage_visit a
+            left join outpt_visit b on a.visit_id = b.id
+            left join outpt_register c on a.register_id = c.id
+            left join base_clinic bc  on a.clinic_id = bc.id
+        WHERE
+          a.hosp_code = #{hospCode}
+          AND a.register_id = #{registerId}
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryOutptTriageVisitById" resultMap="outinTriageVisitMap" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outpt_triage_visit WHERE
+        hosp_code = #{hospCode}
+        and id =#{id}
+
+    </select>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertOutptTriageVisit" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" >
+        insert into
+            outpt_triage_visit
+        (`id`, `hosp_code`, `register_id`, `visit_id`, `dq_id`, `triage_id`, `triage_name`, `triage_no`, `clinic_id`,
+         `doctor_id`, `doctor_name`,`clinic_name`, `dept_id`, `dept_name`, `sort_no`, `name`, `triage_start_code`,
+         `is_call`, `call_time`, `call_number`, `is_loss`,`loss_time`, `remark`, `triage_peo_id`, `triage_peo_name`,
+         `triage_peo_time`, `crte_id`, `crte_name`, `crte_time`)
+        values
+        (#{id}, #{hospCode}, #{registerId}, #{visitId}, #{dqId}, #{triageId}, #{triageName}, #{triageNo}, #{clinicId},
+         #{doctorId}, #{doctorName},#{clinicName}, #{deptId}, #{deptName}, #{sortNo}, #{name}, #{triageStartCode},
+         #{isCall}, #{callTime}, #{callNumber}, #{isLoss},#{lossTime}, #{remark}, #{triagePeoId}, #{triagePeoName},
+         #{triagePeoTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <delete id="deleteOutptTriageVisitById" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        delete from outpt_triage_visit where id = #{id}
+    </delete>
+
+
+
+    <select id="getDoctorByClinicIdAndQueueDate" resultType="cn.hsa.module.sys.user.dto.SysUserDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+             SELECT
+                *
+            FROM
+                sys_user
+            WHERE
+                id IN (
+                SELECT
+                    b.doctor_id
+                FROM
+                    outpt_classes_queue a,
+                    outpt_doctor_queue b
+                WHERE
+                    a.id = b.cq_id
+                    AND a.queue_date = date (#{queueDate})
+                AND b.clinic_id = #{clinicId}
+                ) and status_code ='0'
+    </select>
+
+    <select id="getClinicInfoById" resultType="map" parameterType="map" >
+        select id,`name`,`number`,address from base_clinic
+        where id =#{id} and hosp_code = #{hospCode}
+    </select>
+    <!--保存操作信息修改-->
+    <update id="updateOutptTriageVisitFz" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        update outpt_triage_visit
+            set clinic_id =#{clinicId} ,
+            set doctor_id =#{doctorId} ,
+            set doctor_name =#{doctorName} ,
+            set clinic_name =#{clinicName} ,
+            set triage_start_code = '2' ,
+            set is_call = '0' ,
+            set call_time = null,
+            set call_number = 0 ,
+            set is_loss = '0' ,
+            set loss_time = null,
+            set remark =#{remark}
+        where id = #{id}
+    </update>
+
+
+    <!--分诊操作信息修改-->
+    <update id="updateOutptTriageVisitXg" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        update outpt_triage_visit
+            set clinic_id =#{clinicId} ,
+            set doctor_id =#{doctorId} ,
+            set doctor_name =#{doctorName} ,
+            set clinic_name =#{clinicName} ,
+            set triage_start_code = #{triageStartCode} ,
+            set sort_no = #{sortNo}
+            set remark =#{remark}
+        where id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.system.dao.SysSystemDao">
+
+    <!--获取子系统所有数据-->
+    <select id="queryAll" resultType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        select code value,name label,id from sys_system where is_valid='1' and hosp_code=#{hospCode}
+        order by seq_no
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPage" resultType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        select * from sys_system
+        <where>
+            1=1 and is_valid='1' and hosp_code=#{hospCode}
+            <if test="keyword!=null and keyword!=''">
+                and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%'))
+                or (pym = #{keyword}) or (wbm = #{keyword}))
+            </if>
+        </where>
+        order by seq_no
+    </select>
+
+    <!--根据编码获取数量-->
+    <select id="getCount" resultType="java.lang.Integer" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        select count(1) as num from sys_system where code=#{code} and is_valid='1' and hosp_code=#{hospCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+    <!--根据名称获取数量-->
+    <select id="getCountByName" resultType="java.lang.Integer" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        select count(1) as num from sys_system where name=#{name} and is_valid='1' and hosp_code=#{hospCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--新增-->
+    <insert id="insert">
+        insert into sys_system(id,hosp_code,code,name,pym,wbm,seq_no,remark,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{hospCode},#{code},#{name},#{pym},#{wbm},#{seqNo},#{remark},#{isValid},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--修改-->
+    <update id="update" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        update sys_system
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            seq_no=#{seqNo},
+            remark=#{remark},
+            is_valid=#{isValid},
+        </set>
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <!--删除-->
+    <update id="updateSystemByIsvalid" parameterType="java.util.List">
+        <foreach collection="list" separator=";" item="item">
+            update sys_system
+            set is_valid = '0'
+            where hosp_code = #{item.hospCode} and id = #{item.id}
+        </foreach>
+    </update>
+
+    <!--查询单个-->
+    <select id="getById" resultType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+        select * from sys_system
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+    <!-- 根据医院编码、用户编码（员工工号）查询可登陆子系统信息 -->
+    <select id="queryByUserCode" resultType="java.util.Map">
+        select
+            sus.id,
+            ss.name systemName,
+            ss.code systemCode,
+            bd.id deptId,
+            bd.name deptName,
+            bd.type_identity typeIdentity
+        from
+            sys_user_system sus,
+            sys_system ss,
+            base_dept bd
+        where
+            sus.hosp_code = ss.hosp_code
+            and sus.hosp_code = bd.hosp_code
+            and sus.system_code = ss.code
+            and sus.dept_code = bd.code
+            and sus.user_code = #{userCode}
+            and sus.hosp_code = #{hospCode}
+            order by ss.seq_no asc
+    </select>
+
+    <!--查询子系统序号自动填充前端-->
+    <select id="querySystemSeqNo" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO" resultType="int">
+        select MAX(seq_no) from sys_system where hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--根据系统编码查询是否被用户关联使用-->
+    <select id="querySysUserSystem" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO" resultType="cn.hsa.module.sys.user.dto.SysUserSystemDTO">
+        select id, hosp_code, us_code, user_code, system_code, teacher_code, dept_code, crte_id, crte_name, crte_time
+        from sys_user_system
+        where hosp_code = #{hospCode} and system_code = #{code}
+    </select>
+
+    <select id="querySysUserSystemByList" parameterType="java.util.Map" resultType="cn.hsa.module.sys.user.dto.SysUserSystemDTO">
+        select id, hosp_code, us_code, user_code, system_code, teacher_code, dept_code, crte_id, crte_name, crte_time
+        from sys_user_system
+        where  hosp_code = #{hospCode}
+        and system_code in
+        <foreach collection="sysSystemDTOS" item="item" open="(" close=")" separator=",">
+            #{item.code}
+        </foreach>
+    </select>
+</mapper>

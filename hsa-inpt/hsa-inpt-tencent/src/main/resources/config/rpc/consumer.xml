@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--    <dubbo:reference id="baseFinanceClassifyApi_dubbo" interface="BaseFinanceClassifyApi" check="false"/>-->
+    <!--<dubbo:consumer timeout="30000"/>-->
+
+    <!--基础数据 >> 床位 -->
+    <dubbo:reference id="baseBedService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService" check="false"/>
+    <!--基础数据 >> 科室 -->
+    <dubbo:reference id="baseDeptService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService" check="false"/>
+    <!--基础数据 >> 项目 -->
+    <dubbo:reference id="baseItemService_consumer" interface="cn.hsa.module.base.bi.service.BaseItemService" check="false"/>
+    <!--sys >> 用户 -->
+    <dubbo:reference id="sysUserService_consumer" interface="cn.hsa.module.sys.user.service.SysUserService" check="false"/>
+
+
+</beans>

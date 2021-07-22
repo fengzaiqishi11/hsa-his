@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 全局序列封装Redis客户端RedisClientTemplateImpl-->
+    <bean id="cn.hsa.hsaf.idgenerator.redis.HsafRedisClient"
+          class="cn.hsa.hsaf.idgenerator.redis.impl.RedisClientTemplateImpl">
+        <!-- 使用全局序列的hsafIdgeneratorRedisTemplate，也可以直接使用cache的 hsafRedisTemplate-->
+        <property name="redisTemplate" ref="hsafIdgeneratorRedisTemplate"/>
+    </bean>
+
+    <!--配置-->
+    <bean id="hsafIdgeneratorDistributedJedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最小空闲数 -->
+        <property name="minIdle" value="4"/>
+
+        <!-- 最大空闲数 -->
+        <property name="maxIdle" value="16"/>
+
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="256"/>
+
+        <!-- 最大等待时间 单位毫秒（ms） -->
+        <property name="maxWaitMillis" value="60000"/>
+
+        <!-- 删除间隔 -->
+        <property name="timeBetweenEvictionRunsMillis" value="-1"/>
+
+        <!-- 使用连接时测试连接是否可用 -->
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="testOnCreate" value="true"/>
+    </bean>
+
+    <!--集群版配置 for redisTemplate （可以使用cache的distributedJedisConnectionFactory，此处可不定义）-->
+    <bean id="hsafIdgeneratorJedisClusterConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg index="0">
+            <bean class="cn.hsa.hsaf.cache.redis.HsafRedisClusterConfiguration">
+                <constructor-arg name="clusterNodes" value="${idgenerator.redis.clusterNodes}"/>
+                <property name="maxRedirects" value="3"/>
+                <property name="password">
+                    <bean class="org.springframework.data.redis.connection.RedisPassword">
+                        <constructor-arg name="thePassword" value="${idgenerator.redis.password}"/>
+                    </bean>
+                </property>
+            </bean>
+        </constructor-arg>
+        <constructor-arg index="1" ref="hsafIdgeneratorDistributedJedisPoolConfig"/>
+    </bean>
+
+    <!-- 全局序列的RedisTemplate定义 -->
+    <bean id="hsafIdgeneratorRedisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <!--connectionFactory:可引用单机版，也可引用集群版 -->
+        <property name="connectionFactory" ref="hsafIdgeneratorJedisClusterConnectionFactory"/>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+        <property name="hashKeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+    </bean>
+
+    <!-- 2.备用redis为空时的配置-start -->
+    <bean id="cn.hsa.hsaf.idgenerator.redis.HsafBackClient"
+          class="cn.hsa.hsaf.idgenerator.redis.impl.RedisBackEmptyImpl"/>
+    <!-- 2.备用redis为空时的配置-end -->
+
+    <!-- 3.备用redis不为空时的配置-start -->
+    <!-- 以下4个bean的作用 -->
+    <!-- 3.1 redis 客户端 -->
+    <!-- 3.2 redis 模板配置 -->
+    <!-- 3.3 redis 连接工厂类配置 -->
+    <!-- 3.4 redis 密码配置-->
+
+    <!-- 	<bean id="cn.hsa.hsaf.idgenerator.redis.HsafBackClient" class="cn.hsa.hsaf.idgenerator.redis.impl.RedisBackTemplateImpl"> -->
+    <!-- 		<property name="redisTemplate" ref="hsafIdgeneratorRedisTemplate1"/> -->
+    <!-- 	</bean> -->
+    <!--     <bean id="hsafIdgeneratorRedisTemplate1" class="org.springframework.data.redis.core.RedisTemplate" primary="true"> -->
+    <!--         <property name="connectionFactory" ref="distributedJedisConnectionFactory1"/> -->
+    <!--         <property name="keySerializer"> -->
+    <!--             <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/> -->
+    <!--         </property> -->
+    <!--         <property name="valueSerializer"> -->
+    <!--             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/> -->
+    <!--         </property> -->
+    <!--         <property name="hashKeySerializer"> -->
+    <!--             <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/> -->
+    <!--         </property> -->
+    <!--         <property name="hashValueSerializer"> -->
+    <!--             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/> -->
+    <!--         </property> -->
+    <!--     </bean> -->
+    <!--     <bean id="distributedJedisConnectionFactory1" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"> -->
+    <!--         <constructor-arg name="standaloneConfig"> -->
+    <!--             <bean class="org.springframework.data.redis.connection.RedisStandaloneConfiguration"> -->
+    <!--                 <property name="hostName" value="${cache.standalone1.host}"/> -->
+    <!--                 <property name="port" value="${cache.standalone1.port}"/> -->
+    <!--                 <property name="password" ref="distributedRedisPassword1"/> -->
+    <!--             </bean> -->
+    <!--         </constructor-arg> -->
+    <!--     </bean> -->
+    <!--     <bean id="distributedRedisPassword1" class="org.springframework.data.redis.connection.RedisPassword"> -->
+    <!--         <constructor-arg name="thePassword" value="${cache.standalone1.password}"/> -->
+    <!--     </bean> -->
+    <!-- 3.备用redis不为空时的配置-end -->
+</beans>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 表含义(insure_dict) -->
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDictDAO">
+    <!-- 字段映射 -->
+    <resultMap id="insureDictMap" type="cn.hsa.module.insure.module.entity.InsureDictDO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="insure_reg_code" property="insureRegCode" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="value" property="value" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+        <result column="ext01" property="ext01" jdbcType="VARCHAR" />
+        <result column="ext02" property="ext02" jdbcType="VARCHAR" />
+        <result column="ext03" property="ext03" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        insure_reg_code,
+        code,
+        name,
+        value,
+        remark,
+        crte_id,
+        crte_name,
+        crte_time,
+        ext01,
+        ext02,
+        ext03
+    </sql>
+
+
+    <update id="updateDictCode" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        update insure_dict set code=#{code},name=#{name},value=#{value} where id=#{id} and hosp_code =#{hospCode}
+    </update>
+
+    <delete id="deleteDictCode" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        delete from insure_dict where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+
+    <!-- 根据条件参数查询数据列表,item 表示集合中每一个元素 进行迭代时的别名 -->
+    <select id="queryInsureDict" resultType="cn.hsa.module.insure.module.entity.InsureDictDO" parameterType="cn.hsa.module.insure.module.entity.InsureDictDO">
+        SELECT  hosp_code, insure_reg_code, code, name, name as label, value as id, remark FROM insure_dict where 1=1
+        AND hosp_code = #{hospCode}
+        <if test="code !=null and code !=''">
+            AND code = #{code}
+        </if>
+        <if test="codeList != null and codeList.size() > 0">
+            and code in
+            <foreach collection="codeList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryInsureDiseasePage" resultType="cn.hsa.module.insure.module.entity.InsureDiseaseDO" parameterType="cn.hsa.module.insure.module.entity.InsureDiseaseDO">
+        SELECT * FROM insure_disease
+    </select>
+
+    <select id="queryInsureOrgInfo" resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO" parameterType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
+        SELECT * FROM insure_configuration
+    </select>
+<!--    分页查询医保的码表信息-->
+    <select id="queryDictValuePage" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03
+        from insure_dict where hosp_code=#{hospCode}
+        <if test="keyWord != null and keyWord != ''">
+            and ( code like concat('%',#{keyWord},'%')
+            or name like concat('%',#{keyWord},'%')
+            or insure_reg_code like concat('%',#{keyWord},'%')
+            )
+        </if>
+        order by crte_time desc
+    </select>
+
+    <!-- 查询医保字典表信息 -->
+    <select id="queryInsureDictList" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO" resultMap="insureDictMap">
+        select
+            <include refid="Base_Column_List"/>
+        from
+            insure_dict
+        where
+        hosp_code = #{hospCode}
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="codes != null">
+            AND code in (
+            <foreach collection="codes" item="code" separator=",">
+                #{code}
+            </foreach>
+            )
+        </if>
+        <if test="name != null and name != ''">
+            AND name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id = #{crteId}
+        </if>
+    </select>
+    <select id="getDictById" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select * from insure_dict where hosp_code=#{hospCode} and id=#{id}
+    </select>
+    <select id="queryInsureDictCode" resultType="java.lang.Integer" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select count(*) from insure_dict where hosp_code=#{hospCode} and code=#{code} and value =#{value}
+                                           and insure_reg_code =#{insureRegCode} and id !=#{id}
+    </select>
+    <!--    新增字典表数据-->
+    <insert id="insertInsureDict" parameterType="java.util.List">
+        insert into insure_dict(id,hosp_code,insure_reg_code,code,name,value,remark,crte_id,crte_name,crte_time)
+        values
+        <foreach collection="insureDictDTOList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.insureRegCode}, #{item.code},
+            #{item.name},#{item.value},#{item.remark},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertDict" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        insert into insure_dict(id,hosp_code,insure_reg_code,code,name,value,remark,crte_id,crte_name,crte_time)
+        values   (#{id}, #{hospCode}, #{insureRegCode}, #{code},
+                  #{name},#{value},#{remark},
+                  #{crteId},
+                  #{crteName},
+                  #{crteTime}
+                 )
+    </insert>
+
+    <!--    删除码表值-->
+    <delete id="deleteInsureDict" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        delete from insure_dict where hosp_code=#{hospCode} and insure_reg_code=#{regCode}
+    </delete>
+
+    <!-- 根据条件code + value -> name -->
+    <select id="getInsureDictNameByCode" resultType="java.lang.String" parameterType="java.util.Map">
+        SELECT name FROM insure_dict where 1=1
+        AND hosp_code = #{hospCode}
+        AND value = #{value}
+        AND code = #{code}
+    </select>
+
+    <select id="querySysParameterByCode" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        select
+        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from sys_parameter
+        where
+        hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.product.dao.SyncProductDAO">
+
+    <resultMap type="cn.hsa.module.sync.product.dto.SyncProductDTO" id="SyncProductMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="contact" column="contact" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="fax" column="fax" jdbcType="VARCHAR"/>
+        <result property="postCode" column="post_code" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="SyncProductMap">
+        select
+          id,  code, name, contact, phone, fax, post_code, email, address, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_product
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="SyncProductMap">
+        select
+          id,  code, name
+        from sync_product
+        <where>
+              and is_valid = '1'
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="SyncProductMap">
+        select
+          id,  code, name, contact, phone, fax, post_code, email, address, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_product
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="contact != null and contact != ''">
+                and contact = #{contact}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="fax != null and fax != ''">
+                and fax = #{fax}
+            </if>
+            <if test="postCode != null and postCode != ''">
+                and post_code = #{postCode}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="address != null and address != ''">
+                and address = #{address}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_product(id, code, name, contact, phone, fax, post_code, email, address, remark, pym, wbm,
+        <if test="isValid != null and isValid != ''">
+            is_valid,
+        </if>
+         crte_id, crte_name, crte_time)values (#{id}, #{code}, #{name}, #{contact}, #{phone}, #{fax}, #{postCode}, #{email}, #{address}, #{remark}, #{pym}, #{wbm},
+        <if test="isValid != null and isValid != ''">
+            #{isValid},
+        </if>
+         #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update sync_product
+        <set>
+                code = #{code},
+                name = #{name},
+                contact = #{contact},
+                phone = #{phone},
+                fax = #{fax},
+                post_code = #{postCode},
+                email = #{email},
+                address = #{address},
+                remark = #{remark},
+                pym = #{pym},
+                wbm = #{wbm},
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="updateStatus">
+        update  sync_product
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--判断生产企业编码是否已经存在-->
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(code)
+        from sync_product
+        where  code = #{code}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+</mapper>

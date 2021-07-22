@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.stockinquery.dao.StockInQueryDAO">
+    <resultMap type="cn.hsa.module.phar.pharapply.dto.StroOutDTO" id="StroOutMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="outCode" column="out_code" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="outStockId" column="out_stock_id" jdbcType="VARCHAR"/>
+        <result property="inStockId" column="in_stock_id" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="DECIMAL"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="DECIMAL"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="okAuditCode" column="ok_audit_code" jdbcType="VARCHAR"/>
+        <result property="okAuditId" column="ok_audit_id" jdbcType="VARCHAR"/>
+        <result property="okAuditName" column="ok_audit_name" jdbcType="VARCHAR"/>
+        <result property="okAuditTime" column="ok_audit_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="djlxName" column="djlxName" jdbcType="VARCHAR"/>
+        <result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--分页查询通过实体作为筛选条件-->
+    <select id="queryPage" resultMap="StroOutMap">
+        select
+        so.id, so.hosp_code, so.out_code, so.order_no,so.out_stock_id,so.in_stock_id, so.buy_price_all, so.sell_price_all, so.remark,so.audit_code,
+        so.audit_id, so.audit_name, so.audit_time, so.ok_audit_code, so.ok_audit_id, so.ok_audit_name, so.ok_audit_time, so.crte_id, so.crte_name, so.crte_time,
+        base_dept.name as outDeptName,sys_code_detail.name as djlxName
+        from stro_out so
+        left join base_dept on so.in_stock_id = base_dept.id and  base_dept.hosp_code = so.hosp_code
+        left join sys_code_detail on so.out_code = sys_code_detail.value and sys_code_detail.hosp_code = so.hosp_code and c_code='CRFS'
+        where so.hosp_code = #{hospCode}
+<!--       &lt;!&ndash;     出库到药房&ndash;&gt;-->
+<!--        <if test="type !=null and type != '' and type =='5'.toString()">-->
+<!--            and so.out_code ='5'-->
+<!--        </if>-->
+<!--        &lt;!&ndash; 出库到科室&ndash;&gt;-->
+<!--        <if test="type !=null and type != '' and type =='4'.toString()">-->
+<!--            and so.out_code ='4'-->
+<!--        </if>-->
+        <if test="outCode != null and outCode != '' ">
+          and so.out_code = #{outCode}
+        </if>
+        <if test="outCode == null or outCode == '' ">
+          and so.out_code in ('4','5','10')
+        </if>
+        <if test="orderNo != null and orderNo != '' ">
+          and so.order_no like concat('%',#{orderNo},'%')
+        </if>
+        <if test="orderNo != null and orderNo != '' ">
+            and so.order_no like concat('%',#{orderNo},'%')
+        </if>
+        /*开始日期*/
+        <if test="startDate != null ">
+            and so.crte_time &gt;= #{startDate}
+        </if>
+        /*结束日期*/
+        <if test="endDate != null ">
+            and so.crte_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="outStockId !=null and outStockId != '' ">
+            and so.out_stock_id =#{outStockId}
+        </if>
+        <if test="inStockId !=null and inStockId != ''">
+           and so.in_stock_id =#{inStockId}
+        </if>
+        <if test="auditCode !=null and auditCode != ''">
+            and so.audit_code =#{auditCode}
+        </if>
+        <if test="flag !=null  and flag  != ''">
+            and so.ok_audit_code=#{flag}
+        </if>
+        order by so.audit_time desc
+    </select>
+
+    <!--药房入库确认批量审核-->
+    <update id="updateBatchCheck" parameterType="cn.hsa.module.phar.pharapply.dto.StroOutDTO">
+        update stro_out set ok_audit_code = #{okAuditCode},ok_audit_id=#{okAuditId},ok_audit_name=#{okAuditName},
+        ok_audit_time=#{okAuditTime}, in_stock_id =#{inStockId}
+        where id in
+        <foreach collection="orderNos" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <resultMap type="cn.hsa.module.phar.pharapply.entity.StroOutDetail" id="stroOutinMap_detail">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="outId" column="out_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="VARCHAR"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="buyPrice" column="buy_price" jdbcType="DECIMAL"/>
+        <result property="sellPrice" column="sell_price" jdbcType="DECIMAL"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="DECIMAL"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="DECIMAL"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="DECIMAL"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--点击入库信息  查询入库明细表格数据-->
+    <select id="queryStockInDetail" resultMap="stroOutinMap_detail" parameterType="cn.hsa.module.phar.pharapply.dto.StroOutDTO">
+        select id, hosp_code, out_id, item_code, item_id, item_name, spec, num, unit_code, dosage, dosage_unit_code,
+        buy_price, sell_price, buy_price_all, sell_price_all, split_ratio,
+        split_num, split_price, split_unit_code, batch_no, expiry_date
+        from stro_out_detail
+        where hosp_code=#{hospCode}
+        <if test="outId !=null and outId !='' ">
+            and out_id=#{outId}
+        </if>
+    </select>
+
+    <!--查询批量审核时的入库状态标志-->
+    <select id="queryBatch" parameterType="cn.hsa.module.phar.pharapply.entity.StroOut"
+            resultMap="StroOutMap">
+        select id,ok_audit_code,order_no,out_code from stro_out
+        where id in
+        <foreach collection="orderNos" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and hosp_code=#{hospCode}
+        and audit_code=#{auditCode}
+    </select>
+
+    <!--查询入库明细 更新库存明细信息-->
+    <select id="queryDeatilById" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+            select
+            id,hosp_code, out_id, item_code, item_id, item_name, spec, num, unit_code, dosage,
+            dosage_unit_code, buy_price, sell_price, buy_price_all, sell_price_all, split_ratio,
+            split_num, split_price, split_unit_code, expiry_date, batch_no as batchNo, expiry_date,
+            #{okAuditId} as crteId,#{okAuditName} as crteName,
+            (select stro_out.in_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+            #{hospCode} and stro_out.out_code = #{outCode}) as biz_id,
+            (select stro_out.order_no from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+            #{hospCode} and stro_out.out_code = #{outCode}) as orderNo,
+            (
+            case
+            stro_out_detail.item_code
+            when '1' then
+            (SELECT base_drug.prep_code FROM base_drug WHERE base_drug.id = item_id and
+            base_drug.hosp_code = #{hospCode})
+            end
+            ) as prepCode,
+            (select dp.name from base_dept dp where
+                id = (select stro_out.in_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+                #{hospCode} and stro_out.out_code = #{outCode}) and dp.hosp_code = #{hospCode}) as invoicingTargetName,
+            (select stro_out.in_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+                #{hospCode} and stro_out.out_code = #{outCode}) as invoicingTargetId
+            from stro_out_detail
+            <where>
+                and hosp_code = #{hospCode}
+                <if test="orderNos != null and orderNos.size() > 0">
+                    and out_id in
+                    <foreach collection="orderNos" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+    </select>
+
+</mapper>

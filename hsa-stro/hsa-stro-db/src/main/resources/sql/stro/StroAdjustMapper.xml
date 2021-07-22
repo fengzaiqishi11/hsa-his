@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.adjust.dao.StroAdjustDao">
+
+    <resultMap type="cn.hsa.module.stro.adjust.dto.StroAdjustDTO" id="StroAdjustMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="beforePrice" column="before_price" jdbcType="NUMERIC"/>
+        <result property="afterPrice" column="after_price" jdbcType="NUMERIC"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="bizName" column="biz_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getStroAdjustDtoById" resultMap="StroAdjustMap">
+        select
+          at.id, at.hosp_code, at.biz_id, at.order_no, at.before_price, at.after_price, at.remark, at.audit_id, at.audit_name, at.audit_code, at.audit_time, at.crte_id, at.crte_name, at.crte_time,
+          (select name from base_dept dt where dt.id = at.biz_id and hosp_code = at.hosp_code) biz_name
+        from stro_adjust at
+        where  at.hosp_code = #{hospCode}
+        and at.id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryStroAdjustDtoPage" resultMap="StroAdjustMap">
+        select
+        at.id, at.hosp_code, at.biz_id, at.order_no, at.before_price, at.after_price, at.remark, at.audit_id, at.audit_name, at.audit_code, at.audit_time, at.crte_id, at.crte_name, at.crte_time,
+        (select name from base_dept dt where dt.id = at.biz_id and hosp_code = at.hosp_code) biz_name
+        from stro_adjust at
+        where at.hosp_code = #{hospCode}
+        <if test="bizId != null and bizId != ''">
+            and at.biz_id = #{bizId}
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            and at.order_no like concat("%",#{orderNo},"%")
+        </if>
+        <if test="auditCode != null and auditCode != ''">
+            and at.audit_code = #{auditCode}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(at.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(at.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="ids != null and ids.size() > 0">
+          and at.id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
+        order by audit_code,crte_time desc
+    </select>
+
+    <!--根据条件查询-->
+    <select id="queryStroAdjustDtos" resultMap="StroAdjustMap">
+        select
+        at.id, at.hosp_code, at.biz_id, at.order_no, at.before_price, at.after_price, at.remark, at.audit_id,
+        at.audit_name, at.audit_code, at.audit_time, at.crte_id, at.crte_name, at.crte_time,
+        (select name from base_dept dt where dt.id = at.biz_id and hosp_code = at.hosp_code) biz_name
+        from stro_adjust at
+        where at.hosp_code = #{hospCode}
+        and at.id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        order by audit_code,crte_time
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertStroAdjustDto" keyProperty="" useGeneratedKeys="true">
+        insert into stro_adjust(id, hosp_code, biz_id, order_no, before_price, after_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--调价修改-->
+    <update id="updateStroAdjustDto">
+            update stro_adjust
+                <set>
+                    <if test="id != null and id != ''">
+                        id = #{id},
+                    </if>
+                    <if test="hospCode != null and hospCode != ''">
+                        hosp_code = #{hospCode},
+                    </if>
+                    <if test="bizId != null and bizId != ''">
+                        biz_id = #{bizId},
+                    </if>
+                    <if test="orderNo != null and orderNo != ''">
+                        order_no = #{orderNo},
+                    </if>
+                    <if test="beforePrice != null">
+                        before_price = #{beforePrice},
+                    </if>
+                    <if test="afterPrice != null">
+                        after_price = #{afterPrice},
+                    </if>
+                    <if test="remark != null and remark != ''">
+                        remark = #{remark},
+                    </if>
+                    <if test="auditId != null and auditId != ''">
+                        audit_id = #{auditId},
+                    </if>
+                    <if test="auditName != null and auditName != ''">
+                        audit_name = #{auditName},
+                    </if>
+                    <if test="auditCode != null and auditCode != ''">
+                        audit_code = #{auditCode},
+                    </if>
+                    <if test="auditTime != null">
+                        audit_time = #{auditTime},
+                    </if>
+                    <if test="crteId != null and crteId != ''">
+                        crte_id = #{crteId},
+                    </if>
+                    <if test="crteName != null and crteName != ''">
+                        crte_name = #{crteName},
+                    </if>
+                    <if test="crteTime != null">
+                        crte_time = #{crteTime},
+                    </if>
+                </set>
+            where hosp_code = #{hospCode}
+            and id = #{id}
+
+    </update>
+
+    <!--批量修改(通过id集合修改审核状态)-->
+    <update id="updateStroAdjustDtoByIds">
+            update stro_adjust
+            set audit_id = #{auditId},
+            audit_name = #{auditName},
+            audit_code = #{auditCode},
+            audit_time = #{auditTime}
+            where hosp_code = #{hospCode}
+            and id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+             #{id}
+        </foreach>
+
+    </update>
+
+    <update id="updateAdjustPriceById">
+      <foreach collection="list" item="item" separator=";">
+        update stro_adjust
+        set before_price = #{item.beforePrice},
+            after_price = #{item.afterPrice}
+        where hosp_code = #{item.hospCode} and id  = #{item.id}
+      </foreach>
+    </update>
+
+</mapper>

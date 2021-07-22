@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.material.dao.SyncMaterialDAO">
+
+    <resultMap type="cn.hsa.module.sync.material.dto.SyncMaterialDTO" id="SyncMaterialMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="INTEGER"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="isSuppCurtain" column="is_supp_curtain" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
+        <result property="regCertNo" column="reg_cert_no" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="bfcName" column="bfcName" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="itemCode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="SyncMaterialMap" >
+        select
+          id,  type_code, bfc_code, code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price, is_supp_curtain, use_code, remark, prod_code,
+           reg_cert_no, pym, wbm, is_valid, crte_id, crte_name, crte_time,model,
+           (select name from sync_product  where  prod_code = code) as prodName
+        from sync_material
+        where id = #{id}
+    </select>
+
+    <select id="queryByIds" resultMap="SyncMaterialMap" >
+        select
+        id, hosp_code, type_code, bfc_code, code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price, is_supp_curtain, use_code, remark, prod_code,
+        reg_cert_no, pym, wbm, is_valid, crte_id, crte_name, crte_time,last_buy_price,last_split_buy_price,avg_buy_price,avg_sell_price,model,
+        (select name from base_product  where base_product.hosp_code = #{hospCode} and prod_code = code) as prodName
+        from base_material
+        where id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </select>
+
+    <!--查询所有数据-->
+    <select id="queryAll" resultMap="SyncMaterialMap" >
+        select
+        id,  type_code, bfc_code, code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price,
+        is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm, is_valid, crte_id, crte_name, crte_time,model
+        from sync_material
+        <where>
+           and is_valid = '1'
+            <if test="idList != null">
+                and id in
+                <foreach collection="idList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="SyncMaterialMap">
+        select
+        a.id, a.type_code, a.bfc_code, a.code, a.name, a.spec, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price,
+        a.is_supp_curtain, a.use_code, a.remark, a.prod_code, a.reg_cert_no, a.pym, a.wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,model,
+        b.name as bfcName, c.name as prodName,'2' as itemCode
+        from sync_material a
+        left join sync_finance_classify b on a.bfc_code = b.code
+        left join sync_product c on a.prod_code = c.code
+        <where>
+            <if test="id != null">
+                and a.id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and a.type_code = #{typeCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and a.bfc_code = #{bfcCode}
+            </if>
+            <if test="code != null and code != ''">
+                and a.code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name = #{name}
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="price != null">
+                and a.price = #{price}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="splitRatio != null">
+                and a.split_ratio = #{splitRatio}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="splitPrice != null">
+                and a.split_price = #{splitPrice}
+            </if>
+            <if test="isSuppCurtain != null">
+                and a.is_supp_curtain = #{isSuppCurtain}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and a.use_code = #{useCode}
+            </if>
+            <if test="remark != null and remark != ''">
+                and a.remark = #{remark}
+            </if>
+            <if test="prodCode != null">
+                and a.prod_code = #{prodCode}
+            </if>
+            <if test="regCertNo != null and regCertNo != ''">
+                and a.reg_cert_no = #{regCertNo}
+            </if>
+            <if test="isValid != null and isValid!=''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and a.bfc_code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by a.crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_material(id, type_code, bfc_code, code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price, is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm,
+        <if test="isValid != null and isValid != ''">
+            is_valid,
+        </if>
+        crte_id, crte_name, crte_time,model)
+        values (#{id}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{spec}, #{price}, #{unitCode}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm},
+        <if test="isValid != null and isValid != ''">
+            #{isValid},
+        </if>
+        #{crteId}, #{crteName}, #{crteTime},#{model})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update sync_material
+        <set>
+                type_code = #{typeCode},
+                bfc_code = #{bfcCode},
+                code = #{code},
+                name = #{name},
+                spec = #{spec},
+                price = #{price},
+                unit_code = #{unitCode},
+                split_ratio = #{splitRatio},
+                split_unit_code = #{splitUnitCode},
+                split_price = #{splitPrice},
+                is_supp_curtain = #{isSuppCurtain},
+                use_code = #{useCode},
+                remark = #{remark},
+                prod_code = #{prodCode},
+                reg_cert_no = #{regCertNo},
+                pym = #{pym},
+                wbm = #{wbm},
+                model = #{model}
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateList">
+        <foreach collection="list" item="item" index="index"  separator=";">
+            update sync_material
+            <set>
+                <if test="item.typeCode != null and item.typeCode != ''">
+                    type_code = #{item.typeCode},
+                </if>
+                <if test="item.bfcCode != null">
+                    bfc_code = #{item.bfcCode},
+                </if>
+                <if test="item.code != null and item.code != ''">
+                    code = #{item.code},
+                </if>
+                <if test="item.name != null and item.name != ''">
+                    name = #{item.name},
+                </if>
+                <if test="item.spec != null and item.spec != ''">
+                    spec = #{spec},
+                </if>
+                <if test="item.price != null">
+                    price = #{price},
+                </if>
+                <if test="item.unitCode != null and item.unitCode != ''">
+                    unit_code = #{item.unitCode},
+                </if>
+                <if test="item.lastBuyPrice != null and item.lastBuyPrice != ''">
+                    last_buy_price = #{item.lastBuyPrice},
+                </if>
+                <if test="item.lastSplitBuyPrice != null and item.lastSplitBuyPrice != ''">
+                    last_split_buy_price = #{item.lastSplitBuyPrice},
+                </if>
+                <if test="item.avgBuyPrice != null and item.avgBuyPrice != ''">
+                    avg_buy_price = #{item.avgBuyPrice},
+                </if>
+                <if test="item.avgSellPrice != null and item.avgSellPrice != ''">
+                    avg_sell_price = #{item.avgSellPrice},
+                </if>
+                <if test="item.splitRatio != null">
+                    split_ratio = #{item.splitRatio},
+                </if>
+                <if test="item.splitUnitCode != null and item.splitUnitCode != ''">
+                    split_unit_code = #{item.splitUnitCode},
+                </if>
+                <if test="item.splitPrice != null">
+                    split_price = #{item.splitPrice},
+                </if>
+                <if test="item.isSuppCurtain != null">
+                    is_supp_curtain = #{item.isSuppCurtain},
+                </if>
+                <if test="item.useCode != null and item.useCode != ''">
+                    use_code = #{item.useCode},
+                </if>
+                <if test="item.remark != null and item.remark != ''">
+                    remark = #{item.remark},
+                </if>
+                <if test="item.prodCode != null">
+                    prod_code = #{item.prodCode},
+                </if>
+                <if test="item.regCertNo != null and item.regCertNo != ''">
+                    reg_cert_no = #{item.regCertNo},
+                </if>
+                <if test="item.pym != null and item.pym != ''">
+                    pym = #{pym},
+                </if>
+                <if test="item.wbm != null and item.wbm != ''">
+                    wbm = #{item.wbm},
+                </if>
+                <if test="item.isValid != null">
+                    is_valid = #{item.isValid},
+                </if>
+                <if test="item.model != null">
+                  model = #{item.model},
+                </if>
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+        update  sync_material
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--判断材料编码是否已经存在-->
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(code)
+        from sync_material
+        where code = #{code}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+</mapper>

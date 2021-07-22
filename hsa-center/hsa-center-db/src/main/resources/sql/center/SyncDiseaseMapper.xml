@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncdisease.dao.SyncDiseaseDAO">
+    <resultMap type="cn.hsa.module.sync.syncdisease.dto.SyncDiseaseDTO" id="CenterDiseaseMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="attachCode" column="attach_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="isAdd" column="is_add" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <select id="getById" resultMap="CenterDiseaseMap">
+        select
+        id, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name,
+        crte_time
+        from sync_disease
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+        
+    </select>
+
+    <select id="queryPage" resultMap="CenterDiseaseMap">
+        select
+        id, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name,
+        crte_time
+        from sync_disease
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="attachCode != null and attachCode != ''">
+                and attach_code = #{attachCode}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="isAdd != null">
+                and is_add = #{isAdd}
+            </if>
+            <if test="isValid != null and isValid != '' ">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (code like '%${keyword}%'
+                or name like '%${keyword}%'
+                or wbm like '%${keyword}%'
+                or pym like '%${keyword}%')
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and type_code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <select id="queryAll" resultMap="CenterDiseaseMap">
+        select
+        id, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name,
+        crte_time
+        from sync_disease
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="attachCode != null and attachCode != ''">
+                and attach_code = #{attachCode}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="isAdd != null">
+                and is_add = #{isAdd}
+            </if>
+            <if test="isValid != null">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (code like '%${keyword}%'
+                or name like '%${keyword}%'
+                or wbm like '%${keyword}%'
+                or pym like '%${keyword}%')
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_disease(id , type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据   需要回写的请自行写SQL-->
+    <update id="update">
+        update sync_disease
+        <set>
+            type_code = #{typeCode},
+            code = #{code},
+            attach_code = #{attachCode},
+            name = #{name},
+            nation_code = #{nationCode},
+            is_add = #{isAdd},
+            pym = #{pym},
+            wbm = #{wbm},
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--批量和单个修改有效状态-->
+    <update id="updateStatus" parameterType="java.util.List">
+        update sync_disease
+        set is_valid = #{isValid} where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--判断疾病编码、附加编码、国家编码是否已经存在-->
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(id)
+        from sync_disease
+        <where>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="attachCode != null and attachCode != ''">
+                and attach_code = #{attachCode}
+            </if>
+            <if test="id != null and id != ''">
+                and id != #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>

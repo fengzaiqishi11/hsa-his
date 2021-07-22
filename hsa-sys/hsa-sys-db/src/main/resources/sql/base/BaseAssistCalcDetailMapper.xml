@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bac.dao.BaseAssistCalcDetailDao">
+
+    <resultMap type="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO" id="BaseAssistDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="acCode" column="ac_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="itemTypeCode" column="itemTypeCode" jdbcType="TIMESTAMP"/>
+        <result property="spec" column="spec" jdbcType="TIMESTAMP"/>
+        <result property="unitCode" column="unit_code" jdbcType="TIMESTAMP"/>
+        <result property="bfcId" column="bfcId" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseAssistDetailMap">
+        select
+          id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        from base_assist_detail
+        where id = #{id}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseAssistDetailMap">
+        select
+        id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        from base_assist_detail
+        <where>
+                and hosp_code = #{hospCode}
+            <if test="acCode != null and acCode != ''">
+                and ac_code = #{acCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryallcode" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO">
+        SELECT
+        b.id,
+        b.hosp_code,
+        b.item_code,
+        b.num,
+        b.type_code,
+        b.ac_code,
+        b.start_time AS startTime,
+        b.end_time AS endTime,
+        b.item_code AS itemCode,
+        b.hosp_code AS hospCode,
+        b.type_code AS typeCode,
+        a.itemName,
+        a.itemTypeCode,
+        a.typeCode,
+        a.out_dept_code,
+        a.in_dept_code,
+        a.inDeptName,
+        a.outDeptName,
+        a.price,
+        a.unit_code,
+        a.split_price as splitPrice,
+        a.split_unit_code as splitUnitCode,
+        a.spec,
+        a.id AS itemId
+        FROM
+        base_assist_detail b
+        LEFT JOIN (
+        SELECT
+        id,
+        name AS itemName,
+        CODE,
+        price,
+        unit_code,
+        split_price,
+        split_unit_code,
+        spec,
+        itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        hosp_code,
+        inDeptName,
+        outDeptName,
+        typeCode
+        FROM
+        (
+        SELECT
+        id,
+        name,
+        CODE,
+        price,
+        unit_code,
+        price as split_price,
+        unit_code as split_unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        hosp_code,(
+        SELECT NAME
+        FROM
+        base_dept
+        WHERE
+        CODE = out_dept_code
+        ) AS outDeptName,
+        ( SELECT NAME FROM base_dept WHERE CODE = in_dept_code ) AS inDeptName,
+        '3' AS typeCode
+        FROM
+        base_item
+        WHERE
+        is_valid = '1' UNION ALL
+        SELECT
+        id,
+        name,
+        CODE,
+        price,
+        unit_code,
+        split_price,
+        split_unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        '',
+        '',
+        hosp_code,
+        '',
+        '',
+        '2' AS typeCode
+        FROM
+        base_material
+        WHERE
+        is_valid = '1'
+        ) mAndi
+        ) a ON b.item_code = a.CODE
+        AND b.hosp_code = a.hosp_code
+        AND a.typeCode = b.type_code
+        <where>
+                and b.hosp_code = #{hospCode}
+            <if test="acCode != null and acCode != ''">
+                and b.ac_code = #{acCode}
+            </if>
+        </where>
+    </select>
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_assist_detail(id,hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{acCode}, #{typeCode}, #{itemCode}, #{useCode}, #{startTime}, #{endTime}, #{num}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_assist_detail
+        <set>
+            <if test="acCode != null and acCode != ''">
+                ac_code = #{acCode},
+            </if>
+                type_code = #{typeCode},
+                item_code = #{itemCode},
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteBycode">
+        delete from base_assist_detail where ac_code = #{acCode} and hosp_code= #{hospCode}
+    </delete>
+
+
+    <!--批量新增所有列，列表长度不能为0，且-->
+    <insert id="insertList" parameterType="list">
+        insert into base_assist_detail
+        (id,hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.acCode}, #{item.typeCode}, #{item.itemCode}, #{item.useCode}, #{item.startTime}, #{item.endTime}, #{item.num}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <select id="queryAssistDetails" resultMap="BaseAssistDetailMap">
+        select
+          id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, ifnull(num,0) num, is_valid, crte_id, crte_name, crte_time
+        from base_assist_detail a
+        where hosp_code = #{hospCode} and ac_code=#{code}
+    </select>
+</mapper>

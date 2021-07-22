@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.center.datasource.dao.CenterHospitalDatasourceDAO" >
+
+  <!-- 实体DTO及数据库字段映射 -->
+  <resultMap id="centerHospitalDatasourceDtoMap" type="cn.hsa.module.center.datasource.dto.CenterHospitalDatasourceDTO">
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="ds_code" property="dsCode" jdbcType="VARCHAR" />
+    <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="TIMESTAMP" />
+    <result column="end_date" property="endDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="centerHospitalDtoMap" type="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pro_code" property="proCode" jdbcType="VARCHAR" />
+    <result column="city_code" property="cityCode" jdbcType="VARCHAR" />
+    <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
+    <result column="buli_image_path" property="buliImagePath" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="post_code" property="postCode" jdbcType="VARCHAR" />
+    <result column="hosp_image_path" property="hospImagePath" jdbcType="VARCHAR" />
+    <result column="introduce" property="introduce" jdbcType="VARCHAR" />
+    <result column="website" property="website" jdbcType="VARCHAR" />
+    <result column="legal_name" property="legalName" jdbcType="VARCHAR" />
+    <result column="legal_phone" property="legalPhone" jdbcType="VARCHAR" />
+    <result column="admin_name" property="adminName" jdbcType="VARCHAR" />
+    <result column="admin_phone" property="adminPhone" jdbcType="VARCHAR" />
+    <result column="level_code" property="levelCode" jdbcType="VARCHAR" />
+    <result column="pym" property="pym" jdbcType="VARCHAR" />
+    <result column="wbm" property="wbm" jdbcType="VARCHAR" />
+    <result column="long_lat" property="longLat" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="TIMESTAMP" />
+    <result column="end_date" property="endDate" jdbcType="TIMESTAMP" />
+    <result column="is_valid" property="isValid" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!-- 表所有字段 -->
+  <sql id="Base_Column_List">
+        id,
+        ds_code,
+        hosp_code,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+  <!-- 表所有字段（别名） -->
+  <sql id="Base_ColumnAlias_List">
+        chd.id,
+        chd.ds_code,
+        chd.hosp_code,
+        chd.crte_id,
+        chd.crte_name,
+        chd.crte_time
+    </sql>
+
+  <!-- 根据主键查询表信息 -->
+  <select id="selectByPrimaryKey" resultMap="centerHospitalDatasourceDtoMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from
+    center_hospital_datasource
+    where
+    id = #{id}
+  </select>
+
+  <!-- 新增表信息 -->
+  <insert id="insert" parameterType="cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO" >
+        insert into
+        center_hospital_datasource
+        (
+          id,
+          ds_code,
+          hosp_code,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{dsCode,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+  <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+  <insert id="insertSelective" parameterType="cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO" >
+    insert into
+    center_hospital_datasource
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''">
+        id,
+      </if>
+      <if test="dsCode != null and dsCode != ''">
+        ds_code,
+      </if>
+      <if test="hospCode != null and hospCode != ''">
+        hosp_code,
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id,
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name,
+      </if>
+      <if test="crteTime != null">
+        crte_time
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="dsCode != null and dsCode != ''">
+        #{dsCode,jdbcType=VARCHAR},
+      </if>
+      <if test="hospCode != null and hospCode != ''">
+        #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </trim>
+  </insert>
+
+  <!-- 修改表信息 -->
+  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO" >
+        update
+        center_hospital_datasource
+        set
+                ds_code = #{dsCode,jdbcType=VARCHAR},
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+  <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO" >
+    update
+    center_hospital_datasource
+    <set >
+      <if test="dsCode != null and dsCode != ''">
+        ds_code = #{dsCode,jdbcType=VARCHAR},
+      </if>
+      <if test="hospCode != null and hospCode != ''">
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id = #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name = #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        crte_time = #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where
+    id = #{id}
+  </update>
+
+  <!-- 根据主键删除表信息 -->
+  <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM center_hospital_datasource WHERE id = #{id}
+    </delete>
+
+  <!-- 根据主键批量删除数据 -->
+  <delete id="deleteByIds">
+    DELETE FROM center_hospital_datasource WHERE id IN
+    <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="findByCondition" resultMap="centerHospitalDatasourceDtoMap" parameterType="cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO">
+    SELECT
+    <include refid="Base_ColumnAlias_List" />
+    ,ch.name,
+    ch.code,
+    ch.start_date,
+    ch.end_date
+    FROM center_hospital_datasource chd
+    LEFT JOIN center_hospital ch
+    ON chd.hosp_code = ch.code
+    <where>
+      <if test="dsCode != null and dsCode != ''">
+        AND chd.ds_code = #{dsCode}
+      </if>
+      <if test="hospCode != null and hospCode != ''">
+        AND chd.hosp_code = #{hospCode}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryCenterHospitalAll" parameterType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO" resultMap="centerHospitalDtoMap">
+    SELECT
+      id,
+      code,
+      name,
+      pro_code,
+      city_code,
+      area_code,
+      buli_image_path,
+      address,
+      phone,
+      fax,
+      email,
+      post_code,
+      hosp_image_path,
+      introduce,
+      website,
+      legal_name,
+      legal_phone,
+      admin_name,
+      admin_phone,
+      level_code,
+      disease_code,
+      oper_code,
+      pym,
+      wbm,
+      long_lat,
+      start_date,
+      end_date,
+      is_valid,
+      crte_id,
+      crte_name,
+      crte_time
+    from
+    center_hospital
+    <where>
+      <if test="keyword != null and keyword != ''">
+        code like concat('%',#{keyword},'%')
+        OR name like concat('%',#{keyword},'%')
+      </if>
+    </where>
+  </select>
+
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into
+    center_hospital_datasource
+    (id,
+    ds_code,
+    hosp_code,
+    crte_id,
+    crte_name,
+    crte_time)
+    values
+    <foreach collection="list" item="item" separator=",">
+    (#{item.id},
+    #{item.dsCode},
+    #{item.hospCode},
+    #{item.crteId},
+    #{item.crteName},
+    #{item.crteTime})
+    </foreach>
+  </insert>
+
+  <delete id="delByDsCode" parameterType="java.lang.String">
+    DELETE FROM center_hospital_datasource where ds_code = #{dsCode}
+  </delete>
+
+  <!-- 根据主键查询表信息 -->
+  <select id="queryHaveHospCode" resultMap="centerHospitalDatasourceDtoMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from
+    center_hospital_datasource
+    <where>
+      and hosp_code in
+      <foreach collection="list" item="item" separator="," open="(" close=")">
+        #{item.hospCode}
+      </foreach>
+    </where>
+  </select>
+
+
+
+  <!--删除数据源绑定的相关医院信息-->
+  <delete id="deleteCenterHospital" >
+    delete from center_hospital_datasource  where  id in
+    <foreach collection="ids" open="(" close=")" item="id" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+</mapper>

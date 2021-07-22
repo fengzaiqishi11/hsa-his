@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.centermenu.dao.CenterMenuDAO">
+
+    <resultMap type="cn.hsa.module.center.centermenu.dto.CenterMenuDTO" id="CenterMenuDTOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="upCode" column="up_code" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="icon" column="icon" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="sysName" column="sysName" jdbcType="VARCHAR"/>
+        <result property="upName" column="upName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+  <!--查询单个菜单信息-->
+  <select id="getMenuById" resultMap="CenterMenuDTOMap">
+        select
+          id, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time
+        from center_menu
+        where id = #{id}
+    </select>
+
+  <!--通过实体作为筛选条件查询菜单信息-->
+  <select id="queryMenu" resultMap="CenterMenuDTOMap">
+    select
+    id, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time,
+    (select b.name from center_menu a left join center_menu b on b.code = a.up_code where a.code = #{code}) as upName
+    from center_menu
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="name != null and name != ''">
+        and name = #{name}
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        and type_code = #{typeCode}
+      </if>
+      <if test="upCode != null and upCode != ''">
+        and up_code = #{upCode}
+      </if>
+      <if test="url != null and url != ''">
+        and url = #{url}
+      </if>
+      <if test="icon != null and icon != ''">
+        and icon = #{icon}
+      </if>
+      <if test="seqNo != null">
+        and seq_no = #{seqNo}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="isValid != null and isValid != ''">
+        and is_valid = #{isValid}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and crte_time = #{crteTime}
+      </if>
+    </where>
+    order by seq_no
+  </select>
+
+  <!--获取菜单树-->
+  <select id="getMenuTree" resultType="cn.hsa.base.TreeMenuNode">
+    select `code` id,name label,ifnull(up_code,'-1') parentId,url from center_menu where is_valid = '1' order by seq_no
+  </select>
+
+  <!--新增菜单-->
+  <insert id="insertMenu">
+        insert into center_menu(id, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{code}, #{name}, #{typeCode}, #{upCode}, #{url}, #{icon}, #{seqNo}, #{remark}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+  <!--通过主键修改菜单-->
+  <update id="updateMenu">
+    update center_menu
+    <set>
+      <if test="id != null and id != ''">
+        id = #{id},
+      </if>
+      <if test="code != null and code != ''">
+        code = #{code},
+      </if>
+      <if test="name != null and name != ''">
+        name = #{name},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code = #{typeCode},
+      </if>
+      <if test="upCode != null and upCode != ''">
+        up_code = #{upCode},
+      </if>
+      <if test="url != null and url != ''">
+        url = #{url},
+      </if>
+      <if test="icon != null and icon != ''">
+        icon = #{icon},
+      </if>
+      <if test="seqNo != null">
+        seq_no = #{seqNo},
+      </if>
+      <if test="remark != null and remark != ''">
+        remark = #{remark},
+      </if>
+      <if test="isValid != null and isValid != ''">
+        is_valid = #{isValid},
+      </if>
+    </set>
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="isValid != null and isValid != ''">
+        and is_valid = #{isValid}
+      </if>
+    </where>
+  </update>
+
+  <!--通过主键删除菜单-->
+  <update id="deleteMenu">
+        update center_menu set is_valid = '0' where code = #{code}
+    </update>
+
+  <!-- 查询菜单序号自动填充前端-->
+  <select id="queryMenuSeqNo" resultType="java.lang.Integer">
+      select max(seq_no) from center_menu where is_valid = '1'
+      and (up_code = #{upCode} or up_code is null )
+    </select>
+
+</mapper>

@@ -1,0 +1,199 @@
+package cn.hsa.insure.module.bo.impl;
+
+import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.Transpond;
+import cn.hsa.insure.xiangtan.outpt.OutptFunction;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureOutptOutFeeDTO;
+import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
+import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
+import cn.hsa.module.insure.outpt.bo.OutptBo;
+import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
+import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.insure.module.bo.impl
+ * @Class_name: OutptBoImpl
+ * @Describe(描述): 门诊医保开放统一接口 Bo实现层
+ * @Author: Ou·Mr
+ * @Eamil: oubo@powersi.com.cn
+ * @Date: 2020/11/09 8:57
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ */
+@Component
+public class OutptBoImpl extends HsafBO implements OutptBo {
+
+    @Resource
+    private Transpond transpond;
+
+    @Resource
+    private OutptFunction outptFunction;
+
+    @Resource
+    private InsureIndividualVisitDAO insureIndividualVisitDAO;
+
+    @Resource
+    private InsureIndividualCostDAO insureIndividualCostDAO;
+
+    @Resource
+    private InsureVisitInfoBO insureVisitInfoBO;
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
+
+    @Override
+    public Map<String, Object> getInsureOutptOutFeeInfo(Map<String,Object>map) {
+        String hospCode = map.get("hospCode").toString();
+        String regCode = map.get("insureRegCode").toString();
+        return transpond.<Map>to(hospCode,regCode, Constant.FUNCTION.BIZH110103,map);
+    }
+
+    /**
+     * @Menthod getOutptVisitInfo
+     * @Desrciption 门诊获取医保个人信息
+     * @param param 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/11/10 14:33
+     * @Return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> getOutptVisitInfo(Map<String, Object> param) {
+        String hospCode = (String) param.get("hospCode");
+        String regCode = (String) param.get("regCode");
+        // return transpond.<Map>to(hospCode,regCode, Constant.FUNCTION.BIZH110001,param);
+		// 获取系统参数中配置的是否走统一支付平台
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        map.put("code", "UNIFIED_PAY");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        String bka895 = (String) param.get("bka895");
+        if ("qrcode".equals(bka895)){//电子凭证
+            return transpond.to(hospCode,regCode,Constant.FUNCTION.FC_EMD_11001,param);
+        } else if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+            Map<String, Object> resultMap = insureVisitInfoBO.getInsureVisitInfo(param);
+            return resultMap;
+
+        } else {  // 直接调用医保
+            return transpond.<Map>to(hospCode,regCode, Constant.FUNCTION.BIZH110001,param);
+        }
+    }
+
+    /**
+     * @Menthod setOutptCostUpload
+     * @Desrciption 门诊费用上传并试算
+     * @param param 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/11/26 10:02
+     * @Return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> setOutptCostUploadAndTrial(Map<String, Object> param) {
+        return transpond.<Map>to((String) param.get("hospCode"),(String) param.get("insureRegCode"),Constant.FUNCTION.FC_2002,param);
+    }
+
+    /**
+     * @Menthod setOutptCostUploadAndSettlement
+     * @Desrciption 门诊费用上传并结算
+     * @param param 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/11/26 10:07
+     * @Return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> setOutptCostUploadAndSettlement(Map<String, Object> param) {
+        String hospCode = (String) param.get("hospCode");
+        Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"),Constant.FUNCTION.FC_2003,param);
+        try {
+            if ("settle".equals(param.get("action")) && trialMap != null && trialMap.containsKey("payinfo")) {
+                Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
+                String visitId = (String) param.get("visitId");//就诊id
+                String akb020 = payinfo.get("akb020");//医院编码
+                String aaz217 = payinfo.get("aaz217");//就医登记号
+                //编辑医保患者信息表
+                InsureIndividualVisitDO insureIndividualVisitDO = new InsureIndividualVisitDO();
+                insureIndividualVisitDO.setVisitId(visitId);//就诊id
+                insureIndividualVisitDO.setMedicalRegNo(aaz217);//医保登记号
+                insureIndividualVisitDO.setHospCode(hospCode);
+                insureIndividualVisitDAO.updateByPrimaryKeySelective(insureIndividualVisitDO);
+                if (trialMap.containsKey("insureIndividualCostDOList")) {
+                    List<InsureIndividualCostDO> insureIndividualCostDOList = (List<InsureIndividualCostDO>) trialMap.get("insureIndividualCostDOList");
+                    insureIndividualCostDAO.batchInsertInsureCost(insureIndividualCostDOList);
+                }
+            }
+        }catch (RuntimeException e){
+            throw new AppException("医保结算成功，系统出现异常，请到医保结算系统取消本次结算。");
+        }
+        return trialMap;
+    }
+
+    /**
+     * @Method selectCheckInfo
+     * @Desrciption  读取审批信息
+     * @Param map
+     *
+     * @Author fuhui
+     * @Date   2021/2/1 19:31
+     * @Return map
+     **/
+    @Override
+    public Map<String, Object> selectCheckInfo(Map<String, Object> map) {
+        String hospCode = map.get("hospCode").toString();
+        String insureRegCode = (String) map.get("insureRegCode");
+        return transpond.to(hospCode, insureRegCode, Constant.ChangSha.RESTS.CS_1806, map);
+    }
+
+    /**
+     * @Desrciption  uploadCheckInfo 医院审批信息上报
+     * @Param map
+     *
+     * @Author fuhui
+     * @Date   2021/2/1 19:28
+     * @Return boolean
+    **/
+    @Override
+    public Boolean uploadCheckInfo(Map<String, Object> map) {
+        String hospCode = map.get("hospCode").toString();
+        String insureRegCode = (String) map.get("insureRegCode");
+        return transpond.to(hospCode, insureRegCode, Constant.ChangSha.RESTS.CS_3110, map);
+    }
+
+    /**
+     * @param map
+     * @Desrciption uploadCheckInfo 门特病人取消结算以后 取消登记
+     * @Param map
+     * @Author fuhui
+     * @Date 2021/2/1 19:28
+     * @Return boolean
+     */
+    @Override
+    public Boolean cancelRegister(Map<String, Object> map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO =new InsureIndividualVisitDTO();
+        String visitId = map.get("visitId").toString();
+        String hospCode = map.get("hospCode").toString();
+        insureIndividualVisitDTO.setVisitId(visitId);
+        insureIndividualVisitDTO.setHospCode(hospCode);
+        insureIndividualVisitDTO = insureIndividualVisitDAO.selectInsureIndividualVisit(insureIndividualVisitDTO);
+        if(insureIndividualVisitDTO ==null){
+            throw new AppException("该病人还未进行医保登记,不能取消登记");
+        }
+        String insureRegCode  = insureIndividualVisitDTO.getInsureOrgCode();
+        map.put("insureRegCode",insureRegCode);
+        map.put("aac001",insureIndividualVisitDTO.getAac001());
+        return transpond.to(hospCode, insureRegCode, Constant.ChangSha.OUTPT.CS_2240, map);
+    }
+}

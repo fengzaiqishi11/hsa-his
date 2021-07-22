@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.log.dao.HisLogInfoYcDao">
+
+    <insert id="saveLogYc" parameterType="cn.hsa.module.sys.log.dto.HisLogInfoYcDTO">
+        insert into sys_log_info_yc(id, qqcs,ycmc,ycxx,qqlj,czff,czrid,czr,czip,xzsj,czlx,czms,hosp_code,trace_id)
+        values(#{id},#{qqcs},#{ycmc},#{ycxx},#{qqlj},#{czff},#{czrid},#{czr},#{czip},#{xzsj},#{czlx},#{czms},#{hospCode},#{traceId})
+    </insert>
+
+    <!--异常日志查询-->
+    <select id="queryLogInfoWithYc" parameterType="cn.hsa.module.sys.log.dto.HisLogInfoYcDTO"
+            resultType="cn.hsa.module.sys.log.dto.HisLogInfoYcDTO">
+                select
+                    id,
+                    qqcs,
+                    ycmc,
+                    ycxx,
+                    qqlj,
+                    czff,
+                    czrid,
+                    czr,
+                    czip,
+                    xzsj,
+                    czlx,
+                    czms,
+                    hosp_code,
+                    trace_id
+                from sys_log_info_yc yc
+                where yc.hosp_code = #{hospCode}
+                <if test="queryDate != null">
+                    and yc.xzsj &gt;= DATE_FORMAT(#{queryDate},'%Y-%m-%d')
+                    and yc.xzsj &lt; DATE_FORMAT(DATE_ADD(#{queryDate},INTERVAL 1 DAY),'%Y-%m-%d')
+                </if>
+                <if test="keyword != null and keyword != ''">
+                    and yc.qqlj like concat('%',#{keyword},'%')
+                </if>
+    </select>
+
+    <!--操作日志查询-->
+    <select id="queryLogInfoWithCz" parameterType="cn.hsa.module.sys.log.dto.HisLogInfoYcDTO"
+            resultType="cn.hsa.module.sys.log.dto.HisLogInfoYcDTO">
+            select
+                id,
+                czlx,
+                czms,
+                czff,
+                qqcs,
+                fhcs,
+                qqlj,
+                czrid,
+                czr,
+                czip,
+                xzsj,
+                hosp_code,
+                trace_id
+            from
+            sys_log_info_cz cz
+            where cz.hosp_code = #{hospCode}
+        <if test="queryDate != null">
+            and cz.xzsj &gt;= DATE_FORMAT(#{queryDate},'%Y-%m-%d')
+            and cz.xzsj &lt; DATE_FORMAT(DATE_ADD(#{queryDate},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and yc.qqlj like concat('%',#{keyword},'%')
+        </if>
+    </select>
+
+</mapper>

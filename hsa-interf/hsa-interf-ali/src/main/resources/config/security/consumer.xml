@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hsf="http://www.taobao.com/hsf"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.taobao.com/hsf
+       http://www.taobao.com/hsf/hsf.xsd" default-autowire="byName">
+
+
+    <!--    消费者可选配置 -->
+    <!--    serviceGroup   否  服务的组名  String HSF-->
+    <!--    serviceVersion 否  服务的版本号 String 1.0.0.DAILY-->
+    <!--    clientTimeout  否  客户端统一设置接口中所有方法的超时时间（单位 ms） int    -1-->
+    <!--    generic            否  是否支持泛化调用   boolean    false-->
+    <!--    addressWaitTime    否  同步等待服务注册中心（ ConfigServer ）推送服务提供者地址的时间（单位 ms）  int    3000-->
+    <!--    proxyStyle     否  代理方式（JDK 或 Javassist）  String jdk-->
+    <!--    futureMethods  否  设置调用此服务时需要采用异步调用的方法名列表以及异步调用的方式，默认为空，即所有方法都采用同步调用  String[]   空-->
+    <!--    consistent     否  负载均衡是否使用一致性哈希  String 空-->
+    <!--    methodSpecials 否  配置方法级的超时时间、重试次数、方法名称   com.alibaba.boot.hsf.annotation.HSFConsumer.ConsumerMethodSpecial[]    空-->
+
+    <hsf:consumer group="hsa-cep-auc" id="authorityResuService" interface="cn.hsa.cep.auc.service.AuthorityResuService"
+                  version="1.0.0"/>
+</beans>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.oper.operInforecord.dao.OperAccountTempDetailDAO">
+
+    <resultMap type="cn.hsa.module.oper.operInforecord.dto.OperAccountTempDetailDTO" id="OperAccountTempDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="tempId" column="temp_id" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="bfcName" column="bfc_name" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="OTHER"/>
+        <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="OTHER"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="queryOperAccountTempDetailDTOById" resultMap="OperAccountTempDetailMap">
+        select
+          id, hosp_code, temp_id, bfc_id, bfc_name, item_code, item_id, item_name, num, num_unit_code, spec, phar_id, usage_code, use_code, prep_code, dosage, dosage_unit_code, rate_id, crte_id, crte_name, crte_time
+        from oper_account_temp_detail
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryOperAccountTempDetailDTOPage" resultMap="OperAccountTempDetailMap">
+        select
+        a.id as tempDetailId, a.hosp_code, a.temp_id, a.bfc_id, a.bfc_name, a.item_code, a.item_id, a.item_name, a.num, a.num_unit_code, a.spec, a.phar_id, a.usage_code, a.use_code, a.prep_code, a.dosage, a.dosage_unit_code, a.rate_id, a.crte_id, a.crte_name, a.crte_time,
+        case a.item_code when '1' then (case when b.big_type_code = '2' then  '3' else '1' end) when '2' then '2'  when '3' then '9' end type,
+        case when a.item_code = '1' then  b.in_unit_code else a.num_unit_code end inUnitCode
+        from oper_account_temp_detail a
+        left join base_drug b on b.id = a.item_id and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="tempId != null and tempId != ''">
+            and a.temp_id = #{tempId}
+        </if>
+    </select>
+
+    <!--单个新增-->
+    <insert id="insertOperAccountTempDetailDTO" keyProperty="id" useGeneratedKeys="true">
+        insert into oper_account_temp_detail(hosp_code, temp_id, bfc_id, bfc_name, item_code, item_id, item_name, num, num_unit_code, spec, phar_id, usage_code, use_code, prep_code, dosage, dosage_unit_code, rate_id, crte_id, crte_name, crte_time)
+        values (#{hospCode}, #{tempId}, #{bfcId}, #{bfcName}, #{itemCode}, #{itemId}, #{itemName}, #{num}, #{numUnitCode}, #{spec}, #{pharId}, #{usageCode}, #{useCode}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{rateId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--单个新增-->
+    <insert id="insertOperAccountTempDetailDTOBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into oper_account_temp_detail(id, hosp_code, temp_id, bfc_id, bfc_name, item_code, item_id, item_name, num, num_unit_code, spec, phar_id, usage_code, use_code, prep_code, dosage, dosage_unit_code, rate_id, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id}, #{dto.hospCode}, #{dto.tempId}, #{dto.bfcId}, #{dto.bfcName}, #{dto.itemCode},
+            #{dto.itemId}, #{dto.itemName}, #{dto.num}, #{dto.numUnitCode}, #{dto.spec},
+            #{dto.pharId}, #{dto.usageCode}, #{dto.useCode}, #{dto.prepCode}, #{dto.dosage},
+            #{dto.dosageUnitCode}, #{dto.rateId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime})
+        </foreach>
+    </insert>
+
+    <!--修改数据-->
+    <update id="updateOperAccountTempDetail">
+        update oper_account_temp_detail
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="tempId != null and tempId != ''">
+                temp_id = #{tempId},
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                bfc_id = #{bfcId},
+            </if>
+            <if test="bfcName != null and bfcName != ''">
+                bfc_name = #{bfcName},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="numUnitCode != null and numUnitCode != ''">
+                num_unit_code = #{numUnitCode},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                prep_code = #{prepCode},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="rateId != null and rateId != ''">
+                rate_id = #{rateId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--删除数据-->
+    <delete id="deleteOperAccountTempDetailById">
+        delete from oper_account_temp_detail where hosp_code = #{hospCode} and id = #{id}
+    </delete>
+
+</mapper>

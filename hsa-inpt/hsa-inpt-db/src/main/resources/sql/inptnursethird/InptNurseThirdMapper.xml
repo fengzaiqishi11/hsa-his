@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.inptnursethird.dao.InptNurseThirdDao">
+
+    <resultMap type="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO" id="InptNurseThirdMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="recordTime" column="record_time" jdbcType="TIMESTAMP"/>
+        <result property="inNum" column="in_num" jdbcType="INTEGER"/>
+        <result property="temperatureCode" column="temperature_code" jdbcType="VARCHAR"/>
+        <result property="temperature" column="temperature" jdbcType="OTHER"/>
+        <result property="temperatureRetest" column="temperature_retest" jdbcType="OTHER"/>
+        <result property="pulse" column="pulse" jdbcType="INTEGER"/>
+        <result property="heartRate" column="heart_rate" jdbcType="INTEGER"/>
+        <result property="isVentilator" column="is_ventilator" jdbcType="VARCHAR"/>
+        <result property="breath" column="breath" jdbcType="INTEGER"/>
+        <result property="fortyUpCode" column="forty_up_code" jdbcType="VARCHAR"/>
+        <result property="fortyUpRemark" column="forty_up_remark" jdbcType="VARCHAR"/>
+        <result property="thirtyFiveDownCode" column="thirty_five_down_code" jdbcType="VARCHAR"/>
+        <result property="thirtyFiveDownRemark" column="thirty_five_down_remark" jdbcType="VARCHAR"/>
+        <result property="intake" column="intake" jdbcType="OTHER"/>
+        <result property="output" column="output" jdbcType="OTHER"/>
+        <result property="otherOutput" column="other_output" jdbcType="OTHER"/>
+        <result property="skinCode" column="skin_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="excrementCode" column="excrement_code" jdbcType="VARCHAR"/>
+        <result property="peeCode" column="pee_code" jdbcType="VARCHAR"/>
+        <result property="height" column="height" jdbcType="OTHER"/>
+        <result property="weight" column="weight" jdbcType="OTHER"/>
+        <result property="amBp" column="am_bp" jdbcType="VARCHAR"/>
+        <result property="pmBp" column="pm_bp" jdbcType="VARCHAR"/>
+        <result property="isOperation" column="is_operation" jdbcType="VARCHAR"/>
+        <result property="operationDays" column="operation_days" jdbcType="INTEGER"/>
+        <result property="operationCnt" column="operation_cnt" jdbcType="INTEGER"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="drugAllergy" column="drug_allergy" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="InptNurseThirdMap">
+        select
+        id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
+        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        operation_days, operation_cnt, crte_id, crte_name, crte_time , drug_allergy
+        from inpt_nurse_third
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            and hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != ''">
+                and baby_id = #{babyId}
+            </if>
+            <if test="recordTime != null">
+                and record_time = #{recordTime}
+            </if>
+
+            <if test="inNum != null">
+                and in_num = #{inNum}
+            </if>
+            <if test="temperatureCode != null and temperatureCode != ''">
+                and temperature_code = #{temperatureCode}
+            </if>
+            <if test="temperature != null">
+                and temperature = #{temperature}
+            </if>
+            <if test="temperatureRetest != null">
+                and temperature_retest = #{temperatureRetest}
+            </if>
+            <if test="pulse != null">
+                and pulse = #{pulse}
+            </if>
+            <if test="heartRate != null">
+                and heart_rate = #{heartRate}
+            </if>
+            <if test="isVentilator != null and isVentilator != ''">
+                and is_ventilator = #{isVentilator}
+            </if>
+            <if test="breath != null">
+                and breath = #{breath}
+            </if>
+            <if test="fortyUpCode != null and fortyUpCode != ''">
+                and forty_up_code = #{fortyUpCode}
+            </if>
+            <if test="fortyUpRemark != null and fortyUpRemark != ''">
+                and forty_up_remark = #{fortyUpRemark}
+            </if>
+            <if test="thirtyFiveDownCode != null and thirtyFiveDownCode != ''">
+                and thirty_five_down_code = #{thirtyFiveDownCode}
+            </if>
+            <if test="thirtyFiveDownRemark != null and thirtyFiveDownRemark != ''">
+                and thirty_five_down_remark = #{thirtyFiveDownRemark}
+            </if>
+            <if test="intake != null">
+                and intake = #{intake}
+            </if>
+            <if test="output != null">
+                and output = #{output}
+            </if>
+            <if test="otherOutput != null">
+                and other_output = #{otherOutput}
+            </if>
+            <if test="skinCode != null and skinCode != ''">
+                and skin_code = #{skinCode}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="drugAllergy != null and drugAllergy != ''">
+                and drug_allergy = #{drugAllergy}
+            </if>
+            <if test="excrementCode != null and excrementCode != ''">
+                and excrement_code = #{excrementCode}
+            </if>
+            <if test="peeCode != null and peeCode != ''">
+                and pee_code = #{peeCode}
+            </if>
+            <if test="height != null">
+                and height = #{height}
+            </if>
+            <if test="weight != null">
+                and weight = #{weight}
+            </if>
+            <if test="amBp != null and amBp != ''">
+                and am_bp = #{amBp}
+            </if>
+            <if test="pmBp != null and pmBp != ''">
+                and pm_bp = #{pmBp}
+            </if>
+            <if test="isOperation != null and isOperation != ''">
+                and is_operation = #{isOperation}
+            </if>
+            <if test="operationDays != null">
+                and operation_days = #{operationDays}
+            </if>
+            <if test="operationCnt != null">
+                and operation_cnt = #{operationCnt}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="startTime != null and startTime != '' and endTime != null and endTime != '' "  >
+               and record_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="queryAllRecordTime" resultMap="InptNurseThirdMap">
+        select
+        id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
+        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy
+        from inpt_nurse_third
+        <where>
+            and hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != ''">
+                and baby_id = #{babyId}
+            </if>
+            <if test="queryTime != null">
+                and record_time like concat(#{queryTime},'%')
+            </if>
+        </where>
+    </select>
+
+
+    <!--通过就诊id删除-->
+    <delete id="deleteById">
+        delete
+        from inpt_nurse_third
+        where  visit_id= #{visitId}
+          and hosp_code = #{hospCode}
+          and DATE_FORMAT(record_time,'%Y-%m-%d') = #{queryTime}
+        <if test="babyId != null and babyId != ''">
+            and baby_id = #{babyId}
+        </if>
+    </delete>
+
+
+
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertList" keyProperty="id" useGeneratedKeys="true" parameterType="list">
+        insert into inpt_nurse_third
+        (id,hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
+        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.recordTime}, #{item.inNum}, #{item.temperatureCode},
+            #{item.temperature}, #{item.temperatureRetest}, #{item.pulse}, #{item.heartRate}, #{item.isVentilator},
+            #{item.breath}, #{item.fortyUpCode}, #{item.fortyUpRemark}, #{item.thirtyFiveDownCode},
+            #{item.thirtyFiveDownRemark}, #{item.intake}, #{item.output}, #{item.otherOutput}, #{item.skinCode}, #{item.remark}, #{item.excrementCode}, #{item.peeCode},
+            #{item.height}, #{item.weight}, #{item.amBp}, #{item.pmBp}, #{item.isOperation}, #{item.operationDays},
+            #{item.operationCnt}, #{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.drugAllergy})
+        </foreach>
+    </insert>
+
+
+    <select id="queryAllByTimeSlot" resultType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO">
+        SELECT
+        SJ.time_slot,
+         SJ.time_slot as start_day,
+          SJ.time_slot as record_time,
+        SCD.hosp_code,
+        SCD.visit_id,
+        SCD.baby_id,
+        SCD.record_time,
+        SCD.temperature_code,
+        SCD.in_num,
+        IF
+	( SCD.temperature = 0, NULL, SCD.temperature ) as temperature,
+        IF
+	( SCD.temperature_retest = 0, NULL, SCD.temperature_retest ) as temperature_retest,
+        IF
+	( SCD.pulse = 0, NULL, SCD.pulse ) as pulse,
+        IF
+	( SCD.heart_rate = 0, NULL, SCD.heart_rate ) as heart_rate,
+	SCD.is_ventilator,
+        IF
+	( SCD.breath = 0, NULL, SCD.breath ) as breath,
+        SCD.forty_up_code,
+        SCD.forty_up_remark,
+        SCD.thirty_five_down_code,
+        SCD.thirty_five_down_remark,
+        SCD.intake,
+        SCD.output,
+        SCD.other_output,
+        SCD.skin_code,
+        SCD.remark,
+        SCD.excrement_code,
+        SCD.pee_code,
+        SCD.height,
+        SCD.weight,
+        SCD.am_bp,
+        SCD.pm_bp,
+        SCD.is_operation,
+        SCD.operation_days,
+        SCD.operation_cnt,
+        SCD.crte_id,
+        SCD.crte_name,
+        SCD.crte_time,
+        SCD.drug_allergy
+    FROM
+        (
+    SELECT dates.date, T.sjd, CONCAT( dates.date, ' ', T.sjd, ':00' ) time_slot
+    FROM
+        ( SELECT a.date  FROM
+        ( SELECT DATE_FORMAT(#{endDate},'%Y-%m-%d') - INTERVAL ( a.a + ( 10 * b.a ) + ( 100 * c.a ) ) DAY AS date
+        FROM
+        (
+        SELECT
+            0 AS a UNION ALL
+        SELECT
+            1 UNION ALL
+        SELECT
+            2 UNION ALL
+        SELECT
+            3 UNION ALL
+        SELECT
+            4 UNION ALL
+        SELECT
+            5 UNION ALL
+        SELECT
+            6 UNION ALL
+        SELECT
+            7 UNION ALL
+        SELECT
+            8 UNION ALL
+        SELECT
+            9
+        ) AS a
+        CROSS JOIN (
+        SELECT
+            0 AS a UNION ALL
+        SELECT
+            1 UNION ALL
+        SELECT
+            2 UNION ALL
+        SELECT
+            3 UNION ALL
+        SELECT
+            4 UNION ALL
+        SELECT
+            5 UNION ALL
+        SELECT
+            6 UNION ALL
+        SELECT
+            7 UNION ALL
+        SELECT
+            8 UNION ALL
+        SELECT
+            9
+        ) AS b
+        CROSS JOIN (
+        SELECT
+            0 AS a UNION ALL
+        SELECT
+            1 UNION ALL
+        SELECT
+            2 UNION ALL
+        SELECT
+            3 UNION ALL
+        SELECT
+            4 UNION ALL
+        SELECT
+            5 UNION ALL
+        SELECT
+            6 UNION ALL
+        SELECT
+            7 UNION ALL
+        SELECT
+            8 UNION ALL
+        SELECT
+            9
+        ) AS c
+        ) a
+    WHERE
+
+        a.Date BETWEEN  DATE_FORMAT(#{startDate},'%Y-%m-%d')  and  DATE_FORMAT(#{endDate},'%Y-%m-%d')
+        ) dates
+        LEFT JOIN(
+        SELECT DISTINCT
+        CONCAT( SUBSTRING_INDEX( SUBSTRING_INDEX( a.path, ',', b.help_topic_id + 1 ), ',',- 1 ), ':00' ) AS sjd
+        FROM
+        ( SELECT ( SELECT VALUE AS sjd FROM sys_parameter WHERE CODE = 'HLSCD_KSSJ' AND hosp_code = #{hospCode} ) AS path FROM DUAL ) a
+        JOIN mysql.help_topic b ON b.help_topic_id &lt;  ( LENGTH( a.path ) - LENGTH( REPLACE ( a.path, ',', '' )) + 1 )
+        ) T ON 1 = 1
+        ) SJ
+        LEFT JOIN
+				(select * from inpt_nurse_third WHERE 1=1
+ 				 and visit_id = #{visitId}
+				and hosp_code= #{hospCode}
+                <if test="babyId != null and babyId != ''">
+                    and baby_id = #{babyId}
+                </if>
+                <if test="babyId == null or babyId == ''">
+                    and (baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
+                </if>
+				    )
+				SCD ON  scd.record_time = SJ.time_slot
+
+    ORDER BY SJ.time_slot,SCD.visit_id
+    </select>
+
+    <select id="getRecordTime" resultType="java.lang.String">
+      select
+           DISTINCT DATE_FORMAT(record_time, '%Y-%m-%d' ) as record_time
+         from inpt_nurse_third
+        where
+            forty_up_code = '4'
+              <!--is_operation = '1'-->
+            and visit_id = #{visitId}
+            and hosp_code= #{hospCode}
+        ORDER BY record_time
+    </select>
+
+    <!--根据就诊visitId查询已完成手术列表-->
+    <select id="queryOperByVisitId" parameterType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+            id, hosp_code, visit_id, baby_id, in_no, advice_id, name, gender_code, age, age_unit_code, blood_code, dept_id, oper_dept_id, bed_id, bed_name, oper_disease_id, oper_disease_icd9, oper_disease_name, in_disease_id, in_disease_name, in_disease_icd10, doctor_id, doctor_name, assistant_id1, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, special_request, content, audit_id, audit_name, audit_time, audit_remark, oper_plan_time, oper_room_Id, oper_room_name, xh_nurse_id, xh_nurse_name, qx_nurse_id, qx_nurse_name, ana_code, ana_id1, ana_name1, ana_id2, ana_name2, ana_id3, ana_name3, oper_end_time, notched_code, heal_code, oper_time_hour, status_code, is_cost, total_price, cost_time, cost_id, cost_name, remark, crte_id, crte_name, crte_time, rank, ward_id
+        from oper_info_record
+        where hosp_code = #{hospCode}
+            and visit_id = #{visitId}
+            and status_code in ('3','4')
+     </select>
+
+    <!--根据三测单节点时间点查询科室下在院病人列表-->
+    <select id="queryInptThirdRecordByBatch"
+            parameterType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO"
+            resultType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO">
+        SELECT
+            info.time_slot,
+            info.sjd,
+            info.date,
+            info.bed_name,
+            info.name,
+            info.in_profile,
+            info.in_no,
+            info.visit_id,
+            info.in_time as in_time_batch,
+            info.out_time,
+            it.*
+        FROM
+            (
+            SELECT
+                sj.time_slot,
+                sj.sjd,
+                sj.date,
+                iv.id AS visit_id,
+                iv.hosp_code,
+                iv.in_time,
+                iv.out_time,
+                iv.bed_name,
+                iv.name,
+                iv.in_profile,
+                iv.in_no
+            FROM
+                (
+                    SELECT
+                        dates.date,
+                        T.sjd,
+                        CONCAT( dates.date, ' ', T.sjd, ':00' ) time_slot
+                    FROM
+                        (
+                        SELECT
+                            a.date
+                        FROM
+                        (
+                            SELECT
+                                DATE_FORMAT(#{endDate},'%Y-%m-%d') - INTERVAL ( a.a + ( 10 * b.a ) + ( 100 * c.a ) ) DAY AS date
+                            FROM
+                            (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS a
+                        CROSS JOIN (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS b
+                        CROSS JOIN (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS c
+                        ) a
+                        WHERE a.Date BETWEEN DATE_FORMAT(#{startDate}, '%Y-%m-%d')  AND DATE_FORMAT(#{endDate}, '%Y-%m-%d')
+                    ) dates
+                    LEFT JOIN (
+                        SELECT DISTINCT
+                        CONCAT( SUBSTRING_INDEX( SUBSTRING_INDEX( a.path, ',', b.help_topic_id + 1 ), ',',- 1 ), ':00' ) AS sjd
+                        FROM
+                        ( SELECT ( SELECT VALUE AS sjd FROM sys_parameter WHERE CODE = 'HLSCD_KSSJ' AND hosp_code = #{hospCode} ) AS path FROM DUAL ) a
+                        JOIN mysql.help_topic b ON b.help_topic_id &lt; ( LENGTH( a.path ) - LENGTH( REPLACE ( a.path, ',', '' )) + 1 )
+                    ) T ON 1 = 1
+                ) sj
+            LEFT JOIN inpt_visit iv ON 1 = 1
+            WHERE iv.hosp_code = #{hospCode}
+            AND iv.status_code = '2'
+            <if test="deptId != null and deptId != ''">
+                AND iv.in_dept_id = #{deptId}
+            </if>
+            <if test="startDate != null and sjd != '' and sjd != null">
+                AND sj.time_slot IN ( CONCAT( DATE_FORMAT(#{startDate}, '%Y-%m-%d') , ' ', #{sjd}, ':00:00' ) )
+            </if>
+            <if test="visitIds != null and visitIds.size() > 0 ">
+                and iv.id in
+                <foreach collection="visitIds" item="visitId" open="(" close=")" separator=",">
+                    #{visitId}
+                </foreach>
+            </if>
+            ORDER BY iv.in_time DESC
+            ) info
+        LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time
+    </select>
+
+    <!--批量修改三测单-->
+    <update id="updateList" parameterType="java.util.List">
+        <foreach collection="editList" item="dto" separator=";">
+            update inpt_nurse_third
+            <set>
+                visit_id = #{dto.visitId},
+                record_time = #{dto.recordTime},
+                in_num = #{dto.inNum},
+                temperature_code = #{dto.temperatureCode},
+                temperature = #{dto.temperature},
+                temperature_retest = #{dto.temperatureRetest},
+                pulse = #{dto.pulse},
+                heart_rate = #{dto.heartRate},
+                is_ventilator = #{dto.isVentilator},
+                breath = #{dto.breath},
+                forty_up_code = #{dto.fortyUpCode},
+                forty_up_remark = #{dto.fortyUpRemark},
+                thirty_five_down_code = #{dto.thirtyFiveDownCode},
+                thirty_five_down_remark = #{dto.thirtyFiveDownRemark},
+                intake = #{dto.intake},
+                output = #{dto.output},
+                other_output = #{dto.otherOutput},
+                remark = #{dto.remark},
+                skin_code = #{dto.skinCode},
+                excrement_code = #{dto.excrementCode},
+                pee_code = #{dto.peeCode},
+                height = #{dto.height},
+                weight = #{dto.weight},
+                am_bp = #{dto.amBp},
+                pm_bp = #{dto.pmBp},
+                is_operation = #{dto.isOperation},
+                operation_days = #{dto.operationDays},
+                operation_cnt = #{dto.operationCnt},
+                crte_id = #{dto.crteId},
+                crte_name = #{dto.crteName},
+                crte_time = #{dto.crteTime},
+                drug_allergy = #{dto.drugAllergy},
+            </set>
+            where id = #{dto.id} and hosp_code = #{dto.hospCode}
+        </foreach>
+    </update>
+</mapper>

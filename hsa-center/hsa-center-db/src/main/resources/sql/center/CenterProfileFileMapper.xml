@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.profilefile.dao.CenterProfileFileDAO">
+
+    <resultMap type="cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO" id="CenterProfileFileMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationalityCation" column="nationality_cation" jdbcType="VARCHAR"/>
+        <result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+        <result property="educationCode" column="education_code" jdbcType="VARCHAR"/>
+        <result property="occupationCode" column="occupation_code" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="oftenCode" column="often_code" jdbcType="VARCHAR"/>
+        <result property="nowProv" column="now_prov" jdbcType="VARCHAR"/>
+        <result property="nowCity" column="now_city" jdbcType="VARCHAR"/>
+        <result property="nowArea" column="now_area" jdbcType="VARCHAR"/>
+        <result property="nowPostCode" column="now_post_code" jdbcType="VARCHAR"/>
+        <result property="nativeProv" column="native_prov" jdbcType="VARCHAR"/>
+        <result property="nativeCity" column="native_city" jdbcType="VARCHAR"/>
+        <result property="nativeArea" column="native_area" jdbcType="VARCHAR"/>
+        <result property="nativePostCode" column="native_post_code" jdbcType="VARCHAR"/>
+        <result property="contactName" column="contact_name" jdbcType="VARCHAR"/>
+        <result property="contactRelaCode" column="contact_rela_code" jdbcType="VARCHAR"/>
+        <result property="contactPhone" column="contact_phone" jdbcType="VARCHAR"/>
+        <result property="contactPostCode" column="contact_post_code" jdbcType="VARCHAR"/>
+        <result property="contactAddress" column="contact_address" jdbcType="VARCHAR"/>
+        <result property="takeName" column="take_name" jdbcType="VARCHAR"/>
+        <result property="takeRelaCode" column="take_rela_code" jdbcType="VARCHAR"/>
+        <result property="takeCertNo" column="take_cert_no" jdbcType="VARCHAR"/>
+        <result property="takePhone" column="take_phone" jdbcType="VARCHAR"/>
+        <result property="work" column="work" jdbcType="VARCHAR"/>
+        <result property="workPhone" column="work_phone" jdbcType="VARCHAR"/>
+        <result property="workPostCode" column="work_post_code" jdbcType="VARCHAR"/>
+        <result property="workAddress" column="work_address" jdbcType="VARCHAR"/>
+        <result property="bloodCode" column="blood_code" jdbcType="VARCHAR"/>
+        <result property="familyDisease" column="family_disease" jdbcType="VARCHAR"/>
+        <result property="exposeDisease" column="expose_disease" jdbcType="VARCHAR"/>
+        <result property="heredityDisease" column="heredity_disease" jdbcType="VARCHAR"/>
+        <result property="allergyDisease" column="allergy_disease" jdbcType="VARCHAR"/>
+        <result property="pastDisease" column="past_disease" jdbcType="VARCHAR"/>
+        <result property="pastOper" column="past_oper" jdbcType="VARCHAR"/>
+        <result property="pastTrauma" column="past_trauma" jdbcType="VARCHAR"/>
+        <result property="pastBlood" column="past_blood" jdbcType="VARCHAR"/>
+        <result property="pastRemark" column="past_remark" jdbcType="VARCHAR"/>
+        <result property="allergyRemark" column="allergy_remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="getById" resultMap="CenterProfileFileMap">
+        select
+          id, name, gender_code, age, birthday, nation_code, nationality_cation, native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code, now_prov, now_city, now_area, now_post_code, native_prov, native_city, native_area, native_post_code, contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code, take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease, expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, pym, wbm, remark, crte_id, crte_name, crte_time
+        from center_profile_file
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CenterProfileFileMap">
+        select
+        a.id, a.name, a.gender_code, a.age, a.birthday, a.nation_code, a.nationality_cation, a.native_place, a.education_code,
+        a.occupation_code, a.marry_code, a.cert_code, a.cert_no, a.phone, a.email, a.often_code, a.now_prov, a.now_city, a.now_area,
+        a.now_post_code, a.native_prov, a.native_city, a.native_area, a.native_post_code, a.contact_name, a.contact_rela_code,
+        a.contact_phone, a.contact_post_code, a.contact_address, a.take_name, a.take_rela_code, a.take_cert_no, a.take_phone, a.work,
+        a.work_phone, a.work_post_code, a.work_address, a.blood_code, a.family_disease, a.expose_disease, a.heredity_disease,
+        a.allergy_disease, a.past_disease, a.past_oper, a.past_trauma, a.past_blood, a.past_remark, a.allergy_remark, a.pym, a.wbm,
+        a.remark, a.crte_id, a.crte_name, a.crte_time, b.name as sex
+        from center_profile_file as a
+        left join sync_code_detail as b on a.gender_code = b.value and  b.c_code = 'XB'
+        <where>
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name = #{name}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and a.gender_code = #{genderCode}
+            </if>
+            <if test="age != null">
+                and a.age = #{age}
+            </if>
+            <if test="birthday != null">
+                and a.birthday = #{birthday}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and a.nation_code = #{nationCode}
+            </if>
+            <if test="nationalityCation != null and nationalityCation != ''">
+                and a.nationality_cation = #{nationalityCation}
+            </if>
+            <if test="nativePlace != null and nativePlace != ''">
+                and a.native_place = #{nativePlace}
+            </if>
+            <if test="educationCode != null and educationCode != ''">
+                and a.education_code = #{educationCode}
+            </if>
+            <if test="occupationCode != null and occupationCode != ''">
+                and a.occupation_code = #{occupationCode}
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                and a.marry_code = #{marryCode}
+            </if>
+            <if test="certCode != null and certCode != ''">
+                and a.cert_code = #{certCode}
+            </if>
+            <if test="certNo != null and certNo != ''">
+                and a.cert_no = #{certNo}
+            </if>
+            <if test="phone != null and phone != ''">
+                and a.phone = #{phone}
+            </if>
+            <if test="email != null and email != ''">
+                and a.email = #{email}
+            </if>
+            <if test="oftenCode != null and oftenCode != ''">
+                and a.often_code = #{oftenCode}
+            </if>
+            <if test="nowProv != null and nowProv != ''">
+                and a.now_prov = #{nowProv}
+            </if>
+            <if test="nowCity != null and nowCity != ''">
+                and a.now_city = #{nowCity}
+            </if>
+            <if test="nowArea != null and nowArea != ''">
+                and a.now_area = #{nowArea}
+            </if>
+            <if test="nowPostCode != null and nowPostCode != ''">
+                and a.now_post_code = #{nowPostCode}
+            </if>
+            <if test="nativeProv != null and nativeProv != ''">
+                and a.native_prov = #{nativeProv}
+            </if>
+            <if test="nativeCity != null and nativeCity != ''">
+                and a.native_city = #{nativeCity}
+            </if>
+            <if test="nativeArea != null and nativeArea != ''">
+                and a.native_area = #{nativeArea}
+            </if>
+            <if test="nativePostCode != null and nativePostCode != ''">
+                and a.native_post_code = #{nativePostCode}
+            </if>
+            <if test="contactName != null and contactName != ''">
+                and a.contact_name = #{contactName}
+            </if>
+            <if test="contactRelaCode != null and contactRelaCode != ''">
+                and a.contact_rela_code = #{contactRelaCode}
+            </if>
+            <if test="contactPhone != null and contactPhone != ''">
+                and a.contact_phone = #{contactPhone}
+            </if>
+            <if test="contactPostCode != null and contactPostCode != ''">
+                and a.contact_post_code = #{contactPostCode}
+            </if>
+            <if test="contactAddress != null and contactAddress != ''">
+                and a.contact_address = #{contactAddress}
+            </if>
+            <if test="takeName != null and takeName != ''">
+                and a.take_name = #{takeName}
+            </if>
+            <if test="takeRelaCode != null and takeRelaCode != ''">
+                and a.take_rela_code = #{takeRelaCode}
+            </if>
+            <if test="takeCertNo != null and takeCertNo != ''">
+                and a.take_cert_no = #{takeCertNo}
+            </if>
+            <if test="takePhone != null and takePhone != ''">
+                and a.take_phone = #{takePhone}
+            </if>
+            <if test="work != null and work != ''">
+                and a.work = #{work}
+            </if>
+            <if test="workPhone != null and workPhone != ''">
+                and a.work_phone = #{workPhone}
+            </if>
+            <if test="workPostCode != null and workPostCode != ''">
+                and a.work_post_code = #{workPostCode}
+            </if>
+            <if test="workAddress != null and workAddress != ''">
+                and a.work_address = #{workAddress}
+            </if>
+            <if test="bloodCode != null and bloodCode != ''">
+                and a.blood_code = #{bloodCode}
+            </if>
+            <if test="familyDisease != null and familyDisease != ''">
+                and a.family_disease = #{familyDisease}
+            </if>
+            <if test="exposeDisease != null and exposeDisease != ''">
+                and a.expose_disease = #{exposeDisease}
+            </if>
+            <if test="heredityDisease != null and heredityDisease != ''">
+                and a.heredity_disease = #{heredityDisease}
+            </if>
+            <if test="allergyDisease != null and allergyDisease != ''">
+                and a.allergy_disease = #{allergyDisease}
+            </if>
+            <if test="pastDisease != null and pastDisease != ''">
+                and a.past_disease = #{pastDisease}
+            </if>
+            <if test="pastOper != null and pastOper != ''">
+                and a.past_oper = #{pastOper}
+            </if>
+            <if test="pastTrauma != null and pastTrauma != ''">
+                and a.past_trauma = #{pastTrauma}
+            </if>
+            <if test="pastBlood != null and pastBlood != ''">
+                and a.past_blood = #{pastBlood}
+            </if>
+            <if test="pastRemark != null and pastRemark != ''">
+                and a.past_remark = #{pastRemark}
+            </if>
+            <if test="allergyRemark != null and allergyRemark != ''">
+                and a.allergy_remark = #{allergyRemark}
+            </if>
+            <if test="pym != null and pym != ''">
+                and a.pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and a.wbm = #{wbm}
+            </if>
+            <if test="remark != null and remark != ''">
+                and a.remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="CenterProfileFileMap">
+        select
+        id, name, gender_code, age, birthday, nation_code, nationality_cation, native_place, education_code,
+        occupation_code, marry_code, cert_code, cert_no, phone, email, often_code, now_prov, now_city, now_area,
+        now_post_code, native_prov, native_city, native_area, native_post_code, contact_name, contact_rela_code,
+        contact_phone, contact_post_code, contact_address, take_name, take_rela_code, take_cert_no, take_phone, work,
+        work_phone, work_post_code, work_address, blood_code, family_disease, expose_disease, heredity_disease,
+        allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, pym, wbm,
+        remark, crte_id, crte_name, crte_time
+        from center_profile_file
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%',#{keyword},'%')
+                or cert_no like concat('%',#{keyword},'%')
+                or phone like concat('%',#{keyword},'%'))
+            </if>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="age != null">
+                and age = #{age}
+            </if>
+            <if test="birthday != null">
+                and birthday = #{birthday}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="nationalityCation != null and nationalityCation != ''">
+                and nationality_cation = #{nationalityCation}
+            </if>
+            <if test="nativePlace != null and nativePlace != ''">
+                and native_place = #{nativePlace}
+            </if>
+            <if test="educationCode != null and educationCode != ''">
+                and education_code = #{educationCode}
+            </if>
+            <if test="occupationCode != null and occupationCode != ''">
+                and occupation_code = #{occupationCode}
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                and marry_code = #{marryCode}
+            </if>
+            <if test="certCode != null and certCode != ''">
+                and cert_code = #{certCode}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="oftenCode != null and oftenCode != ''">
+                and often_code = #{oftenCode}
+            </if>
+            <if test="nowProv != null and nowProv != ''">
+                and now_prov = #{nowProv}
+            </if>
+            <if test="nowCity != null and nowCity != ''">
+                and now_city = #{nowCity}
+            </if>
+            <if test="nowArea != null and nowArea != ''">
+                and now_area = #{nowArea}
+            </if>
+            <if test="nowPostCode != null and nowPostCode != ''">
+                and now_post_code = #{nowPostCode}
+            </if>
+            <if test="nativeProv != null and nativeProv != ''">
+                and native_prov = #{nativeProv}
+            </if>
+            <if test="nativeCity != null and nativeCity != ''">
+                and native_city = #{nativeCity}
+            </if>
+            <if test="nativeArea != null and nativeArea != ''">
+                and native_area = #{nativeArea}
+            </if>
+            <if test="nativePostCode != null and nativePostCode != ''">
+                and native_post_code = #{nativePostCode}
+            </if>
+            <if test="contactName != null and contactName != ''">
+                and contact_name = #{contactName}
+            </if>
+            <if test="contactRelaCode != null and contactRelaCode != ''">
+                and contact_rela_code = #{contactRelaCode}
+            </if>
+            <if test="contactPhone != null and contactPhone != ''">
+                and contact_phone = #{contactPhone}
+            </if>
+            <if test="contactPostCode != null and contactPostCode != ''">
+                and contact_post_code = #{contactPostCode}
+            </if>
+            <if test="contactAddress != null and contactAddress != ''">
+                and contact_address = #{contactAddress}
+            </if>
+            <if test="takeName != null and takeName != ''">
+                and take_name = #{takeName}
+            </if>
+            <if test="takeRelaCode != null and takeRelaCode != ''">
+                and take_rela_code = #{takeRelaCode}
+            </if>
+            <if test="takeCertNo != null and takeCertNo != ''">
+                and take_cert_no = #{takeCertNo}
+            </if>
+            <if test="takePhone != null and takePhone != ''">
+                and take_phone = #{takePhone}
+            </if>
+            <if test="work != null and work != ''">
+                and work = #{work}
+            </if>
+            <if test="workPhone != null and workPhone != ''">
+                and work_phone = #{workPhone}
+            </if>
+            <if test="workPostCode != null and workPostCode != ''">
+                and work_post_code = #{workPostCode}
+            </if>
+            <if test="workAddress != null and workAddress != ''">
+                and work_address = #{workAddress}
+            </if>
+            <if test="bloodCode != null and bloodCode != ''">
+                and blood_code = #{bloodCode}
+            </if>
+            <if test="familyDisease != null and familyDisease != ''">
+                and family_disease = #{familyDisease}
+            </if>
+            <if test="exposeDisease != null and exposeDisease != ''">
+                and expose_disease = #{exposeDisease}
+            </if>
+            <if test="heredityDisease != null and heredityDisease != ''">
+                and heredity_disease = #{heredityDisease}
+            </if>
+            <if test="allergyDisease != null and allergyDisease != ''">
+                and allergy_disease = #{allergyDisease}
+            </if>
+            <if test="pastDisease != null and pastDisease != ''">
+                and past_disease = #{pastDisease}
+            </if>
+            <if test="pastOper != null and pastOper != ''">
+                and past_oper = #{pastOper}
+            </if>
+            <if test="pastTrauma != null and pastTrauma != ''">
+                and past_trauma = #{pastTrauma}
+            </if>
+            <if test="pastBlood != null and pastBlood != ''">
+                and past_blood = #{pastBlood}
+            </if>
+            <if test="pastRemark != null and pastRemark != ''">
+                and past_remark = #{pastRemark}
+            </if>
+            <if test="allergyRemark != null and allergyRemark != ''">
+                and allergy_remark = #{allergyRemark}
+            </if>
+            <if test="pym != null and pym != ''">
+                and pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and wbm = #{wbm}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+    
+    
+    
+</mapper>

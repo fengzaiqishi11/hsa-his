@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bd.dao.BaseDiseaseDAO">
+	<resultMap type="cn.hsa.module.base.bd.dto.BaseDiseaseDTO" id="BaseDiseaseMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+		<result property="code" column="code" jdbcType="VARCHAR"/>
+		<result property="attachCode" column="attach_code" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+		<result property="isAdd" column="is_add" jdbcType="VARCHAR"/>
+		<result property="pym" column="pym" jdbcType="VARCHAR"/>
+		<result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+		<result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="isCrb" column="is_infectious" jdbcType="VARCHAR"/>
+		<result property="crbName" column="infectious_name" jdbcType="VARCHAR"/>
+		<result property="crbInterval" column="infectious_interval_days" jdbcType="INTEGER"/>
+		<result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<!--删除疾病规则-->
+	<update id="updateDiseaseRuleIsValid" parameterType="cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO">
+		update base_disease_rule
+		set is_valid = '0'
+		where hosp_code = #{hospCode}
+		and id = #{id}
+	</update>
+
+	<select id="getById" resultMap="BaseDiseaseMap">
+		select
+		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no
+		from base_disease
+		<where>
+			hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and id = #{id}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryPage" resultMap="BaseDiseaseMap">
+		select
+		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		crte_name, crte_time,ifnull(seq_no,14836248) as seq_no
+		from base_disease
+		<where>
+			hosp_code = #{hospCode}
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and type_code = #{typeCode}
+			</if>
+			<if test="attachCode != null and attachCode != ''">
+				and attach_code = #{attachCode}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and nation_code = #{nationCode}
+			</if>
+			<if test="isAdd != null">
+				and is_add = #{isAdd}
+			</if>
+			<if test="isValid != null and isValid != '' ">
+				and is_valid = #{isValid}
+			</if>
+			<if test="crteId != null">
+				and crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and crte_time = #{crteTime}
+			</if>
+			<if test="keyword !=null and keyword != ''">
+				and (code like concat('%',#{keyword},'%')
+				or name like concat('%',#{keyword},'%')
+				or wbm like concat('%',#{keyword},'%')
+				or pym like concat('%',#{keyword},'%'))
+			</if>
+			<if test="ids != null and ids.size() > 0">
+				and type_code in
+				<foreach collection="ids" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+
+			<choose>
+				<when test="queryType == 'icd-10'">
+					and type_code in ('1','2')
+				</when>
+				<when test="queryType == 'icd-9'">
+					and type_code = '3'
+				</when>
+				<when test="queryType == 'icd-m'">
+					and code like concat('%','M','%')
+				</when>
+				<when test="queryType !=null and queryType != ''">
+					and type_code in ('1','2','4')
+				</when>
+				<otherwise>
+
+				</otherwise>
+			</choose>
+
+		</where>
+		order by seq_no asc
+	</select>
+
+	<select id="queryAll" resultMap="BaseDiseaseMap">
+		select
+		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		crte_name, crte_time
+		from base_disease
+		<where>
+			hosp_code = #{hospCode}
+			<if test="isValid != null and isValid != ''">
+				and is_valid = #{isValid}
+			</if>
+			<if test="isValid == null or isValid == ''">
+				and is_valid = '1'
+			</if>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and type_code = #{typeCode}
+			</if>
+			<if test="attachCode != null and attachCode != ''">
+				and attach_code = #{attachCode}
+			</if>
+			<if test="isNationCode == true">
+				and nation_code is not null and LENGTH(trim(nation_code))>0
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and nation_code = #{nationCode}
+			</if>
+			<if test="isAdd != null">
+				and is_add = #{isAdd}
+			</if>
+			<if test="crteId != null">
+				and crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and crte_time = #{crteTime}
+			</if>
+			<if test="keyword !=null and keyword != ''">
+				and (code like concat('%',#{keyword},'%')
+				or name like concat('%',#{keyword},'%')
+				or wbm like concat('%',#{keyword},'%')
+				or pym like concat('%',#{keyword},'%'))
+			</if>
+			<if test="ids != null and ids.size() > 0">
+				and id in
+				<foreach collection="ids" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by crte_time desc
+        <if test="limit != null and limit != ''">
+            limit  #{limit}
+        </if>
+	</select>
+
+	<!--新增所有列-->
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no)
+        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo})
+    </insert>
+
+	<!--新增疾病规则-->
+	<insert id="insertDiseaseRule" parameterType="java.util.List">
+		insert into  base_disease_rule(id, hosp_code, drug_id, disease_id, type_code, prompt_msg, is_valid, crte_id, crte_name, crte_time)
+		values
+		<foreach collection="addList" item="item" separator=",">
+			(#{item.id},
+		    #{item.hospCode},
+		    #{item.drugId},
+		    #{item.diseaseId},
+		    #{item.typeCode},
+		    #{item.promptMsg},
+		    #{item.isValid},
+		    #{item.crteId},
+		    #{item.crteName},
+		    #{item.crteTime})
+		</foreach>
+	</insert>
+
+	<!--通过主键修改数据   需要回写的请自行写SQL-->
+	<update id="update">
+		update base_disease
+		<set>
+			type_code = #{typeCode},
+			code = #{code},
+			attach_code = #{attachCode},
+			name = #{name},
+			nation_code = #{nationCode},
+			is_add = #{isAdd},
+			pym = #{pym},
+			wbm = #{wbm},
+			is_infectious = #{isCrb},
+			infectious_name = #{crbName},
+			infectious_interval_days = #{crbInterval},
+		    seq_no = #{seqNo}
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--批量和单个修改有效状态-->
+	<update id="updateStatus" parameterType="java.util.List">
+		update base_disease
+		set is_valid = #{isValid} where hosp_code = #{hospCode} and
+		<if test="ids != null and ids.size()>0">
+			id in
+			<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</update>
+
+	<!--编辑疾病规则-->
+	<update id="updateDiseaseRule" parameterType="java.util.List">
+		<foreach collection="editList" item="item" separator=";">
+			update base_disease_rule
+			<set>
+				<if test="item.typeCode != null ">
+					type_code = #{item.typeCode},
+				</if>
+			    <if test="item.promptMsg != null">
+					prompt_msg = #{item.promptMsg},
+				</if>
+			</set>
+			where hosp_code = #{item.hospCode}
+			and id = #{item.id}
+		</foreach>
+	</update>
+
+	<!--判断疾病编码、附加编码、国家编码是否已经存在-->
+	<select id="isCodeExist" resultType="java.lang.Integer">
+		select count(id)
+		from base_disease
+		where hosp_code = #{hospCode}
+		<if test="code != null and code != ''">
+			and code = #{code}
+		</if>
+		<if test="nationCode != null and nationCode != ''">
+			and nation_code = #{nationCode}
+		</if>
+		<if test="attachCode != null and attachCode != ''">
+			and attach_code = #{attachCode}
+		</if>
+		<if test="id != null and id != ''">
+			and id != #{id}
+		</if>
+	</select>
+
+    <select id="getDiseaseByIds" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO">
+        select
+        id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+        crte_name, crte_time
+        from base_disease
+        <where>
+            hosp_code = #{hospCode}
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="attachCode != null and attachCode != ''">
+                and attach_code = #{attachCode}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="isAdd != null">
+                and is_add = #{isAdd}
+            </if>
+            <if test="isValid != null and isValid != '' ">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="codes != null and codes.size() > 0">
+                and code in
+                <foreach collection="codes" item="code" separator="," open="(" close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+	<!--根据疾病id分页获取对应的疾病规则列表-->
+    <select id="queryDiseaseRule" parameterType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO">
+		SELECT
+			t1.id,
+			t1.hosp_code,
+			t2.usual_name AS drug_name,
+			t2.spec,
+			t2.unit_code,
+			t2.price,
+			( SELECT b.NAME FROM base_disease b WHERE b.id = t1.disease_id AND b.hosp_code = t1.hosp_code ) AS disease_name,
+			t1.type_code,
+			t1.prompt_msg,
+			t1.is_valid,
+			t1.crte_id,
+			t1.crte_name,
+			t1.crte_time
+		FROM
+			base_disease_rule t1,
+			base_drug t2
+		WHERE
+			t1.drug_id = t2.id
+		 	AND t1.hosp_code = t2.hosp_code
+		  	AND t1.hosp_code = #{hospCode}
+		  	AND t1.is_valid = #{isValid}
+		  	AND t1.disease_id = #{id}
+		ORDER BY
+			t1.crte_time DESC
+	</select>
+
+	<!--检查质控疾病规则-->
+	<select id="queryDiseaseRuleByDid" parameterType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO">
+		SELECT
+			a.drug_id,
+			b.usual_name AS drug_name,
+			a.disease_id,
+			(SELECT NAME FROM base_disease c WHERE a.disease_id = c.id AND a.hosp_code = c.hosp_code AND c.is_valid = #{isValid} ) AS disease_name,
+			a.type_code,
+			a.prompt_msg,
+			a.id
+		FROM base_disease_rule a
+		LEFT JOIN base_drug b ON a.drug_id = b.id AND a.hosp_code = b.hosp_code
+		WHERE
+			a.hosp_code = #{hospCode}
+		  	AND a.is_valid = #{isValid}
+		<if test="ids != null and ids.size > 0">
+			AND a.disease_id IN
+			<foreach collection="ids" separator="," item="item" open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+		ORDER BY
+			a.disease_id,
+			a.crte_time
+	</select>
+    <select id="queryUnifiedPage" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO">
+		select a.id, a.hosp_code, a.type_code, a.code, a.name, a.attach_code,
+			   a.nation_code, a.is_add, a.pym,a.wbm, a.is_valid,
+			   a.crte_id, a.crte_name, a.crte_time from base_disease a
+		left join insure_disease_match  b on a.id = b.hosp_illness_id where b.hosp_illness_id is null
+		 and a.hosp_code=#{hospCode}  and a.is_valid ='1'
+		<if test="keyword !=null and keyword != ''">
+			and (code like concat('%',#{keyword},'%')
+			or name like concat('%',#{keyword},'%')
+			or wbm like concat('%',#{keyword},'%')
+			or pym like concat('%',#{keyword},'%'))
+		</if>
+		order by a.crte_time
+	</select>
+
+    <select id="queryAllInfectious" resultMap="BaseDiseaseMap">
+        select
+        id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+        crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days
+        from base_disease
+        where hosp_code = #{hospCode} and is_infectious='1'
+        <if test="ids != null and ids.size > 0">
+            and id in
+            <foreach collection="ids" separator="," item="item" open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+</mapper>

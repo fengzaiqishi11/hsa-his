@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureGetInfoDAO">
+
+     <select id="getSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
+        select
+            a.id,
+            a.visit_id,
+            d.mib_id,
+            (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
+            (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
+            d.medical_reg_no,
+            a.settle_id,
+            a.insureSettleId,
+            a.hosp_code,
+            b.in_profile,
+            b.name,
+            b.age,
+            b.gender_code,
+            b.birthday,
+            b.nationality_cation,
+            b.nation_code,
+            b.cert_code,
+            b.cert_no as certno,
+            b.occupation_code,
+            b.contact_name,
+            b.contact_rela_code,
+            b.contact_address,
+            b.contact_phone,
+            b.insure_code,
+            '1' as aka130,
+            b.patient_code,
+            b.in_dept_id,
+            (select nation_code from base_dept bd where bd.id = b.in_dept_id and bd.hosp_code = b.hosp_code) as inDeptCode,
+            b.out_dept_id,
+            (select nation_code from base_dept bd where bd.id = b.in_dept_id and bd.hosp_code = b.hosp_code) as outDeptCode,
+            b.out_mode_code,
+            a.insureSettleId,
+            a.personal_price,
+            a.person_price,
+            a.settleway,
+            a.insure_org_code,
+            a.crte_time,
+            d.insuplc_admdvs
+        from insure_individual_settle a
+        left join inpt_visit b on a.visit_id = b.id
+        left join insure_individual_visit d on a.visit_id = d.visit_id
+        where a.insureSettleId = #{insureSettleId} and a.state = '0'
+        order by a.visit_id
+    </select>
+
+    <select id="getOutSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
+        select
+            a.id,
+            a.visit_id ,
+            a.settle_id,
+            d.medical_reg_no,
+            a.insureSettleId,
+            a.hosp_code,
+            d.mib_id,
+            (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
+            b.out_profile as inProfile,
+            b.name,
+            b.age,
+            d.visit_drpt_id,
+            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as inDeptCode,
+            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as outDeptCode,
+            b.gender_code,
+            b.birthday,
+            d.visit_drpt_id,
+            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as inDeptCode,
+            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as outDeptCode,
+            b.nation_code,
+            b.cert_code,
+            b.cert_no as certno,
+            b.insure_code,
+            b.patient_code,
+            '2' as aka130,
+            a.insureSettleId,
+            a.crte_time,
+            a.personal_price,
+            a.person_price,
+            a.settleway,
+            a.insure_org_code,
+            a.crte_time,
+            d.insuplc_admdvs
+        from insure_individual_settle a
+        left join outpt_visit b on a.visit_id = b.id
+        left join insure_individual_visit d on a.visit_id = d.visit_id
+        where a.insureSettleId = #{insureSettleId}
+        order by a.visit_id
+    </select>
+
+    <select id="queryPayinfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualFundDTO">
+        select ifnull(fund_payamt,0) as fund_payamt, fund_pay_type from insure_individual_fund where insure_settle_id = #{insureSettleId}
+    </select>
+
+    <select id="queryOpspdiseinfo" resultType="cn.hsa.module.insure.module.dto.OpspdiseInfoDTO">
+        select b.insure_illness_name as name, b.insure_illness_code as diseaseId from outpt_diagnose a, insure_disease_match b where a.visit_id = #{visitId}
+        and a.disease_id = b.hosp_illness_id and a.hosp_code = #{hospCode} and b.insure_illness_code is not null
+    </select>
+
+    <select id="queryDiseinfo" resultType="cn.hsa.module.insure.module.dto.DiseInfoDTO">
+        select a.disease_id, a.type_code, a.is_main, b.insure_illness_name as name from inpt_diagnose a, insure_disease_match b
+        where a.visit_id = #{visitId} and a.disease_id = b.hosp_illness_id and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
+          and b.insure_illness_code is not null
+    </select>
+
+    <select id="queryIteminfo" resultType="cn.hsa.module.insure.module.dto.ItemInfoDTO">
+        select ifnull(primary_price,0) as primaryPrice,item_type,
+        ifnull(apply_last_price,0) as applyLastPrice,
+        ifnull(fulamt_ownpay_amt,0) as fulamtOwnpayAmt
+        from  insure_individual_cost
+        where visit_id = #{visitId} and insure_settle_id = #{insureSettleId}
+
+    </select>
+
+    <select id="queryOprninfo" resultType="cn.hsa.module.insure.module.dto.OprninfoDTO">
+        select oper_disease_icd9, oper_disease_name, oper_plan_time, doctor_id, doctor_name, rank from oper_info_record where visit_id = #{visitId} -- 手术类型
+    </select>
+
+    <select id="queryIcuinfo" resultType="cn.hsa.module.insure.module.dto.IcuInfoDTO">
+        select * from base_dept where 1=2-- 暂时没表
+    </select>
+
+    <select id="queryInsureCost" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+       select id, '0' as medType,
+        item_id, item_name, crte_time,
+        item_code, price, num, total_num, total_price, doctor_id, doctor_name,
+         dept_id, (select name from base_dept a where a.id = dept_id ) as deptName
+         from inpt_cost where visit_id = #{id} and id not in (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
+    </select>
+
+    <select id="queryOutCost" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select id, '1' as medType,
+        item_id, item_name, crte_time,
+        item_code, price, num, total_num, total_price, doctor_id, doctor_name,
+         dept_id, (select name from base_dept a where a.id = dept_id ) as deptName
+         from insure_individual_cost where visit_id = #{id} and id not in (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
+    </select>
+
+    <select id="queryInCost" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select id, '2' as medType,
+        item_id, item_name, crte_time,
+        item_code,price, num, total_num, total_price, doctor_id, doctor_name,
+        dept_id, (select name from base_dept a where a.id = dept_id ) as deptName
+        from insure_individual_cost where visit_id = #{id} and id not in (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
+    </select>
+
+    <select id="queryVisit" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+      select * from (
+         select id,1 as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
+         nation_code, cert_no, birthday,  patient_code, crte_time from inpt_visit where
+         patient_code = '0'
+        <if test="name != null and name != ''">
+           and ( name like concat('%',#{name},'%')
+            or in_no like concat('%',#{name},'%'))
+        </if>
+        order by crte_time ) m
+         union all
+        select * from (
+         select id,2 as lx,register_no as visitNo, name, gender_code, age, age_unit_code,
+         nation_code, cert_no, birthday,  patient_code, crte_time from outpt_visit where
+         patient_code = '0'
+        <if test="name != null and name != ''">
+           and ( name like concat('%',#{name},'%')
+            or register_no like concat('%',#{name},'%'))
+        </if>
+        order by crte_time ) n
+    </select>
+
+    <insert id="insertCost" keyProperty="" useGeneratedKeys="true">
+    <foreach collection="list" item="entity" separator=";">
+    insert into insure_upload_cost(id, hosp_code, visit_id, mdtrt_sn, ipt_otp_no, med_type,
+    chrg_bchno, feedetl_sn, psn_cert_type, certno, psn_name, fee_ocur_time, cnt, pric, det_item_fee_sumamt,
+    med_list_codg, medins_list_codg, medins_list_name, med_chrgitm_type, prodname, bilg_dept_codg, bilg_dept_name,
+    bilg_dr_codg, bilg_dr_name, crte_id, crte_name, crte_time, org_code, cost_id)
+    values
+        (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.mdtrtSn}, #{entity.iptOtpNo},
+        #{entity.medType}, #{entity.chrgBchno}, #{entity.feedetlSn}, #{entity.psnCertType}, #{entity.certno},
+        #{entity.psnName}, #{entity.feeOcurTime}, #{entity.cnt}, #{entity.pric}, #{entity.detItemFeeSumamt},
+        #{entity.medListCodg}, #{entity.medinsListCodg}, #{entity.medinsListName}, #{entity.medChrgitmType},
+        #{entity.prodname}, #{entity.bilgDeptCodg}, #{entity.bilgDeptName}, #{entity.bilgDrCodg},
+        #{entity.bilgDrName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.orgCode}, #{entity.costId})
+    </foreach>
+    </insert>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+        select
+        id, hosp_code, visit_id, mdtrt_sn, ipt_otp_no, med_type, chrg_bchno, feedetl_sn, psn_cert_type, certno,
+        psn_name, fee_ocur_time, cnt, pric, det_item_fee_sumamt, med_list_codg, medins_list_codg, medins_list_name,
+        med_chrgitm_type, prodname, bilg_dept_codg, bilg_dept_name, bilg_dr_codg, bilg_dr_name, crte_id, crte_name,
+        crte_time
+        from insure_upload_cost
+        where visit_id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryInsureSettle" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
+        select
+        IFNULL(total_price,0) as totalPrice,
+        ifnull(insure_price,0) as insurePrice,
+        ifnull(plan_price,0) as planPrice,
+        ifnull(serious_price,0) as serivicePrice,
+        ifnull(civil_price,0) as civilPrice,
+        ifnull(retire_price,0) as retirerPrice,
+        ifnull(personal_price,0) as personalPrice,
+        ifnull(person_price,0) as personPrice
+        from insure_individual_settle where insureSettleId = #{insureSettleId}
+    </select>
+
+    <select id="queryInsure" resultType="cn.hsa.module.insure.module.dto.ItemInfoDTO">
+        select item_name, ifnull(primary_price,0) as primaryPrice, ifnull(apply_last_price,0) as applyLastPrice, ifnull(overlmtSelfpayAmt,0) as overlmtSelfpayAmt
+        from insure_individual_cost where visit_id = #{visitId} and insure_settle_id = #{insureSettleId}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertSettleInfo" keyProperty="" useGeneratedKeys="true">
+        insert into insure_setl_info(id, hosp_code, visit_id, settle_id, fixmedins_name, fixmedins_code, hi_setl_lv, hi_no, medcasno, dcla_time, psn_name, gend, brdy, age, ntly, neb_age, naty, patn_cert_type, certno, prfs, curr_addr, emp_name, emp_addr, emp_tel, poscode, coner_name, patn_rlts, coner_addr, coner_tel, hi_type, insulic, sp_psn_type, nwb_adm_type, nwb_bir_wt, nwb_adm_wt, opsp_diag_caty, opsp_mdtrt_date, ipt_med_type, adm_way, trt_type, adm_time, adm_caty, refldept_dept, dscg_time, dscg_caty, act_ipt_days, opt_wm_dise, wm_disw_code, opt_tcm_dise, tcm_dise_code, diag_code_cnt, oprn_oprt_code_cnt, vent_used_durg, pwcry_bfadmcoma_dura, pwcry_afadmcoma_dura, bld_cat, bld_amt, bld_unt, spga_nurscare_days, lv1_nurscare_days, scd_nurscare_days, lv3_nursecare_days, dscg_way, acp_medins_name, acp_optins_code, bill_code, bill_no, biz_sn, days_rinp_flag_31, days_rinp_pup_31, chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay, acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn, crte_id, crte_name, crte_time, settle_no)
+        values (#{id}, #{hospCode}, #{visitId}, #{settleId}, #{fixmedinsName}, #{fixmedinsCode}, #{hiSetlLv}, #{hiNo}, #{medcasno}, #{dclaTime}, #{psnName}, #{gend}, #{brdy}, #{age}, #{ntly}, #{nebAge}, #{naty}, #{patnCertType}, #{certno}, #{prfs}, #{currAddr}, #{empName}, #{empAddr}, #{empTel}, #{poscode}, #{conerName}, #{patnRlts}, #{conerAddr}, #{conerTel}, #{hiType}, #{insulic}, #{spPsnType}, #{nwbAdmType}, #{nwbBirWt}, #{nwbAdmWt}, #{opspDiagCaty}, #{opspMdtrtDate}, #{iptMedType}, #{admWay}, #{trtType}, #{admTime}, #{admCaty}, #{refldeptDept}, #{dscgTime}, #{dscgCaty}, #{actIptDays}, #{optWmDise}, #{wmDiswCode}, #{optTcmDise}, #{tcmDiseCode}, #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDurg}, #{pwcryBfadmcomaDura}, #{pwcryAfadmcomaDura}, #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscareDays}, #{lv1NurscareDays}, #{scdNurscareDays}, #{lv3NursecareDays}, #{dscgWay}, #{acpMedinsName}, #{acpOptinsCode}, #{billCode}, #{billNo}, #{bizSn}, #{daysRinpFlag31}, #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEnDate}, #{psnSelfpay}, #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept}, #{medinsFillPsn}, #{crteId}, #{crteName}, #{crteTime}, #{settleNo})
+    </insert>
+
+    <select id="getSetlInfoLocal" resultType="java.lang.String">
+        select id from insure_setl_info where settle_id = #{settleId}
+    </select>
+
+</mapper>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.outptclassify.dao.OutptClassifyDAO">
+
+    <resultMap type="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO" id="OutptClassifyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="visitCode" column="visit_code" jdbcType="VARCHAR"/>
+        <result property="registerCode" column="register_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isExpert" column="is_expert" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO" id="OutptClassifyCostMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="cyId" column="cy_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="itemPrice" column="itemPrice" jdbcType="DECIMAL"/>
+        <result property="itemUnitCode" column="itemUnitCode" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="itemPriceAll" column="itemPriceAll" jdbcType="DECIMAL"/>
+        <result property="itemPreferentialPrice" column="itemPreferentialPrice" jdbcType="DECIMAL"/>
+        <result property="itemPreferentialAllPrice" column="itemPreferentialAllPrice" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="OutptClassifyMap">
+        select
+          id, hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name,
+          crte_time,
+          (select name from base_dept where dept_id = base_dept.id and base_dept.hosp_code = #{hospCode})as deptName
+        from outpt_classify
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllandPage" resultMap="OutptClassifyMap">
+        select
+          id, hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name, crte_time
+        from outpt_classify
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                and visit_code = #{visitCode}
+            </if>
+            <if test="registerCode != null and registerCode != ''">
+                and register_code = #{registerCode}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="pym != null and pym != ''">
+                and pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and wbm = #{wbm}
+            </if>
+            <if test="isExpert != null and isExpert != ''">
+                and is_expert = #{isExpert}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="deptCodes != null and deptCodes.size() > 0">
+                and dept_id in
+              <foreach collection="deptCodes" item="item" separator="," open="(" close=")">
+                (select base_dept.id from base_dept where base_dept.code = #{item} and base_dept.hosp_code = #{hospCode})
+              </foreach>
+            </if>
+            order by visit_code  desc
+    </select>
+
+    <!--优惠类型名称是否重复-->
+    <select id="queryNameIsExist" resultType="java.lang.Integer">
+      select count(name) from outpt_classify
+      where
+      name = #{name} and hosp_code = #{hospCode} and is_valid = '1'
+      <if test="id != null and id != ''">
+        and id != #{id}
+      </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into outpt_classify(id,hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{name}, #{deptId}, #{visitCode}, #{registerCode}, #{remark}, #{pym}, #{wbm}, #{isExpert}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update outpt_classify
+        <set>
+            <if test="hospCode != null">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="deptId != null">
+                dept_id = #{deptId},
+            </if>
+            <if test="visitCode != null">
+                visit_code = #{visitCode},
+            </if>
+            <if test="registerCode != null">
+                register_code = #{registerCode},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="pym != null">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null">
+                wbm = #{wbm},
+            </if>
+            <if test="isExpert != null">
+                is_expert = #{isExpert},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="deleteById">
+        update outpt_classify set is_valid = '0' where hosp_code = #{hospCode}
+        <if test="ids != null and ids.size() > 0">
+          and id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
+    </update>
+
+    <!--新增挂号类别费用-->
+    <insert id="insertOutptCost">
+          insert into outpt_classify_cost(id,hosp_code, cy_id, item_code, item_id, num, use_code)
+          values
+          <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.cyId}, #{item.itemCode}, #{item.itemId}, #{item.num}, #{item.useCode})
+          </foreach>
+      </insert>
+
+    <!--通过主键修改挂号类别费用-->
+    <update id="updateOutptCost" parameterType="java.util.List">
+      <foreach collection="list" item="item" separator=";">
+         update outpt_classify_cost
+            <set>
+              <if test="item.cyId != null and item.cyId != ''">
+                cy_id = #{item.cyId},
+              </if>
+              <if test="item.itemCode != null and item.itemCode != ''">
+                item_code = #{item.itemCode},
+              </if>
+              <if test="item.itemId != null and item.itemId != ''">
+                item_id = #{item.itemId},
+              </if>
+              <if test="item.num != null">
+                num = #{item.num},
+              </if>
+              <if test="item.useCode != null and item.useCode != ''">
+                use_code = #{item.useCode},
+              </if>
+            </set>
+            where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除挂号类别费用-->
+    <delete id="deleteOutptCost" parameterType="java.util.List">
+        delete from outpt_classify_cost where
+        hosp_code = #{hospCode}
+          <if test="ids != null and ids.size() > 0">
+            and id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+              #{id}
+            </foreach>
+          </if>
+    </delete>
+
+    <!--查询单个-->
+    <select id="queryClassifyCostList" resultMap="OutptClassifyCostMap">
+        select a.id, a.hosp_code, a.cy_id, a.item_code, a.item_id, a.num, a.use_code,
+            case when a.item_code = '3' then b.unit_code when a.item_code = '2' then b.unit_code end itemUnitCode,
+            case when a.item_code = '3' then b.name when a.item_code = '2' then b.name end name,
+            case when a.item_code = '3' then b.price when a.item_code = '2' then b.price end itemPrice,
+            case when a.item_code = '3' then b.price*a.num when a.item_code = '2' then b.price*a.num end itemPriceAll,
+            case when a.item_code = '3' then b.price when a.item_code = '2' then b.price end itemPreferentialPrice,
+            case when a.item_code = '3' then b.price*a.num when a.item_code = '2' then b.price*a.num end itemPreferentialAllPrice,
+            case when a.item_code='2' then e.id when a.item_code='3' then d.id end bfcId
+        from outpt_classify_cost a
+        left join base_item b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '3'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+        left join base_finance_classify d on b.bfc_code = d.code and b.hosp_code = d.hosp_code
+        left join base_finance_classify e on c.bfc_code = e.code and c.hosp_code = e.hosp_code
+        where a.cy_id = #{cyId} and a.hosp_code = #{hospCode}
+    </select>
+
+</mapper>

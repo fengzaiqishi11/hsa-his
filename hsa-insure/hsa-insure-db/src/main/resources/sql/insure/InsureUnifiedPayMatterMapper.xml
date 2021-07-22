@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.outpt.dao.InsureUnifiedPayMatterDAO">
+    <!--查询就诊人的诊断列表-->
+    <select id="getDiagnoseListByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="java.util.Map">
+        SELECT a.id,
+               a.disease_id,
+               b.name as disease_name,
+               a.visit_id,
+               a.type_code,
+               a.is_main,
+               a.crte_time
+        FROM inpt_diagnose a
+                 JOIN base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+        WHERE a.visit_id = #{id}
+          and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--查询就诊人的处方列表-->
+    <select id="getOrderListByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="java.util.Map">
+        SELECT a.id,
+               a.order_no,
+               a.group_no,
+               a.is_long,
+               a.item_code,
+               a.use_code,
+               a.num,
+               a.price,
+               a.total_price,
+               a.spec,
+               a.unit_code,
+               a.long_start_time,
+               a.stop_time,
+               a.dept_id,
+               (select name from base_dept t1 where a.dept_id = t1.id and a.hosp_code = t1.hosp_code) as dept_name,
+               a.crte_id,
+               a.crte_name,
+               (select t2.name
+                from sys_code_detail t2,
+                     sys_user t3
+                where t2.c_code = 'RYZW'
+                  and a.crte_id = t3.id
+                  and t3.work_type_code = t2.value
+                  and t2.hosp_code = a.hosp_code
+                  and t3.hosp_code = a.hosp_code)                                                     as work_type_name
+        FROM inpt_advice a
+        WHERE visit_id = #{id}
+          and hosp_code = #{hospCode}
+    </select>
+
+    <select id="getInptVisitById" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select id,
+               hosp_code,
+               profile_id,
+               in_profile,
+               in_no,
+               name,
+               gender_code,
+               age,
+               age_unit_code,
+               birthday,
+               nationality_cation,
+               occupation_code,
+               education_code,
+               contact_name,
+               contact_rela_code,
+               contact_address,
+               contact_phone,
+               nation_code,
+               cert_code,
+               cert_no,
+               marry_code,
+               phone,
+               address,
+               preferential_type_id,
+               patient_code,
+               receive_hosp_name,
+               bed_id,
+               bed_name,
+               nursing_code,
+               diet_type,
+               Illness_code,
+               status_code,
+               in_ward_id,
+               in_dept_id,
+               in_dept_name,
+               in_time,
+               zz_doctor_id,
+               zz_doctor_name,
+               jz_doctor_id,
+               jz_doctor_name,
+               zg_doctor_id,
+               zg_doctor_name,
+               in_remark,
+               in_mode_code,
+               in_disease_id,
+               in_disease_name,
+               in_disease_icd10,
+               in_situation_code,
+               outpt_visit_no,
+               outpt_doctor_id,
+               outpt_doctor_name,
+               outpt_disease_id,
+               outpt_disease_name,
+               outpt_disease_icd10,
+               out_ward_id,
+               out_dept_id,
+               out_dept_name,
+               out_time,
+               out_disease_id,
+               out_disease_name,
+               out_disease_icd10,
+               out_oper_id,
+               out_oper_name,
+               out_oper_time,
+               out_situation_code,
+               out_remark,
+               out_mode_code,
+               is_archive,
+               archive_time,
+               archive_id,
+               archive_name,
+               insure_code,
+               insure_org_code,
+               insure_no,
+               insure_biz_code,
+               insure_treat_code,
+               insure_patient_id,
+               insure_remark,
+               total_advance,
+               total_cost,
+               total_balance,
+               crte_id,
+               crte_name,
+               crte_time,
+               (select name
+                from base_dept
+                where id = inpt_visit.in_ward_id and hosp_code = inpt_visit.hosp_code) as wardName
+        from inpt_visit
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </select>
+</mapper>

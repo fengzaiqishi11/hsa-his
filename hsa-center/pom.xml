@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.center</groupId>
+    <artifactId>hsa-center</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-center</name>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>cn.hsa.his</groupId>
+        <artifactId>hsa-his</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modules>
+        <module>hsa-center-biz</module>
+        <module>hsa-center-db</module>
+        <module>hsa-center-generic</module>
+        <module>hsa-center-tencent</module>
+        <module>hsa-center-ali</module>
+    </modules>
+
+    <dependencies>
+        <!--公共包依赖-->
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- 热部署依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+
+</project>

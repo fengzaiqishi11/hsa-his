@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.queue.dao.OutptClassesQueueDao">
+
+    <resultMap type="cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto" id="OutptClassesQueueMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="queueDate" column="queue_date" jdbcType="TIMESTAMP"/>
+        <result property="csId" column="cs_id" jdbcType="VARCHAR"/>
+        <result property="ccId" column="cc_id" jdbcType="VARCHAR"/>
+        <result property="triageId" column="triage_id" jdbcType="VARCHAR"/>
+        <result property="triageCode" column="triage_code" jdbcType="VARCHAR"/>
+        <result property="triageTypeName" column="triageTypeName" jdbcType="VARCHAR"/>
+        <result property="triageName" column="triageName" jdbcType="VARCHAR"/>
+        <result property="registerNum" column="register_num" jdbcType="INTEGER"/>
+        <result property="genCode" column="gen_code" jdbcType="TIMESTAMP"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultMap="OutptClassesQueueMap">
+        select
+        ocq.*, ocy.name as classifyName, oc.name as classesName, bd.name as deptName,
+        (select `name` from sys_code_detail where c_code = 'FZFS' and hosp_code = #{hospCode} and value = ocq.triage_code) as triageTypeName
+        from outpt_classes_queue ocq, outpt_classify ocy, outpt_classes oc, base_dept bd
+        where
+        ocq.cy_id = ocy.id
+        and ocq.cs_id = oc.id
+        and ocq.dept_id = bd.id
+        and ocq.hosp_code=#{hospCode}
+        <if test="deptId !=null and deptId != ''">
+            and ocq.dept_id = #{deptId}
+        </if>
+        <if test="isValid !=null and isValid != ''">
+            and ocq.is_valid = #{isValid}
+        </if>
+        <if test="queueStartDate != null and queueStartDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &gt;=#{queueStartDate}
+        </if>
+        <if test="queueEndDate != null and queueEndDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &lt;=#{queueEndDate}
+        </if>
+        order by ocq.queue_date desc
+    </select>
+
+    <!---->
+    <select id="queryClassesDoctor" resultType="java.util.Map">
+        select a.doctor_id as doctorId, (select name from sys_user where id = a.doctor_id) as name , a.clinic_id as clinicId from 	outpt_classes_doctor a
+                                                                                                                                         inner join outpt_classify_classes b on a.cc_id = b.id
+        where
+            a.hosp_code=#{hospCode}
+          and b.cy_id = #{cyId}
+          and b.is_valid = '1'
+        group by a.doctor_id,a.clinic_id
+    </select>
+
+    <!--查询班次队列数据-->
+    <select id="queryClassesQueueByParam" parameterType="map" resultMap="OutptClassesQueueMap">
+        select
+        ocq.*
+        from outpt_classes_queue ocq
+        where ocq.hosp_code = #{hospCode,jdbcType=VARCHAR}
+        <if test="deptId !=null and deptId !=''">
+            and ocq.dept_id = #{deptId}
+        </if>
+        <if test="csId !=null and csId !=''">
+            and ocq.cs_id = #{csId}
+        </if>
+        <if test="cyId !=null and cyId !=''">
+            and ocq.cy_id = #{cyId}
+        </if>
+        <if test="queueDate !=null">
+            and ocq.queue_date = #{queueDate}
+        </if>
+    </select>
+
+    <insert id="insertClassesQueue">
+        insert into outpt_classes_queue
+        (
+            id,hosp_code,queue_date,cs_id,cc_id,cy_id,triage_id,triage_code,register_num,gen_code,dept_id,is_valid,crte_id,crte_name,crte_time
+        )
+        values
+        (
+            #{id},#{hospCode},#{queueDate},#{csId},#{ccId},#{cyId},#{triageId},#{triageCode},#{registerNum},#{genCode},
+            #{deptId},#{isValid},#{crteId},#{crteName},#{crteTime}
+        )
+    </insert>
+
+
+    <insert id="insertDoctorQueue">
+        insert into outpt_doctor_queue(id,hosp_code,cq_id,doctor_id,doctor_name,is_valid,register_num,clinic_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.hospCode}, #{item.cqId}, #{item.doctorId}, #{item.doctorName}, #{item.isValid}, #{item.registerNum}, #{item.clinicId})
+        </foreach>
+    </insert>
+
+    <insert id="insertDoctorRegisterBatch">
+        insert into outpt_doctor_register
+        (
+        id,hosp_code,dq_id,register_time,start_time,end_time,register_num,profile_id,is_use,is_lock,is_add,
+        crte_id,crte_name,crte_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id}, #{item.hospCode}, #{item.dqId}, #{item.registerTime}, #{item.startTime}, #{item.endTime}, #{item.registerNum},
+            #{item.profileId}, #{item.isUse}, #{item.isLock}, #{item.isAdd}, #{item.crteId}, #{item.crteName}, #{item.crteTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <!--删除班次队列数据-->
+    <!--    AND  a.queue_date &gt;=  STR_TO_DATE(#{queueStartDate},'%Y-%m-%d')-->
+    <!--    AND  a.queue_date &lt; date_add(STR_TO_DATE(#{queueEndDate},'%Y-%m-%d'),interval 1 day)-->
+    <delete id="deleteClassesQueue" parameterType="map" >
+        DELETE a FROM outpt_classes_queue a
+        WHERE a.hosp_code = #{hospCode}
+        <!--业务日期内-->
+        <!--        <if test="queueStartDate != null and queueStartDate != ''">-->
+        <!--            and DATE_FORMAT(a.queue_date,'%Y-%m-%d') &gt;=#{queueStartDate}-->
+        <!--        </if>-->
+        <!--        <if test="queueEndDate != null and queueEndDate != ''">-->
+        <!--            and DATE_FORMAT(a.queue_date,'%Y-%m-%d') &lt;=#{queueEndDate}-->
+        <!--        </if>-->
+        <!--配置的 或者 手动且无效的-->
+        --         AND a.is_valid = '0'
+        <!--不存在医生队列-->
+        AND (SELECT count(*) FROM outpt_doctor_queue b WHERE b.cq_id = a.id ) = 0
+        <!--不存在挂号表里-->
+        AND (SELECT count(*) FROM outpt_register c WHERE c.cq_id =  a.id) = 0
+        <if test="triageId !=null and triageId !=''">
+            AND a.triage_id = #{triageId}
+        </if>
+    </delete>
+
+    <delete id="deleteClassesQueueByIds" parameterType="map" >
+        DELETE a FROM outpt_classes_queue a
+        WHERE a.hosp_code = #{hospCode}
+        and a.id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!--查询所有满足条件的排班班次数据-->
+    <select id="queryClassifyClassesData" parameterType="map" resultType="map">
+        select
+        distinct t.*
+        FROM(
+        <!--开始时间和结束时间均在传入的时间范围之内-->
+        SELECT
+        a.*,
+        k.name as dept_name
+        FROM
+        outpt_classify_classes a
+        LEFT JOIN base_dept k ON k.id = a.dept_id
+        WHERE a.hosp_code =#{hospCode}
+        <if test="triageId !=null and triageId !=''">
+            and a.triage_id = #{triageId}
+        </if>
+        AND a.is_valid = '1'
+        AND a.weeks IN
+        <foreach collection="xq" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )t
+    </select>
+
+    <!--查询所有满足条件的排班班次医生数据-->
+    <select id="queryClassesDoctorData" parameterType="map" resultType="map">
+        select
+        distinct t.*
+        FROM(
+        <!--开始时间和结束时间均在传入的时间范围之内-->
+        SELECT
+        a.*,
+        u.name as doctor_name
+        FROM outpt_classes_doctor a
+        left join sys_user u on a.doctor_id = u.id
+        WHERE a.hosp_code =#{hospCode}
+        AND a.is_valid = '1') t
+    </select>
+
+
+    <!--查询班次队列数据-->
+    <select id="queryClassesQueueParam" parameterType="java.util.Map" resultMap="OutptClassesQueueMap">
+        select
+        ocq.*,bd.`name` as triageName
+        from outpt_classes_queue ocq,
+        base_dept bd
+        where ocq.triage_id = bd.id and ocq.hosp_code = bd.hosp_code
+          and ocq.hosp_code = #{hospCode,jdbcType=VARCHAR}
+        <if test="ids !=null">
+            and ocq.id in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deptId !=null and deptId !=''">
+            and ocq.dept_id = #{deptId}
+        </if>
+        <if test="csId !=null and csId !=''">
+            and ocq.cs_id = #{csId}
+        </if>
+        <if test="cyId !=null and cyId !=''">
+            and ocq.cy_id = #{cyId}
+        </if>
+        <if test="triageId !=null and triageId !=''">
+            and ocq.triage_id = #{triageId}
+        </if>
+        <if test="isValid !=null and isValid !=''">
+            and ocq.is_valid = #{isValid}
+        </if>
+        <if test="queueStartDate != null and queueStartDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &gt;=#{queueStartDate}
+        </if>
+        <if test="queueEndDate != null and queueEndDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &lt;=#{queueEndDate}
+        </if>
+    </select>
+
+    <insert id="insertClassesQueueBatch" parameterType="list">
+        insert into outpt_classes_queue
+        (
+        id,hosp_code,queue_date,cs_id,cc_id,cy_id,triage_id,triage_code,register_num,gen_code,dept_id,crte_id,crte_name,crte_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},#{item.hospCode},#{item.queue_date},#{item.cs_id},#{item.cc_id},#{item.cy_id},#{item.triage_id},#{item.triage_code},#{item.register_num},#{item.gen_code},
+            #{item.dept_id},#{item.crte_id},#{item.crte_name},#{item.crte_time,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateClassesQueue" parameterType="cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto">
+        update
+        outpt_classes_queue
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="queueDate != null">
+                queue_date = #{queueDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="csId != null and csId != ''">
+                cs_id = #{csId,jdbcType=VARCHAR},
+            </if>
+            <if test="ccId != null and ccId != ''">
+                cc_id = #{ccId,jdbcType=VARCHAR},
+            </if>
+            <if test="cyId != null and cyId != ''">
+                cy_id = #{cyId,jdbcType=VARCHAR},
+            </if>
+            <if test="triageId != null and triageId != ''">
+                triage_id = #{triageId,jdbcType=VARCHAR},
+            </if>
+            <if test="triageCode != null and triageCode != ''">
+                triage_code = #{triageCode,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNum != null">
+                register_num = #{registerNum},
+            </if>
+            <if test="genCode != null and genCode != ''">
+                gen_code = #{genCode,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <!--查询班次队列数据-->
+    <select id="queryRegisterByCqId" parameterType="cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto" resultType="java.util.Map">
+        select
+            *
+        from outpt_register
+        where
+            hosp_code = #{hospCode,jdbcType=VARCHAR}
+          and cq_id = #{id}
+    </select>
+    <select id="queryByClassesQueueDTO" resultType="cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto">
+        select
+             ocq.*
+        from outpt_classes_queue ocq
+        where
+             ocq.hosp_code=#{hospCode}
+            AND cs_id = #{csId}
+            AND cy_id = #{cyId}
+            AND cc_id = #{ccId}
+        limit 1
+    </select>
+    <select id="queryClassifyClasses"
+            resultType="map">
+        select  occ.* from outpt_classify_classes occ
+        where occ.cs_id = #{csId} and occ.is_valid = '1' and hosp_code = #{hospCode}
+         and occ.cy_id = #{cyId} and occ.weeks = #{weeks}
+    </select>
+</mapper>

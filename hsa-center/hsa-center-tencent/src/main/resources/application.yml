@@ -1,0 +1,15 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+server:
+  servlet:
+    context-path: /xxx
+#mybatis:
+#  configuration:
+#    database-id: ${mybatis.database.provider.type:mysql}
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+security:
+  oauth2:
+    client:
+      permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**

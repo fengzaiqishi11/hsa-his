@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--中心平台 >> 医院数据源管理 -->
+    <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
+    <!--中心平台 >> 档案管理 -->
+    <dubbo:reference id="outptProfileFileService_consumer" interface="cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService" check="false"/>
+    <!--中心平台 >> 医院信息 -->
+    <dubbo:reference id="centerHospitalService_consumer" interface="cn.hsa.module.center.hospital.service.CenterHospitalService" check="false"/>
+    <!-- 基础信息子系统 -> 本地档案服务 -->
+    <dubbo:reference id="baseProfileFileService_consumer" interface="cn.hsa.module.base.profileFile.service.BaseProfileFileService" check="false"/>
+    <!-- 单据生成规则业务服务层接口 -->
+    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false" />
+    <!-- 系统参数业务服务层接口 -->
+    <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false" />
+    <!--值域码表服务层接口 -->
+    <dubbo:reference id="sysCodeService_consumer" interface="cn.hsa.module.sys.code.service.SysCodeService" check="false" />
+
+    <!-- 领药申请单 -->
+    <dubbo:reference id="pharOutReceiveService_consumer" interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveService" check="false"/>
+    <!-- 领药申请明细 -->
+    <dubbo:reference id="pharOutReceiveDetailService_consumer" interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService" check="false"/>
+
+
+    <!-- 分诊系统业务接口 -->
+    <dubbo:reference id="outptTriageVisitService_consumer" interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" check="false" />
+</beans>
+

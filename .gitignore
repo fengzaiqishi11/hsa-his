@@ -1,0 +1,47 @@
+*.class
+*.log
+*.lock
+
+# Package Files #
+*.jar
+*.war
+*.ear
+target/
+
+# eclipse
+.settings/
+.classpath
+.project
+logs/
+
+# idea
+.idea/
+*.iml
+
+*velocity.log*
+
+### STS ###
+.apt_generated
+.factorypath
+.springBeans
+
+### IntelliJ IDEA ###
+*.iml
+*.ipr
+*.iws
+.idea
+.classpath
+.project
+.settings/
+bin/
+.idea/
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+*.log
+tmp/

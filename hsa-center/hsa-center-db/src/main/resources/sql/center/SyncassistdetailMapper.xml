@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.syncassist.dao.SyncassistDetailDao">
+
+    <resultMap type="cn.hsa.module.center.syncassist.dto.SyncassistDetailDTO" id="BaseAssistDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="acCode" column="ac_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseAssistDetailMap">
+        select
+          id, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        from sync_assist_detail
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="BaseAssistDetailMap">
+        select
+          id, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        from sync_assist_detail
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseAssistDetailMap">
+        select
+        id,  ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        from sync_assist_detail
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="acCode != null and acCode != ''">
+                and ac_code = #{acCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and item_code = #{itemCode}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and use_code = #{useCode}
+            </if>
+            <if test="startTime != null">
+                and start_time = #{startTime}
+            </if>
+            <if test="endTime != null">
+                and end_time = #{endTime}
+            </if>
+            <if test="num != null">
+                and num = #{num}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryallcode" resultType="java.util.HashMap">
+        SELECT
+        a.price,
+        a.unit_code,
+        a.spec,
+        b.id,
+        b.item_code,
+        b.num,
+        b.type_code,
+        b.ac_code,
+        b.start_time AS startTime,
+        b.end_time AS endTime,
+        b.item_code AS itemCode,
+        b.type_code AS typeCode,
+        a.itemName,
+        a.itemTypeCode,
+        a.typeCode,
+        a.out_dept_code,
+        a.in_dept_code,
+        a.id AS itemId
+        FROM
+        sync_assist_detail b
+        LEFT JOIN (
+        SELECT
+        id,
+        `name` AS itemName,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        typeCode
+        FROM
+        (
+        SELECT
+        id,
+        `name`,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        '3' AS typeCode
+        FROM
+        sync_item
+        WHERE
+        is_valid = '1' UNION ALL
+        SELECT
+        id,
+        `name`,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        '',
+        '',
+        '2' AS typeCode
+        FROM
+        sync_material
+        WHERE
+        is_valid = '1'
+        ) mAndi
+        ) a ON b.item_code = a.CODE
+        AND a.typeCode = b.type_code
+        <where>
+            <if test="acCode != null and acCode != ''">
+                and b.ac_code = #{acCode}
+            </if>
+        </where>
+    </select>
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_assist_detail(id, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{acCode}, #{typeCode}, #{itemCode}, #{useCode}, #{startTime}, #{endTime}, #{num}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update sync_assist_detail
+        <set>
+            <if test="acCode != null and acCode != ''">
+                ac_code = #{acCode},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteBycode">
+        delete from sync_assist_detail where ac_code = #{acCode}
+    </delete>
+
+
+    <!--批量新增所有列，列表长度不能为0，且-->
+    <insert id="insertList" parameterType="list">
+        insert into sync_assist_detail
+        (id,ac_code, type_code,item_code , use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.acCode}, #{item.typeCode},#{item.itemCode}, #{item.useCode}, #{item.startTime},
+            #{item.endTime}, #{item.num}, #{item.isValid}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+</mapper>

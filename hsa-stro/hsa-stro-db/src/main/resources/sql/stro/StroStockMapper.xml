@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.stock.dao.StroStockDao">
+
+    <resultMap type="cn.hsa.module.stro.stock.dto.StroStockDTO" id="StroStockMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="locationNo" column="location_no" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="OTHER"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="OTHER"/>
+        <result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+        <result property="splitPrice" column="split_price" jdbcType="OTHER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="stockMax" column="stock_max" jdbcType="INTEGER"/>
+        <result property="stockMin" column="stock_min" jdbcType="INTEGER"/>
+        <result property="stockOccupy" column="stock_occupy" jdbcType="INTEGER"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StroStockMap">
+        select
+          id, hosp_code, biz_id, location_no, item_code, item_id, item_name, spec, prep_code, num, unit_code, buy_price_all, sell_price_all, split_num, split_price, split_unit_code, stock_max, stock_min, stock_occupy
+        from stro_stock
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAlldrug" resultMap="StroStockMap">
+        select
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
+        a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
+        ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        from stro_stock a
+        JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="locationNo != null and locationNo != ''">
+                and a.location_no = #{locationNo}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and (
+                a.item_name like CONCAT('%',#{itemName},'%')
+                or b.usual_pym like CONCAT('%',#{itemName},'%')
+                or b.usual_wbm like CONCAT('%',#{itemName},'%')
+                or b.good_pym like CONCAT('%',#{itemName},'%')
+                or b.good_wbm like CONCAT('%',#{itemName},'%')
+                )
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and a.prep_code = #{prepCode}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="buyPriceAll != null">
+                and a.buy_price_all = #{buyPriceAll}
+            </if>
+            <if test="sellPriceAll != null">
+                and a.sell_price_all = #{sellPriceAll}
+            </if>
+            <if test="splitNum != null">
+                and a.split_num = #{splitNum}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="stockMax != null">
+                and a.stock_max = #{stockMax}
+            </if>
+            <if test="stockMin != null">
+                and a.stock_min = #{stockMin}
+            </if>
+            <if test="stockOccupy != null">
+                and ifnull(a.stock_occupy,0) = #{stockOccupy}
+            </if>
+            <if test="!isMun">
+                and ifnull(a.split_num,0)>0
+            </if>
+            <if test="!isDate">
+                and ifnull(a.num,0) > ifnull(a.stock_min,0)
+            </if>
+            <if test="types != null and types.size()>0">
+                and b.big_type_code in
+                <foreach collection="types" item="type" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <select id="queryAllmaterial" resultMap="StroStockMap">
+        select
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
+        a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num,
+         a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,
+         ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        from stro_stock a
+        JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="locationNo != null and locationNo != ''">
+                and a.location_no = #{locationNo}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and (
+                a.item_name like CONCAT('%',#{itemName},'%')
+                or b.pym like CONCAT('%',#{itemName},'%')
+                or b.wbm like CONCAT('%',#{itemName},'%')
+                )
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and a.prep_code = #{prepCode}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="buyPriceAll != null">
+                and a.buy_price_all = #{buyPriceAll}
+            </if>
+            <if test="sellPriceAll != null">
+                and a.sell_price_all = #{sellPriceAll}
+            </if>
+            <if test="splitNum != null">
+                and a.split_num = #{splitNum}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="stockMax != null">
+                and a.stock_max = #{stockMax}
+            </if>
+            <if test="stockMin != null">
+                and a.stock_min = #{stockMin}
+            </if>
+            <if test="stockOccupy != null">
+                and ifnull(a.stock_occupy,0) = #{stockOccupy}
+            </if>
+            <if test="!isMun">
+                and ifnull(a.split_num,0)>0
+            </if>
+            <if test="!isDate">
+                and ifnull(a.num,0) > ifnull(a.stock_min,0)
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAll" resultMap="StroStockMap">
+        select
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
+        a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
+        ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        from stro_stock a
+        JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="locationNo != null and locationNo != ''">
+                and a.location_no = #{locationNo}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and (
+                    a.item_name like CONCAT('%',#{itemName},'%')
+                    or b.usual_pym like CONCAT('%',#{itemName},'%')
+                    or b.usual_wbm like CONCAT('%',#{itemName},'%')
+                    or b.good_pym like CONCAT('%',#{itemName},'%')
+                    or b.good_wbm like CONCAT('%',#{itemName},'%')
+                    )
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and a.prep_code = #{prepCode}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="buyPriceAll != null">
+                and a.buy_price_all = #{buyPriceAll}
+            </if>
+            <if test="sellPriceAll != null">
+                and a.sell_price_all = #{sellPriceAll}
+            </if>
+            <if test="splitNum != null">
+                and a.split_num = #{splitNum}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="stockMax != null">
+                and a.stock_max = #{stockMax}
+            </if>
+            <if test="stockMin != null">
+                and a.stock_min = #{stockMin}
+            </if>
+            <if test="stockOccupy != null">
+                and ifnull(a.stock_occupy,0) = #{stockOccupy}
+            </if>
+            <if test="!isMun">
+                and ifnull(a.split_num,0)>0
+            </if>
+            <if test="!isDate">
+                and ifnull(a.num,0) > ifnull(a.stock_min,0)
+            </if>
+            <if test="types != null and types.size()>0">
+                and b.big_type_code in
+                <foreach collection="types" item="type" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+        union all
+        select
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,a.unit_code,
+        ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code,
+         ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
+         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        from stro_stock a
+        JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <where>
+            and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="locationNo != null and locationNo != ''">
+                and a.location_no = #{locationNo}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and (
+                a.item_name like CONCAT('%',#{itemName},'%')
+                or b.pym like CONCAT('%',#{itemName},'%')
+                or b.wbm like CONCAT('%',#{itemName},'%')
+                )
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and a.prep_code = #{prepCode}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="buyPriceAll != null">
+                and a.buy_price_all = #{buyPriceAll}
+            </if>
+            <if test="sellPriceAll != null">
+                and a.sell_price_all = #{sellPriceAll}
+            </if>
+            <if test="splitNum != null">
+                and a.split_num = #{splitNum}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="stockMax != null">
+                and a.stock_max = #{stockMax}
+            </if>
+            <if test="stockMin != null">
+                and a.stock_min = #{stockMin}
+            </if>
+            <if test="stockOccupy != null">
+                and ifnull(a.stock_occupy,0) = #{stockOccupy}
+            </if>
+            <if test="!isMun">
+                and ifnull(a.split_num,0)>0
+            </if>
+            <if test="!isDate">
+                and ifnull(a.num,0) > ifnull(a.stock_min,0)
+            </if>
+        </where>
+    </select>
+
+    <!--修改库存上限下限-->
+    <update id="updateMaxMin">
+        update stro_stock set location_no = #{locationNo},stock_max = #{stockMax},stock_min = #{stockMin},stock_occupy = #{stockOccupy}
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+    <!--
+       检查项目或者材料是否有库存记录
+       条件:医院编码、库房ID、项目代码、项目ID
+       返回：是否有数据
+   -->
+    <select id="getStock" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO" >
+        select a.id, a.hosp_code hospCode, a.biz_id bizId, a.location_no locationNo, a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+        ifnull(a.num,0) num,ifnull(a.buy_price_all,0) buyPriceAll,ifnull(a.sell_price_all,0) sellPriceAll,ifnull(a.split_num,0) splitNum,
+        a.split_price splitPrice,a.split_ratio splitRatio,
+        TRUNCATE(a.sell_price_all/a.num,4) sellPrice, TRUNCATE(a.buy_price_all/a.num,4) buyPrice, TRUNCATE(a.split_price/a.split_num,4)  splitPrice
+        from stro_stock a
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId}
+    </select>
+
+    <!--
+       检查项目或者材料是否有库存明细记录
+       条件:医院编码、库房ID、项目代码、项目ID
+       返回：是否有数据
+   -->
+    <select id="getStockDetail" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
+        select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+        a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
+        a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
+        from stro_stock_detail a
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0
+        <if test="sfBatchNo!=null and sfBatchNo!='' and batchNo!=null and batchNo!=''">
+            and batch_no = #{batchNo}
+        </if>
+        order by a.id
+    </select>
+
+    <select id="getStockDetail1" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
+      select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+      a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
+      a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
+      from stro_stock_detail a
+      where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId}
+      <if test="sfBatchNo!=null and sfBatchNo!='' and batchNo!=null and batchNo!=''">
+        and batch_no = #{batchNo}
+      </if>
+      order by a.id
+    </select>
+
+    <select id="getStockDetails" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
+        select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+        a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
+        a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
+        from stro_stock_detail a
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and buy_price=#{buyPrice}
+        <if test="batchNo!=null and batchNo!=''">
+            and batch_no = #{batchNo}
+        </if>
+        order by a.id asc
+    </select>
+
+    <!--
+       获取项目或者材料库存明细批次数量
+       条件:医院编码、库房ID、项目代码、项目ID
+       返回：是否有数据
+   -->
+    <select id="getStockDetailBatchNoNum" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
+        select a.biz_id bizId,a.item_code itemCode,a.item_id itemId,sum(ifnull(a.num,0)) num,sum(ifnull(a.split_num,0)) splitNum
+        from stro_stock_detail a
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0
+        <if test="batchNo!=null and batchNo!=''">
+            and batch_no = #{batchNo}
+        </if>
+        group by a.biz_id, item_code, item_id  asc
+    </select>
+
+    <!-- 新增库存数据 -->
+    <insert id="insertStock" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into stro_stock(
+        id, hosp_code, biz_id, location_no, item_code, item_id, item_name, spec, prep_code,
+        num, unit_code, buy_price_all, sell_price_all, split_num, split_price, split_unit_code,
+        stock_max, stock_min, stock_occupy,split_ratio
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.bizId},
+            #{item.locationNo},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.spec},
+            #{item.prepCode},
+            #{item.num},
+            #{item.unitCode},
+            #{item.buyPriceAll},
+            #{item.sellPriceAll},
+            #{item.splitNum},
+            #{item.splitPrice},
+            #{item.splitUnitCode},
+            #{item.stockMax},
+            #{item.stockMin},
+            #{item.stockOccupy},
+            #{item.splitRatio}
+            )
+        </foreach>
+    </insert>
+
+    <!--
+      更新库存数量
+      条件：根据机构编码、主键
+      更新：库存数量、零售总价、拆零总数量、拆零总价
+    -->
+    <update id="updateStock" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update stro_stock
+            <set >
+                <if test="item.num != null" >
+                    num = #{item.num},
+                </if>
+                <if test="item.buyPriceAll != null" >
+                    buy_price_all = TRUNCATE(#{item.buyPriceAll},4) ,
+                </if>
+                <if test="item.sellPriceAll != null" >
+                    sell_price_all = TRUNCATE(#{item.sellPriceAll},4),
+                </if>
+                <if test="item.splitNum != null" >
+                    split_num = #{item.splitNum},
+                </if>
+                <if test="item.splitPrice != null" >
+                    split_price = TRUNCATE(#{item.splitPrice},4),
+                </if>
+            </set>
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+
+
+    <!-- 新增库存明细数据 -->
+    <insert id="insertStockDetail" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into stro_stock_detail(
+        id, hosp_code, biz_id, item_code, item_id, item_name, unit_code, num, buy_price,
+        sell_price, buy_price_all, sell_price_all, batch_no, expiry_date, split_num, split_price,
+        split_unit_code, split_ratio
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.bizId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.unitCode},
+            #{item.num},
+            #{item.buyPrice},
+            #{item.sellPrice},
+            #{item.buyPriceAll},
+            #{item.sellPriceAll},
+            #{item.batchNo},
+            #{item.expiryDate},
+            #{item.splitNum},
+            #{item.splitPrice},
+            #{item.splitUnitCode},
+            #{item.splitRatio}
+            )
+        </foreach>
+    </insert>
+
+    <!--
+      更新库存明细数据
+      条件：根据机构编码、主键
+      更新：库存数量、零售总价、购进总价、拆零总数量
+    -->
+    <update id="updateStockDetail" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update stro_stock_detail
+            <set >
+                <if test="item.num != null" >
+                    num = #{item.num},
+                </if>
+                <if test="item.buyPriceAll != null" >
+                    buy_price_all = TRUNCATE(#{item.buyPriceAll},4),
+                </if>
+                <if test="item.sellPriceAll != null" >
+                    sell_price_all = TRUNCATE(#{item.sellPriceAll},4),
+                </if>
+                <if test="item.splitNum != null" >
+                    split_num = #{item.splitNum},
+                </if>
+            </set>
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <select id="getStroStock" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select distinct ifnull((a.split_num-ifnull(a.stock_occupy,0)-#{stockNum}),0) num
+        from stro_stock a join stro_stock_detail b on a.biz_id=b.biz_id and a.item_code=b.item_code and a.item_id=b.item_id and a.hosp_code=b.hosp_code
+        where a.item_code=#{itemCode} and a.item_id=#{itemId} and a.biz_id=#{bizId} and a.hosp_code=#{hospCode}
+        and date_format(now(), '%Y-%m-%d') &lt;= date_format(b.expiry_date, '%Y-%m-%d')
+    </select>
+
+    <!--占用库存或者解除占用的库存数据-->
+    <update id="updateStockOccupy" keyProperty="id" useGeneratedKeys="true">
+        <foreach collection="list" item="item" separator=";">
+            update stro_stock set
+            stock_occupy=(case when (IFNULL(stock_occupy,0)+#{item.stockNum})>0 then IFNULL(stock_occupy,0)+#{item.stockNum}
+            when (IFNULL(stock_occupy,0)+#{item.stockNum})&lt;=0 then 0 end)
+            where item_id=#{item.itemId} and item_code=#{item.itemCode} and hosp_code=#{item.hospCode} and biz_id=#{item.bizId}
+        </foreach>
+    </update>
+
+    <update id="updateStockByDetail">
+        <foreach collection="stroStockDetailDTOList" item="item" separator=";">
+            update stro_stock a,(
+                select ifnull(sum(split_num),0) split_num, ifnull(sum(num),0) num,ifnull(sum(buy_price_all),0) buy_price_all,
+                ifnull(sum(sell_price_all),0) sell_price_all
+                from stro_stock_detail
+                where hosp_code=#{item.hospCode} and biz_id=#{item.bizId} and item_code=#{item.itemCode} and item_id=#{item.itemId}
+            ) b set a.num=b.num,a.split_num=b.split_num,a.buy_price_all=b.buy_price_all,a.sell_price_all=b.sell_price_all
+            where hosp_code=#{item.hospCode} and biz_id=#{item.bizId} and item_code=#{item.itemCode} and item_id=#{item.itemId}
+        </foreach>
+    </update>
+        <!--    更新过期药品/材料的占用库存数量-->
+    <update id="updateOccupy" parameterType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+            <foreach collection="stockDetailDTOList" item="item" separator=";">
+                update stro_stock set stock_occupy = IFNULL(stock_occupy,0) + #{item.num}
+                where item_id=#{item.itemId} and item_code=#{item.itemCode} and hosp_code=#{item.hospCode} and
+                biz_id=#{item.bizId}
+            </foreach>
+        </update>
+
+    <insert id="insertStroStock" parameterType="java.util.List">
+      insert into stro_in_record(id,hosp_code, item_id, item_code, num, buy_price, sell_price, stock_id, stock_detail_id,crte_time)
+      values
+      <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id},#{item.hospCode},#{item.itemId},#{item.itemCode},#{item.num},#{item.buyPrice},#{item.sellPrice},#{item.stockId},#{item.stockDetailId},#{item.crteTime})
+      </foreach>
+    </insert>
+
+    <!--库存效期查询-->
+    <select id="queryValidityWarningPage" resultMap="StroStockMap">
+            select
+                a.id,
+                a.hosp_code,
+                a.biz_id,
+                a.location_no,
+                a.item_code,
+                a.item_id,
+                a.item_name,
+                a.prep_code,
+                ifnull( a.num, 0 ) num,
+                a.unit_code,
+                ifnull( a.buy_price_all, 0 ) buy_price_all,
+                ifnull( a.sell_price_all, 0 ) sell_price_all,
+                ifnull( a.split_num, 0 ) split_num,
+                a.split_unit_code,
+                ifnull( a.stock_max, 0 ) stock_max,
+                ifnull( a.stock_min, 0 ) stock_min,
+                ifnull( a.stock_occupy, 0 ) stock_occupy,
+                ifnull( a.split_price, 0 ) split_price,
+                b.spec AS spec,
+                b.split_ratio AS split_ratio,
+                b.price AS buyPrice,
+                b.price AS sellPrice,
+                b.CODE,
+                l.batch_no,
+                l.expiry_date,
+                ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
+            FROM
+                stro_stock a,
+                stro_stock_detail l,
+                base_drug b
+                where a.hosp_code = l.hosp_code
+                and a.item_code = l.item_code
+                and a.biz_id = l.biz_id
+                and a.item_id = l.item_id
+                and a.hosp_code = b.hosp_code
+                and a.item_id = b.id
+                and a.item_code = '1'
+                and a.hosp_code = #{hospCode}
+                <if test="itemCode != null and itemCode !=''">
+                    and a.item_code = #{itemCode}
+                </if>
+                <if test="warDate != null">
+                    and l.expiry_date &lt;= #{warDate}
+                </if>
+                <if test="itemName != null and itemName != ''">
+                    and (
+                    a.item_name like CONCAT('%',#{itemName},'%')
+                    or b.usual_pym like CONCAT('%',#{itemName},'%')
+                    or b.usual_wbm like CONCAT('%',#{itemName},'%')
+                    or b.good_pym like CONCAT('%',#{itemName},'%')
+                    or b.good_wbm like CONCAT('%',#{itemName},'%')
+                    )
+                </if>
+
+
+                union all
+
+                select
+                a.id,
+                a.hosp_code,
+                a.biz_id,
+                a.location_no,
+                a.item_code,
+                a.item_id,
+                a.item_name,
+                a.prep_code,
+                ifnull( a.num, 0 ) num,
+                a.unit_code,
+                ifnull( a.buy_price_all, 0 ) buy_price_all,
+                ifnull( a.sell_price_all, 0 ) sell_price_all,
+                ifnull( a.split_num, 0 ) split_num,
+                a.split_unit_code,
+                ifnull( a.stock_max, 0 ) stock_max,
+                ifnull( a.stock_min, 0 ) stock_min,
+                ifnull( a.stock_occupy, 0 ) stock_occupy,
+                ifnull( a.split_price, 0 ) split_price,
+                b.spec AS spec,
+                b.split_ratio AS split_ratio,
+                b.price AS buyPrice,
+                b.price AS sellPrice,
+                b.CODE,
+                l.batch_no,
+                l.expiry_date,
+                ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
+            FROM
+                stro_stock a,
+                stro_stock_detail l,
+                base_material b
+                where a.hosp_code = l.hosp_code
+                and a.item_code = l.item_code
+                and a.biz_id = l.biz_id
+                and a.item_id = l.item_id
+                and a.hosp_code = b.hosp_code
+                and a.item_id = b.id
+                and a.item_code = '2'
+                and a.hosp_code = #{hospCode}
+                <if test="itemCode != null and itemCode !=''">
+                    and a.item_code = #{itemCode}
+                </if>
+                <if test="warDate != null">
+                    and l.expiry_date &lt;= #{warDate}
+                </if>
+                <if test="itemName != null and itemName != ''">
+                    and (
+                    a.item_name like CONCAT('%',#{itemName},'%')
+                    or b.pym like CONCAT('%',#{itemName},'%')
+                    or b.wbm like CONCAT('%',#{itemName},'%')
+                    )
+                </if>
+
+    </select>
+
+    <!-- 根据项目id查询库存明细 -->
+    <select id="queryStoclDetailByItemIds" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+      select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+      a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
+      a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice,
+      (select dp.name from base_dept dp where dp.id = a.biz_id and dp.hosp_code = a.hosp_code) as invoicingTargetName,
+      a.biz_id as invoicingTargetId
+      from stro_stock_detail a
+      where hosp_code = #{hospCode} and a.split_num > 0 and item_id = #{itemId}
+<!--        and item_id in-->
+<!--        <foreach collection="itemIds" item="id" separator="," open="(" close=")">-->
+<!--          #{id}-->
+<!--        </foreach>-->
+      order by a.id
+    </select>
+
+
+    <select id="queryStockByBatchAll" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+      select a.hosp_code, a.biz_id, a.item_code, a.item_id, a.item_name,a.batch_no,a.unit_code,
+        a.split_unit_code, a.split_ratio,sum(a.num) num,
+        max(a.buy_price) as buy_price,max(a.sell_price) as sell_price, round((sum(a.num) * max(a.buy_price)),4) as buy_price_all,
+        round((sum(a.num) * max(a.sell_price)),4) as sell_price_all,max(a.expiry_date) as expiry_date,
+        sum(a.split_num) as split_num, max(a.split_price) as split_price,
+        (case a.item_code when '1' then b.spec when '2' then d.spec end ) spec,
+        (case a.item_code when '1' then b.code when '2' then d.code end ) code,
+        (case a.item_code when '1' then b.prep_code when '2' then '' end ) prepCode,
+        case when a.item_code = '1' then (select bp.name from base_product bp where b.prod_code = bp.code and b.hosp_code = bp.hosp_code)
+        when a.item_code = '2' then (select bp.name from base_product bp where d.prod_code = bp.code and d.hosp_code = bp.hosp_code) end prodName
+        from stro_stock_detail a
+        left join base_drug b on a.item_code='1' and b.id=a.item_id and b.hosp_code=a.hosp_code
+        left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code
+        where a.biz_id = #{bizId} and a.hosp_code = #{hospCode}
+        <if test="itemId != null and itemId != ''">
+          and item_id = #{itemId}
+        </if>
+        group by a.hosp_code,a.biz_id, a.item_code, a.item_id, a.item_name,a.batch_no,a.unit_code,
+        a.split_unit_code,a.split_ratio
+    </select>
+    <!--根据bizId查询科室类型码-->
+    <select id="getTypeIdentityByBizId" resultType="java.lang.String">
+        select type_identity from base_dept where id =#{bizId} and hosp_code = #{hospCode}
+    </select>
+
+
+</mapper>

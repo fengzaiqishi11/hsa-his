@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.inventory.dao.InventoryDAO">
+
+    <resultMap type="cn.hsa.module.stro.inventory.dto.InventoryDTO" id="StroInventoryMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="beforePrice" column="before_price" jdbcType="OTHER"/>
+        <result property="afterPrice" column="after_price" jdbcType="OTHER"/>
+        <result property="incdecPrice" column="incdec_price" jdbcType="OTHER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="INTEGER"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StroInventoryMap">
+        select
+          id, hosp_code, biz_id, order_no, before_price, after_price, incdec_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time
+        from stro_inventory
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="StroInventoryMap">
+        select
+        id, hosp_code, biz_id, order_no, ifnull(before_price,0) before_price, ifnull(after_price,0) after_price, ifnull(incdec_price,0) incdec_price,
+        remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time
+        from stro_inventory
+        <where>
+                and hosp_code = #{hospCode}
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="starttime != null and starttime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{starttime}
+            </if>
+            <if test="endtime != null and endtime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{endtime}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and biz_id =#{bizId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and order_no like CONCAT('%',#{keyword},'%')
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into stro_inventory(id,hosp_code, biz_id, order_no, before_price, after_price, incdec_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{incdecPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update stro_inventory
+        <set>
+            <if test="bizId != null">
+                biz_id = #{bizId},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="beforePrice != null">
+                before_price = #{beforePrice},
+            </if>
+            <if test="afterPrice != null">
+                after_price = #{afterPrice},
+            </if>
+            <if test="incdecPrice != null">
+                incdec_price = #{incdecPrice},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="auditId != null">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+
+    <!--通过主键修改实体列表，列表长度不能为0，注意：当实体属性为null时，对应的列也会别更新为null-->
+    <update id="updateAuditCode" parameterType="list">
+        <foreach item="item" collection="list" separator=";" open="" close="" index="index">
+            update stro_inventory set audit_id=#{item.id},audit_name=#{item.auditName},audit_code=#{item.auditCode},audit_time=#{item.auditTime}
+            where hosp_code=#{hospCode} and id in
+            <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+                #{item.id}
+            </foreach>
+        </foreach>
+    </update>
+
+
+    <select id="queryByids" resultMap="StroInventoryMap">
+        select
+        id, hosp_code, biz_id, order_no, before_price, after_price, incdec_price, remark, audit_id, audit_name,
+        audit_code, audit_time, crte_id, crte_name, crte_time
+        from stro_inventory
+        where hosp_code=#{hospCode} and id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

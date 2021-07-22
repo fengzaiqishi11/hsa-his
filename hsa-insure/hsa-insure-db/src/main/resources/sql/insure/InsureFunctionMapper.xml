@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureFunctionDAO">
+
+    <resultMap type="cn.hsa.module.insure.module.dto.InsureFunctionDTO" id="InsureFunctionMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="regCode" column="reg_code" jdbcType="VARCHAR"/>
+        <result property="functionCode" column="function_code" jdbcType="VARCHAR"/>
+        <result property="instanceName" column="instance_name" jdbcType="VARCHAR"/>
+        <result property="functionClass" column="function_class" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.insure.module.entity.InsureFunctionDO" id="InsureFunctionDOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="regCode" column="reg_code" jdbcType="VARCHAR"/>
+        <result property="functionCode" column="function_code" jdbcType="VARCHAR"/>
+        <result property="instanceName" column="instance_name" jdbcType="VARCHAR"/>
+        <result property="functionClass" column="function_class" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <!--查询单个-->
+    <select id="getById" resultMap="InsureFunctionMap">
+        select
+          id, hosp_code, reg_code, function_code, instance_name, function_class, remark, is_valid, crte_id, crte_name, crte_time
+        from insure_function
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="InsureFunctionMap">
+        select
+        id, hosp_code, reg_code, function_code, instance_name, function_class, remark, is_valid, crte_id, crte_name, crte_time
+        from insure_function
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="regCode != null and regCode != ''">
+                and reg_code = #{regCode}
+            </if>
+            <if test="instanceName != null and instanceName != ''">
+                and instance_name = #{instanceName}
+            </if>
+            <if test="functionCode != null and functionCode != ''">
+                and function_code like concat('%',#{functionCode},'%')
+            </if>
+            <if test="functionClass != null and functionClass != ''">
+                and function_class like concat('%',#{functionClass},'%')
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+                and is_valid = '1'
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into insure_function(id, hosp_code, reg_code, instance_name, function_code, function_class, remark, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{regCode}, #{instanceName}, #{functionCode}, #{functionClass}, #{remark}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update insure_function
+        <set>
+            reg_code = #{regCode},
+            function_code = #{functionCode},
+            instance_name = #{instanceName},
+            function_class = #{functionClass},
+            remark = #{remark},
+            is_valid = #{isValid},
+            crte_id = #{crteId},
+            crte_name = #{crteName},
+            crte_time = #{crteTime},
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        delete from insure_function
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+    </delete>
+
+    <select id="queryFunctionAll" parameterType="cn.hsa.module.insure.module.entity.InsureFunctionDO" resultMap="InsureFunctionDOMap">
+        select
+          id, hosp_code, reg_code, function_code, instance_name, function_class, remark, is_valid, crte_id, crte_name, crte_time
+        from insure_function
+        where
+        hosp_code = #{hospCode}
+        <if test="regCode != null and regCode != ''">
+            and reg_code = #{regCode}
+        </if>
+        <if test="functionCode != null and functionCode != ''">
+            and function_code = #{functionCode}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+</mapper>

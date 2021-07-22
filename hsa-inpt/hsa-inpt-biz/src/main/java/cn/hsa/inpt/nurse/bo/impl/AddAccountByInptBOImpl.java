@@ -573,8 +573,12 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
 
         //补全的费用
         List<InptCostDTO> costDtoList = new ArrayList<>();
-
+        int index = 0;
         for (InptLongCostDTO inptLongCostDTO :longCostDtoList){
+            index++;
+            if (inptLongCostDTO.getTotalNum() == null || BigDecimal.ZERO.equals(inptLongCostDTO.getTotalNum())){
+                throw new AppException("第【"+ index +"】行数据的数量为0或为空,保存失败");
+            }
             inptLongCostDTO.setId(SnowflakeUtils.getId());
             inptLongCostDTO.setCrteId(userId);
             inptLongCostDTO.setCrteName(userName);

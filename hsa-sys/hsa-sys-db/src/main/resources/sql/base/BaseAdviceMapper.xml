@@ -431,57 +431,35 @@
 
     <!--门诊合管条码打印查询-->
     <select id="queryOutPtPipePrintPage" resultType="java.util.Map">
-        select * from (
-        SELECT
-        y.merge_id,
-        max(t.dept_name) dept_name,
-        max(t.visit_no) visit_no,
-        ( SELECT NAME FROM sys_code_detail WHERE c_code = 'LISXMLX' AND VALUE = max(ba.technology_code) ) technology_code,
-        max(ba.container_code) container_code,
-        max(ba.specimen_code) specimen_code,
-        GROUP_CONCAT(e.content separator ',') content,
-        max(y.document_sta) document_sta,
-        max(y.apply_no) apply_no,
-        max(t.name) name,
-        max(t.gender_code) gender_code,
-        max(t.age) age,
-        max(t.age_unit_code) age_unit_code,
-        max(y.crte_time) crte_time,
-        max(y.bar_code) bar_code
-        FROM
-        medic_apply y,
-        outpt_prescribe_detail e,
-        base_advice ba,
-        outpt_visit t
-        WHERE
-        e.id = y.opd_id
-        AND e.hosp_code = y.hosp_code
-        AND e.item_id = ba.id
-        AND e.hosp_code = ba.hosp_code
-        AND t.id = y.visit_id
-        AND t.hosp_code = y.hosp_code
-        AND y.hosp_code = #{hospCode}
-        AND EXISTS(
-        select 1 from outpt_cost st where st.hosp_code = e.hosp_code and st.opd_id = e.id and st.settle_code = '2'
-        )
+        select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,scd.`name` as technology_code ,max( ba.container_code ) container_code,max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
+        max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
+        max(ma.bar_code ) bar_code
+        from 	medic_apply ma
+
+        inner join	outpt_prescribe_detail opd on ma.opd_id = opd.id and ma.hosp_code = opd.hosp_code
+        left join  	base_advice ba on opd.item_id = ba.id and opd.hosp_code = ba.hosp_code
+        inner join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
+        right join  outpt_cost oc on opd.id = oc.opd_id and oc.hosp_code = opd.hosp_code
+        left join   sys_code_detail scd on scd.value = ba.technology_code and scd.hosp_code = ba.hosp_code and c_code = 'LISXMLX'
+        where ma.hosp_code='0006' and oc.settle_code ='2'
+
         <if test="name != null and name != '' ">
-            and t.`name` like concat('%',#{name},'%')
+            and ov.`name` like concat('%',#{name},'%')
         </if>
         <if test="deptId != null and deptId != '' ">
-            and t.dept_id = #{deptId}
+            and ov.dept_id = #{deptId}
         </if>
         <if test="visitNo != null and visitNo != '' ">
-            and t.visit_no like concat('%',#{visitNo},'%')
+            and ov.visit_no like concat('%',#{visitNo},'%')
         </if>
         <if test="startDate != null and startDate != '' ">
-            and y.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and ma.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate != null and endDate != '' ">
-            and y.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
-        group by y.merge_id
-        )tab
-        ORDER BY tab.crte_time desc
+        group by ma.merge_id
+        order by ma.crte_time desc
 
 
     </select>

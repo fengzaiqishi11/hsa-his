@@ -1429,24 +1429,21 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
     public PageDTO queryValidityWarningPage(StroStockDTO stroStockDTO) {
         List<StroStockDTO> list = null;
         PageHelper.startPage(stroStockDTO.getPageNo(), stroStockDTO.getPageSize());
-
-        //效期天数
-        Integer warDays = 30;
+        // update by zhangguorui 当不输入预警天数时，不要设置默认的30天，而是把全部的查询出来
         if(StringUtils.isNotEmpty(stroStockDTO.getWarDays())){
-            warDays = Integer.parseInt(stroStockDTO.getWarDays());
+            Integer warDays = Integer.parseInt(stroStockDTO.getWarDays());
+            //根据效期天数，计算出最大预警效期日期
+            Calendar now = Calendar.getInstance();
+            now.add(Calendar.DAY_OF_MONTH, warDays);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String endDate = format.format(now.getTime());
+            try {
+                Date parse = format.parse(endDate);
+                stroStockDTO.setWarDate(parse);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        //根据效期天数，计算出最大预警效期日期
-        Calendar now = Calendar.getInstance();
-        now.add(Calendar.DAY_OF_MONTH, warDays);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String endDate = format.format(now.getTime());
-        try {
-            Date parse = format.parse(endDate);
-            stroStockDTO.setWarDate(parse);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
         list = stroStockDao.queryValidityWarningPage(stroStockDTO);
         return PageDTO.of(list);
     }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.redis.dao.RedisDAO">
+
+    <!--  获取药品信息 -->
+    <select id="getBaseDrug" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_drug a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取材料信息 -->
+    <select id="getBaseMaterial" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_material a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取项目信息 -->
+    <select id="getBaseItem" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_item a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取医嘱信息 -->
+    <select id="getBaseAdvice" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_advice a
+        where a.advice_code = #{adviceCode} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取医嘱明细数据 -->
+    <select id="getBaseAdviceDetail" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_advice_detail a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取科室信息 -->
+    <select id="getBaseDept" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_dept a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+    
+    <!--  获取疾病信息 -->
+    <select id="getBaseDisease" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_disease a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+    
+    <!--  获取科室信息 -->
+    <select id="getBaseFirst" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_dailyfirst_calc a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+    
+    <!--  获取每日特殊计费信息 -->
+    <select id="getBaseSpecial" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_special_calc a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+    
+    <!--  获取频率信息 -->
+    <select id="getBaseRate" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_rate a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+    
+    <!--  获取床位信息 -->
+    <select id="getBaseBed" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  base_bed a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取系统参数 -->
+    <select id="getSystem" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  sys_system a
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--  获取码表数据 -->
+    <select id="getCodeDetail" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from  sys_code_detail a
+        where a.c_code = #{code} and a.hosp_code = #{hospCode}
+    </select>
+    
+</mapper>

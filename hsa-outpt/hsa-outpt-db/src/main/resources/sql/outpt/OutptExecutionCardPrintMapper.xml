@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.executioncardprint.dao.OutptExecutionCardPrintDAO">
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
+        select * from
+        (SELECT
+        a.id,
+        d.id as opId,
+        b.id as opdId,
+        b.group_no as groupNo,
+        b.group_seq_no as groupSeqNo,
+        a.visit_id as visitId,
+        a.crte_time as registerTime,
+        c.name,
+        c.age,
+        c.gender_code as genderCode,
+        d.doctor_name as doctorName,
+        c.age_unit_code as ageUnitCode,
+        d.dept_name as deptName,
+        d.crte_time as crteTime,
+        b.content,
+        b.item_name as itemName,
+        b.speed_code as speeCdode,
+        b.exec_name as execName,
+        b.dosage,
+        b.dosage_unit_code as dosageUnitCode,
+        b.usage_code as usageCode,
+        f.name as rateName,
+        c.visit_no as visitNo,
+        b.num,
+        b.num_unit_code as numUnitCode,
+        b.spec,
+        b.is_skin as isSkin,
+        e.is_positive,
+        e.skin_result_code,
+        f.daily_times,
+        if((select is_print from outpt_prescribe_exec where b.id = opd_id and a.hosp_code = hosp_code limit 1) = '0','0','1') as isPrint
+        FROM
+        outpt_infusion_register a
+        inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+        inner JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
+        inner JOIN outpt_prescribe d on b.op_id = d.id and a.hosp_code = d.hosp_code
+        left JOIN base_rate f on b.rate_id = f.id and a.hosp_code = f.hosp_code
+        left JOIN outpt_skin_result e on b.visit_id = e.visit_id and a.hosp_code = e.hosp_code and b.id = e.opd_id
+        where a.hosp_code = #{hospCode}
+        and d.is_settle = '1' and d.is_cancel = '0'
+        <if test="keyword != null and keyword != ''">
+            and ( c.name like CONCAT('%',#{keyword},'%')
+            or c.visit_no like CONCAT('%',#{keyword},'%')
+            or c.cert_no like CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and b.usage_code in
+            <if test="usageCodeList != null and usageCodeList.size() > 0">
+                <foreach collection="usageCodeList" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+        <!--皮试单执行卡数据查询，用法为输液用法，过滤处方不需要皮试的数据-->
+        <if test="skinPrintFlag != null and skinPrintFlag == 1">
+            and b.is_skin = #{skinPrintFlag}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and a.crte_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and a.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by a.crte_time desc,b.group_no asc ,b.group_seq_no asc)tab
+        where 1=1
+        <if test="printSign != null and printSign != ''">
+            and isPrint = #{printSign}
+        </if>
+        order by registerTime desc,groupNo asc ,groupSeqNo asc
+    </select>
+
+    <select id="queryByIds" parameterType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
+        select *
+        from outpt_prescribe_exec
+        where hosp_code = #{hospCode}
+        <if test="ids != null and ids.size() > 0">
+            and opd_id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+    <!--打印之后更新打印标志-->
+    <!--<update id="update">
+        update outpt_prescribe
+        set is_print = '1'
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>-->
+    <update id="update">
+        update outpt_prescribe_exec set is_print= '1'
+        <if test="ids != null and ids.size() > 0">
+            and opd_id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+    </update>
+    <update id="updatePrintFlagByType" parameterType="java.util.List">
+        <foreach collection="outptInfusionRegisterDTO" item="dto" separator=";">
+            update outpt_prescribe_exec set is_print = #{dto.isPrint} where hosp_code = #{dto.hospCode} and opd_id = #{dto.opdId}
+        </foreach>
+    </update>
+
+</mapper>

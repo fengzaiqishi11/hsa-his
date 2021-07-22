@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureItemDAO">
+
+    <select id="queryInsureItemAll" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select id, hosp_code, insure_reg_code, item_mark, item_code, item_name,
+        item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible,
+        check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id,
+        crte_name, crte_time, ver, ver_name, down_load_type,
+        sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code from insure_item
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( item_code like concat('%',#{keyword},'%')
+            or item_name like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="insureRegCode !=null and insureRegCode != ''">
+            and insure_reg_code =#{insureRegCode}
+        </if>
+        <if test="downLoadType !=null and downLoadType != ''">
+            and down_load_type =#{downLoadType}
+        </if>
+        <if test="handItemList != null and handItemList.size() > 0">
+            and down_load_type in
+            <foreach collection="handItemList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select id, hosp_code, insure_reg_code, item_mark, item_code, item_name, item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible, check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time, ver, ver_name,
+               down_load_type, sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,num,size,record_counts
+        from insure_item where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code =#{insureRegCode}
+        and ver_name is not null
+        order by crte_time desc limit 1
+    </select>
+    <select id="queryPageUnifiedItem" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select ID, HOSP_CODE, INSURE_REG_CODE, ITEM_MARK, ITEM_CODE, ITEM_NAME,
+        ITEM_DOSAGE, ITEM_SPEC, ITEM_PRICE, ITEM_UNIT_CODE, PROD, DEDUCTIBLE, CHECK_PRICE,
+        DIRECTORY, TAKE_DATE, LOSE_DATE, PYM, WBM, IS_VALID, CRTE_ID, CRTE_NAME, CRTE_TIME from insure_item
+        where hosp_code =#{hospCode}
+        <if test="keyWord != null and keyWord != ''">
+            and ( item_code like concat('%',#{keyWord},'%')
+            or item_name like concat('%',#{keyWord},'%')
+            or pym like concat('%',#{keyWord},'%')
+            or wbm like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <if test="insureRegCode !=null and insureRegCode != ''">
+            and insure_reg_code =#{insureRegCode}
+        </if>
+        <if test="downLoadType !=null and downLoadType != ''">
+            and item_type =#{itemType}
+        </if>
+    </select>
+    <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select *
+        from insure_item
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </select>
+    <insert id="insertInsureItem" parameterType="java.util.List">
+        insert into insure_item(id, hosp_code, insure_reg_code, item_mark,
+        item_code, item_name, item_type, item_dosage, item_spec,
+        item_price, item_unit_code, prod, deductible, check_price, directory,
+        take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+        ver, ver_name, down_load_type,
+        sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,drugadm_strdcode,
+        num,size,record_counts) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.insureRegCode}, #{item.itemMark}, #{item.itemCode},
+            #{item.itemName},#{item.itemType},#{item.itemDosage},
+            #{item.itemSpec},
+            #{item.itemPrice},
+            #{item.itemUnitCode},
+            #{item.prod},
+            #{item.deductible},#{item.checkPrice},#{item.directory},#{item.takeDate},#{item.loseDate},
+            #{item.pym},#{item.wbm},#{item.isValid},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime},#{item.ver},#{item.verName},#{item.downLoadType},
+            #{item.spDrugFlag},#{item.spLmtpricDrugFlag},#{item.lmtUsedFlag},#{item.hospItemName},#{item.hospItemCode},
+            #{item.num},#{item.size},#{item.recordCounts},#{item.drugadmStrdcode})
+        </foreach>
+
+    </insert>
+    <insert id="insertUnifiedItem">
+        insert into insure_item(id, hosp_code, insure_reg_code, item_mark,
+                                item_code, item_name, item_type, item_dosage, item_spec,
+                                item_price, item_unit_code, prod, deductible, check_price, directory,
+                                take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+                                ver, ver_name, down_load_type,
+                                sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag, hosp_item_name, hosp_item_code,
+                                num, size, record_counts,drugadm_strdcode,lim_user_explain)
+        values (#{id}, #{hospCode}, #{insureRegCode}, #{itemMark}, #{itemCode},
+                #{itemName}, #{itemType}, #{itemDosage},
+                #{itemSpec},
+                #{itemPrice},
+                #{itemUnitCode},
+                #{prod},
+                #{deductible}, #{checkPrice}, #{directory}, #{takeDate}, #{loseDate},
+                #{pym}, #{wbm}, #{isValid},
+                #{crteId},
+                #{crteName},
+                #{crteTime}, #{ver}, #{verName}, #{downLoadType},
+                #{spDrugFlag}, #{spLmtpricDrugFlag}, #{lmtUsedFlag}, #{hospItemName}, #{hospItemCode},
+                #{num}, #{size}, #{recordCounts},#{drugadmStrdcode},#{limUserExplain})
+    </insert>
+
+    <delete id="deleteInsureItemByRegCode" parameterType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        delete from insure_item
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+          and down_load_type = #{downLoadType}
+    </delete>
+</mapper>

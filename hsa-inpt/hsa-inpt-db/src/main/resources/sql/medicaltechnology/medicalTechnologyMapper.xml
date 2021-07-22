@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.medicaltechnology.dao.MedicalTechnologyDAO">
+
+    <select id="getLISorPASSNeedConfirmCost" parameterType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO" resultType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO" >
+        select a.*,ib.name as babyName,ib.gender_code as babyGenderCode from
+        (
+        SELECT
+        c.id AS costId,
+        c.item_id AS itemId,
+        c.item_name AS itemName,
+        c.price,
+        c.num,
+        v.NAME,
+        v.age,
+        v.age_unit_code,
+        v.bed_name,
+        v.in_no,
+        d.NAME AS sourceDeptName,
+        c.crte_time,
+        v.gender_code,
+        c.baby_id,
+        c.hosp_code,
+        CASE
+        WHEN c.is_ok = '1' THEN
+        '确费'
+        WHEN c.is_ok = '0' THEN
+        '未确费' ELSE '未确费'
+        END AS isOk
+        FROM
+        medic_apply ma,
+        inpt_advice b,
+        inpt_cost c,
+        inpt_visit v,
+        base_dept d
+        WHERE
+        ma.apply_no = b.technology_no
+        AND ma.visit_id = v.id
+        and ma.hosp_code = c.hosp_code
+        and ma.hosp_code = v.hosp_code
+        and ma.hosp_code = d.hosp_code
+        and ma.visit_id = c.visit_id
+        AND b.id = c.iat_id
+        AND d.id = c.dept_id
+        AND ma.hosp_code = #{hospCode}
+        AND ma.type_code = #{typeCode}
+        AND c.status_code = '0'
+        <if test="execDeptId != null and execDeptId != ''">
+            and c.exec_dept_id = #{execDeptId}
+        </if>
+        <if test="sourceDeptId != null and sourceDeptId != ''">
+            and c.source_dept_id = #{sourceDeptId}
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and c.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and c.crte_time &lt;= #{endTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and v.name like concat('%', #{keyword}, '%' )
+        </if>
+        <if test="isOk != null and isOk != ''">
+            and c.is_ok = #{isOk}
+        </if>
+        ) a
+        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+    </select>
+
+    <update id="saveMwdicalTechnologyConfirmCost" parameterType="java.util.Map">
+        update inpt_cost set is_ok = '1', ok_id = #{crteId}, ok_name = #{crteName}, ok_time = #{crteTime}
+        where hosp_code = #{hospCode} and id in ( ${costIds} )
+    </update>
+
+    <update id="updateMedicalTechnologyConfirmCost" parameterType="java.util.Map">
+        update inpt_cost set is_ok = '0', ok_id = null, ok_name = null, ok_time = null
+        where hosp_code = #{hospCode} and id in ( ${costIds} )
+    </update>
+
+    <!-- 根据就诊id查询确费状态为未确费的费用条数 -->
+    <select id="getConfirmCost" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM
+        medic_apply ma,
+        inpt_advice b,
+        inpt_cost c
+        WHERE
+        ma.apply_no = b.technology_no
+        and ma.hosp_code = c.hosp_code
+        and ma.visit_id = c.visit_id
+        AND b.id = c.iat_id
+        AND ma.hosp_code = #{hospCode}
+        AND b.type_code in ('3', '12')
+        AND c.status_code = '0'
+        and c.is_ok = '0'
+        and c.visit_id = #{id}
+    </select>
+
+</mapper>

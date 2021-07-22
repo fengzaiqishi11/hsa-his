@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureIndividualBusinessDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="insureIndividualBusinessDtoMap" type="cn.hsa.module.insure.module.dto.InsureIndividualBusinessDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="mib_id" property="mibId" jdbcType="VARCHAR" />
+        <result column="aaz267" property="aaz267" jdbcType="VARCHAR" />
+        <result column="bear_no" property="bearNo" jdbcType="VARCHAR" />
+        <result column="aka130" property="aka130" jdbcType="VARCHAR" />
+        <result column="aka130_name" property="aka130Name" jdbcType="VARCHAR" />
+        <result column="voip_code" property="voipCode" jdbcType="VARCHAR" />
+        <result column="bka006" property="bka006" jdbcType="VARCHAR" />
+        <result column="bka006_name" property="bka006Name" jdbcType="VARCHAR" />
+        <result column="aka083" property="aka083" jdbcType="VARCHAR" />
+        <result column="aka083_name" property="aka083Name" jdbcType="VARCHAR" />
+        <result column="aae030" property="aae030" jdbcType="TIMESTAMP" />
+        <result column="aae031" property="aae031" jdbcType="TIMESTAMP" />
+        <result column="aka120" property="aka120" jdbcType="VARCHAR" />
+        <result column="aka121" property="aka121" jdbcType="VARCHAR" />
+        <result column="vulnerability" property="vulnerability" jdbcType="VARCHAR" />
+        <result column="pay_mark" property="payMark" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code, 
+        visit_id, 
+        mib_id, 
+        aaz267, 
+        bear_no, 
+        aka130, 
+        aka130_name,
+        voip_code, 
+        bka006, 
+        bka006_name, 
+        aka083, 
+        aka083_name, 
+        aae030, 
+        aae031, 
+        aka120,
+        aka121, 
+        vulnerability, 
+        pay_mark, 
+        crte_id, 
+        crte_name, 
+        crte_time
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        iib.id, 
+        iib.hosp_code, 
+        iib.visit_id, 
+        iib.mib_id, 
+        iib.aaz267, 
+        iib.bear_no, 
+        iib.aka130, 
+        iib.aka130_name,
+        iib.voip_code, 
+        iib.bka006, 
+        iib.bka006_name, 
+        iib.aka083, 
+        iib.aka083_name, 
+        iib.aae030, 
+        iib.aae031, 
+        iib.aka120,
+        iib.aka121, 
+        iib.vulnerability, 
+        iib.pay_mark, 
+        iib.crte_id, 
+        iib.crte_name, 
+        iib.crte_time
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="insureIndividualBusinessDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        insure_individual_business
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualBusinessDO">
+        insert into
+        insure_individual_business
+        (
+          id,
+          hosp_code,
+          visit_id,
+          mib_id,
+          aaz267,
+          bear_no,
+          aka130,
+          aka130_name,
+          voip_code,
+          bka006,
+          bka006_name,
+          aka083,
+          aka083_name,
+          aae030,
+          aae031,
+          aka120,
+          aka121,
+          vulnerability,
+          pay_mark,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{visitId,jdbcType=VARCHAR}, 
+          #{mibId,jdbcType=VARCHAR}, 
+          #{aaz267,jdbcType=VARCHAR}, 
+          #{bearNo,jdbcType=VARCHAR}, 
+          #{aka130,jdbcType=VARCHAR}, 
+          #{aka130Name,jdbcType=VARCHAR}, 
+          #{voipCode,jdbcType=VARCHAR}, 
+          #{bka006,jdbcType=VARCHAR}, 
+          #{bka006Name,jdbcType=VARCHAR}, 
+          #{aka083,jdbcType=VARCHAR}, 
+          #{aka083Name,jdbcType=VARCHAR},
+          #{aae030,jdbcType=TIMESTAMP}, 
+          #{aae031,jdbcType=TIMESTAMP}, 
+          #{aka120,jdbcType=VARCHAR}, 
+          #{aka121,jdbcType=VARCHAR}, 
+          #{vulnerability,jdbcType=VARCHAR}, 
+          #{payMark,jdbcType=VARCHAR}, 
+          #{crteId,jdbcType=VARCHAR}, 
+          #{crteName,jdbcType=VARCHAR}, 
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualBusinessDO">
+        insert into
+        insure_individual_business
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id, 
+                </if>
+                <if test="mibId != null and mibId != ''">
+                    mib_id, 
+                </if>
+                <if test="aaz267 != null and aaz267 != ''">
+                    aaz267, 
+                </if>
+                <if test="bearNo != null and bearNo != ''">
+                    bear_no, 
+                </if>
+                <if test="aka130 != null and aka130 != ''">
+                    aka130, 
+                </if>
+                <if test="aka130Name != null and aka130Name != ''">
+                    aka130_name, 
+                </if>
+                <if test="voipCode != null and voipCode != ''">
+                    voip_code, 
+                </if>
+                <if test="bka006 != null and bka006 != ''">
+                    bka006, 
+                </if>
+                <if test="bka006Name != null and bka006Name != ''">
+                    bka006_name, 
+                </if>
+                <if test="aka083 != null and aka083 != ''">
+                    aka083, 
+                </if>
+                <if test="aka083Name != null and aka083Name != ''">
+                    aka083_name, 
+                </if>
+                <if test="aae030 != null">
+                    aae030, 
+                </if>
+                <if test="aae031 != null">
+                    aae031, 
+                </if>
+                <if test="aka120 != null and aka120 != ''">
+                    aka120, 
+                </if>
+                <if test="aka121 != null and aka121 != ''">
+                    aka121, 
+                </if>
+                <if test="vulnerability != null and vulnerability != ''">
+                    vulnerability, 
+                </if>
+                <if test="payMark != null and payMark != ''">
+                    pay_mark, 
+                </if>
+                <if test="crteId != null and crteId != ''">
+                    crte_id, 
+                </if>
+                <if test="crteName != null and crteName != ''">
+                    crte_name, 
+                </if>
+                <if test="crteTime != null">
+                    crte_time
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="mibId != null and mibId != ''">
+                        #{mibId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aaz267 != null and aaz267 != ''">
+                        #{aaz267,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bearNo != null and bearNo != ''">
+                        #{bearNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka130 != null and aka130 != ''">
+                        #{aka130,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka130Name != null and aka130Name != ''">
+                        #{aka130Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="voipCode != null and voipCode != ''">
+                        #{voipCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bka006 != null and bka006 != ''">
+                        #{bka006,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bka006Name != null and bka006Name != ''">
+                        #{bka006Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka083 != null and aka083 != ''">
+                        #{aka083,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka083Name != null and aka083Name != ''">
+                        #{aka083Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aae030 != null">
+                        #{aae030,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="aae031 != null">
+                        #{aae031,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="aka120 != null and aka120 != ''">
+                        #{aka120,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka121 != null and aka121 != ''">
+                        #{aka121,jdbcType=VARCHAR}, 
+                </if>
+                <if test="vulnerability != null and vulnerability != ''">
+                        #{vulnerability,jdbcType=VARCHAR}, 
+                </if>
+                <if test="payMark != null and payMark != ''">
+                        #{payMark,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteId != null and crteId != ''">
+                        #{crteId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteName != null and crteName != ''">
+                        #{crteName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteTime != null">
+                        #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualBusinessDO">
+        update
+        insure_individual_business
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                mib_id = #{mibId,jdbcType=VARCHAR}, 
+                aaz267 = #{aaz267,jdbcType=VARCHAR}, 
+                bear_no = #{bearNo,jdbcType=VARCHAR}, 
+                aka130 = #{aka130,jdbcType=VARCHAR}, 
+                aka130_name = #{aka130Name,jdbcType=VARCHAR}, 
+                voip_code = #{voipCode,jdbcType=VARCHAR}, 
+                bka006 = #{bka006,jdbcType=VARCHAR}, 
+                bka006_name = #{bka006Name,jdbcType=VARCHAR}, 
+                aka083 = #{aka083,jdbcType=VARCHAR}, 
+                aka083_name = #{aka083Name,jdbcType=VARCHAR}, 
+                aae030 = #{aae030,jdbcType=TIMESTAMP}, 
+                aae031 = #{aae031,jdbcType=TIMESTAMP}, 
+                aka120 = #{aka120,jdbcType=VARCHAR}, 
+                aka121 = #{aka121,jdbcType=VARCHAR}, 
+                vulnerability = #{vulnerability,jdbcType=VARCHAR}, 
+                pay_mark = #{payMark,jdbcType=VARCHAR}, 
+                crte_id = #{crteId,jdbcType=VARCHAR}, 
+                crte_name = #{crteName,jdbcType=VARCHAR}, 
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualBusinessDO">
+        update
+        insure_individual_business
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="mibId != null and mibId != ''">
+                mib_id = #{mibId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aaz267 != null and aaz267 != ''">
+                aaz267 = #{aaz267,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bearNo != null and bearNo != ''">
+                bear_no = #{bearNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka130 != null and aka130 != ''">
+                aka130 = #{aka130,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka130Name != null and aka130Name != ''">
+                aka130_name = #{aka130Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="voipCode != null and voipCode != ''">
+                voip_code = #{voipCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bka006 != null and bka006 != ''">
+                bka006 = #{bka006,jdbcType=VARCHAR}, 
+                </if>
+                <if test="bka006Name != null and bka006Name != ''">
+                bka006_name = #{bka006Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka083 != null and aka083 != ''">
+                aka083 = #{aka083,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka083Name != null and aka083Name != ''">
+                aka083_name = #{aka083Name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aae030 != null">
+                aae030 = #{aae030,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="aae031 != null">
+                aae031 = #{aae031,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="aka120 != null and aka120 != ''">
+                aka120 = #{aka120,jdbcType=VARCHAR}, 
+                </if>
+                <if test="aka121 != null and aka121 != ''">
+                aka121 = #{aka121,jdbcType=VARCHAR}, 
+                </if>
+                <if test="vulnerability != null and vulnerability != ''">
+                vulnerability = #{vulnerability,jdbcType=VARCHAR}, 
+                </if>
+                <if test="payMark != null and payMark != ''">
+                pay_mark = #{payMark,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM insure_individual_business WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM insure_individual_business WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="insureIndividualBusinessDtoMap" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBusinessDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM insure_individual_business iib
+        where
+        iib.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            AND iib.visit_id = #{visitId}
+        </if>
+        <if test="mibId != null and mibId != ''">
+            AND iib.mib_id = #{mibId}
+        </if>
+    </select>
+
+    <delete id="deleteByVisitId" parameterType="java.lang.String">
+        delete from insure_individual_business where visit_id = #{visitId}
+    </delete>
+
+</mapper>

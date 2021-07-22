@@ -1,0 +1,136 @@
+package cn.hsa.module.insure.outpt.service;
+
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.insure.outpt.service
+ * @Class_name: InsureUnifiedPayOutptService
+ * @Describe: 统一支付平台，门诊医保
+ * @Author: guanhongqiang
+ * @Eamil: hongqiang.guan@powersi.com.cn
+ * @Date: 2021/2/9 17:26
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+@FeignClient(value = "hsa-insure")
+public interface InsureUnifiedPayOutptService {
+
+	/**
+	 * @Description: 门诊就诊信息上传
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/2/10 9:02
+	 * @Return
+	 */
+	void insureOutptVisitUpload(Map<String, Object> unifiedPayMap);
+
+
+	/**
+	 * @Description: 门诊预结算
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/2/15 11:56
+	 * @Return
+	 */
+	Map<String, Object> insureOutptSettleAccountIn(Map<String, Object> unifiedPayMap);
+
+	/**
+	 * @Description: 门诊结算
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/2/15 13:16
+	 * @Return
+	 */
+	Map<String,Object> UP_2207(Map<String, Object> unifiedPayMap);
+
+	/**
+	 * @Menthod: UP_2201
+	 * @Desrciption: 统一支付平台-门诊挂号
+	 * @Param: his门诊挂号实体-outptRegisterDTO, 节点标识-flag
+	 * @Author: luoyong
+	 * @Email: luoyong@powersi.com.cn
+	 * @Date: 2021-02-10 09:35
+	 * @Return:
+	 **/
+	WrapperResponse<InsureIndividualVisitDTO> UP_2201(Map<String,Object>map);
+
+	/**
+	 * @Menthod: UP_2202
+	 * @Desrciption: 统一支付平台-门诊挂号撤销
+	 * @Param: his门诊挂号实体-outptRegisterDTO, 节点标识-flag
+	 * @Author: luoyong
+	 * @Email: luoyong@powersi.com.cn
+	 * @Date: 2021-02-10 11:00
+	 * @Return:
+	 **/
+	WrapperResponse<Boolean> UP_2202(Map<String,Object> map);
+
+	/**
+	 * @Menthod: UP_2208
+	 * @Desrciption: 统一支付平台-门诊结算撤销
+	 * @Param: 节点标识-flag
+	 * @Author: luoyong
+	 * @Email: luoyong@powersi.com.cn
+	 * @Date: 2021-02-10 11:00
+	 * @Return:
+	 **/
+	WrapperResponse< Map<String,Object>> UP_2208(Map<String,Object> map);
+
+	/**
+	 * @param map
+	 * @Method updateCancelFeeSubmit
+	 * @Desrciption 门诊医保病人取消费用上传
+	 * @Param
+	 * @Author fuhui
+	 * @Date 2021/3/3 16:44
+	 * @Return
+	 */
+	WrapperResponse<Boolean> updateCancelFeeSubmit(Map<String, Object> map);
+
+	/**
+	 * @param map
+	 * @Method updateFeeSubmit()
+	 * @Desrciption 门诊医保病人费用传输
+	 * @Param
+	 * @Author fuhui
+	 * @Date 2021/3/3 16:38
+	 * @Return
+	 */
+	WrapperResponse<Boolean> updateFeeSubmit(Map<String, Object> map);
+
+	/**
+	 * @Method UP_5301
+	 * @Desrciption  查询门特病人信息
+	 * @Param UP_5301
+	 *
+	 * @Author fuhui
+	 * @Date   2021/3/25 19:28
+	 * @Return
+	**/
+    WrapperResponse<Map<String, Object>> UP_5301(Map<String, Object> params);
+
+	/**
+	 * @Method UP_5302
+	 * @Desrciption 医保统一支付平台：人员定点备案查询
+	 * @Param map
+	 *
+	 * @Author fuhui
+	 * @Date   2021/4/2 9:12
+	 * @Return
+	 **/
+	WrapperResponse<Map<String, Object>> UP_5302(Map<String, Object> map);
+}

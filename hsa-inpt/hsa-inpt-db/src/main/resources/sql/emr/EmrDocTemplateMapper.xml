@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrdoctemplate.dao.EmrDocTemplateDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO" id="EmrDocTemplateMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="templateCode" column="template_code" jdbcType="VARCHAR"/>
+        <result property="templateName" column="template_name" jdbcType="VARCHAR"/>
+        <result property="gxfw" column="gxfw" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="classifyCode" column="classify_code" jdbcType="VARCHAR"/>
+        <result property="emrJson" column="emr_json" jdbcType="OTHER"/>
+        <result property="nrHtml" column="nr_html" jdbcType="OTHER"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--通过共享范围作为筛选条件查询-->
+    <select id="getEmrDocTemplates" resultType="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO" parameterType="java.util.Map">
+        select d.id, d.template_name as label from emr_doc_template d left join emr_classify_template t on d.classify_code = t.classify_code
+        left join emr_patient p on p.classify_template_id = t.id
+        where d.hosp_code = #{hospCode} and p.id = #{emrPatientId}
+        <if test="gxfw != null and gxfw == '1'.toString()">
+            and d.crte_id = #{crteId} and d.gxfw = '1'
+        </if>
+        <if test="gxfw != null and gxfw =='2'.toString()">
+            and d.dept_id = #{deptId} and d.gxfw = '2'
+        </if>
+        <if test="gxfw != null and gxfw =='3'.toString()">
+            and d.gxfw = '3'
+        </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="saveEmrDocTemplate" parameterType="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO">
+        insert into emr_doc_template(id, hosp_code, template_code, template_name, gxfw, dept_id, classify_code, emr_json, nr_html, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{templateCode}, #{templateName}, #{gxfw}, #{deptId},
+        <choose>
+            <when test="classifyCode != null and classifyCode != ''">
+                #{classifyCode},
+            </when>
+            <otherwise>
+                (select c.classify_code from emr_patient p join emr_classify_template c on p.classify_template_id = c.id
+                where p.id = #{emrPatientId} and p.hosp_code = #{hospCode}),
+            </otherwise>
+        </choose>
+        #{emrJson}, #{nrHtml}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <select id="selectEmrDocTemplate" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO">
+        select * from emr_doc_template where id = #{id}
+    </select>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from emr_doc_template where id = #{id}
+    </delete>
+
+    <select id="getEmrDocTemplatesForXJ" resultType="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO" parameterType="java.util.Map">
+        select d.id, d.template_name as label from emr_doc_template d
+        where d.hosp_code = #{hospCode} and d.classify_code = #{emrClassifyCode}
+        <if test="gxfw != null and gxfw == '1'.toString()">
+            and d.crte_id = #{crteId} and d.gxfw = '1'
+        </if>
+        <if test="gxfw != null and gxfw =='2'.toString()">
+            and d.dept_id = #{deptId} and d.gxfw = '2'
+        </if>
+        <if test="gxfw != null and gxfw =='3'.toString()">
+            and d.gxfw = '3'
+        </if>
+    </select>
+
+    <update id="updateEmrDocTemplate" parameterType="cn.hsa.module.emr.emrdoctemplate.dto.EmrDocTemplateDTO">
+        update emr_doc_template set emr_json = #{emrJson}, nr_html = #{nrHtml} where id = #{id} and crte_id = #{crteId}
+    </update>
+
+    <delete id="deleteEmrDocTemplate" parameterType="java.util.Map">
+        delete from emr_doc_template where id = #{id} and crte_id = #{crteId}
+    </delete>
+
+</mapper>

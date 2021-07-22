@@ -1,0 +1,1123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.register.dao.OutptRegisterDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptRegisterMap" type="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="register_no" property="registerNo" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="gender_code" property="genderCode" jdbcType="VARCHAR" />
+        <result column="age" property="age" jdbcType="INTEGER" />
+        <result column="birthday" property="birthday" jdbcType="TIMESTAMP" />
+        <result column="cert_code" property="certCode" jdbcType="VARCHAR" />
+        <result column="cert_no" property="certNo" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="source_bz_code" property="sourceBzCode" jdbcType="VARCHAR" />
+        <result column="visit_code" property="visitCode" jdbcType="VARCHAR" />
+        <result column="source_tj_code" property="sourceTjCode" jdbcType="VARCHAR" />
+        <result column="source_tj_remark" property="sourceTjRemark" jdbcType="VARCHAR" />
+        <result column="register_time" property="registerTime" jdbcType="TIMESTAMP" />
+        <result column="cf_id" property="cfId" jdbcType="VARCHAR" />
+        <result column="cq_id" property="cqId" jdbcType="VARCHAR" />
+        <result column="dq_id" property="dqId" jdbcType="VARCHAR" />
+        <result column="dr_id" property="drId" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+        <result column="doctor_id" property="doctorId" jdbcType="VARCHAR" />
+        <result column="doctor_name" property="doctorName" jdbcType="VARCHAR" />
+        <result column="is_cancel" property="isCancel" jdbcType="VARCHAR" />
+        <result column="is_first_visit" property="isFirstVisit" jdbcType="VARCHAR" />
+        <result column="is_add" property="isAdd" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.base.dept.dto.BaseDeptDTO" id="BaseDeptMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="wardCode" column="ward_code" jdbcType="VARCHAR"/>
+        <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="upDeptCode" column="up_dept_code" jdbcType="VARCHAR"/>
+        <result property="mgDeptCode" column="mg_dept_code" jdbcType="VARCHAR"/>
+        <result property="intro" column="intro" jdbcType="VARCHAR"/>
+        <result property="place" column="place" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+          hosp_code,
+          visit_id,
+          register_no,
+          name,
+          gender_code,
+          age,
+          birthday,
+          cert_code,
+          cert_no,
+          phone,
+          source_bz_code,
+          visit_code,
+          source_tj_code,
+          source_tj_remark,
+          register_time,
+          cf_id,
+          cq_id,
+          dq_id,
+          dr_id,
+          dept_id,
+          dept_name,
+          doctor_id,
+          doctor_name,
+          is_cancel,
+          is_first_visit,
+          is_add,
+          crte_id,
+          crte_name,
+          crte_time
+    </sql>
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptRegisterMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_register
+        where 1=1
+        <if test="id !='' and id !=null ">
+            and id = #{id}
+        </if>
+        <if test="visitId !='' and visitId !=null ">
+            and visit_id = #{visitId}
+        </if>
+        and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" >
+        insert into
+            outpt_register
+        (
+            id,
+            hosp_code,
+            visit_id,
+            register_no,
+            name,
+            gender_code,
+            age,
+            age_unit_code,
+            birthday,
+            cert_code,
+            cert_no,
+            phone,
+            source_bz_code,
+            visit_code,
+            source_tj_code,
+            source_tj_remark,
+            register_time,
+            cf_id,
+            cq_id,
+            dq_id,
+            dr_id,
+            dept_id,
+            dept_name,
+            doctor_id,
+            doctor_name,
+            is_cancel,
+            is_first_visit,
+            is_add,
+            crte_id,
+            crte_name,
+            crte_time
+        ) values (
+                     #{id,jdbcType=VARCHAR},
+                     #{hospCode,jdbcType=VARCHAR},
+                     #{visitId,jdbcType=VARCHAR},
+                     #{registerNo,jdbcType=VARCHAR},
+                     #{name,jdbcType=VARCHAR},
+                     #{genderCode,jdbcType=VARCHAR},
+                     #{age,jdbcType=INTEGER},
+                     #{ageUnitCode,jdbcType=VARCHAR},
+                     #{birthday,jdbcType=TIMESTAMP},
+                     #{certCode,jdbcType=VARCHAR},
+                     #{certNo,jdbcType=VARCHAR},
+                     #{phone,jdbcType=VARCHAR},
+                     #{sourceBzCode,jdbcType=VARCHAR},
+                     #{visitCode,jdbcType=VARCHAR},
+                     #{sourceTjCode,jdbcType=VARCHAR},
+                     #{sourceTjRemark,jdbcType=VARCHAR},
+                     #{registerTime,jdbcType=TIMESTAMP},
+                     #{cfId,jdbcType=VARCHAR},
+                     #{cqId,jdbcType=VARCHAR},
+                     #{dqId,jdbcType=VARCHAR},
+                     #{drId,jdbcType=VARCHAR},
+                     #{deptId,jdbcType=VARCHAR},
+                     #{deptName,jdbcType=VARCHAR},
+                     #{doctorId,jdbcType=VARCHAR},
+                     #{doctorName,jdbcType=VARCHAR},
+                     #{isCancel,jdbcType=VARCHAR},
+                     #{isFirstVisit,jdbcType=VARCHAR},
+                     #{isAdd,jdbcType=VARCHAR},
+                     #{crteId,jdbcType=VARCHAR},
+                     #{crteName,jdbcType=VARCHAR},
+                     #{crteTime,jdbcType=TIMESTAMP}
+                 )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" >
+        insert into
+        outpt_register
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                register_no,
+            </if>
+            <if test="name != null and name != ''">
+                name,
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code,
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="sourceBzCode != null and sourceBzCode != ''">
+                source_bz_code,
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                visit_code,
+            </if>
+            <if test="sourceTjCode != null and sourceTjCode != ''">
+                source_tj_code,
+            </if>
+            <if test="sourceTjRemark != null and sourceTjRemark != ''">
+                source_tj_remark,
+            </if>
+            <if test="registerTime != null">
+                register_time,
+            </if>
+            <if test="cfId != null and cfId != ''">
+                cf_id,
+            </if>
+            <if test="cqId != null and cqId != ''">
+                cq_id,
+            </if>
+            <if test="dqId != null and dqId != ''">
+                dq_id,
+            </if>
+            <if test="drId != null and drId != ''">
+                dr_id,
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id,
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name,
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id,
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name,
+            </if>
+            <if test="isCancel != null and isCancel != ''">
+                is_cancel,
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                is_first_visit,
+            </if>
+            <if test="isAdd != null and isAdd != ''">
+                is_add,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                #{registerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                #{genderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="birthday != null">
+                #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                #{certCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                #{certNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceBzCode != null and sourceBzCode != ''">
+                #{sourceBzCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                #{visitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTjCode != null and sourceTjCode != ''">
+                #{sourceTjCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTjRemark != null and sourceTjRemark != ''">
+                #{sourceTjRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="registerTime != null">
+                #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cfId != null and cfId != ''">
+                #{cfId,jdbcType=VARCHAR},
+            </if>
+            <if test="cqId != null and cqId != ''">
+                #{cqId,jdbcType=VARCHAR},
+            </if>
+            <if test="dqId != null and dqId != ''">
+                #{dqId,jdbcType=VARCHAR},
+            </if>
+            <if test="drId != null and drId != ''">
+                #{drId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="isCancel != null and isCancel != ''">
+                #{isCancel,jdbcType=VARCHAR},
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                #{isFirstVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="isAdd != null and isAdd != ''">
+                #{isAdd,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" >
+        update
+            outpt_register
+        set
+            visit_id = #{visitId,jdbcType=VARCHAR},
+            register_no = #{registerNo,jdbcType=VARCHAR},
+            name = #{name,jdbcType=VARCHAR},
+            gender_code = #{genderCode,jdbcType=VARCHAR},
+            age = #{age,jdbcType=INTEGER},
+            birthday = #{birthday,jdbcType=TIMESTAMP},
+            cert_code = #{certCode,jdbcType=VARCHAR},
+            cert_no = #{certNo,jdbcType=VARCHAR},
+            phone = #{phone,jdbcType=VARCHAR},
+            source_bz_code = #{sourceBzCode,jdbcType=VARCHAR},
+            visit_code = #{visitCode,jdbcType=VARCHAR},
+            source_tj_code = #{sourceTjCode,jdbcType=VARCHAR},
+            source_tj_remark = #{sourceTjRemark,jdbcType=VARCHAR},
+            register_time = #{registerTime,jdbcType=TIMESTAMP},
+            cf_id = #{cfId,jdbcType=VARCHAR},
+            cq_id = #{cqId,jdbcType=VARCHAR},
+            dq_id = #{dqId,jdbcType=VARCHAR},
+            dr_id = #{drId,jdbcType=VARCHAR},
+            dept_id = #{deptId,jdbcType=VARCHAR},
+            dept_name = #{deptName,jdbcType=VARCHAR},
+            doctor_id = #{doctorId,jdbcType=VARCHAR},
+            doctor_name = #{doctorName,jdbcType=VARCHAR},
+            is_cancel = #{isCancel,jdbcType=VARCHAR},
+            is_first_visit = #{isFirstVisit,jdbcType=VARCHAR},
+            is_add = #{isAdd,jdbcType=VARCHAR},
+            crte_id = #{crteId,jdbcType=VARCHAR},
+            crte_name = #{crteName,jdbcType=VARCHAR},
+            crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+            id = #{id} and hosp_code = #{hospCode,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" >
+        update
+        outpt_register
+        <set >
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                register_no = #{registerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code = #{certCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no = #{certNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceBzCode != null and sourceBzCode != ''">
+                source_bz_code = #{sourceBzCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                visit_code = #{visitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTjCode != null and sourceTjCode != ''">
+                source_tj_code = #{sourceTjCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTjRemark != null and sourceTjRemark != ''">
+                source_tj_remark = #{sourceTjRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="registerTime != null">
+                register_time = #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cfId != null and cfId != ''">
+                cf_id = #{cfId,jdbcType=VARCHAR},
+            </if>
+            <if test="cqId != null and cqId != ''">
+                cq_id = #{cqId,jdbcType=VARCHAR},
+            </if>
+            <if test="dqId != null and dqId != ''">
+                dq_id = #{dqId,jdbcType=VARCHAR},
+            </if>
+            <if test="drId != null and drId != ''">
+                dr_id = #{drId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="isCancel != null and isCancel != ''">
+                is_cancel = #{isCancel,jdbcType=VARCHAR},
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                is_first_visit = #{isFirstVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="isAdd != null and isAdd != ''">
+                is_add = #{isAdd,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code = #{hospCode,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据条件参数查询数据列表 ,可以新增查询条件，勿改动查询条件（用于门诊退号信息展示）-->
+    <select id="queryRegisterInfoByParamsPage" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterDO">
+        SELECT
+        a.id,
+        a.hosp_code AS hospCode,
+        a.visit_id AS visitId,
+        a.register_no AS registerNo,
+        a.name,
+        a.gender_code AS genderCode,
+        a.age,
+        d.age_unit_code AS ageUnitCode,
+        a.birthday,
+        a.cert_code AS certCode,
+        a.cert_no AS certNo,
+        a.phone,
+        a.source_bz_code AS sourceBzCode,
+        a.visit_code AS visitCode,
+        a.source_tj_code AS sourceTjCode,
+        a.source_tj_remark AS sourceTjRemark,
+        a.register_time AS registerTime,
+        a.cf_id AS cfId,
+        a.cq_id AS cqId,
+        a.dq_id AS dqId,
+        a.dr_id AS drId,
+        a.dept_id AS deptId,
+        a.dept_name AS deptName,
+        a.doctor_id AS doctorId,
+        a.doctor_name AS doctorName,
+        a.is_cancel AS isCancel,
+        a.is_first_visit AS isFirstVisit,
+        a.is_add AS isAdd,
+        a.crte_id AS crteId,
+        a.crte_name AS crteName,
+        a.crte_time AS crteTime,
+        b.bill_no AS billNo,-- 发票号
+        b.total_price AS totalPrice,-- 挂号费
+        b.preferential_price AS preferentialPrice,-- 优惠总金额
+        b.reality_price AS realityPrice,-- 实付金额
+        b.settle_time AS settleTime,-- 结算时间
+        d.patient_code AS patientCode,
+        ifnull(d.is_visit,'0') as isVisit,
+        e.register_code AS registerCode  -- 挂号类型名称
+        FROM
+        outpt_register a
+        inner JOIN outpt_register_settle b ON a.id = b.register_id
+        inner JOIN outpt_visit d ON a.visit_id = d.id
+        inner JOIN outpt_classify e ON a.cf_id = e.id
+        WHERE
+        a.hosp_code = #{hospCode} and a.is_cancel = '0' and (d.is_visit = '0' or d.is_visit is null)
+        <if test="keyword != null and keyword != ''">
+            and concat(a.name,a.cert_no,a.register_no) LIKE concat(concat('%',#{keyword}),'%')
+        </if>
+        <if test="startTime != null">
+            and a.register_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null">
+            and a.register_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        ORDER BY
+        a.crte_time desc
+    </select>
+
+    <!-- 根据挂号ID查询挂号费用明细表信息 -->
+    <select id="selectDetailByRegisterId" resultType="cn.hsa.module.outpt.register.entity.OutptRegisterDetailDO" parameterType="java.util.Map" >
+        select
+            *
+        from
+            outpt_register_detail
+        where 1=1
+          and register_id = #{registerId}
+          and hosp_code = #{hospCode}
+          and status_code = '0'
+    </select>
+
+    <!-- 挂号费用明细表原始数据被冲红 -->
+    <update id="updateDetailByRegisterId" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE outpt_register_detail
+            <set>
+                <if test="item.registerId != null">
+                    register_id = #{item.registerId},
+                </if>
+                <if test="item.visitId != null">
+                    visit_id = #{item.visitId},
+                </if>
+                <if test="item.itemCode != null">
+                    item_code = #{item.itemCode},
+                </if>
+                <if test="item.itemId != null">
+                    item_id = #{item.itemId},
+                </if>
+                <if test="item.itemName != null">
+                    item_name = #{item.itemName},
+                </if>
+                <if test="item.bfcId!= null">
+                    bfc_id = #{item.bfcId},
+                </if>
+                <if test="item.price != null">
+                    price = #{item.price},
+                </if>
+                <if test="item.num != null">
+                    num = #{item.num},
+                </if>
+                <if test="item.useCode != null">
+                    use_code = #{item.useCode},
+                </if>
+                <if test="item.spec != null">
+                    spec = #{item.spec},
+                </if>
+                <if test="item.preferentialId != null">
+                    preferential_id = #{item.preferentialId},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice},
+                </if>
+                <if test="item.preferentialPrice != null">
+                    preferential_price = #{item.preferentialPrice},
+                </if>
+                <if test="item.realityPrice != null">
+                    reality_price = #{item.realityPrice},
+                </if>
+                <if test="item.unitCode != null">
+                    unit_code = #{item.unitCode},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode},
+                </if>
+                <if test="item.originId != null">
+                    origin_id = #{item.originId},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE 1=1
+            and register_id = #{item.registerId}
+            and hosp_code = #{item.hospCode}
+            and visit_id = #{item.visitId}
+        </foreach>
+    </update>
+
+    <!-- 新增挂号费用明细表信息 -->
+    <insert id="insertDetail" parameterType="list">
+        INSERT INTO outpt_register_detail (
+        id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price,
+        unit_code, status_code, origin_id, crte_id, crte_name, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.registerId},
+            #{item.visitId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.bfcId},
+            #{item.price},
+            #{item.num},
+            #{item.useCode},
+            #{item.spec},
+            #{item.preferentialId},
+            #{item.totalPrice},
+            #{item.preferentialPrice},
+            #{item.realityPrice},
+            #{item.unitCode},
+            #{item.statusCode},
+            #{item.originId},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- 根据挂号ID查询挂号结算表信息 -->
+    <select id="selectSettleByRegisterId" resultType="cn.hsa.module.outpt.register.entity.OutptRegisterSettleDO" parameterType="java.util.Map" >
+        select
+            *
+        from
+            outpt_register_settle
+        where 1=1
+          and register_id = #{registerId}
+          and hosp_code = #{hospCode}
+          and status_code = '0'
+    </select>
+
+    <!-- 挂号费用明细表原始数据被冲红 -->
+    <update id="updateSettleByRegisterId" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterSettleDO" >
+        update
+            outpt_register_settle
+        set
+            status_code = #{statusCode}
+        where 1=1
+          and register_id = #{registerId}
+          and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 新增挂号结算表信息 -->
+    <insert id="insertSettle" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterSettleDO" >
+        insert into
+            outpt_register_settle
+        (
+            id,
+            hosp_code,
+            register_id,
+            total_price,
+            preferential_price,
+            reality_price,
+            settle_time,
+            daily_settle_id,
+            status_code,
+            origin_id,
+            bill_id,
+            bill_no,
+            pay_code,
+            order_no,
+            crte_id,
+            crte_name,
+            crte_time
+        ) values (
+                     #{id,jdbcType=VARCHAR},
+                     #{hospCode,jdbcType=VARCHAR},
+                     #{registerId,jdbcType=VARCHAR},
+                     #{totalPrice,jdbcType=DECIMAL},
+                     #{preferentialPrice,jdbcType=DECIMAL},
+                     #{realityPrice,jdbcType=DECIMAL},
+                     #{settleTime,jdbcType=TIMESTAMP},
+                     #{dailySettleId,jdbcType=VARCHAR},
+                     #{statusCode,jdbcType=VARCHAR},
+                     #{originId,jdbcType=VARCHAR},
+                     #{billId,jdbcType=VARCHAR},
+                     #{billNo,jdbcType=VARCHAR},
+                     #{payCode,jdbcType=VARCHAR},
+                     #{orderNo,jdbcType=VARCHAR},
+                     #{crteId,jdbcType=VARCHAR},
+                     #{crteName,jdbcType=VARCHAR},
+                     #{crteTime,jdbcType=TIMESTAMP}
+                 )
+    </insert>
+
+    <!-- 根据挂号ID查询挂号结算表信息 -->
+    <select id="selectPayByRegisterId" resultType="cn.hsa.module.outpt.register.entity.OutptRegisterPayDO" parameterType="java.util.Map" >
+        select
+            *
+        from
+            outpt_register_pay
+        where 1=1
+          and visit_id = #{visitId}
+          and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 批量插入挂号费支付方式数据 -->
+    <insert id="insertPayList" parameterType="list">
+        INSERT INTO outpt_register_pay (
+        id, hosp_code, rs_id, visit_id, pay_code, price, service_price
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.rsId},
+            #{item.visitId},
+            #{item.payCode},
+            #{item.price},
+            #{item.servicePrice}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据id清除医生号源明细信息 -->
+    <update id="updateDoctorRegister" parameterType="java.util.Map" >
+        update
+            outpt_doctor_register
+        set
+            profile_id = null,
+            is_lock = '0'
+        where 1=1
+          and id = #{drId}
+          and hosp_code = #{hospCode}
+    </update>
+
+
+    <!-- 根据主键删除就诊表未就诊的信息信息 -->
+    <delete id="deleteVisitByVisitId" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterDO">
+        DELETE FROM outpt_visit WHERE id = #{visitId} and hosp_code = #{hospCode} and is_visit != '1'
+    </delete>
+
+    <!-- 根据就诊ID查询就诊表信息 -->
+    <select id="getVisitInfoByVisitId" resultType="cn.hsa.module.outpt.visit.entity.OutptVisitDO" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterDO" >
+        select
+            *
+        from
+            outpt_visit
+        where 1=1
+          and id = #{visitId}
+          and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 新增挂号费用明细表信息 -->
+    <insert id="insertRegDetail" parameterType="list">
+        INSERT INTO outpt_register_detail (
+        id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price,
+        unit_code, status_code, origin_id, crte_id, crte_name, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.registerId},
+            #{item.visitId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.bfcId},
+            #{item.price},
+            #{item.num},
+            #{item.useCode},
+            #{item.spec},
+            #{item.preferentialId},
+            #{item.totalPrice},
+            #{item.preferentialPrice},
+            #{item.realityPrice},
+            #{item.unitCode},
+            #{item.statusCode},
+            #{item.originId},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 新增挂号结算表信息 -->
+    <insert id="batchInsertRegisterSettle" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto" >
+        insert into
+            outpt_register_settle
+        (
+            id,
+            hosp_code,
+            register_id,
+            total_price,
+            preferential_price,
+            reality_price,
+            settle_time,
+            daily_settle_id,
+            status_code,
+            origin_id,
+            bill_id,
+            bill_no,
+            pay_code,
+            order_no,
+            crte_id,
+            crte_name,
+            crte_time
+        ) values (
+                     #{id,jdbcType=VARCHAR},
+                     #{hospCode,jdbcType=VARCHAR},
+                     #{registerId,jdbcType=VARCHAR},
+                     #{totalPrice,jdbcType=DECIMAL},
+                     #{preferentialPrice,jdbcType=DECIMAL},
+                     #{realityPrice,jdbcType=DECIMAL},
+                     #{settleTime,jdbcType=TIMESTAMP},
+                     #{dailySettleId,jdbcType=VARCHAR},
+                     #{statusCode,jdbcType=VARCHAR},
+                     #{originId,jdbcType=VARCHAR},
+                     #{billId,jdbcType=VARCHAR},
+                     #{billNo,jdbcType=VARCHAR},
+                     #{payCode,jdbcType=VARCHAR},
+                     #{orderNo,jdbcType=VARCHAR},
+                     #{crteId,jdbcType=VARCHAR},
+                     #{crteName,jdbcType=VARCHAR},
+                     #{crteTime,jdbcType=TIMESTAMP}
+                 )
+    </insert>
+
+    <!-- 批量插入挂号费支付方式数据 -->
+    <insert id="batchInsertOutptRegisterPay" parameterType="list">
+        INSERT INTO outpt_register_pay (
+        id, hosp_code, rs_id, visit_id, pay_code, price, service_price
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.rsId},
+            #{item.visitId},
+            #{item.payCode},
+            #{item.price},
+            #{item.servicePrice}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据挂号ID查询挂号结算表信息 -->
+    <select id="queryDoctorRegisterByTime" resultType="cn.hsa.module.outpt.register.entity.OutptDoctorRegisterDO" parameterType="java.util.Map" >
+        select
+        *
+        from
+        outpt_doctor_register
+        where
+        hosp_code = #{hospCode}
+        <if test="dqId != null and dqId != ''">
+            and dq_id = #{dqId}
+        </if>
+        <if test="isUse != null and isUse != ''">
+            and is_use = #{isUse}
+        </if>
+        <if test="isLock != null and isLock != ''">
+            and is_lock = #{isLock}
+        </if>
+        <if test="isAdd != null and isAdd != ''">
+            and is_add = #{isAdd}
+        </if>
+    </select>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateDoctorRegisterStatus" parameterType="cn.hsa.module.outpt.register.entity.OutptDoctorRegisterDO" >
+        update
+        outpt_doctor_register
+        <set >
+            <if test="isLock != null and isLock != ''">
+                is_lock = #{isLock,jdbcType=VARCHAR},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                profile_id = #{profileId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code = #{hospCode,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 新增表信息 -->
+    <insert id="insertDoctouRegisterIsAdd" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto" >
+        insert into
+            outpt_doctor_register
+        (
+            id,
+            hosp_code,
+            dq_id,
+            register_time,
+            start_time,
+            end_time,
+            register_num,
+            profile_id,
+            is_use,
+            is_lock,
+            is_add,
+            crte_id,
+            crte_name,
+            crte_time
+        ) values (
+                     #{id,jdbcType=VARCHAR},
+                     #{hospCode,jdbcType=VARCHAR},
+                     #{dqId,jdbcType=VARCHAR},
+                     #{registerTime,jdbcType=VARCHAR},
+                     #{startTime,jdbcType=VARCHAR},
+                     #{endTime,jdbcType=VARCHAR},
+                     #{registerNum,jdbcType=INTEGER},
+                     #{profileId,jdbcType=TIMESTAMP},
+                     #{isUse,jdbcType=VARCHAR},
+                     #{isLock,jdbcType=VARCHAR},
+                     #{isAdd,jdbcType=VARCHAR},
+                     #{crteId,jdbcType=VARCHAR},
+                     #{crteName,jdbcType=VARCHAR},
+                     #{crteTime,jdbcType=TIMESTAMP}
+                 )
+    </insert>
+
+
+    <!-- 根据挂号类别ID查询队列医生 -->
+    <select id="queryOutptDoctorPage" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto" parameterType="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO" >
+        select
+        odq.id,
+        odq.doctor_id as doctorId,
+        CONCAT(odq.doctor_name,'（',css.name,'）') as doctorName,
+        sum(odq.register_num) as registerNum,
+        odq.cq_id as cqId,
+        sum((select count(*) from outpt_doctor_register where dq_id = odq.id and (is_use = 0 and is_lock = 0))) as isUserRegister
+        from
+        outpt_doctor_queue odq
+        left join outpt_classes_queue ocq on odq.cq_id = ocq.id
+        left join outpt_classes css on  css.id = ocq.cs_id
+        where
+        odq.hosp_code = #{hospCode}
+        and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+        <if test="id != null and id != ''">
+            and ocq.cy_id = #{id}
+        </if>
+        group by odq.id,odq.doctor_id,odq.doctor_name,odq.cq_id   order by odq.id,odq.doctor_id
+    </select>
+
+
+    <select id="queryDeptAll" resultMap="BaseDeptMap" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select
+        id, hosp_code, type_code, nation_code, code, name, ward_code, phone, up_dept_code, mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from base_dept where hosp_code=#{hospCode}
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and type_code = #{typeCode}
+        </if>
+        <if test="nationCode != null and nationCode != ''">
+            and nation_code = #{nationCode}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="wardCode != null and wardCode != ''">
+            and ward_code = #{wardCode}
+        </if>
+        <if test="phone != null and phone != ''">
+            and phone = #{phone}
+        </if>
+        <if test="upDeptCode != null and upDeptCode != ''">
+            and up_dept_code = #{upDeptCode}
+        </if>
+        <if test="mgDeptCode != null and mgDeptCode != ''">
+            and mg_dept_code = #{mgDeptCode}
+        </if>
+        <if test="intro != null and intro != ''">
+            and intro = #{intro}
+        </if>
+        <if test="place != null and place != ''">
+            and place = #{place}
+        </if>
+        <if test="remark != null and remark != ''">
+            and remark = #{remark}
+        </if>
+        <if test="pym != null and pym != ''">
+            and pym = #{pym}
+        </if>
+        <if test="wbm != null and wbm != ''">
+            and wbm = #{wbm}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+        <if test="crteId != null">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+        order by  crte_time desc
+    </select>
+
+    <!-- 插入费用明细(直接就诊) -->
+    <insert id="insertRegisterDetail" parameterType="list">
+        INSERT INTO outpt_register_detail (
+        id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price,
+        unit_code, status_code, origin_id, crte_id, crte_name, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.registerId},
+            #{item.visitId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.bfcId},
+            #{item.price},
+            #{item.num},
+            #{item.useCode},
+            #{item.spec},
+            #{item.preferentialId},
+            #{item.totalPrice},
+            #{item.preferentialPrice},
+            #{item.realityPrice},
+            #{item.unitCode},
+            #{item.statusCode},
+            #{item.originId},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryAll" resultMap="outptRegisterMap" parameterType="java.util.Map">
+        select
+        *
+        from outpt_register where
+        hosp_code=#{hospCode}
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+        <if test="nowDate != null">
+            and DATE_FORMAT(register_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+        </if>
+        <if test="cqId != null and cqId != ''">
+            and cq_id = #{cqId}
+        </if>
+    </select>
+</mapper>

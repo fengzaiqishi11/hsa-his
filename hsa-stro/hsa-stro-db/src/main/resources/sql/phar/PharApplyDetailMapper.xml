@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharapply.dao.PharApplyDetailDAO">
+    <!--领药申请明细-->
+    <resultMap type="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO" id="PharApplyDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="applyId" column="apply_id" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="DECIMAL"/>
+        <result property="splitNum" column="split_num" jdbcType="DECIMAL"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="DECIMAL"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="buyPrice" column="buy_price" jdbcType="DECIMAL"/>
+        <result property="sellPrice" column="sell_price" jdbcType="DECIMAL"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="DECIMAL"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="DECIMAL"/>
+        <result property="totalBuyPrice" column="totalBuyPrice" jdbcType="DECIMAL"/>
+        <result property="totalSellPrice" column="totalSellPrice" jdbcType="DECIMAL"/>
+        <result property="stockNum" column="stockNum" jdbcType="DECIMAL"/>
+        <result property="productId" column="product_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--显示领药申请的详细详细信息-->
+    <select id="pharApplyDetail" resultMap="PharApplyDetailMap">
+        select id, hosp_code, item_code, item_id, item_name, apply_id, num,
+        unit_code, spec, dosage, dosage_unit_code, split_ratio, split_unit_code,
+        split_num, split_price, chinese_drug_num, usage_code, buy_price, sell_price,
+        buy_price_all, sell_price_all, product_id
+        from phar_apply_detail
+        where hosp_code = #{hospCode}
+        <if test="applyId !=null and applyId !='' ">
+            and apply_id=#{applyId}
+        </if>
+    </select>
+
+    <!--批量新增领药申请明细-->
+    <insert id="insert" parameterType="java.util.List">
+        insert into phar_apply_detail
+        (id, hosp_code, item_code, item_id, item_name, apply_id, num,
+        unit_code, spec, dosage, dosage_unit_code, split_ratio, split_unit_code,
+        split_num, split_price, chinese_drug_num, usage_code, buy_price, sell_price,
+        buy_price_all, sell_price_all, product_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.itemCode}, #{item.itemId},
+            #{item.itemName},#{item.applyId},#{item.num},
+            #{item.unitCode},
+            #{item.spec},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.splitRatio},
+            #{item.splitUnitCode},
+            #{item.splitNum},
+            #{item.splitPrice},
+            #{item.chineseDrugNum},
+            #{item.usageCode},
+            #{item.buyPrice},
+            #{item.sellPrice},
+            #{item.buyPriceAll},
+            #{item.sellPriceAll},
+            #{item.productId}
+            )
+        </foreach>
+    </insert>
+
+    <!--删除药品申请明细数据-->
+    <delete id="deletePadById">
+        delete from phar_apply_detail where id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+        and hosp_code=#{hospCode}
+    </delete>
+
+    <!--根据领药申请的主键id 查找领药申请的明细的数据-->
+    <select id="getById" resultMap="PharApplyDetailMap">
+        select a.id,
+               a.hosp_code,
+               a.item_code,
+               a.item_id,
+               a.item_name,
+               a.apply_id,
+               a.num,
+               a.unit_code,
+               a.spec,
+               a.dosage,
+               a.dosage_unit_code,
+               a.split_ratio,
+               a.split_unit_code,
+               a.split_num,
+               a.split_price,
+               a.chinese_drug_num,
+               a.usage_code,
+               a.buy_price,
+               a.sell_price,
+               a.buy_price_all,
+               a.sell_price_all,
+               a.product_id,
+               case when a.item_code='2' then bm.model end model
+        from phar_apply_detail a
+        left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+        where a.apply_id = #{id}
+          and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--批量修改领药申请明细数据-->
+    <update id="update" parameterType="java.util.List">
+        <foreach collection="list" index="index" item="item" open="" close="" separator=";">
+            update phar_apply_detail
+            <set>
+                <if test="item.itemCode !=null and item.itemCode != ''">
+                    item_code =#{item.itemCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.itemId !=null and item.itemId != ''">
+                    item_id =#{item.itemId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.itemName !=null and item.itemName != ''">
+                    item_name =#{item.itemName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.num !=null ">
+                    num=#{item.num ,jdbcType=DECIMAL},
+                </if>
+                <if test="item.unitCode !=null and item.unitCode != ''">
+                    unit_code=#{item.unitCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.spec !=null and item.spec != ''">
+                    spec=#{item.spec,jdbcType=VARCHAR},
+                </if>
+                <if test="item.dosage !=null and item.dosage != ''">
+                    dosage=#{item.dosage,jdbcType=DECIMAL},
+                </if>
+                <if test="item.dosageUnitCode !=null and item.dosageUnitCode != ''">
+                    dosage_unit_code=#{item.dosageUnitCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.splitRatio !=null and item.splitRatio != ''">
+                    split_ratio=#{item.splitRatio,jdbcType=DECIMAL},
+                </if>
+                <if test="item.splitUnitCode !=null and item.splitUnitCode != ''">
+                    split_unit_code=#{item.splitUnitCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.splitNum !=null and item.splitNum != ''">
+                    split_num=#{item.splitNum ,jdbcType=DECIMAL},
+                </if>
+                <if test="item.splitPrice !=null and item.splitPrice != ''">
+                    split_price=#{item.splitPrice ,jdbcType=DECIMAL},
+                </if>
+                <if test="item.chineseDrugNum !=null and item.chineseDrugNum != ''">
+                    chinese_drug_num=#{item.chineseDrugNum ,jdbcType=DECIMAL},
+                </if>
+                <if test="item.usageCode !=null and item.usageCode != ''">
+                    usage_code=#{item.usageCode ,jdbcType=VARCHAR},
+                </if>
+                <if test="item.buyPriceAll !=null ">
+                    buy_price_all=#{item.buyPriceAll,jdbcType=DECIMAL},
+                </if>
+                <if test="item.sellPriceAll !=null ">
+                    sell_price_all=#{item.sellPriceAll,jdbcType=DECIMAL},
+                </if>
+                <if test="item.buyPrice!=null ">
+                    buy_price=#{item.buyPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.sellPrice !=null ">
+                    sell_price=#{item.sellPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.productId !=null and item.productId!= ''">
+                    product_id=#{item.productId,jdbcType=VARCHAR},
+                </if>
+
+            </set>
+            where apply_id=#{item.applyId} and hosp_code=#{hospCode}
+        </foreach>
+    </update>
+    <select id="queryDetailById" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDTO" resultMap="PharApplyDetailMap">
+        select id, hosp_code, item_code, item_id, item_name, apply_id, num,
+        unit_code, spec, dosage, dosage_unit_code, split_ratio, split_unit_code,
+        split_num, split_price, chinese_drug_num, usage_code, buy_price, sell_price,
+        buy_price_all, sell_price_all, product_id
+        from phar_apply_detail
+        where apply_id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and hosp_code=#{hospCode}
+    </select>
+
+    <insert id="insertStroOutDetail" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+        insert into stro_out_detail
+        (id, hosp_code, out_id,item_code, item_id, item_name,spec,num,
+        unit_code, dosage, dosage_unit_code, buy_price, sell_price,
+        buy_price_all, sell_price_all, split_ratio,split_num,split_price, split_unit_code,
+        batch_no,expiry_date)
+        values
+        <foreach collection="applyDetailDTOList" item="item" index="index" separator=",">
+            (#{item.id},
+            #{item.hospCode},#{item.outId},#{item.itemCode}, #{item.itemId},
+            #{item.itemName},#{item.spec},#{item.num},
+            #{item.unitCode},#{item.dosage},#{item.dosageUnitCode},
+            #{item.buyPrice}, #{item.sellPrice}, #{item.buyPriceAll},#{item.sellPriceAll},
+            #{item.splitRatio}, #{item.splitNum},#{item.splitPrice},
+            #{item.splitUnitCode},#{item.batchNo},#{item.expiryDate}
+            )
+        </foreach>
+    </insert>
+    <select id="selectTotalPrice" resultMap="PharApplyDetailMap">
+        select sum(buy_price_all) as totalBuyPrice , sum(sell_price_all) as totalSellPrice from phar_apply_detail where hosp_code = #{hospCode}
+        and apply_id=#{id}
+    </select>
+
+    <!--领药申请明细-->
+    <resultMap type="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO" id="detailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="DECIMAL"/>
+        <result property="splitNum" column="split_num" jdbcType="DECIMAL"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="DECIMAL"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="buyPrice" column="buyPrice" jdbcType="DECIMAL"/>
+        <result property="sellPrice" column="sellPrice" jdbcType="DECIMAL"/>
+        <result property="stockNum" column="stockNum" jdbcType="DECIMAL"/>
+        <result property="productId" column="productId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryAllMaterial" resultMap="detailMap" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+        select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+        b.unit_code,b.split_unit_code,b.split_ratio,
+        (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+        b.split_price,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,b.model
+        from stro_stock ss
+        LEFT JOIN base_material b on ss.item_id = b.id
+        <where>
+            and ss.num > 0 and ss.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and ss.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and ss.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and ss.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and ss.item_id = #{itemId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ss.item_name like concat('%',#{keyword},'%')
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and ss.unit_code = #{unitCode}
+            </if>
+        </where>
+    </select>
+    <select id="queryAllDrug" resultMap="detailMap" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+        select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+               b.unit_code,b.dosage,b.dosage_unit_code,b.split_ratio,b.split_unit_code,
+              (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+               b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice
+        from stro_stock ss
+        LEFT JOIN base_drug b on ss.item_id = b.id
+        <where>
+            and ss.num > 0 and ss.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and ss.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and ss.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and ss.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and ss.item_id = #{itemId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ss.item_name like concat('%',#{keyword},'%')
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and ss.unit_code = #{unitCode}
+            </if>
+            <if test="types != null and types.size()>0">
+              and b.big_type_code in
+              <foreach collection="types" item="type" open="(" separator="," close=")">
+                #{type}
+              </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="queryAll" resultMap="detailMap" parameterType = "cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+      select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+      b.unit_code,"" as dosage,"" as dosageUnitCode,b.split_unit_code,b.split_ratio,
+      (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+      b.split_price,"" as usageCode,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,b.model
+      from stro_stock ss
+      LEFT JOIN base_material b on ss.item_id = b.id
+      <where>
+        and ss.num > 0 and ss.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and ss.id = #{id}
+        </if>
+        <if test="bizId != null and bizId != ''">
+          and ss.biz_id = #{bizId}
+        </if>
+        <if test="itemCode != null and itemCode != ''">
+          and ss.item_code = #{itemCode}
+        </if>
+        <if test="itemId != null and itemId != ''">
+          and ss.item_id = #{itemId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+          and ss.item_name like concat('%',#{keyword},'%')
+        </if>
+        <if test="unitCode != null and unitCode != ''">
+          and ss.unit_code = #{unitCode}
+        </if>
+      </where>
+      union all
+      select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+      b.unit_code,b.dosage,b.dosage_unit_code as dosageUnitCode,b.split_unit_code,b.split_ratio,
+      (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+      b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,"" as model
+      from stro_stock ss
+      LEFT JOIN base_drug b on ss.item_id = b.id
+      <where>
+        and ss.num > 0 and ss.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and ss.id = #{id}
+        </if>
+        <if test="bizId != null and bizId != ''">
+          and ss.biz_id = #{bizId}
+        </if>
+        <if test="itemCode != null and itemCode != ''">
+          and ss.item_code = #{itemCode}
+        </if>
+        <if test="itemId != null and itemId != ''">
+          and ss.item_id = #{itemId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+          and ss.item_name like concat('%',#{keyword},'%')
+        </if>
+        <if test="unitCode != null and unitCode != ''">
+          and ss.unit_code = #{unitCode}
+        </if>
+        <if test="types != null and types.size()>0">
+          and b.big_type_code in
+          <foreach collection="types" item="type" open="(" separator="," close=")">
+            #{type}
+          </foreach>
+        </if>
+      </where>
+    </select>
+    <delete id="deleteApplyDetail" parameterType="string">
+        delete from phar_apply_detail where apply_id=#{id} and hosp_code=#{hospCode}
+    </delete>
+
+    <!--查询待出库领药申请-->
+    <select id="queryStroOutPharApply" resultType="cn.hsa.module.phar.pharapply.dto.PharApplyDTO">
+       select a.id, a.hosp_code, a.order_no, a.out_stro_id, a.in_stro_id, a.buy_price_all, a.sell_price_all,
+        a.remark, a.audit_status, a.audit_id,a.audit_name, a.audit_time, a.crte_id, a.crte_name, a.crte_time,
+        (select b.name from base_dept b where b.id = in_stro_id and b.hosp_code = a.hosp_code) as applyDeptName
+        from phar_apply a where a.audit_status = '1' and a.hosp_code = #{hospCode} and a.out_stro_id = #{outStroId}
+        <if test="isOut != null and isOut != ''">
+            and a.is_out = #{isOut}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.order_no like CONCAT('%',#{keyword},'%') or
+                 a.in_stro_id in (select id from base_dept where name like CONCAT('%',#{keyword},'%')))
+        </if>
+        <if test="startDate != null">
+            and date(a.audit_time) &gt;= date(#{startDate})
+        </if>
+        <if test="endDate != null">
+            and date(a.audit_time) &lt;= date(#{startDate})
+      </if>
+    </select>
+
+    <select id="getDeptById" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select * from base_dept where hosp_code = #{hospCode} and id = #{id}
+    </select>
+</mapper>

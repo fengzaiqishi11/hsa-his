@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.doctor.dao.InptAdviceDetailDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO" id="InptAdviceDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="iaId" column="ia_id" jdbcType="VARCHAR"/>
+        <result property="baId" column="ba_id" jdbcType="VARCHAR"/>
+        <result property="iaGroupNo" column="ia_group_no" jdbcType="INTEGER"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="sourceCode" column="source_code" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getInptAdviceDetailById" resultMap="InptAdviceDetailMap">
+        select
+          id, hosp_code, visit_id, ia_id, ba_id, ia_group_no, item_code, item_id, item_name, num, unit_code, price, total_price, use_code, source_code,bfc_id
+        from inpt_advice_detail
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryInptAdviceDetailPage" resultMap="InptAdviceDetailMap">
+        select
+          id, hosp_code, visit_id, ia_id, ba_id, ia_group_no, item_code, item_id, item_name, num, unit_code, price, total_price, use_code, source_code
+        from inpt_advice_detail
+         where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertInptAdviceDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_advice_detail(hosp_code, visit_id, ia_id, ba_id, ia_group_no, item_code, item_id, item_name, num, unit_code, price, total_price, use_code, source_code)
+        values (#{hospCode}, #{visitId}, #{iaId}, #{baId}, #{iaGroupNo}, #{itemCode}, #{itemId}, #{itemName}, #{num}, #{unitCode}, #{price}, #{totalPrice}, #{useCode}, #{sourceCode})
+    </insert>
+
+    <!--单个更新-->
+    <update id="updateInptAdviceDetail">
+        update inpt_advice_detail
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="iaId != null and iaId != ''">
+                ia_id = #{iaId},
+            </if>
+            <if test="baId != null and baId != ''">
+                ba_id = #{baId},
+            </if>
+            <if test="iaGroupNo != null">
+                ia_group_no = #{iaGroupNo},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="sourceCode != null and sourceCode != ''">
+                source_code = #{sourceCode},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <select id="getAdviceDetails" resultMap="InptAdviceDetailMap">
+        select a.* from inpt_advice_detail a
+        where a.hosp_code=#{hospCode}
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and a.ia_id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <!--批量新增-->
+    <insert id="insertInptAdviceDetails" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_advice_detail(id,hosp_code, visit_id, ia_id, ba_id, ia_group_no, bfc_id, item_code, item_id, item_name, num, unit_code,
+        price, total_price, use_code, source_code)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.iaId}, #{item.baId}, #{item.iaGroupNo}, #{item.bfcId}, #{item.itemCode}, #{item.itemId},
+             #{item.itemName}, #{item.num}, #{item.unitCode}, #{item.price}, #{item.totalPrice}, #{item.useCode}, #{item.sourceCode})
+        </foreach>
+    </insert>
+
+    <!--获取需要滚动长期费用的医嘱明细集合(长期医嘱、已核收、未停止、在院病人、拒收标志正常)-->
+    <select id="queryAdviceDetailsToLongCost" resultMap="InptAdviceDetailMap">
+        select a.*
+        from
+        inpt_advice_detail a join inpt_advice b and a.iat_id=b.id
+        join inpt_visit c on a.visit_id=c.id
+        where b.is_long='0' and b.is_stop='0' and b.is_check='1' and b.is_reject!='1'
+        and c.status_code='2'
+    </select>
+
+    <!--根据医嘱ID获取医嘱明细记录-->
+    <select id="getAdviceDetailByAdviceId" resultMap="InptAdviceDetailMap">
+        select * from inpt_advice_detail where hosp_code=#{hospCode} and ia_id=#{adviceId}
+    </select>
+</mapper>

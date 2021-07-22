@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO">
+
+
+    <resultMap type="cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO" id="OperInfoRecordMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="bloodCode" column="blood_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="operDeptId" column="oper_dept_id" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="operDiseaseId" column="oper_disease_id" jdbcType="VARCHAR"/>
+        <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
+        <result property="operDiseaseName" column="oper_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="assistantId1" column="assistant_id1" jdbcType="VARCHAR"/>
+        <result property="assistantName1" column="assistant_name1" jdbcType="VARCHAR"/>
+        <result property="assistantId2" column="assistant_id2" jdbcType="VARCHAR"/>
+        <result property="assistantName2" column="assistant_name2" jdbcType="VARCHAR"/>
+        <result property="assistantId3" column="assistant_id3" jdbcType="VARCHAR"/>
+        <result property="assistantName3" column="assistant_name3" jdbcType="VARCHAR"/>
+        <result property="specialRequest" column="special_request" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditRemark" column="audit_remark" jdbcType="VARCHAR"/>
+        <result property="operPlanTime" column="oper_plan_time" jdbcType="TIMESTAMP"/>
+        <result property="operRoomId" column="oper_room_Id" jdbcType="VARCHAR"/>
+        <result property="operRoomName" column="oper_room_name" jdbcType="VARCHAR"/>
+        <result property="xhNurseId" column="xh_nurse_id" jdbcType="VARCHAR"/>
+        <result property="xhNurseName" column="xh_nurse_name" jdbcType="VARCHAR"/>
+        <result property="qxNurseId" column="qx_nurse_id" jdbcType="VARCHAR"/>
+        <result property="qxNurseName" column="qx_nurse_name" jdbcType="VARCHAR"/>
+        <result property="anaCode" column="ana_code" jdbcType="VARCHAR"/>
+        <result property="anaId1" column="ana_id1" jdbcType="VARCHAR"/>
+        <result property="anaName1" column="ana_name1" jdbcType="VARCHAR"/>
+        <result property="anaId2" column="ana_id2" jdbcType="VARCHAR"/>
+        <result property="anaName2" column="ana_name2" jdbcType="VARCHAR"/>
+        <result property="anaId3" column="ana_id3" jdbcType="VARCHAR"/>
+        <result property="anaName3" column="ana_name3" jdbcType="VARCHAR"/>
+        <result property="operEndTime" column="oper_end_time" jdbcType="TIMESTAMP"/>
+        <result property="notchedCode" column="notched_code" jdbcType="VARCHAR"/>
+        <result property="healCode" column="heal_code" jdbcType="VARCHAR"/>
+        <result property="operTimeHour" column="oper_time_hour" jdbcType="OTHER"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="OTHER"/>
+        <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="costName" column="cost_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="rank" column="rank" jdbcType="VARCHAR"/>
+        <result property="wardId" column="ward_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--新增所有列-->
+    <insert id="insertSurgery" keyProperty="id" useGeneratedKeys="true" >
+        insert into oper_info_record(id,hosp_code, visit_id, baby_id, in_no, advice_id, name, gender_code, age, age_unit_code, blood_code, dept_id, oper_dept_id, bed_id, bed_name, oper_disease_id, oper_disease_icd9, oper_disease_name, in_disease_id, in_disease_name, in_disease_icd10, doctor_id, doctor_name, assistant_id1, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, special_request, content, audit_id, audit_name, audit_time, audit_remark, oper_plan_time, oper_room_Id, oper_room_name, xh_nurse_id, xh_nurse_name, qx_nurse_id, qx_nurse_name, ana_code, ana_id1, ana_name1, ana_id2, ana_name2, ana_id3, ana_name3, oper_end_time, notched_code, heal_code, oper_time_hour, status_code, is_cost, total_price, cost_time, cost_id, cost_name, remark, crte_id, crte_name, crte_time,rank,ward_id)
+        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{inNo}, #{adviceId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{bloodCode}, #{deptId}, #{operDeptId}, #{bedId}, #{bedName}, #{operDiseaseId}, #{operDiseaseIcd9}, #{operDiseaseName}, #{inDiseaseId}, #{inDiseaseName}, #{inDiseaseIcd10}, #{doctorId}, #{doctorName}, #{assistantId1}, #{assistantName1}, #{assistantId2}, #{assistantName2}, #{assistantId3}, #{assistantName3}, #{specialRequest}, #{content}, #{auditId}, #{auditName}, #{auditTime}, #{auditRemark}, #{operPlanTime}, #{operRoomId}, #{operRoomName}, #{xhNurseId}, #{xhNurseName}, #{qxNurseId}, #{qxNurseName}, #{anaCode}, #{anaId1}, #{anaName1}, #{anaId2}, #{anaName2}, #{anaId3}, #{anaName3}, #{operEndTime}, #{notchedCode}, #{healCode}, #{operTimeHour}, #{statusCode}, #{isCost}, #{totalPrice}, #{costTime}, #{costId}, #{costName}, #{remark}, #{crteId}, #{crteName}, #{crteTime},#{rank},#{wardId})
+    </insert>
+
+    <update id="updateSurgeryStatus">
+     update  oper_info_record
+     <set>
+         <if test="operApplyStatusChange != null and operApplyStatusChange != ''">
+             audit_time = #{auditTime},
+         </if>
+         <if test="operApplyStatusChange != null and operApplyStatusChange != ''">
+             audit_name = #{auditName},
+         </if>
+         <if test="operApplyStatusChange != null and operApplyStatusChange != ''">
+             audit_id = #{auditId},
+         </if>
+         <if test="statusCode != null and statusCode != ''">
+             status_code = #{statusCode}
+         </if>
+     </set>
+     where id = #{id}
+     and
+     hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateSurgeryInfo">
+        update  oper_info_record
+        <set>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="inNo != null and inNo != ''">
+                in_no = #{inNo},
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                advice_id = #{adviceId},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                age_unit_code = #{ageUnitCode},
+            </if>
+                blood_code = #{bloodCode},
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="operDeptId != null and operDeptId != ''">
+                oper_dept_id = #{operDeptId},
+            </if>
+            <if test="bedId != null and bedId != ''">
+                bed_id = #{bedId},
+            </if>
+            <if test="bedName != null and bedName != ''">
+                bed_name = #{bedName},
+            </if>
+            <if test="operDiseaseId != null and operDiseaseId != ''">
+                oper_disease_id = #{operDiseaseId},
+            </if>
+            <if test="operDiseaseIcd9 != null and operDiseaseIcd9 != ''">
+                oper_disease_icd9 = #{operDiseaseIcd9},
+            </if>
+            <if test="operDiseaseName != null and operDiseaseName != ''">
+                oper_disease_name = #{operDiseaseName},
+            </if>
+            <if test="inDiseaseId != null and inDiseaseId != ''">
+                in_disease_id = #{inDiseaseId},
+            </if>
+            <if test="inDiseaseName != null and inDiseaseName != ''">
+                in_disease_name = #{inDiseaseName},
+            </if>
+            <if test="inDiseaseIcd10 != null and inDiseaseIcd10 != ''">
+                in_disease_icd10 = #{inDiseaseIcd10},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName},
+            </if>
+                assistant_id1 = #{assistantId1},
+                assistant_name1 = #{assistantName1},
+                assistant_id2 = #{assistantId2},
+                assistant_name2 = #{assistantName2},
+                assistant_id3 = #{assistantId3},
+                assistant_name3 = #{assistantName3},
+                special_request = #{specialRequest},
+                content = #{content},
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+                audit_remark = #{auditRemark},
+            <if test="operPlanTime != null">
+                oper_plan_time = #{operPlanTime},
+            </if>
+            <if test="operRoomId != null and operRoomId != ''">
+                oper_room_Id = #{operRoomId},
+            </if>
+            <if test="operRoomName != null and operRoomName != ''">
+                oper_room_name = #{operRoomName},
+            </if>
+                xh_nurse_id = #{xhNurseId},
+                xh_nurse_name = #{xhNurseName},
+                qx_nurse_id = #{qxNurseId},
+                qx_nurse_name = #{qxNurseName},
+                ana_code = #{anaCode},
+                ana_id1 = #{anaId1},
+                ana_name1 = #{anaName1},
+                ana_id2 = #{anaId2},
+                ana_name2 = #{anaName2},
+                ana_id3 = #{anaId3},
+                ana_name3 = #{anaName3},
+            <if test="operEndTime != null">
+                oper_end_time = #{operEndTime},
+            </if>
+                notched_code = #{notchedCode},
+                heal_code = #{healCode},
+            <if test="operTimeHour != null">
+                oper_time_hour = #{operTimeHour},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="isCost != null and isCost != ''">
+                is_cost = #{isCost},
+            </if>
+                total_price = #{totalPrice},
+            <if test="costTime != null">
+                cost_time = #{costTime},
+            </if>
+                cost_id = #{costId},
+                cost_name = #{costName},
+                remark = #{remark},
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+                rank = #{rank},
+        </set>
+        where id = #{id}
+        and
+        hosp_code = #{hospCode}
+    </update>
+    <update id="updateSurgeryByAdviceId" parameterType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        update  oper_info_record
+        set
+            gender_code=#{genderCode},
+            `name`=#{name},
+            in_no=#{inNo},
+            age=#{age},
+            age_unit_code =#{ageUnitCode},
+            bed_id=#{bedId},
+            bed_name=#{bedName},
+            in_disease_id=#{inDiseaseId},
+            in_disease_name=#{inDiseaseName},
+            ward_id=#{wardId},
+            in_disease_icd10=#{inDiseaseIcd10},
+            oper_disease_id=#{operDiseaseId},
+            oper_disease_name=#{operDiseaseName},
+            dept_id=#{deptId},
+            status_code= #{statusCode},
+            cost_id=#{costId},
+            cost_name=#{costName},
+            crte_id=#{crteId},
+            crte_name=#{crteName}
+        where advice_id = #{adviceId} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateSurgeryCompleteToCancel">
+        update  oper_info_record
+            set oper_end_time = null,
+                 oper_time_hour = null,
+                status_code = #{statusCode}
+        where id = #{id}
+        and
+              hosp_code = #{hospCode}
+    </update>
+
+    <select id="queryOperInfoRecordList"
+            resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+        a.id, a.hosp_code, a.visit_id, a.baby_id, a.in_no, a.advice_id, a.name, a.gender_code, a.age, a.age_unit_code, a.blood_code, a.dept_id, a.oper_dept_id, a.bed_id, a.bed_name,
+        a.oper_disease_id, a.oper_disease_icd9, a.oper_disease_name, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.doctor_id, a.doctor_name,
+        a.assistant_id1, a.assistant_name1, a.assistant_id2, a.assistant_name2, a.assistant_id3, a.assistant_name3, a.special_request, a.content,
+        a.audit_id, a.audit_name, a.audit_time, a.audit_remark,  a.oper_plan_time,
+        a.oper_room_Id, a.oper_room_name, a.xh_nurse_id, a.xh_nurse_name,
+        a.qx_nurse_id, a.qx_nurse_name, a.ana_code, a.ana_id1, a.ana_name1, a.ana_id2, a.ana_name2, a.ana_id3, a.ana_name3, a.oper_end_time,
+        a.notched_code, a.heal_code, a.oper_time_hour, a.status_code, a.is_cost, a.total_price,  a.cost_time, a.cost_id, a.cost_name,
+        a.remark, a.crte_id, a.crte_name,a.crte_time,a.rank,a.ward_id,b.Illness_code
+        from  oper_info_record a
+        left join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        <where>
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and a.hosp_code = #{hospCode}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (a.name like CONCAT('%',#{keyword},'%') or a.bed_name like CONCAT('%',#{keyword},'%') or a.in_no  like CONCAT('%',#{keyword},'%') )
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and a.visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != ''">
+                and a.baby_id = #{babyId}
+            </if>
+            <if test="inNo != null and inNo != ''">
+                and a.in_no = #{inNo}
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                and a.advice_id = #{adviceId}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name = #{name}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and a.gender_code = #{genderCode}
+            </if>
+            <if test="age != null">
+                and a.age = #{age}
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                and a.age_unit_code = #{ageUnitCode}
+            </if>
+            <if test="bloodCode != null and bloodCode != ''">
+                and a.blood_code = #{bloodCode}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and a.dept_id = #{deptId}
+            </if>
+            <if test="operDeptId != null and operDeptId != ''">
+                and a.oper_dept_id = #{operDeptId}
+            </if>
+            <if test="bedId != null and bedId != ''">
+                and a.bed_id = #{bedId}
+            </if>
+            <if test="bedName != null and bedName != ''">
+                and a.bed_name = #{bedName}
+            </if>
+            <if test="operDiseaseId != null and operDiseaseId != ''">
+                and a.oper_disease_id = #{operDiseaseId}
+            </if>
+            <if test="operDiseaseIcd9 != null and operDiseaseIcd9 != ''">
+                and a.oper_disease_icd9 = #{operDiseaseIcd9}
+            </if>
+            <if test="operDiseaseName != null and operDiseaseName != ''">
+                and a.oper_disease_name = #{operDiseaseName}
+            </if>
+            <if test="inDiseaseId != null and inDiseaseId != ''">
+                and a.in_disease_id = #{inDiseaseId}
+            </if>
+            <if test="inDiseaseName != null and inDiseaseName != ''">
+                and a.in_disease_name = #{inDiseaseName}
+            </if>
+            <if test="inDiseaseIcd10 != null and inDiseaseIcd10 != ''">
+                and a.in_disease_icd10 = #{inDiseaseIcd10}
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                and a.doctor_id = #{doctorId}
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                and a.doctor_name = #{doctorName}
+            </if>
+            <if test="assistantId1 != null and assistantId1 != ''">
+                and a.assistant_id1 = #{assistantId1}
+            </if>
+            <if test="assistantName1 != null and assistantName1 != ''">
+                and a.assistant_name1 = #{assistantName1}
+            </if>
+            <if test="assistantId2 != null and assistantId2 != ''">
+                and a.assistant_id2 = #{assistantId2}
+            </if>
+            <if test="assistantName2 != null and assistantName2 != ''">
+                and a.assistant_name2 = #{assistantName2}
+            </if>
+            <if test="assistantId3 != null and assistantId3 != ''">
+                and a.assistant_id3 = #{assistantId3}
+            </if>
+            <if test="assistantName3 != null and assistantName3 != ''">
+                and a.assistant_name3 = #{assistantName3}
+            </if>
+            <if test="specialRequest != null and specialRequest != ''">
+                and a.special_request = #{specialRequest}
+            </if>
+            <if test="content != null and content != ''">
+                and a.content = #{content}
+            </if>
+            <if test="auditId != null and auditId != ''">
+                and a.audit_id = #{auditId}
+            </if>
+            <if test="auditName != null and auditName != ''">
+                and a.audit_name = #{auditName}
+            </if>
+            <if test="auditTime != null">
+                and a.audit_time = #{auditTime}
+            </if>
+            <if test="auditRemark != null and auditRemark != ''">
+                and a.audit_remark = #{auditRemark}
+            </if>
+            <if test="operPlanTime != null">
+                and a.oper_plan_time = #{operPlanTime}
+            </if>
+            <if test="operRoomId != null and operRoomId != ''">
+                and a.oper_room_Id = #{operRoomId}
+            </if>
+            <if test="operRoomName != null and operRoomName != ''">
+                and a.oper_room_name = #{operRoomName}
+            </if>
+            <if test="xhNurseId != null and xhNurseId != ''">
+                and a.xh_nurse_id = #{xhNurseId}
+            </if>
+            <if test="xhNurseName != null and xhNurseName != ''">
+                and a.xh_nurse_name = #{xhNurseName}
+            </if>
+            <if test="qxNurseId != null and qxNurseId != ''">
+                and a.qx_nurse_id = #{qxNurseId}
+            </if>
+            <if test="qxNurseName != null and qxNurseName != ''">
+                and a.qx_nurse_name = #{qxNurseName}
+            </if>
+            <if test="anaCode != null and anaCode != ''">
+                and a.ana_code = #{anaCode}
+            </if>
+            <if test="anaId1 != null and anaId1 != ''">
+                and a.ana_id1 = #{anaId1}
+            </if>
+            <if test="anaName1 != null and anaName1 != ''">
+                and a.ana_name1 = #{anaName1}
+            </if>
+            <if test="anaId2 != null and anaId2 != ''">
+                and a.ana_id2 = #{anaId2}
+            </if>
+            <if test="anaName2 != null and anaName2 != ''">
+                and a.ana_name2 = #{anaName2}
+            </if>
+            <if test="anaId3 != null and anaId3 != ''">
+                and a.ana_id3 = #{anaId3}
+            </if>
+            <if test="anaName3 != null and anaName3 != ''">
+                and a.ana_name3 = #{anaName3}
+            </if>
+            <if test="operEndTime != null">
+                and a.oper_end_time = #{operEndTime}
+            </if>
+            <if test="notchedCode != null and notchedCode != ''">
+                and a.notched_code = #{notchedCode}
+            </if>
+            <if test="healCode != null and healCode != ''">
+                and a.heal_code = #{healCode}
+            </if>
+            <if test="operTimeHour != null">
+                and a.oper_time_hour = #{operTimeHour}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and a.status_code = #{statusCode}
+            </if>
+            <if test="isCost != null and isCost != ''">
+                and a.is_cost = #{isCost}
+            </if>
+            <if test="totalPrice != null">
+                and a.total_price = #{totalPrice}
+            </if>
+            <if test="costTime != null">
+                and a.cost_time = #{costTime}
+            </if>
+            <if test="costId != null and costId != ''">
+                and a.cost_id = #{costId}
+            </if>
+            <if test="costName != null and costName != ''">
+                and a.cost_name = #{costName}
+            </if>
+            <if test="remark != null and remark != ''">
+                and a.remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+            <if test="startTime != null">
+                and a.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and a.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+            </if>
+        </where>
+        order by a.crte_time desc
+    </select>
+
+    <select id="queryOperInfoRecordIsRepeated" resultType="java.lang.Integer">
+        select count(*) from oper_info_record
+        where hosp_code = #{hospCode}
+        and
+        visit_id = #{visitId}
+        and
+        oper_disease_name = #{operDiseaseName}
+        and
+        crte_time = #{crteTime}
+    </select>
+
+    <select id="getOperInfoById" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        ( SELECT
+	oper.*,
+	CONCAT(
+        oper.name,'/',
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value = oper.gender_code),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value = oper.age_unit_code),'')
+        ) AS keyword,
+        '住院病人' as inptOrOutpt,
+        '' as outptVisitNo,
+        inpt.Illness_code as IllnessCode,
+        inpt.zz_doctor_id as zzDoctorId,
+        inpt.total_advance,
+        inpt.total_cost,
+        inpt.total_balance
+	FROM
+		inpt_visit inpt,
+		oper_info_record oper
+	WHERE
+		inpt.hosp_code =  #{hospCode}
+		AND oper.hosp_code = inpt.hosp_code
+		AND oper.in_no = inpt.in_no
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+	) UNION
+	(
+	SELECT
+		oper.*,
+		CONCAT(
+        oper.name,'/',
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value = oper.gender_code),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value = oper.age_unit_code),'')
+        ) AS keyword,
+        '门诊病人' as inptOrOutpt,
+        outpt.visit_no as outptVisitNo,
+	    '' as IllnessCode,
+        outpt.doctor_id as zzDoctorId,
+        0 as total_advance,
+        0 as total_cost,
+        0 as total_balance
+	FROM
+		outpt_visit outpt,
+		oper_info_record oper
+	WHERE
+		outpt.hosp_code =  #{hospCode}
+		AND oper.hosp_code = outpt.hosp_code
+		AND oper.visit_id = outpt.id
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+	)
+    </select>
+<select id="getOperAccountingByOperId" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO" parameterType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+    select total_price as totalPrice from oper_info_record where id = #{id} and hosp_code =#{hospCode}
+</select>
+    <select id="queryOperInfoRecordBasic" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        ( SELECT
+        oper.*,
+        ( SELECT CODE FROM base_dept AS b WHERE b.hosp_code = hosp_code AND b.id = inpt.in_dept_id ) AS deptCode,
+        CONCAT(
+        oper.name,'/',
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value = oper.gender_code),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value = oper.age_unit_code),'')
+        ) AS keyword,
+        '住院病人' as inptOrOutpt,
+        '' as outptVisitNo,
+        inpt.Illness_code as IllnessCode,
+        inpt.zz_doctor_id as zzDoctorId,
+        inpt.total_advance,
+        inpt.total_cost,
+        inpt.total_balance
+        FROM
+        inpt_visit inpt,
+        oper_info_record oper
+        WHERE
+        inpt.hosp_code =  #{hospCode}
+        AND oper.hosp_code = inpt.hosp_code
+        AND oper.in_no = inpt.in_no
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (oper.name like concat('%',#{keyword},'%') or oper.in_no like concat('%',#{keyword},'%') or oper.bed_name like concat('%',#{keyword},'%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and oper.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and oper.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and oper.dept_id = #{deptId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and oper.status_code = #{statusCode}
+        </if>
+        <if test="statusCode == null or statusCode == '' ">
+            and (oper.status_code is null or oper.status_code = 1)
+        </if>
+        ORDER BY
+        inpt.in_time DESC
+        ) UNION
+        (
+        SELECT
+        oper.id,oper.hosp_code,oper.visit_id,oper.baby_id,outpt.visit_no as in_no,oper.advice_id,
+        oper.name,oper.gender_code,oper.age,oper.age_unit_code,oper.blood_code,
+        oper.dept_id,oper.oper_dept_id,oper.bed_id,oper.bed_name,oper.oper_disease_id,
+        oper.oper_disease_icd9,oper.oper_disease_name,oper.in_disease_id,oper.in_disease_name,
+        oper.in_disease_icd10,oper.doctor_id,oper.doctor_name,oper.assistant_id1,oper.assistant_name1,
+        oper.assistant_id2,oper.assistant_name2,oper.assistant_id3,oper.assistant_name3,
+        oper.special_request,oper.content,oper.audit_id,oper.audit_name,oper.audit_time,
+        oper.audit_remark,oper.oper_plan_time,oper.oper_room_Id,oper.oper_room_name,
+        oper.xh_nurse_id,oper.xh_nurse_name,oper.qx_nurse_id,oper.qx_nurse_name,oper.ana_code,
+        oper.ana_id1,oper.ana_name1,oper.ana_id2,oper.ana_name2,oper.ana_id3,oper.ana_name3,
+        oper.oper_end_time,oper.notched_code,oper.heal_code,oper.oper_time_hour,oper.status_code,
+        oper.is_cost,oper.total_price,oper.cost_time,oper.cost_id,oper.cost_name,
+        oper.remark,oper.crte_id,oper.crte_name,oper.crte_time,oper.rank,oper.ward_id,
+        ( SELECT CODE FROM base_dept AS b WHERE b.hosp_code = hosp_code AND b.id = outpt.dept_id ) AS deptCode,
+        CONCAT(
+        oper.name,'/',
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value = oper.gender_code),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value = oper.age_unit_code),'')
+        ) AS keyword,
+        '门诊病人' as inptOrOutpt,
+        outpt.visit_no as outptVisitNo,
+        '' as IllnessCode,
+        outpt.doctor_id as zzDoctorId,
+        0 as total_advance,
+        0 as total_cost,
+        0 as total_balance
+        FROM
+        outpt_visit outpt,
+        oper_info_record oper
+        WHERE
+        outpt.hosp_code =  #{hospCode}
+        AND oper.hosp_code = outpt.hosp_code
+        AND oper.visit_id = outpt.id
+
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (oper.name like concat('%',#{keyword},'%') or oper.visit_id like concat('%',#{keyword},'%') )
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and oper.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and oper.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and oper.dept_id = #{deptId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and oper.status_code = #{statusCode}
+        </if>
+        <if test="statusCode == null or statusCode == '' ">
+            and (oper.status_code is null or oper.status_code = 1)
+        </if>
+        ORDER BY
+        outpt.crte_time DESC
+        )
+    </select>
+
+
+</mapper>

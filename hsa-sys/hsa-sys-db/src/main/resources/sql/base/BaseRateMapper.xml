@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.rate.dao.BaseRateDAO">
+    <resultMap id="BaseRateMap" type="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        <id column="id" property="id" jdbcType="VARCHAR"></id>
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR"></result>
+        <result column="code" property="code" jdbcType="VARCHAR"></result>
+        <result column="name" property="name" jdbcType="VARCHAR"></result>
+        <result column="remark" property="remark" jdbcType="VARCHAR"></result>
+        <result column="daily_times" property="dailyTimes" jdbcType="DECIMAL"></result>
+        <result column="exec_interval" property="execInterval" jdbcType="DECIMAL"></result>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--查询医嘱频率编码-->
+    <select id="queryCode" resultMap="BaseRateMap" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        select code,name from base_rate WHERE  hosp_code=#{hospCode}
+        <if test="name != null and name != ''">
+            and  code= #{code}
+        </if>
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+    </select>
+    <!--查询频率名称-->
+    <select id="queryName" resultMap="BaseRateMap" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        select code,name from base_rate WHERE  hosp_code=#{hospCode}
+        <if test="name != null and name != ''">
+            and  name= #{name}
+        </if>
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+    </select>
+    <!--通过实体属性条件查找医嘱频率信息-->
+    <select id="queryPage" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO" resultMap="BaseRateMap">
+        select id,code,hosp_code,name,remark,daily_times,exec_interval,pym,wbm,seq_no,is_valid,crte_id,crte_name,crte_time
+        from base_rate
+        where  hosp_code = #{hospCode}
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="remark!= null and remark != ''">
+            and remark = #{remark}
+        </if>
+        <if test="dailyTimes != null">
+            and daily_times = #{dailyTimes}
+        </if>
+        <if test="execInterval != null ">
+            and exec_interval = #{execInterval}
+        </if>
+        <if test="pym != null and pym != ''">
+            and pym = #{pym}
+        </if>
+        <if test="wbm != null and wbm != ''">
+            and wbm = #{wbm}
+        </if>
+        <if test="seqNo != null ">
+            and seq_no = #{seqNo}
+        </if>
+        <if test="crteId != null">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+        <if test="isValid!= null and isValid!='' ">
+            and is_valid=#{isValid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( code like concat('%',#{keyword},'%')
+            or name like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        order by  crte_time desc
+    </select>
+    <!--新增单条医嘱频率信息-->
+    <insert id="insert" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        insert into base_rate (id,
+                               hosp_code,
+                               code,
+                               name,
+                               remark,
+                               daily_times,
+                               exec_interval,
+                               pym,
+                               wbm,
+                               seq_no,
+                               is_valid,
+                               crte_id,
+                               crte_name,
+                               crte_time)
+        values (#{id},
+                #{hospCode},
+                #{code},
+                #{name},
+                #{remark},
+                #{dailyTimes},
+                #{execInterval},
+                #{pym},
+                #{wbm},
+                #{seqNo},
+                #{isValid},
+                #{crteId},
+                #{crteName},
+                #{crteTime})
+    </insert>
+    <!--修改医嘱频率信息-->
+    <update id="update" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        update base_rate SET
+                code = #{code},
+                name = #{name},
+                remark = #{remark},
+                daily_times = #{dailyTimes},
+                exec_interval = #{execInterval},
+                pym = #{pym},
+                wbm = #{wbm},
+                seq_no = #{seqNo},
+                crte_id = #{crteId},
+                crte_name = #{crteName},
+                crte_time = #{crteTime},
+                is_valid=#{isValid}
+        where id=#{id} and hosp_code = #{hospCode}
+    </update>
+    <!--批量修改医嘱频率信息有效标识符-->
+    <update id="updateIsValid" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        update base_rate set is_valid = #{isValid} where id in
+        <foreach collection="rateIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+    
+    <select id="getLastCode" resultMap="BaseRateMap" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        select * from base_rate where hosp_code = #{hospCode}
+        order by crte_time DESC limit 1
+    </select>
+
+    <select id="selectCount" parameterType="string" resultType="int">
+        select count(id) from base_rate where hosp_code=#{hospCode}
+    </select>
+    <select id="queryAll" resultMap="BaseRateMap" parameterType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        select id,code,hosp_code,name,remark,daily_times,exec_interval,pym,wbm,seq_no,is_valid,crte_id,crte_name,crte_time
+        from base_rate
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="remark!= null and remark != ''">
+            and remark = #{remark}
+        </if>
+        <if test="dailyTimes != null">
+            and daily_times = #{dailyTimes}
+        </if>
+        <if test="execInterval != null ">
+            and exec_interval = #{execInterval}
+        </if>
+        <if test="pym != null and pym != ''">
+            and pym = #{pym}
+        </if>
+        <if test="wbm != null and wbm != ''">
+            and wbm = #{wbm}
+        </if>
+        <if test="seqNo != null ">
+            and seq_no = #{seqNo}
+        </if>
+        <if test="crteId != null">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+        <if test="isValid != null and isValid !='' ">
+            and is_valid=#{isValid}
+        </if>
+        <if test="rateIdList != null and rateIdList.size() > 0">
+            and id in
+            <foreach collection="rateIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( code like concat('%',#{keyword},'%')
+            or name like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        order by seq_no asc
+    </select>
+
+    <!--根据主键ID查询医嘱频率信息-->
+    <select id="getById" resultMap="BaseRateMap">
+        select * from base_rate where is_valid=#{isValid} and hosp_code=#{hospCode} and id=#{id}
+    </select>
+
+    <select id="getByRateCode" resultType="string">
+        select id from base_rate where hosp_code=#{hospCode} and code = #{code}
+    </select>
+</mapper>

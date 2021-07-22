@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.baseorderreceive.dao.BaseOrderReceiveDAO">
+
+    <resultMap type="cn.hsa.module.base.baseorderreceive.dto.BaseOrderReceiveDTO" id="BaseOrderReceiveMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="priority" column="priority" jdbcType="INTEGER"/>
+        <result property="usageCodes" column="usage_codes" jdbcType="VARCHAR"/>
+        <result property="deptIds" column="dept_ids" jdbcType="VARCHAR"/>
+        <result property="isLvp" column="is_lvp" jdbcType="VARCHAR"/>
+        <result property="isPh" column="is_ph" jdbcType="VARCHAR"/>
+        <result property="isHerb" column="is_herb" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="isEmergency" column="is_emergency" jdbcType="VARCHAR"/>
+        <result property="isMaterial" column="is_material" jdbcType="VARCHAR"/>
+        <result property="isPatient" column="is_patient" jdbcType="VARCHAR"/>
+        <result property="isAll" column="is_all" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseOrderReceiveMap">
+        select
+          id, hosp_code, code, name, priority, usage_codes, dept_ids, is_lvp, is_ph, is_herb, is_give, is_emergency, is_material, is_patient, is_all, is_valid, crte_id, crte_name, crte_time
+        from base_order_receive
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseOrderReceiveMap">
+        select
+        id, hosp_code, code, name, priority, usage_codes, dept_ids, is_lvp, is_ph, is_herb, is_give, is_emergency,
+        is_material, is_patient, is_valid, crte_id, crte_name, crte_time
+        from base_order_receive
+        <where>
+            and hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="priority != null">
+                and priority = #{priority}
+            </if>
+            <if test="usageCodes != null and usageCodes != ''">
+                and usage_codes = #{usageCodes}
+            </if>
+            <if test="deptIds != null and deptIds != ''">
+                and dept_ids = #{deptIds}
+            </if>
+            <if test="isLvp != null and isLvp != ''">
+                and is_lvp = #{isLvp}
+            </if>
+            <if test="isPh != null and isPh != ''">
+                and is_ph = #{isPh}
+            </if>
+            <if test="isHerb != null and isHerb != ''">
+                and is_herb = #{isHerb}
+            </if>
+            <if test="isGive != null and isGive != ''">
+                and is_give = #{isGive}
+            </if>
+            <if test="isEmergency != null and isEmergency != ''">
+                and is_emergency = #{isEmergency}
+            </if>
+            <if test="isMaterial != null and isMaterial != ''">
+                and is_material = #{isMaterial}
+            </if>
+            <if test="isPatient != null and isPatient != ''">
+                and is_patient = #{isPatient}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="" useGeneratedKeys="true">
+        insert into base_order_receive(id, hosp_code, code, name, priority, usage_codes, dept_ids, is_lvp, is_ph, is_herb, is_give, is_emergency, is_material, is_patient,
+        <if test="isValid!=null and isValid!= ''">
+            is_valid,
+        </if>
+         crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{priority}, #{usageCodes}, #{deptIds}, #{isLvp}, #{isPh}, #{isHerb}, #{isGive}, #{isEmergency}, #{isMaterial}, #{isPatient},
+        <if test="isValid!=null and isValid!= ''">
+            #{isValid},
+        </if>
+          #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据(无判空条件))-->
+    <update id="updateBaseOrderReceive">
+        update base_order_receive
+        <set>
+            id = #{id},
+            hosp_code = #{hospCode},
+            code = #{code},
+            name = #{name},
+            priority = #{priority},
+            usage_codes = #{usageCodes},
+            dept_ids = #{deptIds},
+            is_lvp = #{isLvp},
+            is_ph = #{isPh},
+            is_herb = #{isHerb},
+            is_give = #{isGive},
+            is_emergency = #{isEmergency},
+            is_material = #{isMaterial},
+            is_patient = #{isPatient},
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键修改数据(有判空条件))-->
+    <update id="updateBaseOrderReceiveS">
+        update base_order_receive
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="priority != null">
+                priority = #{priority},
+            </if>
+            <if test="usageCodes != null and usageCodes != ''">
+                usage_codes = #{usageCodes},
+            </if>
+            <if test="deptIds != null and deptIds != ''">
+                dept_ids = #{deptIds},
+            </if>
+            <if test="isLvp != null and isLvp != ''">
+                is_lvp = #{isLvp},
+            </if>
+            <if test="isPh != null and isPh != ''">
+                is_ph = #{isPh},
+            </if>
+            <if test="isHerb != null and isHerb != ''">
+                is_herb = #{isHerb},
+            </if>
+            <if test="isGive != null and isGive != ''">
+                is_give = #{isGive},
+            </if>
+            <if test="isEmergency != null and isEmergency != ''">
+                is_emergency = #{isEmergency},
+            </if>
+            <if test="isMaterial != null and isMaterial != ''">
+                is_material = #{isMaterial},
+            </if>
+            <if test="isPatient != null and isPatient != ''">
+                is_patient = #{isPatient},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+        update  base_order_receive
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(name)
+        from base_order_receive
+        where hosp_code = #{hospCode} and name = #{name}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <select id="codeExist" resultType="java.lang.Integer">
+        select count(code)
+        from base_order_receive
+        where hosp_code = #{hospCode} and code = #{code}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+</mapper>

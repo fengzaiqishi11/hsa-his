@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 表含义(insure_dict) -->
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDictDAO">
+
+    <resultMap id="outptPrescribeDTOMaps" type="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        <id property="id" column="id" jdbcType="VARCHAR"></id>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"></result>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"></result>
+        <result property="diagnoseIds" column="diagnose_ids" jdbcType="VARCHAR"></result>
+        <result property="diseaseNames" column="disease_names" jdbcType="VARCHAR"></result>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"></result>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"></result>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"></result>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"></result>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"></result>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"></result>
+        <result property="prescribeTypeCode" column="prescribe_type_code" jdbcType="VARCHAR"></result>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"></result>
+        <result property="remark" column="remark" jdbcType="VARCHAR"></result>
+        <result property="isSettle" column="is_settle" jdbcType="VARCHAR"></result>
+        <result property="isCancel" column="is_cancel" jdbcType="VARCHAR"></result>
+        <result property="isPrint" column="is_print" jdbcType="VARCHAR"></result>
+        <result property="isHerbHospital" column="is_herb_hospital" jdbcType="VARCHAR"></result>
+        <result property="herbNum" column="herb_num" jdbcType="DECIMAL"></result>
+        <result property="herbUseCode" column="herb_use_code" jdbcType="VARCHAR"></result>
+        <result property="weight" column="weight" jdbcType="DECIMAL"></result>
+        <result property="agentName" column="agent_name" jdbcType="VARCHAR"></result>
+        <result property="agentCertNo" column="agent_cert_no" jdbcType="VARCHAR"></result>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"></result>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"></result>
+        <result property="crteTime" column="crteTime" jdbcType="TIMESTAMP"></result>
+        <result property="isSubmit" column="is_submit" jdbcType="TIMESTAMP"></result>
+        <result property="cflJf" column="cflJf" jdbcType="DECIMAL"></result>
+        <result property="cfje" column="cfje" jdbcType="DECIMAL"></result>
+        <result property="unitCode" column="unitCode" jdbcType="DECIMAL"></result>
+
+        <collection property="outptPrescribeDetailsDTOList" ofType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO" javaType="java.util.List">
+            <id property="id" column="idDetail" jdbcType="VARCHAR"></id>
+            <result property="opId" column="op_id" jdbcType="VARCHAR"></result>
+            <result property="visitId" column="visit_id" jdbcType="VARCHAR"></result>
+            <result property="optId" column="opt_id" jdbcType="VARCHAR"></result>
+            <result property="optdGroupNo" column="optd_group_no" jdbcType="BIGINT"></result>
+            <result property="optdGroupSeqNo" column="optd_group_seq_no" jdbcType="BIGINT"></result>
+            <result property="optdId" column="optd_id" jdbcType="VARCHAR"></result>
+            <result property="groupNo" column="group_no" jdbcType="BIGINT"></result>
+            <result property="groupSeqNo" column="group_seq_no" jdbcType="BIGINT"></result>
+            <result property="itemCode" column="item_code" jdbcType="VARCHAR"></result>
+            <result property="itemId" column="item_id" jdbcType="VARCHAR"></result>
+            <result property="itemName" column="item_name" jdbcType="VARCHAR"></result>
+            <result property="price" column="price" jdbcType="DECIMAL"></result>
+            <result property="totalPrice" column="total_price" jdbcType="DECIMAL"></result>
+            <result property="spec" column="spec" jdbcType="VARCHAR"></result>
+            <result property="prepCode" column="prep_code" jdbcType="VARCHAR"></result>
+            <result property="dosage" column="dosage" jdbcType="DECIMAL"></result>
+            <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"></result>
+            <result property="usageCode" column="usage_code" jdbcType="VARCHAR"></result>
+            <result property="rateId" column="rate_id" jdbcType="VARCHAR"></result>
+            <result property="speedCode" column="speed_code" jdbcType="VARCHAR"></result>
+            <result property="useDays" column="use_days" jdbcType="BIGINT"></result>
+            <result property="num" column="num" jdbcType="DECIMAL"></result>
+            <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"></result>
+            <result property="totalNum" column="total_num" jdbcType="DECIMAL"></result>
+            <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"></result>
+            <result property="isSkin" column="is_skin" jdbcType="VARCHAR"></result>
+            <result property="isPositive" column="is_positive" jdbcType="VARCHAR"></result>
+            <result property="content" column="content" jdbcType="VARCHAR"></result>
+            <result property="pharId" column="phar_id" jdbcType="VARCHAR"></result>
+            <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"></result>
+            <result property="useCode" column="use_code" jdbcType="VARCHAR"></result>
+            <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"></result>
+            <result property="execDate" column="exec_date" jdbcType="DATE"></result>
+            <result property="execId" column="exec_id" jdbcType="VARCHAR"></result>
+            <result property="execName" column="exec_name" jdbcType="VARCHAR"></result>
+            <result property="execNum" column="exec_num" jdbcType="BIGINT"></result>
+            <result property="technologyNo" column="technology_no" jdbcType="VARCHAR"></result>
+            <result property="skinDurgId" column="skin_durg_id" jdbcType="VARCHAR"></result>
+            <result property="skinPharId" column="skin_phar_id" jdbcType="VARCHAR"></result>
+            <result property="skinUnitCode" column="skin_unit_code" jdbcType="VARCHAR"></result>
+            <result property="skinResultCode" column="skin_result_code" jdbcType="VARCHAR"></result>
+            <result property="type" column="type" jdbcType="VARCHAR"></result>
+            <result property="phCode" column="phCode" jdbcType="VARCHAR"></result>
+            <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"></result>
+            <result property="skinGoodName" column="skinGoodName" jdbcType="VARCHAR"></result>
+            <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"></result>
+            <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"></result>
+            <result property="isSf" column="isSf" jdbcType="VARCHAR"></result>
+            <result property="prescribeSuffix" column="prescribe_suffix" jdbcType="VARCHAR"></result>
+            <result property="prescribePrefix" column="prescribe_prefix" jdbcType="VARCHAR"></result>
+            <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
+            <result property="unitCode" column="unitCode" jdbcType="VARCHAR"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getInsureFee" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select #{hospCode} appId,#{hospCode} orgCodg ,#{hospCode} orgId,#{hospCode} ecToken,'460100' insuCode, b.cert_no idNo,b.name userName,b.cert_code idType,settle.id medOrgOrd,
+        '' initRxOrd,'0' erFlag,'0' trumFlag,'02' feeType,'1' otpType,'13' medType,settle.reality_price feeSumamt,date_format(settle.settle_time, '%Y%m%d') chrgDate,
+        date_format(settle.settle_time, 'H%i%s') chrgTime,'' rgstSn,'0.00' rgstFee,b.dept_name rgstDeptName,
+        b.doctor_name drName,'N' medreformDot,b.dept_id drDeptCodg,c.cert_code drCertNo, '3' rxItemVal,null iptType,b.visit_code iptOpNo,null iptDeptCodg,null iptDeptName,
+        null iptBegnDate,null iptEndDate,null dscgWay,null iptDays,null birctrlType,
+        null Birmtd,null babyNum,null birctrlDate,null prgDays,'' opter,'' psnNum,'' docno,'7' systemNo,
+        a.id rxDetlNoList,'' chrgitmType,'' chrgType,'' chigitmCentCodg,a.usage_code used,'' minunt,
+        '-' condCodg,'-' condName,
+        d.order_no rxno,a.id rxDetlNo,a.item_id itemNo,a.item_name itemName,'' invoItemNo,'N' hiItem,a.price itemPric,
+        a.num_unit_code itemEmp,a.spec itemSpec,a.total_num itemCnt,a.preferential_price itemAmt,a.item_id prodBarc,
+        rate.code drugFrqu,a.num drugDos,a.use_days drutDays,a.prep_code dosform,null empMedcEmp,null drugTotlnt,null drugTotlntEmp,null drugDelvWay,
+        null drugCntDays,d.crte_name drName,null drCertNo,date_format(d.crte_time, '%Y%m%d%H%i%s') rxDate, presDept.code rsDeptCodg,presDept.`name` rsDept
+        from outpt_settle settle
+        join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
+        left join base_rate rate on a.rate_id = rate.id and a.hosp_code = rate.hosp_code
+        join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        join sys_user c on b.doctor_id = c.id and b.hosp_code = c.hosp_code
+        join outpt_prescribe d on  a.op_id = d.id and a.hosp_code = d.hosp_code
+        join base_dept presDept on d.dept_id = presDept.id and d.hosp_code = presDept.hosp_code
+        where settle.id = #{id} and settle.hosp_code = #{hospCode}
+    </select>
+
+    <select id="getInsureDiagnose" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select '1' diseDetlType,'1' diseDetlSrtNo, c.`code` diseDetlCodg,c.name diseDetlName
+        from outpt_settle a
+        join outpt_diagnose b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        join base_disease c on b.disease_id = c.id and b.hosp_code = c.hosp_code
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+</mapper>

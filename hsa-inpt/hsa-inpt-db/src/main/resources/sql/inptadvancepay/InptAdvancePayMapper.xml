@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.advancepay.dao.InptAdvancePayDAO">
+
+    <resultMap type="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO" id="InptAdvancePayMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="apOrderNo" column="ap_order_no" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="isSettle" column="is_settle" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="redId" column="red_id" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="dailySettleId" column="daily_settle_id" jdbcType="VARCHAR"/>
+        <result property="sourcePayCode" column="source_pay_code" jdbcType="VARCHAR"/>
+        <result property="payCode" column="pay_code" jdbcType="VARCHAR"/>
+        <result property="chequeNo" column="cheque_no" jdbcType="VARCHAR"/>
+        <result property="servicePrice" column="service_price" jdbcType="DECIMAL"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="InptAdvancePayMap">
+        select
+          id, hosp_code, visit_id, ap_order_no, price, is_settle, settle_id, red_id, status_code, daily_settle_id, source_pay_code, pay_code, cheque_no, service_price, order_no, remark, crte_id, crte_name, crte_time
+        from inpt_advance_pay
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="InptAdvancePayMap">
+        select
+        id, hosp_code, (select in_no from inpt_visit iv where iv.hosp_code = hosp_code and iv.id = visit_id ) as in_no ,visit_id, ap_order_no, price, is_settle, settle_id, red_id, status_code, daily_settle_id,
+        source_pay_code, pay_code, cheque_no, service_price, order_no, remark, crte_id, crte_name, crte_time
+        from inpt_advance_pay
+        <where>
+            and hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="apOrderNo != null and apOrderNo != ''">
+                and ap_order_no = #{apOrderNo}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                and is_settle = #{isSettle}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and settle_id = #{settleId}
+            </if>
+            <if test="redId != null and redId != ''">
+                and red_id = #{redId}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and status_code = #{statusCode}
+            </if>
+            <if test="dailySettleId != null and dailySettleId != ''">
+                and daily_settle_id = #{dailySettleId}
+            </if>
+            <if test="sourcePayCode != null and sourcePayCode != ''">
+                and source_pay_code = #{sourcePayCode}
+            </if>
+            <if test="payCode != null and payCode != ''">
+                and pay_code = #{payCode}
+            </if>
+            <if test="chequeNo != null and chequeNo != ''">
+                and cheque_no = #{chequeNo}
+            </if>
+            <if test="servicePrice != null">
+                and service_price = #{servicePrice}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            order by crte_time desc,id desc
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_advance_pay(id,hosp_code, visit_id, ap_order_no, price, is_settle,
+         settle_id, red_id, status_code, daily_settle_id, source_pay_code, pay_code, cheque_no,
+          service_price, order_no, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{visitId}, #{apOrderNo},
+        <if test="price != null">
+         #{price},
+        </if>
+        <if test="price == null">
+            0,
+        </if>
+          #{isSettle}, #{settleId}, #{redId},
+         #{statusCode}, #{dailySettleId}, #{sourcePayCode}, #{payCode}, #{chequeNo}, #{servicePrice},
+          #{orderNo}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据(无判空条件))-->
+    <update id="updateInptAdvancePay">
+        update inpt_advance_pay
+        <set>
+            hosp_code = #{hospCode},
+            visit_id = #{visitId},
+            ap_order_no = #{apOrderNo},
+            price = #{price},
+            is_settle = #{isSettle},
+            settle_id = #{settleId},
+            red_id = #{redId},
+            status_code = #{statusCode},
+            daily_settle_id = #{dailySettleId},
+            source_pay_code = #{sourcePayCode},
+            pay_code = #{payCode},
+            cheque_no = #{chequeNo},
+            service_price = #{servicePrice},
+            order_no = #{orderNo},
+            remark = #{remark}
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键修改数据(有判空条件))-->
+    <update id="updateInptAdvancePayS">
+        update inpt_advance_pay
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="apOrderNo != null and apOrderNo != ''">
+                ap_order_no = #{apOrderNo},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId},
+            </if>
+            <if test="redId != null and redId != ''">
+                red_id = #{redId},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="dailySettleId != null and dailySettleId != ''">
+                daily_settle_id = #{dailySettleId},
+            </if>
+            <if test="sourcePayCode != null and sourcePayCode != ''">
+                source_pay_code = #{sourcePayCode},
+            </if>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="chequeNo != null and chequeNo != ''">
+                cheque_no = #{chequeNo},
+            </if>
+            <if test="servicePrice != null">
+                service_price = #{servicePrice},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from inpt_advance_pay where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!--预交金查询-->
+    <select id="queryAdvancePay" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+            a.bed_id,
+            a.bed_name,
+            a.name,
+            a.gender_code,
+            a.age,
+            a.age_unit_code,
+            a.total_advance,
+            a.total_cost,
+            a.total_balance,
+            a.in_no,
+            a.in_dept_name,
+            (SELECT name FROM base_dept WHERE a.in_ward_id = id ) as ward_name,
+            a.patient_code,
+            a.in_disease_name,
+            a.status_code,
+            a.in_time
+        FROM inpt_visit a
+        WHERE a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (a.name like CONCAT('%',#{keyword},'%') or a.in_no = #{keyword} )
+            </if>
+            <if test="inDeptId != null and inDeptId != ''">
+                and a.in_dept_id = #{inDeptId}
+            </if>
+            <if test="inWardId != null and inWardId != ''">
+                and a.in_ward_id = #{inWardId}
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                and a.patient_code = #{patientCode}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and a.status_code = #{statusCode}
+            </if>
+        order by a.in_time desc
+    </select>
+
+    <update id="editAdvancePayByIds" parameterType="java.util.Map">
+        update inpt_advance_pay
+        <set>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="apOrderNo != null and apOrderNo != ''">
+                ap_order_no = #{apOrderNo},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle},
+            </if>
+            <if test="settleId != null">
+                settle_id = #{settleId},
+            </if>
+            <if test="redId != null and redId != ''">
+                red_id = #{redId},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="dailySettleId != null and dailySettleId != ''">
+                daily_settle_id = #{dailySettleId},
+            </if>
+            <if test="sourcePayCode != null and sourcePayCode != ''">
+                source_pay_code = #{sourcePayCode},
+            </if>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="chequeNo != null and chequeNo != ''">
+                cheque_no = #{chequeNo},
+            </if>
+            <if test="servicePrice != null">
+                service_price = #{servicePrice},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where
+        hosp_code = #{hospCode}
+        AND id IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+</mapper>

@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.oper.operpatientrecord.dao.OperPatientRecordDAO">
+
+
+    <resultMap type="cn.hsa.module.oper.operpatientrecord.dto.OperPatientRecordDTO" id="OperPatientRecordMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="bloodCode" column="blood_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="operDeptId" column="oper_dept_id" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="operDiseaseId" column="oper_disease_id" jdbcType="VARCHAR"/>
+        <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
+        <result property="operDiseaseName" column="oper_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="assistantId1" column="assistant_id1" jdbcType="VARCHAR"/>
+        <result property="assistantName1" column="assistant_name1" jdbcType="VARCHAR"/>
+        <result property="assistantId2" column="assistant_id2" jdbcType="VARCHAR"/>
+        <result property="assistantName2" column="assistant_name2" jdbcType="VARCHAR"/>
+        <result property="assistantId3" column="assistant_id3" jdbcType="VARCHAR"/>
+        <result property="assistantName3" column="assistant_name3" jdbcType="VARCHAR"/>
+        <result property="specialRequest" column="special_request" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditRemark" column="audit_remark" jdbcType="VARCHAR"/>
+        <result property="operPlanTime" column="oper_plan_time" jdbcType="TIMESTAMP"/>
+        <result property="operRoomId" column="oper_room_Id" jdbcType="VARCHAR"/>
+        <result property="operRoomName" column="oper_room_name" jdbcType="VARCHAR"/>
+        <result property="xhNurseId" column="xh_nurse_id" jdbcType="VARCHAR"/>
+        <result property="xhNurseName" column="xh_nurse_name" jdbcType="VARCHAR"/>
+        <result property="qxNurseId" column="qx_nurse_id" jdbcType="VARCHAR"/>
+        <result property="qxNurseName" column="qx_nurse_name" jdbcType="VARCHAR"/>
+        <result property="anaCode" column="ana_code" jdbcType="VARCHAR"/>
+        <result property="anaId1" column="ana_id1" jdbcType="VARCHAR"/>
+        <result property="anaName1" column="ana_name1" jdbcType="VARCHAR"/>
+        <result property="anaId2" column="ana_id2" jdbcType="VARCHAR"/>
+        <result property="anaName2" column="ana_name2" jdbcType="VARCHAR"/>
+        <result property="anaId3" column="ana_id3" jdbcType="VARCHAR"/>
+        <result property="anaName3" column="ana_name3" jdbcType="VARCHAR"/>
+        <result property="operEndTime" column="oper_end_time" jdbcType="TIMESTAMP"/>
+        <result property="notchedCode" column="notched_code" jdbcType="VARCHAR"/>
+        <result property="healCode" column="heal_code" jdbcType="VARCHAR"/>
+        <result property="operTimeHour" column="oper_time_hour" jdbcType="OTHER"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="OTHER"/>
+        <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="costName" column="cost_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="rank" column="rank" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.oper.operpatientrecord.dto.OperPatientRecordDTO" id="OperPatientRecordDTOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="bloodCode" column="blood_code" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="operDeptName" column="oper_dept_name" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="operDiseaseId" column="oper_disease_id" jdbcType="VARCHAR"/>
+        <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
+        <result property="operDiseaseName" column="oper_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="assistantId1" column="assistant_id1" jdbcType="VARCHAR"/>
+        <result property="assistantName1" column="assistant_name1" jdbcType="VARCHAR"/>
+        <result property="assistantId2" column="assistant_id2" jdbcType="VARCHAR"/>
+        <result property="assistantName2" column="assistant_name2" jdbcType="VARCHAR"/>
+        <result property="assistantId3" column="assistant_id3" jdbcType="VARCHAR"/>
+        <result property="assistantName3" column="assistant_name3" jdbcType="VARCHAR"/>
+        <result property="specialRequest" column="special_request" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditRemark" column="audit_remark" jdbcType="VARCHAR"/>
+        <result property="operPlanTime" column="oper_plan_time" jdbcType="TIMESTAMP"/>
+        <result property="operRoomId" column="oper_room_Id" jdbcType="VARCHAR"/>
+        <result property="operRoomName" column="oper_room_name" jdbcType="VARCHAR"/>
+        <result property="xhNurseId" column="xh_nurse_id" jdbcType="VARCHAR"/>
+        <result property="xhNurseName" column="xh_nurse_name" jdbcType="VARCHAR"/>
+        <result property="qxNurseId" column="qx_nurse_id" jdbcType="VARCHAR"/>
+        <result property="qxNurseName" column="qx_nurse_name" jdbcType="VARCHAR"/>
+        <result property="anaCode" column="ana_code" jdbcType="VARCHAR"/>
+        <result property="anaId1" column="ana_id1" jdbcType="VARCHAR"/>
+        <result property="anaName1" column="ana_name1" jdbcType="VARCHAR"/>
+        <result property="anaId2" column="ana_id2" jdbcType="VARCHAR"/>
+        <result property="anaName2" column="ana_name2" jdbcType="VARCHAR"/>
+        <result property="anaId3" column="ana_id3" jdbcType="VARCHAR"/>
+        <result property="anaName3" column="ana_name3" jdbcType="VARCHAR"/>
+        <result property="operEndTime" column="oper_end_time" jdbcType="TIMESTAMP"/>
+        <result property="notchedCode" column="notched_code" jdbcType="VARCHAR"/>
+        <result property="healCode" column="heal_code" jdbcType="VARCHAR"/>
+        <result property="operTimeHour" column="oper_time_hour" jdbcType="OTHER"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="OTHER"/>
+        <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="costName" column="cost_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="rank" column="rank" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryOperPatientRecordAll"
+            resultMap="OperPatientRecordMap">
+        select oir.id, oir.hosp_code,oir.visit_id,oir.baby_id,oir.name,oir.gender_code,oir.age,oir.blood_code,
+        oir.in_no,oir.dept_id,oir.bed_id,oir.bed_name,oir.oper_dept_id,oir.in_disease_id,oir.oper_disease_name,
+        oir.in_disease_icd10 ,oir.oper_disease_name,oir.oper_disease_icd9,oir.notched_code ,oir.crte_time,
+        oir.oper_time_hour,oir.heal_code,oir.doctor_id,oir.doctor_name,oir.assistant_id1,oir.ana_name1,
+        oir.assistant_id2,oir.assistant_name2,oir.assistant_id3,oir.assistant_name3,oir.special_request,
+        oir.advice_id ,oir.audit_id,oir.audit_name,oir.audit_remark,oir.oper_plan_time,oir.oper_room_Id,
+        oir.oper_room_name ,oir.xh_nurse_name,oir.qx_nurse_name,oir.ana_code,oir.ana_id1,oir.ana_name1,
+        oir.ana_id2,oir.ana_name2,oir.ana_id3 ,oir.ana_name3,oir.oper_end_time ,oir.remark , oir.cost_name,
+        oir.cost_time,oir.is_cost,oir.total_price,oir.cost_time,oir.cost_id,oir.cost_name,oir.`rank`,
+        oir.crte_name,oir.crte_id,oir.age_unit_code,status_code
+        from oper_info_record oir
+
+        <where>
+            <if test="id != null and id != ''">
+                and oir.id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and oir.hosp_code = #{hospCode}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (oir.name like CONCAT('%',#{keyword},'%') or oir.bed_name like CONCAT('%',#{keyword},'%') or oir.visit_id like CONCAT('%',#{keyword},'%') or oir.in_no  like CONCAT('%',#{keyword},'%') )
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and oir.visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != ''">
+                and oir.baby_id = #{babyId}
+            </if>
+            <if test="inNo != null and inNo != ''">
+                and oir.in_no = #{inNo}
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                and oir.advice_id = #{adviceId}
+            </if>
+            <if test="name != null and name != ''">
+                and oir.name = #{name}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and oir.gender_code = #{genderCode}
+            </if>
+            <if test="age != null">
+                and oir.age = #{age}
+            </if>
+
+            <if test="bloodCode != null and bloodCode != ''">
+                and oir.blood_code = #{bloodCode}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and oir.dept_id = #{deptId}
+            </if>
+            <if test="operDeptId != null and operDeptId != ''">
+                and oir.oper_dept_id = #{operDeptId}
+            </if>
+            <if test="bedId != null and bedId != ''">
+                and oir.bed_id = #{bedId}
+            </if>
+            <if test="bedName != null and bedName != ''">
+                and oir.bed_name = #{bedName}
+            </if>
+            <if test="operDiseaseId != null and operDiseaseId != ''">
+                and oir.oper_disease_id = #{operDiseaseId}
+            </if>
+            <if test="operDiseaseIcd9 != null and operDiseaseIcd9 != ''">
+                and oir.oper_disease_icd9 = #{operDiseaseIcd9}
+            </if>
+            <if test="operDiseaseName != null and operDiseaseName != ''">
+                and oir.oper_disease_name = #{operDiseaseName}
+            </if>
+            <if test="inDiseaseId != null and inDiseaseId != ''">
+                and oir.in_disease_id = #{inDiseaseId}
+            </if>
+            <if test="inDiseaseName != null and inDiseaseName != ''">
+                and oir.in_disease_name = #{inDiseaseName}
+            </if>
+            <if test="inDiseaseIcd10 != null and inDiseaseIcd10 != ''">
+                and oir.in_disease_icd10 = #{inDiseaseIcd10}
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                and oir.doctor_id = #{doctorId}
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                and oir.doctor_name = #{doctorName}
+            </if>
+            <if test="assistantId1 != null and assistantId1 != ''">
+                and oir.assistant_id1 = #{assistantId1}
+            </if>
+            <if test="assistantName1 != null and assistantName1 != ''">
+                and oir.assistant_name1 = #{assistantName1}
+            </if>
+            <if test="assistantId2 != null and assistantId2 != ''">
+                and oir.assistant_id2 = #{assistantId2}
+            </if>
+            <if test="assistantName2 != null and assistantName2 != ''">
+                and oir.assistant_name2 = #{assistantName2}
+            </if>
+            <if test="assistantId3 != null and assistantId3 != ''">
+                and oir.assistant_id3 = #{assistantId3}
+            </if>
+            <if test="assistantName3 != null and assistantName3 != ''">
+                and oir.assistant_name3 = #{assistantName3}
+            </if>
+            <if test="specialRequest != null and specialRequest != ''">
+                and oir.special_request = #{specialRequest}
+            </if>
+            <if test="content != null and content != ''">
+                and oir.content = #{content}
+            </if>
+            <if test="auditId != null and auditId != ''">
+                and oir.audit_id = #{auditId}
+            </if>
+            <if test="auditName != null and auditName != ''">
+                and oir.audit_name = #{auditName}
+            </if>
+            <if test="auditTime != null">
+                and oir.audit_time = #{auditTime}
+            </if>
+            <if test="auditRemark != null and auditRemark != ''">
+                and oir.audit_remark = #{auditRemark}
+            </if>
+            <if test="operPlanTime != null">
+                and oir.oper_plan_time = #{operPlanTime}
+            </if>
+            <if test="operRoomId != null and operRoomId != ''">
+                and oir.oper_room_Id = #{operRoomId}
+            </if>
+            <if test="operRoomName != null and operRoomName != ''">
+                and oir.oper_room_name = #{operRoomName}
+            </if>
+            <if test="anaCode != null and anaCode != ''">
+                and oir.ana_code = #{anaCode}
+            </if>
+            <if test="anaId1 != null and anaId1 != ''">
+                and oir.ana_id1 = #{anaId1}
+            </if>
+            <if test="anaName1 != null and anaName1 != ''">
+                and oir.ana_name1 = #{anaName1}
+            </if>
+            <if test="anaId2 != null and anaId2 != ''">
+                and oir.ana_id2 = #{anaId2}
+            </if>
+            <if test="anaName2 != null and anaName2 != ''">
+                and oir.ana_name2 = #{anaName2}
+            </if>
+            <if test="anaId3 != null and anaId3 != ''">
+                and oir.ana_id3 = #{anaId3}
+            </if>
+            <if test="anaName3 != null and anaName3 != ''">
+                and oir.ana_name3 = #{anaName3}
+            </if>
+            <if test="operEndTime != null">
+                and oir.oper_end_time = #{operEndTime}
+            </if>
+            <if test="notchedCode != null and notchedCode != ''">
+                and oir.notched_code = #{notchedCode}
+            </if>
+            <if test="healCode != null and healCode != ''">
+                and oir.heal_code = #{healCode}
+            </if>
+            <if test="operTimeHour != null">
+                and oir.oper_time_hour = #{operTimeHour}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and oir.status_code = #{statusCode}
+            </if>
+            <if test="isCost != null and isCost != ''">
+                and oir.is_cost = #{isCost}
+            </if>
+            <if test="totalPrice != null">
+                and oir.total_price = #{totalPrice}
+            </if>
+            <if test="costTime != null">
+                and oir.cost_time = #{costTime}
+            </if>
+            <if test="costId != null and costId != ''">
+                and oir.cost_id = #{costId}
+            </if>
+            <if test="costName != null and costName != ''">
+                and oir.cost_name = #{costName}
+            </if>
+            <if test="remark != null and remark != ''">
+                and oir.remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and oir.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and oir.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and oir.crte_time = #{crteTime}
+            </if>
+            <if test="startTime != null and startTime!=''">
+                and oir.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and startTime != ''">
+                and oir.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+            </if>
+
+        </where>
+        order by oir.crte_time desc
+    </select>
+    <select id="queryOperPatientRecords"
+            resultMap="OperPatientRecordDTOMap">
+        SELECT
+        oir.id,
+        oir.hosp_code,
+        oir.visit_id,
+        oir.baby_id,
+        oir.NAME,
+        oir.gender_code,
+        oir.age,
+        oir.blood_code,
+        oir.in_no,
+        oir.bed_id,
+        oir.bed_name,
+        oir.oper_dept_id,
+        oir.in_disease_name,
+        oir.oper_disease_name,
+        oir.oper_disease_name,
+        oir.notched_code,
+        oir.crte_time,
+        oir.oper_time_hour,
+        oir.heal_code,
+        oir.doctor_id,
+        oir.doctor_name,
+        oir.assistant_id1,
+        oir.assistant_name1,
+        oir.ana_name1,
+        oir.assistant_id2,
+        oir.assistant_name2,
+        oir.assistant_id3,
+        oir.assistant_name3,
+        oir.special_request,
+        oir.advice_id,
+        oir.audit_id,
+        oir.audit_name,
+        oir.audit_remark,
+        oir.audit_time,
+        oir.oper_plan_time,
+        oir.oper_room_Id,
+        oir.oper_room_name,
+        oir.xh_nurse_name,
+        oir.qx_nurse_name,
+        oir.ana_code,
+        oir.ana_id1,
+        oir.ana_id2,
+        oir.ana_name2,
+        oir.ana_id3,
+        oir.ana_name3,
+        oir.oper_end_time,
+        oir.remark,
+        oir.cost_time,
+        oir.is_cost,
+        oir.total_price,
+        oir.cost_id,
+        oir.cost_name,
+        oir.`rank`,
+        oir.crte_name,
+        oir.crte_id,
+        oir.age_unit_code,
+        status_code,
+        oir.content,
+        bd.NAME AS dept_name,
+        bd2.NAME AS oper_dept_name
+        FROM
+        oper_info_record oir
+        LEFT JOIN base_dept bd ON oir.dept_id = bd.id
+        LEFT JOIN base_dept bd2 ON oir.oper_dept_id = bd2.id
+        <where>
+            <if test="id != null and id != ''">
+                and oir.id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and oir.hosp_code = #{hospCode}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (oir.name like CONCAT('%',#{keyword},'%') or oir.bed_name like CONCAT('%',#{keyword},'%') or oir.visit_id like CONCAT('%',#{keyword},'%') or oir.in_no  like CONCAT('%',#{keyword},'%') )
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and oir.dept_id = #{deptId}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and oir.status_code = #{statusCode}
+            </if>
+            <if test="isCost != null and isCost != ''">
+                and oir.is_cost = #{isCost}
+            </if>
+            <if test="operDeptId != null and operDeptId != ''">
+                and oir.oper_dept_id = #{operDeptId}
+            </if>
+            <if test="startTime != null and startTime!=''">
+                and oir.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and startTime != ''">
+                and oir.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+            </if>
+
+        </where>
+        order by oir.crte_time desc
+
+    </select>
+
+    <select id="getNonSurgicalDiseasesInfo" resultType="map" parameterType="map">
+        select `code`,`name`, pym,wbm , #{afterOrBefore} AS afterOrBefore from base_disease
+        where
+            type_code != '3'
+            and hosp_Code = #{hospCode}
+            and is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (code like concat('%',#{keyword},'%') or `name` like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+        </if>
+
+
+    </select>
+
+</mapper>

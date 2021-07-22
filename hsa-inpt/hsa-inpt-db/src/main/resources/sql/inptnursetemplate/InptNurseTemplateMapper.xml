@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.inpt.careTemplate.dao.InptNurseTemplateDAO">
+    <resultMap id="TemplateMap" type="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        <id column="id" property="id" jdbcType="VARCHAR"></id>
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"></result>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--    新增护理模板记录-->
+    <insert id="addInptNurseTemplate" parameterType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        insert into inpt_nurse_template(id, hosp_code, name, content,dept_id, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{name}, #{content},#{deptId}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+    <!--   修改护理模板记录的有效标识 -->
+    <update id="updateIsValidInptNurseTemplate">
+        update inpt_nurse_template set is_valid=#{isValid}
+        where id =#{id} and
+        hosp_code=#{hospCode} and dept_id=#{deptId}
+    </update>
+    <!--    修改护理模板记录-->
+    <update id="updateInptNurseTemplate" parameterType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        update inpt_nurse_template
+        set name=#{name},
+            content=#{content},
+            crte_id = #{crteId},
+            crte_name = #{crteName},
+            crte_time = #{crteTime},
+            is_valid=#{isValid},
+            dept_id=#{deptId}
+        where id = #{id}
+          and hosp_code = #{hospCode} and dept_id=#{deptId}
+    </update>
+    <!--    分页查询所有的护理模板记录-->
+    <select id="queryPage" resultMap="TemplateMap" parameterType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        select id,hosp_code,name,content,is_valid,crte_id,crte_name,crte_time
+        from inpt_nurse_template where hosp_code=#{hospCode} and dept_id=#{deptId}
+        <if test="name !=null and name != ''">
+            and name like concat('%',#{name},'%')
+        </if>
+        <if test="isValid !=null and isValid != ''">
+            and is_valid=#{isValid}
+        </if>
+        order by crte_time desc
+    </select>
+    <!--    根据id查找护理模板记录-->
+    <select id="getById" resultType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        select id,hosp_code,name,content,is_valid,crte_id,crte_name,crte_time,dept_id
+        from inpt_nurse_template where hosp_code=#{hospCode} and dept_id=#{deptId}
+        <if test="id !=null and id != ''">
+            and id=#{id}
+        </if>
+    </select>
+    <!--查询所有护理模板-->
+    <select id="queryAllTemplate" parameterType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO" resultType="cn.hsa.module.inpt.careTemplate.dto.InptNurseTemplateDTO">
+        select id, hosp_code, name, content, dept_id, is_valid, crte_id, crte_name, crte_time
+        from inpt_nurse_template
+        where hosp_code = #{hospCode} and is_valid = #{isValid}
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+    </select>
+</mapper>

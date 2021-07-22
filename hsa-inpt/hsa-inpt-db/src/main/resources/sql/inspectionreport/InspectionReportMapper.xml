@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.inspectionreport.dao.InspectionReportDAO">
+
+    <resultMap id="patientListTree" type="cn.hsa.base.TreeMenuNode">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="label" property="label" jdbcType="VARCHAR"/>
+        <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="patientInfoMap" type="cn.hsa.module.inpt.inspectionreport.dto.PatientInfoDTO">
+        <result column="visitNo" property="visitNo" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="inNo" property="inNo" jdbcType="VARCHAR"/>
+        <result column="bedName" property="bedName" jdbcType="VARCHAR"/>
+        <result column="zzDoctorName" property="zzDoctorName" jdbcType="VARCHAR"/>
+        <result column="inDiseaseName" property="inDiseaseName" jdbcType="VARCHAR"/>
+        <result column="inTime" property="inTime" jdbcType="TIMESTAMP"/>
+        <result column="outTime" property="outTime" jdbcType="TIMESTAMP"/>
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getPatientsTreeOfDepartment" resultMap="patientListTree">
+        SELECT
+        a.id,
+        '' as visit_id,
+        a.label,
+        a.parentId
+        FROM
+        (
+        SELECT
+        bd.CODE id,
+        bd.NAME label,
+        ifnull( bd.up_dept_code, '-2' ) parentId
+        FROM
+        base_dept bd
+        WHERE
+        bd.is_valid = '1'
+        AND bd.CODE != 'B30'
+        AND bd.type_code = #{deptType}
+        AND bd.hosp_code = #{hospCode}
+        ) a UNION ALL
+        SELECT
+        bd.`code` id,
+        '' as visit_id,
+        bd.`name` label,
+        '-2' parentId
+        FROM
+        base_dept bd
+        WHERE
+        bd.CODE in (
+        SELECT
+        IFNULL(
+        up_dept_code,#{code})
+
+        FROM
+        base_dept inbd
+        WHERE
+        inbd.is_valid = '1'
+        AND inbd.type_code =#{deptType}
+        AND inbd.CODE != 'B30'
+        AND inbd.hosp_code = #{hospCode}
+        )
+        AND bd.up_dept_code IS NULL
+
+    </select>
+
+    <select id="getPatientsTreeOfPatients" resultMap="patientListTree">
+        SELECT
+        iv.in_no AS id,
+        iv.id as visit_id,
+        concat( iv.NAME, '[ ', iv.in_no, ' ]', '(', ifnull( iv.bed_name, '未安床' ), ')' ) AS label,
+        bd.`code` AS parentId
+        FROM
+        base_dept bd
+        inner JOIN inpt_visit iv ON bd.id = iv.in_dept_id
+        WHERE
+        bd.CODE in
+        <foreach collection="deptCodeList" open="(" separator="," close=")" item="dcode">
+            #{dcode}
+        </foreach>
+        AND bd.CODE != 'B30'
+        <if test="startTime != null and startTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(in_time, '%Y-%m-%d') >= #{startTime}
+            ]]>
+        </if>
+
+        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(in_time, '%Y-%m-%d') <= #{endTime}
+                ]]>
+        </if>
+        <if test="patientName != null and patientName != ''">
+            <![CDATA[
+                    and iv.`name` like concat('%',#{patientName},'%')
+                ]]>
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and in_dept_id = #{deptId}
+        </if>
+        union all
+        SELECT
+        ov.visit_no AS id,
+        ov.id AS visit_id,
+        concat( ov.NAME, '[ ', ov.visit_no, ' ]', '(', '', ')' ) AS label,
+        bd.`code` AS parentId
+        FROM
+        base_dept bd
+        inner JOIN outpt_visit ov ON bd.id = ov.dept_id
+        WHERE
+        bd.CODE in
+        <foreach collection="deptCodeList" open="(" separator="," close=")" item="dcode">
+            #{dcode}
+        </foreach>
+        AND bd.CODE != 'B30'
+        and ov.tran_in_code = '0'
+        AND ov.is_visit = '1'
+        <if test="startTime != null and startTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(ov.crte_time, '%Y-%m-%d') >= #{startTime}
+            ]]>
+        </if>
+
+        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(ov.crte_time, '%Y-%m-%d') <= #{endTime}
+                ]]>
+        </if>
+        <if test="patientName != null and patientName != ''">
+            <![CDATA[
+                    and ov.`name` like concat('%',#{patientName},'%')
+                ]]>
+        </if>
+        <if test="deptId != null and deptId != ''">
+            <![CDATA[
+                    and ov.`dept_id` = #{deptId}
+                ]]>
+        </if>
+
+    </select>
+
+
+    <select id="getPatientInfo" resultMap="patientInfoMap">
+        SELECT
+            '无' visitNo,
+            iv.id,
+            iv.NAME,
+            scd.`name` AS gender,
+            concat( age, ' ', scd2.`name` ) age,
+            iv.in_no AS inNo,
+            iv.bed_name AS bedName,
+            iv.zz_doctor_name AS zzDoctorName,
+            iv.in_time AS inTime,
+            iv.in_disease_name AS inDiseaseName,
+            iv.out_time AS outTime
+        FROM
+            inpt_visit iv
+                LEFT JOIN sys_code_detail scd ON iv.gender_code = scd.`value`
+                AND scd.c_code = 'XB'
+                LEFT JOIN sys_code_detail scd2 ON iv.age_unit_code = scd2.`value`
+                AND scd2.c_code = 'NLDW'
+        WHERE
+            iv.in_no = #{inVisitNo} UNION ALL
+        SELECT
+            visit_no AS visitNo,
+            ov.id,
+            ov.`name`,
+            scd.`name` AS gender,
+            concat( age, ' ', scd2.`name` ) age,
+            '无' inNo,
+            '无' bedName,
+            doctor_name AS zzDoctorName,
+            visit_time AS inTime,
+            bd.`name` AS inDiseaseName,
+            null outTime
+        FROM
+            outpt_visit ov
+                LEFT JOIN sys_code_detail scd ON ov.gender_code = scd.`value`
+                AND scd.c_code = 'XB'
+                LEFT JOIN sys_code_detail scd2 ON ov.age_unit_code = scd2.`value`
+                AND scd2.c_code = 'NLDW'
+                LEFT JOIN outpt_diagnose od ON ov.id = od.visit_id and od.is_main='1'
+                LEFT JOIN base_disease bd on od.disease_id = bd.id
+        WHERE
+            is_visit = '1'
+          AND ov.visit_no = #{inVisitNo}
+    </select>
+    <select id="getPatientInspectItems" resultType="cn.hsa.module.inpt.inspectionreport.dto.PatientInspectItem">
+        SELECT
+            `apply_no` AS applyNo,
+            `visit_id` AS visitId,
+            `in_no` AS inNo,
+            `order_no` AS orderNo,
+            `result_id` AS resultId,
+            `opd_id` AS opdId,
+            content,
+            `crte_time` AS crteTime
+
+        FROM
+            medic_apply
+        WHERE
+            hosp_code=#{hospCode}
+          and type_code= #{typeCode}
+          and	in_no = #{inNo}
+        <if test="startTime != null and startTime != ''">
+            and crte_Time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and crte_Time &lt; #{endTime}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and type_code = #{typeCode}
+        </if>
+        <if test="babyId != null and babyId != ''">
+            and baby_id = #{babyId}
+        </if>
+        <if test="babyId == null or babyId == ''">
+            and (baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
+        </if>
+    </select>
+    <select id="getExaminationItems" resultType="cn.hsa.module.inpt.inspectionreport.dto.ExaminationItem">
+        SELECT
+            mr.advice_id AS adviceId,
+            mr.visit_id AS visitId,
+            mr.in_no AS inNo,
+            item_id AS itemId,
+            item_name AS itemName,
+            result,
+            apply_no as applyNo,
+            result_detail AS resultDetail,
+            reference_value AS referenceValue,
+            result_unit AS resultUnit,
+            crte_time AS crteTime
+        FROM
+            medic_result mr
+        WHERE
+            mr.in_no = #{inNo}
+          AND mr.advice_id = #{adviceId}
+        ORDER BY
+            crte_time ASC
+    </select>
+    <select id="getInspectionReportInfo"
+            resultType="cn.hsa.module.inpt.inspectionreport.dto.InspectionReportDTO">
+        SELECT
+            apply_no AS applyNo,
+            in_no AS inNo,
+            order_no AS orderNo,
+            dept_id AS deptId,
+            dept_name AS deptName,
+            doctor_name AS doctorName,
+            apply_time AS applyTime,
+            rporter AS reporter,
+            remark,
+            content,
+            report_time AS reportTime,
+            crte_name AS crteName,
+            crte_time AS crteTime,
+            coll_blood_name AS collBloodName,
+            coll_blood_time AS collBloodTime
+        FROM
+            medic_apply
+
+        where in_no = #{inNo}
+          and type_code= '4'
+          and apply_no = #{applyNo}
+            LIMIT 1
+    </select>
+    <select id="getPacsImageReportInfo"
+            resultType="cn.hsa.module.inpt.inspectionreport.dto.PacsImageReportDTO">
+        SELECT
+            ma.apply_no AS applyNo,
+            ma.in_no AS inNo,
+            ma.order_no AS orderNo,
+            ma.dept_name AS deptName,
+            ma.doctor_name AS submittingPhysician,
+            ma.apply_time AS applyTime,
+            ma.result_id AS resultId,
+            mr.result,
+            ma.content,
+            mr.reporte_text AS diagnosis,
+            mr.check_part AS checkPart,
+            mr.crte_name AS reportPhysician,
+            mr.crte_time AS reportTime,
+            mr.crte_name AS auditor,
+            ifnull(bd.NAME,iv.in_disease_name) AS clinicalDiagnosis
+        FROM
+            medic_apply ma
+                inner JOIN medic_result mr ON ma.in_no = mr.in_no
+                AND ma.apply_no = mr.apply_no
+                LEFT JOIN outpt_diagnose od ON od.hosp_code = #{hospCode}
+                AND ma.visit_id = od.visit_id
+                AND od.is_main = '1'
+                LEFT JOIN base_disease bd ON od.disease_id = bd.id
+                LEFT JOIN inpt_visit iv on iv.in_no = ma.in_no
+        WHERE
+            ma.type_code = '5'
+          AND ma.in_no = #{inNo}
+          AND ma.hosp_code = #{hospCode}
+          AND ma.apply_no = #{applyNo}
+            LIMIT 1
+    </select>
+    <select id="getDepartmentById" parameterType="map" resultType="map">
+        select id from base_dept where hosp_code = #{hospCode}
+            and id = #{deptId} and (type_code = '1' or type_code = '2');
+    </select>
+
+    <select id="getHospitalInfo" resultType="map" parameterType="map" >
+        SELECT
+            id,
+            hosp_code AS hospCode,
+            `NAME` as hospName,
+            `CODE` As parameterCode
+        FROM
+            sys_parameter sp
+        where sp.`code` = 'YLJGBM'
+          and sp.hosp_code = #{hospCode}
+            limit 1
+    </select>
+
+    <select id="getAllParentDeptCode" resultType="string">
+        select code from base_dept where  up_dept_code is null
+    </select>
+</mapper>

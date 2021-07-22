@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.phar.pharoutreceive.dao.PharOutReceiveDetailDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="pharOutReceiveDetailDtoMap" type="cn.hsa.module.phar.pharoutreceive.dto.PharOutReceiveDetailDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="or_id" property="orId" jdbcType="VARCHAR" />
+        <result column="op_id" property="opId" jdbcType="VARCHAR" />
+        <result column="opd_id" property="opdId" jdbcType="VARCHAR" />
+        <result column="cost_id" property="costId" jdbcType="VARCHAR" />
+        <result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+        <result column="item_id" property="itemId" jdbcType="VARCHAR" />
+        <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+        <result column="spec" property="spec" jdbcType="VARCHAR" />
+        <result column="dosage" property="dosage" jdbcType="DECIMAL" />
+        <result column="dosage_unit_code" property="dosageUnitCode" jdbcType="VARCHAR" />
+        <result column="num" property="num" jdbcType="DECIMAL" />
+        <result column="unit_code" property="unitCode" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="split_ratio" property="splitRatio" jdbcType="DECIMAL" />
+        <result column="split_unit_code" property="splitUnitCode" jdbcType="VARCHAR" />
+        <result column="split_num" property="splitNum" jdbcType="DECIMAL" />
+        <result column="split_price" property="splitPrice" jdbcType="DECIMAL" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="chinese_drug_num" property="chineseDrugNum" jdbcType="DECIMAL" />
+        <result column="usage_code" property="usageCode" jdbcType="VARCHAR" />
+        <result column="use_code" property="useCode" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        or_id,
+        op_id,
+        opd_id,
+        cost_id,
+        item_code,
+        item_id,
+        item_name,
+        spec,
+        dosage,
+        dosage_unit_code,
+        num,
+        unit_code,
+        price,
+        split_ratio,
+        split_unit_code,
+        split_num,
+        split_price,
+        total_price,
+        chinese_drug_num,
+        usage_code,
+        use_code
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        pord.id,
+        pord.hosp_code,
+        pord.or_id,
+        pord.op_id,
+        pord.opd_id,
+        pord.cost_id,
+        pord.item_code,
+        pord.item_id,
+        pord.item_name,
+        pord.spec,
+        pord.dosage,
+        pord.dosage_unit_code,
+        pord.num,
+        pord.unit_code,
+        pord.price,
+        pord.split_ratio,
+        pord.split_unit_code,
+        pord.split_num,
+        pord.split_price,
+        pord.total_price,
+        pord.chinese_drug_num,
+        pord.usage_code,
+        pord.use_code
+
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="pharOutReceiveDetailDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        phar_out_receive_detail
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO" >
+        insert into
+        phar_out_receive_detail
+        (
+          id,
+          hosp_code,
+          or_id,
+          op_id,
+          opd_id,
+          cost_id,
+          item_code,
+          item_id,
+          item_name,
+          spec,
+          dosage,
+          dosage_unit_code,
+          num,
+          unit_code,
+          price,
+          split_ratio,
+          split_unit_code,
+          split_num,
+          split_price,
+          total_price,
+          chinese_drug_num,
+          usage_code,
+          use_code
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{orId,jdbcType=VARCHAR},
+          #{opId,jdbcType=VARCHAR},
+          #{opdId,jdbcType=VARCHAR},
+          #{costId,jdbcType=VARCHAR},
+          #{itemCode,jdbcType=VARCHAR},
+          #{itemId,jdbcType=VARCHAR},
+          #{itemName,jdbcType=VARCHAR},
+          #{spec,jdbcType=VARCHAR},
+          #{dosage,jdbcType=DECIMAL},
+          #{dosageUnitCode,jdbcType=VARCHAR},
+          #{num,jdbcType=DECIMAL},
+          #{unitCode,jdbcType=VARCHAR},
+          #{price,jdbcType=DECIMAL},
+          #{splitRatio,jdbcType=DECIMAL},
+          #{splitUnitCode,jdbcType=VARCHAR},
+          #{splitNum,jdbcType=DECIMAL},
+          #{splitPrice,jdbcType=DECIMAL},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{chineseDrugNum,jdbcType=DECIMAL},
+          #{usageCode,jdbcType=VARCHAR},
+          #{useCode,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into
+        phar_out_receive_detail
+        (
+          id,
+          hosp_code,
+          or_id,
+          op_id,
+          opd_id,
+          cost_id,
+          item_code,
+          item_id,
+          item_name,
+          spec,
+          dosage,
+          dosage_unit_code,
+          num,
+          unit_code,
+          price,
+          split_ratio,
+          split_unit_code,
+          split_num,
+          split_price,
+          total_price,
+          chinese_drug_num,
+          usage_code,
+          use_code,
+          curr_unit_code
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.orId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.costId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.unitCode,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.splitRatio,jdbcType=DECIMAL},
+            #{item.splitUnitCode,jdbcType=VARCHAR},
+            #{item.splitNum,jdbcType=DECIMAL},
+            #{item.splitPrice,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.chineseDrugNum,jdbcType=DECIMAL},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.currUnitCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO" >
+        insert into
+        phar_out_receive_detail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="orId != null and orId != ''">
+                or_id,
+            </if>
+            <if test="opId != null and opId != ''">
+                op_id,
+            </if>
+            <if test="opdId != null and opdId != ''">
+                opd_id,
+            </if>
+            <if test="costId != null and costId != ''">
+                cost_id,
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code,
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id,
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name,
+            </if>
+            <if test="spec != null and spec != ''">
+                spec,
+            </if>
+            <if test="dosage != null">
+                dosage,
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="splitRatio != null">
+                split_ratio,
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code,
+            </if>
+            <if test="splitNum != null">
+                split_num,
+            </if>
+            <if test="splitPrice != null">
+                split_price,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num,
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code,
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orId != null and orId != ''">
+                #{orId,jdbcType=VARCHAR},
+            </if>
+            <if test="opId != null and opId != ''">
+                #{opId,jdbcType=VARCHAR},
+            </if>
+            <if test="opdId != null and opdId != ''">
+                #{opdId,jdbcType=VARCHAR},
+            </if>
+            <if test="costId != null and costId != ''">
+                #{costId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                #{itemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                #{itemId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="spec != null and spec != ''">
+                #{spec,jdbcType=VARCHAR},
+            </if>
+            <if test="dosage != null">
+                #{dosage,jdbcType=DECIMAL},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                #{dosageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=DECIMAL},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                #{unitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="splitRatio != null">
+                #{splitRatio,jdbcType=DECIMAL},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                #{splitUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="splitNum != null">
+                #{splitNum,jdbcType=DECIMAL},
+            </if>
+            <if test="splitPrice != null">
+                #{splitPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="chineseDrugNum != null">
+                #{chineseDrugNum,jdbcType=DECIMAL},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                #{usageCode,jdbcType=VARCHAR},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                #{useCode,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO" >
+        update
+        phar_out_receive_detail
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                or_id = #{orId,jdbcType=VARCHAR},
+                op_id = #{opId,jdbcType=VARCHAR},
+                opd_id = #{opdId,jdbcType=VARCHAR},
+                cost_id = #{costId,jdbcType=VARCHAR},
+                item_code = #{itemCode,jdbcType=VARCHAR},
+                item_id = #{itemId,jdbcType=VARCHAR},
+                item_name = #{itemName,jdbcType=VARCHAR},
+                spec = #{spec,jdbcType=VARCHAR},
+                dosage = #{dosage,jdbcType=DECIMAL},
+                dosage_unit_code = #{dosageUnitCode,jdbcType=VARCHAR},
+                num = #{num,jdbcType=DECIMAL},
+                unit_code = #{unitCode,jdbcType=VARCHAR},
+                price = #{price,jdbcType=DECIMAL},
+                split_ratio = #{splitRatio,jdbcType=DECIMAL},
+                split_unit_code = #{splitUnitCode,jdbcType=VARCHAR},
+                split_num = #{splitNum,jdbcType=DECIMAL},
+                split_price = #{splitPrice,jdbcType=DECIMAL},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                chinese_drug_num = #{chineseDrugNum,jdbcType=DECIMAL},
+                usage_code = #{usageCode,jdbcType=VARCHAR},
+                use_code = #{useCode,jdbcType=VARCHAR}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO" >
+        update
+        phar_out_receive_detail
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orId != null and orId != ''">
+                or_id = #{orId,jdbcType=VARCHAR},
+            </if>
+            <if test="opId != null and opId != ''">
+                op_id = #{opId,jdbcType=VARCHAR},
+            </if>
+            <if test="opdId != null and opdId != ''">
+                opd_id = #{opdId,jdbcType=VARCHAR},
+            </if>
+            <if test="costId != null and costId != ''">
+                cost_id = #{costId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec,jdbcType=VARCHAR},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage,jdbcType=DECIMAL},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=DECIMAL},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="splitRatio != null">
+                split_ratio = #{splitRatio,jdbcType=DECIMAL},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code = #{splitUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="splitNum != null">
+                split_num = #{splitNum,jdbcType=DECIMAL},
+            </if>
+            <if test="splitPrice != null">
+                split_price = #{splitPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num = #{chineseDrugNum,jdbcType=DECIMAL},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode,jdbcType=VARCHAR},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM phar_out_receive_detail WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM phar_out_receive_detail WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="pharOutReceiveDetailDtoMap" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM phar_out_receive_detail pord
+        where
+            pord.hosp_code = #{hospCode}
+            <if test="orId != null and orId != ''">
+                AND pord.or_id = #{orId}
+            </if>
+            <if test="opId != null and opId != ''">
+                AND pord.op_id = #{opId}
+            </if>
+    </select>
+</mapper>

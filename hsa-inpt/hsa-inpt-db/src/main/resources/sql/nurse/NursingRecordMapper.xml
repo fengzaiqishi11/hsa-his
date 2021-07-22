@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.nurse.dao.NursingRecordDAO">
+
+    <!--新增护理记录-->
+    <insert id="insert" parameterType="java.util.List">
+        insert into inpt_nurse_record (id, hosp_code, visit_id,  baby_id, bno_id, pg_index, first_nurse_id, first_nurse_name,
+        second_nurse_id, second_nurse_name, is_day_sum, is_valid, delete_id, delete_name, delete_time, day_sum_id,
+        day_sum_name, day_sum_time, teacher_nurse_id, teacher_nurse_name, group_no, group_seq_no, is_end,
+        crte_id, crte_name, crte_time, item_001,item_002, item_003, item_004, item_005, item_006, item_007, item_008,
+        item_009, item_010, item_011, item_012, item_013, item_014, item_015, item_016, item_017, item_018, item_019,
+        item_020, item_021, item_022, item_023, item_024, item_025, item_026, item_027, item_028, item_029, item_030,
+        item_031, item_032, item_033, item_034, item_035, item_036, item_037, item_038, item_039, item_040)
+        values
+        <foreach collection="addList" item="item" separator=",">
+            (#{item.id},#{item.hospCode},#{item.visitId},#{item.babyId},#{item.bnoId},#{item.pgIndex},
+            #{item.firstNurseId},#{item.firstNurseName},#{item.secondNurseId},#{item.secondNurseName},#{item.isDaySum},
+            #{item.isValid},#{item.deleteId},#{item.deleteName},#{item.deleteTime},#{item.daySumId},
+            #{item.daySumName},#{item.daySumTime},#{item.teacherNurseId},#{item.teacherNurseName},#{item.groupNo},#{item.groupSeqNo},#{item.isEnd},#{item.crteId},
+            #{item.crteName},#{item.crteTime},#{item.item001},#{item.item002},#{item.item003},
+            #{item.item004},#{item.item005},#{item.item006},#{item.item007},#{item.item008},
+            #{item.item009},#{item.item010},#{item.item011},#{item.item012},#{item.item013},
+            #{item.item014},#{item.item015},#{item.item016},#{item.item017},#{item.item018},
+            #{item.item019},#{item.item020},#{item.item021},#{item.item022},#{item.item023},
+            #{item.item024},#{item.item025},#{item.item026},#{item.item027},#{item.item028},
+            #{item.item029},#{item.item030},#{item.item031},#{item.item032},#{item.item033},
+            #{item.item034},#{item.item035},#{item.item036},#{item.item037},#{item.item038},
+            #{item.item039},#{item.item040})
+        </foreach>
+    </insert>
+
+    <!--编辑护理记录-->
+    <update id="edit" parameterType="java.util.List">
+        <foreach collection="editList" item="item" separator=";">
+            update inpt_nurse_record
+            <set>
+                <if test="item.babyId != null and item.babyId != ''">
+                    baby_id = #{item.babyId},
+                </if>
+                <if test="item.pgIndex != null and item.pgIndex != ''">
+                    pg_index = #{item.pgIndex},
+                </if>
+                <if test="item.firstNurseId != null and item.firstNurseId != ''">
+                    first_nurse_id = #{item.firstNurseId},
+                </if>
+                <if test="item.firstNurseName != null and item.firstNurseName != ''">
+                    first_nurse_name = #{item.firstNurseName},
+                </if>
+                <if test="item.secondNurseId != null and item.secondNurseId != ''">
+                    second_nurse_id = #{item.secondNurseId},
+                </if>
+                <if test="item.secondNurseName != null and item.secondNurseName != ''">
+                    second_nurse_name = #{item.secondNurseName},
+                </if>
+                <if test="item.isDaySum != null and item.isDaySum != ''">
+                    is_day_sum = #{item.isDaySum},
+                </if>
+                <if test="item.isValid != null and item.isValid != ''">
+                    is_valid = #{item.isValid},
+                </if>
+                <if test="item.deleteId != null and item.deleteId != ''">
+                    delete_id = #{item.deleteId},
+                </if>
+                <if test="item.deleteName != null and item.deleteName != ''">
+                    delete_name = #{item.deleteName},
+                </if>
+                <if test="item.deleteTime != null">
+                    delete_time = #{item.deleteTime},
+                </if>
+                <if test="item.daySumId != null and item.daySumId != ''">
+                    day_sum_id = #{item.daySumId},
+                </if>
+                <if test="item.daySumName != null and item.daySumName != ''">
+                    day_sum_name = #{item.daySumName},
+                </if>
+                <if test="item.daySumTime != null">
+                    day_sum_time = #{item.daySumTime},
+                </if>
+                <if test="item.teacherNurseId != null and item.teacherNurseId != ''">
+                    teacher_nurse_id = #{item.teacherNurseId},
+                </if>
+                <if test="item.teacherNurseName != null and item.teacherNurseName != ''">
+                    teacher_nurse_name = #{item.teacherNurseName},
+                </if>
+                <if test="item.groupNo != null and item.groupNo != ''">
+                    group_no = #{item.groupNo},
+                </if>
+                <if test="item.groupSeqNo != null and item.groupSeqNo != ''">
+                    group_seq_no = #{item.groupSeqNo},
+                </if>
+                <if test="item.isEnd != null and item.isEnd != ''">
+                    is_end = #{item.isEnd},
+                </if>
+                <if test="item.crteId != null and item.crteId != ''">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null and item.crteName != ''">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime},
+                </if>
+                <if test="item.item001 != null">
+                    item_001 = #{item.item001},
+                </if>
+                <if test="item.item002 != null">
+                    item_002 = #{item.item002},
+                </if>
+                <if test="item.item003 != null">
+                    item_003 = #{item.item003},
+                </if>
+                <if test="item.item004 != null">
+                    item_004 = #{item.item004},
+                </if>
+                <if test="item.item005 != null">
+                    item_005 = #{item.item005},
+                </if>
+                <if test="item.item006 != null">
+                    item_006 = #{item.item006},
+                </if>
+                <if test="item.item007 != null">
+                    item_007 = #{item.item007},
+                </if>
+                <if test="item.item008 != null">
+                    item_008 = #{item.item008},
+                </if>
+                <if test="item.item009 != null">
+                    item_009 = #{item.item009},
+                </if>
+                <if test="item.item010 != null">
+                    item_010 = #{item.item010},
+                </if>
+                <if test="item.item011 != null">
+                    item_011 = #{item.item011},
+                </if>
+                <if test="item.item012 != null">
+                    item_012 = #{item.item012},
+                </if>
+                <if test="item.item013 != null">
+                    item_013 = #{item.item013},
+                </if>
+                <if test="item.item014 != null">
+                    item_014 = #{item.item014},
+                </if>
+                <if test="item.item015 != null">
+                    item_015 = #{item.item015},
+                </if>
+                <if test="item.item016 != null">
+                    item_016 = #{item.item016},
+                </if>
+                <if test="item.item017 != null">
+                    item_017 = #{item.item017},
+                </if>
+                <if test="item.item018 != null">
+                    item_018 = #{item.item018},
+                </if>
+                <if test="item.item019 != null">
+                    item_019 = #{item.item019},
+                </if>
+                <if test="item.item020 != null">
+                    item_020 = #{item.item020},
+                </if>
+                <if test="item.item021 != null">
+                    item_021 = #{item.item021},
+                </if>
+                <if test="item.item022 != null">
+                    item_022 = #{item.item022},
+                </if>
+                <if test="item.item023 != null">
+                    item_023 = #{item.item023},
+                </if>
+                <if test="item.item024 != null">
+                    item_024 = #{item.item024},
+                </if>
+                <if test="item.item025 != null">
+                    item_025 = #{item.item025},
+                </if>
+                <if test="item.item026 != null">
+                    item_026 = #{item.item026},
+                </if>
+                <if test="item.item027 != null">
+                    item_027 = #{item.item027},
+                </if>
+                <if test="item.item028 != null">
+                    item_028 = #{item.item028},
+                </if>
+                <if test="item.item029 != null">
+                    item_029 = #{item.item029},
+                </if>
+                <if test="item.item030 != null">
+                    item_030 = #{item.item030},
+                </if>
+                <if test="item.item031 != null">
+                    item_031 = #{item.item031},
+                </if>
+                <if test="item.item032 != null">
+                    item_032 = #{item.item032},
+                </if>
+                <if test="item.item033 != null">
+                    item_033 = #{item.item033},
+                </if>
+                <if test="item.item034 != null">
+                    item_034 = #{item.item034},
+                </if>
+                <if test="item.item035 != null">
+                    item_035 = #{item.item035},
+                </if>
+                <if test="item.item036 != null">
+                    item_036 = #{item.item036},
+                </if>
+                <if test="item.item037 != null">
+                    item_037 = #{item.item037},
+                </if>
+                <if test="item.item038 != null">
+                    item_038 = #{item.item038},
+                </if>
+                <if test="item.item039 != null">
+                    item_039 = #{item.item039},
+                </if>
+                <if test="item.item040 != null">
+                    item_040 = #{item.item040},
+                </if>
+            </set>
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            and visit_id = #{item.visitId}
+            and bno_id = #{item.bnoId}
+            <if test="item.babyId != null and item.babyId != ''">
+                and baby_id = #{item.babyId}
+            </if>
+        </foreach>
+    </update>
+
+    <!--删除护理记录-->
+    <update id="updateIsValid" parameterType="java.util.List">
+        <foreach collection="delList" item="item" separator=";">
+            update inpt_nurse_record
+            <set>
+                <if test="item.isValid != null and item.isValid != ''">
+                    is_valid = #{item.isValid},
+                </if>
+                <if test="item.deleteId != null and item.deleteId != ''">
+                    delete_id = #{item.deleteId},
+                </if>
+                <if test="item.deleteName != null and item.deleteName != ''">
+                    delete_name = #{item.deleteName},
+                </if>
+                <if test="item.deleteTime != null">
+                    delete_time = #{item.deleteTime},
+                </if>
+            </set>
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        <!--delete from inpt_nurse_record
+        where group_no in
+        <foreach collection="deleteList" separator="," item="item" open="(" close=")">
+            #{item.groupNo}
+        </foreach>
+        and visit_id in
+        <foreach collection="deleteList" separator="," item="item" open="(" close=")">
+            #{item.visitId}
+        </foreach>
+        and hosp_code in
+        <foreach collection="deleteList" separator="," item="item" open="(" close=")">
+            #{item.hospCode}
+        </foreach>-->
+        <foreach collection="deleteList" separator=";" item="item">
+            delete from inpt_nurse_record
+            <where>
+                <if test="item.hospCode != null and item.hospCode != ''">
+                    and hosp_code = #{item.hospCode}
+                </if>
+                <if test="item.visitId != null and item.visitId != ''">
+                    and visit_id = #{item.visitId}
+                </if>
+                <if test="item.groupNo != null and item.groupNo != ''">
+                    and group_no = #{item.groupNo}
+                </if>
+                <if test="item.babyId != null and item.babyId != ''">
+                    and baby_id = #{item.babyId}
+                </if>
+            </where>
+        </foreach>
+    </delete>
+
+    <!--分页查询护理单记录-->
+    <select id="queryNursingRecord" resultType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO"
+            parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO">
+        select id, hosp_code, visit_id, baby_id, bno_id, pg_index, first_nurse_id, first_nurse_name,
+        second_nurse_id, second_nurse_name, is_day_sum, is_valid, delete_id, delete_name,
+        delete_time, day_sum_id, day_sum_name, day_sum_time, teacher_nurse_id,
+        teacher_nurse_name, group_no, group_seq_no, is_end, crte_id, crte_name, crte_time, item_001, item_002, item_003,
+        item_004, item_005, item_006, item_007, item_008, item_009, item_010, item_011,
+        item_012, item_013, item_014, item_015, item_016, item_017, item_018, item_019,
+        item_020, item_021, item_022, item_023, item_024, item_025, item_026, item_027,
+        item_028, item_029, item_030, item_031, item_032, item_033, item_034, item_035,
+        item_036, item_037, item_038, item_039, item_040
+        from inpt_nurse_record
+        where hosp_code = #{hospCode}
+        and visit_id = #{visitId}
+        and bno_id = #{bnoId}
+        and is_valid = '1'
+        <if test="babyId != null and babyId != ''">
+            and baby_id = #{babyId}
+        </if>
+        <if test="babyId == null or babyId == ''">
+            and (baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
+        </if>
+        <if test="startTime != null">
+            and is_day_sum = '0'
+            and STR_TO_DATE(CONCAT(item_001,item_004),'%Y-%m-%d %H:%i:%s') &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endTime != null">
+            and STR_TO_DATE(CONCAT(item_001,item_004),'%Y-%m-%d %H:%i:%s') &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <!--order by crte_time-->
+        <if test="orderFlag != null and orderFlag == 1">
+            order by item_039, group_no, group_seq_no asc
+        </if>
+        <if test="orderFlag == null">
+            order by group_no, group_seq_no ASC
+        </if>
+
+    </select>
+
+    <!--判断护理单据是否存在-->
+    <select id="findNurseOrder" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO" resultType="int">
+        select count(1)
+        from base_nurse_order
+        where hosp_code = #{hospCode}
+          and id = #{bnoId}
+    </select>
+
+    <!--查询出护理单据类型下所有需要汇总的表头-->
+    <select id="findNurseTbHead" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select id,
+               hosp_code,
+               bno_code,
+               seq_no,
+               up_code,
+               code,
+               name,
+               item_code,
+               min_num,
+               max_num,
+               gender_code,
+               date_type_code,
+               data_width,
+               data_length,
+               source_code,
+               source_value,
+               default_value,
+               is_up,
+               is_sum,
+               is_valid,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and is_sum = '1'
+          and is_valid = '1'
+          and bno_code = #{bnoCode}
+        order by seq_no,crte_time
+    </select>
+
+    <!--查询出护理单据下所有的表头-->
+    <select id="findAllNurseTBhead" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select id,
+               hosp_code,
+               bno_code,
+               seq_no,
+               up_code,
+               code,
+               name,
+               item_code,
+               min_num,
+               max_num,
+               gender_code,
+               date_type_code,
+               data_width,
+               data_length,
+               source_code,
+               source_value,
+               default_value,
+               is_up,
+               is_sum,
+               is_valid,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and is_valid = '1'
+          and bno_code = #{bnoCode}
+        order by seq_no,crte_time
+    </select>
+
+    <!--插入单个护理记录-->
+    <insert id="addDaySummary" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO">
+        insert into inpt_nurse_record (id, hosp_code, visit_id, baby_id, bno_id, pg_index, first_nurse_id, first_nurse_name,
+                                       second_nurse_id, second_nurse_name, is_day_sum, is_valid, delete_id, delete_name,
+                                       delete_time, day_sum_id, day_sum_name, day_sum_time, teacher_nurse_id,
+                                       teacher_nurse_name, group_no, group_seq_no, is_end,crte_id, crte_name, crte_time, item_001, item_002, item_003,
+                                       item_004, item_005, item_006, item_007, item_008, item_009, item_010, item_011,
+                                       item_012, item_013, item_014, item_015, item_016, item_017, item_018, item_019,
+                                       item_020, item_021, item_022, item_023, item_024, item_025, item_026, item_027,
+                                       item_028, item_029, item_030, item_031, item_032, item_033, item_034, item_035,
+                                       item_036, item_037, item_038, item_039, item_040)
+        values (#{id}, #{hospCode}, #{visitId}, #{babyId}, #{bnoId}, #{pgIndex},
+                #{firstNurseId}, #{firstNurseName}, #{secondNurseId}, #{secondNurseName}, #{isDaySum},
+                #{isValid}, #{deleteId}, #{deleteName}, #{deleteTime}, #{daySumId},
+                #{daySumName}, #{daySumTime}, #{teacherNurseId}, #{teacherNurseName}, #{groupNo},#{groupSeqNo},#{isEnd}, #{crteId},
+                #{crteName}, #{crteTime}, #{item001}, #{item002}, #{item003},
+                #{item004}, #{item005}, #{item006}, #{item007}, #{item008},
+                #{item009}, #{item010}, #{item011}, #{item012}, #{item013},
+                #{item014}, #{item015}, #{item016}, #{item017}, #{item018},
+                #{item019}, #{item020}, #{item021}, #{item022}, #{item023},
+                #{item024}, #{item025}, #{item026}, #{item027}, #{item028},
+                #{item029}, #{item030}, #{item031}, #{item032}, #{item033},
+                #{item034}, #{item035}, #{item036}, #{item037}, #{item038},
+                #{item039}, #{item040})
+    </insert>
+
+    <!--查询所有住院病人-->
+    <!--<select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">-->
+    <select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+        id,
+        bed_id,
+        bed_name,
+        name,
+        gender_code,
+        age,
+        age_unit_code,
+        status_code,
+        in_no,
+        in_dept_id,
+        in_dept_name,
+        in_time,
+        in_disease_id,
+        in_disease_name,
+        out_time,
+        total_advance,
+        total_cost,
+        total_balance,
+        zz_doctor_name,
+        outpt_visit_no,
+        in_disease_icd10,
+        in_ward_id,
+        Illness_code,
+        outpt_visit_no
+        FROM
+        inpt_visit
+        WHERE
+        hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and status_code = #{statusCode}
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and in_dept_id = #{inDeptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like CONCAT('%',#{keyword},'%')
+             or bed_name like CONCAT('%',#{keyword},'%')
+             or in_no like CONCAT('%', #{keyword}, '%')
+            or in_dept_name like CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by in_time desc
+    </select>
+
+    <!--查询所有住院病人,预交金缴纳情况-->
+    <select id="queryAcceptGold" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">
+        SELECT
+        iv.id,
+        iv.cert_no,
+        iv.bed_id,
+        iv.bed_name,
+        iv.name,
+        iv.gender_code,
+        iv.age,
+        iv.age_unit_code,
+        iv.status_code,
+        iv.in_no,
+        iv.in_dept_id,
+        iv.in_dept_name,
+        iv.in_time,
+        iv.in_disease_id,
+        iv.in_disease_name,
+        iv.out_time,
+        iv.total_advance,
+        iv.total_cost,
+        iv.total_balance,
+        iv.zz_doctor_name,
+        iv.outpt_visit_no,
+        iv.in_disease_icd10,
+        iv.in_ward_id,
+        iv.Illness_code,
+        iv.outpt_doctor_name,
+        iap.is_settle,
+        iap.pay_code,
+        iap.ap_order_no,
+        iap.price,
+        iap.crte_time,
+        iap.crte_name
+        FROM
+        inpt_visit iv,
+        inpt_advance_pay iap
+        WHERE  iap.visit_id=iv.id
+        and
+        iv.hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and iv.status_code = #{statusCode}
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and iv.in_dept_id = #{inDeptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like CONCAT('%',#{keyword},'%')
+            or iv.bed_name like CONCAT('%',#{keyword},'%')
+            or iv.in_no like CONCAT('%', #{keyword}, '%')
+            or iv.in_dept_name like CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="isSettle != null and isSettle != ''">
+            and iap.is_settle =#{isSettle}
+        </if>
+        <if test="payCode != null and payCode != ''">
+            and iap.pay_code =#{payCode}
+        </if>
+        order by iap.crte_time desc,iv.name asc
+    </select>
+
+    <!--获取分割参数-->
+    <select id="getValue" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+            value
+        from sys_parameter
+        where hosp_code = #{hospCode}
+        and is_valid = '1'
+        and code = #{code}
+    </select>
+
+    <!--获取当前人员最大组号-->
+    <select id="getMaxGroupNo" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO" resultType="java.lang.Integer">
+        select Max(group_no)
+        from inpt_nurse_record
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and is_valid = '1'
+    </select>
+
+    <select id="queryNurseByGroup" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO">
+        select * from inpt_nurse_record where is_valid = '1'
+        and group_no in
+        <foreach collection="groupNoList" item="item" separator="," close=")" open="(">
+            #{item}
+        </foreach>
+        <if test="nurseRecordDTO.visitId != null and nurseRecordDTO.visitId != ''">
+            and visit_id = #{nurseRecordDTO.visitId}
+        </if>
+        <if test="nurseRecordDTO.hospCode != null and nurseRecordDTO.hospCode != ''">
+            and hosp_code = #{nurseRecordDTO.hospCode}
+        </if>
+        <if test="nurseRecordDTO.babyId != null and nurseRecordDTO.babyId != ''">
+            and baby_id = #{nurseRecordDTO.babyId}
+        </if>
+    </select>
+</mapper>

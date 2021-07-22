@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.OutptInsurePayDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptInsurePayDtoMap" type="cn.hsa.module.outpt.fees.dto.OutptInsurePayDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+        <result column="org_no" property="orgNo" jdbcType="VARCHAR" />
+        <result column="org_name" property="orgName" jdbcType="VARCHAR" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code, 
+        settle_id, 
+        visit_id, 
+        type_code, 
+        org_no, 
+        org_name, 
+        total_price
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        oip.id, 
+        oip.hosp_code, 
+        oip.settle_id, 
+        oip.visit_id, 
+        oip.type_code, 
+        oip.org_no, 
+        oip.org_name, 
+        oip.total_price
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptInsurePayDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_insure_pay
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.fees.entity.OutptInsurePayDO" >
+        insert into
+        outpt_insure_pay
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          type_code,
+          org_no,
+          org_name,
+          total_price
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{settleId,jdbcType=VARCHAR}, 
+          #{visitId,jdbcType=VARCHAR}, 
+          #{typeCode,jdbcType=VARCHAR}, 
+          #{orgNo,jdbcType=VARCHAR}, 
+          #{orgName,jdbcType=VARCHAR}, 
+          #{totalPrice,jdbcType=DECIMAL}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptInsurePayDO" >
+        insert into
+        outpt_insure_pay
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                    settle_id, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                    type_code, 
+                </if>
+                <if test="orgNo != null and orgNo != ''">
+                    org_no, 
+                </if>
+                <if test="orgName != null and orgName != ''">
+                    org_name, 
+                </if>
+                <if test="totalPrice != null">
+                    total_price
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                        #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                        #{typeCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="orgNo != null and orgNo != ''">
+                        #{orgNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="orgName != null and orgName != ''">
+                        #{orgName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="totalPrice != null">
+                        #{totalPrice,jdbcType=DECIMAL}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.fees.entity.OutptInsurePayDO" >
+        update
+        outpt_insure_pay
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                type_code = #{typeCode,jdbcType=VARCHAR}, 
+                org_no = #{orgNo,jdbcType=VARCHAR}, 
+                org_name = #{orgName,jdbcType=VARCHAR}, 
+                total_price = #{totalPrice,jdbcType=DECIMAL}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptInsurePayDO" >
+        update
+        outpt_insure_pay
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="orgNo != null and orgNo != ''">
+                org_no = #{orgNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="orgName != null and orgName != ''">
+                org_name = #{orgName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM outpt_insure_pay WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM outpt_insure_pay WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="outptInsurePayDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptInsurePayDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_insure_pay oip 
+        <where>
+            <if test="hospCode != null and hospCode != ''">
+                AND oip.hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+            </if>
+            <if test="settleId != null and settleId != ''">
+                AND oip.settle_id LIKE CONCAT('%', #{settleId}, '%')
+            </if>
+            <if test="visitId != null and visitId != ''">
+                AND oip.visit_id LIKE CONCAT('%', #{visitId}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="getOutptInsurePayByParams" resultMap="outptInsurePayDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_insure_pay oip
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id}
+    </select>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertOutptInsurePays" parameterType="java.util.List">
+        INSERT INTO outpt_insure_pay (
+        id, hosp_code, settle_id, visit_id, type_code, org_no, org_name, total_price
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.settleId},
+            #{item.visitId},
+            #{item.typeCode},
+            #{item.orgNo},
+            #{item.orgName},
+            #{item.totalPrice}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

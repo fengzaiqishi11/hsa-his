@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+<!--    <dubbo:reference id="baseFinanceClassifyApi_dubbo" interface="BaseFinanceClassifyApi" check="false"/>-->
+    <!--<dubbo:consumer timeout="30000"/>-->
+
+    <!--中心平台 >> 医院数据源管理 -->
+    <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
+
+<!--    &lt;!&ndash;基础数据 >> 单据号生成 &ndash;&gt;-->
+<!--    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>-->
+
+<!--    &lt;!&ndash;基础数据 >> 科室 &ndash;&gt;-->
+<!--    <dubbo:reference id="baseDeptService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService" check="false"/>-->
+
+    <!-- 电子病历子系统 -> 电子病历元素管理 -->
+    <dubbo:reference id="emrElementServcie_consumer" interface="cn.hsa.module.emr.emrelement.service.EmrElementServcie" check="false"/>
+
+    <!-- 电子病历子系统 -> 电子病历文档分类元素管理 -->
+    <dubbo:reference id="emrClassifyElementServcie_consumer" interface="cn.hsa.module.emr.emrclassifyelement.service.EmrClassifyElementService" check="false"/>
+
+    <!-- 电子病历子系统 -> 电子病历文档分类 -->
+    <dubbo:reference id="emrClassifyTemplateService_consumer" interface="cn.hsa.module.emr.emrclassifytemplate.service.EmrClassifyTemplateService" check="false"/>
+
+    <!-- cx -->
+    <dubbo:reference id="cxStroStockApi_consumer" interface="cn.hsa.module.stro.stock.service.StroStockService" check="false"/>
+    <!-- 医保管理子系统 -> 项目匹配 -->
+    <dubbo:reference id="insureItemMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureItemMatchService" check="false"/>
+    <!-- 医保管理子系统 -> 疾病匹配 -->
+    <dubbo:reference id="insureDiseaseMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" check="false"/>
+</beans>

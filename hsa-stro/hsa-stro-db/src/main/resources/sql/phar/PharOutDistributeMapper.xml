@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharoutdistribute.dao.PharOutDistributeDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO" id="PharOutDistributeMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="windowId" column="window_id" jdbcType="VARCHAR"/>
+        <result property="assignUserId" column="assign_user_id" jdbcType="VARCHAR"/>
+        <result property="assignUserName" column="assign_user_name" jdbcType="VARCHAR"/>
+        <result property="assignTime" column="assign_time" jdbcType="TIMESTAMP"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distUserName" column="dist_user_name" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDetailDTO" id="PharOutDistributeDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="distributeId" column="distribute_id" jdbcType="VARCHAR"/>
+        <result property="opId" column="op_id" jdbcType="VARCHAR"/>
+        <result property="opdId" column="opd_id" jdbcType="VARCHAR"/>
+        <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="NUMERIC"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="stockDetailId" column="stock_detail_id" jdbcType="VARCHAR"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="backNum" column="back_num" jdbcType="NUMERIC"/>
+        <result property="totalBackNum" column="total_back_num" jdbcType="NUMERIC"/>
+        <result property="upBatchSurplusNum" column="up_batch_surplus_num" jdbcType="NUMERIC"/>
+        <result property="batchSurplusNum" column="batch_surplus_num" jdbcType="NUMERIC"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="NUMERIC"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="NUMERIC"/>
+        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="NUMERIC"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="NUMERIC"/>
+        <result property="oldDistId" column="old_dist_id" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="PharOutDistributeMap">
+        select
+          id, hosp_code, visit_id, settle_id, total_price, phar_id, window_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id, crte_name, crte_time
+        from phar_out_distribute
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PharOutDistributeMap">
+        select
+          id, hosp_code, visit_id, settle_id, total_price, phar_id, window_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id, crte_name, crte_time
+        from phar_out_distribute
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PharOutDistributeMap">
+        select
+        id, hosp_code, visit_id, settle_id, total_price, phar_id, window_id, assign_user_id, assign_user_name,
+        assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id, crte_name, crte_time
+        from phar_out_distribute
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and settle_id = #{settleId}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="pharId != null and pharId != ''">
+                and phar_id = #{pharId}
+            </if>
+            <if test="windowId != null and windowId != ''">
+                and window_id = #{windowId}
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                and assign_user_id = #{assignUserId}
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                and assign_user_name = #{assignUserName}
+            </if>
+            <if test="assignTime != null">
+                and assign_time = #{assignTime}
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                and dist_user_id = #{distUserId}
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                and dist_user_name = #{distUserName}
+            </if>
+            <if test="distTime != null">
+                and dist_time = #{distTime}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and dept_id = #{deptId}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_out_distribute(hosp_code, visit_id, settle_id, total_price, phar_id, window_id, assign_user_id,
+         assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id, crte_name, crte_time)
+        values (#{hospCode}, #{visitId}, #{settleId}, #{totalPrice}, #{pharId}, #{windowId}, #{assignUserId}, #{assignUserName}, #{assignTime}, #{distUserId}, #{distUserName}, #{distTime}, #{deptId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update phar_out_distribute
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="windowId != null and windowId != ''">
+                window_id = #{windowId},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id = #{assignUserId},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name = #{assignUserName},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id = #{distUserId},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name = #{distUserName},
+            </if>
+            <if test="distTime != null">
+                dist_time = #{distTime},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from phar_out_distribute where id = #{id}
+    </delete>
+
+</mapper>

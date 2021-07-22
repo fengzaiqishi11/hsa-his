@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrclassifytemplate.dao.EmrClassifyTemplateDAO">
+
+	<resultMap type="cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO" id="EmrClassifyTemplateMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="classifyCode" column="classify_code" jdbcType="VARCHAR"/>
+		<result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+		<result property="templateHtml" column="template_html" jdbcType="OTHER"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!--查询单个模板-->
+	<select id="getById" resultType="cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO">
+		select
+          id, hosp_code, classify_code, dept_id, template_html, crte_id, crte_name, crte_time
+        from emr_classify_template
+        where id = #{id} and hosp_code = #{hospCode}
+		<if test="deptId != null and deptId != ''">
+			and dept_id = #{deptId}
+		</if>
+		<if test="deptId == null or deptId == ''.toString">
+			and dept_id is null
+		</if>
+	</select>
+
+	<!--查询有效病历模板信息-->
+	<select id="queryTemplate" resultType="cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO">
+		select
+		a.id, a.hosp_code, a.classify_code, a.dept_id, a.template_html, a.crte_id, a.crte_name, a.crte_time
+		from emr_classify_template as a
+		left join emr_classify as b
+		on a.hosp_code = b.hosp_code and ifnull(a.dept_id,'') = ifnull(b.dept_id,'') and a.classify_code  = b.code
+		where a.hosp_code = #{hospCode} and b.is_valid = '1'
+		<if test="deptId != null and deptId != ''">
+			and a.dept_id = #{deptId}
+		</if>
+		<if test="deptId == null or deptId == ''.toString">
+			and a.dept_id is null
+		</if>
+		<if test="codes != null and codes.size>0">
+			and a.classify_code in
+			<foreach collection="codes" item="code" separator="," open="(" close=")">
+				#{code}
+			</foreach>
+		</if>
+	</select>
+
+	<!--查询病历模板信息-->
+	<select id="queryAllTemplate" resultType="cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO">
+		select
+		a.id, a.hosp_code, a.classify_code, a.dept_id, a.template_html, a.crte_id, a.crte_name, a.crte_time
+		from emr_classify_template as a
+		left join emr_classify as b
+		on a.hosp_code = b.hosp_code and ifnull(a.dept_id,'') = ifnull(b.dept_id,'') and a.classify_code  = b.code
+		where a.hosp_code = #{hospCode}
+		<if test="deptId != null and deptId != ''">
+			and a.dept_id = #{deptId}
+		</if>
+		<if test="deptId == null">
+			and a.dept_id is null
+		</if>
+		<if test="codes != null and codes.size>0">
+			and a.classify_code in
+			<foreach collection="codes" item="code" separator="," open="(" close=")">
+				#{code}
+			</foreach>
+		</if>
+	</select>
+
+	<!--查询科室已经派发的分类id-->
+	<select id="queryTemplates" resultType="java.lang.String">
+        select a.classify_code
+        from emr_classify_template as a
+        left join emr_classify as b
+        on a.classify_code  = b.code and ifnull(a.dept_id,'') = ifnull(b.dept_id,'')  and a.hosp_code = b.hosp_code
+        where a.dept_id = #{deptId}  and b.is_valid = '1' and a.hosp_code = #{hospCode}
+    </select>
+
+	<!--查询模板id对应的分类Code-->
+	<select id="queryClassifyCode" resultType="java.lang.String">
+		select classify_code
+		from emr_classify_template
+		where hosp_code = #{hospCode}
+		<if test="codes != null and codes.size>0">
+			and id in
+			<foreach collection="codes" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+
+	<!--单个新增-->
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into emr_classify_template(id, hosp_code, classify_code, dept_id, template_html, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{classifyCode}, #{deptId}, #{templateHtml}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+	<!--批量新增所有列-->
+	<insert id="insertBatch">
+        insert into emr_classify_template(id, hosp_code, classify_code, dept_id, template_html, crte_id, crte_name, crte_time)
+		values
+		<foreach collection="list" separator="," item="item">
+			(#{item.id}, #{item.hospCode}, #{item.classifyCode}, #{item.deptId},
+			#{item.templateHtml}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+		</foreach>
+    </insert>
+
+
+	<!--通过主键修改数据(有判空条件))-->
+	<update id="updateEmrClassifyTemplateS">
+		update emr_classify_template
+		<set>
+			<if test="hospCode != null and hospCode != ''">
+				hosp_code = #{hospCode},
+			</if>
+			<if test="classifyCode != null and classifyCode != ''">
+				classify_code = #{classifyCode},
+			</if>
+			<if test="deptId != null and deptId != ''">
+				dept_id = #{deptId},
+			</if>
+			<if test="templateHtml != null">
+				template_html = #{templateHtml},
+			</if>
+			<if test="crteId != null and crteId != ''">
+				crte_id = #{crteId},
+			</if>
+			<if test="crteName != null and crteName != ''">
+				crte_name = #{crteName},
+			</if>
+			<if test="crteTime != null">
+				crte_time = #{crteTime},
+			</if>
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!-- 查询全员病历所有分类-->
+	<select id="queryClassify" resultType="cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO">
+		select
+		id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm,seq,
+		is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id,
+		crte_name, crte_time, record_time_code,valid_time
+		from emr_classify
+		<where>
+			hosp_code = #{hospCode} and dept_id is null
+			<if test="codes != null and codes.size() > 0">
+				and code in
+				<foreach collection="codes" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询全员病历所有分类元素-->
+	<select id="queryClassifyElement" resultType="cn.hsa.module.emr.emrclassifyelement.dto.EmrClassifyElementDTO">
+		select
+		id, hosp_code, classinfo_code, element_code, dept_id, is_valid, crte_id, crte_name, crte_time
+		from emr_classify_element
+		<where>
+			hosp_code = #{hospCode} and dept_id is null
+			<if test="codes != null and codes.size()>0">
+				and classinfo_code in
+				<foreach collection="codes" item="code" open="(" close=")" separator=",">
+					#{code}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询全院病历绑定的分类-->
+	<select id="queryClassified" resultType="java.lang.String">
+		select code from emr_classify
+		where hosp_code = #{hospCode} and dept_id = #{deptId} and code in
+		<foreach collection="codes" item="code" open="(" close=")" separator=",">
+			#{code}
+		</foreach>
+	</select>
+
+	<select id="queryCheckCodes" resultType="java.lang.String">
+        select a.classify_code
+        from emr_classify_template as a
+        left join emr_classify as b
+        on a.classify_code  = b.code and ifnull(a.dept_id,'') = ifnull(b.dept_id,'')  and a.hosp_code = b.hosp_code
+        where a.dept_id = #{deptId}  and b.is_valid = '1' and a.hosp_code = #{hospCode}
+	</select>
+
+	<select id="queryClassifyNode" resultType="cn.hsa.base.TreeMenuNode">
+		select code as id,name as label,up_code as parentId,valid_time as validTime
+		from emr_classify
+		where hosp_code = #{hospCode} and dept_id is null and
+		code in
+		<foreach collection="codes" item="code" open="(" close=")" separator=",">
+			#{code}
+		</foreach>
+	</select>
+	
+	<!-- 批量新增分类-->
+	<insert id="insertClassify">
+		insert into emr_classify(id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code,
+		pym, wbm, seq, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id,
+		crte_id, crte_name, crte_time, record_time_code,valid_time)
+		values
+		<foreach collection="emrClassifyDTOS" index="index" item="item" separator=",">
+			(#{item.id}, #{item.hospCode}, #{item.code}, #{item.name}, #{item.upCode}, #{item.pagePrintCode},
+			#{item.typeCode}, #{item.docCode}, #{item.genderCode}, #{item.pym}, #{item.wbm},#{item.seq},
+			#{item.isDelNullline}, #{item.isCommon}, #{item.isEnd}, #{item.isValid}, #{item.isUnique},
+			#{item.isPagePrint}, #{item.isAudit}, #{item.isHosp}, #{item.deptId},
+			#{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.recordTimeCode},#{item.validTime})
+		</foreach>
+	</insert>
+
+	<!-- 批量新增分类元素-->
+	<insert id="insertClassifyElement">
+		insert into emr_classify_element(id,hosp_code, classinfo_code, element_code, dept_id, is_valid, crte_id,
+		crte_name, crte_time)
+		values
+		<foreach collection="emrClassifyElementDTOS" separator="," item="item">
+			(#{item.id}, #{item.hospCode}, #{item.classinfoCode}, #{item.elementCode}, #{item.deptId}, '1',
+			#{item.crteId}, #{item.crteName}, #{item.crteTime})
+		</foreach>
+	</insert>
+
+	<!-- 批量修改分类-->
+	<update id="updateClassify">
+		update emr_classify set is_valid = '0' where hosp_code = #{hospCode}
+		and dept_id = #{deptId} and code in
+		<foreach collection="codes" item="code" separator="," open="(" close=")">
+			#{code}
+		</foreach>
+	</update>
+	<!--通过主键批量修改数据(有判空条件))-->
+	<update id="updateTemplate">
+		<foreach collection="list" item="item" index="index" separator=";">
+		update emr_classify_template
+		<set>
+			<if test="item.hospCode != null ">
+				hosp_code = #{item.hospCode},
+			</if>
+			<if test="item.classifyCode != null ">
+				classify_code = #{item.classifyCode},
+			</if>
+			<if test="item.templateHtml != null">
+				template_html = #{item.templateHtml},
+			</if>
+		</set>
+		where id = #{item.id} and hosp_code = #{item.hospCode}
+			<if test="item.deptId != null and item.deptId != ''">
+				and dept_id = #{item.deptId}
+			</if>
+			<if test="item.deptId == null and item.deptId == ''">
+				and dept_id is null
+			</if>
+		</foreach>
+	</update>
+
+	<!-- 批量删除分类-->
+	<delete id="deleteClassify">
+		delete from emr_classify where hosp_code = #{hospCode} and dept_id = #{deptId}
+		and code in
+		<foreach collection="codes" item="code" open="(" close=")" separator=",">
+			#{code}
+		</foreach>
+	</delete>
+
+	<!-- 批量删除分类元素-->
+	<delete id="deleteClassifyElement">
+		delete from emr_classify_element
+		where hosp_code = #{hospCode} and dept_id = #{deptId}
+		and classinfo_code in
+		<foreach collection="codes" item="code" open="(" close=")" separator=",">
+			#{code}
+		</foreach>
+	</delete>
+</mapper>

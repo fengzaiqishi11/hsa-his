@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrelementtemplate.dao.EmrElementTemplateDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO" id="EmrElementTemplateMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="mbName" column="mb_name" jdbcType="VARCHAR"/>
+        <result property="gxfw" column="gxfw" jdbcType="VARCHAR"/>
+        <result property="elementCode" column="element_code" jdbcType="VARCHAR"/>
+        <result property="mbnr" column="mbnr" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--批量新增所有列-->
+    <insert id="saveEmrElementTemplate" parameterType="cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO">
+        insert into emr_element_template(id, hosp_code, dept_id, mb_name, gxfw, element_code, mbnr, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="list" separator=",">
+            (#{list.id}, #{list.hospCode}, #{list.deptId}, #{list.mbName}, #{list.gxfw}, #{list.elementCode}, #{list.mbnr}, #{list.crteId}, #{list.crteName}, #{list.crteTime})
+        </foreach>
+    </insert>
+
+    <!-- 根据条件查询单项模板 -->
+    <select id="getEmrElementTemplates" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO">
+        select * from emr_element_template where hosp_code = #{hospCode} and element_code = #{elementCode}
+        <if test="gxfw != null and gxfw == '1'.toString()">
+            and crte_id = #{userId} and gxfw = '1'
+        </if>
+        <if test="gxfw != null and gxfw == '2'.toString()">
+            and dept_id = #{deptId} and gxfw = '2'
+        </if>
+        <if test="gxfw != null and gxfw == '3'.toString()">
+            and gxfw = '3'
+        </if>
+    </select>
+
+    <!-- 根据主键删除单项模板 -->
+    <delete id="deleteEmrElementTemplates" parameterType="java.util.Map">
+        delete from emr_element_template where hosp_code = #{hosp_code} and id in ( ${ids} )
+    </delete>
+
+    <select id="getBlmbUseElements" resultType="cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO" parameterType="java.util.Map">
+        select m.code as elementCode, m.name as elementName from emr_patient p join emr_classify_template t on p.classify_template_id = t.id
+        join emr_classify_element e on e.classinfo_code = t.classify_code
+        join emr_element m on m.code = e.element_code
+        where m.is_single_template = '1' and p.id = #{emrPatientId} and e.hosp_code = #{hospCode} and m.hosp_code = #{hospCode}
+        and e.dept_id is null
+    </select>
+
+    <select id="getBlmbUseElementsByTemplateId" resultType="cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO" parameterType="java.util.Map">
+        select m.code as elementCode, m.name as elementName from emr_classify_template t
+        join emr_classify_element e on e.classinfo_code = t.classify_code
+        join emr_element m on m.code = e.element_code
+        where m.is_single_template = '1' and t.id = #{emrClassifyTemplateId} and e.hosp_code = #{hospCode} and m.hosp_code = #{hospCode}
+        and e.dept_id is null
+    </select>
+
+</mapper>

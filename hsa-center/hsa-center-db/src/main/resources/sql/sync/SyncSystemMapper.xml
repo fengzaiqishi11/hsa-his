@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncsystem.dao.SyncSystemDAO">
+    <!--获取子系统所有数据-->
+    <select id="queryAll" resultType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        select code value,name label,id from sync_system where is_valid='1' order by seq_no
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPage" resultType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        select * from sync_system
+        <where>
+            1=1 and is_valid='1'
+            <if test="keyword != null and keyword != ''">
+                and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%'))
+                or (pym = #{keyword}) or (wbm = #{keyword}))
+            </if>
+        </where>
+        order by seq_no
+    </select>
+
+    <!--根据编码获取数量-->
+    <select id="getCount" resultType="java.lang.Integer" parameterType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        select count(1) as num from sync_system where code=#{code} and is_valid='1'
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+    <!--根据名称获取数量-->
+    <select id="getCountByName" resultType="java.lang.Integer" parameterType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        select count(1) as num from sync_system where name=#{name} and is_valid='1'
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <select id="getById" resultType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        select * from sync_system
+        where id = #{id}
+    </select>
+
+    <!--新增-->
+    <insert id="insert">
+        insert into sync_system(id,code,name,pym,wbm,seq_no,remark,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{code},#{name},#{pym},#{wbm},#{seqNo},#{remark},#{isValid},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--修改-->
+    <update id="update" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        update sync_system
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            seq_no=#{seqNo},
+            remark=#{remark},
+            is_valid=#{isValid},
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--删除-->
+    <update id="updateSyncSystemByIsvalid" parameterType="cn.hsa.module.sync.syncsystem.dto.SyncSystemDTO">
+        update sync_system
+        set is_valid = '0'
+        where 1=1  and
+        <if test="ids !=null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--查询子系统序号自动填充前端-->
+    <select id="querySystemSeqNo" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO" resultType="int">
+        select MAX(seq_no) from sync_system where is_valid = '1'
+    </select>
+</mapper>

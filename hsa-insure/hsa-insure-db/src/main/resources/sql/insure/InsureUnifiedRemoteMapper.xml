@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedRemoteDAO">
+
+
+    <insert id="insertRemoteFeeDetail" parameterType="java.util.List">
+        insert into insure_unified_remote(id, hosp_code, certno, mdtrt_id, mdtrt_setl_time, setl_sn,
+        medfee_sumamt, optins_pay_sumamt,
+        cnfm_flag, trt_year, trt_month, crte_id, crte_name, crte_time, is_flag,mdtrtarea,medins_no,fulamt_advpay_flag)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode},#{item.certno},#{item.mdtrtId},#{item.mdtrtSetlTime},#{item.setlSn},#{item.medfeeSumamt},
+            #{item.optinsPaySumamt},#{item.cnfmFlag},
+            #{item.trtYear},#{item.trtMonth},#{item.crteId},#{item.crteName},#{item.crteTime},#{item.isFlag},
+            #{item.mdtrtarea},#{item.medinsNo},#{item.fulamtAdvpayFlag})
+        </foreach>
+    </insert>
+
+
+    <update id="updateUnifiedRemoteFlag">
+        <foreach collection="unifiedRemoteDOList" item="item" index="index" open="" close="" separator=";">
+            update insure_unified_remote
+            <set>
+                <if test="item.isFlag !=null and item.isFlag !='' ">
+                    is_flag=#{item.isFlag},
+                </if>
+                <if test="item.omgsId !=null">
+                    omgsId = #{item.omgsId},
+                </if>
+            </set>
+            where id = #{item.id} and hosp_code=#{item.hospCode}
+        </foreach>
+    </update>
+    <select id="queryAll" resultType="cn.hsa.module.insure.module.entity.InsureUnifiedRemoteDO">
+        select id, hosp_code, certno, mdtrt_id, mdtrt_setl_time, setl_sn,
+        medfee_sumamt, optins_pay_sumamt, cnfm_flag,
+        trt_year, trt_month, crte_id, crte_name, crte_time from insure_unified_remote
+        where hosp_code =#{hospCode}
+        <if test="trtYear !=null and trtYear !='' ">
+            and trt_year =#{trtYear}
+        </if>
+        <if test="trtMonth !=null and trtMonth !='' ">
+            and trt_month =#{trtMonth}
+        </if>
+    </select>
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.entity.InsureUnifiedRemoteDO">
+        select iur.ID, iur.HOSP_CODE, iur.CERTNO, iur.MDTRT_ID, iur.MDTRT_SETL_TIME, iur.SETL_SN, iur.MEDFEE_SUMAMT,
+        iur.OPTINS_PAY_SUMAMT, iur.CNFM_FLAG, iur.TRT_YEAR, iur.TRT_MONTH, iur.CRTE_ID, iur.CRTE_NAME,
+        iur.CRTE_TIME, iur.IS_FLAG, iur.MDTRTAREA, iur.MEDINS_NO, iur.FULAMT_ADVPAY_FLAG,iib.aac003,iib.aac004,
+        iiv.aka130_name as aka130Name,iiv.bka006_name as bka006Name,iiv.visit_icd_name as visitIcdName
+        from insure_unified_remote iur
+        left join insure_individual_visit iiv on iiv.medical_reg_no = iur.MDTRT_ID and iiv.hosp_code = iur.hosp_code
+        left join insure_individual_basic iib on iib.hosp_code = iiv.hosp_code = iib.id = iiv.mib_id
+        where iur.hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( iur.certno like concat('%',#{keyword},'%') or
+            iib.aac003 like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+</mapper>

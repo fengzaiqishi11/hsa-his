@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureIndividualCostDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+        <result property="iatdGroupNo" column="iatd_group_no" jdbcType="INTEGER"/>
+        <result property="iatdSeqNo" column="iatd_seq_no" jdbcType="INTEGER"/>
+        <result property="adviceExecId" column="advice_exec_id" jdbcType="VARCHAR"/>
+        <result property="sourceCode" column="source_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+        <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+        <result property="sourceDeptId" column="source_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosageUnitCode" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="preferentialPrice" column="preferential_price" jdbcType="NUMERIC"/>
+        <result property="realityPrice" column="reality_price" jdbcType="NUMERIC"/>
+        <result property="backNum" column="back_num" jdbcType="NUMERIC"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="isDist" column="is_dist" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="backCode" column="back_code" jdbcType="VARCHAR"/>
+        <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
+        <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
+        <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
+        <result property="okTime" column="ok_time" jdbcType="TIMESTAMP"/>
+        <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+        <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="deductible" column="deductible" jdbcType="VARCHAR"/>
+        <result property="guestRatio" column="deductible" jdbcType="VARCHAR"/>
+        <result property="isTrans" column="is_trans" jdbcType="VARCHAR"/>
+        <result property="insureItemCode" column="insure_item_code" jdbcType="VARCHAR"/>
+        <result property="insureItemName" column="insure_item_name" jdbcType="VARCHAR"/>
+        <result property="isTransmit" column="isTransmit" jdbcType="VARCHAR"/>
+        <result property="productName" column="productName" jdbcType="VARCHAR"/>
+        <result property="matchItemCode" column="matchItemCode" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--    把病人产生的费用信息，上传到医保费用信息表-->
+    <insert id="insertInsureCost" parameterType="java.util.List">
+        insert into insure_individual_cost
+        (id, hosp_code, visit_id, cost_id, settle_id, is_hospital, item_type, item_code, item_name, guest_ratio,
+        primary_price, apply_last_price, order_no, transmit_code, crte_id, crte_name, crte_time,insure_is_transmit,batch_no)
+        values
+        <foreach collection="costDTOList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.costId},
+            #{item.settleId},#{item.isHospital},#{item.itemType},
+            #{item.itemCode},
+            #{item.itemName},
+            #{item.guestRatio},
+            #{item.primaryPrice},
+            #{item.applyLastPrice},
+            #{item.orderNo},
+            #{item.transmitCode},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime},
+            #{item.insureIsTransmit},
+            #{item.feeBrgNo}
+            )
+        </foreach>
+    </insert>
+    <!--    费用上传成功以后 更新传输标志-->
+    <update id="updateTransmitFlag" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        update insure_individual_cost set transmit_code ='1' where hosp_code=#{hospCode} and visit_id = #{id}
+    </update>
+    <delete id="deleteIndivdidualCost">
+        delete  from insure_individual_cost where id in
+        <foreach collection="errorCostIdList" item="item" index="index" separator=",">
+            #{item.costId}
+        </foreach>
+    </delete>
+    <!--    查询已匹配和未匹配项目的费用信息-->
+    <select id="queryPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultMap="InptCostMap">
+        SELECT
+        ic.id,ic.hosp_code,ic.visit_id,ic.baby_id,ic.iat_id,ic.iatd_group_no,ic.iatd_seq_no,ic.advice_exec_id,ic.source_code, ic.source_id,
+        ic.old_cost_id,ic.source_dept_id,ic.in_dept_id, ic.bfc_id, ic.item_code,ic.item_id,
+        ic.item_name,
+        ic.price,
+        ic.num,
+        ic.spec,
+        ic.prep_code,
+        ic.dosage,ic.dosage_unit_code, ic.usage_code,ic.rate_id,ic.speed_code,ic.use_days,ic.num_unit_code,
+        ic.total_num,ic.total_num_unit_code,
+        ic.herb_note_code,ic.use_code, ic.herb_num, ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+        ic.dept_id,
+        ic.phar_id,
+        ic.is_dist,
+        ic.is_give,
+        ic.is_ok,
+        ic.ok_id,
+        ic.ok_name,
+        ic.ok_time,
+        ic.settle_code,
+        ic.settle_id,
+        ic.is_check,
+        ic.check_id,
+        ic.check_name,
+        ic.check_time,
+        ic.zz_doctor_id,
+        ic.zz_doctor_name,
+        ic.jz_doctor_id,
+        ic.jz_doctor_name,
+        ic.zg_doctor_id,
+        ic.zg_doctor_name,
+        ic.exec_id,
+        ic.exec_name,
+        ic.exec_time,
+        ic.exec_dept_id,
+        ic.plan_exec_time,
+        ic.status_code,
+        ic.is_cost,
+        ic.cost_time,
+        ic.crte_id,
+        ic.crte_name,
+        ic.crte_time,
+        iim.deductible,
+        iim.is_trans,
+        iim.insure_item_code,
+        iim.insure_item_name,
+        iim.hosp_item_code,
+        iim.hosp_item_name,
+        (
+        CASE
+        WHEN iic.transmit_code IS NULL
+        OR iic.transmit_code = ''
+        THEN '未传输'
+        WHEN iic.transmit_code = '1'
+        THEN '已传输'
+        WHEN iim.is_trans = '0'
+        THEN '未传输'
+        END
+        ) isTransmit
+        FROM
+        inpt_cost ic
+        left JOIN insure_item_match iim
+        ON ic.`item_id` = iim.`hosp_item_id`
+        AND ic.`item_code` = iim.`hosp_item_type`
+        AND ic.hosp_code = iim.hosp_code
+        LEFT JOIN insure_individual_cost iic
+        ON ic.id = iic.cost_id
+        AND ic.hosp_code = iic.hosp_code
+        where ic.hosp_code =#{hospCode}
+        and ic.visit_id =#{visitId}
+        and  IFNULL(iim.is_trans,'0') = #{isMatch}
+        and ic.settle_code in ('0','1')
+        <if test="isTransmit != null and isTransmit !=''">
+            and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
+        </if>
+        <if test="isMatch =='1'.toString()">
+            and iim.audit_code='1'
+            and iim.is_valid ='1'
+        </if>
+        and iim.insure_reg_code = #{insureRegCode}
+    </select>
+
+    <!--    查询已匹配和未匹配项目的费用信息-->
+    <select id="queryAllPage" parameterType="java.util.List" resultMap="InptCostMap">
+        <foreach collection="list" index="index" item="item" open="" close="" separator="union all">
+            SELECT
+            ic.id,ic.hosp_code,ic.visit_id,ic.baby_id,ic.iat_id,ic.iatd_group_no,ic.iatd_seq_no,ic.advice_exec_id,ic.source_code, ic.source_id,
+            ic.old_cost_id,ic.source_dept_id,ic.in_dept_id, ic.bfc_id, ic.item_code,ic.item_id,
+            ic.item_name,
+            ic.price,
+            ic.num,
+            ic.spec,
+            ic.prep_code,
+            ic.dosage,ic.dosage_unit_code, ic.usage_code,ic.rate_id,ic.speed_code,ic.use_days,ic.num_unit_code,
+            ic.total_num,ic.total_num_unit_code,
+            ic.herb_note_code,ic.use_code, ic.herb_num, ic.total_price,
+            ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+            ic.dept_id,
+            ic.phar_id,
+            ic.is_dist,
+            ic.is_give,
+            ic.is_ok,
+            ic.ok_id,
+            ic.ok_name,
+            ic.ok_time,
+            ic.settle_code,
+            ic.settle_id,
+            ic.is_check,
+            ic.check_id,
+            ic.check_name,
+            ic.check_time,
+            ic.zz_doctor_id,
+            ic.zz_doctor_name,
+            ic.jz_doctor_id,
+            ic.jz_doctor_name,
+            ic.zg_doctor_id,
+            ic.zg_doctor_name,
+            ic.exec_id,
+            ic.exec_name,
+            ic.exec_time,
+            ic.exec_dept_id,
+            ic.plan_exec_time,
+            ic.status_code,
+            ic.is_cost,
+            ic.cost_time,
+            ic.crte_id,
+            ic.crte_name,
+            ic.crte_time,
+            iim.deductible,
+            iim.is_trans,
+            iim.insure_item_code,
+            iim.insure_item_name,
+            iim.hosp_item_code,
+            iim.hosp_item_name,
+            iv.name,
+            (
+            CASE
+            WHEN iic.transmit_code IS NULL
+            OR iic.transmit_code = ''
+            THEN '未传输'
+            WHEN iic.transmit_code = '1'
+            THEN '已传输'
+            WHEN iim.is_trans = '0'
+            THEN '未传输'
+            END
+            ) isTransmit
+            FROM
+            inpt_cost ic
+            JOIN insure_item_match iim ON (ic.`item_id` = iim.`hosp_item_id` AND ic.`item_code` = iim.`hosp_item_type` AND ic.hosp_code = iim.hosp_code)
+            left join inpt_visit iv on (ic.visit_id = iv.id and ic.hosp_code = iv.hosp_code)
+            LEFT JOIN insure_individual_cost iic ON (ic.id = iic.cost_id AND ic.hosp_code = iic.hosp_code)
+            where 1=1 and
+            ic.hosp_code = #{item.hospCode}
+            and ic.visit_id = #{item.id}
+            and IFNULL(iim.is_trans,'0') = #{item.isMatch}
+            and IFNULL(iim.audit_code,'0') =#{item.isMatch}
+            and IFNULL(iim.is_valid,'0') =#{item.isMatch}
+            and IFNULL(iim.is_match,'0') =#{item.isMatch}
+            and ic.settle_code in ('0','1')
+            and iim.insure_reg_code = #{item.insureRegCode}
+            <if test="item.isTransmit != null and item.isTransmit !=''">
+                and IFNULL(iic.`transmit_code`,'0') = #{item.isTransmit}
+            </if>
+        </foreach>
+    </select>
+
+    <!-- 通过就诊id查询住院病人的费用信息 -->
+    <select id="queryInptCostByVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select ic.id, ic.hosp_code, ic.visit_id, ic.baby_id, ic.iat_id, ic.iatd_group_no, iatd_seq_no,
+               advice_exec_id, source_code, source_id, old_cost_id, source_dept_id,
+               ic.in_dept_id, ic.bfc_id, ic.item_code, ic.item_id,
+               (case ic.item_code
+                    when ic.item_code ='1' then  (select bp.name from base_drug bd left join base_product bp on bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code where bd.id = ic.item_id)
+                    when ic.item_code ='2' then (select bp.name from base_material bm left join base_product bp on bm.prod_code = bp.code and bm.hosp_code = bp.hosp_code where bm.id = ic.item_id)
+                    else ''
+                   end) as productName,
+               (case ic.item_code
+                   when ic.item_code ='1' then (select bd.code from base_drug bd where ic.item_id = bd.id and bd.hosp_code =ic.hosp_code )
+                   when ic.item_code='2' then (select bm.code from base_material bm where ic.item_id =  bm.id  and bm.hosp_code = ic.hosp_code )
+                   when ic.item_code = '4' then (select ba.code from base_advice ba where ic.item_id = ba.id and ba.hosp_code = ic.hosp_code)
+                   else (select bi.code from base_item bi where ic.item_id = bi.id and bi.hosp_code = ic.hosp_code)
+                   end
+                   ) as hospDrugOrMaterialItemCode,
+               ic.item_name, ic.price, ic.num, ic.spec,
+               (select name from sys_code_detail where value = prep_code and c_code='JXFL') as prepCode,
+               ic.dosage,
+               (select name from sys_code_detail where value = dosage_unit_code and c_code='JLDW') as dosageUnitCode,
+               ic.usage_code, ic.rate_id, ic.speed_code, ic.use_days, num_unit_code,
+               ic.total_num, ic.total_num_unit_code, ic.herb_note_code, ic.use_code, ic.herb_num, ic.total_price,
+               preferential_price, reality_price, back_num, back_code, doctor_id, doctor_name,
+               ic.dept_id, ic.phar_id, is_dist, ic.is_give, is_ok, ok_id, ok_name, ok_time, settle_code,
+               ic.settle_id, ic.is_check, ic.check_id, ic.check_name, ic.check_time, zz_doctor_id, zz_doctor_name,
+               jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, ic.exec_id, ic.exec_name, exec_time,
+               ic.exec_dept_id, plan_exec_time, status_code, is_cost, cost_time, ic.crte_id,
+               iiv.medical_reg_no,iiv.medicine_org_code,
+               if(ic.use_code !='4',0,ic.use_days) as useDays,
+               (select su.code from sys_user su where su.name=ic.crte_name and su.hosp_code = ic.hosp_code) as code,
+               ic.crte_name, ic.crte_time ,
+               iim.item_code insureCode,iim.hosp_item_code,iim.hosp_item_name,iim.insure_item_code,iim.insure_item_name
+               from inpt_cost ic
+               left join insure_individual_visit iiv
+               on ic.visit_id = iiv.visit_id and ic.hosp_code = iiv.hosp_code
+               left join insure_item_match iim on ic.item_id = iim.hosp_item_id and ic.item_code = iim.hosp_item_type and ic.hosp_code = iim.hosp_code
+               left join insure_individual_cost iic on ic.id = iic.cost_id and ic.hosp_code = iic.hosp_code
+        where ic.visit_id=#{id}  and ic.settle_code !='2' and ic.hosp_code=#{hospCode}
+          and iim.is_match ='0'
+          and (ic.baby_id =null or ic.baby_id ='')
+          and iic.transmit_code ='0' or iic.transmit_code is null
+    </select>
+    <!--    分页查询住院病人类型是医保的数据集-->
+    <select id="queryInptPatientPage" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,iv.bed_name,
+        iv.age, iv.age_unit_code,iv.status_code,b.aka130_name as aka130Name,iv.in_disease_name,iv.in_disease_icd10,
+        in_dept_name,iv.insure_org_code,iv.zz_doctor_name,iv.crte_time,iv.crte_name,b.insure_reg_code,
+        b.aac001,b.aka130,b.medicine_org_code,b.visit_icd_code as visitIcdCode ,b.visit_icd_name as visitIcdName
+        from inpt_visit iv inner join insure_individual_visit b
+        on iv.id = b.visit_id and iv.hosp_code = b.hosp_code
+        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6')
+        and iv.patient_code !='0'
+        <if test="name != null and name != ''">
+            and iv.name like concat('%',#{name},'%')
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            and  b.medicine_org_code = #{orgCode}
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and iv.in_dept_id = #{inDeptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( iv.name like concat('%',#{keyword},'%'))
+        </if>
+        order by iv.crte_time desc
+    </select>
+    <update id="editInsureCostByCostIDS" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        update
+        insure_individual_cost
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="costId != null and costId != ''">
+                cost_id = #{costId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                is_hospital = #{isHospital,jdbcType=VARCHAR},
+            </if>
+            <if test="itemType != null and itemType != ''">
+                item_type = #{itemType,jdbcType=VARCHAR},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="guestRatio != null and guestRatio != ''">
+                guest_ratio = #{guestRatio,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryPrice != null">
+                primary_price = #{primaryPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="applyLastPrice != null">
+                apply_last_price = #{applyLastPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="transmitCode != null and transmitCode != ''">
+                transmit_code = #{transmitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insure_settle_id = #{insureSettleId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where
+        cost_id in (
+        <foreach collection="costList" item="item" separator=",">
+            #{item.id}
+        </foreach>
+        )
+        <if test="visitId !=null and visitId !=''">
+            and visit_id =#{visitId}
+        </if>
+        <if test="hospCode !=null and hospCode !=''">
+            and hosp_code =#{hospCode}
+        </if>
+    </update>
+    <insert id="batchInsertInsureCost" parameterType="java.util.List">
+        INSERT INTO insure_individual_cost (
+        id,
+        hosp_code,
+        visit_id,
+        cost_id,
+        settle_id,
+        is_hospital,
+        item_type,
+        item_code,
+        item_name,
+        guest_ratio,
+        primary_price,
+        apply_last_price,
+        order_no,
+        transmit_code,
+        crte_id,
+        crte_name,
+        crte_time
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.visitId},
+            #{item.costId},
+            #{item.settleId},
+            #{item.isHospital},
+            #{item.itemType},
+            #{item.itemCode},
+            #{item.itemName},
+            #{item.guestRatio},
+            #{item.primaryPrice},
+            #{item.applyLastPrice},
+            #{item.orderNo},
+            #{item.transmitCode},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 查询费用传输、已传输、未传输费用信息-->
+    <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        ic.id id,
+        ic.hosp_code hospCode,
+        ic.visit_id visitId,
+        ic.baby_id babyId,
+        ic.iat_id iatId,
+        ic.iatd_group_no iatdGroupNo,
+        ic.iatd_seq_no iatdSeqNo,
+        ic.advice_exec_id adviceExecId,
+        ic.source_code sourceCode,
+        ic.source_id sourceId,
+        ic.old_cost_id oldCostId,
+        ic.source_dept_id sourceDeptId,
+        ic.in_dept_id inDeptId,
+        ic.bfc_id bfcId,
+        ic.item_code itemCode,
+        ic.item_id itemId,
+        ic.item_name itemName,
+        ic.price price,
+        ic.num num,
+        ic.spec spec,
+        ic.prep_code prepCode,
+        ic.dosage dosage,
+        ic.dosage_unit_code dosageUnitCode,
+        ic.usage_code usageCode,
+        ic.rate_id rateId,
+        ic.speed_code speedCode,
+        ic.use_days useDays,
+        ic.num_unit_code numUnitCode,
+        ic.total_num totalNum,
+        ic.total_num_unit_code totalNumUnitCode,
+        ic.herb_note_code herbNoteCode,
+        ic.use_code useCode,
+        ic.herb_num herbNum,
+        ic.total_price totalPrice,
+        ic.preferential_price preferentialPrice,
+        ic.reality_price realityPrice,
+        ic.back_num backNum,
+        ic.back_code backCode,
+        ic.doctor_id doctorId,
+        ic.doctor_name doctorName,
+        ic.dept_id deptId,
+        ic.status_code statusCode,
+        (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,
+        ic.phar_id pharId,
+        ic.is_dist isDist,
+        ic.is_give isGive,
+        ic.is_ok isOk,
+        ic.ok_id okId,
+        ic.ok_name okName,
+        ic.ok_time okTime,
+        ic.crte_time crteTime,
+        ic.cost_time costTime,
+        ic.status_code statusCode,
+        iic.cost_id costId,
+        iic.feedetl_sn feedetlSn,
+        iim.item_code insureMatchItemCode,
+        iim.insure_reg_code insureRegCode,
+        iim.molss_item_id molssItemId,
+        iim.pqcc_item_id pqccItemId,
+        iim.hosp_item_id hospItemId,
+        iim.hosp_item_name hospItemName,
+        iim.hosp_item_code hospItemCode,
+        iim.hosp_item_type hospItemType,
+        iim.hosp_item_spec hospItemSpec,
+        iim.hosp_item_unit_code hospItemUnitCode,
+        iim.hosp_item_prep_code hospItemPrepCode,
+        iim.hosp_item_price hospItemPrice,
+        iim.insure_item_name insureItemName,
+        iim.insure_item_code insureItemCode,
+        iim.insure_item_type insureItemType,
+        iim.insure_item_spec insureItemSpec,
+        iim.insure_item_unit_code insureItemUnitCode,
+        iim.insure_item_prep_code insureItemPrepCode,
+        iim.insure_item_price insureItemPrice,
+        iim.deductible deductible,
+        iim.standard_code standardCode,
+        iim.check_price checkCode,
+        iim.lmt_user_flag lmtUserFlag,
+        iim.manufacturer manufacturer,
+        iim.tcmdrug_used_way tcmdrugUsedWay
+        FROM
+        inpt_cost ic
+        JOIN insure_item_match iim
+        ON ic.`item_id` = iim.`hosp_item_id`
+        AND ic.`item_code` = iim.`hosp_item_type`
+        AND iim.`is_valid` = '1'
+        AND ic.`hosp_code` = iim.`hosp_code`
+        LEFT JOIN insure_individual_cost iic
+        ON ic.`id` = iic.`cost_id`
+        AND ic.`hosp_code` = iic.`hosp_code`
+        WHERE ic.`hosp_code` = #{hospCode}
+        AND ic.`settle_code` IN ('0', '1')
+        AND ic.`visit_id` = #{visitId}
+        AND IFNULL(iim.`is_match`, '0') = #{isMatch}
+        AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+        AND iim.insure_reg_code = #{insureRegCode}
+        <if test="queryBaby != null and queryBaby =='N'.toString() " >
+            and (ic.baby_id is null or trim(ic.baby_id) = '')
+        </if>
+        order by ic.total_price desc
+    </select>
+    <select id="queryLastestOrderNo" resultType="java.lang.String">
+        select order_no from insure_individual_cost where hosp_code =#{hospCode} and visit_id=#{id}
+        order by crte_time desc limit 1
+    </select>
+
+    <delete id="delInsureCost" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        DELETE
+        FROM
+        insure_individual_cost
+        WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
+        <if test="insureIsTransmit !=null and insureIsTransmit != ''">
+            and insure_is_transmit is not null
+        </if>
+    </delete>
+    <!-- 查询费用信息 -->
+    <select id="queryInptCostList" parameterType="java.util.Map" resultType="java.lang.String">
+        select sum(primary_price) from insure_individual_cost where hosp_code = #{hospCode} and visit_id =#{visitId}
+                          and ifnull(insure_settle_id,'0') = '0'
+
+    </select>
+    <select id="selectInsureIndividualCost"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select iic.cost_id,iic.visit_id,iiv.medicine_org_code, iiv.aac001, iic.insure_is_transmit,ic.feedetl_sn
+        from insure_individual_cost iic left join insure_individual_visit iiv on
+        iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
+        join inpt_cost ic on ic.id = iic.cost_id and ic.hosp_code = iic.hosp_code
+        where iic.hosp_code =#{hospCode} and iic.visit_id = #{visitId} and iic.insure_is_transmit ='1'
+
+    </select>
+    <select id="queryInsureCost" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select * from insure_individual_cost where  hosp_code =#{hospCode} and visit_id = #{visitId}
+    </select>
+
+    <update id="updateInsureCost">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_individual_cost
+            <set>
+                <if test="item.fulamt_ownpay_amt !=null and item.fulamt_ownpay_amt !='' ">
+                    fulamt_ownpay_amt = #{item.fulamt_ownpay_amt}
+                </if>
+                <if test="item.overlmt_selfpay  and item.overlmt_selfpay !='' ">
+                    overlmt_selfpay = #{item.overlmt_selfpay}
+                </if>
+                <if test="item.preselfpay_amt and item.preselfpay_amt != ''">
+                    preselfpay_amt = #{item.preselfpay_amt}
+                </if>
+                <if test="item.inscp_scp_amt and item.inscp_scp_amt !=''">
+                    inscp_scp_amt = #{item.inscp_scp_amt}
+                </if>
+            </set>
+            where  cost_id = #{item.feedetl_sn}
+        </foreach>
+    </update>
+    <update id="updateInsureSettleCost">
+        update insure_individual_cost set insure_settle_id = #{insureSettleId} where hosp_code =#{hospCode} and visit_id =#{visitId}
+        <if test="insureSettleId != null and insureSettleId != ''">
+            and IFNULL(insure_settle_id,'0') ='0'
+        </if>
+
+    </update>
+    <update id="updateFeeUploadResult">
+        <foreach collection="individualCostDTOList" item="item" index="index" open="" close="" separator=";">
+            update insure_individual_cost
+            <set>
+                <if test="item.fulamtOwnpayAmt !=null ">
+                    fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},
+                </if>
+                <if test="item.overlmtAmt !=null ">
+                    overlmt_selfpay = #{item.overlmtAmt},
+                </if>
+                <if test="item.preselfpayAmt !=null">
+                    preselfpay_amt = #{item.preselfpayAmt},
+                </if>
+                <if test="item.inscpScpAmt !=null">
+                    inscp_scp_amt = #{item.inscpScpAmt},
+                </if>
+                <if test="item.guestRatio !=null  and item.guestRatio != ''">
+                    guest_ratio = #{item.guestRatio},
+                </if>
+                <if test="item.lmtUsedFlag !=null  and item.lmtUsedFlag !=''">
+                    lmt_used_flag = #{item.lmtUsedFlag},
+                </if>
+                <if test="item.medChrgitmType !=null  and item.medChrgitmType !=''">
+                    medChrgitmType = #{item.medChrgitmType},
+                </if>
+                <if test="item.pricUplmtAmt !=null">
+                    pric_uplmt_amt = #{item.pricUplmtAmt},
+                </if>
+                <if test="item.chrgItemLv !=null">
+                    chrgItemLv = #{item.chrgItemLv},
+                </if>
+                <if test="item.sumBigDecimalFee !=null">
+                    sum_fee = #{item.sumBigDecimalFee},
+                </if>
+                <if test="item.detItemFeeSumamt !=null">
+                    det_item_fee_sumamt = #{item.detItemFeeSumamt},
+                </if>
+            </set>
+            where  feedetl_sn = #{item.feedetlSn} and hosp_code =#{item.hospCode} and visit_id =#{item.visitId}
+        </foreach>
+    </update>
+    <update id="updateCostInsureStatus">
+        <foreach collection="insureIndividualCostDOList" item="item" index="index" open="" close="" separator=";">
+            update insure_individual_cost
+            <set>
+                <if test="item.insureIsTransmit !=null ">
+                    insure_is_transmit = #{item.insureIsTransmit},
+                </if>
+                <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
+                    feedetl_Sn = #{item.feedetl_sn}
+                </if>
+            </set>
+            where  cost_id = #{item.id} and hosp_code =#{item.hospCode} and visit_id =#{item.visitId}
+        </foreach>
+
+    </update>
+    <update id="updateInptCost">
+        <foreach collection="insureIndividualCostDOList" item="item" index="index" open="" close="" separator=";">
+            update inpt_cost
+            <set>
+                <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
+                    feedetl_Sn = #{item.feedetl_sn}
+                </if>
+            </set>
+            where  id = #{item.id} and hosp_code =#{item.hospCode} and visit_id =#{item.visitId}
+        </foreach>
+    </update>
+    <select id="queryOutptInsureCostByVisit" resultType="java.util.Map">
+        SELECT
+            ic.id id,
+            ic.hosp_code hospCode,
+            ic.visit_id visitId,
+            ic.op_id opId,
+            (select op.order_no from outpt_prescribe op where op.hosp_code = ic.hosp_code and op.id = ic.op_id
+                and ic.visit_id = op.visit_id) rxNo,
+            (select su.work_type_code from sys_user su where su.hosp_code = ic.hosp_code and ic.doctor_id = su.id ) workTypeCode,
+            ic.source_code sourceCode,
+            ic.source_id sourceId,
+            ic.old_cost_id oldCostId,
+            ic.source_dept_id sourceDeptId,
+            ic.bfc_id bfcId,
+            ic.item_code itemCode,
+            ic.item_id itemId,
+            ic.item_name itemName,
+            ic.price price,
+            ic.num num,
+            ic.spec spec,
+            ic.prep_code prepCode,
+            ic.dosage dosage,
+            ic.dosage_unit_code dosageUnitCode,
+            ic.usage_code usageCode,
+            ic.rate_id rateId,
+            ic.use_days useDays,
+            ic.num_unit_code numUnitCode,
+            ic.total_num totalNum,
+            ic.herb_note_code herbNoteCode,
+            ic.use_code useCode,
+            ic.herb_num herbNum,
+            ic.total_price totalPrice,
+            ic.preferential_price preferentialPrice,
+            ic.reality_price realityPrice,
+            ic.back_num backNum,
+            ic.doctor_id doctorId,
+            ic.doctor_name doctorName,
+            ic.dept_id deptId,
+            (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,
+            ic.phar_id pharId,
+            ic.is_dist isDist,
+            ic.crte_time crteTime,
+            ic.status_code statusCode,
+            iim.item_code insureMatchItemCode,
+            iim.insure_reg_code insureRegCode,
+            iim.molss_item_id molssItemId,
+            iim.pqcc_item_id pqccItemId,
+            iim.hosp_item_id hospItemId,
+            iim.hosp_item_name hospItemName,
+            iim.hosp_item_code hospItemCode,
+            iim.hosp_item_type hospItemType,
+            iim.hosp_item_spec hospItemSpec,
+            iim.hosp_item_unit_code hospItemUnitCode,
+            iim.hosp_item_prep_code hospItemPrepCode,
+            iim.hosp_item_price hospItemPrice,
+            iim.insure_item_name insureItemName,
+            iim.insure_item_code insureItemCode,
+            iim.insure_item_type insureItemType,
+            iim.insure_item_spec insureItemSpec,
+            iim.insure_item_unit_code insureItemUnitCode,
+            iim.insure_item_prep_code insureItemPrepCode,
+            iim.insure_item_price insureItemPrice,
+            iim.deductible deductible,
+            iim.standard_code standardCode,
+            iim.check_price checkCode,
+            iim.lmt_user_flag lmtUserFlag,
+            iim.manufacturer manufacturer,
+            iim.tcmdrug_used_way tcmdrugUsedWay
+        FROM
+            outpt_cost ic
+                JOIN insure_item_match iim
+                     ON ic.`item_id` = iim.`hosp_item_id`
+                         AND ic.`item_id` = iim.`hosp_item_id`
+                         AND iim.`is_match` = '1'
+                         AND ic.`hosp_code` = iim.`hosp_code`
+                LEFT JOIN insure_individual_cost iic
+                          ON ic.`id` = iic.`cost_id`
+                              AND ic.`hosp_code` = iic.`hosp_code`
+
+        WHERE ic.`hosp_code` = #{hospCode}
+          AND ic.`settle_code` IN ('0', '1')
+          AND ic.`visit_id` = #{visitId}
+          AND IFNULL(iim.`is_match`, '0') = #{isMatch}
+          AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+          AND iim.insure_reg_code = #{insureRegCode}
+        order by ic.crte_time desc
+    </select>
+    <delete id="deleteOutptInsureCost">
+        delete from insure_individual_cost where visit_id =#{id} and hosp_code = #{hospCode}
+        <if test="insureSettleId !=null and insureSettleId !='' ">
+            and  insure_settle_id is null
+        </if>
+    </delete>
+    <select id="selectCostIsTransmit" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO" parameterType="map">
+        select (select sum(iic.primary_price) from insure_individual_cost iic where iic.hosp_code = ic.hosp_code
+        and iic.visit_id = ic.visit_id group by iic.visit_id) as uploadRealityPrice,
+        ic.id, ic.hosp_code, ic.visit_id, ic.cost_id, ic.settle_id, ic.is_hospital, ic.item_type,
+        ic.item_code, ic.item_name, ic.guest_ratio, ic.primary_price, ic.apply_last_price, ic.order_no,
+        ic.transmit_code, ic.crte_id, ic.crte_name, ic.crte_time, ic.rxSn, ic.overlmtSelfpayAmt, ic.chrgItemLv,
+        ic.fulamtOwnpayFlag, ic.ownpayRea, ic.hiLmtpric from insure_individual_cost ic
+        where ic.visit_id =#{visitId} and ic.hosp_code =#{hospCode} and ifnull(settle_id,'0') = '0'
+        <if test="isHospital != null and isHospital != ''">
+            and ic.is_hospital =#{isHospital}
+        </if>
+    </select>
+
+    <select id="queryBackInptFee" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select ic.id,ic.hosp_code,ic.old_cost_id,ic.status_code,ic.total_num,ic.item_name from inpt_cost ic
+        where hosp_code =#{hospCode}
+        and visit_id =#{visitId} and total_num &lt; 0
+          and not exists (select 1 from insure_individual_cost t where t.hosp_code = ic.hosp_code
+                                                                   and t.cost_id = ic.old_cost_id)
+
+    </select>
+    <select id="queryInsureInptCost" resultType="java.util.HashMap" >
+        SELECT
+            ic.id id,
+            ic.hosp_code hospCode,
+            ic.visit_id visitId,
+            ic.baby_id babyId,
+            ic.iat_id iatId,
+            ic.iatd_group_no iatdGroupNo,
+            ic.iatd_seq_no iatdSeqNo,
+            ic.advice_exec_id adviceExecId,
+            ic.source_code sourceCode,
+            ic.source_id sourceId,
+            ic.old_cost_id oldCostId,
+            ic.source_dept_id sourceDeptId,
+            ic.in_dept_id inDeptId,
+            ic.bfc_id bfcId,
+            ic.item_code itemCode,
+            ic.item_id itemId,
+            ic.item_name itemName,
+            ic.price price,
+            ic.num num,
+            ic.spec spec,
+            ic.prep_code prepCode,
+            ic.dosage dosage,
+            ic.dosage_unit_code dosageUnitCode,
+            ic.usage_code usageCode,
+            ic.rate_id rateId,
+            ic.speed_code speedCode,
+            ic.use_days useDays,
+            ic.num_unit_code numUnitCode,
+            ic.total_num totalNum,
+            ic.total_num_unit_code totalNumUnitCode,
+            ic.herb_note_code herbNoteCode,
+            ic.use_code useCode,
+            ic.herb_num herbNum,
+            ic.total_price totalPrice,
+            ic.preferential_price preferentialPrice,
+            ic.reality_price realityPrice,
+            ic.back_num backNum,
+            ic.back_code backCode,
+            ic.doctor_id doctorId,
+            ic.doctor_name doctorName,
+            ic.dept_id deptId,
+            (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,
+            ic.phar_id pharId,
+            ic.is_dist isDist,
+            ic.is_give isGive,
+            ic.is_ok isOk,
+            ic.ok_id okId,
+            ic.ok_name okName,
+            ic.ok_time okTime,
+            ic.crte_time crteTime,
+            ic.cost_time costTime,
+            ic.status_code statusCode,
+            iic.cost_id costId,
+            iic.feedetl_sn feedetlSn,
+            iim.item_code insureMatchItemCode,
+            iim.insure_reg_code insureRegCode,
+            iim.molss_item_id molssItemId,
+            iim.pqcc_item_id pqccItemId,
+            iim.hosp_item_id hospItemId,
+            iim.hosp_item_name hospItemName,
+            iim.hosp_item_code hospItemCode,
+            iim.hosp_item_type hospItemType,
+            iim.hosp_item_spec hospItemSpec,
+            iim.hosp_item_unit_code hospItemUnitCode,
+            iim.hosp_item_prep_code hospItemPrepCode,
+            iim.hosp_item_price hospItemPrice,
+            iim.insure_item_name insureItemName,
+            iim.insure_item_code insureItemCode,
+            iim.insure_item_type insureItemType,
+            iim.insure_item_spec insureItemSpec,
+            iim.insure_item_unit_code insureItemUnitCode,
+            iim.insure_item_prep_code insureItemPrepCode,
+            iim.insure_item_price insureItemPrice,
+            iim.deductible deductible,
+            iim.standard_code standardCode,
+            iim.check_price checkCode,
+            iim.lmt_user_flag lmtUserFlag,
+            iim.manufacturer manufacturer,
+            iim.tcmdrug_used_way tcmdrugUsedWay
+        FROM
+            insure_individual_cost iic
+            join inpt_cost ic on iic.cost_id = ic.id and iic.hosp_code = ic.hosp_code
+            join insure_item_match iim on iim.insure_item_code = iic.item_code and iim.hosp_code = iic.hosp_code
+        where  iic.visit_id = #{visitId} and iic.hosp_code =#{hospCode} and iic.transmit_code ='1'
+    </select>
+    <select id="selectLastCostInfo" resultType="java.lang.String">
+            select batch_no from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+            and  transmit_code ='1' order by crte_time desc limit 1;
+    </select>
+    <select id="selectIsSetlleFee" resultType="java.util.Map">
+        select id, hosp_code, visit_id, cost_id, settle_id, is_hospital,
+               item_type, item_code, item_name, guest_ratio, primary_price, apply_last_price,
+               order_no, transmit_code, crte_id, crte_name, crte_time, rxSn, overlmtSelfpayAmt,
+               chrgItemLv, fulamtOwnpayFlag, ownpayRea, hiLmtpric, fulamt_ownpay_amt, overlmt_selfpay,
+               preselfpay_amt, inscp_scp_amt, medChrgitmType as med_chrgitm_type, overlmt_amt, lmt_used_flag, pric_uplmt_amt,
+               insure_settle_id, insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt
+        from insure_individual_cost where visit_id = #{visitId} and hosp_code =#{hospCode}
+        and insure_settle_id = #{insureSettleId}
+    </select>
+    <select id="queryInptFeeCost" resultType="cn.hsa.module.inpt.doctor.entity.InptCostDO">
+        select id, hosp_code, visit_id, baby_id, iat_id, iatd_group_no, iatd_seq_no,
+               advice_exec_id, source_code, source_id, old_cost_id, source_dept_id, in_dept_id,
+               bfc_id, item_code, item_id, item_name, price, num, spec, prep_code, dosage, dosage_unit_code,
+               usage_code, rate_id, speed_code, use_days, num_unit_code, total_num, total_num_unit_code,
+               herb_note_code, use_code, herb_num, total_price, preferential_price, reality_price, back_num,
+               back_code, doctor_id, doctor_name, dept_id, phar_id, is_dist, is_give, is_ok, ok_id, ok_name,
+               ok_time, settle_code, settle_id, is_check, check_id, check_name, check_time, zz_doctor_id, zz_doctor_name,
+               jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, exec_id, exec_name, exec_time, exec_dept_id,
+               plan_exec_time, status_code, is_cost, cost_time,
+               crte_id, crte_name, crte_time, is_wait, distribute_all_detail_id,feedetl_sn from inpt_cost
+            where visit_id =#{visitId} and hosp_code =#{hospCode}
+    </select>
+    <select id="queryUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+        (case b.item_code
+             when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code =b.hosp_code )
+             when b.item_code='2' then (select bm.code from base_material bm where b.item_id =  bm.id  and bm.hosp_code = b.hosp_code )
+             when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code = b.hosp_code)
+             else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+            end
+            ) as hospItemCode,
+        iim.hosp_item_id
+        FROM
+        inpt_cost b
+        LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+        WHERE
+        b.visit_id = #{visitId}
+        and b.hosp_code =#{hospCode}
+        AND (
+        iim.is_trans = '0'
+        OR b.item_id  &lt;&gt;  ifnull(iim.hosp_item_id,''))
+    </select>
+
+    <select id="queryAllQueryUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        <foreach collection="list" index="index" item="item" open="" close="" separator="union all">
+            SELECT
+            iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+            (case b.item_code
+            when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code =b.hosp_code )
+            when b.item_code='2' then (select bm.code from base_material bm where b.item_id =  bm.id  and bm.hosp_code = b.hosp_code )
+            when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code = b.hosp_code)
+            else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+            end
+            ) as hospItemCode,
+            iim.hosp_item_id,
+            b.total_price totalPrice,
+            b.reality_price realityPrice
+            FROM
+            inpt_cost b
+            LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+            join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+            WHERE
+            b.visit_id = #{item.id}
+            <if test="item.isUnified == '0'.toString()">
+                and iim.insure_reg_code = #{item.insureRegCode}
+            </if>
+            AND (
+            iim.is_trans = '0'
+            OR b.item_id &lt;&gt;  ifnull(iim.hosp_item_id,''))
+        </foreach>
+    </select>
+    <select id="selectLastFeedSn" resultType="java.lang.String">
+        select feedetl_sn from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+        and feedetl_sn is not null order by feedetl_sn desc limit 1
+    </select>
+
+</mapper>

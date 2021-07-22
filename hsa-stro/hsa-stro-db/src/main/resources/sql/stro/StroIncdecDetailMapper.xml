@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.incdec.dao.StroIncdecDetailDao">
+
+    <resultMap type="cn.hsa.module.stro.incdec.dto.StroIncdecDetailDTO" id="StroIncdecDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="adjustId" column="adjust_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="sellPrice" column="sell_price" jdbcType="NUMERIC"/>
+        <result property="buyPrice" column="buy_price" jdbcType="NUMERIC"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="sellBeforePrice" column="sell_before_price" jdbcType="NUMERIC"/>
+        <result property="sellAfterPrice" column="sell_after_price" jdbcType="NUMERIC"/>
+        <result property="buyBeforePrice" column="buy_before_price" jdbcType="NUMERIC"/>
+        <result property="buyAfterPrice" column="buy_after_price" jdbcType="NUMERIC"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="OTHER"/>
+        <result property="beforeNum" column="before_num" jdbcType="INTEGER"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="resultCode" column="result_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="profitLossType" column="profit_loss_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="queryStroIncdecDetailDTOById" resultMap="StroIncdecDetailMap">
+        select
+          l.id, l.hosp_code, l.adjust_id, l.item_code, l.item_id, l.item_name,l.sell_price,l.buy_price,l.split_price,
+          l.sell_before_price,l.sell_after_price,l.buy_before_price,l.buy_after_price, l.batch_no, l.expiry_date,
+          l.before_num, l.num, l.unit_code, l.result_code, l.split_ratio, l.split_num, l.split_unit_code,l.profit_loss_type,
+          (select good_name from base_drug g where g.hosp_code = l.hosp_code and g.id = l.item_id) drugName
+        from stro_incdec_detail l
+        where hosp_code = #{hospCode}
+         and id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryStroIncdecDetailDTOPage" resultMap="StroIncdecDetailMap">
+        select
+        l.id, l.hosp_code, l.adjust_id, l.item_code, l.item_id, l.item_name,l.sell_price,l.buy_price,l.split_price, l.sell_before_price,l.sell_after_price,l.buy_before_price,l.buy_after_price, l.batch_no, l.expiry_date, l.before_num, l.num, l.unit_code, l.result_code, l.split_ratio, l.split_num, l.split_unit_code,
+        bd.good_name as drugName,l.profit_loss_type,
+        case when l.item_code = '1' then (select bp.name from base_product bp where bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code)
+        when l.item_code = '2' then (select bp.name from base_product bp where bm.prod_code = bp.code and bm.hosp_code = bp.hosp_code) end prodName,
+        case when l.item_code='1' then bd.code when l.item_code='2' then bm.code end code,
+        case when l.item_code='1' then bd.spec when l.item_code='2' then bm.spec end spec,
+        case when l.item_code='2' then bm.model end model
+        from stro_incdec_detail l
+        left join base_drug bd on bd.id = l.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = l.item_id and bm.hosp_code = #{hospCode}
+        where l.hosp_code = #{hospCode}
+        <if test="ids != null and ids.size() > 0">
+          and l.adjust_id in
+          <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
+    </select>
+
+
+    <!--批量新增-->
+    <insert id="insertStroIncdecDetailDTO" keyProperty="id" useGeneratedKeys="true">
+        insert into stro_incdec_detail(id,hosp_code, adjust_id, item_code, item_id, item_name,
+        sell_price,buy_price,split_price,sell_before_price,sell_after_price,buy_before_price,buy_after_price,
+         batch_no, expiry_date, before_num, num, unit_code, result_code, split_ratio, split_num, split_unit_code,profit_loss_type)
+        values
+        <foreach collection="list" item="dto" index="index" separator=",">
+            (#{dto.id},#{dto.hospCode}, #{dto.adjustId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName},
+             #{dto.sellPrice}, #{dto.buyPrice}, #{dto.splitPrice}, #{dto.sellBeforePrice}, #{dto.sellAfterPrice},
+             #{dto.buyBeforePrice}, #{dto.buyAfterPrice}, #{dto.batchNo}, #{dto.expiryDate}, #{dto.beforeNum},
+              #{dto.num}, #{dto.unitCode}, #{dto.resultCode}, #{dto.splitRatio}, #{dto.splitNum}, #{dto.splitUnitCode},#{dto.profitLossType})
+        </foreach>
+
+    </insert>
+
+    <!--批量更新-->
+    <update id="updateStroIncdecDetailDTO">
+        <foreach collection="list"  item="dto" separator=";">
+            update stro_incdec_detail
+            <set>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code = #{dto.hospCode},
+                </if>
+                <if test="adjustId != null and adjustId != ''">
+                    adjust_id = #{dto.adjustId},
+                </if>
+                <if test="itemCode != null and itemCode != ''">
+                    item_code = #{dto.itemCode},
+                </if>
+                <if test="itemId != null and itemId != ''">
+                    item_id = #{dto.itemId},
+                </if>
+                <if test="itemName != null and itemName != ''">
+                    item_name = #{dto.itemName},
+                </if>
+                <if test="sellPrice != null and sellPrice != ''">
+                    sell_price = #{dto.sellPrice},
+                </if>
+                <if test="buyPrice != null and buyPrice != ''">
+                    buy_price = #{dto.buyPrice},
+                </if>
+                <if test="splitPrice != null and splitPrice != ''">
+                    split_price = #{dto.splitPrice},
+                </if>
+                <if test="sellBeforePrice != null and sellBeforePrice != ''">
+                    sell_before_price = #{dto.sellBeforePrice},
+                </if>
+                <if test="sellAfterPrice != null and sellAfterPrice != ''">
+                    sell_after_price = #{dto.sellAfterPrice},
+                </if>
+                <if test="buyBeforePrice != null and buyBeforePrice != ''">
+                    buy_before_price = #{dto.buyBeforePrice},
+                </if>
+                <if test="buyAfterPrice != null and buyAfterPrice != ''">
+                    buy_after_price = #{dto.buyAfterPrice},
+                </if>
+                <if test="batchNo != null and batchNo != ''">
+                    batch_no = #{dto.batchNo},
+                </if>
+                <if test="expiryDate != null">
+                    expiry_date = #{dto.expiryDate},
+                </if>
+                <if test="beforeNum != null">
+                    before_num = #{dto.beforeNum},
+                </if>
+                <if test="num != null">
+                    num = #{dto.num},
+                </if>
+                <if test="unitCode != null and unitCode != ''">
+                    unit_code = #{dto.unitCode},
+                </if>
+                <if test="resultCode != null and resultCode != ''">
+                    result_code = #{dto.resultCode},
+                </if>
+                <if test="splitRatio != null">
+                    split_ratio = #{dto.splitRatio},
+                </if>
+                <if test="splitNum != null">
+                    split_num = #{dto.splitNum},
+                </if>
+                <if test="splitUnitCode != null and splitUnitCode != ''">
+                    split_unit_code = #{dto.splitUnitCode},
+                </if>
+                <if test="profitLossType != null and profitLossType != ''">
+                  profit_loss_type = #{dto.profitLossType},
+                </if>
+            </set>
+            where
+            hosp_code = #{dto.hospCode}
+            and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <!--根据单据id删除-->
+    <delete id="deleteStroIncdecDetailDTO">
+        delete from stro_incdec_detail where hosp_code = #{hospCode} and adjust_id = #{id}
+    </delete>
+
+    <!--根据条件查询-->
+    <select id="queryStroIncdecDetailDTOs" resultMap="StroIncdecDetailMap">
+        select
+          id, hosp_code, adjust_id, item_code, item_id, item_name, sell_price, buy_price, split_price,
+          sell_before_price, sell_after_price,buy_before_price,buy_after_price, batch_no, expiry_date,
+          before_num, num, unit_code, result_code, split_ratio, split_num, split_unit_code,profit_loss_type
+        from stro_incdec_detail
+        where hosp_code = #{hospCode}
+        <if test="ids != null and ids.size() >0">
+            and adjust_id in
+            <foreach collection="ids"  item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+
+    </select>
+
+    <!--获得库存明细数据-->
+    <select id="queryStroStockDetailDTOs" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        SELECT
+            l.hosp_code,
+            c.biz_id AS bizId,
+            c.biz_id as invoicingTargetId,
+            (select dp.name from base_dept dp where dp.id = c.biz_id and dp.hosp_code = c.hosp_code) as invoicingTargetName,
+            c.order_no,
+            l.item_code,
+            l.item_id,
+            l.item_name,
+            l.num,
+            l.unit_code,
+            l.buy_price,
+            l.sell_price,
+            ( l.buy_price * l.num ) AS buy_price_all,
+            ( l.sell_price * l.num ) AS sell_price_all,
+            l.split_ratio,
+            l.split_num,
+            l.split_price,
+            l.split_unit_code,
+            l.batch_no,
+            l.expiry_date,
+            l.profit_loss_type,
+            c.audit_id crteId,c.audit_name crteName
+        FROM
+            stro_incdec_detail l,
+            stro_incdec c
+        WHERE
+            l.hosp_code = c.hosp_code
+            AND l.adjust_id = c.id
+            AND l.hosp_code = #{hospCode}
+            AND l.adjust_id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 生产者：暴露接口 -->
+    <!-- 采购计划 -->
+    <dubbo:service interface="cn.hsa.module.stro.purchase.service.StroPurchaseService" ref="stroPurchaseService_provider"/>
+
+    <!-- 入库 -->
+    <dubbo:service interface="cn.hsa.module.stro.stroin.service.StroInService" ref="stroInService_provider"/>
+
+    <!-- 查询药库 -->
+    <dubbo:service interface="cn.hsa.module.stro.stock.service.StroStockService" ref="stroStockService_provider"/>
+
+    <!--药房入库查询与确认-->
+    <dubbo:service interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" ref="stockInQueryService_provider"/>
+    <!--药房领药申请-->
+    <dubbo:service interface="cn.hsa.module.phar.pharapply.service.PharApplyService" ref="pharApplyService_provider"/>
+
+
+    <!-- 药库 -> 盘点信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.stro.inventory.service.InventoryService" ref="inventoryService_provider"/>
+
+    <!-- 药库 -> 盘点信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingService" ref="stroInvoicingService_provider"/>
+
+    <!-- 出库 -->
+    <dubbo:service interface="cn.hsa.module.stro.stroout.service.StroOutService" ref="stroOutService_provider"/>
+
+    <!-- 调价 -->
+    <dubbo:service interface="cn.hsa.module.stro.adjust.service.StroAdjustService" ref="stroAdjustService_provider"/>
+
+    <!-- 报损 -->
+    <dubbo:service interface="cn.hsa.module.stro.incdec.service.StroIncdecService" ref="stroIncdecService_provider"/>
+
+
+    <!-- 退库确认 -->
+    <dubbo:service interface="cn.hsa.module.stro.backstroconfirm.service.BackStroConfirmService" ref="backStroConfirmService_provider"/>
+    <!--药房入库查询与确认-->
+    <dubbo:service interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" ref="stockInQueryService_provider"/>
+    <!--药房领药申请-->
+    <dubbo:service interface="cn.hsa.module.phar.pharapply.service.PharApplyService" ref="pharApplyService_provider"/>
+
+    <!-- 门诊退药 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharoutbackdrug.service.OutBackDrugService" ref="outBackDrugService_provider"/>
+
+    <!-- 住院退药 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService" ref="inBackDrugService_provider"/>
+    <!-- 住院待领 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService" ref="pharInWaitReceiveService_provider"/>
+
+    <!-- 门诊发药 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharoutdistributedrug.service.OutDistributeDrugService" ref="outDistributeDrugService_provider"/>
+
+    <!-- 住院发药 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharindistributedrug.service.InDistributeDrugService" ref="inDistributeDrugService_provider"/>
+    <!-- 领药申请单 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveService" ref="pharOutReceiveService_provider"/>
+    <!-- 领药申请明细 -->
+    <dubbo:service interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService" ref="pharOutReceiveDetailService_provider"/>
+</beans>

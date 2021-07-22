@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.outpt.dao.OutptPrescribeDAO">
+
+    <!--用户-->
+    <select id="querySysUserAll" resultType="java.util.Map" parameterType="java.util.Map">
+        select b.id ksid, b.name ksmc, a.id zgid, a.name zgmc from sys_user a
+        join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode} and a.status_code = '0'
+    </select>
+
+    <!--获取频率信息-->
+    <select id="queryBaseRateAll" resultType="java.util.Map" parameterType="java.util.Map">
+        select a.id sid, a.code bh, a.name mc, a.daily_times mtcs, a.exec_interval jgts
+        from base_rate a
+        where a.hosp_code = #{hospCode} and a.is_valid = 1
+    </select>
+
+    <!--获取用法-->
+    <select id="queryBaseYfAll" resultType="java.util.Map" parameterType="java.util.Map">
+        select a.value sid, a.name mc from sys_code_detail a
+        where a.c_code = 'YF' and a.is_valid = '1' and a.hosp_code = #{hospCode}
+    </select>
+
+    <!--获取药品信息-->
+    <select id="queryBaseDrugAll" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        a.prod_code,
+        (select name from base_product bp where a.prod_code = bp.code and a.hosp_code = bp.hosp_code) as sccj,
+	'1' ypxmlx,
+	a.type_code,
+	a.id ggid,
+	a.good_name ypmc,
+	a.spec gg,
+	d.NAME dw,
+	a.split_price lsj,
+	CASE
+			WHEN
+				a.big_type_code = '2' THEN
+					g.cyf
+					WHEN a.big_type_code = '1' THEN
+					g.zcf
+					WHEN a.big_type_code = '0' THEN
+					g.xyf
+				END pharId,
+	ifnull((
+	SELECT
+		num
+	FROM
+		stro_stock
+	WHERE
+		stro_stock.item_id = a.id
+		AND stro_stock.biz_id = pharId
+	),0.0000) AS sysl,
+	'' yytj,
+	a.prep_code ypjx,
+	'' ycyl,
+	a.dosage ypjl,
+	f.NAME jldw,
+	a.usage_code yfid,
+	c.NAME yfmc,
+	b.id yyjgid,
+	b.NAME yyjgmc
+FROM
+	base_drug a
+	LEFT JOIN base_rate b ON a.rate_code = b.CODE
+	AND a.hosp_code = b.hosp_code
+	LEFT JOIN sys_code_detail c ON c.c_code = 'YF'
+	AND a.usage_code = c.
+VALUE
+
+	AND a.hosp_code = c.hosp_code
+	LEFT JOIN sys_code_detail d ON d.c_code = 'DW'
+	AND a.split_unit_code = d.
+VALUE
+
+	AND a.hosp_code = d.hosp_code
+	LEFT JOIN sys_code_detail f ON f.c_code = 'JLDW'
+	AND a.dosage_unit_code = f.
+VALUE
+
+	AND a.hosp_code = f.hosp_code
+	LEFT JOIN (
+	SELECT
+		max(
+		IF
+		( b.type_code = '1', c.id, '0' )) xyf,
+		max(
+		IF
+		( b.type_code = '2', c.id, '0' )) zcf,
+		max(
+		IF
+		( b.type_code = '3', c.id, '0' )) cyf
+	FROM
+		base_dept a
+		join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+		join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+	WHERE
+		a.id = #{deptId} and a.hosp_code = #{hospCode}
+
+	) g ON 1 = 1
+WHERE
+	a.is_valid = '1'
+	AND a.hosp_code = #{hospCode}
+UNION ALL
+SELECT
+    a.prod_code,
+        (select name from base_product bp where a.prod_code = bp.code and a.hosp_code = bp.hosp_code) as sccj,
+	'2' ypxmlx,
+	a.type_code,
+	a.id sid,
+	a.NAME ypmc,
+	a.spec gg,
+	d.NAME dw,
+	a.split_price lsj,
+	'' pharId,
+	'1000' sysl,
+	'' yytj,
+	'' ypjx,
+	'' ycyl,
+	'' ypjl,
+	'' jldw,
+	'' yfid,
+	'' yfmc,
+	'' yyjgid,
+	'' yyjgmc
+FROM
+	base_material a
+	LEFT JOIN sys_code_detail d ON d.c_code = 'DW'
+	AND a.split_unit_code = d.
+VALUE
+
+	AND a.hosp_code = d.hosp_code
+WHERE
+	a.is_valid = '1'
+	AND a.hosp_code = #{hospCode}
+    </select>
+
+    <!--获取医嘱信息-->
+    <select id="queryBaseAdviceAll" resultType="java.util.Map" parameterType="java.util.Map">
+        select '3' ypxmlx,'' yplb ,a.id xmid ,a.name xmmc , '' gg ,c.name dw ,
+        a.price lsj , '' yfid,'' yfmc,'' yyjgid,'' yyjgmc
+        from base_advice a
+        left join sys_code_detail c on c.c_code = 'DW' and a.unit_code = c.value and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!--获取档案信息-->
+    <select id="queryProfileFileAll" resultType="java.util.Map" parameterType="java.util.Map">
+        select a.id brid, a.name xm, a.gender_code xbid, a.marry_code hyid, '' xxid,a.nation_code mzid,a.birthday csrq, a.cert_no sfzh,
+        a.now_prov xzdz, a.work_address gzdw, a.phone lxdh, a.phone lxsjh, a.out_profile ybkh,a.allergy_disease gms,a.out_profile blh,a.crte_time djrq,
+        patient_code patCode
+        from base_profile_file a
+        where a.hosp_code = #{hospCode} and a.name = #{xm} and a.cert_no =#{sfzh}
+    </select>
+
+    <!--修改档案信息-->
+    <update id="updateProfileFile">
+        update base_profile_file
+        set name = #{name},
+        cert_no = #{certNo},
+        marry_code = #{marryCode},
+        gender_code = #{genderCode},
+        blood_code = #{bloodCode},
+        nation_code = #{nationCode},
+        phone = #{phone},
+        birthday = #{birthday},
+        remark = #{remark}
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--新增就诊信息-->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" >
+        insert into outpt_visit
+        (
+            id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
+            birthday, marry_code, nation_code, cert_code, cert_no, phone, visit_no, visit_code, patient_code,
+            preferential_type_id, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+            insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
+            pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
+        )
+        values
+        (
+            #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
+            #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
+            #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+            #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
+            #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
+        )
+    </insert>
+
+    <insert id="insertRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        insert into outpt_register
+        (id, hosp_code, visit_id, register_no, name, gender_code, age,
+        birthday, cert_code, cert_no, phone, source_bz_code, visit_code,
+        source_tj_code, source_tj_remark, register_time, dept_id, dept_name,
+        doctor_name, doctor_id, is_first_visit, crte_id, crte_name, crte_time)
+        values
+        (#{registerId},#{hospCode},#{id},#{registerNo},#{name},#{genderCode},#{age},
+        #{birthday},#{certCode},#{certNo},#{phone},#{sourceBzCode},#{visitCode},
+        #{sourceTjCode},#{sourceTjRemark},#{registerTime},#{deptId},#{deptName},
+        #{doctorName},#{doctorId},#{isFirstVisit},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <select id="queryDiaginose" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		crte_name, crte_time
+		from base_disease where hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--获取就诊主诊断-->
+    <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="java.util.Map">
+        select a.id, a.disease_id, a.visit_id
+        from outpt_diagnose a
+        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and a.is_main =1
+    </select>
+
+    <!-- 获取药品信息 -->
+    <select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="java.util.Map">
+        select a.*, case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
+        c.id bfcId
+        from base_drug a
+        left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
+        left join(
+            select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
+            max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+            from base_dept a
+            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            where a.id =#{deptId} and a.hosp_code = #{hospCode}
+        )b on 1 = 1
+        where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <select id="getDayTimes" resultType="cn.hsa.module.base.rate.dto.BaseRateDTO">
+        select daily_times from base_rate where id = #{string}
+    </select>
+
+    <!-- 获取材料信息 -->
+    <select id="getBaseMaterial" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO" parameterType="java.util.Map">
+        select a.*, b.id bfcId from base_material a
+        join base_finance_classify b on a.bfc_code = b.code and a.hosp_code = b.hosp_code
+        where (a.id = #{itemId} or a.code = #{itemId}) and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!-- 获取医嘱信息 -->
+    <select id="getAdvice" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO" parameterType="java.util.Map">
+        select * from base_advice a
+        where (a.id = #{itemId} or a.code = #{itemId} ) and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!-- 新增处方信息-->
+    <insert id="insertPrescribe">
+        insert into outpt_prescribe(
+        id, hosp_code, visit_id, diagnose_ids, order_no, doctor_id, doctor_name, dept_id, dept_name,
+        type_code, prescribe_type_code, settle_id, remark, is_herb_hospital, herb_num, herb_use_code,
+        weight, agent_name, agent_cert_no, crte_id, crte_name, crte_time, is_settle, is_cancel, is_print, is_submit
+        )
+        values
+            (
+            #{id},
+            #{hospCode},
+            #{visitId},
+            #{diagnoseIds},
+            #{orderNo},
+            #{doctorId},
+            #{doctorName},
+            #{deptId},
+            #{deptName},
+            #{typeCode},
+            #{prescribeTypeCode},
+            #{settleId},
+            #{remark},
+            #{isHerbHospital},
+            #{herbNum},
+            #{herbUseCode},
+            #{weight},
+            #{agentName},
+            #{agentCertNo},
+            #{crteId},
+            #{crteName},
+            #{crteTime},
+            #{isSettle},
+            #{isCancel},
+            #{isPrint},
+            #{isSubmit}
+            )
+    </insert>
+
+    <!-- 新增处方明细数据 -->
+    <insert id="insertPrescribeDetail" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into outpt_prescribe_detail(
+        id, hosp_code, op_id, visit_id, opt_id, optd_group_no, optd_group_seq_no, optd_id, group_no,
+        group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content,
+        phar_id, bfc_id, use_code, exec_dept_id, exec_date,exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id,
+        skin_unit_code, prescribe_prefix, prescribe_suffix, remark
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.opId},
+            #{item.visitId},
+            #{item.optId},
+            #{item.optdGroupNo},
+            #{item.optdGroupSeqNo},
+            #{item.optdId},
+            #{item.groupNo},
+            #{item.groupSeqNo},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.price},
+            #{item.totalPrice},
+            #{item.spec},
+            #{item.prepCode},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.usageCode},
+            #{item.rateId},
+            #{item.speedCode},
+            #{item.useDays},
+            #{item.num},
+            #{item.numUnitCode},
+            #{item.totalNum},
+            #{item.herbNoteCode},
+            #{item.isSkin},
+            #{item.isPositive},
+            #{item.content},
+            #{item.pharId},
+            #{item.bfcId},
+            #{item.useCode},
+            #{item.execDeptId},
+            #{item.execDate},
+            #{item.execId},
+            #{item.execName},
+            #{item.execNum},
+            #{item.technologyNo},
+            #{item.skinDurgId},
+            #{item.skinPharId},
+            #{item.skinUnitCode},
+            #{item.prescribePrefix},
+            #{item.prescribeSuffix},
+            #{item.remark}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getPrescribeId" resultType="java.lang.String">
+        select id from outpt_prescribe where visit_id = #{jzid} and hosp_code = #{hospCode} and is_submit = '1' limit 1
+    </select>
+
+    <delete id="deletePresribeDetial">
+        delete from outpt_prescribe_detail where visit_id = #{jzid} and hosp_code = #{hospCode}
+    </delete>
+
+    <delete id="deletePresribeDetialExec">
+        delete from outpt_prescribe_exec where visit_id = #{jzid} and hosp_code = #{hospCode}
+    </delete>
+
+    <delete id="deletePresribeDetialExt">
+        delete from outpt_prescribe_detail_ext where visit_id = #{jzid} and hosp_code = #{hospCode}
+    </delete>
+
+    <delete id="deleteCost">
+        delete from outpt_cost where visit_id = #{jzid} and hosp_code = #{hospCode}
+    </delete>
+
+    <delete id="deletePresribe">
+        delete from outpt_prescribe where visit_id = #{jzid} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 检查库存-->
+    <select id="checkStock" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        select * from stro_stock a
+        left join (
+        select a.biz_id,a.item_id, a.hosp_code,sum(totalNum) totalNum  from (
+        select a.phar_id biz_id, a.item_id, a.hosp_code, case when a.item_code = '1' and a.num_unit_code = b.split_unit_code then a.total_num
+        when a.item_code = '1' and a.num_unit_code = b.unit_code then a.total_num*b.split_ratio
+        when a.item_code = '2' and a.num_unit_code = c.split_unit_code then a.total_num
+        when a.item_code = '2' and a.num_unit_code = c.unit_code then a.total_num*c.split_ratio else 0 end totalNum
+        from outpt_cost a
+        left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+        where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_sub(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
+
+        union all
+        select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
+        from stro_stock a
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
+        union all
+        select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
+        when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+        from base_drug a
+        where a.hosp_code = #{hospCode} and a.id = #{itemId}
+        <if test="costId != null" >
+            and 1 != 1
+        </if>
+        union all
+        select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
+        when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+        from base_material a
+        where a.hosp_code = #{hospCode} and a.id = #{itemId}
+        )a group by a.biz_id,a.item_id, a.hosp_code
+        )b on a.hosp_code = b.hosp_code and a.item_id = b.item_id and a.biz_id = b.biz_id
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId} and (a.split_num - ifnull(b.totalNum,0)) &gt;= 0
+    </select>
+
+    <!--  获取系统参数信息 -->
+    <select id="getParameterValue" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO" >
+        select  a.id, a.hosp_code hospCode, a.name, a.code, a.remark, a.pym, a.wbm, a.value
+        from sys_parameter a
+        where  a.hosp_code = #{hospCode}  and code in
+        <foreach item="code" collection="code" separator="," open="(" close=")" index="">
+            #{code}
+        </foreach>
+    </select>
+</mapper>

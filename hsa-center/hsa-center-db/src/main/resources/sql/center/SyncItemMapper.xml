@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncitem.dao.SyncItemDAO">
+    <resultMap type="cn.hsa.module.sync.syncitem.dto.SyncItemDTO" id="CenterItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="abbr" column="abbr" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="onePrice" column="one_price" jdbcType="NUMERIC"/>
+        <result property="twoPrice" column="two_price" jdbcType="NUMERIC"/>
+        <result property="threePrice" column="three_price" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="intension" column="intension" jdbcType="VARCHAR"/>
+        <result property="prompt" column="prompt" jdbcType="VARCHAR"/>
+        <result property="except" column="except" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isCg" column="is_cg" jdbcType="VARCHAR"/>
+        <result property="isMs" column="is_ms" jdbcType="VARCHAR"/>
+        <result property="isSuppCurtain" column="is_supp_curtain" jdbcType="VARCHAR"/>
+        <result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+        <result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+        <result property="namePym" column="name_pym" jdbcType="VARCHAR"/>
+        <result property="nameWbm" column="name_wbm" jdbcType="VARCHAR"/>
+        <result property="abbrPym" column="abbr_pym" jdbcType="VARCHAR"/>
+        <result property="abbrWbm" column="abbr_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="CenterItemMap">
+        select
+        id, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price,
+        unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code,
+        in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,
+        (select count(0) from sync_advice_detail where sync_advice_detail.type_code = '3' and item_code = sync_item.code) as adviceFlag
+        from sync_item
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+
+    </select>
+
+    <!--查询医院下的所有项目-->
+    <select id="queryAll" resultMap="CenterItemMap">
+        select
+        id, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price,
+        unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code,
+        in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_item
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and bfc_code = #{bfcCode}
+            </if>
+            <if test="abbr != null and abbr != ''">
+                and abbr = #{abbr}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="onePrice != null">
+                and one_price = #{onePrice}
+            </if>
+            <if test="twoPrice != null">
+                and two_price = #{twoPrice}
+            </if>
+            <if test="threePrice != null">
+                and three_price = #{threePrice}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="intension != null and intension != ''">
+                and intension = #{intension}
+            </if>
+            <if test="prompt != null and prompt != ''">
+                and prompt = #{prompt}
+            </if>
+            <if test="except != null and except != ''">
+                and except = #{except}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isOut != null and isOut != ''">
+                and is_out = #{isOut}
+            </if>
+            <if test="isIn != null and isIn != ''">
+                and is_in = #{isIn}
+            </if>
+            <if test="isCg != null and isCg != ''">
+                and is_cg = #{isCg}
+            </if>
+            <if test="isMs != null and isMs != ''">
+                and is_ms = #{isMs}
+            </if>
+            <if test="isSuppCurtain != null and isSuppCurtain != ''">
+                and is_supp_curtain = #{isSuppCurtain}
+            </if>
+            <if test="outDeptCode != null and outDeptCode != ''">
+                and out_dept_code = #{outDeptCode}
+            </if>
+            <if test="inDeptCode != null and inDeptCode != ''">
+                and in_dept_code = #{inDeptCode}
+            </if>
+            <if test="abbrPym != null and abbrPym != ''">
+                and abbr_pym = #{abbrPym}
+            </if>
+            <if test="abbrWbm != null and abbrWbm != ''">
+                and abbr_wbm = #{abbrWbm}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (code like concat('%',#{keyword},'%')
+                or name like concat('%',#{keyword},'%')
+                or name_pym like concat('%',#{keyword},'%')
+                or name_wbm like concat('%',#{keyword},'%')
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="CenterItemMap">
+        select
+        id, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price,
+        unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code,
+        in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_item
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and bfc_code = #{bfcCode}
+            </if>
+            <if test="abbr != null and abbr != ''">
+                and abbr = #{abbr}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="onePrice != null">
+                and one_price = #{onePrice}
+            </if>
+            <if test="twoPrice != null">
+                and two_price = #{twoPrice}
+            </if>
+            <if test="threePrice != null">
+                and three_price = #{threePrice}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="intension != null and intension != ''">
+                and intension = #{intension}
+            </if>
+            <if test="prompt != null and prompt != ''">
+                and prompt = #{prompt}
+            </if>
+            <if test="except != null and except != ''">
+                and except = #{except}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isOut != null and isOut != ''">
+                and is_out = #{isOut}
+            </if>
+            <if test="isIn != null and isIn != ''">
+                and is_in = #{isIn}
+            </if>
+            <if test="isCg != null and isCg != ''">
+                and is_cg = #{isCg}
+            </if>
+            <if test="isMs != null and isMs != ''">
+                and is_ms = #{isMs}
+            </if>
+            <if test="isSuppCurtain != null and isSuppCurtain != ''">
+                and is_supp_curtain = #{isSuppCurtain}
+            </if>
+            <if test="outDeptCode != null and outDeptCode != ''">
+                and out_dept_code = #{outDeptCode}
+            </if>
+            <if test="inDeptCode != null and inDeptCode != ''">
+                and in_dept_code = #{inDeptCode}
+            </if>
+            <if test="abbrPym != null and abbrPym != ''">
+                and abbr_pym = #{abbrPym}
+            </if>
+            <if test="abbrWbm != null and abbrWbm != ''">
+                and abbr_wbm = #{abbrWbm}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (code like concat('%',#{keyword},'%')
+                or name like concat('%',#{keyword},'%')
+                or name_pym like concat('%',#{keyword},'%')
+                or name_wbm like concat('%',#{keyword},'%'))
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and type_code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_item(id, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{nationCode}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update sync_item
+        <set>
+            nation_code = #{nationCode},
+            type_code = #{typeCode},
+            bfc_code = #{bfcCode},
+            code = #{code},
+            name = #{name},
+            abbr = #{abbr},
+            spec = #{spec},
+            price = #{price},
+            one_price = #{onePrice},
+            two_price = #{twoPrice},
+            three_price = #{threePrice},
+            unit_code = #{unitCode},
+            intension = #{intension},
+            prompt = #{prompt},
+            except = #{except},
+            remark = #{remark},
+            is_out = #{isOut},
+            is_in = #{isIn},
+            is_cg = #{isCg},
+            is_ms = #{isMs},
+            is_supp_curtain = #{isSuppCurtain},
+            out_dept_code = #{outDeptCode},
+            in_dept_code = #{inDeptCode},
+            name_pym = #{namePym},
+            name_wbm = #{nameWbm},
+            abbr_pym = #{abbrPym},
+            abbr_wbm = #{abbrWbm},
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--批量和单个修改有效状态-->
+    <update id="updateStatus" parameterType="java.util.List">
+        update sync_item
+        set is_valid = #{isValid} where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--判断项目编码、国家编码是否已经存在-->
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(id)
+        from sync_item
+        <where>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="id != null and id != ''">
+                and id != #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>

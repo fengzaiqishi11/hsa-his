@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.inpt.doctor.dao.InptBabyDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="inptBabyDtoMap" type="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="gender_code" property="genderCode" jdbcType="VARCHAR" />
+        <result column="birth_time" property="birthTime" jdbcType="TIMESTAMP" />
+        <result column="weight" property="weight" jdbcType="DECIMAL" />
+        <result column="height" property="height" jdbcType="DECIMAL" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code,
+        visit_id,
+        code,
+        name,
+        gender_code, 
+        birth_time, 
+        weight, 
+        height,
+        remark, 
+        type_code
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        ib.id, 
+        ib.hosp_code, 
+        ib.visit_id,
+        ib.code,
+        ib.name,
+        ib.gender_code, 
+        ib.birth_time, 
+        ib.weight, 
+        ib.height,
+        ib.remark, 
+        ib.type_code
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="inptBabyDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        inpt_baby
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.inpt.doctor.entity.InptBabyDO" >
+        insert into
+        inpt_baby
+        (
+          id,
+          hosp_code,
+          visit_id,
+          name,
+          gender_code,
+          birth_time,
+          weight,
+          height,
+          remark,
+          type_code
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{visitId,jdbcType=VARCHAR}, 
+          #{name,jdbcType=VARCHAR}, 
+          #{genderCode,jdbcType=VARCHAR}, 
+          #{birthTime,jdbcType=TIMESTAMP}, 
+          #{weight,jdbcType=DECIMAL}, 
+          #{height,jdbcType=DECIMAL}, 
+          #{remark,jdbcType=VARCHAR}, 
+          #{typeCode,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.inpt.doctor.entity.InptBabyDO" >
+        insert into
+        inpt_baby
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id, 
+                </if>
+                <if test="name != null and name != ''">
+                    name, 
+                </if>
+                <if test="genderCode != null and genderCode != ''">
+                    gender_code, 
+                </if>
+                <if test="birthTime != null">
+                    birth_time, 
+                </if>
+                <if test="weight != null">
+                    weight, 
+                </if>
+                <if test="height != null">
+                    height, 
+                </if>
+                <if test="remark != null and remark != ''">
+                    remark, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                    type_code
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="name != null and name != ''">
+                        #{name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="genderCode != null and genderCode != ''">
+                        #{genderCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="birthTime != null">
+                        #{birthTime,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="weight != null">
+                        #{weight,jdbcType=DECIMAL}, 
+                </if>
+                <if test="height != null">
+                        #{height,jdbcType=DECIMAL}, 
+                </if>
+                <if test="remark != null and remark != ''">
+                        #{remark,jdbcType=VARCHAR}, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                        #{typeCode,jdbcType=VARCHAR}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.inpt.doctor.entity.InptBabyDO" >
+        update
+        inpt_baby
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                name = #{name,jdbcType=VARCHAR}, 
+                gender_code = #{genderCode,jdbcType=VARCHAR}, 
+                birth_time = #{birthTime,jdbcType=TIMESTAMP}, 
+                weight = #{weight,jdbcType=DECIMAL}, 
+                height = #{height,jdbcType=DECIMAL}, 
+                remark = #{remark,jdbcType=VARCHAR}, 
+                type_code = #{typeCode,jdbcType=VARCHAR}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.inpt.doctor.entity.InptBabyDO" >
+        update
+        inpt_baby
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR}, 
+                </if>
+                <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="birthTime != null">
+                birth_time = #{birthTime,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="weight != null">
+                weight = #{weight,jdbcType=DECIMAL}, 
+                </if>
+                <if test="height != null">
+                height = #{height,jdbcType=DECIMAL}, 
+                </if>
+                <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR}, 
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode,jdbcType=VARCHAR}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM inpt_baby WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM inpt_baby WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="inptBabyDtoMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM inpt_baby ib 
+        where
+        ib.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            AND ib.visit_id = #{visitId}
+        </if>
+        <if test="name != null and name != ''">
+            AND ib.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+
+    <!--新增婴儿信息-->
+    <insert id="insertBaby" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        insert into inpt_baby(id, hosp_code, code, visit_id, name, gender_code, birth_time, weight, height, remark, type_code)
+        values (#{id}, #{hospCode}, #{code}, #{visitId}, #{name}, #{genderCode}, #{birthTime}, #{weight}, #{height}, #{remark}, #{typeCode})
+    </insert>
+
+    <!--编辑婴儿信息-->
+    <update id="updateBaby" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        update inpt_baby
+        <set>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode},
+            </if>
+            <if test="birthTime != null">
+                birth_time = #{birthTime},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--根据就诊id查询出对应的新生婴儿列表-->
+    <select id="queryByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        select
+        ib.id,
+        ib.hosp_code,
+        ib.code,
+        ib.visit_id,
+        ib.name,
+        ib.gender_code,
+        ib.birth_time,
+        ib.weight,
+        ib.height,
+        ib.remark,
+        ib.type_code
+        from inpt_baby ib
+        where ib.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and ib.visit_id = #{id}
+        </if>
+    </select>
+
+    <!--检验婴儿编号是否重复-->
+    <select id="queryByCode" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        select id,
+        hosp_code,
+        code,
+        visit_id,
+        name,
+        gender_code,
+        birth_time,
+        weight,
+        height,
+        remark,
+        type_code
+        from inpt_baby
+        where hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="id != null and id !=''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--根据婴儿id查询婴儿信息-->
+    <select id="getById" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        select id,
+               hosp_code,
+               code,
+               visit_id,
+               name,
+               gender_code,
+               birth_time,
+               weight,
+               height,
+               remark,
+               type_code
+        from inpt_baby
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        select
+        id, hosp_code, code, visit_id, name, gender_code, birth_time, weight, height, remark, type_code
+        from inpt_baby
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="birthTime != null">
+                and birth_time = #{birthTime}
+            </if>
+            <if test="weight != null">
+                and weight = #{weight}
+            </if>
+            <if test="height != null">
+                and height = #{height}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+        </where>
+    </select>
+</mapper>

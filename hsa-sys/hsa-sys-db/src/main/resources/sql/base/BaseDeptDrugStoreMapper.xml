@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.base.deptDrug.dao.BaseDeptDrugStoreDAO">
+    <!--    新增科室关联药房信息数据-->
+    <resultMap id="drugStoreMap" type="cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="drugTypeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="drugStoreCode" column="drugstore_code" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertDrugstore" parameterType="java.util.List">
+        insert into base_dept_drugstore (id, hosp_code, dept_code, type_code, drugstore_code, is_valid, crte_id,
+        crte_name, crte_time)
+        values
+        <foreach collection="drugStoreList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.deptCode}, #{item.drugTypeCode}, #{item.drugStoreCode},
+            #{item.isValid}, #{item.crteId}, #{item.crteName},
+            #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--    修改科室关联药房信息数据-->
+    <update id="update" parameterType="java.util.List">
+        update base_dept_drugstore
+        set drugstore_code =#{drugStoreCode},
+        type_code=#{drugTypeCode}
+        where id in
+        <foreach collection="drugStoreList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode} and dept_code = #{code}
+    </update>
+    <!--    作废科室关联药房信息数据-->
+    <update id="updateIsValid" parameterType="cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO">
+        update base_dept_drugstore
+        set is_valid =#{isValid}
+        where hosp_code = #{hospCode}
+          and dept_code in
+        <foreach collection="deptCodeList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <delete id="deleteDrugStore" parameterType="cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO">
+        delete from base_dept_drugstore where dept_code = #{code}
+        and hosp_code = #{hospCode}
+    </delete>
+
+    <select id="queryBaseDeptDrugstore" resultMap="drugStoreMap">
+        select bdd.dept_code,bdd.type_code,bdd.drugstore_code,bd.name  from base_dept_drugstore bdd
+        left join base_dept bd on bdd.drugstore_code = bd.code and bdd.hosp_code=bd.hosp_code
+        where bdd.hosp_code=#{hospCode}
+        <if test="code !=null and code != ''">
+           and bdd.dept_code=#{code}
+        </if>
+    </select>
+</mapper>

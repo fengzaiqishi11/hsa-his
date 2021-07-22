@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: hsa-xxx
+  cloud:
+    alicloud:
+      acm:
+        file-extension: yaml
+        timeout: 3000
+        refresh-enabled: true

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.sys</groupId>
+    <artifactId>hsa-sys-ali</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-sys-ali</name>
+
+    <parent>
+        <artifactId>hsa-sys</artifactId>
+        <groupId>cn.hsa.sys</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <properties>
+        <start-class>cn.hsa.sys.HsaAliApplication</start-class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.hsa.sys</groupId>
+            <artifactId>hsa-sys-biz</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.sys</groupId>
+            <artifactId>hsa-sys-db</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- 1.分布式服务 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-rpc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 2.分布式缓存组件 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-cache-redis</artifactId>
+        </dependency>
+
+        <!-- 3.分布式消息队列组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-mq</artifactId>
+        </dependency>
+
+        <!-- 4.对象存储组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-fsstore</artifactId>
+        </dependency>
+
+        <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-gateway</artifactId>
+        </dependency>
+
+        <!-- 6.分布式数据库 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--数据库连接驱动-->
+        <!--本地模拟用-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <!--兼容edas的支持版本-->
+            <version>8.0.17</version>
+        </dependency>
+
+        <!--Rest接口文档-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>hsa-sys</finalName>
+        <plugins>
+            <plugin>
+                <groupId>com.taobao.pandora</groupId>
+                <artifactId>pandora-boot-maven-plugin</artifactId>
+                <version>2.1.9.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                        <exclude>config/**/*.properties</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

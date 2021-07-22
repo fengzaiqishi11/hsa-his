@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.phys.dao.PhysRegDAO">
+
+    <insert id="addVisitByPhys">
+        insert into outpt_visit
+        (
+            id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
+            birthday, marry_code, nation_code, cert_code, cert_no, phone, visit_no, visit_code, patient_code,
+            preferential_type_id, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+            insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
+            pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
+        )
+        values
+        (
+            #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
+            #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
+            #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+            #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
+            #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
+        )
+    </insert>
+    <insert id="addBatchPhys">
+        insert into outpt_cost(id,hosp_code,visit_id,item_id,item_name,total_price,
+        preferential_price,reality_price,status_code,item_code,crte_Time)
+        values
+        <foreach collection="outptCostDTOS" separator=","  item="item" index="index" >
+            (#{item.id},#{item.hospCode},#{item.visitId},#{item.itemId},#{item.itemName},#{item.totalPrice},
+            #{item.preferentialPrice},#{item.realityPrice},#{item.statusCode},#{item.itemCode},#{item.crteTime})
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bw.dao.BaseWindowDAO">
+
+    <resultMap type="cn.hsa.module.base.bw.dto.BaseWindowDTO" id="BaseWindowMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseWindowMap">
+        select
+          id, hosp_code, dept_code, code, name, is_valid, crte_id, crte_name, crte_time
+        from base_window
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="BaseWindowMap">
+        select
+          a.id, a.hosp_code, a.dept_code, a.code, a.name, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
+          b.name as deptName
+        from base_window a
+        left join base_dept b on  a.dept_code = b.code and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <select id="queryByDeptId" resultMap="BaseWindowMap">
+        select
+          a.id, a.hosp_code, a.dept_code, a.code, a.name, a.is_valid, a.crte_id, a.crte_name, a.crte_time , b.name as deptName
+        from base_window a
+		left join base_dept b
+		 on  a.dept_code = b.code and a.hosp_code = b.hosp_code
+        where a.is_valid = '1' and b.is_valid = '1' and a.hosp_code = #{hospCode}
+        and b.id  = #{deptId}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseWindowMap">
+        select
+          a.id, a.hosp_code, a.dept_code, a.code, a.name, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
+          b.name as deptName
+        from base_window a
+        left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+        <where>
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+                and a.hosp_code = #{hospCode}
+            <if test="deptCode != null and deptCode != ''">
+                and a.dept_code = #{deptCode}
+            </if>
+            <if test="code != null and code != ''">
+                and a.code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name = #{name}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (a.name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_window(id,hosp_code, dept_code, code, name, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{deptCode}, #{code}, #{name}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_window
+        <set>
+                hosp_code = #{hospCode},
+                dept_code = #{deptCode},
+                code = #{code},
+                name = #{name},
+                is_valid = #{isValid},
+        </set>
+        where id = #{id}  and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="delete">
+        update  base_window
+        <set>
+            is_valid = 0
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <select id="isNameExist" resultType="java.lang.Integer">
+        select count(name)
+        from base_window
+        where hosp_code = #{hospCode} and name = #{name} and dept_code =#{deptCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.mrisclassify.dao.SyncMrisClassifyDAO">
+
+    <resultMap type="cn.hsa.module.sync.mrisclassify.dto.SyncMrisClassifyDTO" id="SyncMrisClassifyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="mrisCode" column="mris_code" jdbcType="VARCHAR"/>
+        <result property="bfcCodes" column="bfc_codes" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="SyncMrisClassifyMap">
+        select
+          id,  mris_code, bfc_codes, is_valid, crte_id, crte_name, crte_time
+        from sync_mris_classify
+        where id = #{id} 
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SyncMrisClassifyMap">
+        select * from (
+        select
+        id, mris_code, bfc_codes, is_valid, crte_id, crte_name, crte_time,
+        (select name from sync_code_detail where value = mris_code and c_code = 'BAFY') as mrisName
+        from sync_mris_classify
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="mrisCode != null and mrisCode != ''">
+                and mris_code = #{mrisCode}
+            </if>
+            <if test="bfcCodes != null and bfcCodes != ''">
+                and bfc_codes = #{bfcCodes}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+        ) a
+        <where>
+            <if test="keyword != null and keyword!=''" >
+                and (mrisName like concat('%',#{keyword},'%') or bfc_codes like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="" useGeneratedKeys="true">
+        insert into sync_mris_classify(id,  mris_code, bfc_codes,
+        <if test="isValid!=null and isValid!= ''">
+            is_valid,
+        </if>
+         crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{mrisCode}, #{bfcCodes},
+        <if test="isValid!=null and isValid!= ''">
+            #{isValid},
+        </if>
+         #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据(无判空条件))-->
+    <update id="updateSyncMrisClassify">
+        update sync_mris_classify
+        <set>
+            id = #{id},
+            mris_code = #{mrisCode},
+            bfc_codes = #{bfcCodes},
+        </set>
+        where id = #{id} 
+    </update>
+
+    <!--通过主键修改数据(有判空条件))-->
+    <update id="updateSyncMrisClassifyS">
+        update sync_mris_classify
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="mrisCode != null and mrisCode != ''">
+                mris_code = #{mrisCode},
+            </if>
+            <if test="bfcCodes != null and bfcCodes != ''">
+                bfc_codes = #{bfcCodes},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} 
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+        update  sync_mris_classify
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        
+    </update>
+
+    <select id="isCodeExist" resultType="java.lang.Integer">
+        select count(mris_code)
+        from sync_mris_classify
+        where mris_code = #{mrisCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+</mapper>

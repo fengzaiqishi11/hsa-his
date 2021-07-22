@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.daily.dao.OutinDailyDAO">
+
+    <resultMap type="cn.hsa.module.outpt.daily.dto.OutinDailyDTO" id="OutinDailyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="dailyNo" column="daily_no" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="insureTotalPrice" column="insure_total_price" jdbcType="NUMERIC"/>
+        <result property="yjssTotalPrice" column="yjss_total_price" jdbcType="NUMERIC"/>
+        <result property="yjtkTotalPrice" column="yjtk_total_price" jdbcType="NUMERIC"/>
+        <result property="yjjsTotalPrice" column="yjjs_total_price" jdbcType="NUMERIC"/>
+        <result property="yjcdTotalPrice" column="yjcd_total_price" jdbcType="NUMERIC"/>
+        <result property="backTotalPrice" column="back_total_price" jdbcType="NUMERIC"/>
+        <result property="preferentialTotalPrice" column="preferential_total_price" jdbcType="NUMERIC"/>
+        <result property="roundTotalPrice" column="round_total_price" jdbcType="NUMERIC"/>
+        <result property="realityTotalPrice" column="reality_total_price" jdbcType="NUMERIC"/>
+        <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
+        <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
+        <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
+        <result property="okTime" column="ok_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <!--查询单个-->
+    <select id="queryOutinDailyByDailyNo" resultMap="OutinDailyMap">
+        select
+          id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, back_total_price, preferential_total_price, round_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time
+        from outin_daily
+        where hosp_code = #{hospCode} and daily_no = #{dailyNo}
+    </select>
+
+    <!--查询出个人日结缴款最大的开始与结束时间-->
+    <select id="queryOutinDailyByCreateId" resultMap="OutinDailyMap">
+        select
+          max(start_time) start_time, max(end_time) end_time
+        from outin_daily
+        where
+        hosp_code = #{hospCode}
+        and crte_id = #{crteId}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="OutinDailyMap">
+        SELECT
+            daily_no,
+            start_time,
+            end_time,
+            sum( total_price+yjss_total_price ) AS total_price,
+            sum( insure_total_price ) AS insure_total_price,
+            sum( yjss_total_price ) AS yjss_total_price,
+            sum( yjtk_total_price ) AS yjtk_total_price,
+            sum( yjjs_total_price ) AS yjjs_total_price,
+            sum( yjcd_total_price ) AS yjcd_total_price,
+            sum( back_total_price ) AS back_total_price,
+            sum( preferential_total_price ) AS preferential_total_price,
+            sum( round_total_price ) AS round_total_price,
+            sum( reality_total_price+yjss_total_price ) AS reality_total_price,
+            min(is_ok) as is_ok,
+            min(ok_name) as ok_name,
+            min(ok_time) as ok_time,
+            min(crte_name) as crte_name,
+            min(crte_time) as crte_time
+        FROM outin_daily
+        where hosp_code = #{hospCode}
+        <if test="crteId != null and crteId !=''">
+            and crte_id = #{crteId}
+        </if>
+        <if test="startTime != null">
+            and crte_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and crte_time &lt;= #{endTime}
+        </if>
+        <if test="isOk != null and isOk != ''">
+            and is_ok = #{isOk}
+        </if>
+
+        <if test="crteName != null and crteName !=''">
+            and crte_name like CONCAT('%',#{crteName},'%')
+        </if>
+
+        and type_code in
+        <foreach collection="jklxList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY daily_no, start_time, end_time
+        order by start_time DESC, end_time DESC
+    </select>
+
+    <!-- 获取最后一次缴款记录 -->
+    <select id="getLastDaily" resultType="cn.hsa.module.outpt.daily.dto.OutinDailyDTO">
+        select ifnull((
+            select end_time from outin_daily where hosp_code = #{hospCode} and crte_id = #{crteId}
+            and type_code in
+            <foreach collection="jklxList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            order by crte_time desc
+            limit 0, 1
+        ), str_to_date('2020-01-01 00:00:00',  '%Y-%m-%d %H:%i:%S')) start_time, now() end_time from dual
+    </select>
+
+    <!--确认缴款-->
+    <update id="update">
+        update outin_daily set is_ok = '1', ok_id = #{okId}, ok_name = #{okName}, ok_time = #{okTime} where daily_no = #{dailyNo} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 日结缴款 - 清空已存在的日结ID -->
+    <update id="updateDailyIdIsNull">
+        <!--清空挂号结算表日结缴款ID -->
+        update outpt_register_settle set daily_settle_id = null where daily_settle_id in (
+        SELECT id FROM outin_daily WHERE hosp_code = #{hospCode} AND daily_no = #{dailyNo} );
+
+        <!--清空门诊结算表日结缴款ID -->
+        update outpt_settle set daily_settle_id = null where daily_settle_id in (
+        SELECT id FROM outin_daily WHERE hosp_code = #{hospCode} AND daily_no = #{dailyNo} );
+
+        <!--清空住院结算表日结缴款ID -->
+        update inpt_settle set daily_settle_id = null where daily_settle_id in (
+        SELECT id FROM outin_daily WHERE hosp_code = #{hospCode} AND daily_no = #{dailyNo} );
+
+        <!--清空住院预交表日结缴款ID -->
+        update inpt_advance_pay set daily_settle_id = null where daily_settle_id in (
+        SELECT id FROM outin_daily WHERE hosp_code = #{hospCode} AND daily_no = #{dailyNo} );
+    </update>
+
+    <!--取消缴款-->
+    <delete id="delete">
+        <!-- 删除日结主表 -->
+        delete from outin_daily where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+        <!-- 删除日结发票表 -->
+        delete from outin_daily_invoice where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+        <!-- 删除日结财务分类表 -->
+        delete from outin_daily_finclassify where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+        <!-- 删除日结支付方式表 -->
+        delete from outin_daily_pay where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+        <!-- 删除日结统筹支付表 -->
+        delete from outin_daily_insure where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+        <!-- 删除日结预交金表 -->
+        delete from outin_daily_advance_pay where hosp_code = #{hospCode} and daily_no = #{dailyNo};
+    </delete>
+
+    <!-- 根据缴款开始、结束时间查询挂号结算记录 -->
+    <select id="queryOutptRegisterSettleAll" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price from outpt_register_settle
+        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
+    </select>
+
+    <!-- 根据缴款开始、结束时间查询挂号结算记录 -->
+    <select id="queryOutptRegisterSettle" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price from outpt_register_settle
+        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
+        group by status_code
+    </select>
+
+    <!-- 门诊结算发票信息 -->
+    <select id="queryOutptRegisterSettleByBillId" resultType="java.util.Map">
+        SELECT count(distinct bill_no) num, CONCAT(min(CAST(bill_no as SIGNED)), '') start_no, CONCAT(max(CAST(bill_no as SIGNED)), '') end_no, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price
+        FROM outpt_register_settle
+        WHERE hosp_code = #{hospCode} AND crte_id = #{crteId} and bill_no is not null and settle_time between #{startTime} and #{endTime}
+        group by bill_id
+    </select>
+
+    <!-- 根据挂号结算结算记录反查挂号费用表 -->
+    <select id="queryOutptRegisterDetail" resultType="java.util.Map">
+        select ord.bfc_id, sum(ord.total_price) total_price, sum(ord.preferential_price) preferential_price, sum(ord.reality_price) reality_price  from outpt_register_detail ord where ord.hosp_code = #{hospCode} and ord.status_code = '0' and ord.crte_id = #{crteId} and ord.register_id in (
+            select ors.register_id from outpt_register_settle ors where ors.hosp_code = ord.hosp_code and ors.crte_id = #{crteId} and ors.settle_time between #{startTime} and #{endTime}
+        )
+        group by ord.bfc_id
+    </select>
+
+    <!-- 根据挂号结算结算记录反查挂号支付方式表 -->
+    <select id="queryOutptRegisterPay" resultType="java.util.Map">
+        select pay_code, sum(price) total_price from outpt_register_pay orp where orp.hosp_code = #{hospCode} and orp.rs_id in (
+            select ors.id from outpt_register_settle ors where ors.hosp_code = orp.hosp_code and ors.crte_id =#{crteId} and ors.settle_time between #{startTime} and #{endTime}
+        )
+        group by pay_code
+    </select>
+
+    <!-- 门诊 - 结算表 -->
+    <select id="queryOutptSettleAll" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price from outpt_settle
+        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+    </select>
+
+    <!-- 门诊 - 结算表 -->
+    <select id="queryOutptSettle" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price from outpt_settle
+        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+        group by status_code
+    </select>
+
+    <!-- 门诊 - 费用表 -->
+    <select id="queryOutptCost" resultType="java.util.Map">
+        select oc.bfc_id, sum(oc.total_price) total_price, sum(oc.preferential_price) preferential_price, sum(oc.reality_price) reality_price from outpt_cost oc where oc.hosp_code = #{hospCode} and oc.settle_id in (
+	        select os.id from outpt_settle os where os.hosp_code = oc.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	    )
+	    group by oc.bfc_id
+    </select>
+
+    <!-- 门诊 - 发票表 -->
+    <select id="queryOutptSettleInvoice" resultType="java.util.Map">
+        select count(distinct osi.invoice_no) num, CONCAT(min(CAST(osi.invoice_no as SIGNED)), '') start_no, CONCAT(max(CAST(osi.invoice_no as SIGNED)), '') end_no, sum(osi.total_price) total_price from outpt_settle_invoice osi
+        where osi.hosp_code = #{hospCode} and osi.invoice_no is not null and osi.settle_id in (
+	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	    )
+	    group by invoice_id
+    </select>
+
+    <!-- 门诊 - 支付方式表 -->
+    <select id="queryOutptPay" resultType="java.util.Map">
+        select op.pay_code, sum(op.price) total_price from outpt_pay op where op.hosp_code = #{hospCode} and op.settle_id in (
+	        select os.id from outpt_settle os where os.hosp_code = op.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	    )
+	    group by op.pay_code
+    </select>
+
+    <!-- 门诊 - 合同单位支付表 -->
+    <select id="queryOutptInsurePay" resultType="java.util.Map">
+        select oip.type_code, sum(oip.total_price) total_price from outpt_insure_pay oip where oip.hosp_code = #{hospCode} and oip.settle_id in (
+	        select os.id from outpt_settle os where os.hosp_code = oip.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	    )
+	    group by oip.type_code
+    </select>
+
+    <!-- 住院 - 结算表 -->
+    <select id="queryInptSettleAll" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price from inpt_settle
+        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+    </select>
+
+    <!-- 住院 - 结算表 -->
+    <select id="queryInptSettle" resultType="java.util.Map">
+        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price from inpt_settle
+        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+        group by status_code
+    </select>
+
+    <!-- 住院 - 费用表 -->
+    <select id="queryIntptCost" resultType="java.util.Map">
+        select ic.bfc_id, sum(ic.total_price) total_price, sum(ic.preferential_price) preferential_price, sum(ic.reality_price) reality_price from inpt_cost ic where ic.hosp_code = #{hospCode} and ic.status_code = '0' and ic.settle_code = '2' and ic.settle_id in (
+            select iss.id from inpt_settle iss where iss.hosp_code = ic.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+        )
+        group by ic.bfc_id
+    </select>
+
+    <!-- 住院 - 发票表 -->
+    <select id="queryInptSettleInvoice" resultType="java.util.Map">
+        select count(distinct isi.invoice_no) num, CONCAT(min(CAST(isi.invoice_no as SIGNED)), '') start_no, CONCAT(max(CAST(isi.invoice_no as SIGNED)), '') end_no, sum(isi.total_price) total_price from inpt_settle_invoice isi
+        where isi.hosp_code = #{hospCode} and isi.invoice_no is not null and isi.settle_id in (
+            select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+        )
+        group by isi.invoice_id
+    </select>
+
+    <!-- 住院 - 支付方式表 -->
+    <select id="queryInptPay" resultType="java.util.Map">
+        select ip.pay_code, sum(ip.price) total_price from inpt_pay ip where ip.hosp_code = #{hospCode} and ip.settle_id in (
+            select iss.id from inpt_settle iss where iss.hosp_code = ip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+        )
+        group by ip.pay_code
+    </select>
+
+    <!-- 住院 - 合同单位支付表 -->
+    <select id="queryInptInsurePay" resultType="java.util.Map">
+        select iip.type_code, sum(iip.total_price) total_price from inpt_insure_pay iip where iip.hosp_code = #{hospCode} and iip.settle_id in (
+            select iss.id from inpt_settle iss where iss.hosp_code = iip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+        )
+        group by iip.type_code
+    </select>
+
+    <!-- 新增日结缴款主表 -->
+    <insert id="insertOutinDailyList">
+        insert into outin_daily(id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, back_total_price, preferential_total_price, round_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.dailyNo}, #{item.startTime}, #{item.endTime}, #{item.typeCode}, #{item.totalPrice}, #{item.insureTotalPrice}, #{item.yjssTotalPrice}, #{item.yjtkTotalPrice}, #{item.yjjsTotalPrice}, #{item.yjcdTotalPrice}, #{item.backTotalPrice}, #{item.preferentialTotalPrice}, #{item.roundTotalPrice}, #{item.realityTotalPrice}, #{item.isOk}, #{item.okId}, #{item.okName}, #{item.okTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+
+    </insert>
+
+    <!-- 新增日结缴款发票表 -->
+    <insert id="insertOutinDailyInvoiceList">
+        insert into outin_daily_invoice(id, hosp_code, daily_id, daily_no, type_code, num, start_no, end_no, total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.num}, #{item.startNo}, #{item.endNo}, #{item.totalPrice})
+        </foreach>
+    </insert>
+
+    <!-- 新增日结缴款支付方式表 -->
+    <insert id="insertOutinDailyPayList">
+        insert into outin_daily_pay(id, hosp_code, daily_id, daily_no, type_code, pay_code, total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.payCode}, #{item.totalPrice})
+        </foreach>
+    </insert>
+
+    <!-- 新增日结缴款财务分类表 -->
+    <insert id="insertOutinDailyFinclassifyList">
+        insert into outin_daily_finclassify(id, hosp_code, daily_id, daily_no, type_code, bfc_id, total_price, preferential_total_price, reality_total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.bfcId}, #{item.totalPrice}, #{item.preferentialTotalPrice}, #{item.realityTotalPrice})
+        </foreach>
+    </insert>
+
+    <!-- 新增日结缴款合同单位支付表 -->
+    <insert id="insertOutinDailyInsureList">
+        insert into outin_daily_insure(id, hosp_code, daily_id, daily_no, type_code, insure_code, total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.insureCode}, #{item.totalPrice})
+        </foreach>
+    </insert>
+
+    <!-- 新增日结缴款预交金支付方式表 -->
+    <insert id="insertOutinDailyAdvancePayList">
+        insert into outin_daily_advance_pay(id, hosp_code, daily_id, daily_no, type_code, pay_code, total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.payCode}, #{item.totalPrice})
+        </foreach>
+    </insert>
+
+    <!-- 修改挂号结算表日结缴款ID -->
+    <update id="updateDailyIdByOutptRegisterSettle">
+        update outpt_register_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+    </update>
+
+    <!-- 修改门诊结算表日结缴款ID -->
+    <update id="updateDailyIdByOutptSettle">
+        update outpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+    </update>
+
+    <!-- 修改住院结算表日结缴款ID -->
+    <update id="updateDailyIdByInptSettle">
+        update inpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+    </update>
+
+    <!-- 修改住院预交金表日结缴款ID -->
+    <update id="updateDailyIdByInptAdvancePay">
+        update inpt_advance_pay set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time between #{startTime} and #{endTime}
+    </update>
+
+    <!-- 根据日结单号、日结类型查询日结主表 -->
+    <select id="getOutinDaily" resultType="cn.hsa.module.outpt.daily.entity.OutinDailyDO">
+        SELECT * FROM outin_daily WHERE hosp_code = #{hospCode} AND daily_no = #{dailyNo} and type_code = #{typeCode}
+    </select>
+
+    <!-- 根据日结单号、日结类型查询日结财务分类表 -->
+    <select id="queryDailyByDailyNo" resultType="java.util.Map">
+        select bfc.code, REPLACE(bfc.name, '费用','收入') name, ifnull( sum( tmp.total_price ), 0 ) total_price from base_finance_classify bfc
+        left join (
+            select t.code, sum(t1.total_price) total_price from base_finance_classify t, outin_daily_finclassify t1
+            where t.id = t1.bfc_id and t.hosp_code = #{hospCode} and t.hosp_code = t1.hosp_code
+            and daily_no = #{dailyNo} and t1.type_code = #{typeCode}
+            group by t.code
+        ) tmp on tmp.code like concat(bfc.code, '%')
+        where bfc.hosp_code = #{hospCode} and bfc.up_code is null and (bfc.is_valid = '1' or (bfc.is_valid = '0' and tmp.total_price is not null))
+        group by bfc.code, bfc.name
+        order by bfc.code
+    </select>
+
+    <!-- 根据日结单号、日结类型查询日结支付方式表 -->
+    <select id="queryOutinDailyPay" resultType="java.util.Map">
+         select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
+            left join (
+                SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
+                WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
+                GROUP BY odp.pay_code
+            ) t1 on t.value = t1.pay_code
+         where t.c_code = 'ZFFS' and (t.is_valid = '1' or (t.is_valid = '0' and t1.total_price is not null))
+         order by t.seq_no
+    </select>
+
+    <!-- 根据日结单号、日结类型查询日结发票表 -->
+    <select id="queryOutinDailyInvoiceByDailyNo" resultType="java.util.Map">
+        select * from outin_daily_invoice	where hosp_code = #{hospCode} and daily_no = #{dailyNo}
+    </select>
+
+    <!-- 住院预交金 -->
+    <select id="queryInptAdvancePay" resultType="cn.hsa.module.inpt.advancepay.entity.InptAdvancePayDO">
+        select * from inpt_advance_pay where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time between #{startTime} and #{endTime}
+    </select>
+
+    <!-- 住院预交金，支付方式 -->
+    <select id="queryOutinDailyAdvancePay" resultType="java.lang.String">
+        SELECT
+            group_concat(concat(t.name, '：', ifnull( odap.total_price, 0 ), '元') order BY t.seq_no separator '，') msg
+        FROM
+            sys_code_detail t
+            LEFT JOIN outin_daily_advance_pay odap ON t.VALUE = odap.pay_code AND t.hosp_code = odap.hosp_code and odap.type_code = #{typeCode} and odap.daily_no = #{dailyNo}
+        WHERE
+            t.hosp_code = #{hospCode}
+            AND t.c_code = 'ZFFS' AND ( t.is_valid = '1' OR ( t.is_valid = '0' AND odap.total_price IS NOT NULL ) )
+    </select>
+
+    <!-- 日结缴款 - 结算列表 -->
+    <select id="querySettle" resultType="java.util.Map">
+        <choose>
+            <!-- 住院日结 -->
+            <when test="typeCode == '2'.toString()">
+                SELECT * FROM (
+                    SELECT
+                        '住院预交' AS type,
+                        iap.ap_order_no AS settle_no,
+                        iv.in_no AS profile_no,
+                        iv.name as name,
+                        iv.in_dept_name as dept_name,
+                        '' AS invoice_no,
+                        DATE_FORMAT(iap.crte_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
+                        round(iap.price, 2) total_price,
+                        iap.crte_name as crte_name,
+                        iap.status_code as status_code
+                    FROM
+                        outin_daily od,
+                        inpt_advance_pay iap,
+                        inpt_visit iv
+                    WHERE
+                        od.hosp_code = #{hospCode}
+                        AND od.type_code = '2'
+                        AND od.daily_no = #{dailyNo}
+                        AND od.hosp_code = iap.hosp_code
+                        AND od.hosp_code = iv.hosp_code
+                        AND od.id = iap.daily_settle_id
+                        AND iap.visit_id = iv.id
+
+                    union all
+
+                    SELECT
+                        '住院收费' AS type,
+                        iss.settle_no AS settle_no,
+                        iv.in_no AS profile_no,
+                        iv.name as name,
+                        iv.in_dept_name as dept_name,
+                        isi.invoice_no AS invoice_no,
+                        DATE_FORMAT(iss.settle_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
+                        round(iss.actual_price, 2) total_price,
+                        iss.crte_name AS crte_name,
+                        iss.status_code as status_code
+                    FROM
+                        outin_daily od,
+                        inpt_settle iss,
+                        inpt_settle_invoice isi,
+                        inpt_visit iv
+                    WHERE
+                        od.hosp_code = #{hospCode}
+                        AND od.type_code = '2'
+                        AND od.daily_no = #{dailyNo}
+                        AND od.hosp_code = iss.hosp_code
+                        AND od.hosp_code = isi.hosp_code
+                        AND od.hosp_code = iv.hosp_code
+                        AND od.id = iss.daily_settle_id
+                        AND iss.id = isi.settle_id
+                        AND iss.visit_id = iv.id
+                ) t
+                ORDER BY t.settle_time DESC
+            </when>
+            <!-- 门诊、挂号日结 -->
+            <otherwise>
+                SELECT * FROM (
+                    <if test="rjjkfs == '0'.toString() or typeCode == '0'.toString()">
+                        SELECT
+                            '挂号收费' AS type,
+                            orr.register_no AS settle_no,
+                            ov.out_profile AS profile_no,
+                            orr.name AS name,
+                            orr.dept_name AS dept_name,
+                            ors.bill_no AS invoice_no,
+                            DATE_FORMAT( ors.settle_time, '%Y-%m-%d %H:%i:%s' ) AS settle_time,
+                            round( ors.reality_price, 2 ) AS total_price,
+                            ors.crte_name AS crte_name,
+                            ors.status_code AS status_code
+                        FROM
+                            outin_daily od
+                            INNER JOIN outpt_register_settle ors ON ors.daily_settle_id = od.id
+                            INNER JOIN outpt_register orr ON orr.id = ors.register_id
+                            LEFT JOIN outpt_visit ov ON ov.id = orr.visit_id AND ov.hosp_code = od.hosp_code
+                        WHERE
+                            od.hosp_code =  #{hospCode}
+                            AND od.type_code = '0'
+                            AND od.daily_no = #{dailyNo}
+                            AND ors.hosp_code = od.hosp_code
+                            AND orr.hosp_code = od.hosp_code
+                    </if>
+
+                    <if test="rjjkfs == '0'.toString()">
+                        UNION ALL
+                    </if>
+
+                    <if test="rjjkfs == '0'.toString() or typeCode == '1'.toString()">
+                    SELECT
+                        '门诊收费' AS type,
+                        os.settle_no AS settle_no,
+                        ov.out_profile AS profile_no,
+                        ov.name AS name,
+                        ov.dept_name AS dept_name,
+                        osi.invoice_no AS invoice_no,
+                        DATE_FORMAT(os.settle_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
+                        round(os.actual_price, 2) AS total_price,
+                        os.crte_name AS crte_name,
+                        os.status_code as status_code
+                    FROM
+                        outin_daily od
+                        join outpt_settle os on od.hosp_code = os.hosp_code and od.id = os.daily_settle_id
+                        left join outpt_settle_invoice osi on os.hosp_code = osi.hosp_code and os.id = osi.settle_id
+                        join outpt_visit ov on os.visit_id = ov.id and os.hosp_code = ov.hosp_code
+                    WHERE
+                        od.hosp_code = #{hospCode}
+                        AND od.type_code = '1'
+                        AND od.daily_no = #{dailyNo}
+                    </if>
+                ) t
+                ORDER BY t.settle_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 日结缴款 - 预交金列表 -->
+    <select id="queryAdvancePay" resultType="java.util.Map">
+        SELECT
+            iv.name,
+            iv.in_no,
+            iv.gender_code,
+            iv.in_dept_name,
+            iv.age,
+            iv.age_unit_code,
+            iap.ap_order_no,
+            iap.pay_code,
+            iap.status_code,
+            round(iap.price, 2) total_price,
+            DATE_FORMAT(iap.crte_time, '%Y-%m-%d %H:%i:%s') AS crte_time,
+            iap.crte_name
+        FROM
+            outin_daily od,
+            inpt_advance_pay iap,
+            inpt_visit iv
+        WHERE
+            od.hosp_code = #{hospCode}
+            AND od.type_code = #{typeCode}
+            AND od.daily_no = #{dailyNo}
+            AND od.hosp_code = iap.hosp_code
+            AND od.hosp_code = iv.hosp_code
+            AND od.id = iap.daily_settle_id
+            AND iap.visit_id = iv.id
+        ORDER BY
+            iap.crte_time DESC
+    </select>
+
+    <!-- 日结缴款 - 预交金冲抵列表 -->
+    <select id="queryAdvancePayCd" resultType="java.util.Map">
+        SELECT
+            iv.name,
+            iv.in_no,
+            iv.gender_code,
+            iv.in_dept_name,
+            iv.age,
+            iv.age_unit_code,
+            iss.settle_no,
+            iap.ap_order_no,
+            iap.pay_code,
+            iap.status_code,
+            round(iap.price, 2) total_price,
+	        DATE_FORMAT(iap.crte_time, '%Y-%m-%d %H:%i:%s') AS crte_time,
+            iap.crte_name
+        FROM
+            outin_daily od,
+            inpt_settle iss,
+            inpt_advance_pay iap,
+            inpt_visit iv
+        WHERE
+            od.hosp_code = #{hospCode}
+            AND od.type_code = #{typeCode}
+            AND od.daily_no = #{dailyNo}
+            AND od.hosp_code = iss.hosp_code
+            AND od.hosp_code = iap.hosp_code
+            AND od.hosp_code = iv.hosp_code
+            and od.id = iss.daily_settle_id
+            and od.id = iap.daily_settle_id
+            AND iss.id = iap.settle_id
+            AND iss.visit_id = iv.id
+        ORDER BY
+            iss.settle_time DESC
+    </select>
+</mapper>

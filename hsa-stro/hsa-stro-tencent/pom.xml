@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.stro</groupId>
+    <artifactId>hsa-stro-tencent</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-stro-tencent</name>
+
+    <parent>
+        <artifactId>hsa-stro</artifactId>
+        <groupId>cn.hsa.stro</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <properties>
+        <start-class>cn.hsa.stro.HsaTencentApplication</start-class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.hsa.stro</groupId>
+            <artifactId>hsa-stro-biz</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.stro</groupId>
+            <artifactId>hsa-stro-db</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- 1.分布式服务 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-rpc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>5.1.8.RELEASE</version>
+        </dependency>
+
+        <!-- 2.分布式缓存组件 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-cache-redis</artifactId>
+        </dependency>
+
+        <!--3.分布式消息队列组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-mq</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--4.对象存储组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-fsstore</artifactId>
+        </dependency>
+
+        <!--5.网关（应用可以同时访问腾讯云和阿里云网关）-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-gateway</artifactId>
+        </dependency>
+
+        <!-- 6.分布式数据库 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <!--com.tencent.tsf.sleuth.instrument.jdbc需要依赖HikariCP-->
+            <!--
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
+            -->
+        </dependency>
+
+        <!--数据库连接驱动-->
+        <!--本地模拟用-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <!--Rest接口文档-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>hsa-stro</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>${start-class}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                        <exclude>config/**/*.properties</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+
+</project>

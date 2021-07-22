@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.financeclassify.dao.SyncFinanceClassifyDAO">
+
+    <resultMap type="cn.hsa.module.sync.financeclassify.dto.SyncFinanceClassifyDTO" id="SyncFinanceClassifyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="inCode" column="in_code" jdbcType="VARCHAR"/>
+        <result property="outCode" column="out_code" jdbcType="VARCHAR"/>
+        <result property="upCode" column="up_code" jdbcType="VARCHAR"/>
+        <result property="isEnd" column="is_end" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--根据ID查询-->
+    <select id="getById" resultMap="SyncFinanceClassifyMap">
+        select
+          id, code, name, in_code, out_code, up_code, is_end, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_finance_classify
+        where id = #{id}
+    </select>
+
+    <select id="queryDropDownEnd" resultMap="SyncFinanceClassifyMap">
+        select
+          id, code, name, in_code, out_code, up_code, is_end, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_finance_classify
+        <where>
+        is_end = '1' and is_valid = '1'
+        </where>
+    </select>
+
+    <select id="queryTree" resultType="cn.hsa.base.TreeMenuNode">
+        select code id, name label, if(up_code = '' or up_code is null ,'-1',up_code) parentId
+        from sync_finance_classify
+        <where>
+            <if test="isValid != null and isValid !=''">
+                and  is_valid=#{isValid}
+            </if>
+            <if test="isEnd != null and isEnd !=''">
+                and is_end = #{isEnd}
+            </if>
+        </where>
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SyncFinanceClassifyMap">
+        select
+          id, code, name, in_code, out_code, up_code, is_end, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_finance_classify
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="inCode != null and inCode != ''">
+                and in_code = #{inCode}
+            </if>
+            <if test="outCode != null and outCode != ''">
+                and out_code = #{outCode}
+            </if>
+            <if test="upCode != null">
+                and up_code = #{upCode}
+            </if>
+            <if test="isEnd != null">
+                and is_end = #{isEnd}
+            </if>
+            <if test="isValid != null and isValid != '' ">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增单条信息-->
+    <insert id="insert">
+        insert into sync_finance_classify(id, code, name, in_code, out_code, up_code, is_end, pym, wbm,
+         <if test="isValid!=null and isValid!= ''">
+             is_valid,
+         </if>
+         crte_id, crte_name, crte_time)
+        values (#{id} , #{code}, #{name}, #{inCode}, #{outCode}, #{upCode}, #{isEnd}, #{pym}, #{wbm},
+        <if test="isValid!=null and isValid!= ''">
+            #{isValid},
+        </if>
+          #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--根据ID修改信息-->
+    <update id="update">
+        update sync_finance_classify
+        <set>
+                code = #{code},
+                name = #{name},
+                in_code = #{inCode},
+                out_code = #{outCode},
+                up_code = #{upCode},
+                is_end = #{isEnd},
+                pym = #{pym},
+                wbm = #{wbm},
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据ID修改有效标识为无效-->
+    <update id="updateStatus">
+        update sync_finance_classify set is_valid = #{isValid} where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateDownNodeStatus">
+        update sync_finance_classify set is_valid = #{isValid} where code in
+        <foreach collection="codes" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--判断财务编码是否已经存在-->
+    <select id="isCodeExist" resultType="java.lang.Integer">
+    select count(code)
+    from sync_finance_classify
+    where  code = #{code}
+    <if test="id != null and id != ''">
+        and id != #{id}
+    </if>
+    </select>
+
+    <select id="isNameExist" resultType="java.lang.Integer">
+        select count(name)
+        from base_finance_classify
+        where  name = #{name}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <select id="queryByUpCode" resultMap="SyncFinanceClassifyMap">
+        select   id, code, name, in_code, out_code, up_code, is_end, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_finance_classify
+        where
+        <if test="upCode != null and upCode != '' and upCode != '-1'">
+              up_code = #{upCode}
+        </if>
+        <if test="upCode == null or upCode =='' or upCode == '-1'">
+             up_code is null or up_code = '' or up_code ='-1'
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureConfigurationDAO">
+
+<!-- 实体DTO及数据库字段映射 -->
+<resultMap id="insureConfigurationMap" type="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="reg_code" property="regCode" jdbcType="VARCHAR" />
+    <result column="org_code" property="orgCode" jdbcType="VARCHAR" />
+    <result column="attr_code" property="attrCode" jdbcType="VARCHAR" />
+    <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="request_code" property="requestCode" jdbcType="VARCHAR" />
+    <result column="time_out" property="timeOut" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="contact" property="contact" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="is_remote" property="isRemote" jdbcType="VARCHAR" />
+    <result column="is_valid" property="isValid" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+<!-- 表所有字段 -->
+<sql id="Base_Column_List">
+        id,
+        hosp_code,
+        code,
+        name,
+        reg_code,
+        org_code,
+        attr_code,
+        type_code,
+        url,
+        request_code,
+        time_out,
+        username,
+        password,
+        contact,
+        email,
+        phone,
+        is_remote,
+        is_valid,
+        remark,
+        crte_id,
+        crte_name,
+        crte_time,
+        mdtrtarea_admvs
+    </sql>
+
+<!-- 表所有字段（别名） -->
+<sql id="Base_ColumnAlias_List">
+        ic.id,
+        ic.hosp_code,
+        ic.code,
+        ic.name,
+        ic.reg_code,
+        ic.org_code,
+        ic.attr_code,
+        ic.type_code,
+        ic.url,
+        ic.request_code,
+        ic.time_out,
+        ic.username,
+        ic.password,
+        ic.contact,
+        ic.email,
+        ic.phone,
+        ic.is_remote,
+        ic.is_valid,
+        ic.remark,
+        ic.crte_id,
+        ic.crte_name,
+        ic.crte_time,
+        ic.mdtrtarea_admvs
+    </sql>
+
+<!--通过实体作为筛选条件查询-->
+<select id="queryAll" resultMap="insureConfigurationMap">
+    select
+    id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+    from insure_configuration
+    <where>
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            and hosp_code = #{hospCode}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="regCode != null and regCode != ''">
+            and reg_code = #{regCode}
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            and org_code = #{orgCode}
+        </if>
+        <if test="attrCode != null and attrCode != ''">
+            and attr_code = #{attrCode}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and type_code = #{typeCode}
+        </if>
+        <if test="url != null and url != ''">
+            and url = #{url}
+        </if>
+        <if test="requestCode != null and requestCode != ''">
+            and request_code = #{requestCode}
+        </if>
+        <if test="timeOut != null and timeOut != ''">
+            and time_out = #{timeOut}
+        </if>
+        <if test="username != null and username != ''">
+            and username = #{username}
+        </if>
+        <if test="password != null and password != ''">
+            and password = #{password}
+        </if>
+        <if test="contact != null and contact != ''">
+            and contact = #{contact}
+        </if>
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+        <if test="phone != null and phone != ''">
+            and phone = #{phone}
+        </if>
+        <if test="isRemote != null and isRemote != ''">
+            and is_remote = #{isRemote}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+        <if test="remark != null and remark != ''">
+            and remark = #{remark}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+    </where>
+</select>
+
+<!-- 根据主键查询表信息 -->
+<select id="selectByPrimaryKey" resultMap="insureConfigurationMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from
+    insure_configuration
+    where
+    id = #{id}
+</select>
+
+<!-- 新增表信息 -->
+<insert id="insert" parameterType="cn.hsa.module.insure.module.entity.InsureConfigurationDO" >
+        insert into
+        insure_configuration
+        (
+          id,
+          hosp_code,
+          code,
+          name,
+          reg_code,
+          org_code,
+          attr_code,
+          type_code,
+          url,
+          request_code,
+          time_out,
+          username,
+          password,
+          contact,
+          email,
+          phone,
+          is_remote,
+          is_valid,
+          remark,
+          crte_id,
+          crte_name,
+          crte_time,
+          mdtrtarea_admvs
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{code,jdbcType=VARCHAR},
+          #{name,jdbcType=VARCHAR},
+          #{regCode,jdbcType=VARCHAR},
+          #{orgCode,jdbcType=VARCHAR},
+          #{attrCode,jdbcType=VARCHAR},
+          #{typeCode,jdbcType=VARCHAR},
+          #{url,jdbcType=VARCHAR},
+          #{requestCode,jdbcType=VARCHAR},
+          #{timeOut,jdbcType=VARCHAR},
+          #{username,jdbcType=VARCHAR},
+          #{password,jdbcType=VARCHAR},
+          #{contact,jdbcType=VARCHAR},
+          #{email,jdbcType=VARCHAR},
+          #{phone,jdbcType=VARCHAR},
+          #{isRemote,jdbcType=VARCHAR},
+          #{isValid,jdbcType=VARCHAR},
+          #{remark,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP},
+          #{mdtrtareaAdmvs,jdbcType=VARCHAR}
+        )
+    </insert>
+
+<!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+<insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureConfigurationDO" >
+    insert into
+    insure_configuration
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="id != null and id != ''">
+            id,
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            hosp_code,
+        </if>
+        <if test="code != null and code != ''">
+            code,
+        </if>
+        <if test="name != null and name != ''">
+            name,
+        </if>
+        <if test="regCode != null and regCode != ''">
+            reg_code,
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            org_code,
+        </if>
+        <if test="attrCode != null and attrCode != ''">
+            attr_code,
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            type_code,
+        </if>
+        <if test="url != null and url != ''">
+            url,
+        </if>
+        <if test="requestCode != null and requestCode != ''">
+            request_code,
+        </if>
+        <if test="timeOut != null and timeOut != ''">
+            time_out,
+        </if>
+        <if test="username != null and username != ''">
+            username,
+        </if>
+        <if test="password != null and password != ''">
+            password,
+        </if>
+        <if test="contact != null and contact != ''">
+            contact,
+        </if>
+        <if test="email != null and email != ''">
+            email,
+        </if>
+        <if test="phone != null and phone != ''">
+            phone,
+        </if>
+        <if test="isRemote != null and isRemote != ''">
+            is_remote,
+        </if>
+        <if test="isValid != null and isValid != ''">
+            is_valid,
+        </if>
+        <if test="remark != null and remark != ''">
+            remark,
+        </if>
+        <if test="crteId != null and crteId != ''">
+            crte_id,
+        </if>
+        <if test="crteName != null and crteName != ''">
+            crte_name,
+        </if>
+        <if test="crteTime != null">
+            crte_time,
+        </if>
+        <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
+            mdtrtarea_admvs
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        <if test="id != null and id != ''">
+            #{id,jdbcType=VARCHAR},
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            #{hospCode,jdbcType=VARCHAR},
+        </if>
+        <if test="code != null and code != ''">
+            #{code,jdbcType=VARCHAR},
+        </if>
+        <if test="name != null and name != ''">
+            #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="regCode != null and regCode != ''">
+            #{regCode,jdbcType=VARCHAR},
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            #{orgCode,jdbcType=VARCHAR},
+        </if>
+        <if test="attrCode != null and attrCode != ''">
+            #{attrCode,jdbcType=VARCHAR},
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            #{typeCode,jdbcType=VARCHAR},
+        </if>
+        <if test="url != null and url != ''">
+            #{url,jdbcType=VARCHAR},
+        </if>
+        <if test="requestCode != null and requestCode != ''">
+            #{requestCode,jdbcType=VARCHAR},
+        </if>
+        <if test="timeOut != null and timeOut != ''">
+            #{timeOut,jdbcType=VARCHAR},
+        </if>
+        <if test="username != null and username != ''">
+            #{username,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null and password != ''">
+            #{password,jdbcType=VARCHAR},
+        </if>
+        <if test="contact != null and contact != ''">
+            #{contact,jdbcType=VARCHAR},
+        </if>
+        <if test="email != null and email != ''">
+            #{email,jdbcType=VARCHAR},
+        </if>
+        <if test="phone != null and phone != ''">
+            #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test="isRemote != null and isRemote != ''">
+            #{isRemote,jdbcType=VARCHAR},
+        </if>
+        <if test="isValid != null and isValid != ''">
+            #{isValid,jdbcType=VARCHAR},
+        </if>
+        <if test="remark != null and remark != ''">
+            #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="crteId != null and crteId != ''">
+            #{crteId,jdbcType=VARCHAR},
+        </if>
+        <if test="crteName != null and crteName != ''">
+            #{crteName,jdbcType=VARCHAR},
+        </if>
+        <if test="crteTime != null">
+            #{crteTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
+            #{mdtrtareaAdmvs,jdbcType=VARCHAR}
+        </if>
+    </trim>
+</insert>
+
+<!-- 修改表信息 -->
+<update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureConfigurationDO" >
+        update
+        insure_configuration
+        set
+                code = #{code,jdbcType=VARCHAR},
+                name = #{name,jdbcType=VARCHAR},
+                reg_code = #{regCode,jdbcType=VARCHAR},
+                org_code = #{orgCode,jdbcType=VARCHAR},
+                attr_code = #{attrCode,jdbcType=VARCHAR},
+                type_code = #{typeCode,jdbcType=VARCHAR},
+                url = #{url,jdbcType=VARCHAR},
+                request_code = #{requestCode,jdbcType=VARCHAR},
+                time_out = #{timeOut,jdbcType=VARCHAR},
+                username = #{username,jdbcType=VARCHAR},
+                password = #{password,jdbcType=VARCHAR},
+                contact = #{contact,jdbcType=VARCHAR},
+                email = #{email,jdbcType=VARCHAR},
+                phone = #{phone,jdbcType=VARCHAR},
+                is_remote = #{isRemote,jdbcType=VARCHAR},
+                is_valid = #{isValid,jdbcType=VARCHAR},
+                remark = #{remark,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+                mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR}
+        where
+        id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+<!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+<update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.insure.module.entity.InsureConfigurationDO" >
+    update
+    insure_configuration
+    <set >
+        <if test="hospCode != null and hospCode != ''">
+            hosp_code = #{hospCode,jdbcType=VARCHAR},
+        </if>
+        <if test="code != null and code != ''">
+            code = #{code,jdbcType=VARCHAR},
+        </if>
+        <if test="name != null and name != ''">
+            name = #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="regCode != null and regCode != ''">
+            reg_code = #{regCode,jdbcType=VARCHAR},
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            org_code = #{orgCode,jdbcType=VARCHAR},
+        </if>
+        <if test="attrCode != null and attrCode != ''">
+            attr_code = #{attrCode,jdbcType=VARCHAR},
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            type_code = #{typeCode,jdbcType=VARCHAR},
+        </if>
+        <if test="url != null and url != ''">
+            url = #{url,jdbcType=VARCHAR},
+        </if>
+        <if test="requestCode != null and requestCode != ''">
+            request_code = #{requestCode,jdbcType=VARCHAR},
+        </if>
+        <if test="timeOut != null and timeOut != ''">
+            time_out = #{timeOut,jdbcType=VARCHAR},
+        </if>
+        <if test="username != null and username != ''">
+            username = #{username,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null and password != ''">
+            password = #{password,jdbcType=VARCHAR},
+        </if>
+        <if test="contact != null and contact != ''">
+            contact = #{contact,jdbcType=VARCHAR},
+        </if>
+        <if test="email != null and email != ''">
+            email = #{email,jdbcType=VARCHAR},
+        </if>
+        <if test="phone != null and phone != ''">
+            phone = #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test="isRemote != null and isRemote != ''">
+            is_remote = #{isRemote,jdbcType=VARCHAR},
+        </if>
+        <if test="isValid != null and isValid != ''">
+            is_valid = #{isValid,jdbcType=VARCHAR},
+        </if>
+        <if test="remark != null and remark != ''">
+            remark = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="crteId != null and crteId != ''">
+            crte_id = #{crteId,jdbcType=VARCHAR},
+        </if>
+        <if test="crteName != null and crteName != ''">
+            crte_name = #{crteName,jdbcType=VARCHAR},
+        </if>
+        <if test="crteTime != null">
+            crte_time = #{crteTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
+            mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR}
+        </if>
+    </set>
+    where
+    id = #{id}
+</update>
+
+<!-- 根据主键删除表信息 -->
+<delete id="deleteById" parameterType="java.lang.String">
+    DELETE FROM insure_configuration WHERE id = #{id}
+</delete>
+
+<!-- 根据主键批量删除数据 -->
+<delete id="deleteByIds">
+    delete from insure_configuration
+    where
+    <if test="ids != null and ids.size()>0">
+        id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </if>
+    and hosp_code = #{hospCode}
+</delete>
+
+<!-- 根据条件参数查询数据列表 -->
+<select id="findByCondition" resultMap="insureConfigurationMap" parameterType="cn.hsa.module.insure.module.entity.InsureConfigurationDO">
+    SELECT
+    <include refid="Base_ColumnAlias_List" />
+    FROM insure_configuration ic
+    WHERE
+        ic.hosp_code = #{hospCode}
+        <if test="code != null and code != ''">
+            AND ic.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            AND ic.name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="regCode != null and regCode != ''">
+            AND ic.reg_code = #{regCode}
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            AND ic.org_code = #{orgCode}
+        </if>
+        <if test="attrCode != null and attrCode != ''">
+            AND ic.attr_code = #{attrCode}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            AND ic.type_code = #{typeCode}
+        </if>
+</select>
+
+    <!--查询单个-->
+    <select id="getById" parameterType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO" resultMap="insureConfigurationMap">
+        select
+          id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        from insure_configuration
+        where  hosp_code = #{hospCode}
+       <if test="id !=null and id !='' ">
+           and id=#{id}
+       </if>
+        <if test="code !=null and code!= ''">
+            and code=#{code}
+        </if>
+        <if test="orgCode!=null and orgCode!= ''">
+            and org_code=#{orgCode}
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
+        select
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        from insure_configuration
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and name like concat('%',#{keyword},'%')
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            and hosp_code = #{hospCode}
+        </where>
+    </select>
+<!-- 判断code是否存在-->
+    <select id="queryCodeIsExist" resultType="java.lang.Integer">
+        select count(*) from insure_configuration
+        where
+        hosp_code = #{hospCode} and code = #{code}
+        <if test="id != null and id != ''">
+           and id != #{id}
+        </if>
+    </select>
+    <select id="queryInsureIndividualConfig"
+            resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
+        select
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        from insure_configuration
+        where  hosp_code = #{hospCode}
+        <if test="id !=null and id !='' ">
+            and id=#{id}
+        </if>
+        <if test="code !=null and code!= ''">
+            and code=#{code}
+        </if>
+        <if test="regCode!=null and regCode!= ''">
+            and reg_code=#{regCode}
+        </if>
+        <if test="orgCode!=null and orgCode!= ''">
+            and org_code=#{orgCode}
+        </if>
+        <if test="isValid!=null and isValid!= ''">
+            and is_valid=#{isValid}
+        </if>
+    </select>
+
+</mapper>

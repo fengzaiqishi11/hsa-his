@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.queue.dao.OutptDoctorQueueDao">
+
+    <resultMap type="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto" id="OutptDoctorQueueMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="cqId" column="cq_id" jdbcType="TIMESTAMP"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="registerNum" column="register_num" jdbcType="VARCHAR"/>
+        <result property="clinicId" column="clinic_id" jdbcType="VARCHAR"/>
+        <result property="clinicName" column="clinicName" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultMap="OutptDoctorQueueMap">
+        select
+        odq.*, ocq.queue_date as queueDate,bc.`name` as clinicName
+        from outpt_doctor_queue odq, outpt_classes_queue ocq,base_clinic bc
+        where
+        bc.id = odq.clinic_id
+        and bc.hosp_code = odq.hosp_code
+        and odq.cq_id = ocq.id
+        and odq.hosp_code=#{hospCode}
+        <if test="cqId !=null and cqId != ''">
+            and odq.cq_id = #{cqId}
+        </if>
+    </select>
+
+    <select id="queryLowestTriagePatientsDoctor" parameterType="map" resultType="map">
+    select * from (SELECT
+                           a.doctor_id,b.queue_date ,a.id,a.doctor_name,a.clinic_id
+                       FROM
+                           outpt_doctor_queue a,
+                           outpt_classes_queue b
+                       WHERE
+                           a.cq_id = b.id
+                         AND b.queue_date = date (#{queueDate})
+	AND b.dept_id = #{deptId}) c
+	left join (
+	select dq_id,doctor_id doctId,count(1) as count
+        from outpt_triage_visit otv where (otv.triage_start_code = '1'
+        or otv.triage_start_code = '2' or otv.triage_start_code = '3' ) AND otv.hosp_code = #{hospCode}
+        group by dq_id,doctId)d
+        on d.dq_id  = c.id
+            and d.doctId  = c.doctor_id
+        ORDER BY count asc limit 1
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryAll" resultMap="OutptDoctorQueueMap">
+        select
+        odq.*
+        from outpt_doctor_queue odq
+        where
+        odq.hosp_code=#{hospCode}
+        <if test="cqId !=null and cqId != ''">
+            and odq.cq_id = #{cqId}
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryById" resultMap="OutptDoctorQueueMap">
+        select
+        odq.*
+        from outpt_doctor_queue odq
+        where
+        odq.hosp_code=#{hospCode}
+        <if test="id !=null and id != ''">
+            and odq.id = #{id}
+        </if>
+        limit 1
+    </select>
+
+
+    <!--查询需要删除的医生队列数据-->
+    <select id="queryDoctorQueueDel" parameterType="map" resultType="map">
+        select a.*
+        from outpt_doctor_queue a
+        where a.hosp_code = #{hospCode}
+        --         and a.is_valid = '0'
+        <if test="triageId !=null and triageId !=''">
+            AND #{triageId} = (SELECT b.triage_id FROM outpt_classes_queue b WHERE b.id = a.cq_id)
+        </if>
+        AND (SELECT count(*) FROM outpt_register b where b.dq_id = a.id) = 0
+        AND (select count(*) FROM outpt_doctor_register d where d.dq_id = a.id and d.is_use = '1' ) = 0
+    </select>
+
+
+
+    <!--查询所有不能删除的医生队列数据-->
+    <select id="queryDoctorQueueNotDel" parameterType="map" resultType="string">
+        select
+            DISTINCT
+            t.ysdlid
+        from(
+                SELECT
+                    a.id as ysdlid ,count(*) as sl
+                FROM outpt_doctor_queue a,
+                     outpt_doctor_register b
+                where  a.hosp_code = #{hospCode}
+                  and b.hosp_code = #{hospCode}
+                  and b.dq_id = a.id
+                  and b.is_use = '1'
+                group by  a.id
+                having count(*)>0
+                union all
+                select b.dq_id as ysdlid, count(*) as sl
+                from outpt_register a,
+                     outpt_doctor_register b
+                where a.hosp_code = #{hospCode}
+                  and b.hosp_code = #{hospCode}
+                  and a.dr_id = b.id
+                group by b.dq_id
+                having count(*)>0
+            ) t
+    </select>
+
+    <!--物理删除医生队列-->
+    <delete id="deleteDoctorQueue" parameterType="list" >
+        delete from outpt_doctor_queue
+        where id in
+        <foreach collection="list" item="id" index="index" open="(" separator="," close=")">
+            #{id,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDoctorQueueByCqids" parameterType="list" >
+        delete from outpt_doctor_queue
+        where cq_id in
+        <foreach collection="list" item="id" index="index" open="(" separator="," close=")">
+            #{id,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <!-- 批量删除没有被使用号源明细-->
+    <delete id="deleteDoctorRegister" parameterType="list">
+        delete from outpt_doctor_register where dq_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and is_use = '0'
+    </delete>
+
+    <!--查询医生队列信息-->
+    <select id="queryDoctorQueueByParam" parameterType="map" resultType="map">
+        select
+        odq.*
+        from outpt_doctor_queue odq
+        where odq.hosp_code = #{hospCode}
+        <if test="isValid !=null and isValid !=''">
+            and odq.is_valid = #{isValid}
+        </if>
+        <if test="cqId !=null and cqId !=''">
+            and odq.cq_id = #{cqId}
+        </if>
+    </select>
+
+    <insert id="insertDoctorQueueBatch">
+        insert into outpt_doctor_queue(id,hosp_code,cq_id,doctor_id,doctor_name,is_valid,register_num,clinic_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.hospCode}, #{item.cq_id}, #{item.doctor_id}, #{item.doctor_name}, #{item.is_valid}, #{item.register_num},#{item.clinic_id})
+        </foreach>
+    </insert>
+</mapper>

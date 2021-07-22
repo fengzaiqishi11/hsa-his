@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.syshospital.dao.SysHospitalDAO">
+
+    <resultMap type="cn.hsa.module.center.hospital.dto.CenterHospitalDTO" id="SysHospitalMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="proCode" column="pro_code" jdbcType="VARCHAR"/>
+        <result property="cityCode" column="city_code" jdbcType="VARCHAR"/>
+        <result property="areaCode" column="area_code" jdbcType="VARCHAR"/>
+        <result property="buliImagePath" column="buli_image_path" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="fax" column="fax" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="postCode" column="post_code" jdbcType="VARCHAR"/>
+        <result property="hospImagePath" column="hosp_image_path" jdbcType="VARCHAR"/>
+        <result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+        <result property="website" column="website" jdbcType="VARCHAR"/>
+        <result property="legalName" column="legal_name" jdbcType="VARCHAR"/>
+        <result property="legalPhone" column="legal_phone" jdbcType="VARCHAR"/>
+        <result property="adminName" column="admin_name" jdbcType="VARCHAR"/>
+        <result property="adminPhone" column="admin_phone" jdbcType="VARCHAR"/>
+        <result property="levelCode" column="level_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="longLat" column="long_lat" jdbcType="VARCHAR"/>
+        <result property="startDate" column="start_date" jdbcType="DATE"/>
+        <result property="endDate" column="end_date" jdbcType="DATE"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="DATE"/>
+        <result property="diseaseCode" column="disease_code" jdbcType="VARCHAR"/>
+        <result property="operCode" column="oper_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getByHospCode" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO" resultMap="SysHospitalMap">
+        select
+          id, code, name, pro_code, city_code, disease_code, oper_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time
+        from center_hospital
+        where code = #{code}
+    </select>
+    <!--通过主键修改数据-->
+    <update id="update">
+        update center_hospital
+        <set>
+                name = #{name},
+                pro_code = #{proCode},
+                city_code = #{cityCode},
+                area_code = #{areaCode},
+                disease_code = #{diseaseCode},
+                oper_code = #{operCode},
+                buli_image_path = #{buliImagePath},
+                address = #{address},
+                phone = #{phone},
+                fax = #{fax},
+                email = #{email},
+                post_code = #{postCode},
+                hosp_image_path = #{hospImagePath},
+                introduce = #{introduce},
+                website = #{website},
+                legal_name = #{legalName},
+                legal_phone = #{legalPhone},
+                admin_name = #{adminName},
+                admin_phone = #{adminPhone},
+                pym = #{pym},
+                wbm = #{wbm},
+                long_lat = #{longLat}
+        </set>
+        where code = #{code}
+    </update>
+
+</mapper>

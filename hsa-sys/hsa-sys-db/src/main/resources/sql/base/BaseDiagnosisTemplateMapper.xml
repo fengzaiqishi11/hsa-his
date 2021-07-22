@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.diagnosistemplate.dao.BaseDiagnosisTemplateDAO">
+
+    <resultMap type="cn.hsa.module.base.diagnosistemplate.dto.BaseDiagnosisTemplateDTO" id="BaseDiagnosisTemplateMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizType" column="biz_type" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="diseaseId" column="disease_id" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="disease_name" jdbcType="VARCHAR"/>
+        <result property="diseaseIcd10" column="disease_icd10" jdbcType="VARCHAR"/>
+        <result property="useScopeCode" column="use_scope_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+        <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 根据ID查询 -->
+    <select id="getById" resultMap="BaseDiagnosisTemplateMap">
+        select id,hosp_code,biz_type,type_code,disease_id,disease_name,disease_icd10,use_scope_code,pym,wbm,dept_id,dept_name,doctor_id,doctor_name,is_check,check_id,check_name,check_time,is_valid,crte_id,crte_name,crte_time
+        FROM base_diagnosis_template
+        where hosp_code = #{hospCode} and id =#{id}
+    </select>
+
+    <!-- 查询所以信息 -->
+    <select id="queryAll" resultMap="BaseDiagnosisTemplateMap">
+        select
+        id,hosp_code,biz_type,type_code,disease_id,disease_name,disease_icd10,use_scope_code,pym,wbm,dept_id,dept_name,doctor_id,doctor_name,is_check,check_id,check_name,check_time,is_valid,crte_id,crte_name,crte_time
+
+        from base_diagnosis_template
+        where  hosp_code = #{hospCode}
+
+        <if test="keyword != null and keyword != ''">
+            and (disease_name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+        </if>
+
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+
+        <if test="useScopeCode != null and useScopeCode != ''">
+            and use_scope_code = #{useScopeCode}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and doctor_id = #{doctorId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+        ORDER BY crte_time desc
+    </select>
+
+    <!--查询单个-->
+    <insert id="save">
+         INSERT INTO base_diagnosis_template (
+            id,
+            hosp_code,
+            biz_type,
+            type_code,
+            disease_id,
+            disease_name,
+            disease_icd10,
+            use_scope_code,
+            pym,
+            wbm,
+            dept_id,
+            dept_name,
+            doctor_id,
+            doctor_name,
+            is_check,
+            check_id,
+            check_name,
+            check_time,
+            is_valid,
+            crte_id,
+            crte_name,
+            crte_time
+        )
+        VALUES
+        (
+        #{id},
+        #{hospCode},
+        #{bizType},
+        #{typeCode},
+        #{diseaseId},
+        #{diseaseName},
+        #{diseaseIcd10},
+        #{useScopeCode},
+        #{pym},
+        #{wbm},
+        #{deptId},
+        #{deptName},
+        #{doctorId},
+        #{doctorName},
+        #{isCheck},
+        #{checkId},
+        #{checkName},
+        #{checkTime},
+        #{isValid},
+        #{crteId},
+        #{crteName},
+        #{crteTime}
+        )
+    </insert>
+
+    <!--删除-->
+    <delete id="deleteById">
+        DELETE FROM base_diagnosis_template  WHERE ID =#{id}
+    </delete>
+
+    <!--修改医嘱-->
+    <update id="updateById">
+         UPDATE base_diagnosis_template
+            SET
+            hosp_code=#{hospCode},
+            biz_type=#{bizType},
+            type_code =#{typeCode},
+            disease_id=#{diseaseId},
+            disease_name=#{diseaseName},
+            disease_icd10=#{diseaseIcd10},
+            use_scope_code=#{useScopeCode},
+            pym=#{pym},
+            wbm=#{wbm},
+            dept_id=#{deptId},
+            dept_name=#{deptName},
+            doctor_id=#{doctorId},
+            doctor_name=#{doctorName},
+            check_id=#{checkId},
+            check_name=#{checkName},
+            check_time=#{checkTime},
+            is_valid=#{isValid}
+            WHERE
+            id = #{id}
+    </update>
+</mapper>

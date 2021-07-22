@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.center.datasource.dao.CenterDatasourceDAO" >
+  <!-- 实体DTO及数据库字段映射 -->
+  <resultMap id="centerDatasourceDtoMap" type="cn.hsa.module.center.datasource.entity.CenterDatasourceDO">
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="CenterDataSourceResultMap" type="cn.hsa.module.center.datasource.dto.CenterDatasourceDTO" >
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    <result column="hosp_code" property="hospCode" jdbcType="TIMESTAMP" />
+    <association property="centerHospitalDatasourceDO" column="ds_code">
+      <result column="chdId" property="id" jdbcType="VARCHAR" />
+      <result column="chdDsCode" property="dsCode" jdbcType="VARCHAR" />
+      <result column="chdHospCode" property="hospCode" jdbcType="VARCHAR" />
+      <result column="chdCrteId" property="crteId" jdbcType="VARCHAR" />
+      <result column="chdCrteName" property="crteName" jdbcType="VARCHAR" />
+      <result column="chdCrteTime" property="crteTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+  <!-- 表所有字段 -->
+  <sql id="Base_Column_List">
+        id,
+        code,
+        name,
+        type_code,
+        driver_name,
+        url,
+        username,
+        password
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+  <!-- 表所有字段（别名） -->
+  <sql id="Base_ColumnAlias_List">
+        cd.id,
+        cd.code,
+        cd.name,
+        cd.type_code,
+        cd.driver_name,
+        cd.url,
+        cd.username,
+        cd.password,
+        cd.crte_id,
+        cd.crte_name,
+        cd.crte_time
+    </sql>
+
+  <!-- 根据主键查询表信息 -->
+  <select id="selectByPrimaryKey" resultMap="centerDatasourceDtoMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from
+    center_datasource
+    where
+    id = #{id}
+  </select>
+
+  <!-- 新增表信息 -->
+  <insert id="insert" parameterType="cn.hsa.module.center.datasource.entity.CenterDatasourceDO" >
+        insert into
+        center_datasource
+        (
+          id,
+          code,
+          name,
+          type_code,
+          driver_name,
+          url,
+          username,
+          password,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{code,jdbcType=VARCHAR},
+          #{name,jdbcType=VARCHAR},
+          #{typeCode,jdbcType=VARCHAR},
+          #{driverName,jdbcType=VARCHAR},
+          #{url,jdbcType=VARCHAR},
+          #{username,jdbcType=VARCHAR},
+          #{password,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+  <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+  <insert id="insertSelective" parameterType="cn.hsa.module.center.datasource.entity.CenterDatasourceDO" >
+    insert into
+    center_datasource
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''">
+        id,
+      </if>
+      <if test="code != null and code != ''">
+        code,
+      </if>
+      <if test="name != null and name != ''">
+        name,
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code,
+      </if>
+      <if test="driverName != null and driverName != ''">
+        driver_name,
+      </if>
+      <if test="url != null and url != ''">
+        url,
+      </if>
+      <if test="username != null and username != ''">
+        username,
+      </if>
+      <if test="password != null and password != ''">
+        password,
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id,
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name,
+      </if>
+      <if test="crteTime != null">
+        crte_time
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null and code != ''">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name != ''">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        #{typeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null and driverName != ''">
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null and url != ''">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null and username != ''">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null and password != ''">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </trim>
+  </insert>
+
+  <!-- 修改表信息 -->
+  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.center.datasource.entity.CenterDatasourceDO" >
+        update
+        center_datasource
+        set
+                code = #{code,jdbcType=VARCHAR},
+                name = #{name,jdbcType=VARCHAR},
+                type_code = #{typeCode,jdbcType=VARCHAR},
+                driver_name = #{driverName,jdbcType=VARCHAR},
+                url = #{url,jdbcType=VARCHAR},
+                username = #{username,jdbcType=VARCHAR},
+                password = #{password,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+  <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.center.datasource.entity.CenterDatasourceDO" >
+    update
+    center_datasource
+    <set >
+      <if test="code != null and code != ''">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name != ''">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code = #{typeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null and driverName != ''">
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null and url != ''">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null and username != ''">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null and password != ''">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id = #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name = #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        crte_time = #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where
+    id = #{id}
+  </update>
+
+  <!-- 根据主键删除表信息 -->
+  <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM center_datasource WHERE id = #{id}
+    </delete>
+
+  <!-- 根据主键批量删除数据 -->
+  <delete id="deleteByIds">
+    DELETE FROM center_datasource WHERE id IN
+    <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 查询数据源关系信息 -->
+  <select id="queryCenterHospitalDatasourceAll" resultMap="CenterDataSourceResultMap">
+    SELECT
+        ch.code,
+        cd.driver_name,
+        cd.url,
+        cd.username,
+        cd.password
+    FROM
+        center_hospital ch
+        INNER JOIN center_hospital_datasource chd ON ch.CODE = chd.hosp_code
+        INNER JOIN center_datasource cd ON chd.ds_code = cd.code
+    WHERE
+        ch.is_valid = '1' and now() BETWEEN ch.start_date and ch.end_date
+  </select>
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="findByCondition" resultMap="CenterDataSourceResultMap" parameterType="cn.hsa.module.center.datasource.dto.CenterDatasourceDTO">
+    SELECT
+    <include refid="Base_ColumnAlias_List" />
+    FROM center_datasource cd
+    <where>
+      <if test="code != null and code != ''">
+        cd.code LIKE CONCAT('%', #{code}, '%')
+        OR cd.name LIKE CONCAT('%', #{code}, '%')
+      </if>
+      <if test="name != null and name != ''">
+        AND cd.name LIKE CONCAT('%', #{name}, '%')
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        AND cd.type_code LIKE CONCAT('%', #{typeCode}, '%')
+      </if>
+    </where>
+    order by cd.crte_time DESC
+  </select>
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="getDataSourceByHosp" resultMap="CenterDataSourceResultMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    SELECT
+    <include refid="Base_ColumnAlias_List" />
+    FROM center_hospital_datasource chd
+    inner join center_datasource cd on chd.ds_code = cd.code
+    where chd.hosp_code = #{newHospCode}
+  </select>
+
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="findCenterDataSourceByIds" resultMap="CenterDataSourceResultMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    SELECT
+    *
+    FROM center_datasource
+    where id in
+    <foreach collection="ids" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="findHospitalCenterDataSourceByIds" resultMap="CenterDataSourceResultMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    select
+    DISTINCT b.hosp_code,a.*
+    from center_datasource a, center_hospital_datasource b
+    where a.code = b.ds_code
+    and a.id in
+    <foreach collection="ids" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <!-- 查询数据源关系信息 -->
+  <select id="getCenterHospitalDatasource" resultMap="CenterDataSourceResultMap">
+    SELECT
+        ch.code,
+        cd.driver_name,
+        cd.url,
+        cd.username,
+        cd.password
+    FROM
+        center_hospital ch
+        INNER JOIN center_hospital_datasource chd ON ch.CODE = chd.hosp_code
+        INNER JOIN center_datasource cd ON chd.ds_code = cd.code
+    WHERE
+        ch.is_valid = '1' and now() BETWEEN ch.start_date and ch.end_date and ch.code = #{hospCode}
+  </select>
+</mapper>

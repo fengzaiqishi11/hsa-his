@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharindistributedrug.dao.InDistributeDrugDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharinbackdrug.entity.PharInReceiveDO" id="inReceiveMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="windowId" column="window_id" jdbcType="VARCHAR"/>
+        <result property="assignUserId" column="assign_user_id" jdbcType="VARCHAR"/>
+        <result property="assignUserName" column="assign_user_name" jdbcType="VARCHAR"/>
+        <result property="assignTime" column="assign_time" jdbcType="TIMESTAMP"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distUserName" column="dist_user_name" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO" id="detailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="wrId" column="wr_id" jdbcType="VARCHAR"/>
+        <result property="receiveId" column="receive_id" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="NUMERIC"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--申请记录-->
+    <select id="getInRecivePage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO">
+        select DATE_FORMAT(a.crte_time, '%Y-%m-%d') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
+        a.order_no orderNo,(select name from base_window where id=a.window_id and hosp_code=#{hospCode}) windowName,a.window_id windowId,
+        a.total_price totalPrice,a.status_code statusCode,a.assign_user_name assignUserName,
+        DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,
+        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName
+        from phar_in_receive a
+        where 1=1 and a.hosp_code=#{hospCode}
+        <if test="queryFlag == '' or queryFlag == null">
+          and a.status_code != '3'
+        </if>
+        <if test="pharId!=null and pharId!=''">
+            and a.phar_id=#{pharId}
+        </if>
+        <if test="orderNo!=null and orderNo!=''">
+            and a.order_no like CONCAT('%',#{orderNo},'%')
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status_code = #{status}
+        </if>
+        <if test="queryDate!=null and queryDate!=''">
+            <if test="status == 1 or status == '1'">
+                and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = #{queryDate}
+            </if>
+            <if test="status == 2 or status == '2'">
+                and DATE_FORMAT(a.assign_time,'%Y-%m-%d') = #{queryDate}
+            </if>
+            <if test="status == null or status == ''">
+                and (DATE_FORMAT(a.assign_time,'%Y-%m-%d') = #{queryDate} or DATE_FORMAT(a.crte_time,'%Y-%m-%d') = #{queryDate})
+            </if>
+        </if>
+        <if test="deptId!=null and deptId!=''">
+            and a.dept_id=#{deptId}
+        </if>
+        order by a.assign_time desc,a.crte_time desc
+    </select>
+
+    <!--住院发药记录-->
+    <select id="getSendInRecivePage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO">
+        select DATE_FORMAT(a.crte_time, '%Y-%m-%d') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
+        a.order_no orderNo,(select name from base_window where id=a.window_id and hosp_code=#{hospCode}) windowName,a.window_id windowId,
+        a.total_price totalPrice,a.status_code statusCode,a.assign_user_name assignUserName,
+        DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,
+        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName
+        from phar_in_receive a
+        where 1=1 and a.hosp_code=#{hospCode} and a.status_code != '1'
+        <if test="pharId!=null and pharId!=''">
+            and a.phar_id=#{pharId}
+        </if>
+        <if test="orderNo!=null and orderNo!=''">
+            and a.order_no like CONCAT('%',#{orderNo},'%')
+        </if>
+        <if test="assignUserId!=null and assignUserId!=''">
+            and a.assign_user_id = #{assignUserId}
+        </if>
+        <if test="windowId!=null and windowId!=''">
+            and a.window_id = #{windowId}
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status_code = #{status}
+        </if>
+        <if test="queryDate!=null and queryDate!=''">
+<!--            <if test="status == 2 or status == '2'">-->
+<!--                and DATE_FORMAT(a.assign_time,'%Y-%m-%d') = #{queryDate}-->
+<!--            </if>-->
+<!--            <if test="status == 3 or status == '3'">-->
+<!--                and DATE_FORMAT(a.dist_time,'%Y-%m-%d') = #{queryDate}-->
+<!--            </if>-->
+<!--            <if test="status == null or status == ''">-->
+<!--                and (DATE_FORMAT(a.assign_time,'%Y-%m-%d') = #{queryDate} or DATE_FORMAT(a.dist_time,'%Y-%m-%d') = #{queryDate})-->
+<!--            </if>-->
+			and DATE_FORMAT(a.assign_time,'%Y-%m-%d') = #{queryDate}
+        </if>
+        <if test="deptId!=null and deptId!=''">
+            and a.dept_id=#{deptId}
+        </if>
+        order by a.assign_time desc
+    </select>
+
+    <!--住院发药-取药明细单-->
+    <select id="getInReviceDetailPage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
+        select
+        a.id,a.visit_id,a.item_name itemName,a.spec,(case a.item_code when '1' then (select prep_code from base_drug where id=a.item_id and a.item_code='1' and hosp_code=a.hosp_code) else '' end) prepCode,
+        a.price,a.split_price splitPrice,a.unit_code unitCode,a.item_code itemCode,a.item_id itemId,ifnull(a.num,0) num,ifnull(a.num*a.price,0) total,
+        (select ifnull(sum(split_num),0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockNum,
+        (select ifnull(stock_occupy,0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockOccupy,
+        (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
+        (select name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) name,ifnull(a.dosage,0) dosage,a.dosage_unit_code dosageUnitCode,
+        (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
+        a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,a.split_ratio splitRatio,
+        (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName
+        from (
+        select a.id,a.receive_id,a.item_name,a.spec,
+        a.price,max(a.split_price) split_price,a.unit_code,a.item_code,a.item_id,
+        a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age
+        ,sum(a.num) num,a.split_unit_code,ifnull(sum(a.split_num), 0) splitNum,a.split_ratio,a.dosage_unit_code
+        from phar_in_receive_detail a
+        join phar_in_receive b on a.receive_id=b.id
+        join inpt_visit c on a.visit_id=c.id
+        where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
+        <if test="receiveId!=null and receiveId!=''">
+            and a.receive_id=#{receiveId}
+        </if>
+        <if test="windowId!=null and windowId!=''">
+            and b.window_id=#{windowId}
+        </if>
+        group by a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,a.id,
+        a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age,a.split_unit_code,a.split_ratio,a.dosage_unit_code
+        ) a
+        order by patientInfo
+    </select>
+
+    <!--住院发药-取药明细单打印-->
+    <select id="getInReviceDetail" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
+        select
+        a.item_name itemName,a.spec,
+        a.price,a.unit_code unitCode,a.item_code itemCode,a.item_id itemId,ifnull(a.num,0) num,ifnull(a.num*a.price,0) total,
+        ifnull(a.dosage,0) dosage,a.visit_id visitId,
+        (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
+        (select in_no from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) inNo,
+        (case a.item_code when '1' then (select code from base_drug where id=a.item_id and a.item_code='1' and hosp_code=a.hosp_code)
+            else (select code from base_material where id=a.item_id and a.item_code='2' and hosp_code=a.hosp_code) end) code,
+        (select location_no from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) locationNo,
+        (select name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) name,ifnull(a.dosage,0) dosage,a.dosage_unit_code dosageUnitCode,
+        (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
+         (select name from base_rate where id=a.rate_id and hosp_code=a.hosp_code) as rateName,
+        a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,
+         a.is_long isLong,a.crte_id crteId,a.crte_name crteName,a.usage_code usageCode,
+         a.in_disease_name inDiseaseName,a.patient_code patientCode
+        from (
+            select a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,
+            a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age
+            ,ifnull(a.num,0) num,a.split_unit_code,ifnull(a.split_num, 0) splitNum,a.dosage_unit_code,
+            ifnull(d.is_long,'') is_long,d.crte_id,d.crte_name,d.rate_id,d.usage_code,c.in_disease_name,c.patient_code
+            from phar_in_receive_detail a
+            join phar_in_receive b on a.receive_id=b.id
+            join inpt_visit c on a.visit_id=c.id
+            join inpt_advice d on a.advice_id = d.id
+            where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode} and d.hosp_code = #{hospCode}
+            <if test="receiveId!=null and receiveId!=''">
+                and a.receive_id=#{receiveId}
+            </if>
+            <if test="windowId!=null and windowId!=''">
+                and b.window_id=#{windowId}
+            </if>
+--             group by a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,
+--             a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age,a.split_unit_code,a.split_ratio,a.dosage_unit_code,
+--             d.is_long,d.crte_id,d.crte_name,d.rate_id,d.usage_code,c.in_disease_name,c.patient_code
+        ) a
+        order by patientInfo
+    </select>
+
+    <!--住院发药-取药合计单-->
+    <select id="getInSumReviceDetailPage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
+        select c.*,
+        ifnull((select num from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockNum,
+        (select unit_code from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code) stockUnionCode,
+        ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy
+        from (
+            select a.item_code itemCode,a.item_id itemId,a.item_name itemName,a.spec,a.price,a.unit_code unitCode,b.phar_id,a.split_ratio splitRatio,
+            ifnull(sum(a.dosage),0) dosage,ifnull(sum(a.num),0) total,a.hosp_code,ifnull(sum(a.split_num),0) splitNum,a.split_unit_code splitUnitCode,
+            a.dosage_unit_code dosageUnitCode,
+        (select name from base_product c join base_drug d on d.prod_code=c.code where c.hosp_code=a.hosp_code and d.hosp_code=a.hosp_code and d.id=a.item_id) prodName
+            from phar_in_receive_detail a
+            join phar_in_receive b on a.receive_id=b.id
+            where 1=1
+        <if test="receiveId!=null and receiveId!=''">
+            and a.receive_id=#{receiveId}
+        </if>
+            group by a.item_code,a.item_id,a.item_name,a.spec,a.price,a.unit_code,b.phar_id,a.hosp_code,a.split_unit_code,a.split_ratio,a.dosage_unit_code
+        ) c order by c.itemName
+    </select>
+
+    <!--根据领药申请ID获取明细数据-->
+    <select id="getInReceiveDetailsById" resultMap="detailMap">
+        select a.* from (
+        select item_code,item_id,hosp_code,wr_id,receive_id,advice_id,visit_id,split_ratio,ifnull(sum(split_num),0) split_num,ifnull(sum(num),0) num,id,item_name,
+        curr_unit_code,unit_code,spec,max(dosage) dosage,max(dosage_unit_code) dosage_unit_code,max(price) price,
+        max(split_unit_code) split_unit_code,max(split_price) split_price,max(chinese_drug_num) chinese_drug_num,
+        max(usage_code) usage_code,ifnull(sum(total_price),0) total_price,
+        (select iv.name from inpt_visit iv where iv.id = visit_id and iv.hosp_code = hosp_code ) as name
+        from phar_in_receive_detail where receive_id=#{id} and hosp_code=#{hospCode}
+        group by item_code,item_id,hosp_code,wr_id,receive_id,advice_id,visit_id,split_ratio,id,item_name,curr_unit_code,unit_code,spec
+        ) a where a.split_num>0
+    </select>
+
+    <!--根据主键获取住院领药申请数据-->
+    <select id="getInReceiveById" resultMap="inReceiveMap">
+        select * from phar_in_receive where id=#{id} and hosp_code=#{hospCode}
+    </select>
+
+    <select id="getInptCostsByReceiveDetail" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select c.* from phar_in_receive_detail a
+        join phar_in_wait_receive b on a.wr_id=b.id
+        join inpt_cost c on b.cost_id=c.id
+        where 1=1 and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
+        <if test="pharInReceiveDetailDOList!=null and pharInReceiveDetailDOList.size()>0">
+            and (a.id) in
+            <foreach collection="pharInReceiveDetailDOList" item="item" separator=","  open="(" close=")">
+                 #{item.id}
+            </foreach>
+        </if>
+    </select>
+
+    <!--更新住院领药申请表-->
+    <update id="updateInReceive" keyProperty="id" useGeneratedKeys="true">
+        update phar_in_receive
+         <set>
+             <if test="assignUserId!=null and assignUserId!=''">
+                 assign_user_id=#{assignUserId},
+             </if>
+             <if test="assignUserName!=null and assignUserName!=''">
+                 assign_user_name=#{assignUserName},
+             </if>
+             <if test="assignTime!=null">
+                 assign_time=#{assignTime},
+             </if>
+             <if test="statusCode!=null and statusCode!=''">
+                 status_code=#{statusCode},
+             </if>
+             <if test="distUserId!=null and distUserId!=''">
+                 dist_user_id=#{distUserId},
+             </if>
+             <if test="distUserName!=null and distUserName!=''">
+                 dist_user_name=#{distUserName},
+             </if>
+             <if test="distTime!=null">
+                 dist_time=#{distTime},
+             </if>
+         </set>
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <!--更新配药人信息-->
+    <update id="updateInReceiveAssign" keyProperty="id" useGeneratedKeys="true">
+        update phar_in_receive set assign_user_id=#{assignUserId},assign_user_name=#{assignUserName},assign_time=#{assignTime},status_code=#{statusCode}
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <!--更新住院待领表、配药信息-->
+    <update id="updateInWaitReceiveAssign" keyProperty="id" useGeneratedKeys="true">
+        <foreach collection="list" item="item" separator=";">
+            update phar_in_wait_receive set assign_user_id=#{item.assignUserId},assign_user_name=#{item.assignUserName},
+            assign_time=#{item.assignTime},status_code=#{item.statusCode}
+            where (id=#{item.wrId} or old_wr_id=#{item.wrId}) and hosp_code=#{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--更新住院待领表、发药信息-->
+    <update id="updateInWaitReceiveDistribute" keyProperty="id" useGeneratedKeys="true">
+        <foreach collection="list" item="item" separator=";">
+            update phar_in_wait_receive set dist_user_id=#{item.distUserId},dist_user_name=#{item.distUserName},
+            dist_time=#{item.distTime},status_code=#{item.statusCode}
+            where (id=#{item.wrId} or old_wr_id=#{item.wrId}) and hosp_code=#{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--更新住院待领表 配药信息-->
+    <update id="updateInWaitReceive" keyProperty="id" useGeneratedKeys="true">
+        <foreach collection="list" item="item" separator=";">
+            update phar_in_wait_receive
+            <set>
+                <if test="item.assignUserId!=null and item.assignUserId!=''">
+                    assign_user_id=#{item.assignUserId},
+                </if>
+                <if test="item.assignUserName!=null and item.assignUserName!=''">
+                    assign_user_name=#{item.assignUserName},
+                </if>
+                <if test="item.assignTime!=null">
+                    assign_time=#{item.assignTime},
+                </if>
+                <if test="item.statusCode!=null and item.statusCode!=''">
+                    status_code=#{item.statusCode},
+                </if>
+                <if test="item.distUserId!=null and item.distUserId!=''">
+                    dist_user_id=#{item.distUserId},
+                </if>
+                <if test="item.distUserName!=null and item.distUserName!=''">
+                    dist_user_name=#{item.distUserName},
+                </if>
+                <if test="item.distTime!=null">
+                    dist_time=#{item.distTime},
+                </if>
+            </set>
+            where id=#{item.wrId} and hosp_code=#{item.hospCode}
+        </foreach>
+    </update>
+
+    <update id="updateInptCostIsDist">
+        update inpt_cost set is_dist='1' where 1=1 and hosp_code=#{hospCode}
+        <if test="costDTOList!=null and costDTOList.size()>0">
+            and (id) in
+            <foreach collection="costDTOList" item="item" separator=","  open="(" close=")">
+                #{item.id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--插入住院发药表-->
+    <insert id="insertInDistribute" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_distribute(id,hosp_code,phar_id,window_id,order_no,order_type_code,total_price,assign_user_id,
+        assign_user_name,assign_time,dist_user_id,dist_user_name,dist_time,dept_id,status_code,crte_id,crte_name,crte_time)
+        values(#{id},#{hospCode},#{pharId},#{windowId},#{orderNo},#{orderTypeCode},#{totalPrice},#{assignUserId}
+        ,#{assignUserName},#{assignTime},#{distUserId},#{distUserName},#{distTime},#{deptId},#{statusCode},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--插入住院发药明细表-->
+    <insert id="insertInDistributeDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_distribute_detail(id,hosp_code,distribute_id,ir_id,ird_id,advice_id,group_no,
+        visit_id,baby_id,item_code,item_id,item_name,num,price,unit_code,spec,dosage,dosage_unit_code,total_price,
+        split_ratio,split_unit_code,split_num,split_price,chinese_drug_num,usage_code,stock_detail_id,batch_no,
+        up_batch_surplus_num,batch_surplus_num,up_buy_price_all,buy_price_all,up_sell_price_all,sell_price_all,curr_unit_code,distribute_all_detail_id,old_dist_id)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.distributeId}, #{item.irId}, #{item.irdId}, #{item.adviceId}, #{item.groupNo},
+            #{item.visitId}, #{item.babyId}, #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.num},
+            #{item.price}, #{item.unitCode}, #{item.spec}, #{item.dosage}, #{item.dosageUnitCode}, #{item.totalPrice}, #{item.splitRatio}
+            , #{item.splitUnitCode}, #{item.splitNum}, #{item.splitPrice}, #{item.chineseDrugNum}, #{item.usageCode}, #{item.stockDetailId}
+            , #{item.batchNo}, #{item.upBatchSurplusNum}, #{item.batchSurplusNum}, #{item.upBuyPriceAll}
+            , #{item.buyPriceAll}, #{item.upSellPriceAll}, #{item.sellPriceAll}, #{item.currUnitCode},#{item.distributeAllDetailId},#{item.oldDistId})
+        </foreach>
+    </insert>
+
+    <insert id="insertInDistributeAllDetail">
+      insert into phar_in_distribute_all_detail(id, hosp_code, distribute_id, ir_id, ird_id, advice_id,
+      group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage,
+      dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num,
+      usage_code, curr_unit_code,crte_id,crte_name,crte_time,old_dist_id)
+      values
+      <foreach item="item" collection="list" separator="," open="" close="" index="index">
+        (#{item.id}, #{item.hospCode}, #{item.distributeId}, #{item.irId}, #{item.irdId}, #{item.adviceId},
+        #{item.groupNo}, #{item.visitId}, #{item.babyId}, #{item.itemCode}, #{item.itemId}, #{item.itemName},
+        #{item.num}, #{item.price}, #{item.unitCode}, #{item.spec},#{item.dosage}, #{item.dosageUnitCode},
+        #{item.totalPrice}, #{item.splitRatio}, #{item.splitUnitCode}, #{item.splitNum},#{item.splitPrice},
+        #{item.chineseDrugNum}, #{item.usageCode}, #{item.currUnitCode},#{item.crteId},#{item.crteName},
+        #{item.crteTime},#{item.oldDistId})
+      </foreach>
+    </insert>
+
+    <!--查询就诊id在配药表里-->
+    <select id="queryVisitByReceiveOrder" resultType="java.lang.String">
+      select distinct a.visit_id
+      from phar_in_receive_detail a
+      join base_drug b on b.id = a.item_id and b.type_code = '2' and a.hosp_code = b.hosp_code
+      left join phar_in_receive c on c.id = a.receive_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
+      where a.hosp_code = #{hospCode} and a.receive_id = #{id}
+      and item_code = '1'
+    </select>
+    <!--查询就诊id在发药表里-->
+    <select id="queryVisitByDistributeOrder" resultType="java.lang.String">
+        select distinct a.visit_id
+        from phar_in_distribute_detail a
+        join base_drug b on b.id = a.item_id and b.type_code = '2' and a.hosp_code = b.hosp_code
+        left join phar_in_distribute c on c.id = a.distribute_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
+        where a.hosp_code = #{hospCode} and a.distribute_id = #{id}
+        and item_code = '1'
+      </select>
+
+    <!--根据就诊id查询就诊信息-->
+    <select id="queryPatientInfoByVitsitId" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+      select a.*,
+     (CONCAT(a.name,'/',
+     (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = a.gender_code and e.hosp_code = a.hosp_code AND
+     e.c_code = 'XB' ), '' )),'/',
+     a.age,
+     (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = a.age_unit_code AND hosp_code =
+     a.hosp_code ), '岁' )))) as patientInfo
+     from inpt_visit a where a.hosp_code = #{hospCode}
+     <if test="ids!=null and ids.size()>0">
+       and (a.id) in
+       <foreach collection="ids" item="item" separator=","  open="(" close=")">
+         #{item}
+       </foreach>
+     </if>
+   </select>
+
+    <!--根据就诊id和配药id查询医嘱信息-->
+    <select id="queryDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+      select a.* from inpt_advice a
+      join phar_in_receive_detail pc on pc.advice_id = a.id and pc.hosp_code = a.hosp_code
+      and pc.receive_id = #{id} and pc.visit_id = #{visitId}
+--       left join phar_in_receive b on pc.receive_id = b.id and pc.hosp_code = b.hosp_code
+      where a.hosp_code = #{hospCode}
+    </select>
+
+    <!--根据就诊id和发药id查询医嘱信息-->
+    <select id="queryDrugByDistributeIdAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select a.* from inpt_advice a
+        join phar_in_distribute_detail pc on pc.distribute_id = a.id and pc.hosp_code = a.hosp_code
+        and pc.distribute_id = #{id} and pc.visit_id = #{visitId}
+        where a.hosp_code = #{hospCode}
+      </select>
+
+  <update id="updateCostDistId">
+    <foreach collection="list" item="item" separator=";">
+      update inpt_cost a set a.distribute_all_detail_id = #{item.distributeAllDetailId}
+       where a.hosp_code = #{item.hospCode}
+       and a.id = (select b.cost_id from phar_in_wait_receive b where b.id = #{item.wrId} and b.hosp_code = #{item.hospCode})
+    </foreach>
+  </update>
+
+  <!--删除配药明细-->
+  <delete id="deletePharInReceiveDetailDTO">
+    delete from phar_in_receive_detail where hosp_code = #{hospCode} and receive_id = #{receiveId}
+    <if test="ids!=null and ids.size()>0">
+      and id in
+      <foreach collection="ids" item="item" separator=","  open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+    <if test="itemIds!=null and itemIds.size()>0">
+      and item_id in
+      <foreach collection="itemIds" item="item" separator=","  open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+  </delete>
+
+  <!--查询需要取消的配药明细-->
+  <select id="queryCanclePharInReceiveDetailDTO" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
+    select * from phar_in_receive_detail
+    where hosp_code = #{hospCode} and receive_id = #{receiveId}
+    <if test="ids!=null and ids.size()>0">
+      and id in
+      <foreach collection="ids" item="item" separator=","  open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+    <if test="itemIds!=null and itemIds.size()>0">
+      and item_id in
+      <foreach collection="itemIds" item="item" separator=","  open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <!--修改费用退药状态-->
+  <update id="updateCostBackCodeStatus">
+    update inpt_cost set back_code = #{backCode} where hosp_code = #{hospCode} and back_code = '1'
+    and id in
+    <foreach collection="ids" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </update>
+
+  <!--查询剩余配药明细-->
+  <select id="querySurplusPharInReceiveDetailDTO" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
+    select * from phar_in_receive_detail where hosp_code = #{hospCode} and receive_id = #{id}
+  </select>
+
+  <!--删除配药主表-->
+  <delete id="deleteCanclePharInReceivelDTO">
+    delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
+  </delete>
+</mapper>

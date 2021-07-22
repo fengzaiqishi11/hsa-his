@@ -193,6 +193,11 @@ public class BaseDeptServiceImpl extends HsafService implements BaseDeptService 
         BaseDeptDTO baseDeptDTO = MapUtils.get(map, "baseDeptDTO");
         return WrapperResponse.success(baseDeptBO.getDeptTypeCode(baseDeptDTO));
     }
+    @Override
+    public WrapperResponse<List<BaseDeptDTO>> getPharInfo(Map map) {
+        BaseDeptDTO baseDeptDTO = MapUtils.get(map, "baseDeptDTO");
+        return WrapperResponse.success(baseDeptBO.getPharInfo(baseDeptDTO));
+    }
 
     /**
     * @Method getDeptInfoByLoginDeptId

@@ -38,7 +38,9 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
-        <result property="tcmdrugUsedWay" column="tcmdrug_used_way" jdbcType="TIMESTAMP"/>
+        <result property="lmtUserFlag" column="lmt_user_flag" jdbcType="VARCHAR"/>
+        <result property="limUserExplain" column="lim_user_explain" jdbcType="VARCHAR"/>
+        <result property="tcmdrugUsedWay" column="tcmdrug_used_way" jdbcType="VARCHAR"/>
     </resultMap>
     <!--通过实体作为筛选条件查询-->
     <select id="queryPageOrAll" resultMap="InsureItemMatchMap"
@@ -176,6 +178,12 @@
             </if>
             <if test="tcmdrugUsedWay !=null and tcmdrugUsedWay !='' ">
                 and tcmdrug_used_way =#{tcmdrug_used_way}
+            </if>
+            <if test="lmtUserFlag !=null and lmtUserFlag !='' ">
+                and lmt_user_flag =#{lmtUserFlag}
+            </if>
+            <if test="limUserExplain !=null and limUserExplain !='' ">
+                and lim_user_explain =#{limUserExplain}
             </if>
         </where>
         order by audit_code,crte_time desc

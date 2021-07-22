@@ -805,4 +805,9 @@ public interface InptAdviceDAO {
     Boolean  updateAdvanceDaysLastExcTime(@Param("list") List<String>  inptAdviceDTOList,@Param("advance_days") String days);
 
 
+    //根据visitIds，itemIds查询出对应的医嘱明细表数据
+    List<InptAdviceDetailDTO> queryInptAdviceDetail(Map map);
+
+    // 更新医嘱明细表副表数据，限制用药字段
+    int updateInptAdviceDetail(@Param("detailsExtDTOS") List<InptAdviceDetailDTO> detailsExtDTOS);
 }

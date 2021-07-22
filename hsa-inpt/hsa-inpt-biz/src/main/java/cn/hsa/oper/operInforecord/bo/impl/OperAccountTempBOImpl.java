@@ -168,79 +168,16 @@ public class OperAccountTempBOImpl extends HsafBO implements OperAccountTempBO {
         return operAccountTempDetailDTOS;
     }
 
-    //补充价格信息
+    //计算总价格信息
     private List<OperAccountTempDetailDTO> updatePrice(OperAccountTempDetailDTO operAccountTempDetailDTO, List<OperAccountTempDetailDTO> operAccountTempDetailDTOS) {
 
-        ArrayList<String> drugIdList = new ArrayList<>();
-        ArrayList<String> itemIdList = new ArrayList<>();
-        ArrayList<String> materialIdList = new ArrayList<>();
-        operAccountTempDetailDTOS.forEach((dto) ->{
-            if(EnumUtil.XMLB1.getKey().equals(dto.getItemCode())){
-                drugIdList.add(dto.getItemId());
-            };
-            if(EnumUtil.XMLB2.getKey().equals(dto.getItemCode())){
-                materialIdList.add(dto.getItemId());
-            };
-            if(EnumUtil.XMLB3.getKey().equals(dto.getItemCode())){
-                itemIdList.add(dto.getItemId());
-            };
-
-        });
-
-        HashMap<String, Object> map = new HashMap<>();
-        HashMap<String, Object> drugMap = new HashMap<>();
-        HashMap<String, Object> itemMap = new HashMap<>();
-        HashMap<String, Object> materialMap = new HashMap<>();
-        BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
-        BaseMaterialDTO baseMaterialDTO = new BaseMaterialDTO();
-        BaseItemDTO baseItemDTO = new BaseItemDTO();
-
-        if(!ListUtils.isEmpty(drugIdList)){}{
-        baseDrugDTO.setHospCode(operAccountTempDetailDTO.getHospCode());
-        baseDrugDTO.setIds(drugIdList);
-        map.put("baseDrugDTO",baseDrugDTO);
-        map.put("hospCode",operAccountTempDetailDTO.getHospCode());
-        List<BaseDrugDTO> baseDrugDTOS = baseDrugService.queryAll(map).getData();
-            baseDrugDTOS.forEach((drug) ->{
-            drugMap.put(drug.getId(),drug);
-            });
-        }
-
-        if(!ListUtils.isEmpty(materialIdList)){}{
-        baseMaterialDTO.setHospCode(operAccountTempDetailDTO.getHospCode());
-        baseMaterialDTO.setIds(materialIdList);
-        map.put("baseMaterialDTO",baseMaterialDTO);
-        List<BaseMaterialDTO> baseMaterialDTOS = baseMaterialService.queryBaseMaterialDTOs(map).getData();
-         baseMaterialDTOS.forEach((material) ->{
-            materialMap.put(material.getId(),material);
-         });
-        }
-        if(!ListUtils.isEmpty(itemIdList)){}{
-        baseItemDTO.setHospCode(operAccountTempDetailDTO.getHospCode());
-        baseItemDTO.setIds(itemIdList);
-        map.put("baseItemDTO",baseItemDTO);
-        List<BaseItemDTO> baseItemDTOS = baseItemService.queryAll(map).getData();
-            baseItemDTOS.forEach((item) ->{
-            itemMap.put(item.getId(),item);
-            });
-        }
         for(int i =0 ; i < operAccountTempDetailDTOS.size(); i++){
-            if(EnumUtil.XMLB1.getKey().equals(operAccountTempDetailDTOS.get(i).getItemCode())){
-                BaseDrugDTO baseDrug = (BaseDrugDTO)drugMap.get(operAccountTempDetailDTOS.get(i).getItemId());
-                operAccountTempDetailDTOS.get(i).setPrice(baseDrug.getPrice());
-                operAccountTempDetailDTOS.get(i).setTotalPrice(baseDrug.getPrice().multiply(operAccountTempDetailDTOS.get(i).getNum()));
-                operAccountTempDetailDTOS.get(i).setBigTypeCode(baseDrug.getBigTypeCode());
-            };
-            if(EnumUtil.XMLB2.getKey().equals(operAccountTempDetailDTOS.get(i).getItemCode())){
-                BaseMaterialDTO baseMaterial = (BaseMaterialDTO)materialMap.get(operAccountTempDetailDTOS.get(i).getItemId());
-                operAccountTempDetailDTOS.get(i).setPrice(baseMaterial.getPrice());
-                operAccountTempDetailDTOS.get(i).setTotalPrice(baseMaterial.getPrice().multiply(operAccountTempDetailDTOS.get(i).getNum()));
-            };
-            if(EnumUtil.XMLB3.getKey().equals(operAccountTempDetailDTOS.get(i).getItemCode())){
-                BaseItemDTO baseItem = (BaseItemDTO)itemMap.get(operAccountTempDetailDTOS.get(i).getItemId());
-                operAccountTempDetailDTOS.get(i).setPrice(baseItem.getPrice());
-                operAccountTempDetailDTOS.get(i).setTotalPrice(baseItem.getPrice().multiply(operAccountTempDetailDTOS.get(i).getNum()));
-            };
+            OperAccountTempDetailDTO tempDetailDTO = operAccountTempDetailDTOS.get(i);
+            if(tempDetailDTO.getPrice() == null) {
+                tempDetailDTO.setPrice(BigDecimal.ZERO);
+            }
+            tempDetailDTO.setTotalPrice(tempDetailDTO.getPrice().multiply(tempDetailDTO.getNum()));
+
         }
         return operAccountTempDetailDTOS;
     }
@@ -332,6 +269,7 @@ public class OperAccountTempBOImpl extends HsafBO implements OperAccountTempBO {
     * @Date   2021/1/22 11:15
     * @Return boolean
     **/
+    @Override
     public Boolean deleteOperAccountTempDTOById(OperAccountTempDTO operAccountTempDTO){
         int i = operAccountTempDAO.deleteOperAccountTempDTOById(operAccountTempDTO);
         int i1 = operAccountTempDAO.deleteOperAccountTempDetailByTempId(operAccountTempDTO);
@@ -347,6 +285,7 @@ public class OperAccountTempBOImpl extends HsafBO implements OperAccountTempBO {
     * @Date   2021/1/22 11:16
     * @Return boolean
     **/
+    @Override
     public Boolean saveOperAccountTemp(OperAccountTempDTO operAccountTempDTO){
 
         List<OperAccountTempDetailDTO> listDetail = operAccountTempDTO.getListDetail();

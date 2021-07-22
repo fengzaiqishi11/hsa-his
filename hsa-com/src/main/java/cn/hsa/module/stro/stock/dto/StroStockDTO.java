@@ -68,4 +68,6 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date warDate;
+    // 根据有效期降序或者升序 0--降序 1--升序，默认降序
+    private String isSort;
 }

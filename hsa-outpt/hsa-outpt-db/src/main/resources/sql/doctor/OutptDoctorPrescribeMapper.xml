@@ -2144,4 +2144,86 @@
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
     </select>
 
+    <!--根据visitIds，itemIds查询出对应的费用表数据-->
+    <select id="queryOuptCost" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+        *
+        FROM
+        outpt_cost
+        WHERE hosp_code = #{hospCode}
+        and status_code = '0'
+        <if test="visitIds != null and visitIds.size() > 0">
+            and visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by crte_time asc
+    </select>
+
+    <!--根据visitIds，itemIds查询出对应的处方明细表副表数据-->
+    <select id="queryOuptPreDetailExt" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
+        SELECT
+        a.*
+        FROM
+        outpt_prescribe_detail_ext a
+        left join outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+        and b.is_cancel = '0'
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and a.item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by a.op_id, a.group_no, a.group_seq_no asc
+    </select>
+
+    <!--更新费用表数据，限制用药字段-->
+    <update id="updateOuptCost" parameterType="java.util.List">
+        <foreach collection="costDTOS" item="item" separator=";">
+            update outpt_cost
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
+
+    <!--更新处方明细表副表数据，限制用药字段-->
+    <update id="updateOuptPreDetailExt" parameterType="java.util.List">
+        <foreach collection="detailsExtDTOS" item="item" separator=";">
+            update outpt_prescribe_detail_ext
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
 </mapper>

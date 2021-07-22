@@ -32,8 +32,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String medcasno; // 病案号 *
 
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dclaTime; // 申报时间
 
@@ -41,15 +41,17 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String gend; // 性别 *
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date brdy; // 出生日期 *
 
     private int age; // 年龄
 
+    private String babyAgeMonth; // 年龄(不足一岁)
+
     private String ntly; // 国籍 *
 
-    private int nwbAge; // （年龄不足一周岁 ）年龄
+    /*private int nwbAge; // （年龄不足一周岁 ）年龄*/
 
     private String naty; // 民族 *
 
@@ -57,15 +59,15 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String prfs; // 职业 *
 
-    private String cuurAddr; // 现住址
+    private String address; // 现住址
 
-    private String empName; // 单位名称
+    private String work; // 单位名称
 
-    private String empAddr; // 单位地址
+    private String workAddress; // 单位地址
 
-    private String empTel; // 单位电话
+    private String workPhone; // 单位电话
 
-    private String poscode; // 邮编
+    private String workPostCode; // 邮编
 
     private String conerName; // 联系人姓名 *
 
@@ -83,45 +85,49 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String nebAdmType; // 新生儿入院类型
 
-    private Double nwbBirWt; // 新生儿出生体重
+    private String babyBirthWeight; // 新生儿出生体重
 
-    private Double nwbAdmWt; // 新生儿入院体重
+    private String babyInWeight; // 新生儿入院体重
 
-    private String opspDiagCaty; // 门诊慢特病诊断科别
+    private String visitDrptName; // 门诊慢特病诊断科别
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date opspMdtrtDate; // 门诊慢特病就诊日期
+    private Date visitTime; // 门诊慢特病就诊日期
 
     private String iptMedType; // 住院医疗类型 *
 
-    private String admWay; // 入院途径
+    private String inWay; // 入院途径
 
     private String trtType; // 治疗类别
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh-MM-ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh-MM-ss")
-    private Date admTime; // 入院时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date inTime; // 入院时间
 
     private String admCaty; // 入院科别 *
 
-    private String refldeptDept; // 转科科别
+    private String turnDeptIds; // 转科科别
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh-MM-ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh-MM-ss")
-    private Date dscgTime; // 出院时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date outTime; // 出院时间
 
     private String dscgCaty; // 出院科别 *
 
-    private int actIptDays; // 实际住院天数
+    private String inDays; // 实际住院天数
 
-    private String otpWmDise; // 门（急）诊西医诊断
+    private String outptDiseaseName; // 门（急）诊西医诊断
 
-    private String wmDiseCode; // 西医诊断疾病代码
+    private String visitIcdCode; // 西医诊断疾病代码
+
+    private String inSituationName; // 入院病情
+
+    private String accessoryDiagnosisName;  //其他诊断
 
     private String bldCat; // 输血品种 *
 
-    private String dscgWay; // 离院方式 *
+    private String outModeName; // 离院方式 *
 
     private String billCode; // 票据代码 *
 
@@ -129,13 +135,13 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String bizSn; // 业务流水号 *
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date setlBegnDate; // 结算开始日期 *
+    private Date startTime; // 结算开始日期 *
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date setlEndnDate; // 结算结束日期 *
+    private Date endTime; // 结算结束日期 *
 
     private BigDecimal psnSelfpay; // 个人自付 *
 
@@ -161,7 +167,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String genderCode; // 性别
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthday; // 出生日期
 
@@ -195,9 +201,9 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String insureSettleId; // 业务流水号
 
-    private Date startTime; // 结算开始日期
+    /*private Date startTime; // 结算开始日期
 
-    private Date endTime; // 结算结束日期
+    private Date endTime; // 结算结束日期*/
 
     private BigDecimal selfPrice; // 个人自付
 
@@ -228,5 +234,18 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String upload;//打印、上传标志
 
+    private String settleNo;//医保结算清单流水号
 
+    private String inptBeforeDay;//入院前昏迷天
+    private String inptBeforeHour;//入院前昏迷时
+    private String inptBeforeMinute;//入院前昏迷分
+    private String inptLastDay;//入院后昏迷天
+    private String inptLastHour;//入院后昏迷时
+    private String inptLastMinute;//入院后昏迷分
+    private String isInpt;//是否有出院31天再住院计划
+    private String zgDoctorName;//主诊医生姓名
+    private String zgDoctorId;//主诊医生代码
+    private String omsgid;//业务流水号
+    private String invoiceDetailId;//票据代码
+    private String invoiceNo;//票据号码
 }

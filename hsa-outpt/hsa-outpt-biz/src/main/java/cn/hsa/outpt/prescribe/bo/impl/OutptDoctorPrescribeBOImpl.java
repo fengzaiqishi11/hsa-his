@@ -18,6 +18,10 @@ import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
+import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
+import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
@@ -41,7 +45,9 @@ import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -117,6 +123,24 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      */
     @Resource
     private BaseProfileFileService baseProfileFileService_consumer;
+
+    /**
+     * 系统参数服务
+     */
+    @Resource
+    private SysParameterService sysParameterService_consumer;
+
+    /**
+     * 医保项目匹配服务
+     */
+    @Resource
+    private InsureItemMatchService insureItemMatchService_consumer;
+
+    /**
+     * 医保登记服务
+     */
+    @Resource
+    private InsureIndividualVisitService insureIndividualVisitService_consumer;
 
     /**
      * @Menthod queryPatientByOperType
@@ -3603,5 +3627,157 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public List<Map<String, Object>> checkStock(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO) {
         return outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO);
+    }
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    @Override
+    public List<InsureItemMatchDTO> queryLimitDrugList(OutptVisitDTO outptVisitDTO) {
+        if (StringUtils.isEmpty(outptVisitDTO.getVisitId())) throw new RuntimeException("就诊id为空，请核对！");
+        // 根据就诊id查询就诊记录
+        Map visitMap = new HashMap();
+        visitMap.put("visitId", outptVisitDTO.getVisitId());
+        visitMap.put("hospCode", outptVisitDTO.getHospCode());
+        List<OutptVisitDTO> visitById = outptVisitDAO.getVisitById(visitMap);
+        if (ListUtils.isEmpty(visitById)) throw new RuntimeException("就诊记录不存在，请核对！");
+
+        OutptVisitDTO visitDTO = visitById.get(0);
+        // 病人类型
+        String patientCode = visitDTO.getPatientCode();
+        // 医保机构编码
+        String insureRegCode = null;
+        if (StringUtils.isNotEmpty(patientCode)) {
+            if (Integer.parseInt(patientCode) > 0) { // 医保病人
+                // 通过就诊id查询医保登记信息
+                Map insureParamMap = new HashMap();
+                insureParamMap.put("hospCode", outptVisitDTO.getHospCode());
+                insureParamMap.put("id", outptVisitDTO.getVisitId());
+                InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
+                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                insureRegCode = insureIndividualVisitById.getInsureRegCode();
+
+            } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人
+                // 根据系统参数(INSURE_DEFAULT_REG_CODE)获取限制用药的默认医保机构编码
+                SysParameterDTO sysParameterDTO = this.getSysParam(outptVisitDTO.getHospCode());
+                if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                    Map parse = (Map) JSON.parse(sysParameterDTO.getValue());
+                    if (StringUtils.isNotEmpty(MapUtils.get(parse, "isLmtDrugFlag"))
+                            && "1".equals(MapUtils.get(parse, "isLmtDrugFlag"))
+                            && StringUtils.isNotEmpty(MapUtils.get(parse, "defaultInsureRegCode"))) {
+                        // 启用限制用药，且配置了默认医保机构编码
+                        insureRegCode = MapUtils.get(parse, "defaultInsureRegCode");
+                    } else {
+                        // 不启用限制用药
+                        throw new RuntimeException("请先在系统参数【INSURE_DEFAULT_REG_CODE】配置默认医保机构编码");
+                    }
+                }
+            }
+        }
+
+        // 根据医保机构编码查询限制级用药列表
+        InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
+        // 医院编码
+        insureItemMatchDTO.setHospCode(outptVisitDTO.getHospCode());
+        // 医保机构编码
+        insureItemMatchDTO.setInsureRegCode(insureRegCode);
+        // 已审核
+        insureItemMatchDTO.setAuditCode(Constants.SHZT.SHWC);
+        // 有效
+        insureItemMatchDTO.setIsValid(Constants.SF.S);
+        // 已匹配
+        insureItemMatchDTO.setIsMatch(Constants.SF.S);
+        // 已传输
+        insureItemMatchDTO.setIsTrans(Constants.SF.S);
+        // 属限制级用药
+        insureItemMatchDTO.setLmtUserFlag(Constants.SF.S);
+        Map map = new HashMap();
+        map.put("hospCode", outptVisitDTO.getHospCode());
+        map.put("insureItemMatchDTO", insureItemMatchDTO);
+        List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchService_consumer.queryLimitDrugList(map).getData();
+        /*Map<String, List<InsureItemMatchDTO>> resultMap = new HashMap<>();
+        if (!ListUtils.isEmpty(insureItemMatchDTOS)) {
+            resultMap = insureItemMatchDTOS.stream().collect(Collectors.groupingBy(InsureItemMatchDTO::getInsureRegCode));
+        }*/
+        return insureItemMatchDTOS;
+    }
+
+    /**
+     * @Menthod: updateOuptCostAndPreDetailExt
+     * @Desrciption: 更新费用表以及处方明细表副表限制用药相关字段()
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     **/
+    @Override
+    public Boolean updateOuptCostAndPreDetailExt(List<InsureItemMatchDTO> insureItemMatchDTOS) {
+        if (ListUtils.isEmpty(insureItemMatchDTOS)) {
+            throw new RuntimeException("入参错误，请选择需要保存的处方！");
+        }
+
+        // 去重后的就诊visitIds
+        List<String> visitIds = insureItemMatchDTOS.stream().map(InsureItemMatchDTO::getVisitId).distinct().collect(Collectors.toList());
+        // 去重后的项目itemIds
+        List<String> itemIds = insureItemMatchDTOS.stream().map(InsureItemMatchDTO::getHospItemId).distinct().collect(Collectors.toList());
+        Map<String, List<InsureItemMatchDTO>> listMap = insureItemMatchDTOS.stream().collect(Collectors.groupingBy(InsureItemMatchDTO::getHospItemId));
+
+        //根据visitIds，itemIds查询出对应的费用表以及处方明细表副表数据
+        Map map = new HashMap();
+        map.put("visitIds", visitIds);
+        map.put("itemIds", itemIds);
+        map.put("hospCode", insureItemMatchDTOS.get(0).getHospCode());
+        List<OutptCostDTO> costDTOS = outptDoctorPrescribeDAO.queryOuptCost(map);
+        List<OutptPrescribeDetailsExtDTO> detailsExtDTOS = outptDoctorPrescribeDAO.queryOuptPreDetailExt(map);
+
+        // 更新费用表数据，限制用药字段
+        if (!ListUtils.isEmpty(costDTOS)) {
+            for (OutptCostDTO costDTO : costDTOS) {
+                List<InsureItemMatchDTO> itemMatchDTOSByItemId = MapUtils.get(listMap, costDTO.getItemId());
+                if (!ListUtils.isEmpty(itemMatchDTOSByItemId)) {
+                    for (InsureItemMatchDTO insureItemMatchDTO : itemMatchDTOSByItemId) {
+                        costDTO.setLmtUserFlag(insureItemMatchDTO.getLmtUserFlag());
+                        costDTO.setLimUserExplain(insureItemMatchDTO.getLimUserExplain());
+                    }
+                }
+            }
+            outptDoctorPrescribeDAO.updateOuptCost(costDTOS);
+        }
+
+        // 更新处方明细表副表数据，限制用药字段
+        if (!ListUtils.isEmpty(detailsExtDTOS)) {
+            for (OutptPrescribeDetailsExtDTO detailsExtDTO : detailsExtDTOS) {
+                List<InsureItemMatchDTO> itemMatchDTOSByItemId = MapUtils.get(listMap, detailsExtDTO.getItemId());
+                if (!ListUtils.isEmpty(itemMatchDTOSByItemId)) {
+                    for (InsureItemMatchDTO insureItemMatchDTO : itemMatchDTOSByItemId) {
+                        detailsExtDTO.setLmtUserFlag(insureItemMatchDTO.getLmtUserFlag());
+                        detailsExtDTO.setLimUserExplain(insureItemMatchDTO.getLimUserExplain());
+                    }
+                }
+            }
+            outptDoctorPrescribeDAO.updateOuptPreDetailExt(detailsExtDTOS);
+        }
+
+        return true;
+    }
+
+    /**
+     * 根据系统参数获取限制用药的默认医保机构编码
+     * @param hospCode
+     * @return
+     */
+    private SysParameterDTO getSysParam(String hospCode) {
+        Map sysParamMap = new HashMap();
+        sysParamMap.put("hospCode", hospCode);
+        sysParamMap.put("code", "INSURE_DEFAULT_REG_CODE"); // 医保限制用药默认医保机构编码
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParamMap).getData();
+        return sysParameterDTO;
     }
 }

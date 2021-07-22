@@ -240,7 +240,7 @@
         select ${sqlStr} d.id visistID
         from inpt_visit d
         join inpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
-        left join inpt_settle c on a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
+        left join inpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
         where a.hosp_code = #{hospCode}
         <if test="statusCode != null and statusCode != ''">
             and d.status_code = #{statusCode}

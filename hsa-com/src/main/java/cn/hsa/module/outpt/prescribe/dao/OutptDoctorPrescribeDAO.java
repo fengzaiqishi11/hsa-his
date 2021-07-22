@@ -856,4 +856,16 @@ public interface OutptDoctorPrescribeDAO {
      * @Return OutptDiagnoseDTO集合
      */
     List<OutptDiagnoseDTO> queryOutptDiagnose(OutptDiagnoseDTO outptDiagnoseDTO);
+
+    //根据visitIds，itemIds查询出对应的费用表数据
+    List<OutptCostDTO> queryOuptCost(Map map);
+
+    //根据visitIds，itemIds查询出对应的处方明细表副表数据
+    List<OutptPrescribeDetailsExtDTO> queryOuptPreDetailExt(Map map);
+
+    // 更新费用表数据，限制用药字段
+    int updateOuptCost(@Param("costDTOS") List<OutptCostDTO> costDTOS);
+
+    // 更新处方明细表副表数据，限制用药字段
+    int updateOuptPreDetailExt(@Param("detailsExtDTOS")List<OutptPrescribeDetailsExtDTO> detailsExtDTOS);
 }

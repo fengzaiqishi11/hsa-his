@@ -42,7 +42,7 @@ public class InptSettlementController extends BaseController {
 
     @Resource
     private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
-    
+
     /**
      * @Menthod queryInptvisitByPage
      * @Desrciption  查询可出院结算的用户信息
@@ -113,6 +113,24 @@ public class InptSettlementController extends BaseController {
         return inptSettlementService_consumer.saveCostTrial(param);
     }
 
+    /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
+    @PostMapping("/insureUnifiedPayInpt")
+    public WrapperResponse<Map<String,Object>> insureUnifiedPayInpt(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode", sysUserDTO.getHospCode());//医院编码
+        param.put("visitId",inptVisitDTO.getVisitId());
+        param.put("inptVisitDTO",inptVisitDTO);//请求参数
+        return inptSettlementService_consumer.insureUnifiedPayInpt(param);
+    }
 
     /**
      * @Menthod saveSettle
@@ -211,7 +229,7 @@ public class InptSettlementController extends BaseController {
         map.put("inptVisitDTO", inptVisitDTO);
         return inptSettlementService_consumer.queryDiagnose(map);
     }
-    
+
     /**
      * @Method editDischargeInpt
      * @Desrciption  医保出院办理
@@ -219,8 +237,8 @@ public class InptSettlementController extends BaseController {
      *
      * @Author fuhui
      * @Date   2021/5/28 11:40 
-     * @Return 
-    **/
+     * @Return
+     **/
     @PostMapping("/editDischargeInpt")
     public WrapperResponse<Boolean> editDischargeInpt(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);

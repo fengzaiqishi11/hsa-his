@@ -212,4 +212,8 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
     private String sourceTjCode; // 病人来源途径代码(1.门诊，2.住院，3.体检)
 
+    // 门诊医生名称
+    private String outptDoctorId;
+    // 门诊医生姓名
+    private String outptDoctorName;
 }

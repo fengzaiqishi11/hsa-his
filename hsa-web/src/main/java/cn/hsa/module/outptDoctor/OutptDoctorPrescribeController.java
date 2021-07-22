@@ -11,6 +11,7 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -1033,5 +1034,43 @@ public class OutptDoctorPrescribeController extends BaseController {
     SysUserDTO sysUserDTO = getSession(req, res);
     parameter.put("hospCode",sysUserDTO.getHospCode());
     return outptTriageVisitService_consumer.updateNumberMiss(parameter);
+  }
+
+  /**
+   * @Menthod: queryLimitDrugList
+   * @Desrciption: 查询医保限制级用药列表
+   * @Param: outptVisitDTO
+   * @Author: luoyong
+   * @Email: luoyong@powersi.com.cn
+   * @Date: 2021-07-19 11:42
+   * @Return:
+   **/
+  @GetMapping("/queryLimitDrugList")
+  public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+    Map paramMap = new HashMap();
+    paramMap.put("hospCode", sysUserDTO.getHospCode());
+    paramMap.put("outptVisitDTO", outptVisitDTO);
+    return outptDoctorPrescribeService_consumer.queryLimitDrugList(paramMap);
+  }
+
+  /**
+   * @Menthod: updateOuptCostAndPreDetailExt
+   * @Desrciption: 更新费用表以及处方明细表副表限制用药相关字段()
+   * @Param: insureItemMatchDTOS
+   * @Author: luoyong
+   * @Email: luoyong@powersi.com.cn
+   * @Date: 2021-07-19 19:51
+   * @Return:
+   **/
+  @PostMapping("/updateOuptCostAndPreDetailExt")
+  public WrapperResponse<Boolean> updateOuptCostAndPreDetailExt(@RequestBody List<InsureItemMatchDTO> insureItemMatchDTOS, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    insureItemMatchDTOS.forEach(insureItemMatchDTO -> insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode()));
+    Map map = new HashMap();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("insureItemMatchDTOS", insureItemMatchDTOS);
+    return outptDoctorPrescribeService_consumer.updateOuptCostAndPreDetailExt(map);
   }
 }

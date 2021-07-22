@@ -1235,6 +1235,33 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     }
 
     /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    @Override
+    public List<InsureItemMatchDTO> queryLimitDrugList(InsureItemMatchDTO insureItemMatchDTO) {
+        /*// 已审核
+        insureItemMatchDTO.setAuditCode(Constants.SHZT.SHWC);
+        // 有效
+        insureItemMatchDTO.setIsValid(Constants.SF.S);
+        // 已匹配
+        insureItemMatchDTO.setIsMatch(Constants.SF.S);
+        // 已传输
+        insureItemMatchDTO.setIsTrans(Constants.SF.S);
+        // 属限制级用药
+        insureItemMatchDTO.setLmtUserFlag(Constants.SF.S);*/
+
+        // 查询已匹配、已传输的限制级用药列表
+        List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchDAO.queryPageOrAll(insureItemMatchDTO);
+        return insureItemMatchDTOS;
+    }
+
+    /**
      * 封装导入的数据
      * @param num
      * @param key

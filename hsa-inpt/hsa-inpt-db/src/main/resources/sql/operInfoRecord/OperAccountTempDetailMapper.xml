@@ -23,6 +23,8 @@
         <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
@@ -39,9 +41,12 @@
         select
         a.id as tempDetailId, a.hosp_code, a.temp_id, a.bfc_id, a.bfc_name, a.item_code, a.item_id, a.item_name, a.num, a.num_unit_code, a.spec, a.phar_id, a.usage_code, a.use_code, a.prep_code, a.dosage, a.dosage_unit_code, a.rate_id, a.crte_id, a.crte_name, a.crte_time,
         case a.item_code when '1' then (case when b.big_type_code = '2' then  '3' else '1' end) when '2' then '2'  when '3' then '9' end type,
-        case when a.item_code = '1' then  b.in_unit_code else a.num_unit_code end inUnitCode
+        case when a.item_code = '1' then  b.in_unit_code else a.num_unit_code end inUnitCode, b.big_type_code,ifnull(b.price,ifnull(bi.price,bm.price)) as price
+
         from oper_account_temp_detail a
         left join base_drug b on b.id = a.item_id and a.hosp_code = b.hosp_code
+        left join base_item bi on bi.id = a.item_id and a.hosp_code = bi.hosp_code
+        left join base_material bm on bm.id = a.item_id and a.hosp_code = bm.hosp_code
         where a.hosp_code = #{hospCode}
         <if test="tempId != null and tempId != ''">
             and a.temp_id = #{tempId}

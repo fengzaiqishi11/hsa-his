@@ -2944,10 +2944,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                         operInfoRecordDTO.setCrteId(outptPrescribeDTO.getCrteId());
                         operInfoRecordDTO.setCrteName(outptPrescribeDTO.getCrteName());
                         operInfoRecordDTO.setCrteTime(outptPrescribeDTO.getCrteTime());
-                        Map map = new HashMap();
-                        map.put("hospCode", outptPrescribeDetailsDTO.getHospCode());
-                        map.put("operInfoRecordDTO", operInfoRecordDTO);
-                        operInfoRecordService_consumer.saveSurgery(map);
+                        outptDoctorPrescribeDAO.insertSurgery(operInfoRecordDTO);
                     }
                 }
             }

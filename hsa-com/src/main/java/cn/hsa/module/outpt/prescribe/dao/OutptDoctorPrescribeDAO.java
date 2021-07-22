@@ -533,6 +533,14 @@ public interface OutptDoctorPrescribeDAO {
     int deleteOperInfoRecord(OutptPrescribeDTO outptPrescribeDTO);
 
     /**
+       * 新增手术申请
+       * @Author: luonianxin
+       * @Email: nianxin.luo@powersi.com
+       * @Date: 2021/7/21 11:02
+    **/
+    int insertSurgery(OperInfoRecordDTO operInfoRecordDTO);
+
+    /**
      * @Method insertPrescribeDetailExt
      * @Desrciption 新增处方执行明细
      * @param outptPrescribeDetailsExtDTOList

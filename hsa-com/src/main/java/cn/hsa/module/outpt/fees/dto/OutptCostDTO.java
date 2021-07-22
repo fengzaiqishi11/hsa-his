@@ -154,4 +154,9 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     private String inNo;
     // 住院天数
     private String inDays;
+
+    // 占用库存
+    private BigDecimal stockOccupy;
+    // 拆零库存
+    private BigDecimal splitNum;
 }

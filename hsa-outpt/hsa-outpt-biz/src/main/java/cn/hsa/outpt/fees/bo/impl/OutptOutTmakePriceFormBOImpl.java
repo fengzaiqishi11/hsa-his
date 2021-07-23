@@ -225,6 +225,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 被冲红
             insureIndividualSettleDO.setState(Constants.ZTBZ.BCH);
+            insureIndividualSettleDO.setSettleState("1");
             Map selectInsureMap = new HashMap();
             selectInsureMap.put("hospCode",hospCode);
             selectInsureMap.put("insureIndividualSettleDO",insureIndividualSettleDO);

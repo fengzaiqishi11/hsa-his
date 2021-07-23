@@ -1011,7 +1011,10 @@
 				and a.doctor_intro = #{doctorIntro}
 			</if>
 			<if test="isGuide != null and isGuide != ''">
-				and a.is_guide = #{isGuide},
+				and a.is_guide = #{isGuide}
+			</if>
+			<if test="deptTypeCode != null and deptTypeCode != ''">
+				and b.type_code = #{deptTypeCode}
 			</if>
 		</where>
 	</select>

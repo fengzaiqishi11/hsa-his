@@ -81,6 +81,8 @@
         <result property="outptPrescribeCrteTime" column="prescribeCrteTime" jdbcType="TIMESTAMP"/>
         <result property="code" column="xmlbcode" jdbcType="VARCHAR"/>
         <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="stockOccupy" column="stock_occupy" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 门诊处方数据库映射配置 -->
@@ -1163,6 +1165,14 @@
         </foreach>
     </delete>
 
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteFCFCostByIds">
+        DELETE FROM outpt_cost WHERE op_id is null and settle_code in ('0','1') and hosp_code = #{hospCode} and id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
     <!-- 根据条件参数查询数据列表 -->
     <select id="findByCondition" resultMap="outptCostDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         SELECT
@@ -1481,7 +1491,9 @@
         bd.good_pym,
         bd.good_wbm,
         '0' as is_cg,
-        ss.num - IFNULL(ss.stock_occupy,0) AS stockNum,
+        ss.num,
+        ss.split_num,
+        ss.stock_occupy,
         bd.rate_code rateCode
         FROM
             stro_stock ss
@@ -1528,7 +1540,9 @@
         bm.pym AS good_pym,
         bm.wbm AS good_wbm,
         '0' as is_cg,
-        ss.num - IFNULL(ss.stock_occupy,0) AS stockNum,
+        ss.num,
+        ss.split_num,
+        ss.stock_occupy,
         '' rateCode
         FROM
             stro_stock ss
@@ -1574,7 +1588,9 @@
         name_pym as good_pym,
         name_wbm as good_wbm,
         is_cg,
-        null AS stockNum,
+        null as num,
+        null as split_num,
+        null as stock_occupy,
         '' rateCode
         FROM
         base_item

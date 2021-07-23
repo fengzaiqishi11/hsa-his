@@ -441,7 +441,7 @@
         inner join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
         right join  outpt_cost oc on opd.id = oc.opd_id and oc.hosp_code = opd.hosp_code
         left join   sys_code_detail scd on scd.value = ba.technology_code and scd.hosp_code = ba.hosp_code and c_code = 'LISXMLX'
-        where ma.hosp_code='0006' and oc.settle_code ='2'
+        where ma.hosp_code=#{hospCode} and oc.settle_code ='2'
 
         <if test="name != null and name != '' ">
             and ov.`name` like concat('%',#{name},'%')

@@ -708,6 +708,7 @@
 		a.preferential_type_id, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
 		a.insure_patient_id, a.insure_remark, a.doctor_id, a.doctor_name, a.dept_id, a.dept_name, a.visit_time,
 		a.remark, a.pym, a.wbm,
+		a.doctor_id as outpt_doctor_id, a.doctor_name as outpt_doctor_name,
 		a.is_visit, a.is_first_visit, a.tran_in_code, a.in_dept_id, a.in_disease_id, a.in_remark,a.advance_payment,
 		(select name from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseName,
 		(select nation_code from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseCode,

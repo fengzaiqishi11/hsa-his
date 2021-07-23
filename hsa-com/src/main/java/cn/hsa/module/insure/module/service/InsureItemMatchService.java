@@ -228,4 +228,15 @@ public interface InsureItemMatchService {
      **/
     WrapperResponse<Map<String,Object>> insertInsureItemInfos(Map<String,String> map);
 
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: paramMap
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    @GetMapping("/service/insure/insureItemMatch/queryLimitDrugList")
+    WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap);
 }

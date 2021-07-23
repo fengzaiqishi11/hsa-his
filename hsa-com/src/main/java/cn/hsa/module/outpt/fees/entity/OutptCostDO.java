@@ -137,4 +137,12 @@ public class OutptCostDO extends PageDO implements Serializable {
         private String distributeAllDetailId;
         // 原结算id
         private String oneSettleId;
+        /**
+         * 限制使用标志
+         */
+        private String lmtUserFlag;
+        /**
+         * 限制使用说明
+         */
+        private String limUserExplain;
 }

@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.prescribe.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -458,4 +459,28 @@ public interface OutptDoctorPrescribeService {
      * @Return List<Map<String, Object>>
      */
     WrapperResponse<List<Map<String, Object>>>checkStock(Map map);
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: outptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     **/
+    @GetMapping("/service/outpt/outptDoctorPrescribe/queryLimitDrugList")
+    WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap);
+
+    /**
+     * @Menthod: updateOuptCostAndPreDetailExt
+     * @Desrciption: 更新费用表以及处方明细表副表限制用药相关字段()
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     **/
+    @PostMapping("/service/outpt/outptDoctorPrescribe/updateOuptCostAndPreDetailExt")
+    WrapperResponse<Boolean> updateOuptCostAndPreDetailExt(Map map);
 }

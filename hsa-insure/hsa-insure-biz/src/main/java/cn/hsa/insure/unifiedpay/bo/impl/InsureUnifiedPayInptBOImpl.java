@@ -747,6 +747,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         settleDataMap.put("visitId",inptVisitDTO.getId());
         settleDataMap.put("resultJson",resultJson);
         setlinfoDataMap.put("age",setlinfoDataMap.get("age").toString());
+        settleDataMap.put("setlinfo",setlinfoDataMap);
         return  updateInptTrialSettleInfo(settleDataMap,hospCode,insureConfigurationDTO.getRegCode());
 
     }
@@ -823,7 +824,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("bka843",null);//特惠保
         paramMap.put("bka844",null);//医院减免
         paramMap.put("bka845",null);//政府兜底
-        paramMap.put("setlinfo",outDataMap.get("setlinfo").toString());
+        if(outDataMap.get("setlinfo") != null){
+            paramMap.put("setlinfo",outDataMap.get("setlinfo").toString());
+        }
         paramMap.put("resultJson",outDataMap.get("resultJson").toString());
         if("settle".equals(outDataMap.get("action") == null ? "" :outDataMap.get("action").toString())) {
             paramMap.put("action","settle");

@@ -173,6 +173,19 @@ public interface InptCostDAO {
     int updateInptCostBatchWithBackCost(InptCostDTO inptCostDTO);
 
     /**
+     * @Menthod updateNewBackCost
+     * @Desrciption 住院退费确认更新(更新状态 已退费不退药)
+     *
+     * @Param
+     * [inptCostDTO]
+     *
+     * @Author jiahong.yang
+     * @Date   2021/7/20 10:07
+     * @Return int
+     **/
+    int updateNewBackCost(InptCostDTO inptCostDTO);
+
+    /**
     * @Method updateInptCostBatchWithBackDrug
     * @Desrciption 住院退药批量更新
     * @param inptCostDTO

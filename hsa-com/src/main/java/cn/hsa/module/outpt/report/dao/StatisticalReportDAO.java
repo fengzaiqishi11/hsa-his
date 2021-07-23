@@ -165,5 +165,22 @@ public interface StatisticalReportDAO {
      **/
     List<Map<String, Object>> queryOutInSumAntibiosisDrug(Map<String, Object> paramMap);
 
-
+    /**
+     * @Method queryOutPtSumDrug
+     * @Desrciption 门诊明细汇总
+     * @Param [paramMap]
+     * @Author zhangguorui
+     * @Date   2021/7/23 9:12
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    List<Map<String, Object>> queryOutPtSumDrug(Map<String, Object> paramMap);
+    /**
+     * @Method queryInSumDrug
+     * @Desrciption 住院明细汇总
+     * @Param [paramMap]
+     * @Author zhangguorui
+     * @Date   2021/7/23 9:14
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    List<Map<String, Object>> queryInSumDrug(Map<String, Object> paramMap);
 }

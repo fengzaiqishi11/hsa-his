@@ -131,4 +131,20 @@ public class InptNurseThirdDTO extends InptNurseThirdDO implements Serializable 
      * 患者visitIds
      */
     private List<String> visitIds;
+    /**
+     * 婴儿babyIds
+     */
+    private List<String> babyIds;
+    /**
+     * 婴儿姓名
+     */
+    private String babyName;
+    /**
+     * 婴儿编号
+     */
+    private String babyCode;
+    /**
+     * 是否查询婴儿标志(SF: 1是，0否)
+     */
+    private String isQueryBaby;
 }

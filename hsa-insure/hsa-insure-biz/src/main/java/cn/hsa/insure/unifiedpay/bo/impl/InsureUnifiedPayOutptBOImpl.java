@@ -812,6 +812,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         dataMap.put("dr_name", insureIndividualVisitDTO.getDoctorName()); // 医师姓名
         dataMap.put("dept_code", insureIndividualVisitDTO.getVisitDrptId()); // 科室编码
         dataMap.put("dept_name", insureIndividualVisitDTO.getVisitDrptName()); // 科室名称
+
+        dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden()); // 传值社保卡识别码
+        dataMap.put("psn_cert_type", "1");
+        dataMap.put("certno", insureIndividualVisitDTO.getAac002()); // 传值证件号码
+
         Map deptMap = new HashMap();
         deptMap.put("hospCode", hospCode);
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();

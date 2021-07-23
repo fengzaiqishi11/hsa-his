@@ -1258,7 +1258,7 @@
 		 top_price,
 		 plan_account_price,
 		 portion_price,
-		 state,
+		 `state`,
 		 settle_state,
 		 costbatch,
 		 aka130,
@@ -1795,6 +1795,35 @@
 	<!--	修改病重类的字段-->
 	<update id="updateIllness">
 		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
+	</update>
+
+	<update id="updateInsureSettleById">
+		update
+		insure_individual_settle
+		<set>
+			<if test="omsgid != null and omsgid != ''">
+				omsgid = #{omsgid,jdbcType=VARCHAR},
+			</if>
+			<if test="oinfno != null and oinfno != ''">
+				oinfno = #{oinfno,jdbcType=VARCHAR}
+			</if>
+			<if test="insureSettleId != null and insureSettleId != ''">
+				insure_settle_id = #{insureSettleId,jdbcType=VARCHAR}
+			</if>
+			<if test="medicalRegNo != null and medicalRegNo != ''">
+				medical_reg_no = #{medicalRegNo,jdbcType=VARCHAR}
+			</if>
+			<if test="clrOptins != null and clrOptins != ''">
+				clr_optins = #{clrOptins,jdbcType=VARCHAR}
+			</if>
+			<if test="clrWay != null and clrWay != ''">
+				clr_way = #{clrWay,jdbcType=VARCHAR}
+			</if>
+			<if test="clrType != null and clrType != ''">
+				clr_type = #{clrType,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
 	</update>
 
 </mapper>

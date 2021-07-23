@@ -864,7 +864,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Boolean editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -920,7 +920,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
-        return true;
+        return resultMap;
     }
 
     /**
@@ -1099,6 +1099,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
         mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
+        mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
+        mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
+        mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();

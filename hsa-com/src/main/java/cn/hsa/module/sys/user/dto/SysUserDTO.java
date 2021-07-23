@@ -67,4 +67,6 @@ public class SysUserDTO extends SysUserDO implements Serializable {
     private String pagePath;
     //是否查询登录机构的数据
     private Boolean isQuerySelfDept;
+    /** 分诊室ID **/
+    private String clinicId;
 }

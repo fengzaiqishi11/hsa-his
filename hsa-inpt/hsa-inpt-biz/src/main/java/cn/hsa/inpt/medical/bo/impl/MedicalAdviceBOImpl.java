@@ -1401,7 +1401,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = new InptCostDTO();
                 //计费时间=计费当天日期+当前时间(时分秒)
                 Date date = DateUtils.parse(startTime + " " + DateUtils.format(DateUtils.getNow(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-
+                if (baseAssistCalcDetailDO.getItemId() == null ){
+                    throw new AppException(baseAssistCalcDetailDO.getName() +"配置项目错误!");
+                }
                 //辅助计费 有可能为 3 项目，2材料
                 if("3".equals(baseAssistCalcDetailDO.getItemCode())){
                     //获取项目信息
@@ -1605,6 +1607,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
         //循环明细,组装医嘱明细数据,入库
         for (BaseAssistCalcDetailDTO detailDTO:assistCalcDetailDTOList) {
+            if (detailDTO.getItemId() == null ){
+                throw new AppException(detailDTO.getName() +"配置项目错误!");
+            }
             //医嘱明细对象
             InptAdviceDetailDTO inptAdviceDetailDTO = new InptAdviceDetailDTO();
             if (Constants.XMLB.CL.equals(detailDTO.getItemCode())) {//材料

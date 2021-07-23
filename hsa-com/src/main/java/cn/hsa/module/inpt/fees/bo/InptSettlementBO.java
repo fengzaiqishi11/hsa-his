@@ -55,6 +55,17 @@ public interface InptSettlementBO {
      * @Date 2020/9/25 11:57
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
+    WrapperResponse insureUnifiedPayInpt(Map param);
+
+    /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
     WrapperResponse saveSettle(Map param);
 
     /**

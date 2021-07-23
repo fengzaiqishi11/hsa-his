@@ -1488,6 +1488,7 @@
     <!-- 获取辅助计费明细数据 -->
     <select id="getAssistDetail" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO">
     SELECT
+        a.name,
         bd.id id,
         bd.hosp_code hospCode,
         bd.ac_code acCode,
@@ -1804,5 +1805,44 @@
         </foreach>
     </insert>
 
+    <!--根据visitIds，itemIds查询出对应的医嘱明细表数据-->
+    <select id="queryInptAdviceDetail" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        SELECT
+        a.*
+        FROM
+        inpt_advice_detail a
+        left join inpt_advice b on a.hosp_code = b.hosp_code and a.ia_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and a.item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by a.ia_id, b.group_no, b.group_seq_no asc
+    </select>
 
+    <!--更新医嘱明细表副表数据，限制用药字段-->
+    <update id="updateInptAdviceDetail" parameterType="java.util.List">
+        <foreach collection="detailsExtDTOS" item="item" separator=";">
+            update inpt_advice_detail
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
 </mapper>

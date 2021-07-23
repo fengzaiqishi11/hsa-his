@@ -1488,6 +1488,7 @@
     <!-- 获取辅助计费明细数据 -->
     <select id="getAssistDetail" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO">
     SELECT
+        a.name,
         bd.id id,
         bd.hosp_code hospCode,
         bd.ac_code acCode,

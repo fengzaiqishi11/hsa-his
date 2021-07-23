@@ -334,6 +334,9 @@
         select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'
         union all
+        select if(count(1) > 0, concat('[',group_concat(ic.item_name),']退费未确认'), '') errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '1'
+        union all
         SELECT if(count(1) > 0, concat('[',group_concat(ia.content),']医嘱未停止'), '') errMsg  FROM inpt_advice ia
         WHERE ia.hosp_code = #{hospCode} and  ia.visit_id = #{visitId} and is_submit = '1' and ia.is_long = '0' AND ifnull(is_stop, '0') = '0'  and ifnull(ia.is_reject, '0') = '0'
 

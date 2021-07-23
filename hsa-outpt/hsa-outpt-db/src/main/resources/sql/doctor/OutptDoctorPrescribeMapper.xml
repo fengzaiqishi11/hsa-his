@@ -386,7 +386,7 @@
             <if test="id != null and id != ''" >
                 and a.id = #{id}
             </if>
-        )a order by a.type, a.visitTime desc
+        )a order by a.type,a.crte_time
     </select>
 
     <!--  获取历史病历记录 -->

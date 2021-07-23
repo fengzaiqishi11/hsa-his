@@ -1196,7 +1196,7 @@
         a.total_advance,
         (case s.id when null then a.total_cost else s.reality_price end) total_cost,
         (case when s.settle_take_price != '0' then s.settle_take_price
-         when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
+        when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
         a.total_balance,
         a.crte_id,
         a.crte_name,
@@ -1260,7 +1260,7 @@
     <sql id="MzZyItemDocoterSql">
         SELECT
         'ZY' bizCode,
-        '住院' item_Type,
+        '住院' item_type,
         b.item_id,
         b.bfc_id ,
         b.item_code ,
@@ -1273,21 +1273,16 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        inpt_visit a,
-        inpt_cost b,
-        inpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        inpt_cost b   left join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1303,7 +1298,7 @@
         UNION ALL
         SELECT
         'MZ' as bizCode,
-        '门诊' as  item_Type,
+        '门诊' as  item_type,
         b.item_id,
         b.bfc_id ,
         b.item_code ,
@@ -1316,21 +1311,26 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        outpt_visit a,
-        outpt_cost b,
-        outpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        (select if(reality_price&lt;0,-total_num,total_num)as total_num,aa.reality_price,aa.item_id,aa.visit_id,aa.hosp_code,aa.settle_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.num_unit_code,
+        aa.price ,
+        aa.doctor_id,
+        aa.doctor_name,
+        aa.crte_time as cost_time
+        from outpt_cost aa )  b left join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1346,7 +1346,7 @@
         UNION ALL
         SELECT
         'MZ' as bizCode,
-        '挂号' as  item_Type,
+        '挂号' as  item_type,
         b.item_id,
         b.bfc_id ,
         b.item_code ,
@@ -1359,21 +1359,27 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.num ) AS num
         FROM
-        outpt_visit a,
-        outpt_register_detail b,
-        outpt_register_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.register_id = c.register_id
-        AND b.hosp_code = c.hosp_code
+        (select aa.item_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.unit_code,
+        aa.price,
+        aa.crte_id,
+        aa.crte_name,
+        aa.reality_price ,
+        aa.crte_time as cost_time,
+        if(aa.reality_price  &lt; 0,-aa.num,aa.num) as num,aa.visit_id,aa.hosp_code,aa.register_id  from  outpt_register_detail aa ) b left join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+        where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1404,7 +1410,7 @@
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
-        </if>
+        </if> order by t.item_type,t.bfc_id,t.item_code,t.item_id
     </select>
 
     <select id = "queryHospitalItemReportInfoGroupFour" resultType="java.util.LinkedHashMap">
@@ -1421,10 +1427,13 @@
         <if test="bfcId != null and bfcId != ''">
             and t.bfc_id = #{bfcId}
         </if>
+        <if test="userId != null and userId != ''">
+            and t.doctor_id = #{userId}
+        </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
-        ORDER BY t.bizCode desc
+        ORDER BY t.item_type ,t.visit_id,t.bfc_id,t.item_code,t.item_id
     </select>
     <select id = "queryHospitalItemReportInfoGroupFourSum" resultType="java.util.LinkedHashMap">
         select sum(reality_price) as 'reality_priceSum',sum(num) as 'numSum' from (
@@ -1443,7 +1452,7 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
-        ORDER BY t.bizCode desc
+        ORDER BY t.bizCode ,t.visit_id
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、开方医生分组合计-->
@@ -1469,7 +1478,7 @@
     <!--门诊住院项目使用量统计查询,按业务类型、项目分组-->
     <sql id="MzZyItemSql">
         SELECT
-        '住院' item_Type,
+        '住院' item_type,
         'ZY' bizCode,
         b.item_id,
         b.bfc_id ,
@@ -1481,21 +1490,16 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        inpt_visit a,
-        inpt_cost b,
-        inpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        inpt_cost b   left join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1518,21 +1522,26 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        outpt_visit a,
-        outpt_cost b,
-        outpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        (select if(reality_price&lt;0,-total_num,total_num)as total_num,aa.reality_price,aa.item_id,aa.visit_id,aa.hosp_code,aa.settle_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.num_unit_code,
+        aa.price ,
+        aa.doctor_id,
+        aa.doctor_name,
+        aa.crte_time as cost_time
+        from outpt_cost aa )  b left join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1555,21 +1564,25 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.num ) AS num
         FROM
-        outpt_visit a,
-        outpt_register_detail b,
-        outpt_register_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.register_id = c.register_id
-        AND b.hosp_code = c.hosp_code
+        (select aa.item_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.unit_code,
+        aa.price,
+        aa.reality_price ,
+        aa.crte_time as cost_time,
+        if(aa.reality_price  &lt;  0,-aa.num,aa.num) as num,aa.visit_id,aa.hosp_code,aa.register_id  from  outpt_register_detail aa ) b left join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+        where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1597,7 +1610,7 @@
         <if test="keyword != null and keyword != ''">
             and e.item_name  like '%${keyword}%'
         </if>
-        ORDER BY  e.bizCode desc
+        ORDER BY  e.item_type,e.bfc_id,e.item_code,e.item_id
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、统计总数-->
@@ -1620,207 +1633,17 @@
     <!--业务类型/开方医生/项目/就诊病人-->
     <sql id="MzZyItemDocoterPatientSql">
         SELECT
-            'ZY' bizCode,
-            '住院' item_Type,
-            a.in_no,
-            a.name,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-            DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') as in_time,
-            DATE_FORMAT(a.out_time, '%Y-%m-%d %H:%i:%s') as out_time,
-            DATE_FORMAT(c.settle_time, '%Y-%m-%d %H:%i:%s') as settle_time,
-            b.item_id,
-            b.bfc_id ,
-            b.item_code ,
-            b.item_name,
-            b.spec,
-            b.total_num_unit_code AS num_unit_code,
-            b.price,
-            b.doctor_id,
-            b.doctor_name,
-            b.visit_id,
-            b.dept_id,
-            sum( b.reality_price ) AS reality_price,
-            sum( b.total_num ) AS num
-        FROM
-            inpt_visit a,
-            inpt_cost b,
-            inpt_settle c
-        WHERE
-            a.id = b.visit_id
-            AND a.hosp_code = b.hosp_code
-            AND b.settle_id = c.id
-            AND b.hosp_code = c.hosp_code
-            /*开始日期*/
-            <if test="startDate != null and startDate != ''">
-                and date(c.settle_time) &gt;= date(#{startDate})
-            </if>
-            /*结束日期*/
-            <if test="endDate != null and endDate != ''">
-                and date(c.settle_time) &lt;= date(#{endDate})
-            </if>
-        GROUP BY
-            b.item_id,
-            b.bfc_id,
-            b.item_code,
-            B.item_name,
-            b.spec,
-            b.total_num_unit_code,
-            b.price ,
-            b.doctor_id,
-            b.doctor_name,
-            a.name,
-            b.visit_id,
-            a.in_no,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            a.in_time,
-            a.out_time,
-            c.settle_time,
-            b.dept_id
-
-            UNION ALL
-        SELECT
-            'MZ' as bizCode,
-            '门诊' as  item_Type,
-            a.visit_no as in_no,
-            a.name,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-            null as in_time,
-            null as out_time,
-            DATE_FORMAT(c.settle_time, '%Y-%m-%d %H:%i:%s') as settle_time,
-            b.item_id,
-            b.bfc_id ,
-            b.item_code ,
-            b.item_name,
-            b.spec,
-            b.num_unit_code,
-            b.price,
-            b.doctor_id,
-            b.doctor_name,
-            b.visit_id,
-            b.dept_id,
-            sum( b.reality_price ) AS reality_price,
-            sum( b.total_num ) AS num
-        FROM
-            outpt_visit a,
-            outpt_cost b,
-            outpt_settle c
-        WHERE
-            a.id = b.visit_id
-            AND a.hosp_code = b.hosp_code
-            AND b.settle_id = c.id
-            AND b.hosp_code = c.hosp_code
-            /*开始日期*/
-            <if test="startDate != null and startDate != ''">
-                and date(c.settle_time) &gt;= date(#{startDate})
-            </if>
-            /*结束日期*/
-            <if test="endDate != null and endDate != ''">
-                and date(c.settle_time) &lt;= date(#{endDate})
-            </if>
-        GROUP BY
-            b.item_id,
-            b.bfc_id,
-            b.item_code,
-            B.item_name,
-            b.spec,
-            b.num_unit_code,
-            b.price ,
-            b.doctor_id,
-            b.doctor_name,
-            a.name,
-            b.visit_id,
-            a.visit_no,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            a.visit_time,
-            c.settle_time,
-            b.dept_id
-
-        UNION ALL
-        SELECT
-            'MZ' as bizCode,
-            '挂号' as  item_Type,
-            a.visit_no as in_no,
-            a.name,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-            null as in_time,
-            null as out_time,
-            DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
-            b.item_id,
-            b.bfc_id ,
-            b.item_code ,
-            b.item_name,
-            b.spec,
-            b.unit_code,
-            b.price,
-            b.crte_id as doctor_id,
-            b.crte_name as doctor_name,
-            b.visit_id,
-            a.dept_id,
-            sum( b.reality_price ) AS reality_price,
-            sum( b.num ) AS num
-        FROM
-            outpt_visit a,
-            outpt_register_detail b,
-            outpt_register_settle c
-        WHERE
-            a.id = b.visit_id
-            AND a.hosp_code = b.hosp_code
-            AND b.register_id = c.register_id
-            AND b.hosp_code = c.hosp_code
-            /*开始日期*/
-            <if test="startDate != null and startDate != ''">
-                and date(c.settle_time) &gt;= date(#{startDate})
-            </if>
-            /*结束日期*/
-            <if test="endDate != null and endDate != ''">
-                and date(c.settle_time) &lt;= date(#{endDate})
-            </if>
-        GROUP BY
-            b.item_id,
-            b.bfc_id,
-            b.item_code,
-            B.item_name,
-            b.spec,
-            b.unit_code,
-            b.price ,
-            b.crte_id,
-            b.crte_name,
-            a.name,
-            b.visit_id,
-            a.visit_no,
-            a.gender_code,
-            a.age,
-            a.patient_code,
-            a.visit_time,
-            c.settle_time,
-            a.dept_id
-    </sql>
-    <sql id="MzZyItemPatientSql">
-        SELECT
         'ZY' bizCode,
-        '住院' item_Type,
+        '住院' item_type,
         a.in_no,
         a.name,
         a.gender_code,
         a.age,
         a.patient_code,
         DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as in_time,
-        DATE_FORMAT(a.out_time , '%Y-%m-%d %H:%i:%s') as out_time,
-        DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') as in_time,
+        DATE_FORMAT(a.out_time, '%Y-%m-%d %H:%i:%s') as out_time,
+        DATE_FORMAT(c.settle_time, '%Y-%m-%d %H:%i:%s') as settle_time,
         b.item_id,
         b.bfc_id ,
         b.item_code ,
@@ -1835,21 +1658,16 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        inpt_visit a,
-        inpt_cost b,
-        inpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        inpt_cost b   left join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1875,7 +1693,7 @@
         UNION ALL
         SELECT
         'MZ' as bizCode,
-        '门诊' as  item_Type,
+        '门诊' as  item_type,
         a.visit_no as in_no,
         a.name,
         a.gender_code,
@@ -1884,7 +1702,7 @@
         DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
         null as in_time,
         null as out_time,
-        DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        DATE_FORMAT(c.settle_time, '%Y-%m-%d %H:%i:%s') as settle_time,
         b.item_id,
         b.bfc_id ,
         b.item_code ,
@@ -1899,21 +1717,28 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.total_num ) AS num
         FROM
-        outpt_visit a,
-        outpt_cost b,
-        outpt_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.settle_id = c.id
-        AND b.hosp_code = c.hosp_code
+        (select if(reality_price&lt;0,-total_num,total_num)as total_num,aa.reality_price,aa.item_id,aa.visit_id,aa.hosp_code,aa.settle_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.num_unit_code,
+        aa.price ,
+        aa.doctor_id,
+        aa.dept_id,
+        aa.crte_time,
+        aa.doctor_name,
+        aa.crte_time as cost_time
+        from outpt_cost aa )  b left join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -1938,7 +1763,7 @@
         UNION ALL
         SELECT
         'MZ' as bizCode,
-        '挂号' as  item_Type,
+        '挂号' as  item_type,
         a.visit_no as in_no,
         a.name,
         a.gender_code,
@@ -1962,21 +1787,224 @@
         sum( b.reality_price ) AS reality_price,
         sum( b.num ) AS num
         FROM
-        outpt_visit a,
-        outpt_register_detail b,
-        outpt_register_settle c
-        WHERE
-        a.id = b.visit_id
-        AND a.hosp_code = b.hosp_code
-        AND b.register_id = c.register_id
-        AND b.hosp_code = c.hosp_code
+        (select aa.item_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.unit_code,
+        aa.price,
+        aa.crte_id,
+        aa.crte_name,
+        aa.reality_price ,
+        aa.crte_time as cost_time,
+        if(aa.reality_price  &lt;  0,-aa.num,aa.num) as num,aa.visit_id,aa.hosp_code,aa.register_id  from  outpt_register_detail aa ) b left join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+        where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(c.settle_time) &gt;= date(#{startDate})
+            and date(b.cost_time) &gt;= date(#{startDate})
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(c.settle_time) &lt;= date(#{endDate})
+            and date(b.cost_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+        b.item_id,
+        b.bfc_id,
+        b.item_code,
+        B.item_name,
+        b.spec,
+        b.unit_code,
+        b.price ,
+        b.crte_id,
+        b.crte_name,
+        a.name,
+        b.visit_id,
+        a.visit_no,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        a.visit_time,
+        c.settle_time,
+        a.dept_id
+    </sql>
+    <sql id="MzZyItemPatientSql">
+        SELECT
+        'ZY' bizCode,
+        '住院' item_type,
+        a.in_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as in_time,
+        DATE_FORMAT(a.out_time , '%Y-%m-%d %H:%i:%s') as out_time,
+        DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        b.item_id,
+        b.bfc_id ,
+        b.item_code ,
+        b.item_name,
+        b.spec,
+        b.total_num_unit_code AS num_unit_code,
+        b.price,
+        b.doctor_id,
+        b.doctor_name,
+        b.visit_id,
+        b.dept_id,
+        sum( b.reality_price ) AS reality_price,
+        sum( b.total_num ) AS num
+        FROM
+        inpt_cost b   left join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
+        /*开始日期*/
+        <if test="startDate != null and startDate != ''">
+            and date(b.cost_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(b.cost_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+        b.item_id,
+        b.bfc_id,
+        b.item_code,
+        B.item_name,
+        b.spec,
+        b.total_num_unit_code,
+        b.price ,
+        b.doctor_id,
+        b.doctor_name,
+        a.name,
+        b.visit_id,
+        a.in_no,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        a.in_time,
+        a.out_time,
+        c.settle_time,
+        b.dept_id
+
+        UNION ALL
+        SELECT
+        'MZ' as bizCode,
+        '门诊' as  item_type,
+        a.visit_no as in_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        null as in_time,
+        null as out_time,
+        DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        b.item_id,
+        b.bfc_id ,
+        b.item_code ,
+        b.item_name,
+        b.spec,
+        b.num_unit_code,
+        b.price,
+        b.doctor_id,
+        b.doctor_name,
+        b.visit_id,
+        b.dept_id,
+        sum( b.reality_price ) AS reality_price,
+        sum( b.total_num ) AS num
+        FROM
+        (select if(reality_price&lt;0,-total_num,total_num)as total_num,aa.reality_price,aa.item_id,aa.visit_id,aa.hosp_code,aa.settle_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.num_unit_code,
+        aa.price ,
+        aa.doctor_id,
+        aa.doctor_name,
+        aa.dept_id,
+        aa.crte_time as cost_time
+        from outpt_cost aa )  b left join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE 1=1
+        /*开始日期*/
+        <if test="startDate != null and startDate != ''">
+            and date(b.cost_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(b.cost_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+        b.item_id,
+        b.bfc_id,
+        b.item_code,
+        B.item_name,
+        b.spec,
+        b.num_unit_code,
+        b.price ,
+        b.doctor_id,
+        b.doctor_name,
+        a.name,
+        b.visit_id,
+        a.visit_no,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        a.visit_time,
+        c.settle_time,
+        b.dept_id
+
+        UNION ALL
+        SELECT
+        'MZ' as bizCode,
+        '挂号' as  item_type,
+        a.visit_no as in_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.patient_code,
+        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        null as in_time,
+        null as out_time,
+        DATE_FORMAT(c.settle_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        b.item_id,
+        b.bfc_id ,
+        b.item_code ,
+        b.item_name,
+        b.spec,
+        b.unit_code,
+        b.price,
+        b.crte_id as doctor_id,
+        b.crte_name as doctor_name,
+        b.visit_id,
+        a.dept_id,
+        sum( b.reality_price ) AS reality_price,
+        sum( b.num ) AS num
+        FROM
+        (select aa.item_id,
+        aa.bfc_id,
+        aa.item_code,
+        aa.item_name,
+        aa.spec,
+        aa.unit_code,
+        aa.price,
+        aa.crte_id,
+        aa.crte_name,
+        aa.reality_price ,
+        aa.crte_time as cost_time,
+        if(aa.reality_price &lt; 0,-aa.num,aa.num) as num,aa.visit_id,aa.hosp_code,aa.register_id  from  outpt_register_detail aa ) b left join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+        where 1=1
+        /*开始日期*/
+        <if test="startDate != null and startDate != ''">
+            and date(b.cost_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(b.cost_time) &lt;= date(#{endDate})
         </if>
         GROUP BY
         b.item_id,
@@ -2001,7 +2029,7 @@
     <!--门诊住院项目使用量统计查询,按业务类型、开方医生、项目、就诊病人分组-->
     <select id="queryHospitalItemReportInfoGroupOne" resultType="java.util.LinkedHashMap">
         select *,(select name from base_dept a where a.id = dept_id) as dept_name from (
-            <include refid="MzZyItemDocoterPatientSql"/>
+        <include refid="MzZyItemDocoterPatientSql"/>
         ) t
         where 1=1
         <if test="tyepCodeList != null and tyepCodeList.size() > 0">
@@ -2022,7 +2050,7 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
-        ORDER BY t.bizCode desc
+        ORDER BY t.item_type,t.visit_time ,t.visit_id,t.bfc_id,t.item_code,t.item_id
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、开方医生、项目、就诊病人分组合计-->
@@ -2049,7 +2077,7 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
-        ORDER BY t.bizCode desc
+        ORDER BY t.bizCode ,t.visit_id
     </select>
 
     <!--门诊科室/医生收入统计-->
@@ -2093,7 +2121,7 @@
 
     <!--住院科室用药统计-->
     <select id="queryInptMedication" resultType="java.util.LinkedHashMap">
-      select A.* from (
+        select A.* from (
         select
         max(a.item_name) as itemName,
         sum(a.num) as num,
@@ -2113,15 +2141,15 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
-          and date(b.crte_time) &gt;= date(#{startTime})
+            and date(b.crte_time) &gt;= date(#{startTime})
         </if>
         /*结束日期*/
         <if test="endTime != null and endTime != ''">
-          and date(b.crte_time) &lt;= date(#{endTime})
+            and date(b.crte_time) &lt;= date(#{endTime})
         </if>
         group by b.dept_id, a.item_id
-      ) A
-      where a.num > 0
+        ) A
+        where a.num > 0
 
     </select>
 
@@ -2405,70 +2433,70 @@
 
     <!-- 入库汇总统计合计 按供应商/入库单据明细 -->
     <select id="queryStroBusinessSummaryMainDeTail" resultType="java.util.Map">
-      select
-      bs.name as supplierName, /*供应商名*/
-      sid.order_no as orderNo, /*单据号*/
-      sid.item_name as itemName,
-      sid.unit_code as unitCode,
-      sid.batch_no as batchNo,
-      sid.expiry_date as expiryDate,
-      sid.sell_price as sellPrice,
-      sid.buy_price as buyPrice,
-      sid.split_num as splitNum,
-      sid.num as num,
-      (sid.num * sid.buy_price) as buyPriceAll,
-      (sid.num * sid.sell_price) as sellPriceAll,
-      case sid.item_code when '1' then b.spec when '2' then c.spec end spec,
-      case sid.item_code when '1' then b.code when '2' then c.code end code,
-      case sid.item_code when '1' then b.big_type_code when '2' then '3' end typeCode,
-      sid.crte_time as crteTime,
-      case sid.item_code when '1' then (select p.name from base_product p where p.hosp_code = #{hospCode} and p.code = b.prod_code)
-      when '2' then (select p.name from base_product p where p.hosp_code = #{hospCode} and p.code = c.prod_code)
-      end prodName
-      from stro_invoicing sid
-      left join base_drug b on sid.item_id = b.id and sid.hosp_code = b.hosp_code and sid.item_code = '1'
-      left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
-      ${sql}
-      <if test="startDate != null and startDate != ''">
-        and date(sid.crte_time) &gt;=date(#{startDate})
-      </if>
-      /*出院日期*/
-      <if test="endDate != null and endDate !='' ">
-        and date(sid.crte_time) &lt;= date(#{endDate})
-      </if>
-      /*药房*/
-      <if test="yfids != null and yfids.size()>0">
-        and bs.id in
-        <foreach collection="yfids" item="id" separator="," open="(" close=")">
-          #{id}
-        </foreach>
-      </if>
+        select
+        bs.name as supplierName, /*供应商名*/
+        sid.order_no as orderNo, /*单据号*/
+        sid.item_name as itemName,
+        sid.unit_code as unitCode,
+        sid.batch_no as batchNo,
+        sid.expiry_date as expiryDate,
+        sid.sell_price as sellPrice,
+        sid.buy_price as buyPrice,
+        sid.split_num as splitNum,
+        sid.num as num,
+        (sid.num * sid.buy_price) as buyPriceAll,
+        (sid.num * sid.sell_price) as sellPriceAll,
+        case sid.item_code when '1' then b.spec when '2' then c.spec end spec,
+        case sid.item_code when '1' then b.code when '2' then c.code end code,
+        case sid.item_code when '1' then b.big_type_code when '2' then '3' end typeCode,
+        sid.crte_time as crteTime,
+        case sid.item_code when '1' then (select p.name from base_product p where p.hosp_code = #{hospCode} and p.code = b.prod_code)
+        when '2' then (select p.name from base_product p where p.hosp_code = #{hospCode} and p.code = c.prod_code)
+        end prodName
+        from stro_invoicing sid
+        left join base_drug b on sid.item_id = b.id and sid.hosp_code = b.hosp_code and sid.item_code = '1'
+        left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
+        ${sql}
+        <if test="startDate != null and startDate != ''">
+            and date(sid.crte_time) &gt;=date(#{startDate})
+        </if>
+        /*出院日期*/
+        <if test="endDate != null and endDate !='' ">
+            and date(sid.crte_time) &lt;= date(#{endDate})
+        </if>
+        /*药房*/
+        <if test="yfids != null and yfids.size()>0">
+            and bs.id in
+            <foreach collection="yfids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
 
-      /*科室*/
-      <if test="ksids != null and ksids.size()>0">
-        and bs.id in
-        <foreach collection="ksids" item="id" separator="," open="(" close=")">
-          #{id}
-        </foreach>
-      </if>
+        /*科室*/
+        <if test="ksids != null and ksids.size()>0">
+            and bs.id in
+            <foreach collection="ksids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
 
-      /*供应商*/
-      <if test="gysids != null and gysids.size()>0">
-        and bs.id in
-        <foreach collection="gysids" item="id" separator="," open="(" close=")">
-          #{id}
+        /*供应商*/
+        <if test="gysids != null and gysids.size()>0">
+            and bs.id in
+            <foreach collection="gysids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and
+        sid.biz_id in
+        <foreach collection="bizIds" item="item" separator="," open="(" close=")">
+            #{item}
         </foreach>
-      </if>
-      and
-      sid.biz_id in
-      <foreach collection="bizIds" item="item" separator="," open="(" close=")">
-        #{item}
-      </foreach>
-      <if test="type != null and type == 'Y'.toString() ">
-        ,(case sid.item_code when '1' then b.big_type_code when '2' then '3' end)
-      </if>
-      order by supplierName
-  </select>
+        <if test="type != null and type == 'Y'.toString() ">
+            ,(case sid.item_code when '1' then b.big_type_code when '2' then '3' end)
+        </if>
+        order by supplierName
+    </select>
 
     <!-- 入库汇总统计 按供应商/计费类别 -->
     <select id="queryStroBusinessSummaryBfc" resultType="java.util.Map">
@@ -2914,8 +2942,8 @@
         </foreach>
         and outin_code in
         <foreach collection="outinCodeList" item="item" separator="," open="(" close=")">
-        #{item}
-      </foreach>
+            #{item}
+        </foreach>
         <if test="startDate != null and startDate != ''">
             and date(siv.crte_time) &gt;=date(#{startDate})
         </if>
@@ -2940,107 +2968,107 @@
 
 
     <select id="queryPharConsumeNoPD" resultMap="StroInvoicingMap">
-      select
-      siv.item_id as item_id,
-      siv.batch_no as batch_no,
-      siv.item_name as item_name,
-      siv.item_code as item_code,
-      siv.unit_code as unit_code,
-      siv.sell_price as sell_price,
-      siv.buy_price as buy_price,
-      siv.num as num,
-      siv.biz_id as biz_id,
-      siv.crte_time as crte_time,
-      siv.split_num as split_num,
-      siv.split_unit_code as split_unit_code,
-      case siv.item_code when '1' then b.spec when '2' then c.spec end spec,
-      case siv.item_code when '1' then b.code when '2' then c.code end code,
-      case siv.item_code when '1' then b.big_type_code when '2' then '3' end typeCode
-      from stro_invoicing siv
-      left join base_drug b on siv.item_id = b.id and siv.hosp_code = b.hosp_code and siv.item_code = '1'
-      left join base_material c on siv.item_id = c.id and siv.hosp_code = c.hosp_code and siv.item_code = '2'
-      where 1=1 and outin_code in ('8','23','25','27','28') and siv.hosp_code = #{hospCode} and
-      biz_id in
-      <foreach collection="bizIds" item="item" separator="," open="(" close=")">
-        #{item}
-      </foreach>
-      <if test="startDate != null and startDate != ''">
-        and date(siv.crte_time) &gt;=date(#{startDate})
-      </if>
-      /*出院日期*/
-      <if test="endDate != null and endDate !='' ">
-        and date(siv.crte_time) &lt;= date(#{endDate})
-      </if>
-      <if test="code != null and code != ''">
-        and item_code = #{code}
-      </if>
-      <if test="keyword != null and keyword != ''">
-        and (
-        siv.item_name like concat('%', #{keyword}, '%')
-        or b.usual_pym like concat('%', #{keyword}, '%')
-        or b.usual_wbm like concat('%', #{keyword}, '%')
-        or b.good_pym like concat('%', #{keyword}, '%')
-        or b.good_wbm like concat('%', #{keyword}, '%')
-        or c.pym like concat('%', #{keyword}, '%')
-        or c.wbm like concat('%', #{keyword}, '%'))
-      </if>
+        select
+        siv.item_id as item_id,
+        siv.batch_no as batch_no,
+        siv.item_name as item_name,
+        siv.item_code as item_code,
+        siv.unit_code as unit_code,
+        siv.sell_price as sell_price,
+        siv.buy_price as buy_price,
+        siv.num as num,
+        siv.biz_id as biz_id,
+        siv.crte_time as crte_time,
+        siv.split_num as split_num,
+        siv.split_unit_code as split_unit_code,
+        case siv.item_code when '1' then b.spec when '2' then c.spec end spec,
+        case siv.item_code when '1' then b.code when '2' then c.code end code,
+        case siv.item_code when '1' then b.big_type_code when '2' then '3' end typeCode
+        from stro_invoicing siv
+        left join base_drug b on siv.item_id = b.id and siv.hosp_code = b.hosp_code and siv.item_code = '1'
+        left join base_material c on siv.item_id = c.id and siv.hosp_code = c.hosp_code and siv.item_code = '2'
+        where 1=1 and outin_code in ('8','23','25','27','28') and siv.hosp_code = #{hospCode} and
+        biz_id in
+        <foreach collection="bizIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="startDate != null and startDate != ''">
+            and date(siv.crte_time) &gt;=date(#{startDate})
+        </if>
+        /*出院日期*/
+        <if test="endDate != null and endDate !='' ">
+            and date(siv.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="code != null and code != ''">
+            and item_code = #{code}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+            siv.item_name like concat('%', #{keyword}, '%')
+            or b.usual_pym like concat('%', #{keyword}, '%')
+            or b.usual_wbm like concat('%', #{keyword}, '%')
+            or b.good_pym like concat('%', #{keyword}, '%')
+            or b.good_wbm like concat('%', #{keyword}, '%')
+            or c.pym like concat('%', #{keyword}, '%')
+            or c.wbm like concat('%', #{keyword}, '%'))
+        </if>
     </select>
 
 
     <select id="querySumPharConsume" resultType="java.util.Map">
-      select A.* ${sqlStrTem1} from(
-            select
-            siv.item_id as itemId,
-            siv.item_name as itemName,
-            siv.item_code as itemCode,
-            max(siv.unit_code) as unitCode,
-            sum(siv.num) as num,
-            sum(siv.split_num) as splitNum,
-            max(siv.split_unit_code) as splitUnitCode,
-            sum(siv.num * siv.sell_price) as sellPriceAll,
-            case siv.item_code when '1' then b.price when '2' then c.price end sellPrice,
-            case siv.item_code when '1' then b.last_buy_price when '2' then c.last_buy_price end buyPrice,
-            case siv.item_code when '1' then b.spec when '2' then c.spec end spec,
-            case siv.item_code when '1' then b.code when '2' then c.code end code,
-            case siv.item_code when '1' then b.avg_buy_price when '2' then c.avg_buy_price end avgBuyPrice,
-            case siv.item_code when '1' then b.avg_sell_price when '2' then c.avg_sell_price end avgSellPrice,
-            ${sqlStrInpt}
-            case siv.item_code when '1' then b.big_type_code when '2' then '3' end typeCode
-            from stro_invoicing siv
-            left join base_drug b on siv.item_id = b.id and siv.hosp_code = b.hosp_code and siv.item_code = '1'
-            left join base_material c on siv.item_id = c.id and siv.hosp_code = c.hosp_code and siv.item_code = '2'
-            where 1=1 and siv.hosp_code = #{hospCode} and
-            biz_id in
-            <foreach collection="bizIds" item="item" separator="," open="(" close=")">
-              #{item}
-            </foreach>
-            and outin_code in
-            <foreach collection="outinCodeList" item="item" separator="," open="(" close=")">
-              #{item}
-            </foreach>
-            <if test="startDate != null and startDate != ''">
-              and date(siv.crte_time) &gt;=date(#{startDate})
-            </if>
-            /*出院日期*/
-            <if test="endDate != null and endDate !='' ">
-              and date(siv.crte_time) &lt;= date(#{endDate})
-            </if>
-            <if test="code != null and code != ''">
-              and item_code = #{code}
-            </if>
-            <if test="keyword != null and keyword != ''">
-              and (
-              siv.item_name like concat('%', #{keyword}, '%')
-              or b.usual_pym like concat('%', #{keyword}, '%')
-              or b.usual_wbm like concat('%', #{keyword}, '%')
-              or b.good_pym like concat('%', #{keyword}, '%')
-              or b.good_wbm like concat('%', #{keyword}, '%')
-              or c.pym like concat('%', #{keyword}, '%')
-              or c.wbm like concat('%', #{keyword}, '%'))
-            </if>
-            group by siv.item_id,siv.item_name,siv.item_code
+        select A.* ${sqlStrTem1} from(
+        select
+        siv.item_id as itemId,
+        siv.item_name as itemName,
+        siv.item_code as itemCode,
+        max(siv.unit_code) as unitCode,
+        sum(siv.num) as num,
+        sum(siv.split_num) as splitNum,
+        max(siv.split_unit_code) as splitUnitCode,
+        sum(siv.num * siv.sell_price) as sellPriceAll,
+        case siv.item_code when '1' then b.price when '2' then c.price end sellPrice,
+        case siv.item_code when '1' then b.last_buy_price when '2' then c.last_buy_price end buyPrice,
+        case siv.item_code when '1' then b.spec when '2' then c.spec end spec,
+        case siv.item_code when '1' then b.code when '2' then c.code end code,
+        case siv.item_code when '1' then b.avg_buy_price when '2' then c.avg_buy_price end avgBuyPrice,
+        case siv.item_code when '1' then b.avg_sell_price when '2' then c.avg_sell_price end avgSellPrice,
+        ${sqlStrInpt}
+        case siv.item_code when '1' then b.big_type_code when '2' then '3' end typeCode
+        from stro_invoicing siv
+        left join base_drug b on siv.item_id = b.id and siv.hosp_code = b.hosp_code and siv.item_code = '1'
+        left join base_material c on siv.item_id = c.id and siv.hosp_code = c.hosp_code and siv.item_code = '2'
+        where 1=1 and siv.hosp_code = #{hospCode} and
+        biz_id in
+        <foreach collection="bizIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and outin_code in
+        <foreach collection="outinCodeList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="startDate != null and startDate != ''">
+            and date(siv.crte_time) &gt;=date(#{startDate})
+        </if>
+        /*出院日期*/
+        <if test="endDate != null and endDate !='' ">
+            and date(siv.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="code != null and code != ''">
+            and item_code = #{code}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+            siv.item_name like concat('%', #{keyword}, '%')
+            or b.usual_pym like concat('%', #{keyword}, '%')
+            or b.usual_wbm like concat('%', #{keyword}, '%')
+            or b.good_pym like concat('%', #{keyword}, '%')
+            or b.good_wbm like concat('%', #{keyword}, '%')
+            or c.pym like concat('%', #{keyword}, '%')
+            or c.wbm like concat('%', #{keyword}, '%'))
+        </if>
+        group by siv.item_id,siv.item_name,siv.item_code
         ) A
-  </select>
+    </select>
 
 
     <!--库房报损统计(按品种)-->
@@ -3817,7 +3845,7 @@
 
     <!--门诊/住院明细收费-->
     <select id="queryAllChargeDetail" resultType="java.util.LinkedHashMap">
-       select * from (
+        select * from (
         SELECT
         b.register_no,
         settle.settle_no,
@@ -4048,7 +4076,7 @@
 
     <!--住院明细收费-->
     <select id="queryInptAllChargeDetail" resultType="java.util.LinkedHashMap">
-      select * from (
+        select * from (
         select  b.in_no,
         settle.settle_no,
         b.name,
@@ -5807,55 +5835,54 @@
     <!--门诊收费员收入统计-按结算时间-->
     <select id="queryCollectorInComeStaMZ" resultType="java.util.Map">
         select
-            sum(t.totalPrice) as totalPrice,
-            sum(t.actualPrice) as actualPrice,
-            sum(t.selfPrice) as selfPrice,
-            sum(t.insureTotalPrice) as insureTotalPrice,
-            sum(t.truncPrice) as truncPrice,
-            max(t.crteName) as crteName
+        sum(t.totalPrice) as totalPrice,
+        sum(t.actualPrice) as actualPrice,
+        sum(t.selfPrice) as selfPrice,
+        sum(t.insureTotalPrice) as insureTotalPrice,
+        sum(t.truncPrice) as truncPrice,
+        max(t.crteName) as crteName
 
         from (
-            select
-            a.total_price as totalPrice, /**总费用**/
-            a.actual_price as actualPrice, /**实收金额**/
-            a.self_price as selfPrice, /**个人支付**/
-            a.mi_price as insureTotalPrice,
-            a.trunc_price as truncPrice,
-            a.crte_name as crteName,
-            a.crte_id as crteId
-            from outpt_settle a
-            where a.hosp_code = #{hospCode} and a.is_settle = '1'
-            /*开始日期*/
-            <if test="startDate != null">
-                and date(a.settle_time) &gt;=date(#{startDate})
-            </if>
-            /*结束日期*/
-            <if test="endDate != null">
-                and date(a.settle_time) &lt;= date(#{endDate})
-            </if>
+        select
+        a.total_price as totalPrice, /**总费用**/
+        a.actual_price as actualPrice, /**实收金额**/
+        a.self_price as selfPrice, /**个人支付**/
+        a.mi_price as insureTotalPrice,
+        a.trunc_price as truncPrice,
+        a.crte_name as crteName,
+        a.crte_id as crteId
+        from outpt_settle a
+        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(a.settle_time) &gt;=date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(a.settle_time) &lt;= date(#{endDate})
+        </if>
 
-            union all
+        union all
 
-            select
-            a.total_price as totalPrice, /**总费用**/
-            a.reality_price as actualPrice, /**实收金额**/
-            a.reality_price as selfPrice, /**个人支付**/
-            0 as insureTotalPrice,
-            0 as truncPrice,
-            a.crte_name as crteName,
-            a.crte_id as crteId
+        select
+        a.total_price as totalPrice, /**总费用**/
+        a.reality_price as actualPrice, /**实收金额**/
+        a.reality_price as selfPrice, /**个人支付**/
+        0 as insureTotalPrice,
+        0 as truncPrice,
+        a.crte_name as crteName,
+        a.crte_id as crteId
 
-            from outpt_register_settle a
-            where a.hosp_code = #{hospCode}
-            AND a.status_code = '0'
-            /*开始日期*/
-            <if test="startDate != null">
-                and date(a.settle_time) &gt;=date(#{startDate})
-            </if>
-            /*结束日期*/
-            <if test="endDate != null">
-                and date(a.settle_time) &lt;= date(#{endDate})
-            </if>
+        from outpt_register_detail a
+        where a.hosp_code = #{hospCode}
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(a.crte_time) &gt;=date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(a.crte_time) &lt;= date(#{endDate})
+        </if>
         ) t group by t.crteId
     </select>
     <!--门诊收费员收入明细统计(缴款时间)-->

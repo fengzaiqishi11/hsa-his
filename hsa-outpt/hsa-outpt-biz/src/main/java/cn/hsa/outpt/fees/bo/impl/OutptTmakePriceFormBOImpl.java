@@ -329,6 +329,32 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 官红强 2021年1月26日20:50:53 试算时不再计算优惠金额，直接取费用明细（处方病人直接取费用，直接划价收费病人还是需要计算优惠）
             List<OutptCostDTO> outptCostDTOList = this.customVerifyCouponPrice(outptVisitDTO, 0);
 
+            // =======================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    start ===============
+            List<String> deleteCost = new ArrayList<>();  // 需要删除的非处方费用
+            List<OutptCostDTO> tempoutptCostDTOList = new ArrayList<>();
+            tempoutptCostDTOList.addAll(outptCostDTOList);  // 复制处方费用
+            List<OutptCostDTO> temp = outptVisitDTO.getOutptCostDTOList(); // 结算页面传递的需要收费的费用
+            // 得到需要删除的费用
+            for (int i = tempoutptCostDTOList.size()-1; i>=0; i--) {
+                for (int j = 0; j < temp.size(); j++) {
+                    if (!"1".equals(temp.get(j).getSourceCode()) && tempoutptCostDTOList.get(i).getId().equals(temp.get(j).getId())) {
+                        tempoutptCostDTOList.remove(i);
+                        break;
+                    }
+                }
+            }
+            // 获取需要删除费用的id集合
+            if (!ListUtils.isEmpty(tempoutptCostDTOList)) {
+                for (OutptCostDTO dec : tempoutptCostDTOList) {
+                    deleteCost.add(dec.getId());
+                }
+                String[] ids = deleteCost.toArray(new String[deleteCost.size()]);
+                outptCostDAO.deleteFCFCostByIds(ids, outptVisitDTO.getHospCode());
+                outptCostDTOList.removeAll(tempoutptCostDTOList);
+            }
+            // ====================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    end ===============
+
+
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
                 return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试", null);
             }

@@ -294,11 +294,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销
                 if (isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "1");
+                    objectMap.put("tcmdrug_used_way","1"); // 中药使用方式
                 } else if (!isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "0");
+                    objectMap.put("tcmdrug_used_way","2"); // 中药使用方式
                 }
 
-                objectMap.put("tcmdrug_used_way",""); // 中药使用方式
+
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志
                 objectMap.put("etip_hosp_code",""); // 外检医院编码
                 // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)

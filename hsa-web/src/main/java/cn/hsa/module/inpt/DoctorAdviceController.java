@@ -6,6 +6,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.dto.SysUserSystemDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
@@ -380,5 +381,43 @@ public class DoctorAdviceController extends BaseController {
         paramMap.put("inptAdviceList", inptAdviceDTO.getInptAdviceDTOList());
         // 保存处方信息
         return doctorAdviceService_consumer.saveInptAdviceZCY(paramMap);
+    }
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 08:48
+     * @Return:
+     **/
+    @GetMapping("/queryLimitDrugList")
+    public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode", sysUserDTO.getHospCode());
+        paramMap.put("inptVisitDTO", inptVisitDTO);
+        return doctorAdviceService_consumer.queryLimitDrugList(paramMap);
+    }
+
+    /**
+     * @Menthod: updateInptAdviceDetailLmt
+     * @Desrciption: 更新医嘱明细表限制用药相关字段
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 10:39
+     * @Return:
+     **/
+    @PostMapping("/updateInptAdviceDetailLmt")
+    public WrapperResponse<Boolean> updateInptAdviceDetailLmt(@RequestBody List<InsureItemMatchDTO> insureItemMatchDTOS, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureItemMatchDTOS.forEach(insureItemMatchDTO -> insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode()));
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureItemMatchDTOS", insureItemMatchDTOS);
+        return doctorAdviceService_consumer.updateInptAdviceDetailLmt(map);
     }
 }

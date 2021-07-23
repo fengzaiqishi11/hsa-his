@@ -967,6 +967,26 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     }
 
     /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
+    public synchronized WrapperResponse insureUnifiedPayInpt (Map param){
+        Map<String, String> inptInsureResult = new HashMap<String, String>();
+        Map<String, Object> unifiedMap = new HashMap<>();
+        unifiedMap.put("hospCode", param.get("hospCode"));
+        unifiedMap.put("inptVisit", param.get("inptVisitDTO"));
+        unifiedMap.put("visitId", param.get("visitId"));
+        inptInsureResult = insureUnifiedPayInptService.UP_2303(unifiedMap).getData();
+        return WrapperResponse.success("试算成功。", inptInsureResult);
+    }
+
+
+    /**
      * @Method handInsureUnifiedInptSettle
      * @Desrciption 医保统一支付平台 ：住院结算业务：以及住院结算以后的反参
      * @Param inptVisitDTO：住院就诊实体信息  insureIndividualVisitDTO：医保就诊实体类对象 param:前台入参 inptCostDOList:费用集合

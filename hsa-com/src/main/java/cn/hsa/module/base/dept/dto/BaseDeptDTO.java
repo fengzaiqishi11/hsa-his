@@ -58,4 +58,6 @@ public class BaseDeptDTO extends BaseDeptDO implements Serializable {
     private String value;  // 科室下拉框对应的code
     private String flag;
     private String multiPharFlag;
+    /** 药房名字 **/
+    private String pharName;
 }

@@ -141,6 +141,13 @@ public interface BaseDeptDAO {
      * @Return baseDeptDTO 科室维护信息数据传输对象
      **/
     List<BaseDeptDTO> getDeptTypeCode(BaseDeptDTO baseDeptDTO);
+    /**
+       * 住院护士站补记账获取发药药房信息
+       * @Author : luonianxin
+       * @Email: nianxin.luo@powersi.com
+       * @Date: 2021/7/22 17:52
+    **/
+    List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO);
 
     List<BaseDeptDTO> getDeptTypeIdentity(BaseDeptDTO baseDeptDTO);
 

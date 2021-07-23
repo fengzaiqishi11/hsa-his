@@ -81,6 +81,19 @@ public class InptSettlementServiceImpl extends HsafService implements InptSettle
     }
 
     /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
+    public WrapperResponse insureUnifiedPayInpt(Map param) {
+        return inptSettlementBO.insureUnifiedPayInpt(param);
+    }
+
+    /**
      * @Method: querySettle
      * @Description: 获取住院发票数据
      * @Param: [params]

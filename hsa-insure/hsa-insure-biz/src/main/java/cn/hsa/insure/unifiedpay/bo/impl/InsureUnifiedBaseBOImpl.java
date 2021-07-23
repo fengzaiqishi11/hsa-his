@@ -70,7 +70,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     @Resource
     private BaseDeptService baseDeptService_consumer;
-    
+
     @Resource
     private InsureUnifiedPayInptService insureUnifiedPayInptService;
 
@@ -401,6 +401,33 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
         Map<String, Object> resultDataMap = new HashMap<>();
         resultDataMap.put("outptMap", outptMap);
+        return resultDataMap;
+    }
+
+    /**
+     * @Method querySettleDeInfo
+     * @Desrciption 结算信息查询
+     * @Param
+     * @Author caoliang
+     * @Date 2021/7/19 19:00
+     * @Return
+     **/
+    public Map<String, Object> querySettleDeInfo(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureSettleId = MapUtils.get(map, "insureSettleId");
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("setl_id", insureSettleId);
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        paramMap.put("data", dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap);
+        List<Map<String, Object>> setldetail = MapUtils.get(MapUtils.get(resultMap, "output"),"setldetail");
+        Map<String, Object> setlinfo = MapUtils.get(MapUtils.get(resultMap, "output"),"setlinfo");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        resultDataMap.put("setldetail", setldetail);
+        resultDataMap.put("setlinfo", setlinfo);
         return resultDataMap;
     }
 

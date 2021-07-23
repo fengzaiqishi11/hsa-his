@@ -91,6 +91,8 @@
     <dubbo:reference id="insureIndividualSettleService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualSettleService" check="false"/>
     <!-- 医保就诊 -->
     <dubbo:reference id="insureIndividualVisitService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualVisitService" check="false"/>
+    <!-- 医保项目匹配Service -->
+    <dubbo:reference id="insureItemMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureItemMatchService" check="false" />
     <!-- 医保机构 -->
     <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
     <!-- 医保费用 -->

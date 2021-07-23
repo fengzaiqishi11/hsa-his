@@ -198,4 +198,15 @@ public interface InsureItemMatchBO {
      * @Return
      **/
     Map<String,Object> insertInsureItemInfos(Map<String,String> map);
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    List<InsureItemMatchDTO> queryLimitDrugList(InsureItemMatchDTO insureItemMatchDTO);
 }

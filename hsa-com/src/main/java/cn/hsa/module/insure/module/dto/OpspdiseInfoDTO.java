@@ -12,8 +12,8 @@ import lombok.ToString;
 public class OpspdiseInfoDTO {
     private String diagName;  // 诊断名称
     private String diagCode;  // 诊断代码
-    private String oprnOprtName;  // 手术操作名称
-    private String oprnOprtCode;  // 手术操作代码
+    private String operDiseaseName;  // 手术操作名称
+    private String operDiseaseIcd9;  // 手术操作代码
 
     private String visitIcdCode;
     private String visitIcdName;

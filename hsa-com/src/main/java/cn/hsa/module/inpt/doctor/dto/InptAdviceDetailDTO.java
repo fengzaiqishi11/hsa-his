@@ -33,5 +33,8 @@ public class InptAdviceDetailDTO extends InptAdviceDetailDO implements Serializa
     private BigDecimal valuationPrice;  //计价金额
     private String babyId;   // 婴儿id
     private String queryBaby; // 是否查询婴儿
+    private String isHospFlag;
+    private String limUserExplain;
+    private String lmtUserFlag;
 
 }

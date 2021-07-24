@@ -258,4 +258,33 @@ public class InsureIndividualCostServiceImpl implements InsureIndividualCostServ
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         return insureIndividualCostBO.insurCostTransmissionJob(inptVisitDTO);
     }
+    /**
+     * @param map
+     * @Method updateLimitUserFlag
+     * @Desrciption 住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 9:20
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateLimitUserFlag(Map<String, Object> map) {
+
+        return WrapperResponse.success(insureIndividualCostBO.updateLimitUserFlag(map));
+    }
+
+    /**
+     * @param map
+     * @Method queryInptCostPage
+     * @Desrciption 根据就诊id 查询住院费用明细数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 13:49
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryInptCostPage(Map<String, Object> map) {
+        InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
+        return WrapperResponse.success(insureIndividualCostBO.queryInptCostPage(inptVisitDTO));
+    }
 }

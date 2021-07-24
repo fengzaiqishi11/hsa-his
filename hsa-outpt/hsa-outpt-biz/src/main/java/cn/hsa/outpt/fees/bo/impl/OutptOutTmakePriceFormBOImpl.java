@@ -275,6 +275,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("crteName",outptVisitDTO.getCrteName());
             map.put("hospCode",hospCode);  // 医院编码
             map.put("visitId",visitId); //就诊id
+            map.put("id",visitId); //就诊id
             map.put("oldOutptSettleDTO",oldOutptSettleDTO);
             SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
             if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台

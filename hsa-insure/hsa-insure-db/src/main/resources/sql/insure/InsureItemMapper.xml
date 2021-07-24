@@ -81,8 +81,8 @@
             #{item.crteId},
             #{item.crteName},
             #{item.crteTime},#{item.ver},#{item.verName},#{item.downLoadType},
-            #{item.spDrugFlag},#{item.spLmtpricDrugFlag},#{item.lmtUsedFlag},#{item.hospItemName},#{item.hospItemCode},
-            #{item.num},#{item.size},#{item.recordCounts},#{item.drugadmStrdcode})
+            #{item.spDrugFlag},#{item.spLmtpricDrugFlag},#{item.lmtUsedFlag},#{item.hospItemName},#{item.hospItemCode},#{item.drugadmStrdcode},
+            #{item.num},#{item.size},#{item.recordCounts})
         </foreach>
 
     </insert>

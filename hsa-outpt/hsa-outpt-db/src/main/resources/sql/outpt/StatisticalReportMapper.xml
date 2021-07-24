@@ -1363,7 +1363,7 @@
         join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
         join phar_in_distribute b on a.distribute_id=b.id
         WHERE
-        g.hosp_code = #{hospCode}
+        g.hosp_code = #{hospCode} and num >0
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
             and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
@@ -1549,113 +1549,131 @@
 
     </select>
 
-    <!--抗菌类门诊、住院发药汇总统计-->
-    <select id="queryOutInSumAntibiosisDrug" resultType="java.util.Map">
-        SELECT
-        crte_time,
-        type_code,
-        code,
-        usual_name,
-        good_name,
-        spec,
-        unit_code,
-        split_ratio,
-        num,
-        price,
-        total_price,
-        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
-        prod_code,
-        prod_name
-        FROM
-        (
-        SELECT
-        date_format(b.crte_time,'%Y%m%d') crte_time,
-        max('门诊') type_code,
-        g.code,
-        max(g.usual_name) usual_name,
-        g.good_name,
-        g.spec,
-        g.unit_code,
-        max(g.split_ratio) split_ratio,
-        sum(a.num) num,
-        max(a.price) price,
-        sum(a.total_price) total_price,
-        (case max(g.antibacterial_code)
-        when 1 then
-        '抗菌类'
-        when 2 then
-        '抗菌类'
-        when 3 then
-        '特殊使用抗菌药'
-        else
-        ''
-        end) antibacterial_name,
-        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
-        g.prod_code,
-        (select name from base_product t where t.hosp_code = g.hosp_code and t.`code` = g.prod_code limit 1) prod_name,
-        max(g.ddd) ddd
-        FROM
-        base_drug g
-        join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
-        join phar_out_distribute b on a.distribute_id=b.id
-        WHERE
-        g.hosp_code = #{hospCode}
-        and a.num > 0
-        and a.num > a.total_back_num
-        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
-        <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
-        </if>
-        <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-        group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
+  <!--抗菌类门诊、住院发药汇总统计-->
+  <select id="queryOnlyOutSumAntibiosisDrug" resultType="java.util.Map">
+    SELECT
+    crte_time,
+    type_code,
+    code,
+    usual_name,
+    good_name,
+    spec,
+    unit_code,
+    split_ratio,
+    num,
+    price,
+    total_price,
+    concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+    prod_code,
+    prod_name
+    FROM
+    (
+    SELECT
+    date_format(b.crte_time,'%Y%m%d') crte_time,
+    max('门诊') type_code,
+    g.code,
+    max(g.usual_name) usual_name,
+    g.good_name,
+    g.spec,
+    g.unit_code,
+    max(g.split_ratio) split_ratio,
+    sum(a.num) num,
+    max(a.price) price,
+    sum(a.total_price) total_price,
+    (case max(g.antibacterial_code)
+    when 1 then
+    '抗菌类'
+    when 2 then
+    '抗菌类'
+    when 3 then
+    '特殊使用抗菌药'
+    else
+    ''
+    end) antibacterial_name,
+    if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+    g.prod_code,
+    (select name from base_product t where t.hosp_code = g.hosp_code and t.`code` = g.prod_code limit 1) prod_name,
+    max(g.ddd) ddd
+    FROM
+    base_drug g
+    join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+    join phar_out_distribute b on a.distribute_id=b.id
+    WHERE
+    g.hosp_code = #{hospCode}
+    and a.num > 0
+    and a.num > a.total_back_num
+    AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+    <if test="startDate != null and startDate != ''">
+      and date(b.crte_time) >= date(#{startDate})
+    </if>
+    <if test="endDate != null and endDate != ''">
+      and date(b.crte_time) &lt;= date(#{endDate})
+    </if>
+    group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
+    )tab order by tab.crte_time desc
 
-        union all
+  </select>
 
-        SELECT
-        date_format(b.crte_time,'%Y%m%d') crte_time,
-        max('住院') type_code,
-        g.code,
-        max(g.usual_name) usual_name,
-        g.good_name,
-        g.spec,
-        g.unit_code,
-        max(g.split_ratio) split_ratio,
-        sum(a.num) num,
-        max(a.price) price,
-        sum(a.total_price) total_price,
-        (case max(g.antibacterial_code)
-        when 1 then
-        '抗菌类'
-        when 2 then
-        '抗菌类'
-        when 3 then
-        '特殊使用抗菌药'
-        else
-        ''
-        end) antibacterial_name,
-        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
-        g.prod_code,
-        (select name from base_product t where t.hosp_code = g.hosp_code and t.`code` = g.prod_code limit 1) prod_name,
-        max(g.ddd) ddd
-        FROM
-        base_drug g
-        join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
-        join phar_in_distribute b on a.distribute_id=b.id
-        WHERE
-        g.hosp_code = #{hospCode}
-        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
-        <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
-        </if>
-        <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-        group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
+  <select id="queryOnlyInSumAntibiosisDrug" resultType="java.util.Map">
+    SELECT
+    crte_time,
+    type_code,
+    code,
+    usual_name,
+    good_name,
+    spec,
+    unit_code,
+    split_ratio,
+    num,
+    price,
+    total_price,
+    concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+    prod_code,
+    prod_name
+    FROM
+    (
+    SELECT
+    date_format(b.crte_time,'%Y%m%d') crte_time,
+    max('住院') type_code,
+    g.code,
+    max(g.usual_name) usual_name,
+    g.good_name,
+    g.spec,
+    g.unit_code,
+    max(g.split_ratio) split_ratio,
+    sum(a.num) num,
+    max(a.price) price,
+    sum(a.total_price) total_price,
+    (case max(g.antibacterial_code)
+    when 1 then
+    '抗菌类'
+    when 2 then
+    '抗菌类'
+    when 3 then
+    '特殊使用抗菌药'
+    else
+    ''
+    end) antibacterial_name,
+    if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+    g.prod_code,
+    (select name from base_product t where t.hosp_code = g.hosp_code and t.`code` = g.prod_code limit 1) prod_name,
+    max(g.ddd) ddd
+    FROM
+    base_drug g
+    join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+    join phar_in_distribute b on a.distribute_id=b.id
+    WHERE
+    g.hosp_code = #{hospCode}
+    AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+    <if test="startDate != null and startDate != ''">
+      and date(b.crte_time) >= date(#{startDate})
+    </if>
+    <if test="endDate != null and endDate != ''">
+      and date(b.crte_time) &lt;= date(#{endDate})
+    </if>
+    group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 
-        )tab order by tab.crte_time desc
-
-    </select>
+    )tab order by tab.crte_time desc
+  </select>
 
 </mapper>

@@ -352,6 +352,13 @@ public class BaseDeptBOImpl extends HsafBO implements BaseDeptBO {
         }
         return baseDeptDAO.getDeptTypeCode(baseDeptDTO);
     }
+    @Override
+    public List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO) {
+
+        baseDeptDTO.setIsValid(Constants.SF.S);
+        List<BaseDeptDTO> pharList = baseDeptDAO.getPharInfo(baseDeptDTO);
+        return pharList;
+    }
 
     /**
     * @Method getDeptInfoByLoginDeptId

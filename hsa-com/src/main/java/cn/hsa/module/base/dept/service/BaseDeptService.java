@@ -130,6 +130,7 @@ public interface BaseDeptService {
      **/
     @PostMapping("/api/base/baseDept/getDeptTypeCode")
     WrapperResponse<List<BaseDeptDTO>> getDeptTypeCode(Map map);
+    WrapperResponse<List<BaseDeptDTO>> getPharInfo(Map map);
 
     /**
     * @Method getDeptInfoByLoginDeptId

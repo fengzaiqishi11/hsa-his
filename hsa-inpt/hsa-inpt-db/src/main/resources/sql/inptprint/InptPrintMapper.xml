@@ -384,6 +384,7 @@
       <if test="isLong != null and isLong != ''">
         and is_long = #{isLong}
       </if>
+    order by long_start_time
   </select>
 
   <select id="queryAdvicePrintByIds" resultMap="InptAdvicePrintMap">

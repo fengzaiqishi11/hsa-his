@@ -101,6 +101,15 @@ public interface OutptCostDAO {
      */
     int deleteByIds(@Param("ids") String[] ids);
 
+	/**
+	 * @Description: 删除非处方费用
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/7/21 19:20
+	 * @Return
+	 */
+	int deleteFCFCostByIds(@Param("ids") String[] ids, String hospCode);
     /**
      * @Menthod findByCondition
      * @Desrciption 查询门诊费用信息

@@ -106,7 +106,7 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
         }
         inptCostDTO.setIsOk(Constants.SF.S);// 是否确费
         inptCostDTO.setOkTime(DateUtils.getNow()); // 确费时间
-        return inptCostDAO.updateInptCostBatchWithBackCost(inptCostDTO) > 0;
+        return inptCostDAO.updateNewBackCost(inptCostDTO) > 0;
     }
 
     /**

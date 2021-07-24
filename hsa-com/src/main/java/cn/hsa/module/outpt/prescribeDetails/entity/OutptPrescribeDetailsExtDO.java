@@ -139,4 +139,12 @@ public class OutptPrescribeDetailsExtDO extends PageDO implements Serializable {
      * 用药性质代码（YYXZ）
      */
     private String useCode;
+    /**
+     * 限制使用标志
+     */
+    private String lmtUserFlag;
+    /**
+     * 限制使用说明
+     */
+    private String limUserExplain;
 }

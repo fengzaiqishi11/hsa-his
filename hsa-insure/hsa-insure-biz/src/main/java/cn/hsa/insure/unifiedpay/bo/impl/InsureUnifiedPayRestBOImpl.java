@@ -2933,7 +2933,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             //医保中心项目编码
             itemDTO.setItemCode(MapUtils.get(item, "med_list_codg"));
             // 医保中心项目名称
-            if(StringUtils.isEmpty(MapUtils.get(item, "drug_prodname"))){
+            if(StringUtils.isEmpty(MapUtils.get(item, "drug_prodname")) || "无".equals(MapUtils.get(item, "drug_prodname"))||
+                    "null".equals(MapUtils.get(item, "drug_prodname"))){
                 itemDTO.setItemName(MapUtils.get(item, "drug_genname"));
             }else{
                 itemDTO.setItemName(MapUtils.get(item, "drug_prodname"));

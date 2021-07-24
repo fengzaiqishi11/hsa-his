@@ -1214,9 +1214,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dscginfoMap.put("pret_flag", insureIndividualVisitDTO.getPretFlag());//	早产标志
         dscginfoMap.put("birctrl_matn_date", insureIndividualVisitDTO.getBirctrlMatnDate());//	计划生育手术或生育日期
         dscginfoMap.put("cop_flag", null);//	伴有并发症标志
-        dscginfoMap.put("dscg_dept_code", null);//	出院科室编码
-        dscginfoMap.put("dscg_dept_name", null);//	出院科室名称
-        dscginfoMap.put("dscg_bed", null);//	出院床位
+        dscginfoMap.put("dscg_dept_code", insureIndividualVisitDTO.getOutDeptId());//	出院科室编码
+        dscginfoMap.put("dscg_dept_name", insureIndividualVisitDTO.getOutDeptName());//	出院科室名称
+        dscginfoMap.put("dscg_bed", insureIndividualVisitDTO.getOutModeCode());//	出院床位
         dscginfoMap.put("dscg_way", null);//	离院方式
         dscginfoMap.put("die_date", null);//	死亡日期
         dscginfoMap.put("expi_gestation_nub_of_m", null);//	终止妊娠月数

@@ -267,7 +267,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         configurationDTO.setHospCode(hospCode);  // 医院编码
         configurationDTO.setOrgCode(medicineOrgCode); // 医疗机构编码
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
-        String mdtrtareaAdmvs = configurationDTO.getMdtrtareaAdmvs();
+        if(configurationDTO ==null){
+            throw new AppException("获取医保配置信息为空");
+        }
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("setl_id", insureSettleId);

@@ -25,7 +25,7 @@ public interface InsureUnifiedPayInptService {
      * @Date: 2021-02-10 11:00
      * @Return:
      **/
-    WrapperResponse<Boolean> editCancelInptSettle(Map<String,Object> insureUnifiedMap);
+    WrapperResponse<Map<String,Object>> editCancelInptSettle(Map<String,Object> insureUnifiedMap);
 
 
 

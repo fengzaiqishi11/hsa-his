@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualBusinessDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualBasicDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualBusinessDO;
@@ -106,6 +107,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         String bka006 = (String) info.get("bka006");//待遇类型
         String bka006Name = (String) info.get("bka006Name");//待遇类型名称
         String aac001 = personinfo.get("aac001");//个人电脑号
+        String aaz267 = spinfo.get("aaz267");// 特殊业务类型
         JSONArray jsonArray = (JSONArray) info.get("diagnose");//诊断信息
         if (jsonArray.size() == 0) {
             throw new AppException("未录入诊断信息");
@@ -140,6 +142,8 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
                 throw new AppException("该患者已经已经做了医保登记");
             }
         }
+       /* InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
+        insureIndividualBasicDAO.getByVisitId(insureIndividualBasicDTO);*/
         //医保就诊信息
         InsureIndividualVisitDO insureIndividualVisitDO = new InsureIndividualVisitDO();
         insureIndividualVisitDO.setId(insureVisitId);//id
@@ -157,7 +161,6 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         insureIndividualVisitDO.setAka130Name(aka130Name);//业务类型名称
         insureIndividualVisitDO.setBka006(bka006);//待遇类型
         insureIndividualVisitDO.setBka006Name(bka006Name);//待遇类型名称
-        insureIndividualVisitDO.setInjuryBorthSn(null);//业务申请号
         /**
          * 长沙市门特病人  必填主副诊断
          */
@@ -281,6 +284,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         insureIndividualBasicDO.setCrteId(crteId);//创建人id
         insureIndividualBasicDO.setCrteName(crteName);//创建人姓名
         insureIndividualBasicDO.setCrteTime(now);//创建时间
+        insureIndividualBasicDO.setAaz267(aaz267); // 特殊业务序列号
         insureIndividualBasicDAO.insertSelective(insureIndividualBasicDO);
 
         insureIndividualBusinessDAO.deleteByVisitId(visitId);
@@ -291,7 +295,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         insureIndividualBusinessDO.setVisitId(visitId);//就诊id
         insureIndividualBusinessDO.setMibId(iIBId);//个人基本信息id
         insureIndividualBusinessDO.setAaz267(spinfo.get("aaz267"));//业务申请序列号
-        insureIndividualBusinessDO.setBearNo(injuryorbirthinfo.get("bka042"));//生育序列号
+        insureIndividualBusinessDO.setBearNo(injuryorbirthinfo.get("serial_pers"));//生育序列号
         insureIndividualBusinessDO.setAka130(aka130);//业务类型
         insureIndividualBusinessDO.setAka130Name(aka130Name);//业务名称
         insureIndividualBusinessDO.setVoipCode(injuryorbirthinfo.get("identify_flag"));//业务认定编号

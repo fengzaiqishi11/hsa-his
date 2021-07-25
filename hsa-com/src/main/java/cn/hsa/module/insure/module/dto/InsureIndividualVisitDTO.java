@@ -104,4 +104,5 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date aac006;
         private String gend;
+        private String aaz267;
 }

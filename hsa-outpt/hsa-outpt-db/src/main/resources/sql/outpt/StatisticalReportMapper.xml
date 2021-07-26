@@ -1148,11 +1148,18 @@
             and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
             concat('%',#{keyword},'%'))
         </if>
+        <if test="keyword2 != null and keyword2 != ''">
+            and (iv.name like concat('%',#{keyword2},'%') or iv.cert_no like concat('%',#{keyword2},'%') or ma.in_no like
+            concat('%',#{keyword2},'%'))
+        </if>
         <if test="itemName != null and itemName != ''">
             and ma.content like concat('%',#{itemName},'%')
         </if>
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="clinicType != null and clinicType != '0'.toString()">
+            and ma.medic_type = #{clinicType}
         </if>
         union all
         SELECT

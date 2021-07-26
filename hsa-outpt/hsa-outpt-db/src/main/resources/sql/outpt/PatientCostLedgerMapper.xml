@@ -2446,6 +2446,7 @@
         sid.num as num,
         (sid.num * sid.buy_price) as buyPriceAll,
         (sid.num * sid.sell_price) as sellPriceAll,
+        (sid.sell_price - sid.buy_price) * sid.num as priceSpread,
         case sid.item_code when '1' then b.spec when '2' then c.spec end spec,
         case sid.item_code when '1' then b.code when '2' then c.code end code,
         case sid.item_code when '1' then b.big_type_code when '2' then '3' end typeCode,

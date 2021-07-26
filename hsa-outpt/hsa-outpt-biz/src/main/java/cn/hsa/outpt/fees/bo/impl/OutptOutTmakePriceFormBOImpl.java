@@ -225,7 +225,6 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 被冲红
             insureIndividualSettleDO.setState(Constants.ZTBZ.BCH);
-            insureIndividualSettleDO.setSettleState("1");
             Map selectInsureMap = new HashMap();
             selectInsureMap.put("hospCode",hospCode);
             selectInsureMap.put("insureIndividualSettleDO",insureIndividualSettleDO);
@@ -233,9 +232,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // insureIndividualSettleService_consumer.updateByPrimaryKey(selectInsureMap);
 
             // 冲红
-            String isnureRedSettleId = SnowflakeUtils.getId();
             insureIndividualSettleDO.setSettleId(redSettleId);
-            insureIndividualSettleDO.setId(isnureRedSettleId);
+            insureIndividualSettleDO.setId(SnowflakeUtils.getId());
             insureIndividualSettleDO.setState(Constants.ZTBZ.CH);
             insureIndividualSettleDO.setHospCode(hospCode);
             insureIndividualSettleDO.setTotalPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getTotalPrice()));
@@ -277,6 +275,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("crteName",outptVisitDTO.getCrteName());
             map.put("hospCode",hospCode);  // 医院编码
             map.put("visitId",visitId); //就诊id
+            map.put("id",visitId); //就诊id
             map.put("oldOutptSettleDTO",oldOutptSettleDTO);
             SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
             if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
@@ -285,23 +284,22 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 map.put("insureSettleId",insureSettleId);
                 map.put("personalPrice",personalPrice);
                 Map<String,Object> resultMap = insureUnifiedPayOutptService_consumer.UP_2208(map).getData();
-                if(!MapUtils.isEmpty(resultMap)){
-                    insureIndividualCostService_consumer.deleteOutptInsureCost(map);
-                }
-                Map<String,Object> setlInfoMap = MapUtils.get(resultMap,"setlinfo");
+                Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+                    if(data == true){
+                        MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
+                        insureIndividualCostService_consumer.deleteOutptInsureCost(map);
+                    }
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"funtionCode"));
-
-                individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
-                individualSettleDTO.setMedicalRegNo(MapUtils.get(setlInfoMap,"mdtrt_id"));
-                individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
-                individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_optins"));
-                individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
-
                 individualSettleDTO.setHospCode(hospCode);
-                individualSettleDTO.setId(isnureRedSettleId);
-                outptVisitDAO.updateInsureSettleById(individualSettleDTO);
+                individualSettleDTO.setVisitId(visitId);
+                individualSettleDTO.setState(Constants.SF.F);
+                individualSettleDTO.setSettleState("1");
+                outptVisitDAO.updateInsureSettle(individualSettleDTO);
+//                insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
+//                insureIndividualVisitService_consumer.deleteInsureVisitById(map).getData();
+
             }
             else {
                 /**

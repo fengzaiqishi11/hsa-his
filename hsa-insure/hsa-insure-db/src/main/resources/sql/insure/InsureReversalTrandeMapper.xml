@@ -161,7 +161,7 @@
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
             AND c.aae140 IS NOT NULL
-            AND e.settle_state = '1'
+            AND e.settle_state = '1' and e.insureSettleId is not null
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
@@ -198,6 +198,7 @@
             c.aae140 as insutype,
             t.is_hospital,
             e.clr_type ,
+            e.state,
             e.clr_optins,
             t.insure_reg_code as setl_optins,
             e.total_price as medfee_sumamt,

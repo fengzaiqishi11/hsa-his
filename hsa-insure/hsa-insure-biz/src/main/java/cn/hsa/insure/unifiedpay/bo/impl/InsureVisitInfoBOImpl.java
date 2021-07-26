@@ -148,12 +148,12 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		inputMap.put("insur_code", insureConfigurationDTO.getRegCode());  // 医保中心编码
 		if("03".equals(mdtrtCertType)){
 			if(StringUtils.isEmpty(insureIndividualBasicDTO.getInsuplc_admdvs())){
-				inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+				inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
 			}else{
 				inputMap.put("insuplc_admdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); //参保地医保区划分
 			}
 		}else{
-			inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+			inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
 		}
 		inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
 		String url = insureConfigurationDTO.getUrl();

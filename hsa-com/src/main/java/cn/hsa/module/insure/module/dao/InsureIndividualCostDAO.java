@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.module.dao;
 
 
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
@@ -306,4 +307,25 @@ public interface InsureIndividualCostDAO {
      * @Return
     **/
     String selectLastFeedSn(Map<String, Object> map);
+    /**
+     * @param map
+     * @Method updateLimitUserFlag
+     * @Desrciption 住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 9:20
+     * @Return
+     */
+    Boolean updateLimitUserFlag(Map<String, Object> map);
+
+    /**
+     * @param inptVisitDTO
+     * @Method queryInptCostPage
+     * @Desrciption 根据就诊id 查询住院费用明细数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 13:49
+     * @Return
+     */
+    List<InptAdviceDetailDTO> queryInptCostPage(InptVisitDTO inptVisitDTO);
 }

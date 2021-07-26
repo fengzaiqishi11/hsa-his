@@ -290,12 +290,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                  */
                 costInfoMap.put("hosp_appr_flag", hospApprFlag);
                 // 海南省 + (药品和材料) + 限制级用药标志为 '1' ,则报销
-                if ("1".equals(hnSpecial) && ("1".equals(itemCode) || "2".equals(itemCode)) && "1".equals(lmtUserFlag)) {
+                if ("1".equals(hnSpecial) && "0".equals(lmtUserFlag)) {
                     costInfoMap.put("hosp_appr_flag", "1");
                 // 其他省份：(药品和材料) + (xzbzFlag = 1) +  (xzbzbxFlag != 1)  不报销
-                } else if (("1".equals(itemCode) || "2".equals(itemCode)) &&
-                        "1".equals(MapUtils.get(map, "xzbzFlag"))  &&
-                        !"1".equals(MapUtils.get(map, "xzbzbxFlag"))) {
+                } else if ("0".equals(lmtUserFlag)) {
                         costInfoMap.put("hosp_appr_flag", "2");
                 }
 

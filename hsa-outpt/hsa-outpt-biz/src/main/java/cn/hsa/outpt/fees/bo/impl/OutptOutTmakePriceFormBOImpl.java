@@ -275,6 +275,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("crteName",outptVisitDTO.getCrteName());
             map.put("hospCode",hospCode);  // 医院编码
             map.put("visitId",visitId); //就诊id
+            map.put("id",visitId); //就诊id
             map.put("oldOutptSettleDTO",oldOutptSettleDTO);
             SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
             if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
@@ -283,9 +284,11 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 map.put("insureSettleId",insureSettleId);
                 map.put("personalPrice",personalPrice);
                 Map<String,Object> resultMap = insureUnifiedPayOutptService_consumer.UP_2208(map).getData();
-                if(!MapUtils.isEmpty(resultMap)){
-                    insureIndividualCostService_consumer.deleteOutptInsureCost(map);
-                }
+                Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+                    if(data == true){
+                        MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
+                        insureIndividualCostService_consumer.deleteOutptInsureCost(map);
+                    }
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"funtionCode"));

@@ -3313,8 +3313,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //停嘱时间
             Date stopTime = medicalAdviceDTO.getCheckTime() ;
             if(dto.getStopTime() != null){
-                inptAdviceDTO.setStopTime(dto.getStopTime());
+                stopTime = dto.getStopTime();
             }
+            inptAdviceDTO.setStopTime(stopTime);
             //获取带教医生信息
             SysUserDTO sysUserDTO = getSysUserDTO(adviceDTO);
             //代教医生 实习医生老师

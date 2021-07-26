@@ -177,6 +177,4 @@ public interface StatisticalReportDAO {
      * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      **/
     List<Map<String, Object>> queryOnlyInSumAntibiosisDrug(Map<String, Object> paramMap);
-
-
 }

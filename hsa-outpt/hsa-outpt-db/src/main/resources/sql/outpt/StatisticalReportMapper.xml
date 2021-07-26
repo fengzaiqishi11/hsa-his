@@ -1370,7 +1370,7 @@
         join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
         join phar_in_distribute b on a.distribute_id=b.id
         WHERE
-        g.hosp_code = #{hospCode}
+        g.hosp_code = #{hospCode} and num >0
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
             and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')

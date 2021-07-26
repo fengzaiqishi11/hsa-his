@@ -587,6 +587,12 @@
     </select>
 
     <select id="queryInsurePrimaryPrice" resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
-        select count(primary_price)as primaryPrice from insure_individual_cost where visit_id = #{visitId} and hosp_code = #{hospCode} and insure_is_transmit = '1'
+        select count(primary_price)as primaryPrice from insure_individual_cost where hosp_code = #{hospCode} and insure_is_transmit = '1'
+        <if test="id!=null and id!= ''">
+            and visit_id = #{id}
+        </if>
+        <if test="visitId!=null and visitId!= ''">
+            and visit_id = #{visitId}
+        </if>
     </select>
 </mapper>

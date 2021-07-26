@@ -524,7 +524,160 @@
             </if>
             ORDER BY iv.in_time DESC
             ) info
-        LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time
+        LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time and it.baby_id is null
+    </select>
+
+    <!--根据三测单节点时间点查询科室下在院病人的【婴儿】列表-->
+    <select id="queryInptThirdRecordByBabyBatch"
+            parameterType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO"
+            resultType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO">
+        SELECT
+            info.time_slot,
+            info.sjd,
+            info.date,
+            info.bed_name,
+            info.name,
+            info.in_profile,
+            info.in_no,
+            info.visit_id,
+            info.baby_id,
+            info.baby_name,
+            info.in_time as in_time_batch,
+            info.out_time,
+            it.*
+        FROM
+            (
+            SELECT
+                sj.time_slot,
+                sj.sjd,
+                sj.date,
+                iv.id AS visit_id,
+                ib.id as baby_id,
+                ib.name as baby_name,
+                iv.hosp_code,
+                iv.in_time,
+                iv.out_time,
+                iv.bed_name,
+                iv.name,
+                iv.in_profile,
+                iv.in_no
+            FROM
+                (
+                SELECT
+                    dates.date,
+                    T.sjd,
+                    CONCAT( dates.date, ' ', T.sjd, ':00' ) time_slot
+                FROM
+                    (
+                    SELECT
+                        a.date
+                    FROM
+                        (
+                        SELECT
+                            DATE_FORMAT(#{endDate},'%Y-%m-%d') - INTERVAL ( a.a + ( 10 * b.a ) + ( 100 * c.a ) ) DAY AS date
+                        FROM
+                            (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS a
+                        CROSS JOIN (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS b
+                        CROSS JOIN (
+                            SELECT
+                                0 AS a UNION ALL
+                            SELECT
+                                1 UNION ALL
+                            SELECT
+                                2 UNION ALL
+                            SELECT
+                                3 UNION ALL
+                            SELECT
+                                4 UNION ALL
+                            SELECT
+                                5 UNION ALL
+                            SELECT
+                                6 UNION ALL
+                            SELECT
+                                7 UNION ALL
+                            SELECT
+                                8 UNION ALL
+                            SELECT
+                                9
+                            ) AS c
+                        ) a
+                    WHERE a.Date BETWEEN DATE_FORMAT(#{startDate}, '%Y-%m-%d')  AND DATE_FORMAT(#{endDate}, '%Y-%m-%d')
+                    ) dates
+                LEFT JOIN (
+                    SELECT DISTINCT
+                        CONCAT( SUBSTRING_INDEX( SUBSTRING_INDEX( a.path, ',', b.help_topic_id + 1 ), ',',- 1 ), ':00' ) AS sjd
+                    FROM
+                    ( SELECT ( SELECT VALUE AS sjd FROM sys_parameter WHERE CODE = 'HLSCD_KSSJ' AND hosp_code = #{hospCode} ) AS path FROM DUAL ) a
+                    JOIN mysql.help_topic b ON b.help_topic_id &lt; ( LENGTH( a.path ) - LENGTH( REPLACE ( a.path, ',', '' )) + 1 )
+                    ) T ON 1 = 1
+            ) sj
+            JOIN inpt_visit iv ON 1 = 1
+            RIGHT JOIN inpt_baby ib on iv.hosp_code = ib.hosp_code and iv.id = ib.visit_id
+            WHERE iv.hosp_code = #{hospCode}
+              AND iv.status_code = '2'
+            <if test="deptId != null and deptId != ''">
+                AND iv.in_dept_id = #{deptId}
+            </if>
+            <if test="startDate != null and sjd != '' and sjd != null">
+                AND sj.time_slot IN ( CONCAT( DATE_FORMAT(#{startDate}, '%Y-%m-%d') , ' ', #{sjd}, ':00:00' ) )
+            </if>
+            <if test="visitIds != null and visitIds.size() > 0 ">
+                and iv.id in
+                <foreach collection="visitIds" item="visitId" open="(" close=")" separator=",">
+                    #{visitId}
+                </foreach>
+            </if>
+            <if test="babyIds != null and babyIds.size() > 0 ">
+                and ib.id in
+                <foreach collection="babyIds" item="babyId" open="(" close=")" separator=",">
+                    #{babyId}
+                </foreach>
+            </if>
+            ORDER BY iv.in_time DESC
+            ) info
+        LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time and info.baby_id = it.baby_id
     </select>
 
     <!--批量修改三测单-->

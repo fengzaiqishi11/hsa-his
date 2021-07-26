@@ -2,10 +2,12 @@ package cn.hsa.module.insure.module.bo;
 
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
+import cn.hsa.util.MapUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -187,4 +189,25 @@ public interface InsureIndividualCostBO {
      * @Return
      **/
     Map<String,String> insurCostTransmissionJob(InptVisitDTO inptVisitDTO);
+    /**
+     * @param map
+     * @Method updateLimitUserFlag
+     * @Desrciption 住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 9:20
+     * @Return
+     */
+    Boolean updateLimitUserFlag(Map<String, Object> map);
+
+    /**
+     * @param inptVisitDTO
+     * @Method queryInptCostPage
+     * @Desrciption 根据就诊id 查询住院费用明细数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 13:49
+     * @Return
+     */
+    PageDTO queryInptCostPage( InptVisitDTO inptVisitDTO );
 }

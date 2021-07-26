@@ -322,7 +322,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             dm.put("medfee_sumamt",MapUtils.get(dl, "medfee_sumamt"));//医疗费总额
             dm.put("fund_pay_sumamt",MapUtils.get(dl, "fund_pay_sumamt"));//基金支付总额
             dm.put("acct_pay",MapUtils.get(dl, "acct_pay"));//个人账户支出
-            dm.put("refd_setl_flag",MapUtils.get(dl, "refd_setl_flag"));//退费结算标志
+            if("0".equals(MapUtils.get(dl, "state"))){
+                dm.put("refd_setl_flag","0");//退费结算标志
+            }else{
+                dm.put("refd_setl_flag","1");//退费结算标志
+            }
             dataMapList.add(dm);
         }
 

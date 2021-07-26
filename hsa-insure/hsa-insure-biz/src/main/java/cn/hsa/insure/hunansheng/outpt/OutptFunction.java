@@ -297,12 +297,7 @@ public class OutptFunction {
         httpParam.put("doctor_no", insureIndividualVisitDTO.getCode());  //处方医生编号
         httpParam.put("doctor_name", insureIndividualVisitDTO.getAdviceDoctorName()); //处方医生姓名
         httpParam.put("note", insureIndividualVisitDTO.getRemark()); //备注
-        if (StringUtils.isNotEmpty(insureIndividualVisitDTO.getInjuryBorthSn())) {
-            httpParam.put("serial_apply", insureIndividualVisitDTO.getInjuryBorthSn());//门诊特殊病业务申请号
-        } else {
-            httpParam.put("serial_apply", insureIndividualVisitDTO.getAaz267());//门诊特殊病业务申请号
-        }
-
+        httpParam.put("serial_apply", insureIndividualVisitDTO.getInjuryBorthSn());//门诊特殊病业务申请号
         httpParam.put("bill_no", ""); //单据号 唯一省直中心可为空长沙中心如果为空系统自动分配
         httpParam.put("cash_money", "0.00");//刷卡金额 格式：0.00
         //paramMap.put("patient_id", null); //His端门诊号 目前只长沙县核三系统用到

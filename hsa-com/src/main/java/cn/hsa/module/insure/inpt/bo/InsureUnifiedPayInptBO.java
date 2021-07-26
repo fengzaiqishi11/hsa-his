@@ -25,7 +25,7 @@ public interface InsureUnifiedPayInptBO {
      * @Date: 2021-02-10 11:00
      * @Return:
      **/
-    Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap);
+    Boolean editCancelInptSettle(Map<String,Object> insureUnifiedMap);
     /**
      * @Method saveInptFeeTransmit
      * @Desrciption  医保统一支付平台：住院业务模块--住院费用传输

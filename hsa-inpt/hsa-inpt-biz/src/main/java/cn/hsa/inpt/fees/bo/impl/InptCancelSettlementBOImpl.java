@@ -27,10 +27,7 @@ import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.BigDecimalUtils;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DeepCopy;
-import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
@@ -327,9 +324,10 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                 insureIndividualVisitDTO.setInptVisitNo(inptVisitDTO.getInNo());
                 InsureIndividualSettleDTO selectEntity = inptVisitDAO.getInsureIndividualSettleInfo(insureIndividualSettleDTO);
 
-
+                // 原记录被冲红和冲红处理
+                String insureSettleId = SnowflakeUtils.getId();
                 if (selectEntity != null) { // 原记录被冲红和冲红处理
-                    this.insureIndividualSettleChangrRed(selectEntity);
+                    this.insureIndividualSettleChangrRed(selectEntity,insureSettleId);
                 }
 
                 Map<String,Object> isInsureUnifiedMap = new HashMap<>();
@@ -362,14 +360,33 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     settleMap.put("insureIndividualCostDTO",insureIndividualCostDTO);
                     settleMap.put("hospCode",hospCode);
                     // 出院结算取消
-                    Boolean data = insureUnifiedPayInptService_consumer.editCancelInptSettle(insureUnifiedMap).getData();
-                    if(true == data){
+                   Map<String,Object> reMap =  insureUnifiedPayInptService_consumer.editCancelInptSettle(insureUnifiedMap);
+                   Map<String,Object> outptMap = MapUtils.get(reMap,"output");
+                   Map<String,Object> setlInfoMap = MapUtils.get(outptMap,"setlinfo");
+                   if(!MapUtils.isEmpty(setlInfoMap)){
                         inptCostSettleDAO.updateInsureSettleCost(settleMap);
                     }
-//                    // 出院登记撤销
-//                    insureUnifiedPayInptService_consumer.UP_2405(insureUnifiedMap);
-//                    inptVisitDTO.setIsOut("0");
-//                    insureIndividualVisitService.updateInsureInidivdual(insureUnifiedMap).getData();
+                    InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+                    individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
+                    individualSettleDTO.setMedicalRegNo(MapUtils.get(setlInfoMap,"mdtrt_id"));
+                    individualSettleDTO.setOmsgid(MapUtils.get(reMap,"msgId"));
+                    individualSettleDTO.setOinfno(MapUtils.get(reMap,"infno"));
+                    if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
+                        individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
+                    }else{
+                        individualSettleDTO.setClrOptins(selectEntity.getClrOptins());
+                    }
+                    if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
+                        individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
+                    }else {
+                        individualSettleDTO.setClrOptins(selectEntity.getClrWay());
+                    }
+                    if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_type"))){
+                        individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
+                    }else{
+                        individualSettleDTO.setClrOptins(selectEntity.getClrType());
+                    }
+                    inptVisitDAO.updateInsureSettleById(individualSettleDTO);
                 }
                 else{
                     Map<String,Object> insureParam = new HashMap<String,Object>();
@@ -391,6 +408,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             }
             return WrapperResponse.success("取消结算成功。",null);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AppException("取消结算失败:" + e.getMessage());
         }
     }
@@ -400,7 +418,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
      * 医保结算信息表数据冲红处理
      * @param selectEntity
      */
-    private void insureIndividualSettleChangrRed(InsureIndividualSettleDTO selectEntity) {
+    private void insureIndividualSettleChangrRed(InsureIndividualSettleDTO selectEntity,String insureSettleId ) {
         // 原数据被冲红
         selectEntity.setState(Constants.ZTBZ.BCH);
         inptVisitDAO.updateInsureIndividualSettle(selectEntity);
@@ -409,7 +427,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
         inptVisitDAO.updateInsureIndividualCostBySettleId(settleId);
         // 冲红
         selectEntity.setState(Constants.ZTBZ.CH);
-        selectEntity.setId(SnowflakeUtils.getId());
+        selectEntity.setId(insureSettleId);
         selectEntity.setTotalPrice(BigDecimalUtils.negate(selectEntity.getTotalPrice()));
         selectEntity.setInsurePrice(BigDecimalUtils.negate(selectEntity.getInsurePrice()));
         selectEntity.setPlanPrice(BigDecimalUtils.negate(selectEntity.getPlanPrice()));

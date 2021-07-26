@@ -163,10 +163,10 @@ public class StatemnetController extends BaseController {
     SysUserDTO userDTO = getSession(req, res) ;
     map.put("hospCode", userDTO.getHospCode());
     inptVisitDTO.setHospCode(userDTO.getHospCode());
-    // 如果需要查询当前医生的病人
-    if (inptVisitDTO != null && "1".equals(inptVisitDTO.getZgbrQuery())) {
-      inptVisitDTO.setZgDoctorId(userDTO.getId());
-    }
+    // 注释by张国瑞 在院病人查询功能 改为下拉列表的形式 选择主管医生而不是选择当前登录的医生
+//    if (inptVisitDTO != null && "1".equals(inptVisitDTO.getZgbrQuery())) {
+//      inptVisitDTO.setZgDoctorId(userDTO.getId());
+//    }
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.queryInPatient(map);
   }

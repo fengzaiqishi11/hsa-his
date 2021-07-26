@@ -287,20 +287,18 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                  */
                 objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
                 // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
-                if("1".equals(zhSpecial) && ("1".equals(itemCode) || "2".equals(itemCode)) && "0".equals(lmtUserFlag)) {
+                if("1".equals(zhSpecial) && "0".equals(lmtUserFlag)) {
                     objectMap.put("hosp_appr_flag", "0");
                 }
 
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销
                 if (isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "1");
-                    objectMap.put("tcmdrug_used_way","1"); // 中药使用方式
                 } else if (!isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "0");
-                    objectMap.put("tcmdrug_used_way","2"); // 中药使用方式
                 }
 
-
+                objectMap.put("tcmdrug_used_way",""); // 中药使用方式
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志
                 objectMap.put("etip_hosp_code",""); // 外检医院编码
                 // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)
@@ -458,41 +456,17 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureIndividualCostDTO insureIndividualCostDTO = null;
         List<InsureIndividualCostDTO> individualCostDTOList = new ArrayList<>();
         for(Map<String, Object> item :resultDataMap){
+            DecimalFormat df1 = new DecimalFormat("0.00");
             insureIndividualCostDTO = new InsureIndividualCostDTO();
             insureIndividualCostDTO.setVisitId(visitId);
             insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn")); // 费用明细流水号
             insureIndividualCostDTO.setHospCode(hospCode);
-            if(MapUtils.get(item,"selfpay_prop").toString().indexOf(".")>0){
-                insureIndividualCostDTO.setGuestRatio(MapUtils.get(item,"selfpay_prop").toString()); // 自付比例
-            }else{
-                insureIndividualCostDTO.setOverlmtAmt(BigDecimal.valueOf((int)MapUtils.get(item,"selfpay_prop"),2));
-            }
-            if(MapUtils.get(item,"overlmt_amt").toString().indexOf(".")>0){
-                insureIndividualCostDTO.setOverlmtAmt(MapUtils.get(item,"overlmt_amt"));// 超限价金额
-            }else{
-                insureIndividualCostDTO.setOverlmtAmt(BigDecimal.valueOf((int)MapUtils.get(item,"overlmt_amt"),2));
-            }
-            if(MapUtils.get(item,"preselfpay_amt").toString().indexOf(".")>0){
-                insureIndividualCostDTO.setPreselfpayAmt(MapUtils.get(item,"preselfpay_amt")); // 先行自付金额
-            }else{
-                insureIndividualCostDTO.setPreselfpayAmt(BigDecimal.valueOf((int)MapUtils.get(item,"preselfpay_amt"),2)); // 先行自付金额
-            }
-            if(MapUtils.get(item,"inscp_scp_amt").toString().indexOf(".")>0) {
-                insureIndividualCostDTO.setInscpScpAmt(MapUtils.get(item,"inscp_scp_amt")); //          // 符合政策范围金额
-            }else{
-                insureIndividualCostDTO.setInscpScpAmt(BigDecimal.valueOf((int)MapUtils.get(item,"inscp_scp_amt"),2));
-            }
-
-            if(MapUtils.get(item,"fulamt_ownpay_amt").toString().indexOf(".")>0){
-                insureIndividualCostDTO.setFulamtOwnpayAmt(MapUtils.get(item,"fulamt_ownpay_amt")); // 全自费金额
-            }else{
-                insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimal.valueOf((int)MapUtils.get(item,"fulamt_ownpay_amt"),2)); // 全自费金额
-            }
-            if(MapUtils.get(item,"det_item_fee_sumamt").toString().indexOf(".")>0){
-                insureIndividualCostDTO.setDetItemFeeSumamt(MapUtils.get(item,"det_item_fee_sumamt")); // 全自费金额
-            }else{
-                insureIndividualCostDTO.setDetItemFeeSumamt(BigDecimal.valueOf((int)MapUtils.get(item,"det_item_fee_sumamt"),2)); // 全自费金额
-            }
+            insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "selfpay_prop").toString()))));
+            insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_amt").toString()))));
+            insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString())))); // 先行自付金额
+            insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString()))));
+            insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString())))); // 全自费金额
+            insureIndividualCostDTO.setDetItemFeeSumamt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString())))); // 全自费金额
             insureIndividualCostDTO.setSumBigDecimalFee(sumBigDecimal);
             insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item,"med_chrgitm_type")); //医疗收费项目类别
             insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item,"lmt_used_flag"));
@@ -869,7 +843,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Boolean editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -925,7 +899,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
-        return resultMap;
+        return true;
     }
 
     /**
@@ -1104,9 +1078,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
         mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
-        mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
-        mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
-        mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();
@@ -1243,9 +1214,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dscginfoMap.put("pret_flag", insureIndividualVisitDTO.getPretFlag());//	早产标志
         dscginfoMap.put("birctrl_matn_date", insureIndividualVisitDTO.getBirctrlMatnDate());//	计划生育手术或生育日期
         dscginfoMap.put("cop_flag", null);//	伴有并发症标志
-        dscginfoMap.put("dscg_dept_code", null);//	出院科室编码
-        dscginfoMap.put("dscg_dept_name", null);//	出院科室名称
-        dscginfoMap.put("dscg_bed", null);//	出院床位
+        dscginfoMap.put("dscg_dept_code", insureIndividualVisitDTO.getOutDeptId());//	出院科室编码
+        dscginfoMap.put("dscg_dept_name", insureIndividualVisitDTO.getOutDeptName());//	出院科室名称
+        dscginfoMap.put("dscg_bed", insureIndividualVisitDTO.getOutModeCode());//	出院床位
         dscginfoMap.put("dscg_way", null);//	离院方式
         dscginfoMap.put("die_date", null);//	死亡日期
         dscginfoMap.put("expi_gestation_nub_of_m", null);//	终止妊娠月数

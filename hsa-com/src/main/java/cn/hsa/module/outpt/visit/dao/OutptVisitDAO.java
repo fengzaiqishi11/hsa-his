@@ -125,15 +125,4 @@ public interface OutptVisitDAO {
      * @Return
      */
     Boolean updateVisitTime(Map<String, Object> map);
-
-    /**
-     * @param individualSettleDTO
-     * @Method updateInsureSettleById
-     * @Desrciption 更新医保结算表
-     * @Param
-     * @Author liaojiguang
-     * @Date 2021/7/22 20:05
-     * @Return
-     */
-    Boolean updateInsureSettleById(InsureIndividualSettleDTO individualSettleDTO);
 }

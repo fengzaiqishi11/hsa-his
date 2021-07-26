@@ -290,24 +290,21 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                  */
                 costInfoMap.put("hosp_appr_flag", hospApprFlag);
                 // 海南省 + (药品和材料) + 限制级用药标志为 '1' ,则报销
-                if ("1".equals(hnSpecial) && ("1".equals(itemCode) || "2".equals(itemCode)) && "1".equals(lmtUserFlag)) {
+                if ("1".equals(hnSpecial) && "0".equals(lmtUserFlag)) {
                     costInfoMap.put("hosp_appr_flag", "1");
                 // 其他省份：(药品和材料) + (xzbzFlag = 1) +  (xzbzbxFlag != 1)  不报销
-                } else if (("1".equals(itemCode) || "2".equals(itemCode)) &&
-                        "1".equals(MapUtils.get(map, "xzbzFlag"))  &&
-                        !"1".equals(MapUtils.get(map, "xzbzbxFlag"))) {
+                } else if ("0".equals(lmtUserFlag)) {
                         costInfoMap.put("hosp_appr_flag", "2");
                 }
 
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销
                 if ("1".equals(huNanSpecial) && isCompound && "103".equals(MapUtils.get(map, "insureItemType"))) {
                     costInfoMap.put("hosp_appr_flag", "1");
-                    costInfoMap.put("tcmdrug_used_way", "1");
                 } else if ("1".equals(huNanSpecial) && !isCompound && "103".equals(MapUtils.get(map, "insureItemType"))) {
                     costInfoMap.put("hosp_appr_flag", "0");
-                    costInfoMap.put("tcmdrug_used_way", "2");
                 }
 
+                costInfoMap.put("tcmdrug_used_way", null); // TODO 中药使用方式
                 costInfoMap.put("etip_flag", null); // TODO 外检标志
                 costInfoMap.put("etip_hosp_code", null); // TODO 外检医院编码
                 costInfoMap.put("dscg_tkdrug_flag", null); // TODO 出院带药标志
@@ -813,11 +810,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         dataMap.put("dr_name", insureIndividualVisitDTO.getDoctorName()); // 医师姓名
         dataMap.put("dept_code", insureIndividualVisitDTO.getVisitDrptId()); // 科室编码
         dataMap.put("dept_name", insureIndividualVisitDTO.getVisitDrptName()); // 科室名称
-
-        dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden()); // 传值社保卡识别码
-        dataMap.put("psn_cert_type", "1");
-        dataMap.put("certno", insureIndividualVisitDTO.getAac002()); // 传值证件号码
-
         Map deptMap = new HashMap();
         deptMap.put("hospCode", hospCode);
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();

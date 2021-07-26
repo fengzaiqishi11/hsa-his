@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.inptnursethird.bo.InptNurseThirdBO;
 import cn.hsa.module.inpt.inptnursethird.dao.InptNurseThirdDao;
 import cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO;
+import cn.hsa.module.inpt.inptnursethird.entity.InptNurseThirdDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -160,7 +162,9 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             outTime =DateUtils.getNow();
         }
         int inDays = longOfTwoDate(inTime, outTime);
-        if (inDays == 0) inDays = 1;
+        if (inDays == 0) {
+            inDays = 1;
+        }
         retMap.put("inDays", String.valueOf(inDays));
         retMap.put("endDay",String.valueOf((inptNurseThirdDTO.getPage())*7));
         retMap.put("startDay",String.valueOf((inptNurseThirdDTO.getPage()-1)*7+1));
@@ -390,7 +394,13 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
         Date startDate = DateUtil.stringToDate(format, "yyyy-MM-dd");
         inptNurseThirdDTO.setStartDate(startDate);
         inptNurseThirdDTO.setEndDate(startDate);
-        List<InptNurseThirdDTO> list = inptNurseThirdDao.queryInptThirdRecordByBatch(inptNurseThirdDTO);
+        List<InptNurseThirdDTO> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(inptNurseThirdDTO.getIsQueryBaby()) && Constants.SF.S.equals(inptNurseThirdDTO.getIsQueryBaby())) {
+            // 批量查询婴儿列表
+            list = inptNurseThirdDao.queryInptThirdRecordByBabyBatch(inptNurseThirdDTO);
+        } else {
+            list = inptNurseThirdDao.queryInptThirdRecordByBatch(inptNurseThirdDTO);
+        }
         return list;
     }
 
@@ -405,23 +415,21 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
      **/
     @Override
     public Boolean saveBatch(List<InptNurseThirdDTO> inptNurseThirdDTOS) {
-        List<String> visitIds = new ArrayList<>();
-        List<InptNurseThirdDTO> addList = new ArrayList<>();
-        List<InptNurseThirdDTO> editList = new ArrayList<>();
+        List<String> visitIds = inptNurseThirdDTOS.stream().map(InptNurseThirdDO::getBabyId).collect(Collectors.toList());
+        // 过滤出婴儿id不为空的babyIds
+        List<String> babyIds = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isNotEmpty(inptNurseThirdDTO.getBabyId())).map(InptNurseThirdDTO::getBabyId).collect(Collectors.toList());
+        List<InptNurseThirdDTO> addList = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isEmpty(inptNurseThirdDTO.getId())).collect(Collectors.toList());
+        List<InptNurseThirdDTO> editList = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isNotEmpty(inptNurseThirdDTO.getId())).collect(Collectors.toList());
         String sjd = inptNurseThirdDTOS.get(0).getSjd(); //录入时间点
         String queryTime = inptNurseThirdDTOS.get(0).getQueryTime(); //录入日期
+        String isQueryBaby = inptNurseThirdDTOS.get(0).getIsQueryBaby();//是否录入婴儿
 
         Date date = DateUtil.stringToDate(queryTime, "yyyy-MM-dd");
         String format = DateUtils.format(date, "yyyy-MM-dd");
         Date startDate = DateUtil.stringToDate(format, "yyyy-MM-dd");
 
-        for (InptNurseThirdDTO inptNurseThirdDTO : inptNurseThirdDTOS) {
-            visitIds.add(inptNurseThirdDTO.getVisitId());
-            if (StringUtils.isEmpty(inptNurseThirdDTO.getId())){
-                addList.add(inptNurseThirdDTO);
-            } else {
-                editList.add(inptNurseThirdDTO);
-            }
+        if (ListUtils.isEmpty(visitIds)) {
+            throw new RuntimeException("批量录入三测单失败：录入患者为空");
         }
 
         //新增
@@ -432,10 +440,19 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             nurseThirdDTO.setEndDate(startDate);
             nurseThirdDTO.setSjd(sjd);
             nurseThirdDTO.setVisitIds(visitIds);
+            if (!ListUtils.isEmpty(babyIds)) {
+                nurseThirdDTO.setBabyIds(babyIds);
+            }
             nurseThirdDTO.setHospCode(inptNurseThirdDTOS.get(0).getHospCode());
             nurseThirdDTO.setDeptId(inptNurseThirdDTOS.get(0).getDeptId());
 
-            List<InptNurseThirdDTO> resultList = inptNurseThirdDao.queryInptThirdRecordByBatch(nurseThirdDTO);
+            List<InptNurseThirdDTO> resultList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(isQueryBaby) && Constants.SF.S.equals(isQueryBaby)) {
+                resultList = inptNurseThirdDao.queryInptThirdRecordByBabyBatch(nurseThirdDTO);
+            } else {
+                resultList = inptNurseThirdDao.queryInptThirdRecordByBatch(nurseThirdDTO);
+            }
+
             if (!ListUtils.isEmpty(resultList)){
                 for (InptNurseThirdDTO dto : resultList) {
                     if (StringUtils.isNotEmpty(dto.getVisitId()) && visitIds.indexOf(dto.getVisitId()) != -1){

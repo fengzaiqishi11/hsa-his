@@ -6,6 +6,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.RequestInsure;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.inpt.InptFunction;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InptService;
@@ -619,5 +620,35 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             resultMap.put("code","1");
             resultMap.put("info","【" + hospCode + "】医保传输服务定时执行完成！");
             return resultMap;
+    }
+    /**
+     * @param map
+     * @Method updateLimitUserFlag
+     * @Desrciption 住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 9:20
+     * @Return
+     */
+    @Override
+    public Boolean updateLimitUserFlag(Map<String, Object> map) {
+
+        return insureIndividualCostDAO.updateLimitUserFlag(map);
+    }
+
+    /**
+     * @param inptVisitDTO
+     * @Method queryInptCostPage
+     * @Desrciption 根据就诊id 查询住院费用明细数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/20 13:49
+     * @Return
+     */
+    @Override
+    public PageDTO queryInptCostPage(InptVisitDTO inptVisitDTO) {
+        PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
+        List<InptAdviceDetailDTO> inptCostDTOList =  insureIndividualCostDAO.queryInptCostPage(inptVisitDTO);
+        return PageDTO.of(inptCostDTOList);
     }
 }

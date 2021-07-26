@@ -5905,4 +5905,42 @@
         </if>
         group by a.crte_id
     </select>
+    <select id="queryOutMedicationGet" resultType="java.util.LinkedHashMap">
+        select A.* from (
+            select
+            max(a.item_name) as itemName,
+            sum(a.num) as num,
+            sum(a.split_num) as splitNum,
+            sum(a.total_price) as totalPrice,
+            max(a.price) as price,
+            max(a.split_price) as splitPrice,
+            case max(a.item_code) when '1' then max(bd.spec) when '2' then max(bm.spec) end spec,
+            case max(a.item_code) when '1' then max(bd.code) when '2' then max(bm.code) end code,
+            max(a.unit_code) as unitCode,
+            max(a.split_unit_code) as splitUnitCode,
+            (select name from base_dept where id = b.dept_id) as deptName
+            from phar_out_distribute_detail a
+            left join phar_out_distribute b on a.distribute_id = b.id
+            left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
+            left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = '2'
+            where a.hosp_code = #{hosp_code}
+            <if test="deptId != null and deptId != ''">
+                and b.dept_id = #{deptId}
+            </if>
+            /*开始日期*/
+            <if test="startTime != null and startTime != ''">
+                and date(b.crte_time) &gt;= date(#{startTime})
+            </if>
+            /*结束日期*/
+            <if test="endTime != null and endTime != ''">
+                and date(b.crte_time) &lt;= date(#{endTime})
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and a.name like conact('%',#{keyword},'%')
+            </if>
+            group by b.dept_id, a.item_id
+            ) A
+            where a.num > 0
+    </select>
+
 </mapper>

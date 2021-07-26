@@ -100,6 +100,9 @@ public interface InptNurseThirdDao {
      **/
     List<InptNurseThirdDTO> queryInptThirdRecordByBatch(InptNurseThirdDTO inptNurseThirdDTO);
 
+    // 根据三测单节点时间点查询科室下在院病人的【婴儿】列表
+    List<InptNurseThirdDTO> queryInptThirdRecordByBabyBatch(InptNurseThirdDTO inptNurseThirdDTO);
+
     /**
      * @Menthod: updateList
      * @Desrciption: 批量修改三测单

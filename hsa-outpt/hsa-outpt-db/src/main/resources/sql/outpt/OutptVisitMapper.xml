@@ -88,7 +88,7 @@
             top_price,
             plan_account_price,
             portion_price,
-            state,
+            `state`,
             settle_state,
             costbatch,
             aka130,
@@ -583,6 +583,36 @@
         </set>
         where id = #{id} and hosp_code = #{hospCode}
     </update>
+
+    <update id="updateInsureSettleById">
+        update
+        insure_individual_settle
+        <set>
+            <if test="omsgid != null and omsgid != ''">
+                omsgid = #{omsgid,jdbcType=VARCHAR},
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                oinfno = #{oinfno,jdbcType=VARCHAR}
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insure_settle_id = #{insureSettleId,jdbcType=VARCHAR}
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                medical_reg_no = #{medicalRegNo,jdbcType=VARCHAR}
+            </if>
+            <if test="clrOptins != null and clrOptins != ''">
+                clr_optins = #{clrOptins,jdbcType=VARCHAR}
+            </if>
+            <if test="clrWay != null and clrWay != ''">
+                clr_way = #{clrWay,jdbcType=VARCHAR}
+            </if>
+            <if test="clrType != null and clrType != ''">
+                clr_type = #{clrType,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
     <update id="updateInsureSettle">
         update
         insure_individual_settle
@@ -607,7 +637,6 @@
         <if test="settleState != null and settleState != ''">
             and  settle_state = #{settleState,jdbcType=VARCHAR}
         </if>
-
     </update>
     <select id="getInsureBasicById" parameterType="java.util.Map" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
 		select b.*,a.insure_org_code,a.insure_reg_code,a.medical_reg_no as aaz217,a.visit_id from insure_individual_visit a

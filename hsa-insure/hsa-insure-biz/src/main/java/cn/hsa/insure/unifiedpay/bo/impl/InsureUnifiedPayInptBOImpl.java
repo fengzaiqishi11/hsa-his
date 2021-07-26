@@ -294,11 +294,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销
                 if (isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "1");
+                    objectMap.put("tcmdrug_used_way","1"); // 中药使用方式
                 } else if (!isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "0");
+                    objectMap.put("tcmdrug_used_way","2"); // 中药使用方式
                 }
 
-                objectMap.put("tcmdrug_used_way",""); // 中药使用方式
+
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志
                 objectMap.put("etip_hosp_code",""); // 外检医院编码
                 // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)
@@ -867,7 +869,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Boolean editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -923,7 +925,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
-        return true;
+        return resultMap;
     }
 
     /**
@@ -1102,6 +1104,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
         mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
+        mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
+        mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
+        mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();

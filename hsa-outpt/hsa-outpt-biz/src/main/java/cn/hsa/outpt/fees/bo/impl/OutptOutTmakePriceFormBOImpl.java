@@ -225,6 +225,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 被冲红
             insureIndividualSettleDO.setState(Constants.ZTBZ.BCH);
+            insureIndividualSettleDO.setSettleState("1");
             Map selectInsureMap = new HashMap();
             selectInsureMap.put("hospCode",hospCode);
             selectInsureMap.put("insureIndividualSettleDO",insureIndividualSettleDO);
@@ -232,8 +233,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // insureIndividualSettleService_consumer.updateByPrimaryKey(selectInsureMap);
 
             // 冲红
+            String isnureRedSettleId = SnowflakeUtils.getId();
             insureIndividualSettleDO.setSettleId(redSettleId);
-            insureIndividualSettleDO.setId(SnowflakeUtils.getId());
+            insureIndividualSettleDO.setId(isnureRedSettleId);
             insureIndividualSettleDO.setState(Constants.ZTBZ.CH);
             insureIndividualSettleDO.setHospCode(hospCode);
             insureIndividualSettleDO.setTotalPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getTotalPrice()));
@@ -286,17 +288,20 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 if(!MapUtils.isEmpty(resultMap)){
                     insureIndividualCostService_consumer.deleteOutptInsureCost(map);
                 }
+                Map<String,Object> setlInfoMap = MapUtils.get(resultMap,"setlinfo");
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"funtionCode"));
-                individualSettleDTO.setHospCode(hospCode);
-                individualSettleDTO.setVisitId(visitId);
-                individualSettleDTO.setState(Constants.SF.F);
-                individualSettleDTO.setSettleState("1");
-                outptVisitDAO.updateInsureSettle(individualSettleDTO);
-//                insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
-//                insureIndividualVisitService_consumer.deleteInsureVisitById(map).getData();
 
+                individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
+                individualSettleDTO.setMedicalRegNo(MapUtils.get(setlInfoMap,"mdtrt_id"));
+                individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
+                individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_optins"));
+                individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
+
+                individualSettleDTO.setHospCode(hospCode);
+                individualSettleDTO.setId(isnureRedSettleId);
+                outptVisitDAO.updateInsureSettleById(individualSettleDTO);
             }
             else {
                 /**

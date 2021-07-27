@@ -793,8 +793,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptPrescribeDetailsDTO.setLoginDeptId(outptPrescribeDTO.getDeptId());
             for(OutptPrescribeDTO outptPrescribe: outptPrescribeDTOList){
                 //判断处方类型和处方类别是否一样 :PhCode 毒麻类型
-                if(outptPrescribeDetailsDTO.getType().equals(outptPrescribe.getTypeCode()) &&
-                        outptPrescribeDetailsDTO.getPhCode().equals(outptPrescribe.getPrescribeTypeCode())){
+                String type = outptPrescribeDetailsDTO.getType();
+                String phCode = outptPrescribeDetailsDTO.getPhCode() ;
+                if(StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(phCode) &&type.equals(outptPrescribe.getTypeCode()) && phCode.equals(outptPrescribe.getPrescribeTypeCode())){
                     cfBoolean = true;
                     //获取处方ID
                     outptPrescribeDetailsDTO.setOpId(outptPrescribe.getId());

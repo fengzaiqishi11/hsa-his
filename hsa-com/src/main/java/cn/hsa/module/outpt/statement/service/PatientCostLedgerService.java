@@ -131,8 +131,18 @@ public interface PatientCostLedgerService {
    * @Date   2020-11-12 15:39
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
    **/
+  @PostMapping("/service/outpt/statement/queryOutptDeptIncomeTableHead")
+  WrapperResponse<Map> queryOutptDeptIncomeTableHead(Map paraMap);
+  /**
+   * @Method queryOutptDeptIncome
+   * @Desrciption 门诊科室/医生收入统计
+   @params [paraMap]
+    * @Author chenjun
+   * @Date   2020-11-12 15:39
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+   **/
   @PostMapping("/service/outpt/statement/queryOutptDeptIncome")
-  WrapperResponse<Map> queryOutptDeptIncome(Map paraMap);
+  WrapperResponse<PageDTO> queryOutptDeptIncome(Map paraMap);
 
   /**
    * @Method queryInptMedication

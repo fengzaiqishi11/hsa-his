@@ -189,4 +189,18 @@ public class InsureIndividualSettleServiceImpl extends HsafService implements In
         return WrapperResponse.success(insureIndividualSettleBO.querySettle(insureIndividualSettleDTO));
     }
 
+    /**
+     * @param map
+     * @Method queryIsSettleInfo
+     * @Desrciption 查询已经结算的医保记录信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/26 10:14
+     * @Return
+     */
+    @Override
+    public WrapperResponse<InsureIndividualSettleDTO> queryIsSettleInfo(Map<String, Object> map) {
+        return null;
+    }
+
 }

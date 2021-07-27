@@ -278,8 +278,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 objectMap.put("acord_dept_name",""); // 受单科室名称
                 objectMap.put("orders_dr_code",""); // 受单医生编码
                 objectMap.put("orders_dr_name",""); // 受单医生姓名
-                String itemCode = MapUtils.get(map,"hospItemType");
-                String lmtUserFlag = MapUtils.get(map,"lmtUserFlag");
+                String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");
 
                 /**
                  * zhSpecial : '1' 珠海
@@ -288,17 +287,20 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
                 // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
                 if("1".equals(zhSpecial) && "0".equals(lmtUserFlag)) {
-                    objectMap.put("hosp_appr_flag", "0");
+                    objectMap.put("hosp_appr_flag", "1");
                 }
 
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销
                 if (isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
                     objectMap.put("hosp_appr_flag", "1");
+                    objectMap.put("tcmdrug_used_way","1");
                 } else if (!isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
+                    objectMap.put("hosp_appr_flag", "0");
+                    objectMap.put("tcmdrug_used_way","2");
+                }else if("1".equals(huNanSpecial) && "0".equals(lmtUserFlag)){
                     objectMap.put("hosp_appr_flag", "0");
                 }
 
-                objectMap.put("tcmdrug_used_way",""); // 中药使用方式
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志
                 objectMap.put("etip_hosp_code",""); // 外检医院编码
                 // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)
@@ -843,7 +845,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Boolean editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -855,9 +857,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
-
-        inptMap.put("infno","2305");  // 交易编号
-        inptMap.put("msgid",StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode()));
+        String infno = "2305";
+        String msgId = StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode());
+        inptMap.put("infno",infno);  // 交易编号
+        inptMap.put("msgid",msgId);
         inptMap.put("insuplc_admdvs",insureIndividualVisitDTO.getInsuplcAdmdvs()); //参保地医保区划分
         inptMap.put("medins_code",insureIndividualVisitDTO.getMedicineOrgCode()); //定点医药机构编号
         inptMap.put("insur_code",insureConfigurationDTO.getRegCode()); //医保中心编码
@@ -899,7 +902,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
-        return true;
+        resultMap.put("msgId",msgId);
+        resultMap.put("infno",infno);
+        return resultMap;
     }
 
     /**

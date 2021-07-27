@@ -292,7 +292,7 @@ public interface PatientCostLedgerDAO {
    * @Date   2020-11-12 10:44
    * @Return java.util.List<java.util.Map>
    **/
-  List<Map> queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+  List<Map<String ,Object>> queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
 
   /**
    * @Method queryInptMedication
@@ -744,4 +744,13 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return
    */
   List<Map> queryCollectorInComeStaDetailMZ(Map map);
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊领药统计
+   * @Param [pharOutDistributeDTO]
+   * @Author zhangguorui
+   * @Date   2021/7/23 16:04
+   * @Return java.util.List
+   */
+  List<Map> queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO);
 }

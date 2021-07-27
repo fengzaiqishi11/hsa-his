@@ -218,7 +218,7 @@
             ext08              = #{ext08,jdbcType=VARCHAR},
             ext09              = #{ext09,jdbcType=VARCHAR},
             ext10              = #{ext10,jdbcType=VARCHAR}
-        where id = #{id}
+        where id = #{id} and hosp_code = #{hospCode}
     </update>
 
 

@@ -207,6 +207,7 @@ public class StatemnetController extends BaseController {
     WrapperResponse<PageDTO> listWrapperResponse = patientCostLedgerService_consumer.queryOutOrInPospitalItemInfoSum(paraMap);
     return listWrapperResponse;
   }
+
   /**
    * @Method queryOutptDeptIncome
    * @Desrciption 门诊科室/医生收入统计
@@ -215,8 +216,25 @@ public class StatemnetController extends BaseController {
    * @Date 2020-11-12 10:14
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.module.inpt.doctor.dto.InptVisitDTO>>
    **/
-  @PostMapping("/queryOutptDeptIncome")
-  public WrapperResponse<Map> queryOutptDeptIncome(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+  @PostMapping("/queryOutptDeptIncomeTableHead")
+  public WrapperResponse<Map> queryOutptDeptIncomeTableHead(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.queryOutptDeptIncomeTableHead(map);
+  }
+  /**
+   * @Method queryOutptDeptIncome
+   * @Desrciption 门诊科室/医生收入统计
+   * @params [inptVisitDTO]
+   * @Author chenjun
+   * @Date 2020-11-12 10:14
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.module.inpt.doctor.dto.InptVisitDTO>>
+   **/
+  @GetMapping("/queryOutptDeptIncome")
+  public WrapperResponse<PageDTO> queryOutptDeptIncome(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
     Map map = new HashMap();
     SysUserDTO userDTO = getSession(req, res) ;
     inptVisitDTO.setHospCode(userDTO.getHospCode());

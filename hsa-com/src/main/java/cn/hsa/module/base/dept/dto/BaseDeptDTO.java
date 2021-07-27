@@ -60,4 +60,6 @@ public class BaseDeptDTO extends BaseDeptDO implements Serializable {
     private String multiPharFlag;
     /** 药房名字 **/
     private String pharName;
+    /** 药房ID **/
+    private String pharId;
 }

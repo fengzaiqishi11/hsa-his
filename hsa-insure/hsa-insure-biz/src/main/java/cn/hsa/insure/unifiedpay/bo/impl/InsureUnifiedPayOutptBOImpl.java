@@ -302,6 +302,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     costInfoMap.put("hosp_appr_flag", "1");
                 } else if ("1".equals(huNanSpecial) && !isCompound && "103".equals(MapUtils.get(map, "insureItemType"))) {
                     costInfoMap.put("hosp_appr_flag", "0");
+                }else if("1".equals(huNanSpecial) && "0".equals(lmtUserFlag)){
+                    costInfoMap.put("hosp_appr_flag", "0");
                 }
 
                 costInfoMap.put("tcmdrug_used_way", null); // TODO 中药使用方式

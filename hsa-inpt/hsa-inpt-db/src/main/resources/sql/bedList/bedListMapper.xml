@@ -372,4 +372,32 @@
     <select id="getMaxSeqNoByDeptCode" resultType="java.lang.Integer">
         select ifnull(max(seq_no), 0) + 1 from base_bed where hosp_code =#{hospCode} and dept_code = #{deptCode}
     </select>
+
+    <!--出院诊断保存 lly 20210723-->
+    <insert id="insertDiagnose" parameterType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" useGeneratedKeys="false">
+        insert into inpt_diagnose(
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        )
+        values
+            (
+            #{id},
+            #{hospCode},
+            #{diseaseId},
+            #{visitId},
+            #{typeCode},
+            #{isMain},
+            #{crteId},
+            #{crteName},
+            now()
+            )
+    </insert>
+    <select id="getInptDiagnose" resultType="java.lang.Integer">
+        select count(*) from inpt_diagnose where
+        hosp_code =#{hospCode} and visit_id =#{visitId} and is_main ='1' and type_code !='201'
+    </select>
+
+    <select id="getInptDiagnoseByVisitId" resultType="java.lang.Integer">
+        select count(*) from inpt_diagnose where
+        hosp_code =#{hospCode} and visit_id =#{visitId} and (type_code ='204' or type_code ='303') and  disease_id=#{diseaseId}
+    </select>
 </mapper>

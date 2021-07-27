@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -242,6 +243,24 @@ public class StatemnetController extends BaseController {
     return patientCostLedgerService_consumer.queryInptMedication(map);
   }
 
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [PharOutDistributeDTO, req, res]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:44
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @GetMapping("/queryOutMedicationGet")
+  public WrapperResponse<PageDTO> queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO,
+                                                        HttpServletRequest req, HttpServletResponse res){
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req,res);
+    pharOutDistributeDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode",userDTO.getHospCode());
+    map.put("pharOutDistributeDTO",pharOutDistributeDTO);
+    return patientCostLedgerService_consumer.queryOutMedicationGet(map);
+  }
 
   /**
    * @Method queryOutptDeptIncome

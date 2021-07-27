@@ -276,6 +276,9 @@ public class InptSettlementController extends BaseController {
         if (StringUtils.isEmpty(inptVisitDTO.getId())){
             return WrapperResponse.fail("参数错误。",null);
         }
+        if (StringUtils.isEmpty(inptVisitDTO.getBabyId())){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
+        }
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());//医院编码
         inptVisitDTO.setCrteId(sysUserDTO.getId());//当前登录用户id
         inptVisitDTO.setCrteName(sysUserDTO.getName());//当前登录用户名
@@ -305,6 +308,9 @@ public class InptSettlementController extends BaseController {
                 || StringUtils.isEmpty((String) params.get("settleId")) || params.get("inptPay") == null || !params.containsKey("isInvoice")){
             return WrapperResponse.fail("参数错误。",null);
         }
+        if (!params.containsKey("babyId") || StringUtils.isEmpty((String) params.get("babyId"))){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
+        }
         List<InptPayDO> inptPayDOList = JSONArray.parseArray(JSON.toJSONString(params.get("inptPay")), InptPayDO.class);//支付方式信息
         params.put("hospCode", sysUserDTO.getHospCode());//医院编码
         params.put("userId", sysUserDTO.getId());//当前登录用户id
@@ -332,6 +338,9 @@ public class InptSettlementController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
             return WrapperResponse.fail("参数错误。",null);
+        }
+        if (StringUtils.isEmpty(babyId)){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
         }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码

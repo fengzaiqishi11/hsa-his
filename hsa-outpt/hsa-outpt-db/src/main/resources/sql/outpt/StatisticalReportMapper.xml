@@ -1000,16 +1000,20 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode from (
+        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.`name`,scd2.`name`) as fee_type  from (
         SELECT
         iv.`name`,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
         iv.bed_name,
+        iv.in_disease_name,
         DATE_FORMAT( ma.crte_time, '%Y-%m-%d %H:%i:%s' ) AS crte_time,
         ma.content AS item_name,
         ic.total_price as price,
+        iv.crte_name as doctor_name,
+        ma.medic_type,
+        ma.type_code,
         ia.baby_id,
         ia.hosp_code,
         ia.total_num as num
@@ -1051,6 +1055,9 @@
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
+            and 1=2
+        </if>
         union all
         SELECT
         ov.`name`,
@@ -1058,16 +1065,23 @@
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
         '' AS bed_name,
+        (SELECT NAME FROM
+        base_disease WHERE
+        id = ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) FROM outpt_prescribe WHERE id = oc.op_id )
+        ) AS  in_disease_name,
         DATE_FORMAT( ma.crte_time, '%Y-%m-%d %H:%i:%s' ) AS crte_time,
         ma.content AS item_name,
         oc.total_price as price,
+        ov.doctor_name,
+        ma.medic_type,
+        ma.type_code,
         ''  as baby_id,
         oc.hosp_code as hosp_code,
         oc.total_num as num
         FROM
         medic_apply ma,
         outpt_visit ov,
-        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price from outpt_cost
+        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price ,op_id from outpt_cost
         where status_code='0' group by visit_id,opd_id ,hosp_code,total_num) oc
         WHERE
         ma.visit_id = ov.id
@@ -1100,21 +1114,32 @@
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
+            and 1=2
+        </if>
         ) a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        left join (SELECT `name`,`value`,c_code,hosp_code FROM sys_code_detail ) scd  on scd.hosp_code = a.hosp_code
+        AND scd.c_code = 'PACSXMLX' AND a.type_code = '5'AND a.medic_type = scd.`value`
+        left join	(SELECT `name`,`value`,c_code,hosp_code FROM sys_code_detail ) scd2 on scd2.hosp_code = a.hosp_code
+        AND scd2.c_code = 'LISXMLX' AND a.type_code = '4'AND a.medic_type = scd2.`value`
     </select>
 
     <select id="passStatistics"  resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode from (
+        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.`name`,scd2.`name`) as fee_type from (
         SELECT
         iv.`name`,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
         iv.bed_name,
+        iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
         ic.total_price as price,
+        iv.crte_name as doctor_name,
+        ma.medic_type,
+        ma.type_code,
         ia.baby_id,
         ia.hosp_code as hosp_code,
         ia.total_num as num
@@ -1122,7 +1147,7 @@
         medic_apply ma,
         inpt_advice ia,
         inpt_visit iv,
-        (select visit_id ,iat_id, sum(total_price) as total_price from inpt_cost where status_code='0' group by visit_id
+        (select visit_id ,iat_id, sum(total_price) as total_price ,source_code from inpt_cost where status_code='0' group by visit_id
         ,iat_id)ic
         WHERE
         ma.order_no = ia.order_no
@@ -1154,6 +1179,9 @@
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
+            and 1=2
+        </if>
         union all
         SELECT
         ov.`name`,
@@ -1161,16 +1189,23 @@
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
         '' AS bed_name,
+        (SELECT NAME FROM
+        base_disease WHERE
+        id = ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) FROM outpt_prescribe WHERE id = oc.op_id )
+        ) AS  in_disease_name,
         DATE_FORMAT( ma.crte_time, '%Y-%m-%d %H:%i:%s' ) AS crte_time,
         ma.content AS item_name,
         oc.total_price as price,
+        ov.doctor_name,
+        ma.medic_type,
+        ma.type_code,
         '' as baby_id,
         ov.hosp_code as hosp_code,
         oc.total_num as num
         FROM
         medic_apply ma,
         outpt_visit ov,
-        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price from outpt_cost
+        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price, source_code ,op_id from outpt_cost
         where status_code='0' group by visit_id,opd_id ,hosp_code,total_num) oc
         WHERE
         ma.visit_id = ov.id
@@ -1200,11 +1235,18 @@
         <if test="itemName != null and itemName != ''">
             and ma.content like concat('%',#{itemName},'%')
         </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
+            and 1=2
+        </if>
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        left join (SELECT `name`,`value`,c_code,hosp_code FROM sys_code_detail ) scd  on scd.hosp_code = a.hosp_code
+        AND scd.c_code = 'PACSXMLX' AND a.type_code = '5'AND a.medic_type = scd.`value`
+        left join	(SELECT `name`,`value`,c_code,hosp_code FROM sys_code_detail ) scd2 on scd2.hosp_code = a.hosp_code
+        AND scd2.c_code = 'LISXMLX' AND a.type_code = '4'AND a.medic_type = scd2.`value`
     </select>
 
 
@@ -1363,7 +1405,7 @@
         join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
         join phar_in_distribute b on a.distribute_id=b.id
         WHERE
-        g.hosp_code = #{hospCode} and num >0
+        g.hosp_code = #{hospCode}
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
             and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
@@ -1372,7 +1414,7 @@
             and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
-        )tab
+        )tab where num > 0
     </select>
 
 
@@ -1610,7 +1652,7 @@
       and date(b.crte_time) &lt;= date(#{endDate})
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
-    )tab order by tab.crte_time desc
+    )tab where num > 0 order by tab.crte_time desc
 
   </select>
 
@@ -1673,7 +1715,7 @@
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 
-    )tab order by tab.crte_time desc
+    )tab where num > 0 order by tab.crte_time desc
   </select>
 
 </mapper>

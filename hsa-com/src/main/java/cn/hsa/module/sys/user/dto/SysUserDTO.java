@@ -69,4 +69,6 @@ public class SysUserDTO extends SysUserDO implements Serializable {
     private Boolean isQuerySelfDept;
     // 科室性质
     private String deptTypeCode;
+    /** 分诊室ID **/
+    private String clinicId;
 }

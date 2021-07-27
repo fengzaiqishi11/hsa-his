@@ -1,6 +1,7 @@
 package cn.hsa.module.inpt;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.service.InptCancelSettlementService;
@@ -81,6 +82,7 @@ public class InptCancelSettlementController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @PutMapping("/editCancelSettlement")
+    @NoRepeatSubmit
     public WrapperResponse editCancelSettlement(@RequestBody Map<String,String> param, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(param.get("visitId")) || StringUtils.isEmpty(param.get("settleId"))){

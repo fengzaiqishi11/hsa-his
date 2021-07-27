@@ -1171,7 +1171,7 @@
         when '1' then '医保' else '自费' end as isMatch
         from inpt_cost cost
         left join insure_individual_visit iiv on iiv.visit_id = cost.visit_id and iiv.hosp_code = cost.hosp_code
-        left join insure_item_match insure on cost.item_id = insure.hosp_item_id on cost.hosp_code = insure.hosp_code on iiv.insure_reg_code = insure.insure_reg_code
+        left join insure_item_match insure on cost.item_id = insure.hosp_item_id and cost.hosp_code = insure.hosp_code and iiv.insure_reg_code = insure.insure_reg_code
         where cost.hosp_code = #{hospCode}
         and cost.iat_id in
         <foreach collection="iatIdList" item="item" open="(" close=")" separator=",">

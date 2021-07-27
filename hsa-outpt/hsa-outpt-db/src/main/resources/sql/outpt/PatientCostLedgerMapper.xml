@@ -2152,7 +2152,7 @@
             and a.item_name like concat('%',#{keyword},'%')
         </if>
         group by b.dept_id, a.item_id
-        ) A
+        ) A where A.splitNum != 0
 
     </select>
 
@@ -5945,7 +5945,7 @@
                 and a.item_name like concat('%',#{keyword},'%')
             </if>
             group by b.dept_id, a.item_id
-            ) A
+            ) A where A.splitNum != 0
     </select>
 
 </mapper>

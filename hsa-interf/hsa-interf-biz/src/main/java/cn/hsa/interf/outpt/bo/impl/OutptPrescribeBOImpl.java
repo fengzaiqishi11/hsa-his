@@ -369,6 +369,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptProfileFileDTO.setName(outptVisitDTO.getName());
         outptProfileFileDTO.setGenderCode(outptVisitDTO.getGenderCode());
         outptProfileFileDTO.setAge(outptVisitDTO.getAge());
+        outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
         outptProfileFileDTO.setBirthday(outptVisitDTO.getBirthday());
         outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());

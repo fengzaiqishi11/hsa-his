@@ -167,6 +167,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             inptSettleDO.setCrteId(userId);//创建人id
             inptSettleDO.setCrteName(userName);//创建人姓名
             inptSettleDO.setCrteTime(new Date());//创建时间
+            inptSettleDO.setSettleTime(inptSettleDO.getCrteTime());
             inptSettleDAO.insertSelective(inptSettleDO);
             //修改结算被冲红信息
             InptSettleDO inptSettleDO1 = new InptSettleDO();

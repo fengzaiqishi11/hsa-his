@@ -292,7 +292,7 @@ public interface PatientCostLedgerDAO {
    * @Date   2020-11-12 10:44
    * @Return java.util.List<java.util.Map>
    **/
-  List<Map> queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+  List<Map<String ,Object>> queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
 
   /**
    * @Method queryInptMedication

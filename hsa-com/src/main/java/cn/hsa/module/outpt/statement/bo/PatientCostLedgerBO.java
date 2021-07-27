@@ -129,7 +129,9 @@ public interface PatientCostLedgerBO {
    * @Date   2020-11-12 10:44
    * @Return java.util.List<java.util.Map>
    **/
-  Map queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+  PageDTO queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+
+  Map queryOutptDeptIncomeTableHead (InptVisitDTO inptVisitDTO);
 
   /**
    * @Menthod stroBusinessSummary

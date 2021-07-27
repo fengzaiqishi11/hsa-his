@@ -173,10 +173,24 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
    **/
   @Override
-  public WrapperResponse<Map> queryOutptDeptIncome(Map paraMap) {
+  public WrapperResponse<Map> queryOutptDeptIncomeTableHead(Map paraMap) {
     InptVisitDTO inptVisitDTO = MapUtils.get(paraMap, "inptVisitDTO");
-    Map map = patientCostLedgerBO.queryOutptDeptIncome(inptVisitDTO);
+    Map map = patientCostLedgerBO.queryOutptDeptIncomeTableHead(inptVisitDTO);
     return WrapperResponse.success(map);
+  }
+  /**
+   * @Method queryOutptDeptIncome
+   * @Desrciption 门诊科室/医生收入统计
+   @params [paraMap]
+    * @Author chenjun
+   * @Date   2020-11-12 10:15
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryOutptDeptIncome(Map paraMap) {
+    InptVisitDTO inptVisitDTO = MapUtils.get(paraMap, "inptVisitDTO");
+    PageDTO pageDTO = patientCostLedgerBO.queryOutptDeptIncome(inptVisitDTO);
+    return WrapperResponse.success(pageDTO);
   }
 
   /**

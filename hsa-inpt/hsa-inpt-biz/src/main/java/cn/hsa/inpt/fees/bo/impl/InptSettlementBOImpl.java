@@ -428,7 +428,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 insureIndividualSettleDO.setDischargedDate(inptVisitDTO1.getInTime());//出院日期
                 insureIndividualSettleDO.setDischargedCase(inptVisitDTO1.getOutSituationCode());//出院情况
                 insureIndividualSettleDO.setSettleway(Constants.JSFS.PTJS);//结算方式,01 普通结算,02 包干结算
-                insureIndividualSettleDO.setTotalPrice(totalPrice);//总费用
+                insureIndividualSettleDO.setTotalPrice(akc264);// 本次医疗总费用
                 insureIndividualSettleDO.setInsurePrice(miPrice);//医保支付
                 insureIndividualSettleDO.setPlanPrice(ake039);//统筹基金支付
                 insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付

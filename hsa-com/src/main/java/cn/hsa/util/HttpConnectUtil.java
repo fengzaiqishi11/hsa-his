@@ -59,11 +59,11 @@ public class HttpConnectUtil {
                     result.append(line);
                 }
             }else{
-                throw new RuntimeException("调用接口失败。http返回码为："+conn.getResponseCode());
+                throw new RuntimeException("接口地址："+URL+", http返回码为："+conn.getResponseCode());
             }
         }catch (Exception e){
             exception = e;
-            throw new RuntimeException("调用接口异常。: "+e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }finally {
             try{
                 if(out != null){

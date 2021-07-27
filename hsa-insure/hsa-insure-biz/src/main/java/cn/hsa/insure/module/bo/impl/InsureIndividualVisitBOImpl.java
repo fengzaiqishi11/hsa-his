@@ -222,7 +222,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         Map<String, String> delBasicParam = new HashMap<String, String>();
         delBasicParam.put("hospCode", hospCode);
         delBasicParam.put("aac001", aac001);
-        insureIndividualBasicDAO.deleteByAac001(delBasicParam);
+
         //医保个人基本信息
         InsureIndividualBasicDO insureIndividualBasicDO = new InsureIndividualBasicDO();
         insureIndividualBasicDO.setId(iIBId);//主键id

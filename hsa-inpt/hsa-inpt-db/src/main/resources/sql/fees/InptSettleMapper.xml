@@ -840,7 +840,8 @@
             (select in_code from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) inCode,
             (select cd.name from sys_code_detail cd, base_finance_classify bfc where bfc.in_code = cd.value and cd.hosp_code=d.hospCode and cd.c_code = 'FPGL' and bfc.hosp_code=d.hospCode and d.bfcId= bfc.id) fpglName,
             (select name from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) bfcName,ifnull(d.realityPrice,0) realityPrice,
-            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') yjxj,
+            case when d.babyId is not null then 0 else
+            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') end as yjxj,
             (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') yjzz,
             (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code='1') tkxj,
             (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code!='1') tkzz,
@@ -849,9 +850,9 @@
             (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr
             from
             (
-            select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice, c.self_price as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime
+            select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice, c.self_price as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId
             from inpt_cost a join inpt_visit b on a.visit_id=b.id
-            join inpt_settle c on c.visit_id=a.visit_id
+            join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id
             where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
             and c.status_code='0' and a.status_code='0'  and c.id=#{settleId}
             group by a.bfc_id,a.visit_id,a.hosp_code

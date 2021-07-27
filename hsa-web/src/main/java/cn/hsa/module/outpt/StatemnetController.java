@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -163,10 +164,10 @@ public class StatemnetController extends BaseController {
     SysUserDTO userDTO = getSession(req, res) ;
     map.put("hospCode", userDTO.getHospCode());
     inptVisitDTO.setHospCode(userDTO.getHospCode());
-    // 如果需要查询当前医生的病人
-    if (inptVisitDTO != null && "1".equals(inptVisitDTO.getZgbrQuery())) {
-      inptVisitDTO.setZgDoctorId(userDTO.getId());
-    }
+    // 注释by张国瑞 在院病人查询功能 改为下拉列表的形式 选择主管医生而不是选择当前登录的医生
+//    if (inptVisitDTO != null && "1".equals(inptVisitDTO.getZgbrQuery())) {
+//      inptVisitDTO.setZgDoctorId(userDTO.getId());
+//    }
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.queryInPatient(map);
   }
@@ -260,6 +261,24 @@ public class StatemnetController extends BaseController {
     return patientCostLedgerService_consumer.queryInptMedication(map);
   }
 
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [PharOutDistributeDTO, req, res]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:44
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @GetMapping("/queryOutMedicationGet")
+  public WrapperResponse<PageDTO> queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO,
+                                                        HttpServletRequest req, HttpServletResponse res){
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req,res);
+    pharOutDistributeDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode",userDTO.getHospCode());
+    map.put("pharOutDistributeDTO",pharOutDistributeDTO);
+    return patientCostLedgerService_consumer.queryOutMedicationGet(map);
+  }
 
   /**
    * @Method queryOutptDeptIncome

@@ -267,7 +267,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         configurationDTO.setHospCode(hospCode);  // 医院编码
         configurationDTO.setOrgCode(medicineOrgCode); // 医疗机构编码
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
-        String mdtrtareaAdmvs = configurationDTO.getMdtrtareaAdmvs();
+        if(configurationDTO ==null){
+            throw new AppException("获取医保配置信息为空");
+        }
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("setl_id", insureSettleId);
@@ -347,21 +349,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                     List<Map<String, Object>> listMap = groupMap.get(key);
                     for (Map<String, Object> item : listMap) {
                         DecimalFormat df1 = new DecimalFormat("0.00");
-                        if (MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(MapUtils.get(item, "det_item_fee_sumamt"), 2));
-                        } else {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                        }
-                        if (MapUtils.get(item, "fulamt_ownpay_amt").toString().indexOf(".") > 0) {
-                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.scale(MapUtils.get(item, "fulamt_ownpay_amt"), 2));
-                        } else {
-                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-                        }
-                        if (MapUtils.get(item, "preselfpay_amt").toString().indexOf(".") > 0) {
-                            preselfpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.scale(MapUtils.get(item, "preselfpay_amt"), 2));
-                        } else {
-                            preselfpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString()))));
-                        }
+                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                        preselfpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString()))));
                     }
                     pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
                     pMap.put("fulamtOwnpayAmt", fulamtOwnpayAmt);

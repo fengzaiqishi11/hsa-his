@@ -145,4 +145,15 @@ public interface InsureIndividualSettleService {
      * @Return
     **/
     WrapperResponse<InsureIndividualSettleDTO> querySettle(Map<String, Object> map);
+
+    /**
+     * @Method queryIsSettleInfo
+     * @Desrciption  查询已经结算的医保记录信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/26 10:14
+     * @Return
+    **/
+    WrapperResponse<InsureIndividualSettleDTO> queryIsSettleInfo(Map<String, Object> map);
 }

@@ -429,6 +429,34 @@
 		</if>
 		order by crte_time desc
 	</select>
+	<update id="updateInsureSettleById">
+		update
+		insure_individual_settle
+		<set>
+			<if test="omsgid != null and omsgid != ''">
+				omsgid = #{omsgid,jdbcType=VARCHAR},
+			</if>
+			<if test="oinfno != null and oinfno != ''">
+				oinfno = #{oinfno,jdbcType=VARCHAR},
+			</if>
+			<if test="insureSettleId != null and insureSettleId != ''">
+				insureSettleId = #{insureSettleId,jdbcType=VARCHAR},
+			</if>
+			<if test="medicalRegNo != null and medicalRegNo != ''">
+				medicalRegNo = #{medicalRegNo,jdbcType=VARCHAR},
+			</if>
+			<if test="clrOptins != null and clrOptins != ''">
+				clr_optins = #{clrOptins,jdbcType=VARCHAR},
+			</if>
+			<if test="clrWay != null and clrWay != ''">
+				clr_way = #{clrWay,jdbcType=VARCHAR},
+			</if>
+			<if test="clrType != null and clrType != ''">
+				clr_type = #{clrType,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
 
 
 	<!--单个新增-->

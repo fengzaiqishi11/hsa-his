@@ -434,4 +434,17 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     return WrapperResponse.success(patientCostLedgerBO.queryTollCollectorIncomeStatistics(map));
   }
 
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [map]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:56
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @Override
+  public WrapperResponse<PageDTO> queryOutMedicationGet(Map map) {
+    return WrapperResponse.success(patientCostLedgerBO.queryOutMedicationGet(MapUtils.get(map,"pharOutDistributeDTO")));
+  }
+
 }

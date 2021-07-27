@@ -2796,5 +2796,18 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<Map> list = patientCostLedgerDAO.queryCollectorInComeStaDetail(map);
         return PageDTO.of(list);
     }
+    /**
+     * @Method queryOutMedicationGet
+     * @Desrciption 门诊用药统计
+     * @Param [map]
+     * @Author zhangguorui
+     * @Date   2021/7/23 15:57
+     * @Return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO) {
+        PageHelper.startPage(pharOutDistributeDTO.getPageNo(),pharOutDistributeDTO.getPageSize());
+        return PageDTO.of(patientCostLedgerDAO.queryOutMedicationGet(pharOutDistributeDTO));
+    }
 
 }

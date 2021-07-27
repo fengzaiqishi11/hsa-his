@@ -347,5 +347,15 @@ public interface PatientCostLedgerService {
    */
   @GetMapping("/service/outpt/statement/queryTollCollectorIncomeStatistics")
   WrapperResponse<PageDTO> queryTollCollectorIncomeStatistics(Map map);
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [PharOutDistributeDTO, req, res]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:44
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @GetMapping("/service/outpt/statement/queryOutMedicationGet")
+  WrapperResponse<PageDTO> queryOutMedicationGet(Map map);
 }
 

@@ -3235,6 +3235,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 throw new AppException("未查找到医保个人信息，请做医保登记。");
             }
         }
+
         insureVisitParam.put("id",visitId);
         insureVisitParam.put("hospCode",hospCode);
         insureVisitParam.put("insureSettleId","1");  //作为sql条件判断 删除医保结算id不为空的数据
@@ -3252,6 +3253,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     /**
      * @param outptVisitDTO
      * @Method checkSettleMoney
+     * 费用做判断验证之前，需要判断是否已经做了医保登记，是否已经医保结算，一个医保登记号，只能有一笔正常的结算信息
      * @Desrciption 门诊预结算之前，需要判断his产生的费用，是否和上传到医保的费用相等。
      *  feeMap：包含医保匹配的费用集数据，以及包含匹配费用的总和
      *  sumRealityPrice：表示本次匹配费用且未传输的总金额
@@ -3281,6 +3283,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          */
         insureIndividualCostService_consumer.deleteOutptInsureCost(map);
         Map<String, Object> feeMap = commonInsureCost(map);
+        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+        individualSettleDTO.setHospCode(hospCode);
+        individualSettleDTO.setVisitId(visitId);
+        individualSettleDTO.setState(Constants.SF.S);
+        individualSettleDTO.setSettleState(Constants.SF.S);
+        individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
+        if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){
+            throw new AppException("一次门诊医保登记,只能有一笔正常的结算记录");
+        }
         List<Map<String,Object>> insureCostList = MapUtils.get(feeMap,"insureCostList");
         List<OutptCostDTO> outptCostDTOList = outptVisitDTO.getOutptCostDTOList();
         if(ListUtils.isEmpty(outptCostDTOList)){

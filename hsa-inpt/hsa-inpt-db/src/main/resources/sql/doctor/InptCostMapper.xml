@@ -962,6 +962,22 @@
         </foreach>
     </update>
 
+    <!--住院退费确认-->
+    <update id="updateNewBackCost">
+      update inpt_cost
+      set
+      back_code = if(back_code = '1','3',back_code),
+      is_ok = #{isOk},
+      ok_id = #{okId},
+      ok_name = #{okName},
+      ok_time = #{okTime}
+      where hosp_code = #{hospCode}
+      and id in
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    </update>
+
     <!--住院退药批量更新-->
     <update id="updateInptCostBatchWithBackDrug">
         update inpt_cost

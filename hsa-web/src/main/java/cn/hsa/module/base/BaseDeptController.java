@@ -260,6 +260,17 @@ public class BaseDeptController extends BaseController {
         return this.baseDeptService_consumer.getDeptTypeCode(map);
     }
 
+    @PostMapping("/getPharInfo")
+    public WrapperResponse<List<BaseDeptDTO>> getPharInfo(@RequestBody BaseDeptDTO baseDeptDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        baseDeptDTO.setHospCode(sysUserDTO.getHospCode());
+        baseDeptDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        map.put("baseDeptDTO", baseDeptDTO);
+        return this.baseDeptService_consumer.getPharInfo(map);
+    }
+
     /**
      * @param baseDeptDTO
      * @Method getDeptInfoByLoginDeptId

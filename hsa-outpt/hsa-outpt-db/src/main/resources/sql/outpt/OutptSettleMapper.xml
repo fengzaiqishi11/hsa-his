@@ -524,6 +524,9 @@
         <if test="chargeId != null and chargeId != ''">
             and a.crte_id = #{chargeId}
         </if>
+        <if test="doctorId != null and doctorId != ''">
+            and b.doctor_id = #{doctorId}
+        </if>
         order by a.settle_no desc, a.settle_time desc
     </select>
 

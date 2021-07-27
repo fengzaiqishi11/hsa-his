@@ -445,24 +445,18 @@
                         iv.in_dept_name as dept_name,
                         isi.invoice_no AS invoice_no,
                         DATE_FORMAT(iss.settle_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
-                        round(iss.actual_price, 2) total_price,
+                        round(iss.reality_price, 2) total_price,
                         iss.crte_name AS crte_name,
                         iss.status_code as status_code
                     FROM
-                        outin_daily od,
-                        inpt_settle iss,
-                        inpt_settle_invoice isi,
-                        inpt_visit iv
+                    outin_daily od
+                    join inpt_settle iss on od.hosp_code = iss.hosp_code and od.id = iss.daily_settle_id
+                    left join inpt_settle_invoice isi on iss.hosp_code = isi.hosp_code and iss.id = isi.settle_id
+                    join inpt_visit iv on iss.hosp_code = iv.hosp_code and iss.visit_id = iv.id
                     WHERE
                         od.hosp_code = #{hospCode}
                         AND od.type_code = '2'
                         AND od.daily_no = #{dailyNo}
-                        AND od.hosp_code = iss.hosp_code
-                        AND od.hosp_code = isi.hosp_code
-                        AND od.hosp_code = iv.hosp_code
-                        AND od.id = iss.daily_settle_id
-                        AND iss.id = isi.settle_id
-                        AND iss.visit_id = iv.id
                 ) t
                 ORDER BY t.settle_time DESC
             </when>

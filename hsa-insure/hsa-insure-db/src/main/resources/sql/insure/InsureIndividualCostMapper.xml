@@ -546,11 +546,13 @@
         iim.deductible deductible,
         iim.standard_code standardCode,
         iim.check_price checkCode,
-        iim.lmt_user_flag lmtUserFlag,
         iim.manufacturer manufacturer,
-        iim.tcmdrug_used_way tcmdrugUsedWay
+        iim.tcmdrug_used_way tcmdrugUsedWay,
+        iad.lmt_user_flag  lmtUserFlag
         FROM
         inpt_cost ic
+        left join inpt_advice_detail iad on ic.hosp_code = iad.hosp_code and ic.visit_id = iad.visit_id
+        and ic.item_id = iad.item_id and ic.iat_id = iad.ia_id
         JOIN insure_item_match iim
         ON ic.`item_id` = iim.`hosp_item_id`
         AND ic.`item_code` = iim.`hosp_item_type`
@@ -979,5 +981,18 @@
         select feedetl_sn from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
         and feedetl_sn is not null order by feedetl_sn desc limit 1
     </select>
+    <update id="updateLimitUserFlag">
+        update inpt_advice_detail set lmt_user_flag =#{lmtUserFlag}
+        where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
+    </update>
+    <select id="queryInptCostPage" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        select ic.id, ic.hosp_code, ic.visit_id, ic.ia_id, ic.ba_id, ic.ia_group_no, ic.bfc_id, ic.item_code,
+               ic.item_id, ic.item_name, ic.num, ic.unit_code, ic.price,
+               ic.total_price, ic.use_code, ic.source_code, ic.lmt_user_flag as is_hosp_flag, ic.lim_user_explain,ic.lmt_user_flag
+        from inpt_advice_detail ic join insure_item_match iim on iim.hosp_item_id = ic.item_id
+        where ic.hosp_code =#{hospCode} and ic.visit_id =#{visitId}
+    </select>
+
+
 
 </mapper>

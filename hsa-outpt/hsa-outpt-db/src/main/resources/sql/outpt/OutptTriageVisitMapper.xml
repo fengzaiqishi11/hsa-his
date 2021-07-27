@@ -510,22 +510,21 @@
 
 
     <select id="getDoctorByClinicIdAndQueueDate" resultType="cn.hsa.module.sys.user.dto.SysUserDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
-             SELECT
-                *
-            FROM
-                sys_user
+        SELECT
+            su.*,
+            tmp.clinic_id
+        FROM
+            sys_user su,(SELECT
+                             b.doctor_id ,b.clinic_id
+                         FROM
+                             outpt_classes_queue a,
+                             outpt_doctor_queue b
+                         WHERE
+                             a.hosp_code=b.hosp_code and a.id = b.cq_id
+                           AND a.queue_date = date (#{queueDate})
+                        AND b.clinic_id = #{clinicId} ) tmp
             WHERE
-                id IN (
-                SELECT
-                    b.doctor_id
-                FROM
-                    outpt_classes_queue a,
-                    outpt_doctor_queue b
-                WHERE
-                    a.id = b.cq_id
-                    AND a.queue_date = date (#{queueDate})
-                AND b.clinic_id = #{clinicId}
-                ) and status_code ='0'
+                su.id IN (tmp.doctor_id) and status_code ='0'
     </select>
 
     <select id="getClinicInfoById" resultType="map" parameterType="map" >

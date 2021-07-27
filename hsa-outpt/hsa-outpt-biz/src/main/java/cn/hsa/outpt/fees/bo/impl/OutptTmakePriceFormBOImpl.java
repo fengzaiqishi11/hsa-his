@@ -337,7 +337,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 得到需要删除的费用
             for (int i = tempoutptCostDTOList.size()-1; i>=0; i--) {
                 for (int j = 0; j < temp.size(); j++) {
-                    if (!"1".equals(temp.get(j).getSourceCode()) && tempoutptCostDTOList.get(i).getId().equals(temp.get(j).getId())) {
+                    if (tempoutptCostDTOList.get(i).getId() == null || temp.get(j).getId() == null) {
+                        tempoutptCostDTOList.remove(i);
+                        break;
+                    }else if (!"1".equals(temp.get(j).getSourceCode()) && tempoutptCostDTOList.get(i).getId().equals(temp.get(j).getId())) {
                         tempoutptCostDTOList.remove(i);
                         break;
                     }

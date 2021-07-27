@@ -506,7 +506,50 @@
     <delete id="deleteOutptTriageVisitById" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
         delete from outpt_triage_visit where id = #{id}
     </delete>
-
+    <!-- 获取医生下已接诊和未接诊病人数量作为分诊时病人的排序号 -->
+    <select id="getSequenceNoOfDoctorOrDept" parameterType="map" resultType="map">
+        SELECT
+        (count(a.id)+1) as sequenceNo
+        FROM
+        outpt_visit a
+        JOIN outpt_register b ON a.id = b.visit_id
+        AND a.hosp_code = b.hosp_code
+        LEFT JOIN outpt_diagnose c ON a.id = c.visit_id
+        AND a.hosp_code = c.hosp_code
+        AND c.is_main = '1'
+        AND ifnull( c.disease_id, '' ) != ''
+        LEFT JOIN base_disease d ON c.disease_id = d.id
+        AND c.hosp_code = d.hosp_code
+        LEFT JOIN sys_parameter e ON e.CODE = 'MZYS_EKCFNL'
+        AND a.hosp_code = e.hosp_code
+        AND ( DATE_FORMAT( FROM_DAYS( TO_DAYS(#{registerTime})- TO_DAYS( a.birthday )), '%Y' )+ 0 ) &lt;= e.
+        VALUE
+        LEFT JOIN sys_parameter f ON f.CODE = 'GH_JS'
+        AND a.hosp_code = f.hosp_code
+        LEFT JOIN outpt_register_settle g ON b.id = g.register_id
+        AND b.hosp_code = g.hosp_code
+        AND g.status_code = '0'
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND ((
+        f.
+        VALUE
+        = '0'
+        AND g.id IS NOT NULL
+        )
+        OR ifnull( f.VALUE, '0' ) != '0'
+        OR f.id IS NULL
+        )
+        <if test="doctorId != null">
+            AND b.doctor_id =#{doctorId}
+        </if>
+        <if test="deptId != null">
+            AND  (b.dept_id = #{deptId} and ifnull(b.doctor_id,'') = '')
+        </if>
+        AND ifnull( b.is_cancel, '0' ) = '0'
+        AND date( b.register_time ) = date(
+        #{registerTime})
+    </select>
 
 
     <select id="getDoctorByClinicIdAndQueueDate" resultType="cn.hsa.module.sys.user.dto.SysUserDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
@@ -530,6 +573,14 @@
     <select id="getClinicInfoById" resultType="map" parameterType="map" >
         select id,`name`,`number`,address from base_clinic
         where id =#{id} and hosp_code = #{hospCode}
+    </select>
+    <select id="getOutptTriageVisitForUpdateByRegisterId"
+            resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        SELECT
+            `id`,`hosp_code`,`register_id`,`visit_id`,`triage_no`,`doctor_id`,`dept_id`,
+            `dept_name`,`sort_no`
+        FROM
+            outpt_triage_visit  where hosp_code = #{hospCode} and  register_id = #{registerId} for update
     </select>
     <!--保存操作信息修改-->
     <update id="updateOutptTriageVisitFz" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">

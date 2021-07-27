@@ -27,6 +27,7 @@
         <result property="typeIdentity" column="type_identity" jdbcType="VARCHAR"/>
         <result property="drugStoreCode" column="drugStoreCode" jdbcType="VARCHAR"/>
         <result property="pharName" column="pharName" jdbcType="VARCHAR"/>
+        <result property="pharId" column="pharId" jdbcType="VARCHAR"/>
 
     </resultMap>
     <!--通过实体作为筛选条件查询-->
@@ -400,7 +401,7 @@
 
     <!-- 护士站补记账获取药房信息 -->
     <select id="getPharInfo" resultMap="BaseDeptMap">
-        select a.*,c.name as pharName
+        select a.*,c.name as pharName,c.id as pharId
         from  base_dept a ,
         base_dept_drugstore  b ,
         base_dept c ,

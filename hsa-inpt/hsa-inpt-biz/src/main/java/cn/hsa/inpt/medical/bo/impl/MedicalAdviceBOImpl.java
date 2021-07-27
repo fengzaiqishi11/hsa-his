@@ -410,11 +410,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 if (parameterDTO != null && !StringUtils.isEmpty(parameterDTO.getValue())) {
                     cxfBaseItem = getBaseItemDTOByCode(medicalAdviceDTO.getHospCode(), parameterDTO.getValue());
                 }
-
-                if (cxfBaseItem == null){
-                    return ;
-                }
-
                 /**
                  * 判断是否合管 医技分类、容器、标本不能为空,有空表示不合管
                  * 1.根据医技分类、容器、标本判断是否合管

@@ -10,4 +10,7 @@
 
     <!--系统用户管理 -->
     <dubbo:reference id="centerUserService_consumer" interface="cn.hsa.module.center.user.service.CenterUserService" check="false"/>
+
+    <!--本地规则服务-->
+    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>
 </beans>

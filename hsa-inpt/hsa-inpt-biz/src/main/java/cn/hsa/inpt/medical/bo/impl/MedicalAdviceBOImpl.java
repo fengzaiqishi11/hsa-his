@@ -55,6 +55,7 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -2357,6 +2358,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //材料
         Map<String, BaseMaterialDTO> materiaMap = new HashMap<>();
 
+        // 获取医保限制用药用药参数 luoyong 2021.07.28/14:21
+        SysParameterDTO sysParameterDTO = getSysParameterDTO(medicalAdviceDTO.getHospCode(), "INSURE_DEFAULT_REG_CODE");
+
         //获取医嘱集合
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(medicalAdviceDTO.getHospCode(), adviceIds);
         if (ListUtils.isEmpty(inptAdviceDTOList)) {
@@ -2490,6 +2494,18 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
                 //住院领药申请
                 produceWaitReceive(inptCostDTO, inptAdviceDTO, medicalAdviceDTO, date, msgList, inWaitReceiveDTOS, drugMap, materiaMap);
+
+                // 根据医保限制用药系统参数(INSURE_DEFAULT_REG_CODE)，判断是否需要更新费用表中相关医保限制用药字段 luoyong 2021.07.28/14:21
+                if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                    Map parse = (Map) JSON.parse(sysParameterDTO.getValue());
+                    String isLmtDrugFlag = MapUtils.get(parse, "isLmtDrugFlag");
+                    // 开启了限制用药
+                    if (StringUtils.isNotEmpty(isLmtDrugFlag) && "1".equals(isLmtDrugFlag)) {
+                        inptCostDTO.setLmtUserFlag(inptAdviceDetailDTO.getLmtUserFlag());
+                        inptCostDTO.setLimUserExplain(inptAdviceDetailDTO.getLimUserExplain());
+                        inptCostDTO.setIsReimburse(inptAdviceDetailDTO.getIsReimburse());
+                    }
+                }
 
                 inptCostDTOs.add(inptCostDTO);
 

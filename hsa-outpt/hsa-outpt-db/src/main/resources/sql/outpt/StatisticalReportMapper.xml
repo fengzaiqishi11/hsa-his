@@ -1273,7 +1273,7 @@
         g.good_name,
         g.spec,
         g.unit_code,
-        sum(a.num - a.total_back_num) num,
+        sum(a.num) num,
         (case max(g.antibacterial_code)
         when 1 then
         '抗菌类'
@@ -1294,9 +1294,7 @@
         join phar_out_distribute b on a.distribute_id=b.id
         WHERE
         g.hosp_code = #{hospCode}
-        and a.num > a.total_back_num
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
-
         <if test="startDate != null and startDate != ''">
             and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
         </if>
@@ -1413,7 +1411,7 @@
             and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
-        )tab where num > 0
+        )tab where tab.num != 0
     </select>
 
 
@@ -1618,7 +1616,7 @@
     g.spec,
     g.unit_code,
     max(g.split_ratio) split_ratio,
-    sum(a.num - a.total_back_num) num,
+    sum(a.num) num,
     max(a.price) price,
     sum(a.total_price) total_price,
     (case max(g.antibacterial_code)
@@ -1641,8 +1639,6 @@
     join phar_out_distribute b on a.distribute_id=b.id
     WHERE
     g.hosp_code = #{hospCode}
-    and a.num > 0
-    and a.num > a.total_back_num
     AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
     <if test="startDate != null and startDate != ''">
       and date(b.crte_time) >= date(#{startDate})
@@ -1651,7 +1647,7 @@
       and date(b.crte_time) &lt;= date(#{endDate})
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
-    )tab where num > 0 order by tab.crte_time desc
+    )tab where tab.num != 0 order by tab.crte_time desc
 
   </select>
 

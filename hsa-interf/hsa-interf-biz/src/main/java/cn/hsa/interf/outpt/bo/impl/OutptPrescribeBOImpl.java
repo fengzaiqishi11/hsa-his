@@ -347,6 +347,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         List<Map<String, Object>> list = this.queryProfileFileAll(map1);
         if (list.size() > 0){
             yjRcDTO.setOutProfile(MapUtils.get(list.get(0), "ybkh"));
+            outptVisitDTO.setProfileId(MapUtils.get(list.get(0), "brid"));
         } else {
             throw new AppException("未获取到该人档案信息");
         }

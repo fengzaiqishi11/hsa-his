@@ -1106,7 +1106,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             pharOutReceiveDO.setTotalPrice((BigDecimal) pharOutReceiveMap.get(pharId).get("totalPrice"));//总金额
             Boolean isDist = Constants.SF.F.equals(outptCostDTOList.get(0).getIsDist());//判断是否已发药
             pharOutReceiveDO.setStatusCode(isDist ? Constants.LYZT.QL : Constants.LYZT.FY);//发药状态
-            pharOutReceiveDO.setDeptId(depId);//申请科室
+            pharOutReceiveDO.setDeptId((String) pharOutReceiveMap.get(pharId).get("sourceDeptId"));//申请科室
             pharOutReceiveDO.setCrteId(userId);//创建人
             pharOutReceiveDO.setCrteName(userName);//创建人姓名
             pharOutReceiveDO.setCrteTime(new Date());//创建时间
@@ -1226,6 +1226,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                             Map<String, Object> receiveMap = new HashMap<String, Object>();
                             receiveMap.put("id", SnowflakeUtils.getId());//领药申请单id
                             receiveMap.put("totalPrice", outptCostDTO.getRealityPrice());//总金额
+                            receiveMap.put("sourceDeptId", outptCostDTO.getSourceDeptId());//申请科室ID
                             pharOutReceiveMap.put(outptCostDTO.getPharId(), receiveMap);
                         } else {
                             BigDecimal price = (BigDecimal) pharOutReceiveMap.get(outptCostDTO.getPharId()).get("totalPrice");

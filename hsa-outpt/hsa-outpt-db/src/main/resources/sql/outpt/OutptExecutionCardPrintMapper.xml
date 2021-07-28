@@ -69,12 +69,16 @@
         <if test="endTime != null and endTime != ''">
             and a.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
-        order by a.crte_time desc,b.group_no asc ,b.group_seq_no asc)tab
+        <!--根据处方同顺序排序-->
+        order by a.id asc, d.id asc, b.id asc, d.crte_time DESC, a.crte_time DESC, b.group_no asc , b.group_seq_no asc) tab
+        <!--order by a.crte_time desc,b.group_no asc ,b.group_seq_no asc)tab-->
         where 1=1
         <if test="printSign != null and printSign != ''">
             and isPrint = #{printSign}
         </if>
-        order by registerTime desc,groupNo asc ,groupSeqNo asc
+        <!--根据处方同顺序排序-->
+        ORDER BY id asc, opId asc, opdId asc, registerTime DESC, groupNo asc, groupSeqNo asc
+        <!--order by registerTime desc,groupNo asc ,groupSeqNo asc-->
     </select>
 
     <select id="queryByIds" parameterType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">

@@ -197,7 +197,7 @@ public interface DoctorAdviceService {
     /**
      * @Menthod: queryLimitDrugList
      * @Desrciption: 查询医保限制级用药列表
-     * @Param: inptVisitDTO
+     * @Param: inptAdviceDTO
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-22 08:48

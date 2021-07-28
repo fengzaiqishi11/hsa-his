@@ -36,5 +36,6 @@ public class InptAdviceDetailDTO extends InptAdviceDetailDO implements Serializa
     private String isHospFlag;
     private String limUserExplain;
     private String lmtUserFlag;
+    private String isReimburse;
 
 }

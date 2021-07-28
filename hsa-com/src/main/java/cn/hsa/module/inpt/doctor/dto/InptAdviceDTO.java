@@ -143,4 +143,8 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
 
     /** 手术信息 **/
     private OperInfoRecordDTO operInfoRecordDTO;
+    /**
+     * 医嘱ids字符串
+     */
+    private String idsStr;
 }

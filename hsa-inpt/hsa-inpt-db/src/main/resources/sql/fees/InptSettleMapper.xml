@@ -842,7 +842,8 @@
             (select name from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) bfcName,ifnull(d.realityPrice,0) realityPrice,
             case when d.babyId is not null then 0 else
             (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') end as yjxj,
-            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') yjzz,
+            case when d.babyId is not null then 0 else
+            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') end as yjzz,
             (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code='1') tkxj,
             (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code!='1') tkzz,
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') bsxj,

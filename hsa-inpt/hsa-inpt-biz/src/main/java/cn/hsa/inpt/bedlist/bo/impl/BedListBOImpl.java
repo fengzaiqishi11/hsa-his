@@ -1239,7 +1239,7 @@ public class BedListBOImpl implements BedListBO {
     // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
     public void insertDiagnose(InptVisitDTO inptVisitDTO){
             if (inptVisitDTO!=null) {
-                // 查询是否存在出院诊断
+                // 查询是否存在出院主诊断
                 Integer diagnoseCount = bedListDAO.getInptDiagnoseByVisitId(inptVisitDTO.getHospCode(),
                         inptVisitDTO.getId(),inptVisitDTO.getOutDiseaseId());
                 if (diagnoseCount != null && diagnoseCount > 0) {
@@ -1252,12 +1252,12 @@ public class BedListBOImpl implements BedListBO {
                     inptDiagnose.setCrteId(inptVisitDTO.getCrteId());
                     inptDiagnose.setDiseaseId(inptVisitDTO.getOutDiseaseId());
                     // 查询出入院诊断之外的主诊断
-//                    Integer count = bedListDAO.getInptDiagnose(inptVisitDTO.getHospCode(), inptVisitDTO.getId());
-//                    if (count != null && count > 0) {
-//                    } else {
-//                        inptDiagnose.setIsMain("1");
-//                    }
-                    inptDiagnose.setIsMain("0");
+                    Integer count = bedListDAO.getInptDiagnose(inptVisitDTO.getHospCode(), inptVisitDTO.getId());
+                    if (count != null && count > 0) {
+                        inptDiagnose.setIsMain("0");
+                    } else {
+                        inptDiagnose.setIsMain("1");
+                    }
                     inptDiagnose.setTypeCode("204");
                     bedListDAO.insertDiagnose(inptDiagnose);
                 }

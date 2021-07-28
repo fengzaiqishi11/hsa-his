@@ -393,11 +393,11 @@
     </insert>
     <select id="getInptDiagnose" resultType="java.lang.Integer">
         select count(*) from inpt_diagnose where
-        hosp_code =#{hospCode} and visit_id =#{visitId} and is_main ='1' and type_code !='201'
+        hosp_code =#{hospCode} and visit_id =#{visitId} and is_main ='1' and type_code !='201' and (type_code='204' or type_code='303')
     </select>
 
     <select id="getInptDiagnoseByVisitId" resultType="java.lang.Integer">
         select count(*) from inpt_diagnose where
-        hosp_code =#{hospCode} and visit_id =#{visitId} and (type_code ='204' or type_code ='303') and  disease_id=#{diseaseId}
+        hosp_code =#{hospCode} and visit_id =#{visitId} and (type_code ='204' or type_code ='303') and  disease_id=#{diseaseId} and is_main ='1'
     </select>
 </mapper>

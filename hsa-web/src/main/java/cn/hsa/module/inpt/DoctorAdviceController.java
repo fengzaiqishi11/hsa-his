@@ -386,19 +386,19 @@ public class DoctorAdviceController extends BaseController {
     /**
      * @Menthod: queryLimitDrugList
      * @Desrciption: 查询医保限制级用药列表
-     * @Param: inptVisitDTO
+     * @Param: inptAdviceDTO
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-22 08:48
      * @Return:
      **/
     @GetMapping("/queryLimitDrugList")
-    public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(InptAdviceDTO inptAdviceDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        inptAdviceDTO.setHospCode(sysUserDTO.getHospCode());
         Map paramMap = new HashMap();
         paramMap.put("hospCode", sysUserDTO.getHospCode());
-        paramMap.put("inptVisitDTO", inptVisitDTO);
+        paramMap.put("inptAdviceDTO", inptAdviceDTO);
         return doctorAdviceService_consumer.queryLimitDrugList(paramMap);
     }
 

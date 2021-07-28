@@ -2194,13 +2194,24 @@
         order by a.op_id, a.group_no, a.group_seq_no asc
     </select>
 
+    <!--根据处方ids和visitId从处方明细表副表查询出处方列表-->
+    <select id="queryPrescribeListByIdsAndVisitId" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
+        select
+               *
+        from outpt_prescribe_detail_ext
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and FIND_IN_SET(op_id, #{ids})
+    </select>
+
     <!--更新费用表数据，限制用药字段-->
     <update id="updateOuptCost" parameterType="java.util.List">
         <foreach collection="costDTOS" item="item" separator=";">
             update outpt_cost
             set
             lmt_user_flag = #{item.lmtUserFlag},
-            lim_user_explain = #{item.limUserExplain}
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
             where hosp_code = #{item.hospCode}
             and id = #{item.id}
             <if test="item.visitId != null and item.visitId != ''">
@@ -2218,7 +2229,8 @@
             update outpt_prescribe_detail_ext
             set
             lmt_user_flag = #{item.lmtUserFlag},
-            lim_user_explain = #{item.limUserExplain}
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
             where hosp_code = #{item.hospCode}
             and id = #{item.id}
             <if test="item.visitId != null and item.visitId != ''">

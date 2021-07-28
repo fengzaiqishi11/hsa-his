@@ -1046,12 +1046,12 @@ public class OutptDoctorPrescribeController extends BaseController {
    * @Return:
    **/
   @GetMapping("/queryLimitDrugList")
-  public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+  public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(OutptPrescribeDTO outptPrescribeDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
-    outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+      outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     Map paramMap = new HashMap();
     paramMap.put("hospCode", sysUserDTO.getHospCode());
-    paramMap.put("outptVisitDTO", outptVisitDTO);
+    paramMap.put("outptPrescribeDTO", outptPrescribeDTO);
     return outptDoctorPrescribeService_consumer.queryLimitDrugList(paramMap);
   }
 

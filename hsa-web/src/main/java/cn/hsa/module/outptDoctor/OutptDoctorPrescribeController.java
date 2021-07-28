@@ -1021,6 +1021,7 @@ public class OutptDoctorPrescribeController extends BaseController {
   public WrapperResponse<Map<String,Object>> callNumberInTheQueue(@RequestBody  Map<String,Object> parameter, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     parameter.put("hospCode",sysUserDTO.getHospCode());
+    parameter.put("doctorId",sysUserDTO.getId());
     return outptTriageVisitService_consumer.updateCallNumberInTheQueue(parameter);
   }
   /**

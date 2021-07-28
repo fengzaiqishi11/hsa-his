@@ -346,6 +346,7 @@
             a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
             a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
             a.crte_time,
+            otv.triage_start_code as triageStatusCode,
             case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
             from outpt_visit a
             join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
@@ -353,6 +354,7 @@
         left join base_disease d on c.disease_id = d.id and c.hosp_code = d.hosp_code
             left join sys_parameter e on e.code = 'MZYS_EKCFNL' and a.hosp_code = e.hosp_code
                 and (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(a.birthday)), '%Y')+0) &lt;= e.value
+        left join outpt_triage_visit otv on a.hosp_code = otv.hosp_code and a.register_id = otv.register_id
             <!-- 待接诊 -->
             <if test="operType == '1'.toString() ">
                 left join sys_parameter f on f.code = 'GH_JS' and a.hosp_code = f.hosp_code

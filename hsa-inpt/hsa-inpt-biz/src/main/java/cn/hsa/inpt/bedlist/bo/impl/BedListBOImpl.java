@@ -1252,12 +1252,12 @@ public class BedListBOImpl implements BedListBO {
                     inptDiagnose.setCrteId(inptVisitDTO.getCrteId());
                     inptDiagnose.setDiseaseId(inptVisitDTO.getOutDiseaseId());
                     // 查询出入院诊断之外的主诊断
-                    Integer count = bedListDAO.getInptDiagnose(inptVisitDTO.getHospCode(), inptVisitDTO.getId());
-                    if (count != null && count > 0) {
-                        inptDiagnose.setIsMain("0");
-                    } else {
-                        inptDiagnose.setIsMain("1");
-                    }
+//                    Integer count = bedListDAO.getInptDiagnose(inptVisitDTO.getHospCode(), inptVisitDTO.getId());
+//                    if (count != null && count > 0) {
+//                    } else {
+//                        inptDiagnose.setIsMain("1");
+//                    }
+                    inptDiagnose.setIsMain("0");
                     inptDiagnose.setTypeCode("204");
                     bedListDAO.insertDiagnose(inptDiagnose);
                 }

@@ -1684,7 +1684,7 @@
         ${caseSqlStr}
         from (
         select a.dept_id,a.bfc_id,sum(a.reality_price) as reality_price
-        from outpt_cost a  where a.status_code ='0' and a.hosp_code = #{hospCode}
+        from outpt_cost a  where  a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
             and date(a.crte_time) &gt;= date(#{startTime})

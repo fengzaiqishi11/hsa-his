@@ -83,6 +83,7 @@
         <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
         <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
         <result property="stockOccupy" column="stock_occupy" jdbcType="VARCHAR"/>
+        <result property="stockNum" column="stock_num" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 门诊处方数据库映射配置 -->
@@ -1491,7 +1492,7 @@
         bd.good_pym,
         bd.good_wbm,
         '0' as is_cg,
-        ss.num,
+        ss.num as stock_num,
         ss.split_num,
         ss.stock_occupy,
         bd.rate_code rateCode
@@ -1540,7 +1541,7 @@
         bm.pym AS good_pym,
         bm.wbm AS good_wbm,
         '0' as is_cg,
-        ss.num,
+        ss.num as stock_num,
         ss.split_num,
         ss.stock_occupy,
         '' rateCode
@@ -1588,7 +1589,7 @@
         name_pym as good_pym,
         name_wbm as good_wbm,
         is_cg,
-        null as num,
+        null as stock_num,
         null as split_num,
         null as stock_occupy,
         '' rateCode

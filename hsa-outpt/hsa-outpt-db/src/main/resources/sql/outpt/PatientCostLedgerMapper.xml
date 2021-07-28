@@ -1711,7 +1711,7 @@
         max(a.unit_code) as unitCode,
         max(a.split_unit_code) as splitUnitCode,
         (select name from base_dept where id = b.dept_id) as deptName
-        from phar_in_distribute_detail a
+        from phar_in_distribute_all_detail a
         left join phar_in_distribute b on a.distribute_id = b.id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
         left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = '2'
@@ -1724,9 +1724,12 @@
         <if test="endTime != null and endTime != ''">
             and date(b.crte_time) &lt;= date(#{endTime})
         </if>
+        /*项目名称*/
+        <if test="keyword != null and keyword != ''">
+            and a.item_name like concat('%',#{keyword},'%')
+        </if>
         group by b.dept_id, a.item_id
-        ) A
-        where a.num > 0
+        ) A where A.splitNum != 0
 
     </select>
 
@@ -5483,6 +5486,7 @@
         </if>
         group by a.crte_id
     </select>
+    <!--门诊领药统计查询-->
     <select id="queryOutMedicationGet" resultType="java.util.LinkedHashMap">
         select A.* from (
             select
@@ -5498,7 +5502,7 @@
             max(a.split_unit_code) as splitUnitCode,
             max(date(b.crte_time)) as creTime,
             (select name from base_dept where id = b.dept_id) as deptName
-            from phar_out_distribute_detail a
+            from phar_out_distribute_all_detail a
             left join phar_out_distribute b on a.distribute_id = b.id
             left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
             left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = '2'
@@ -5518,8 +5522,7 @@
                 and a.item_name like concat('%',#{keyword},'%')
             </if>
             group by b.dept_id, a.item_id
-            ) A
-            where A.num > 0
+            ) A where A.splitNum != 0
     </select>
 
 </mapper>

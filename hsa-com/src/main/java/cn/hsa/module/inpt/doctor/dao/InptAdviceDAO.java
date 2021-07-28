@@ -810,4 +810,7 @@ public interface InptAdviceDAO {
 
     // 更新医嘱明细表副表数据，限制用药字段
     int updateInptAdviceDetail(@Param("detailsExtDTOS") List<InptAdviceDetailDTO> detailsExtDTOS);
+
+    // 根据医嘱ids字符串和visitId从处方明细表副表查询出处方列表
+    List<InptAdviceDetailDTO> queryAdviceByIdsAndVisitId(InptAdviceDTO inptAdviceDTO);
 }

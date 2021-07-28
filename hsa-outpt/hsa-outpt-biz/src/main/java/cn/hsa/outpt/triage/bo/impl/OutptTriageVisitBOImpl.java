@@ -210,6 +210,7 @@ public class OutptTriageVisitBOImpl implements OutptTriageVisitBO {
         OutptTriageVisitDTO outptTriageVisitDTO = new OutptTriageVisitDTO();
         outptTriageVisitDTO.setRegisterId(MapUtils.get(map,"registerId"));
         outptTriageVisitDTO.setHospCode(MapUtils.get(map,"hospCode"));
+        outptTriageVisitDTO.setDoctorId(MapUtils.get(map,"doctorId"));
         outptTriageVisitDTO.setTriageStartCode(Constants.FZZT.HAVE_BEEN_CALLED);
         outptTriageVisitDTO.setIsCall(Constants.SF.S);
         outptTriageVisitDTO.setCallTime(new Date());
@@ -251,6 +252,11 @@ public class OutptTriageVisitBOImpl implements OutptTriageVisitBO {
 
     /** 更新叫号状态叫号时间，叫号次数，分诊状态等 **/
     private synchronized  int updateTriageStartCodeByRegisterId(OutptTriageVisitDTO outptTriageVisitDTO) {
+        OutptTriageVisitDTO triageVisitDTO = outptTriageVisitDAO.getOutptTriageVisitForUpdateByRegisterId(outptTriageVisitDTO);
+        if(triageVisitDTO.getDoctorId() != null) {
+            // 叫号时如果该患者已经挂号到医生或者通过分诊台指定了分诊医生那么就不该更新医生信息
+            outptTriageVisitDTO.setDoctorId(null);
+        }
        return outptTriageVisitDAO.updateOutptTriageVisitByRegisterId(outptTriageVisitDTO);
     }
 
@@ -312,7 +318,7 @@ public class OutptTriageVisitBOImpl implements OutptTriageVisitBO {
         int affectRows = updateTriageStartCodeByRegisterId(outptTriageVisitDTO);
 
         if (!success.equals(code)) {
-            throw new AppException(jObj.getString("message"));
+            throw new AppException("过号失败，失败信息："+jObj.toJSONString());
         }
         return affectRows > 0;
     }

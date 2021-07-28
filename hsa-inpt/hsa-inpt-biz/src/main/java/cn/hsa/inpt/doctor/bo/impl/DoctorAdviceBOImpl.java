@@ -1229,18 +1229,29 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     /**
      * @Menthod: queryLimitDrugList
      * @Desrciption: 查询医保限制级用药列表
-     * @Param: inptVisitDTO
+     * @Param: inptAdviceDTO
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-22 08:48
      * @Return:
      **/
     @Override
-    public List<InsureItemMatchDTO> queryLimitDrugList(InptVisitDTO inptVisitDTO) {
-        if (StringUtils.isEmpty(inptVisitDTO.getId())) throw new RuntimeException("就诊id为空，请核对！");
+    public List<InsureItemMatchDTO> queryLimitDrugList(InptAdviceDTO inptAdviceDTO) {
+        if (StringUtils.isEmpty(inptAdviceDTO.getVisitId())) throw new RuntimeException("就诊id为空，请核对！");
+        if (StringUtils.isEmpty(inptAdviceDTO.getIdsStr())) throw new RuntimeException("未选择需要提交的医嘱！");
         // 根据就诊id查询就诊记录
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setId(inptAdviceDTO.getVisitId());
+        inptVisitDTO.setHospCode(inptAdviceDTO.getHospCode());
         InptVisitDTO visitById = inptVisitDAO.getInptVisitById(inptVisitDTO);
         if (visitById == null) throw new RuntimeException("就诊记录不存在，请核对！");
+
+        // 根据医嘱ids字符串和visitId从处方明细表副表查询出处方列表
+        List<InptAdviceDetailDTO> list = inptAdviceDAO.queryAdviceByIdsAndVisitId(inptAdviceDTO);
+        List<String> itemIdList = new ArrayList<>();
+        if (!ListUtils.isEmpty(list)) {
+            itemIdList = list.stream().map(InptAdviceDetailDTO::getItemId).distinct().collect(Collectors.toList());
+        }
 
         // 病人类型
         String patientCode = visitById.getPatientCode();
@@ -1294,7 +1305,19 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("insureItemMatchDTO", insureItemMatchDTO);
         List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchService_consumer.queryLimitDrugList(map).getData();
-        return insureItemMatchDTOS;
+
+        List<InsureItemMatchDTO> result = new ArrayList<>();
+        // 返回结果，根据医嘱明细下所有的项目id匹配医保限制类用药的项目
+        if (!ListUtils.isEmpty(itemIdList) && !ListUtils.isEmpty(insureItemMatchDTOS)) {
+            for (String itemId : itemIdList) {
+                for (InsureItemMatchDTO itemMatchDTO : insureItemMatchDTOS) {
+                    if (itemId.equals(itemMatchDTO.getHospItemId())) {
+                        result.add(itemMatchDTO);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -1333,6 +1356,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                     for (InsureItemMatchDTO insureItemMatchDTO : itemMatchDTOSByItemId) {
                         detailsExtDTO.setLmtUserFlag(insureItemMatchDTO.getLmtUserFlag());
                         detailsExtDTO.setLimUserExplain(insureItemMatchDTO.getLimUserExplain());
+                        detailsExtDTO.setIsReimburse(insureItemMatchDTO.getIsReimburse());
                     }
                 }
             }

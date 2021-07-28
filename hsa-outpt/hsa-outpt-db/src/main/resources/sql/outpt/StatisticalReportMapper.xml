@@ -1273,7 +1273,7 @@
         g.good_name,
         g.spec,
         g.unit_code,
-        sum(a.num) num,
+        sum(a.num - a.total_back_num) num,
         (case max(g.antibacterial_code)
         when 1 then
         '抗菌类'
@@ -1294,7 +1294,6 @@
         join phar_out_distribute b on a.distribute_id=b.id
         WHERE
         g.hosp_code = #{hospCode}
-        and a.num > 0
         and a.num > a.total_back_num
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
 
@@ -1305,7 +1304,7 @@
             and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
-        )tab
+        )tab where tab.num !=0
     </select>
 
     <!--抗菌类门诊发药汇总统计-->
@@ -1619,7 +1618,7 @@
     g.spec,
     g.unit_code,
     max(g.split_ratio) split_ratio,
-    sum(a.num) num,
+    sum(a.num - a.total_back_num) num,
     max(a.price) price,
     sum(a.total_price) total_price,
     (case max(g.antibacterial_code)

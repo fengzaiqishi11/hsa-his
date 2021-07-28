@@ -674,7 +674,7 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
      **/
     @Override
     public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap) {
-        return WrapperResponse.success(outptDoctorPrescribeBO.queryLimitDrugList(MapUtils.get(paramMap, "outptVisitDTO")));
+        return WrapperResponse.success(outptDoctorPrescribeBO.queryLimitDrugList(MapUtils.get(paramMap, "outptPrescribeDTO")));
     }
 
     /**

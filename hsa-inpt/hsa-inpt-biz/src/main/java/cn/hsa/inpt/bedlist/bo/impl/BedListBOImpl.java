@@ -1239,7 +1239,7 @@ public class BedListBOImpl implements BedListBO {
     // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
     public void insertDiagnose(InptVisitDTO inptVisitDTO){
             if (inptVisitDTO!=null) {
-                // 查询是否存在出院诊断
+                // 查询是否存在出院主诊断
                 Integer diagnoseCount = bedListDAO.getInptDiagnoseByVisitId(inptVisitDTO.getHospCode(),
                         inptVisitDTO.getId(),inptVisitDTO.getOutDiseaseId());
                 if (diagnoseCount != null && diagnoseCount > 0) {

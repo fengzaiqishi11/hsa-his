@@ -469,7 +469,6 @@
     <!-- 查询费用传输、已传输、未传输费用信息-->
     <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
-        DISTINCT
         ic.id id,
         ic.hosp_code hospCode,
         ic.visit_id visitId,
@@ -549,11 +548,9 @@
         iim.check_price checkCode,
         iim.manufacturer manufacturer,
         iim.tcmdrug_used_way tcmdrugUsedWay,
-        iad.lmt_user_flag  lmtUserFlag
+        ic.is_reimburse as isReimburse
         FROM
         inpt_cost ic
-        left join inpt_advice_detail iad on ic.hosp_code = iad.hosp_code and ic.visit_id = iad.visit_id
-        and ic.item_id = iad.item_id and ic.iat_id = iad.ia_id
         JOIN insure_item_match iim
         ON ic.`item_id` = iim.`hosp_item_id`
         AND ic.`item_code` = iim.`hosp_item_type`

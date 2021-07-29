@@ -22,7 +22,6 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.ConditionalOnEnabledResourceChain;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -130,6 +129,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         String visitId = inptVisitDTO.getId();
         String crteId = inptVisitDTO.getCrteId();
         String code = inptVisitDTO.getCode();
+        String isHalfSettle = inptVisitDTO.getIsHalfSettle();
+        Date startDate = inptVisitDTO.getFeeStartDate();
+        Date endDate = inptVisitDTO.getFeeEndDate();
         String crteName = inptVisitDTO.getCrteName();
         int batchCount = 100; // 定义分批处理的数据
         int count;
@@ -137,6 +139,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         Map<String,Object> insureVisitParam = new HashMap<String,Object>();
         insureVisitParam.put("id",visitId);
         insureVisitParam.put("hospCode",hospCode);
+
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
         if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
             throw new AppException("【" + inptVisitDTO.getName() + "】未完成医保登记。");
@@ -152,6 +155,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         insureCostParam.put("transmitCode",Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode",insureRegCode);// 医保机构编码
         insureCostParam.put("queryBaby","N");// 医保机构编码
+        insureCostParam.put("isHalfSettle",isHalfSettle);// 是否中途结算
+        insureCostParam.put("feeStartDate",DateUtils.format(startDate,DateUtils.Y_M_D));
+        insureCostParam.put("feeEndDate",DateUtils.format(endDate,DateUtils.Y_M_D));// 是否中途结算
         //查询为上传的费用集合
         List<Map<String,Object>> insureCostList = insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
 
@@ -265,7 +271,8 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                     }
                 }
                 leng++;
-            }else{
+            }
+            else{
                 inptVisitDTO.setInsureCostList(insureCostList);
                 if(Constants.BRLX.SNYDBR.equals(insureIndividualVisitDTO.getPatientType()) ||
                         Constants.BRLX.SWYDBR.equals(insureIndividualVisitDTO.getPatientType())){
@@ -275,14 +282,31 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                 }
             }
         }
+
         if(!MapUtils.isEmpty(resultDataMap) && (Integer)MapUtils.get(resultDataMap, "num") > 0){
             List<Map<String,Object>> list2  = MapUtils.get(resultDataMap, "list2");
             if(!ListUtils.isEmpty(list2)){
-                for(Map<String,Object> item : list2){
-                    item.put("insureIsTransmit","1");
+                if("1".equals(isHalfSettle)){
+                    // 如果是费用传输的时候，选择了中途结算，但是并没有实际结算，下一次的费用传输，应该覆盖上次的结算区间
+                    for(Map<String,Object> item : list2){
+                        item.put("insureIsTransmit","1");
+                        item.put("startDate",DateUtils.format(startDate,DateUtils.Y_M_D));
+                        item.put("isHalfSettle",isHalfSettle);
+                        item.put("endDate",DateUtils.format(endDate,DateUtils.Y_M_D));
+                        item.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
+                    }
+                }else{
+                    for(Map<String,Object> item : list2){
+                        item.put("insureIsTransmit","1");
+                    }
                 }
                 insureIndividualCostDAO.updateCostInsureStatus(list2);
             }
+        }
+        // 如果在费用传输的时候 选择了中途结算，则更新医保就诊表里面的结算次数,同时更新是否结算标志
+        //
+        if("1".equals(isHalfSettle)){
+            insureIndividualVisitDAO.updateInsureInidivdual(inptVisitDTO);
         }
         resultMap.put("name",inptVisitDTO.getName());
         resultMap.put("num",insureCostList.size());

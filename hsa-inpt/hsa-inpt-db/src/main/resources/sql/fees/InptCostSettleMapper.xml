@@ -150,9 +150,13 @@
         id = #{id}
     </update>
     <update id="updateInsureSettleCost">
-        update insure_individual_cost set insure_settle_id = #{insureSettleId} where hosp_code =#{hospCode} and visit_id =#{visitId}
+        update insure_individual_cost set insure_settle_id = #{insureSettleId} where hosp_code =#{hospCode}
+        and visit_id =#{visitId}
         <if test="insureSettleId != null and insureSettleId != ''">
             and IFNULL(insure_settle_id,'0') ='0'
+        </if>
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and insure_register_no = #{medicalRegNo}
         </if>
     </update>
 

@@ -2,11 +2,14 @@ package cn.hsa.module.insure.module.dto;
 
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -96,4 +99,12 @@ public class InsureIndividualCostDTO extends InsureIndividualCostDO implements S
         private String insureSettleId ; // 医保结算id
         private BigDecimal sumBigDecimalFee; // 本次费用传输总金额
         private BigDecimal detItemFeeSumamt ; // 明细项目费用总额
+        @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private Date feeStartTime;
+        @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private Date feeEndTime;
+        private int settleCount; // 中途结算次数
+        private String  isHalfSettle; //是否中途结算
 }

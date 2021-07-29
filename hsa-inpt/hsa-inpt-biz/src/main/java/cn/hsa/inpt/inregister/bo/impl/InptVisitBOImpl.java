@@ -975,7 +975,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 Map<String, Object> insureUnifiedPayParam = new HashMap<>();
                 insureUnifiedPayParam.put("hospCode",insureInptRegisterDTO.getHospCode());
                 insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
-                insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
+//                insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
                 /**统一支付平台调用   结束*/
             }else{
                 if (!Constants.BRLX.SNYDBR.equals(inptVisitDTO.getPatientCode()) && !Constants.BRLX.SWYDBR.equals(inptVisitDTO.getPatientCode())) {

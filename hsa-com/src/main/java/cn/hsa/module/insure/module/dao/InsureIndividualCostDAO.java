@@ -328,4 +328,15 @@ public interface InsureIndividualCostDAO {
      * @Return
      */
     List<InptAdviceDetailDTO> queryInptCostPage(InptVisitDTO inptVisitDTO);
+    
+    /**
+     * @Method 查询中途结算时：选择的费用区间
+     * @Desrciption  
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/7/28 9:31
+     * @Return 
+    **/
+    InsureIndividualCostDTO selectHalfTransmitFee(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

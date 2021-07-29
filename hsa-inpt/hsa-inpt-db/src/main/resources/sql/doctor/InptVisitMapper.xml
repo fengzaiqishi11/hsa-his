@@ -125,10 +125,10 @@
 		left join inpt_diagnose c on (a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1')
 		where a.hosp_code = #{hospCode} and a.status_code in ('1','2','3','4','5','6')
 		<if test="isInsureRegister == '0'.toString() ">
-			and b.id is null
+			and (b.id is null or b.settle_count >0)
 		</if>
 		<if test="isInsureRegister == '1'.toString() ">
-			and b.id is not null
+			and b.id is not null and  1 > b.settle_count
 		</if>
 		<if test="startTime != null and startTime != ''">
 			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')

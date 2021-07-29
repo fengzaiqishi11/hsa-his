@@ -113,7 +113,7 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     /*查询用的两个时间范围*/
     private String Stime;
     private String Etime;
-
+    private String isHalfSettle; // 是否开启中途结算
 
 
 
@@ -138,6 +138,12 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date feeEndDate;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date feeStartDate;
     //住院结束时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -356,4 +362,5 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     // 是否使用个人账户
     private String isUserInsureAccount;
     private String isUnified ;
+    private String feeParam;
 }

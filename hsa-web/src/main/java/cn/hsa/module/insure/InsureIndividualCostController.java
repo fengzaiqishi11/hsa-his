@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Package_name: cn.hsa.module.insure
@@ -80,6 +81,7 @@ public class InsureIndividualCostController extends BaseController {
             List<String> idsList = Arrays.asList(ids.split(","));
             inptVisitDTO.setIds(idsList);
         }
+        AtomicInteger atomicInteger = new AtomicInteger();
         param.put("hospCode",sysUserDTO.getHospCode());
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
         inptVisitDTO.setCrteId(sysUserDTO.getId());//创建人id

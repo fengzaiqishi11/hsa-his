@@ -358,6 +358,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     insureIndividualCostDTO.setVisitId(inptVisitDTO.getId());
                     settleMap.put("visitId",inptVisitDTO.getId());
                     settleMap.put("insureSettleId",null);
+                    settleMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
                     settleMap.put("insureIndividualCostDTO",insureIndividualCostDTO);
                     settleMap.put("hospCode",hospCode);
                     // 出院结算取消

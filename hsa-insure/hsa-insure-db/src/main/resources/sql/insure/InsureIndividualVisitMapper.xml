@@ -736,7 +736,7 @@
         iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,
         if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time, '%Y-%m-%d' )) END)
                = 0,1,(case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time, '%Y-%m-%d' )) END))
-        as  hospitalDay
+        as  hospitalDay,iiv.settle_count,iiv.is_half_settle
         FROM
         insure_individual_visit iiv
         left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
@@ -748,6 +748,7 @@
             or iv.name like concat('%',#{keyword},'%')
             )
         </if>
+        order by settle_count desc limit 1;
     </select>
 
     <select id="queryInsureIndividualVisitByIds" parameterType="map"

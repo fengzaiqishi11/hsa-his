@@ -280,4 +280,12 @@ public interface MrisHomeService {
      * @Return
     **/
     List<MrisDiagnoseDO> queryAllDiagnose(Map<String, Object> map);
+
+    /**
+     *
+     * @param map
+     * @return String
+     */
+    @GetMapping("/service/mris/mrisHome/importMrisInfo")
+    WrapperResponse<String> importMrisInfo(Map map) throws Exception;
 }

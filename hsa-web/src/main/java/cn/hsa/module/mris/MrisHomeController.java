@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -322,5 +323,55 @@ public class MrisHomeController extends BaseController {
         map.put("crteId",sysUserDTO.getId());
         map.put("crteName",sysUserDTO.getName());
         return WrapperResponse.success(mrisHomeService_consumer.updateMrisFeesInfo(map));
+    }
+
+    /**
+     * @Menthod: inptMrisInfoDownload
+     * @Desrciption:
+     * @Param: 1. hospCode: 医院编码
+     * 2. data: 入参 code-科室编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-19 17:25
+     * @Return: csv文件
+     **/
+    @GetMapping("/inptMrisInfoDownload")
+    public void inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res,String statusCode) throws Exception {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map param =new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("statusCode",statusCode);
+        param.put("hospName",sysUserDTO.getHospName());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
+        WrapperResponse<String> returnDatas = mrisHomeService_consumer.importMrisInfo(param);
+        String path = returnDatas.getData();
+        try {
+            // path是指欲下载的文件的路径。
+            File file = new File(path);
+            // 取得文件名。
+            String filename = file.getName();
+            // 取得文件的后缀名。
+            String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+
+            // 以流的形式下载文件。
+            InputStream fis = new BufferedInputStream(new FileInputStream(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            // 清空response
+            res.reset();
+            // 设置response的Header
+            res.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("utf-8"),"ISO8859-1"));
+            res.addHeader("Content-Length", "" + file.length());
+            OutputStream toClient = new BufferedOutputStream(res.getOutputStream());
+            res.setContentType("application/octet-stream");
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

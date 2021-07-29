@@ -432,7 +432,7 @@ public interface OutptDoctorPrescribeBO {
      * @Date: 2021-07-19 11:42
      * @Return:
      */
-    List<InsureItemMatchDTO> queryLimitDrugList(OutptVisitDTO outptVisitDTO);
+    List<InsureItemMatchDTO> queryLimitDrugList(OutptPrescribeDTO outptPrescribeDTO);
 
     /**
      * @Menthod: updateOuptCostAndPreDetailExt

@@ -298,7 +298,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setId(outptVisitDTO.getProfileId());
             outptProfileFileDTO.setHospCode(hospCode);
             outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
-            outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
+            outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
             outptProfileFileDTO.setName(outptVisitDTO.getName());
             outptProfileFileDTO.setAge(outptVisitDTO.getAge());
             outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
@@ -782,6 +782,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 log.error("排班医生的诊室ID为空或者不存在,执行的SQL语句ID为 'cn.hsa.module.outpt.queue.dao.queryClassesQueueParam',查询的参数为：{}",mapParam);
                 return ;
             }
+
             OutptClassesQueueDto classesQueueDto = classesQueue.get(0);
             // 3.获取班次是否排队叫号信息
             OutptClassifyClassesDTO classifyClassesDTO = new OutptClassifyClassesDTO();
@@ -800,6 +801,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptTriageVisitDTO.setDoctorId(outptRegisterDTO.getDoctorId());
             outptTriageVisitDTO.setDoctorName(outptRegisterDTO.getDoctorName());
             outptTriageVisitDTO.setDqId(outptRegisterDTO.getDqId());
+
+            outptTriageVisitDTO.setSortNo(getSequenceNoByCond(null,outptRegisterDTO.getDoctorId(),hospCode));
+
             mapParam.put("id",doctorQueueDto.getClinicId());
             Map result = outptTriageVisitDao.getClinicInfoById(mapParam);
             outptTriageVisitDTO.setClinicName(result == null? null:MapUtils.get(result,"name"));
@@ -829,6 +833,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptTriageVisitDTO.setCrteId(outptRegisterDTO.getCrteId());
         outptTriageVisitDTO.setCrteName(outptRegisterDTO.getCrteName());
         outptTriageVisitDTO.setCrteTime(DateUtils.getNow());
+        if(outptTriageVisitDTO.getSortNo() == null)
+        outptTriageVisitDTO.setSortNo(getSequenceNoByCond(outptRegisterDTO.getDeptId(),null,hospCode));
 
         outptTriageVisitDao.insertOutptTriageVisit(outptTriageVisitDTO);
 
@@ -870,6 +876,21 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             }
             log.debug("挂号时调用叫号接口的返回结果："+result);
         }
+    }
+
+    /** 根据医生id或部门id查询当天病人的排序号 **/
+    private Integer getSequenceNoByCond(String deptId, String doctorId,String hospCode){
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",hospCode);
+        map.put("registerTime",new Date());
+        if(deptId != null) {
+            map.put("deptId", deptId);
+        }
+        if(doctorId != null) {
+            map.put("doctorId", doctorId);
+        }
+        Map<String,Integer> sequenceNoMap = outptTriageVisitDao.getSequenceNoOfDoctorOrDept(map);
+        return Integer.valueOf(String.valueOf(sequenceNoMap.get("sequenceNo")));
     }
 
     private void disposeFpxx(OutptRegisterSettleDto outptRegisterSettleDto, String hospCode){

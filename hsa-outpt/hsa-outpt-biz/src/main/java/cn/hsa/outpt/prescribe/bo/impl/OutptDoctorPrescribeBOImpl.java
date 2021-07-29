@@ -3094,7 +3094,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setAge(outptVisitDTO.getAge());
         outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
         outptProfileFileDTO.setBirthday(outptVisitDTO.getBirthday());
-        outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
+        outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
@@ -3641,14 +3641,28 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      * @Return:
      */
     @Override
-    public List<InsureItemMatchDTO> queryLimitDrugList(OutptVisitDTO outptVisitDTO) {
-        if (StringUtils.isEmpty(outptVisitDTO.getVisitId())) throw new RuntimeException("就诊id为空，请核对！");
+    public List<InsureItemMatchDTO> queryLimitDrugList(OutptPrescribeDTO outptPrescribeDTO) {
+        if (StringUtils.isEmpty(outptPrescribeDTO.getVisitId())) {
+            throw new RuntimeException("就诊id为空，请核对！");
+        }
+        if (StringUtils.isEmpty(outptPrescribeDTO.getIds())) {
+            throw new RuntimeException("未选择需要提交的处方！");
+        }
         // 根据就诊id查询就诊记录
         Map visitMap = new HashMap();
-        visitMap.put("visitId", outptVisitDTO.getVisitId());
-        visitMap.put("hospCode", outptVisitDTO.getHospCode());
+        visitMap.put("visitId", outptPrescribeDTO.getVisitId());
+        visitMap.put("hospCode", outptPrescribeDTO.getHospCode());
         List<OutptVisitDTO> visitById = outptVisitDAO.getVisitById(visitMap);
-        if (ListUtils.isEmpty(visitById)) throw new RuntimeException("就诊记录不存在，请核对！");
+        if (ListUtils.isEmpty(visitById)) {
+            throw new RuntimeException("就诊记录不存在，请核对！");
+        }
+
+        // 根据处方ids和visitId从处方明细表副表查询出处方列表
+        List<OutptPrescribeDetailsExtDTO> list = outptDoctorPrescribeDAO.queryPrescribeListByIdsAndVisitId(outptPrescribeDTO);
+        List<String> itemIdList = new ArrayList<>();
+        if (!ListUtils.isEmpty(list)) {
+            itemIdList = list.stream().map(OutptPrescribeDetailsExtDTO::getItemId).distinct().collect(Collectors.toList());
+        }
 
         OutptVisitDTO visitDTO = visitById.get(0);
         // 病人类型
@@ -3659,15 +3673,15 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             if (Integer.parseInt(patientCode) > 0) { // 医保病人
                 // 通过就诊id查询医保登记信息
                 Map insureParamMap = new HashMap();
-                insureParamMap.put("hospCode", outptVisitDTO.getHospCode());
-                insureParamMap.put("id", outptVisitDTO.getVisitId());
+                insureParamMap.put("hospCode", outptPrescribeDTO.getHospCode());
+                insureParamMap.put("id", outptPrescribeDTO.getVisitId());
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
                 if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人
                 // 根据系统参数(INSURE_DEFAULT_REG_CODE)获取限制用药的默认医保机构编码
-                SysParameterDTO sysParameterDTO = this.getSysParam(outptVisitDTO.getHospCode());
+                SysParameterDTO sysParameterDTO = this.getSysParam(outptPrescribeDTO.getHospCode());
                 if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
                     Map parse = (Map) JSON.parse(sysParameterDTO.getValue());
                     if (StringUtils.isNotEmpty(MapUtils.get(parse, "isLmtDrugFlag"))
@@ -3686,7 +3700,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         // 根据医保机构编码查询限制级用药列表
         InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
         // 医院编码
-        insureItemMatchDTO.setHospCode(outptVisitDTO.getHospCode());
+        insureItemMatchDTO.setHospCode(outptPrescribeDTO.getHospCode());
         // 医保机构编码
         insureItemMatchDTO.setInsureRegCode(insureRegCode);
         // 已审核
@@ -3700,14 +3714,23 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         // 属限制级用药
         insureItemMatchDTO.setLmtUserFlag(Constants.SF.S);
         Map map = new HashMap();
-        map.put("hospCode", outptVisitDTO.getHospCode());
+        map.put("hospCode", outptPrescribeDTO.getHospCode());
         map.put("insureItemMatchDTO", insureItemMatchDTO);
         List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchService_consumer.queryLimitDrugList(map).getData();
-        /*Map<String, List<InsureItemMatchDTO>> resultMap = new HashMap<>();
-        if (!ListUtils.isEmpty(insureItemMatchDTOS)) {
-            resultMap = insureItemMatchDTOS.stream().collect(Collectors.groupingBy(InsureItemMatchDTO::getInsureRegCode));
-        }*/
-        return insureItemMatchDTOS;
+
+        List<InsureItemMatchDTO> result = new ArrayList<>();
+        // 返回结果，根据处方下所有的项目id匹配医保限制类用药的项目
+        if (!ListUtils.isEmpty(itemIdList) && !ListUtils.isEmpty(insureItemMatchDTOS)) {
+            for (String itemId : itemIdList) {
+                for (InsureItemMatchDTO itemMatchDTO : insureItemMatchDTOS) {
+                    if (itemId.equals(itemMatchDTO.getHospItemId())) {
+                        result.add(itemMatchDTO);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -3747,6 +3770,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                     for (InsureItemMatchDTO insureItemMatchDTO : itemMatchDTOSByItemId) {
                         costDTO.setLmtUserFlag(insureItemMatchDTO.getLmtUserFlag());
                         costDTO.setLimUserExplain(insureItemMatchDTO.getLimUserExplain());
+                        costDTO.setIsReimburse(insureItemMatchDTO.getIsReimburse());
                     }
                 }
             }
@@ -3761,6 +3785,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                     for (InsureItemMatchDTO insureItemMatchDTO : itemMatchDTOSByItemId) {
                         detailsExtDTO.setLmtUserFlag(insureItemMatchDTO.getLmtUserFlag());
                         detailsExtDTO.setLimUserExplain(insureItemMatchDTO.getLimUserExplain());
+                        detailsExtDTO.setIsReimburse(insureItemMatchDTO.getIsReimburse());
                     }
                 }
             }

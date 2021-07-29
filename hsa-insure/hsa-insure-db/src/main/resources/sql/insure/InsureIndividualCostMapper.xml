@@ -481,6 +481,7 @@
     <!-- 查询费用传输、已传输、未传输费用信息-->
     <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
+        DISTINCT
         ic.id id,
         ic.hosp_code hospCode,
         ic.visit_id visitId,

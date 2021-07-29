@@ -1684,7 +1684,7 @@
         ${caseSqlStr}
         from (
         select a.dept_id,a.bfc_id,sum(a.reality_price) as reality_price
-        from outpt_cost a  where a.status_code ='0' and a.hosp_code = #{hospCode}
+        from outpt_cost a  where  a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
             and date(a.crte_time) &gt;= date(#{startTime})
@@ -1726,7 +1726,13 @@
         </if>
         /*项目名称*/
         <if test="keyword != null and keyword != ''">
-            and a.item_name like concat('%',#{keyword},'%')
+            and (a.item_name like concat('%',#{keyword},'%')
+            or bd.usual_name like concat('%',#{keyword},'%')
+            or bd.good_pym like concat('%',#{keyword},'%')
+            or bd.good_wbm like concat('%',#{keyword},'%')
+            or bd.usual_pym like concat('%',#{keyword},'%')
+            or bd.usual_wbm like concat('%',#{keyword},'%')
+            )
         </if>
         group by b.dept_id, a.item_id
         ) A where A.splitNum != 0
@@ -5519,7 +5525,14 @@
                 and date(b.crte_time) &lt;= #{endTime}
             </if>
             <if test="keyword != null and keyword != ''">
-                and a.item_name like concat('%',#{keyword},'%')
+                and (
+                a.item_name like concat('%',#{keyword},'%')
+                or bd.usual_name like concat('%',#{keyword},'%')
+                or bd.good_pym like concat('%',#{keyword},'%')
+                or bd.good_wbm like concat('%',#{keyword},'%')
+                or bd.usual_pym like concat('%',#{keyword},'%')
+                or bd.usual_wbm like concat('%',#{keyword},'%')
+                )
             </if>
             group by b.dept_id, a.item_id
             ) A where A.splitNum != 0

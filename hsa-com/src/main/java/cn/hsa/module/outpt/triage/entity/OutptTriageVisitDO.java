@@ -42,7 +42,7 @@ public class OutptTriageVisitDO extends PageDO implements Serializable {
     private String clinicName;//诊室名称
     private String doctorId;//医生ID
     private String doctorName;//医生ID
-    private int sortNo; // 排序号,
+    private Integer sortNo; // 排序号,
     private String name; // 病人姓名,
     private String triageStartCode; // 分诊状态（FZZT）,
     private String isCall; //是否叫号,

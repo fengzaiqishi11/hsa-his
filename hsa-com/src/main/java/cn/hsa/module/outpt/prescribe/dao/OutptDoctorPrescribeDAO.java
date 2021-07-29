@@ -868,4 +868,7 @@ public interface OutptDoctorPrescribeDAO {
 
     // 更新处方明细表副表数据，限制用药字段
     int updateOuptPreDetailExt(@Param("detailsExtDTOS")List<OutptPrescribeDetailsExtDTO> detailsExtDTOS);
+
+    // 根据处方ids和visitId从处方明细表副表查询出处方列表
+    List<OutptPrescribeDetailsExtDTO> queryPrescribeListByIdsAndVisitId(OutptPrescribeDTO outptPrescribeDTO);
 }

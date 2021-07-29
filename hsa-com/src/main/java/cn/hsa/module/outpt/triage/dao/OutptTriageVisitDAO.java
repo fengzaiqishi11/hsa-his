@@ -33,6 +33,7 @@ public interface OutptTriageVisitDAO {
      * @Date: 2021/6/22 15:30
      **/
     int updateOutptTriageVisitByRegisterId(OutptTriageVisitDTO outptTriageVisitDTO);
+    OutptTriageVisitDTO getOutptTriageVisitForUpdateByRegisterId(OutptTriageVisitDTO outptTriageVisitDTO);
 
     /**
      * 更新就诊病人到队列中
@@ -63,7 +64,13 @@ public interface OutptTriageVisitDAO {
      * @Date: 2021/6/22 15:30
      **/
     int deleteOutptTriageVisitById(OutptTriageVisitDTO outptTriageVisitDTO);
-    OutptClassesQueueDto getOutptClassQueueById(OutptClassesQueueDto classesQueueDto);
+    /**
+       *  查询挂号到医生或部门下的排序号
+       * @Author: luonianxin
+       * @Email: nianxin.luo@powersi.com
+       * @Date: 2021/7/27 13:56
+    **/
+    Map<String,Integer> getSequenceNoOfDoctorOrDept(Map<String,Object> param);
 
     /**
      * 根据传过来的医院编码分诊台,查询对应的病人信息

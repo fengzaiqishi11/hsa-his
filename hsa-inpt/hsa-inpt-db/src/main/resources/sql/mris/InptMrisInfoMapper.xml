@@ -871,8 +871,15 @@
         IFNULL(c.hcl03,0) as D33,
         IFNULL(c.hcl03,0) as D33,
         IFNULL(c.fy06,0) as D34
-       from mris_base_info b LEFT JOIN mris_cost c on b.hosp_code = c.hosp_code and  b.visit_id = c.visit_id
+       from mris_base_info b LEFT JOIN mris_cost c on c.hosp_code= #{hospCode} and  b.visit_id = c.visit_id
+       left join inpt_visit v on v.hosp_code=#{hospCode} and  b.visit_id = v.id
        where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL AND b.out_time IS NOT NULL
+       <if test="inDeptId!=null and inDeptId!=''">
+        and v.in_dept_id = #{inDeptId}
+       </if>
+       <if test="statusCode != null and statusCode !=''">
+         and v.status_code = #{statusCode}
+       </if>
        <if test="visitId!=null and visitId!=''">
           and b.visit_id =#{visitId}
        </if>

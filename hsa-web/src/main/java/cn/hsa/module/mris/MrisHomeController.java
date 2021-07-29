@@ -336,10 +336,15 @@ public class MrisHomeController extends BaseController {
      * @Return: csv文件
      **/
     @GetMapping("/inptMrisInfoDownload")
-    public void inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res) throws Exception {
+    public void inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res,String statusCode) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map param =new HashMap();
         param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("statusCode",statusCode);
+        param.put("hospName",sysUserDTO.getHospName());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
         WrapperResponse<String> returnDatas = mrisHomeService_consumer.importMrisInfo(param);
         String path = returnDatas.getData();
         try {
@@ -358,7 +363,7 @@ public class MrisHomeController extends BaseController {
             // 清空response
             res.reset();
             // 设置response的Header
-            res.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes()));
+            res.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("utf-8"),"ISO8859-1"));
             res.addHeader("Content-Length", "" + file.length());
             OutputStream toClient = new BufferedOutputStream(res.getOutputStream());
             res.setContentType("application/octet-stream");

@@ -3094,7 +3094,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setAge(outptVisitDTO.getAge());
         outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
         outptProfileFileDTO.setBirthday(outptVisitDTO.getBirthday());
-        outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
+        outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());

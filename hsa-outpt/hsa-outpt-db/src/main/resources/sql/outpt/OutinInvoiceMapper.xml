@@ -851,6 +851,7 @@
             s.reality_price as settleRealityPrice,
             s.self_price as selfPrice,
             s.mi_price as miPrice,
+            v.doctor_id as doctorId,
             u.name as doctorName,
             u.prac_certi_no as pracCertiNo,
             (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice
@@ -1493,6 +1494,7 @@
     <select id="getZyCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select c.*, d.name as xmName, v.name as patientName, v.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode,
          s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
+         s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
          scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo,
          case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays
         from inpt_settle s join inpt_cost c on c.settle_id = s.id

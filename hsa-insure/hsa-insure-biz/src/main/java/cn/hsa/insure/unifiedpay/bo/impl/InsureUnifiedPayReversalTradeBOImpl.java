@@ -289,21 +289,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      **/
     @Override
     public Map<String, Object> updateUP_3202(Map<String, Object> parameterMap) {
+        Map<String, Object> resultMap = new HashMap<>();
         String hospCode = MapUtils.get(parameterMap, "hospCode");
         String insureRegCode = MapUtils.get(parameterMap, "insureRegCode");
-        Map<String, Object> resultMap = new HashMap<>();
-
-        if(ListUtils.isEmpty(MapUtils.get(parameterMap, "detailList"))){
-            resultMap.put("code", "-1");
-            resultMap.put("errorMsg", "数据异常，无费用明细");
-            return resultMap;
-        }
+        String stmtBegndate = MapUtils.get(parameterMap, "stmt_begndate");
+        String stmtEnddate = MapUtils.get(parameterMap, "stmt_enddate");
 
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("setl_optins",MapUtils.get(parameterMap, "clr_optins"));//结算经办机构
         dataMap.put("clr_type",MapUtils.get(parameterMap, "clr_type"));//结算经办机构
-        dataMap.put("stmt_begndate",MapUtils.get(parameterMap, "stmt_begndate"));//对账开始日期
-        dataMap.put("stmt_enddate",MapUtils.get(parameterMap, "stmt_enddate"));//对账结束日期
+        dataMap.put("stmt_begndate",stmtBegndate);//对账开始日期
+        dataMap.put("stmt_enddate",stmtEnddate);//对账结束日期
         dataMap.put("medfee_sumamt",MapUtils.get(parameterMap, "medfee_sumamt"));//医疗费总额
         dataMap.put("fund_pay_sumamt",MapUtils.get(parameterMap, "fund_pay_sumamt"));//基金支付总额
         dataMap.put("cash_payamt",MapUtils.get(parameterMap, "person_price"));//现金支付金额
@@ -311,32 +307,24 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         dataMap.put("fixmedins_code",MapUtils.get(parameterMap, "fixmedins_code"));// 医疗机构编码
         dataMap.put("REFD_SETL_FLAG",MapUtils.get(parameterMap, "refdSetlFlag")); // 是否包含退费数据
         dataMap.put("fixmedins_refd_setl_flag", MapUtils.get(parameterMap, "refdSetlFlag"));//定点医药机构结算笔数
-        List<Map<String, Object>> dataMapList = new ArrayList<>();
-        Map<String, Object> dm = new HashMap<>();
-        Object detailList = MapUtils.get(parameterMap, "detailList");
-        for(Map<String,Object> dl: ((List<Map<String, Object>>)detailList)){
-            dm = new HashMap<>();
-            dm.put("setl_id",MapUtils.get(dl, "setl_id"));//结算ID
-            dm.put("mdtrt_id",MapUtils.get(dl, "mdtrt_id"));//就诊ID
-            dm.put("psn_no",MapUtils.get(dl, "psn_no"));//人员编号
-            dm.put("medfee_sumamt",MapUtils.get(dl, "medfee_sumamt"));//医疗费总额
-            dm.put("fund_pay_sumamt",MapUtils.get(dl, "fund_pay_sumamt"));//基金支付总额
-            dm.put("acct_pay",MapUtils.get(dl, "acct_pay"));//个人账户支出
-            if("0".equals(MapUtils.get(dl, "state"))){
-                dm.put("refd_setl_flag","0");//退费结算标志
-            }else{
-                dm.put("refd_setl_flag","1");//退费结算标志
-            }
-            dataMapList.add(dm);
-        }
 
+        //设置对账时间
+        Map<String,Object> selectDataListMap = new HashMap();
+        selectDataListMap.put("startDate",stmtBegndate);
+        selectDataListMap.put("endDate",stmtEnddate);
+        selectDataListMap.put("clrType",MapUtils.get(parameterMap, "clr_type"));
+        selectDataListMap.put("hospCode",hospCode);
+        selectDataListMap.put("insureRegCode",insureRegCode);
+        selectDataListMap.put("refdSetlFlag",MapUtils.get(parameterMap, "refdSetlFlag"));
+        List<Map<String,Object>> datailList = insureReversalTradeDAO.queryDataWith3202(selectDataListMap);
+        if (ListUtils.isEmpty(datailList)) {
+            throw new AppException("对明细账失败：未获取到费用明细信息！");
+        }
         Map<String, Object> httpParam = new HashMap<>();
         httpParam.put("data",dataMap);
-        httpParam.put("fsUploadIn",dataMapList);
+        httpParam.put("fsUploadIn",datailList);
         httpParam.put("flag","1");
-
         resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_3202, httpParam);
-
         return resultMap;
     }
 

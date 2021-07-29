@@ -573,11 +573,21 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
 
         //补全的费用
         List<InptCostDTO> costDtoList = new ArrayList<>();
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(hospCode);
+        inptVisitDTO.setId(longCostDtoList.get(0).getVisitId());
+        inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
         int index = 0;
         for (InptLongCostDTO inptLongCostDTO :longCostDtoList){
             index++;
+            if (inptLongCostDTO.getStartTime() == null){
+                throw new AppException(inptLongCostDTO.getItemName() + "计费开始时间不能为空!");
+            }
             if (inptLongCostDTO.getTotalNum() == null || BigDecimal.ZERO.equals(inptLongCostDTO.getTotalNum())){
-                throw new AppException("第【"+ index +"】行数据的数量为0或为空,保存失败");
+                throw new AppException(inptLongCostDTO.getItemName() + "数量为0或为空,保存失败!");
+            }
+            if (inptLongCostDTO.getStartTime().before(inptVisitDTO.getInTime())){
+                throw new AppException(inptLongCostDTO.getItemName() + "计费时间不能小于入院时间："+ DateUtils.format(inptVisitDTO.getInTime(),"yyyy-MM-dd HH:mm:ss"));
             }
             inptLongCostDTO.setId(SnowflakeUtils.getId());
             inptLongCostDTO.setCrteId(userId);
@@ -667,7 +677,8 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setExecDeptId(loginDeptId);
                 inptCostDTO.setStatusCode(Constants.ZTBZ.ZC) ;
                 inptCostDTO.setIsCost(Constants.SF.S) ;
-                inptCostDTO.setCostTime(startTime) ;
+                String strDate = DateUtils.format(startTime,"yyyy-MM-dd") + " " + DateUtils.format(inptLongCostDTO.getStartTime(),"HH:mm:ss");
+                inptCostDTO.setCostTime(DateUtils.parse(strDate,"yyyy-MM-dd HH:mm:ss")) ;
                 inptCostDTO.setCrteId(userId) ;
                 inptCostDTO.setCrteName(userName);
                 inptCostDTO.setCrteTime(inptLongCostDTO.getCrteTime()) ;
@@ -802,7 +813,6 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     }
                 }
                 dto.setId(SnowflakeUtils.getId());
-
                 dto.setItemName(id.getName());
                 dto.setPrice(id.getPrice());
                 dto.setSpec(id.getSpec());//规格
@@ -934,6 +944,7 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     wdto.setStatusCode(Constants.LYZT.DL);
                     wdto.setUsageCode(dto.getUsageCode());
                     wdto.setVisitId(dto.getVisitId());
+                    wdto.setGroupNo("0");
 
                     wdto.setStatusCode(Constants.FYZT.DL);//0、待领，1、请领，2、配药，3、发药
                     wdto.setPharId(dto.getPharId());//发药药房id

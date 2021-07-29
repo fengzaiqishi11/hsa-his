@@ -27,6 +27,33 @@
         </if>
     </select>
 
+    <!--分页查询已出院患者信息(珠海)-->
+    <select id="queryOutHospPatientPageZ" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT v.*,CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1')) as inNo
+        FROM inpt_visit v
+        left join  base_profile_file b on b.hosp_code=#{hospCode} and v.profile_id =b.id
+        WHERE v.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword !=''">
+            and CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1')) LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        <if test="inDeptId != null and inDeptId !=''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode !=''">
+            and v.patient_code = #{patientCode}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+    </select>
+
     <!--查询病案患者基本信息-->
     <select id="getMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
             resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">

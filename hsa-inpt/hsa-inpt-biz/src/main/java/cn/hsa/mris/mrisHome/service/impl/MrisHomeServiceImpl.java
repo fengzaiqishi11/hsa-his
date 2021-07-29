@@ -361,7 +361,7 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     @Override
     public WrapperResponse<String> importMrisInfo(Map map) throws Exception {
         List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
-        String rootPath = System.getProperty("user.dir")+"/files/";
+        String rootPath = System.getProperty("user.dir")+"/data/files/";
         String hospName= (String) map.get("hospName");
         String fileName="hqmsts_"+hospName+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
         CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);

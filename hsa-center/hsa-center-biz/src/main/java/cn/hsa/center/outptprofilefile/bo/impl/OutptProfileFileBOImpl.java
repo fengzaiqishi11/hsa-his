@@ -10,6 +10,8 @@ import cn.hsa.module.center.outptprofilefile.dao.OutptProfileFileDAO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.syncorderrule.service.SyncOrderRuleService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,9 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
 
     @Resource
     private BaseOrderRuleService baseOrderRuleService_consumer;
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Method getById
@@ -227,13 +232,30 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             //初始化设置住院次数
             outptProfileFileExtendDTO.setTotalIn(0);
         }
-
-        // 不管何种方式 只要是新增的从表数据都给他生成住院号和门诊号
-        // 调用本地的规则服务，生成住院号和门诊号
-        Map inMap = new HashMap();
-        inMap.put("hospCode", outptProfileFileDTO.getHospCode());
-        inMap.put("typeCode", "36");
-        String inProfile = baseOrderRuleService_consumer.getOrderNo(inMap).getData();
+        // 20210726 liuliyun 珠海病案号生成
+        Map sysParam=new HashMap();
+        sysParam.put("hospCode",outptProfileFileDTO.getHospCode());
+        sysParam.put("code","BAH_SF");
+        SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(sysParam).getData();
+        // 未配置系统参数时，添加默认值
+        if (sysParameterDTO ==null){
+            sysParameterDTO=new SysParameterDTO();
+            sysParameterDTO.setValue("0");
+        }
+        String inProfile ="";
+        if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
+            Map inMap = new HashMap();
+            inMap.put("hospCode", outptProfileFileDTO.getHospCode());
+            inMap.put("typeCode", "361");
+            inProfile = baseOrderRuleService_consumer.getOrderNo(inMap).getData();
+        }else {
+            // 不管何种方式 只要是新增的从表数据都给他生成住院号和门诊号
+            // 调用本地的规则服务，生成住院号和门诊号
+            Map inMap = new HashMap();
+            inMap.put("hospCode", outptProfileFileDTO.getHospCode());
+            inMap.put("typeCode", "36");
+            inProfile = baseOrderRuleService_consumer.getOrderNo(inMap).getData();
+        }
         Map outMap = new HashMap();
         outMap.put("hospCode", outptProfileFileDTO.getHospCode());
         outMap.put("typeCode", "104");

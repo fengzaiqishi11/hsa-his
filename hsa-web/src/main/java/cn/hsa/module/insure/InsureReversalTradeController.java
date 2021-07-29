@@ -157,9 +157,7 @@ public class InsureReversalTradeController extends BaseController {
     public WrapperResponse<Map<String,Object>> invoking3202(@RequestBody Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         paraMap.put("hospCode",sysUserDTO.getHospCode());
-
         WrapperResponse wrapperResponse = insureUnifiedPayReversalTradeService_consumer.updateUP_3202(paraMap);
-
         return wrapperResponse;
     }
 

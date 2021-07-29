@@ -3406,8 +3406,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      */
     public double calculateZsl(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO, BaseDrugDTO baseDrugDTO , BaseRateDTO baseRateDTO, double numNew){
         double zslNew = 0;
-        // 1：单次向上取整
-        if(StringUtils.isNotEmpty(baseDrugDTO.getTruncCode()) && "1".equals(baseDrugDTO.getTruncCode())){
+        // 没有配置默认 1：单次向上取整
+        if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
             // 按小单位计算
             if(outptPrescribeDetailsDTO.getNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
                 //按大单位计算 总数量 = 用量（向上取整） * 用药频率次数 * （用药天数/药品执行周期）

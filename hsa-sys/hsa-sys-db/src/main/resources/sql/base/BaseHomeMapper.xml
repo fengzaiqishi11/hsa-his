@@ -592,8 +592,8 @@
                 SUM(IF(t.status_code in ('5','7') and t.out_time >= #{filter_date}, 1, 0)) cyrs,
                 SUM(IF(t.status_code = '2', 1, 0)) zyrs,
                 SUM(IF(t.out_situation_code = '4' and t.out_time >= #{filter_date}, 1, 0)) swrs,
-                SUM(IF(t.Illness_code = '2',1,0)) bzrs,
-                SUM(IF(t.Illness_code = '1',1,0)) bwrs,
+                SUM(IF(t.status_code = '2' and t.Illness_code = '2',1,0)) bzrs,
+                SUM(IF(t.status_code = '2' and t.Illness_code = '1',1,0)) bwrs,
                 SUM(
                     (
                     SELECT

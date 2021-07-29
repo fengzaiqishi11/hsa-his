@@ -545,7 +545,7 @@
       <if test='queryBaby =="N"'>
           and (ia.baby_id is null or ia.baby_id = '')
       </if>
-      order by a.seq_no
+      order by a.long_start_time,a.seq_no
   </select>
 
   <!--批量新增新增所医嘱打印信息-->

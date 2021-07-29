@@ -1718,11 +1718,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
-            and date(b.crte_time) &gt;= date(#{startTime})
+            and date(a.crte_time) &gt;= date(#{startTime})
         </if>
         /*结束日期*/
         <if test="endTime != null and endTime != ''">
-            and date(b.crte_time) &lt;= date(#{endTime})
+            and date(a.crte_time) &lt;= date(#{endTime})
         </if>
         /*项目名称*/
         <if test="keyword != null and keyword != ''">
@@ -5518,11 +5518,11 @@
             </if>
             /*开始日期*/
             <if test="startTime != null">
-                and date(b.crte_time) &gt;= #{startTime}
+                and date(a.crte_time) &gt;= #{startTime}
             </if>
             /*结束日期*/
             <if test="endTime != null">
-                and date(b.crte_time) &lt;= #{endTime}
+                and date(a.crte_time) &lt;= #{endTime}
             </if>
             <if test="keyword != null and keyword != ''">
                 and (

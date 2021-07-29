@@ -1353,7 +1353,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         pf.setPhone(inptVisitDTO.getPhone());
         pf.setName(inptVisitDTO.getName());
         pf.setCertNo(inptVisitDTO.getCertNo());
-        pf.setCertCode(inptVisitDTO.getCertCode());
+        pf.setCertCode(StringUtils.isEmpty(inptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : inptVisitDTO.getCertCode());
         pf.setNationalityCation(inptVisitDTO.getNationalityCation());
         pf.setOccupationCode(inptVisitDTO.getOccupationCode());
         pf.setEducationCode(inptVisitDTO.getEducationCode());

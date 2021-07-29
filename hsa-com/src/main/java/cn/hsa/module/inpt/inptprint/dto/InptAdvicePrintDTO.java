@@ -57,4 +57,7 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
      * 药品大类
      */
     private String bigTypeCode;
+
+    // 医嘱是否停自身
+    private String isStopMyself;
 }

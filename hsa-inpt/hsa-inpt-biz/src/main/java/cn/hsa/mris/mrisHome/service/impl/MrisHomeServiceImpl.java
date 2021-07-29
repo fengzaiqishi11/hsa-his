@@ -361,18 +361,11 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     @Override
     public WrapperResponse<String> importMrisInfo(Map map) throws Exception {
         List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
-        //查询系统参数(dbf文件生成路径参数)
-        Map<String, Object> mapParam = new HashMap<String, Object>();
-        mapParam.put("hospCode", map.get("hospCode"));
-        mapParam.put("code", "DBF_ZIP_FILE_URL");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapParam).getData();
-        if (sysParameterDTO == null){
-            sysParameterDTO =new SysParameterDTO();
-            sysParameterDTO.setValue("D://dbf");
-        }
-        String fileName="hqmsts_"+ DateUtils.format(DateUtils.YMDHM)+"M";
-        CSVWriterUtils.writeCsv(mrisInfos,sysParameterDTO.getValue(),fileName);
-        String path = sysParameterDTO.getValue()+"/"+fileName+".csv";
+        String rootPath = System.getProperty("user.dir")+"/files/";
+        String hospName= (String) map.get("hospName");
+        String fileName="hqmsts_"+hospName+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
+        CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
+        String path = rootPath+"/"+fileName+".csv";
         return WrapperResponse.success(path);
     }
 }

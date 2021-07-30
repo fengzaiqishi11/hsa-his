@@ -336,4 +336,8 @@ public class InptCostDO extends PageDO implements Serializable {
      * 限制使用说明
      */
     private String limUserExplain;
+    /**
+     * 是否报销
+     */
+    private String isReimburse;
 }

@@ -3094,7 +3094,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setAge(outptVisitDTO.getAge());
         outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
         outptProfileFileDTO.setBirthday(outptVisitDTO.getBirthday());
-        outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
+        outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
@@ -3406,8 +3406,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      */
     public double calculateZsl(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO, BaseDrugDTO baseDrugDTO , BaseRateDTO baseRateDTO, double numNew){
         double zslNew = 0;
-        // 1：单次向上取整
-        if(StringUtils.isNotEmpty(baseDrugDTO.getTruncCode()) && "1".equals(baseDrugDTO.getTruncCode())){
+        // 没有配置默认 1：单次向上取整
+        if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
             // 按小单位计算
             if(outptPrescribeDetailsDTO.getNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
                 //按大单位计算 总数量 = 用量（向上取整） * 用药频率次数 * （用药天数/药品执行周期）
@@ -3657,6 +3657,19 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             throw new RuntimeException("就诊记录不存在，请核对！");
         }
 
+        // 根据系统参数(INSURE_DEFAULT_REG_CODE)获取限制用药的默认医保机构编码
+        SysParameterDTO sysParameterDTO = this.getSysParam(outptPrescribeDTO.getHospCode());
+        if (sysParameterDTO == null || StringUtils.isEmpty(sysParameterDTO.getValue())) {
+            return null;
+        }
+        Map parse = new HashMap();
+        if (StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+            parse = (Map) JSON.parse(sysParameterDTO.getValue());
+        }
+        if (StringUtils.isNotEmpty(MapUtils.get(parse, "isLmtDrugFlag")) && "0".equals(MapUtils.get(parse, "isLmtDrugFlag"))) {
+            return null;
+        }
+
         // 根据处方ids和visitId从处方明细表副表查询出处方列表
         List<OutptPrescribeDetailsExtDTO> list = outptDoctorPrescribeDAO.queryPrescribeListByIdsAndVisitId(outptPrescribeDTO);
         List<String> itemIdList = new ArrayList<>();
@@ -3680,10 +3693,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人
-                // 根据系统参数(INSURE_DEFAULT_REG_CODE)获取限制用药的默认医保机构编码
-                SysParameterDTO sysParameterDTO = this.getSysParam(outptPrescribeDTO.getHospCode());
-                if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
-                    Map parse = (Map) JSON.parse(sysParameterDTO.getValue());
+                if (StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
                     if (StringUtils.isNotEmpty(MapUtils.get(parse, "isLmtDrugFlag"))
                             && "1".equals(MapUtils.get(parse, "isLmtDrugFlag"))
                             && StringUtils.isNotEmpty(MapUtils.get(parse, "defaultInsureRegCode"))) {

@@ -298,7 +298,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setId(outptVisitDTO.getProfileId());
             outptProfileFileDTO.setHospCode(hospCode);
             outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
-            outptProfileFileDTO.setCertCode(outptVisitDTO.getCertCode());
+            outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
             outptProfileFileDTO.setName(outptVisitDTO.getName());
             outptProfileFileDTO.setAge(outptVisitDTO.getAge());
             outptProfileFileDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());

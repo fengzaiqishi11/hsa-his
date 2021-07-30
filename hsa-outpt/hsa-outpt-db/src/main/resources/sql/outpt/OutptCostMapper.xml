@@ -244,6 +244,7 @@
         <result property="pym" column="pym" jdbcType="VARCHAR"/>
         <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
         <result property="isVisit" column="is_visit" jdbcType="VARCHAR"/>
+        <result property="isPhys" column="is_phys" jdbcType="VARCHAR"/>
         <result property="isFirstVisit" column="is_first_visit" jdbcType="VARCHAR"/>
         <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
         <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
@@ -1258,6 +1259,7 @@
         pym,
         wbm,
         is_visit,
+        is_phys,
         is_first_visit,
         in_dept_id,
         in_disease_id,
@@ -1292,6 +1294,9 @@
         </if>
         <if test="genderCode != null and genderCode != ''">
             AND gender_code = #{genderCode}
+        </if>
+        <if test="isPhys != null and isPhys != ''">
+            AND is_phys =#{isPhys}
         </if>
         <if test="keyword != null and keyword != ''">
             AND(
@@ -1333,32 +1338,84 @@
         )
         </if>
         <if test='type == "1"'>
-        AND(
+            AND(
             NOT EXISTS(
-                select
-                id
-                from
-                outpt_cost
-                where
-                hosp_code = #{hospCode}
-                and source_code = '1'
-                and visit_id = outpt_visit.id
-                and status_code = '0'
-                and settle_code in ('0','1')
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and visit_id = outpt_visit.id
+            and status_code = '0'
+            and settle_code in ('0','1')
             )
             AND NOT EXISTS(
-                select
-                id
-                from
-                outpt_prescribe
-                where
-                hosp_code = #{hospCode}
-                and visit_id = outpt_visit.id
-                and is_settle = '0'
-                and is_cancel = '0'
-                and is_submit = '1'
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and visit_id = outpt_visit.id
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
             )
-        )
+            )
+        </if>
+        <if test='type == "2"'>
+            AND (
+            EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            OR EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
+        </if>
+        <if test='type == "3"'>
+            AND(
+            NOT EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            AND NOT EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
         </if>
         order by crte_time desc
     </select>

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.regex.Pattern.compile;
+
 /**
  * @Package_name: cn.hsa.base.profileFile.bo.impl
  * @Class_name: BaseProfileFileBOImpl
@@ -46,7 +48,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     @Override
     public Boolean save(OutptProfileFileDTO outptProfileFileDTO) {
         //校验身份证格式是否正确
-        this.checkCard(outptProfileFileDTO.getCertNo());
+        this.checkCard(outptProfileFileDTO.getCertNo(), outptProfileFileDTO.getCertCode());
         if (StringUtils.isNotEmpty(outptProfileFileDTO.getType())) {
             String type = outptProfileFileDTO.getType();
             if (StringUtils.isNotEmpty(type)) {
@@ -207,24 +209,64 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Date 2020/9/22 16:50
      * @Return boolean
      **/
-    private boolean checkCard(String cardNo) {
+    private boolean checkCard(String cardNo, String certCode) {
         if (StringUtils.isEmpty(cardNo)) {
-            throw new AppException("身份证号为空，请检查后重新输入");
+            throw new AppException("证件号为空，请检查后重新输入");
+        } else if (StringUtils.isEmpty(certCode)) {
+            throw new AppException("证件类型不能为空，请检查后重新输入");
         } else {
-            Pattern pattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
-            if (cardNo.length() == 15) {
-                Matcher isNum = pattern.matcher(cardNo);
-                if (!isNum.matches()) {
-                    throw new AppException("身份证号15位时只能为纯数字，请检查后重新输入");
+            if (Constants.ZJLB.JMSFZ.equals(certCode)) { // 居民身份证
+                Pattern pattern = compile("^-?\\d+(\\.\\d+)?$");
+                if(cardNo.length() == 15){
+                    Matcher isNum = pattern.matcher(cardNo);
+                    if(!isNum.matches()){
+                        throw new AppException("身份证号15位时只能为纯数字，请检查后重新输入");
+                    }
+                }else if(cardNo.length() == 18){
+                    Matcher isNum = pattern.matcher(cardNo.substring(0,17));
+                    Boolean flag = cardNo.substring(17,18) == "X"?true:false;
+                    if(!isNum.matches() && !flag){
+                        throw new AppException("身份证号18位时只能前17位为纯数字，最后1位为大写英文字母X，请检查后重新输入");
+                    }
+                }else{
+                    throw new AppException("身份证号只能为15位或者18位，请检查后重新输入");
                 }
-            } else if (cardNo.length() == 18) {
-                Matcher isNum = pattern.matcher(cardNo.substring(0, 17));
-                Boolean flag = cardNo.substring(17, 18) == "X" ? true : false;
-                if (!isNum.matches() && !flag) {
-                    throw new AppException("身份证号18位时只能前17位为纯数字，最后1位为大写英文字母X，请检查后重新输入");
+            } else if (Constants.ZJLB.JMHKB.equals(certCode)) { // 户口本
+                Pattern pattern = compile("\\\\d{9}");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("居民户口薄格式有误，请检查后重新出入");
                 }
-            } else {
-                throw new AppException("身份证号只能为15位或者18位，请检查后重新输入");
+            }else if (Constants.ZJLB.GATXZ.equals(certCode)) { // 港澳通行证
+                Pattern pattern = compile("^[HMhm]{1}([0-9]{10}|[0-9]{8})$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("港澳通行证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.TWTXZ.equals(certCode)) { // 台湾通行证
+                Pattern pattern = compile("^\\d{8}|^[a-zA-Z0-9]{10}|^\\d{18}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("台湾通行证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.JGZ.equals(certCode)) { // 军官证
+                Pattern pattern = compile("^[\\\\u4E00-\\\\u9FA5](字第)([0-9a-zA-Z]{4,8})(号?)$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("军官证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.JSZ.equals(certCode)) { // 驾驶证
+                Pattern pattern = compile("\\\\d{12}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("驾驶证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.HZ.equals(certCode)) { // 护照
+                Pattern pattern = compile("^([a-zA-z]|[0-9]){5,17}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("护照格式有误，请检查后重新出入");
+                }
             }
         }
         return true;

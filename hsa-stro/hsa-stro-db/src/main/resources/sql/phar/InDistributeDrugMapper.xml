@@ -187,10 +187,10 @@
             ,ifnull(a.num,0) num,a.split_unit_code,ifnull(a.split_num, 0) splitNum,a.dosage_unit_code,
             ifnull(d.is_long,'') is_long,d.crte_id,d.crte_name,d.rate_id,d.usage_code,c.in_disease_name,c.patient_code
             from phar_in_receive_detail a
-            join phar_in_receive b on a.receive_id=b.id
-            join inpt_visit c on a.visit_id=c.id
-            join inpt_advice d on a.advice_id = d.id
-            where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode} and d.hosp_code = #{hospCode}
+            join phar_in_receive b on a.receive_id=b.id and a.hosp_code = b.hosp_code
+            join inpt_visit c on a.visit_id=c.id and a.hosp_code = c.hosp_code
+            left join inpt_advice d on a.advice_id = d.id and a.hosp_code = d.hosp_code
+            where a.hosp_code=#{hospCode}
             <if test="receiveId!=null and receiveId!=''">
                 and a.receive_id=#{receiveId}
             </if>

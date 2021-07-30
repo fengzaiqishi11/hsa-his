@@ -385,6 +385,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             System.out.println("费用传输的总数量为:" + mapList.size());
             String resultJson ="";
             String url= insureConfigurationDTO.getUrl();
+
+
+          List<Map<String,Object>> listAllMap = new ArrayList<>();
             Map<String,Object> inputMap = new HashMap<>();
             if(mapList.size() > 100){
                 int toIndex =100;
@@ -412,9 +415,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     logger.info("统一支付平台住院费用传输回参:" + resultJson);
                     Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
                     List<Map<String,Object>> resultDataMap =  MapUtils.get(outptMap,"result");
-                    updateInsureCost(resultDataMap,map, sumBigDecimal);
+                    listAllMap.addAll(resultDataMap);
                 }
-
+              updateInsureCost(listAllMap,map, sumBigDecimal);
             }
             else{
                 inputMap.put("data", dataMap);

@@ -754,9 +754,12 @@
         allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, pym, wbm,
         remark, crte_id, crte_name, crte_time
         from center_profile_file
-        where cert_code = '01' and cert_no = #{certNo}
+        where cert_no = #{certNo}
         <if test="id != null and id != ''">
             and id != #{id}
+        </if>
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
         </if>
         order by crte_time desc limit 1
     </select>
@@ -771,7 +774,11 @@
         allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, pym, wbm,
         remark, crte_id, crte_name, crte_time
         from center_profile_file
-        where cert_code = '01' and cert_no = #{certNo}
+        where cert_no = #{certNo}
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
+        order by crte_time desc limit 1
     </select>
     
     <!--根据值域代码编码获取值域代码值-->

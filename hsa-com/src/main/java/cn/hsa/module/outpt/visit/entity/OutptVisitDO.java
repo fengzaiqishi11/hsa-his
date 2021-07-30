@@ -215,4 +215,8 @@ public class OutptVisitDO extends PageDO implements Serializable {
      * 是否食源性
      */
     private String isFoodBorne;
+    /**
+     * 是否为体检登记
+     */
+    private String isPhys;
 }

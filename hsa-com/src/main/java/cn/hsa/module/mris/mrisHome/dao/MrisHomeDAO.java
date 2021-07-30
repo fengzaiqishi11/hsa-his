@@ -43,6 +43,17 @@ public interface MrisHomeDAO {
     List<InptVisitDTO> queryOutHospPatientPage(InptVisitDTO inptVisitDTO);
 
     /**
+     * @Method: queryOutHospPatientPageZ
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyn.liu@powersi.com
+     * @Date: 2021/7/27 10:03
+     * @Return: java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+     **/
+    List<InptVisitDTO> queryOutHospPatientPageZ(InptVisitDTO inptVisitDTO);
+
+    /**
      * @Method: insertMrisBaseInfo
      * @Description: 新增病案基本患者信息
      * @Param: [mrisBaseInfoDO]

@@ -227,9 +227,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     public WrapperResponse queryOutptCostList(Map param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String visitId = (String) param.get("visitId");//患者id
+        String isPhys = (String) param.get("isPhys");//是否为体检信息
         String preferentialTypeId = (String) param.get("preferentialTypeId");//优惠类型id
         //获取费用数据
-        param.put("sourceCode", Constants.FYLYFS.ZJHJSF);//划价收费费用
+        //为了区分查询体检和其他收费数据,添加个前端传递参数isPhys
+        param.put("sourceCode", isPhys.equals("1") ? Constants.FYLYFS.QTFY : Constants.FYLYFS.ZJHJSF);//划价收费费用
         List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryDrugMaterialByVisitId(param);
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setHospCode(hospCode);
@@ -1106,7 +1108,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             pharOutReceiveDO.setTotalPrice((BigDecimal) pharOutReceiveMap.get(pharId).get("totalPrice"));//总金额
             Boolean isDist = Constants.SF.F.equals(outptCostDTOList.get(0).getIsDist());//判断是否已发药
             pharOutReceiveDO.setStatusCode(isDist ? Constants.LYZT.QL : Constants.LYZT.FY);//发药状态
-            pharOutReceiveDO.setDeptId(depId);//申请科室
+            pharOutReceiveDO.setDeptId((String) pharOutReceiveMap.get(pharId).get("sourceDeptId"));//申请科室
             pharOutReceiveDO.setCrteId(userId);//创建人
             pharOutReceiveDO.setCrteName(userName);//创建人姓名
             pharOutReceiveDO.setCrteTime(new Date());//创建时间
@@ -1226,6 +1228,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                             Map<String, Object> receiveMap = new HashMap<String, Object>();
                             receiveMap.put("id", SnowflakeUtils.getId());//领药申请单id
                             receiveMap.put("totalPrice", outptCostDTO.getRealityPrice());//总金额
+                            receiveMap.put("sourceDeptId", outptCostDTO.getSourceDeptId());//申请科室ID
                             pharOutReceiveMap.put(outptCostDTO.getPharId(), receiveMap);
                         } else {
                             BigDecimal price = (BigDecimal) pharOutReceiveMap.get(outptCostDTO.getPharId()).get("totalPrice");

@@ -1005,8 +1005,10 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         this.hendeleOutptTriageVisitData(outptVisitDTO, outptRegisterDTO);
 
         //6. 根据是否结算参数判断是挂号结算还是门诊划价结算
-        String settleId = null;
-        // 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
+        //7.挂号结算表数据(outpt_register_settle)和结算支付表数据(outpt_register_pay)
+        // 微信直接走挂号结算
+        String settleId = this.handleOutptRegisterSettleAndPayData(data, outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
+        /*// 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
         SysParameterDTO ghJsSysParameterDTO = this.getSysParam(hospCode, "GH_JS");
         if (ghJsSysParameterDTO != null && "1".equals(ghJsSysParameterDTO.getValue())) {
             // 门诊划价收费结算
@@ -1016,7 +1018,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             // 挂号时结算
             //7.挂号结算表数据(outpt_register_settle)和结算支付表数据(outpt_register_pay)
             settleId = this.handleOutptRegisterSettleAndPayData(data, outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
-        }
+        }*/
 
         //9.更新号源表数据(outpt_doctor_register)
         if (StringUtils.isNotEmpty(MapUtils.get(data, "sourceId"))) {
@@ -1597,7 +1599,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         this.registerDetailChangeRed(outptRegisterDTO);
 
         String redSettleId = SnowflakeUtils.getId();
-        // 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
+        /*// 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
         SysParameterDTO ghJsSysParameterDTO = this.getSysParam(hospCode, "GH_JS");
         if (ghJsSysParameterDTO != null && "1".equals(ghJsSysParameterDTO.getValue())) {
             //8.门诊费用表数据冲红(outpt_cost)
@@ -1608,7 +1610,14 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
             //5.挂号支付方式冲红
             this.registerPayChangeRed(outptRegisterDTO, redSettleId);
-        }
+        }*/
+
+        // 微信只走挂号时结算
+        //4.挂号结算表数据冲红
+        this.registerSettleChangeRed(outptRegisterDTO, redSettleId);
+
+        //5.挂号支付方式冲红
+        this.registerPayChangeRed(outptRegisterDTO, redSettleId);
 
         //6.更新病人就诊信息标志为作废
         this.updatePatientState(outptRegisterDTO);

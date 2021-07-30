@@ -372,103 +372,22 @@
         ) and hosp_code = #{hospCode} and is_valid = '1'
     </select>
 
-
-    <!--住院合管条码打印查询-->
-    <select id="queryInptPipePrintPage" resultType="java.util.Map">
-        SELECT
-        ma.merge_id,
-        max(iv.in_dept_name) AS dept_name,
-        max(iv.in_no) AS visit_no,
-        ( SELECT NAME FROM sys_code_detail WHERE c_code = 'LISXMLX' AND VALUE = max(ba.technology_code) )
-        technology_code,
-        max(ba.container_code) container_code,
-        max(ba.specimen_code) specimen_code,
-        GROUP_CONCAT(ia.content separator ',') content,
-        max(ma.document_sta) document_sta,
-        max(ma.apply_no) apply_no,
-        max(iv.name) name,
-        max(iv.gender_code) gender_code,
-        max(iv.age) age,
-        max(iv.age_unit_code) age_unit_code,
-        max(ma.crte_time) crte_time,
-        max(ma.bar_code) bar_code
-        FROM
-
-        medic_apply ma
-        inner join inpt_advice_detail iad on  ma.hosp_code = iad.hosp_code and ma.opd_id = iad.id
-        left join inpt_advice ia on iad.hosp_code = ia.hosp_code and iad.ia_id = ia.id
-        left join base_advice ba on iad.hosp_code = ba.hosp_code and iad.ba_id = ba.id
-        left join inpt_visit iv on iad.hosp_code = iv.hosp_code and iad.visit_id = iv.id
-
-        where ma.hosp_code = #{hospCode}
-        <if test="name != null and name != '' ">
-            and iv.`name` like concat('%',#{name},'%')
-        </if>
-        <if test="deptId != null and deptId != '' ">
-            and iv.in_dept_id = #{deptId}
-        </if>
-        <if test="visitNo != null and visitNo != '' ">
-            and iv.in_no like concat('%',#{visitNo},'%')
-        </if>
-        <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
-        </if>
-        <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-        group by ma.merge_id
-        order by ma.crte_time desc
-    </select>
-
-    <!--门诊合管条码打印查询-->
-    <select id="queryOutPtPipePrintPage" resultType="java.util.Map">
-        select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,scd.`name` as technology_code ,max( ba.container_code ) container_code,max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
-        max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
-        max(ma.bar_code ) bar_code
-        from 	medic_apply ma
-
-        inner join	outpt_prescribe_detail opd on ma.opd_id = opd.id and ma.hosp_code = opd.hosp_code
-        left join  	base_advice ba on opd.item_id = ba.id and opd.hosp_code = ba.hosp_code
-        left join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
-        right join  outpt_cost oc on opd.id = oc.opd_id and oc.hosp_code = opd.hosp_code
-        left join   sys_code_detail scd on scd.value = ba.technology_code and scd.hosp_code = ba.hosp_code and c_code = 'LISXMLX'
-        where ma.hosp_code=#{hospCode} and oc.settle_code ='2'
-
-        <if test="name != null and name != '' ">
-            and ov.`name` like concat('%',#{name},'%')
-        </if>
-        <if test="deptId != null and deptId != '' ">
-            and ov.dept_id = #{deptId}
-        </if>
-        <if test="visitNo != null and visitNo != '' ">
-            and ov.visit_no like concat('%',#{visitNo},'%')
-        </if>
-        <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
-        </if>
-        <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-        group by ma.merge_id
-        order by ma.crte_time desc
-
-
-    </select>
-
-    <!--合管条码打印查询-->
+    <!--合管条码打印查询合并-->
     <select id="queryPtPipePrintPage" resultType="java.util.Map">
-        select * from (
-        select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,scd.`name` as technology_code ,max( ba.container_code ) container_code,max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
-        max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,max(ma.crte_time ) crte_time,
-        max(ma.bar_code ) bar_code
+        select * from  (select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,max( ba.container_code ) container_code,
+        max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,
+        max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
+        max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
+        max(ma.bar_code ) bar_code,
+        ba.technology_code
         from 	medic_apply ma
 
-        inner join	outpt_prescribe_detail opd on ma.hosp_code = opd.hosp_code and ma.opd_id = opd.id
-        left join  	base_advice ba on opd.item_id = ba.id and opd.hosp_code = ba.hosp_code
-        left join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
-        right join  outpt_cost oc on opd.id = oc.opd_id and oc.hosp_code = opd.hosp_code
-        left join   sys_code_detail scd on scd.value = ba.technology_code and scd.hosp_code = ba.hosp_code and c_code = 'LISXMLX'
-        where ma.hosp_code=#{hospCode} and oc.settle_code ='2'
+        join outpt_prescribe_detail opd on ma.opd_id = opd.id and ma.hosp_code = opd.hosp_code
+        join base_advice ba on opd.item_id = ba.id and opd.hosp_code = ba.hosp_code
+        join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
+        join  outpt_prescribe op on opd.op_id = op.id and op.hosp_code = opd.hosp_code
+
+        where op.is_settle ='1' and ma.hosp_code = #{hospCode}
 
         <if test="name != null and name != '' ">
             and ov.`name` like concat('%',#{name},'%')
@@ -484,17 +403,17 @@
         </if>
         <if test="endDate != null and endDate != '' ">
             and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="queryType != null and queryType == 'zy'.toString()">
+            and 1=2
         </if>
         group by ma.merge_id
 
         union all
-
         SELECT
         ma.merge_id,
         max(iv.in_dept_name) AS dept_name,
         max(iv.in_no) AS visit_no,
-        ( SELECT NAME FROM sys_code_detail WHERE c_code = 'LISXMLX' AND VALUE = max(ba.technology_code) )
-        technology_code,
         max(ba.container_code) container_code,
         max(ba.specimen_code) specimen_code,
         GROUP_CONCAT(ia.content separator ',') content,
@@ -505,14 +424,15 @@
         max(iv.age) age,
         max(iv.age_unit_code) age_unit_code,
         max(ma.crte_time) crte_time,
-        max(ma.bar_code) bar_code
+        max(ma.bar_code) bar_code,
+        ba.technology_code
         FROM
 
         medic_apply ma
-        inner join inpt_advice_detail iad on  ma.hosp_code = iad.hosp_code and ma.opd_id = iad.id
-        left join inpt_advice ia on iad.hosp_code = ia.hosp_code and iad.ia_id = ia.id
-        left join base_advice ba on iad.hosp_code = ba.hosp_code and iad.ba_id = ba.id
-        left join inpt_visit iv on iad.hosp_code = iv.hosp_code and iad.visit_id = iv.id
+        join inpt_advice ia  on ma.hosp_code = ia.hosp_code and ma.order_no = ia.order_no
+        join inpt_advice_detail iad on ia.id = iad.ia_id and ia.hosp_code = iad.hosp_code
+        join base_advice ba on iad.hosp_code = ba.hosp_code and iad.ba_id = ba.id and ba.type_code = '3'
+        join inpt_visit iv on iad.hosp_code = iv.hosp_code and iad.visit_id = iv.id
 
         where ma.hosp_code = #{hospCode}
         <if test="name != null and name != '' ">
@@ -530,10 +450,12 @@
         <if test="endDate != null and endDate != '' ">
             and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
+        <if test="queryType != null and queryType == 'mz'.toString()">
+            and 1=2
+        </if>
         group by ma.merge_id
-        )tab
-        ORDER BY tab.crte_time desc
-
+        ) tab1
+        order by tab1.crte_time desc
     </select>
 
     <!--合管条码打印更新-->

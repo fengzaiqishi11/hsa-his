@@ -717,17 +717,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
 
         List<Map<String, Object>> list = null;
         String queryType = MapUtils.get(paramMap, "queryType");
-
-        if("mz".equals(queryType)){
-            //门诊合管查询
-            list = baseAdviceDAO.queryOutPtPipePrintPage(paramMap);
-        }else if("zy".equals(queryType)){
-            //住院合管查询
-            list = baseAdviceDAO.queryInptPipePrintPage(paramMap);
-        }else{
-            //合管查询
-            list = baseAdviceDAO.queryPtPipePrintPage(paramMap);
-        }
+        // queryType 值为mz查询门诊数据，zy查询住院数据,其余的查询全院数据
+        list = baseAdviceDAO.queryPtPipePrintPage(paramMap);
 
         return PageDTO.of(list);
     }

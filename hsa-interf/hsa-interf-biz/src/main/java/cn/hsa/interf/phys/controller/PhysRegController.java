@@ -10,10 +10,7 @@ import cn.hsa.module.interf.phys.service.PhysRegService;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.StringUtils;
 import groovy.util.logging.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;

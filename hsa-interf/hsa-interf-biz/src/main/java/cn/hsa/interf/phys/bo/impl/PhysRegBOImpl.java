@@ -60,6 +60,8 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
         Optional.ofNullable(outptVisitDTO.getCertNo()).orElseThrow(() -> new AppException("传入的身份证号不能为空"));
         // 是否就诊 默认传过来的是就诊
         outptVisitDTO.setIsVisit(Constants.SF.S);
+        // 是否为体检登记标志
+        outptVisitDTO.setIsPhys("1");
         // 设置就诊时间
         outptVisitDTO.setVisitTime(DateUtils.getNow());
         int result = physRegDAO.addVisitByPhys(outptVisitDTO);
@@ -104,7 +106,8 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             // 设置创建时间
             outptCostDTO.setCrteTime(DateUtils.getNow());
             // 费用来源方式代码
-            outptCostDTO.setSourceCode(Constants.FYLYFS.ZJHJSF);
+            outptCostDTO.setSourceCode(Constants.FYLYFS.QTFY);
+
             outptCostDTOS.add(outptCostDTO);
         });
         int result = physRegDAO.addBatchPhys(outptCostDTOS);

@@ -35,7 +35,7 @@
         left join  base_profile_file b on b.hosp_code=#{hospCode} and v.profile_id =b.id
         WHERE v.hosp_code = #{hospCode}
         <if test="keyword != null and keyword !=''">
-            and CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1')) LIKE CONCAT('%',#{keyword},'%')
+            and CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1'),v.name,v.phone,v.cert_no,v.in_no) LIKE CONCAT('%',#{keyword},'%')
         </if>
         <if test="inDeptId != null and inDeptId !=''">
             and v.in_dept_id = #{inDeptId}

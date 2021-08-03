@@ -1857,4 +1857,75 @@
             </if>
         </foreach>
     </update>
+
+    <!--根据科室,领药单据，查询提前领药的医嘱-->
+
+    <select id="selectAdviceByDeptAndType" resultType="String">
+        select DISTINCT aaa.id from (select
+        distinct a.id,a.item_code,(case when a.item_code ='1' then c.good_name else d.name end ) as item_name,c.is_lvp,
+        c.ph_code,c.big_type_code,a.use_code,a.usage_code,a.yylx
+        from
+        inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
+        LEFT JOIN base_drug c ON a.item_id = c.id  and a.hosp_code = c.hosp_code AND a.item_code = '1'
+        LEFT JOIN base_material d ON a.item_id = d.id and a.hosp_code = d.hosp_code AND a.item_code = '2'
+        where 1=1  and a.item_code in ('1','2')
+        and a.hosp_code=#{hospCode}
+        --         已提交
+        and a.is_submit='1'
+        --         长期医嘱
+        and a.is_long='0'
+        --         已核收
+        and a.is_check='1'
+        --         排除停嘱并核收
+        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         非据收医嘱
+        and (a.is_reject is null or a.is_reject='0')
+        --         在院
+        and b.status_code='2'
+        --         医嘱开始时间小于等于当前时间
+        and date(a.long_start_time) &lt;= date(#{endDate})
+        --         预停时间不为空,那么需要大于当前时间
+        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date(a.plan_stop_time) &gt; date(#{endDate})))
+        and a.exec_dept_id = #{deptId}
+        and a.advance_days &gt; 0
+
+        ) aaa  where 1=1
+
+        <if test="isAll != null and isAll == '0'.toString()">
+            and
+            -- 用法 >
+            <if test="usageCodes != null and usageCodes.size()>0">
+                 aaa.usage_code in
+                <foreach collection="usageCodes" open="(" close=")" item="usageCode" separator=",">
+                    #{usageCode}
+                </foreach>
+            </if>
+            -- 材料>
+            <if test="isMaterial != null and isMaterial == '1'.toString()">
+                or aaa.item_code ='2'
+            </if>
+            -- 大输液>
+            <if test="isIvdrip != null and isIvdrip == '1'.toString()">
+                or ifnull(aaa.is_lvp,'') = '1'
+            </if>
+            -- 特殊药品>
+            <if test="isPh != null and isPh == '1'.toString()">
+                or ifnull(aaa.ph_code,'') != '5'
+            </if>
+            -- 中草药>
+            <if test="isHerb != null and isHerb == '1'.toString()">
+                or ifnull(aaa.big_type_code,'') = '2'
+            </if>
+            -- 出院带药>
+            <if test="isGive != null and isGive == '1'.toString()">
+                or aaa.use_code ='4'
+            </if>
+            -- 叫病人>
+            <if test="isPatient != null and isPatient == '1'.toString()">
+                or aaa.yylx ='2'
+            </if>
+        </if>
+    </select>
+
+
 </mapper>

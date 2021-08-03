@@ -42,7 +42,8 @@ public interface OutptClassesQueueDao {
     Map<String,Object> queryClassifyClasses(Map<String,Object> map);
 
     void insertDoctorQueue(List<OutptDoctorQueueDto> list);
-
+    /** 查询医生在某个班次是否存在排班 **/
+    List<Map<String,Object>> queryDoctorQueueOfTodayByClassifyIdDoctorId(Map<String,Object> params);
     void insertDoctorRegisterBatch(List<OutptDoctorRegisterDto> list);
 
     void deleteClassesQueue(Map map);

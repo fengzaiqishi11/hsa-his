@@ -1888,6 +1888,7 @@
         and (a.plan_stop_time is null or (a.plan_stop_time is not null and date(a.plan_stop_time) &gt; date(#{endDate})))
         and a.exec_dept_id = #{deptId}
         and ifnull(a.advance_days,'0') = '0'
+        and A.use_code in ('1','4')
 
         ) aaa  where 1=1
 

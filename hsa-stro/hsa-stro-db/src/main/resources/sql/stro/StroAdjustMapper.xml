@@ -78,6 +78,64 @@
         order by audit_code,crte_time
     </select>
 
+    <!--查看出库表和明细表里面是否有未审核的药品-->
+    <select id="selectJudgeStoOutDruag" resultType="java.util.Map">
+        SELECT a.out_code as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_out` a,stro_out_detail b where
+                a.id = b.out_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+                b.item_id in
+                <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+    </select>
+
+    <!--查看采购表和明细表里面是否有未审核的药品-->
+    <select id="selectJudgePhrDruag" resultType="java.util.Map">
+        SELECT '1' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_purchase` a,stro_purchase_detail b where
+        a.id = b.purchase_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        b.item_id in
+        <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查看入库表和明细表里面是否有未审核的药品-->
+    <select id="selectJudgeStoInDruag" resultType="java.util.Map">
+        SELECT a.in_code as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_in` a,stro_in_detail b where
+        a.id = b.in_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        b.item_id in
+        <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <!--查看盘点表和明细表里面是否有未审核的药品-->
+    <select id="selectJudgeInventoryDruag" resultType="java.util.Map">
+        SELECT '7' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_inventory` a,stro_inventory_detail b where
+        a.id = b.inventory_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        b.item_id in
+        <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查看报损表和明细表里面是否有未审核的药品-->
+    <select id="selectJudgeIncdecDruag" resultType="java.util.Map">
+        SELECT '8' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_incdec` a,stro_incdec_detail b where
+        a.id = b.adjust_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        b.item_id in
+        <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <!--查看退库确认中是否存在，通过-->
+    <select id="selectJudgeconfirmDruag" resultType="java.util.Map">
+        SELECT '21' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_out` a,stro_out_detail b where
+        a.id = b.out_id and a.audit_code = '1' and a.ok_audit_code='0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        b.item_id in
+        <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
 
     <!--单个新增-->
     <insert id="insertStroAdjustDto" keyProperty="" useGeneratedKeys="true">

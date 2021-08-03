@@ -7,7 +7,6 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.ba.service.BaseAdviceService;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
-import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.stro.adjust.bo.StroAdjustBO;
 import cn.hsa.module.stro.adjust.dao.StroAdjustDao;
 import cn.hsa.module.stro.adjust.dao.StroAdjustDetailDao;
@@ -16,7 +15,8 @@ import cn.hsa.module.stro.adjust.dto.StroAdjustDetailDTO;
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
-import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
+import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
+import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +55,9 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
 
     @Resource
     BaseOrderRuleService baseOrderRuleService_consumer;
+
+    @Resource
+    SysCodeService sysCodeService_consumer;
 
     /**
     * @Method queryStroAdjustDoPage
@@ -274,6 +278,8 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
                 detial.setNum(BigDecimal.valueOf(0));
                 detial.setSplitNum(BigDecimal.valueOf(0));
             });
+            // 校验药品是否存在同级调拨、退供应商、平级出库等未审核完成的情况
+            judgeAdjustDruag(stroStockDetailDTOS);
             Map<String,Object> jxcMap = new HashMap<>();
             jxcMap.put("type", Constants.CRFS.TJ);
             jxcMap.put("sfBatchNo", true);
@@ -326,6 +332,73 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
             isSuccess = true;
         }
         return isSuccess;
+    }
+    /**
+     * @Method judgeAdjustDruag
+     * @Desrciption 校验是否能够审核
+     * @Param [stroStockDetailDTOS]
+     * @Author zhangguorui
+     * @Date   2021/8/3 9:21
+     * @Return void
+     */
+    private void judgeAdjustDruag(List<StroStockDetailDTO> stroStockDetailDTOS) {
+        Optional.ofNullable(stroStockDetailDTOS).orElseThrow(() -> new AppException("调价的药品不能为空"));
+        String hospCode = stroStockDetailDTOS.get(0).getHospCode();
+        // 取出药品id
+        List<String> druagList = stroStockDetailDTOS.stream().map(StroStockDetailDTO::getItemId).collect(Collectors.toList());
+        // 判断同级调拨、出库到科室、出库到药房（未审核的数据中，是否存在调价单中的项目，如果存在则不允许审核调价单，并给出提示）--出库表、库存明细表
+        // Map 返回的字段有 outCode 出库方式,itemId 项目id,itemName 项目名称
+        List<Map<String, String>> stoMap = stroAdjustDao.selectJudgeStoOutDruag(druagList, hospCode);
+        // 判断采购入库
+        List<Map<String, String>> phrMap = stroAdjustDao.selectJudgePhrDruag(druagList, hospCode);
+        // 判断直接入库、同级调拨确认、退供应商、平级出库
+        List<Map<String, String>> stoInMap = stroAdjustDao.selectJudgeStoInDruag(druagList, hospCode);
+        // 判断盘盈盘亏
+        List<Map<String, String>> inventoryMap = stroAdjustDao.selectJudgeInventoryDruag(druagList, hospCode);
+        // 判断报损报益
+        List<Map<String, String>> incdecMap = stroAdjustDao.selectJudgeIncdecDruag(druagList, hospCode);
+        // 退库确认
+        List<Map<String, String>> confirmMap = stroAdjustDao.selectJudgeconfirmDruag(druagList, hospCode);
+        // 把上面所有的map 全部封装到 resultMapList中，做一个全部汇总提示
+        List<Map<String,String>> resultMapList = new ArrayList<>();
+        resultMapList.addAll(stoMap);
+        resultMapList.addAll(phrMap);
+        resultMapList.addAll(stoInMap);
+        resultMapList.addAll(inventoryMap);
+        resultMapList.addAll(incdecMap);
+        resultMapList.addAll(confirmMap);
+        if(!ListUtils.isEmpty(resultMapList)){
+            // 查询码表 获得出入方式
+            SysCodeDetailDTO sysCodeDetailDTO = new SysCodeDetailDTO();
+            sysCodeDetailDTO.setCode("CRFS");
+            sysCodeDetailDTO.setHospCode(hospCode);
+            Map queryCodeMap = new HashMap();
+            queryCodeMap.put("sysCodeDetailDTO",sysCodeDetailDTO);
+            queryCodeMap.put("hospCode",hospCode);
+            // 调用值域service 获得所有的出入方式的值
+            WrapperResponse<List<SysCodeDetailDTO>> listWrapperResponse = sysCodeService_consumer.queryCodeDetailAll(queryCodeMap);
+            List<SysCodeDetailDTO> codeList = listWrapperResponse.getData();
+            // 过滤码表 value 作为key, name作为value
+            Map<String, String> codeMap = codeList.stream().collect(Collectors.toMap(SysCodeDetailDTO::getValue, SysCodeDetailDTO::getName));
+            // 根据出入库方式进行分组
+            Map<String, List<Map<String, String>>> messageMap = resultMapList.stream().collect(Collectors.groupingBy(item -> item.get("outCode")));
+            // 最后的异常信息
+            StringBuffer errorMessage = new StringBuffer("审核失败，");
+            messageMap.entrySet().forEach(item->{
+                List<Map<String, String>> value = item.getValue();
+                List<String> itemName = value.stream().map(map -> map.get("itemName")).distinct().collect(Collectors.toList());
+                String message = itemName.toString();
+                // 出入方式
+                String crfs = codeMap.get(item.getKey());
+                if ("退库确认".equals(crfs)){
+                    errorMessage.append("退库确认或者入库确认中 "+message+" 还未审核。");
+                }else{
+                    errorMessage.append(crfs+"中 "+message+" 还未审核。");
+                }
+
+            });
+            throw new AppException(errorMessage.toString());
+        }
     }
 
     /**

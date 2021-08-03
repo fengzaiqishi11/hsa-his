@@ -613,6 +613,7 @@
         and a.item_code = '1'
         and a.biz_id = #{bizId}
         and a.hosp_code = #{hospCode}
+        and a.num > 0
         <if test="itemCode != null and itemCode !=''">
             and a.item_code = #{itemCode}
         </if>
@@ -672,6 +673,7 @@
         and a.item_code = '2'
         and a.biz_id = #{bizId}
         and a.hosp_code = #{hospCode}
+        and a.num > 0
         <if test="itemCode != null and itemCode !=''">
             and a.item_code = #{itemCode}
         </if>

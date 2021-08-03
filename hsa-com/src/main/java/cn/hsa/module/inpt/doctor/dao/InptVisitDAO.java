@@ -111,6 +111,8 @@ public interface InptVisitDAO {
      **/
     Integer deleteById(InptVisitDTO inptVisitDTO);
 
+    Integer invalidPatientStatus(InptVisitDTO inptVisitDTO);
+
     /**
      * @Method: getVisitByAdviceId
      * @Description: 通过医嘱ID获取住院病人信息

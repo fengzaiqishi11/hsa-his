@@ -319,7 +319,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (c) {
             throw new AppException("当前存在预交金余额，无法取消入院登记");
         }
-        inptVisitDAO.deleteById(inptVisitById);
+        inptVisitById.setStatusCode(Constants.BRZT.ZF);
+        inptVisitDAO.invalidPatientStatus(inptVisitById);
         return true;
     }
 

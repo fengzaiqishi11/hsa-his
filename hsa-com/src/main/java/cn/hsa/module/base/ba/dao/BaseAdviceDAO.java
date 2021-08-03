@@ -155,26 +155,6 @@ public interface BaseAdviceDAO {
 
     List<BaseAdviceDTO> getOperationNamePage(BaseAdviceDTO baseAdviceDTO);
 
-    /**住院合管条码打印查询
-    * @Method queryPipePrintPage
-    * @Desrciption
-    * @param paramMap
-    * @Author liuqi1
-    * @Date   2021/4/25 11:39
-    * @Return java.util.Map
-    **/
-    List<Map<String,Object>> queryInptPipePrintPage(Map<String,Object> paramMap);
-
-    /**门诊合管条码打印查询
-    * @Method queryOutPtPipePrintPage
-    * @Desrciption
-    * @param paramMap
-    * @Author liuqi1
-    * @Date   2021/4/26 11:42
-    * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
-    **/
-    List<Map<String,Object>> queryOutPtPipePrintPage(Map<String,Object> paramMap);
-
     /**合管条码打印查询
     * @Method queryPtPipePrintPage
     * @Desrciption

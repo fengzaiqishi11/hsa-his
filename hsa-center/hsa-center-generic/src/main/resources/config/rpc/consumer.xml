@@ -13,4 +13,7 @@
 
     <!--本地规则服务-->
     <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>
+
+    <!--系统参数管理 -->
+    <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
 </beans>

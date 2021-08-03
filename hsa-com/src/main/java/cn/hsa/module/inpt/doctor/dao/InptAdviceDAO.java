@@ -813,4 +813,12 @@ public interface InptAdviceDAO {
 
     // 根据医嘱ids字符串和visitId从处方明细表副表查询出处方列表
     List<InptAdviceDetailDTO> queryAdviceByIdsAndVisitId(InptAdviceDTO inptAdviceDTO);
+    /**
+     * @Desrciption 根据单据类型过滤查询有效医嘱
+     * @param map
+     * @Author pengbo
+     * @Date   2021/08/02 14:44
+     * @Return list
+     */
+    List<String> selectAdviceByDeptAndType (Map map);
 }

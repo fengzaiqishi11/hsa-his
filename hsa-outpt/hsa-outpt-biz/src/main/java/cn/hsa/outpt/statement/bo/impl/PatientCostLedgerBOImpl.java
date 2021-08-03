@@ -103,7 +103,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         //动态拼接sql
         StringBuffer sqlStr = new StringBuffer();
         if(ListUtils.isEmpty(inptCostDTOSAll)){
-            return PageDTO.of(null);
+            return PageDTO.of(new ArrayList());
         }
         for (InptCostDTO inptCostDTO : inptCostDTOSAll) {
             sqlStr.append("sum((case when a.bfc_id = '");

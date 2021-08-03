@@ -142,10 +142,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by a.bfc_id,c.name
@@ -273,10 +273,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by d.id
@@ -313,10 +313,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            a.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
     </select>
@@ -368,10 +368,10 @@
         <!--过滤条件增加医生名 称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by d.out_dept_id
@@ -409,10 +409,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            a.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by a.out_dept_id
@@ -1718,11 +1718,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
-            and date(b.crte_time) &gt;= date(#{startTime})
+            and date(a.crte_time) &gt;= date(#{startTime})
         </if>
         /*结束日期*/
         <if test="endTime != null and endTime != ''">
-            and date(b.crte_time) &lt;= date(#{endTime})
+            and date(a.crte_time) &lt;= date(#{endTime})
         </if>
         /*项目名称*/
         <if test="keyword != null and keyword != ''">
@@ -5518,11 +5518,11 @@
             </if>
             /*开始日期*/
             <if test="startTime != null">
-                and date(b.crte_time) &gt;= #{startTime}
+                and date(a.crte_time) &gt;= #{startTime}
             </if>
             /*结束日期*/
             <if test="endTime != null">
-                and date(b.crte_time) &lt;= #{endTime}
+                and date(a.crte_time) &lt;= #{endTime}
             </if>
             <if test="keyword != null and keyword != ''">
                 and (

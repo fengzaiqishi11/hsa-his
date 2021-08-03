@@ -832,6 +832,9 @@
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         SELECT
+            (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and bd.id = a.source_dept_id) as createDeptName, -- 开方科室
+            (select bd2.name from base_dept bd2 where bd2.hosp_code = a.hosp_code and bd2.id = a.phar_id) as pharName, -- 发药药房
+            (select bd3.name from base_dept bd3 where bd3.hosp_code = a.hosp_code and bd3.id = a.exec_dept_id) as execDeptName, -- 执行科室
             a.item_id as item_id, -- 项目ID
             a.item_name as itemName, -- 项目名称
             a.spec as spec, -- 规格
@@ -952,6 +955,10 @@
     <!-- 根据条件查询住院发票明细表列表信息 -->
     <select id="queryOutinItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         SELECT
+            (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and bd.id = a.source_dept_id) as createDeptName, -- 开嘱科室
+            (select bd2.name from base_dept bd2 where bd2.hosp_code = a.hosp_code and bd2.id = a.phar_id) as pharName, -- 发药药房
+            (select bd3.name from base_dept bd3 where bd3.hosp_code = a.hosp_code and bd3.id = a.exec_dept_id) as execDeptName, -- 执行科室
+            a.doctor_name as doctorName, -- 开嘱医生
             a.item_id as item_id, -- 项目ID
             a.item_name as itemName, -- 项目名称
             a.spec as spec, -- 规格

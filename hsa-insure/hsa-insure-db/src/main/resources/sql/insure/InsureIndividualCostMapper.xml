@@ -350,7 +350,7 @@
         b.aac001,b.aka130,b.medicine_org_code,b.visit_icd_code as visitIcdCode ,b.visit_icd_name as visitIcdName
         from inpt_visit iv inner join insure_individual_visit b
         on iv.id = b.visit_id and iv.hosp_code = b.hosp_code
-        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6') and b.insure_settle_id is null
+        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6')
         and iv.patient_code !='0'
         <if test="name != null and name != ''">
             and iv.name like concat('%',#{name},'%')
@@ -584,7 +584,9 @@
         iim.check_price checkCode,
         iim.manufacturer manufacturer,
         iim.tcmdrug_used_way tcmdrugUsedWay,
+        iim.lmt_user_flag lmtUserFlag,
         ic.is_reimburse isReimburse
+
         FROM
         inpt_cost ic
         JOIN insure_item_match iim

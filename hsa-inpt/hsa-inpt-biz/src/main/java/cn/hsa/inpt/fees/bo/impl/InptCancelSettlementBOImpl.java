@@ -311,20 +311,25 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             // add by 廖继广 on 2020/11/04
             Integer patientCodeInt = Integer.valueOf(inptVisitDTO.getPatientCode());
             if (patientCodeInt > 0) {
+
+                InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
+                insureIndividualSettleDTO.setHospCode(inptVisitDTO.getHospCode());
+                insureIndividualSettleDTO.setVisitId(visitId);
+                insureIndividualSettleDTO.setSettleId(settleId);
+                insureIndividualSettleDTO.setIsHospital(Constants.SF.S);
+                InsureIndividualSettleDTO selectEntity = inptVisitDAO.getInsureIndividualSettleInfo(insureIndividualSettleDTO);
+                if(selectEntity !=null){
+                    inptVisitDTO.setMedicalRegNo(selectEntity.getMedicalRegNo());
+                }else{
+                    throw new AppException("根据就诊id和His结算id查询医保结信息为空");
+                }
                 InsureIndividualVisitDTO insureIndividualVisitDTO = inptVisitDAO.getInsureIndividualVisitInfo(inptVisitDTO);
                 if (insureIndividualVisitDTO == null) {
                     throw new AppException("医保取消结算失败：未查询到医保就医登记信息");
                 }
 
                 // 冲红医保的相关表（insure_individual_settle）
-                InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
-                insureIndividualSettleDTO.setHospCode(inptVisitDTO.getHospCode());
-                insureIndividualSettleDTO.setVisitId(visitId);
-                insureIndividualSettleDTO.setSettleId(settleId);
-                insureIndividualSettleDTO.setIsHospital(Constants.SF.S);
                 insureIndividualVisitDTO.setInptVisitNo(inptVisitDTO.getInNo());
-                InsureIndividualSettleDTO selectEntity = inptVisitDAO.getInsureIndividualSettleInfo(insureIndividualSettleDTO);
-
                 // 原记录被冲红和冲红处理
                 String insureSettleId = SnowflakeUtils.getId();
                 if (selectEntity != null) { // 原记录被冲红和冲红处理
@@ -342,6 +347,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     Map<String,Object> insureUnifiedMap = new HashMap<>();
                     insureUnifiedMap.put("setl_id",selectEntity.getInsureSettleId()); // 结算ID
                     insureUnifiedMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊ID
+                    insureUnifiedMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊ID
                     insureUnifiedMap.put("hospCode",hospCode); // 医院编码
                     insureUnifiedMap.put("psn_no",insureIndividualVisitDTO.getAac001()); // 人员编号
                     insureUnifiedMap.put("medins_code",hospCode); // 医疗机构编码

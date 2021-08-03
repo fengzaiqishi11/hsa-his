@@ -192,5 +192,27 @@ public interface InsureIndividualVisitDAO {
     List<InsureIndividualVisitDTO> queryInsureIndividualVisitByIds(Map<String,Object> insureVisitParam);
 
     List<String> queryAllInsureRegister(Map<String,String> selectMap);
+
+    /**
+     * @Method getMedicalRegNo
+     * @Desrciption  获取未结算的就医登记号
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/30 14:38
+     * @Return
+    **/
+    String getMedicalRegNo(Map<String, Object> map);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method selectInsureInfo
+     * @Desrciption 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/30 15:32
+     * @Return
+     */
+    InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }
 

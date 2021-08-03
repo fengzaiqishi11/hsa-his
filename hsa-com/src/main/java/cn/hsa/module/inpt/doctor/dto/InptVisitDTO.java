@@ -363,4 +363,5 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String isUserInsureAccount;
     private String isUnified ;
     private String feeParam;
+    private String insureSettleId;
 }

@@ -280,7 +280,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("acord_dept_name", null); // 受单科室名称
                 costInfoMap.put("orders_dr_code", null); // TODO 受单医生编码
                 costInfoMap.put("orders_dr_name", null); // TODO 受单医生姓名
-                String itemCode = MapUtils.get(map, "hospItemType");
                 String lmtUserFlag = MapUtils.get(map, "lmtUserFlag");
 
                 /**
@@ -289,8 +288,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                  * hosp_appr_flag: 医院审批标志
                  */
                 costInfoMap.put("hosp_appr_flag", hospApprFlag);
-                // 海南省 + (药品和材料) + 限制级用药标志为 '1' ,则报销
-                if ("1".equals(hnSpecial) && "0".equals(lmtUserFlag)) {
+                // 海南省 + (药品和材料) + 限制级用药标志为 '0' ,则报销
+                if ("1".equals(hnSpecial) && "1".equals(lmtUserFlag)) {
                     costInfoMap.put("hosp_appr_flag", "1");
                 // 其他省份：(药品和材料) + (xzbzFlag = 1) +  (xzbzbxFlag != 1)  不报销
                 } else if ("0".equals(lmtUserFlag)) {
@@ -553,7 +552,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costMap.put("fee_ocur_time", DateUtils.format((Date) map.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
                 costMap.put("med_list_code", map.get("insureItemCode") == null ? "" : map.get("insureItemCode").toString()); //  医疗目录编码
                 costMap.put("medins_list_code", map.get("hospItemCode") == null ? "" : map.get("hospItemCode").toString()); //  医药机构目录编码
-                costMap.put("det_item_fee_sumamt", BigDecimalUtils.scale((BigDecimal) map.get("realityPrice"), 2)); // 明细项目费用总额
+
+                String realityDetailPrice = df1.format(BigDecimalUtils.convert(map.get("realityPrice").toString()));
+                BigDecimal convertPrice = BigDecimalUtils.convert(realityDetailPrice);
+                costMap.put("det_item_fee_sumamt",convertPrice); // 明细项目费用总额
                 costMap.put("cnt", BigDecimalUtils.scale(MapUtils.get(map, "totalNum"), 4)); // 数量
                 costMap.put("pric", BigDecimalUtils.scale(BigDecimalUtils.divide((BigDecimal) map.get("realityPrice"), (BigDecimal) map.get("totalNum")), 4)); // 单价
                 costMap.put("sin_dos_dscr", null); // 单次剂量描述

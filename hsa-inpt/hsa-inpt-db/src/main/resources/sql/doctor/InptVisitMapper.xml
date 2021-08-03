@@ -120,15 +120,15 @@
     </select>
 
 	<select id="queryInsureRegisterPage" resultMap="InptVisitMap">
-		select DISTINCT a.*,c.disease_id as inDiagnoseId from inpt_visit a
+		select DISTINCT b.medical_reg_no, a.*,c.disease_id as inDiagnoseId from inpt_visit a
 		left join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
 		left join inpt_diagnose c on (a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1')
 		where a.hosp_code = #{hospCode} and a.status_code in ('1','2','3','4','5','6')
 		<if test="isInsureRegister == '0'.toString() ">
-			and (b.id is null or b.settle_count >0)
+			and (b.id is null or (b.insure_settle_id is not null and b.is_half_settle ='1'))
 		</if>
 		<if test="isInsureRegister == '1'.toString() ">
-			and b.id is not null and  1 > b.settle_count
+			and b.id is not null or  2 > b.settle_count
 		</if>
 		<if test="startTime != null and startTime != ''">
 			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
@@ -139,7 +139,7 @@
 		<if test="keyword != null and keyword != ''">
 			AND concat(a.name,a.in_no,a.bed_name) LIKE CONCAT('%', #{keyword}, '%')
 		</if>
-		order by a.crte_time desc
+		order by a.crte_time,b.crte_time desc
 	</select>
 
 	<!--分页查询-->
@@ -1136,6 +1136,9 @@
 			resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
 		select a.*,b.card_iden as cardIden from insure_individual_visit a inner join insure_individual_basic b on (a.mib_id = b.id and a.hosp_code = b.hosp_code)
 		where a.hosp_code = #{hospCode} and a.visit_id = #{id}
+		<if test="medicalRegNo != null and medicalRegNo != ''">
+			and a.medical_reg_no = #{medicalRegNo}
+		</if>
 	</select>
 
 	<!-- 修改数据 -->

@@ -107,4 +107,7 @@ public class InsureIndividualCostDTO extends InsureIndividualCostDO implements S
         private Date feeEndTime;
         private int settleCount; // 中途结算次数
         private String  isHalfSettle; //是否中途结算
+        private String insureRegisterNo ;
+        private BigDecimal sumFee;
+        private String batchNo; // 费用批次号
 }

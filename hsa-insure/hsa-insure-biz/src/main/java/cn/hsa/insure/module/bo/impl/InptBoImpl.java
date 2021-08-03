@@ -13,6 +13,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.Constants;
@@ -56,6 +57,9 @@ public class InptBoImpl extends HsafBO implements InptBo {
 
     @Resource
     private InsureUnifiedPayInptService insureUnifiedPayInptService;
+
+    @Resource
+    private InsureIndividualVisitService insureIndividualVisitService;
 
     @Resource
     private SysParameterService sysParameterService_consumer;
@@ -149,29 +153,38 @@ public class InptBoImpl extends HsafBO implements InptBo {
         String userName = (String) param.get("userName"); // 经办人
         String code = (String) param.get("code"); // 操作人编码
         InptVisitDTO inptVisitDTO = (InptVisitDTO) param.get("inptVisitDTO");
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", hospCode);
+        isInsureUnifiedMap.put("code", "UNIFIED_PAY");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
         //获取医保就诊信息
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
         insureIndividualVisitDTO.setVisitId(visitId);//就诊id
         insureIndividualVisitDTO.setCode(code);
-        List<InsureIndividualVisitDTO> insureIndividualVisitDTOS = insureIndividualVisitDAO.findByCondition(insureIndividualVisitDTO);
-        if (insureIndividualVisitDTOS == null || insureIndividualVisitDTOS.isEmpty()){
-            throw new AppException("未获取到医保个人信息。");
-        }
-        insureIndividualVisitDTO = insureIndividualVisitDTOS.get(0);
-        //获取医保个人基本信息
         InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();//查询条件
-        insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());//个人基本信息
-        insureIndividualBasicDTO.setHospCode(hospCode);//医院编码
-        List<InsureIndividualBasicDTO>  insureIndividualBasicDTOList = insureIndividualBasicDAO.queryAll(insureIndividualBasicDTO);
-        if (insureIndividualBasicDTOList == null || insureIndividualBasicDTOList.isEmpty()){
-            throw new AppException("未获取到医保个人基本信息。");
+        if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
+            List<InsureIndividualVisitDTO> insureIndividualVisitDTOS = insureIndividualVisitDAO.findByCondition(insureIndividualVisitDTO);
+            if (insureIndividualVisitDTOS == null || insureIndividualVisitDTOS.size() > 1 || insureIndividualVisitDTOS.size() == 0) {
+                throw new AppException("未获取到医保就诊信息。");
+            }
+            insureIndividualVisitDTO = insureIndividualVisitDTOS.get(0);
+            //获取医保个人基本信息
+            insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());//个人基本信息
+            insureIndividualBasicDTO.setHospCode(hospCode);//医院编码
+            List<InsureIndividualBasicDTO>  insureIndividualBasicDTOList = insureIndividualBasicDAO.queryAll(insureIndividualBasicDTO);
+            if (insureIndividualBasicDTOList == null || insureIndividualBasicDTOList.isEmpty()){
+                throw new AppException("未获取到医保个人基本信息。");
+            }
+            insureIndividualBasicDTO = insureIndividualBasicDTOList.get(0);
+        }else{
+            Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+            insureVisitParam.put("hospCode", hospCode);//医院编码
+            insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
+            insureIndividualVisitDTO.setVisitId(inptVisitDTO.getId());//就诊id
+            insureVisitParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+            insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(insureVisitParam).getData();
         }
-        Map<String,Object> isInsureUnifiedMap = new HashMap<>();
-        isInsureUnifiedMap.put("hospCode",hospCode);
-        isInsureUnifiedMap.put("code","UNIFIED_PAY");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
-        insureIndividualBasicDTO = insureIndividualBasicDTOList.get(0);
         if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
             insureIndividualVisitDTO.setInsureIsTransmit("1"); //删除 只删除已经上传到医保的数据
         }
@@ -183,7 +196,6 @@ public class InptBoImpl extends HsafBO implements InptBo {
          * 通过获取系统参数来判断 是走医保统一支付平台 还是调用自己的的医保接口
          */
         if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
-          if(!ListUtils.isEmpty(collect)){
               Map<String, Object> insureUnifiedMap = new HashMap<>();
               insureUnifiedMap.put("individualCostDTOList",individualCostDTOList);
               insureUnifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
@@ -193,7 +205,6 @@ public class InptBoImpl extends HsafBO implements InptBo {
                  //删除本次患者取消医保费用信息
                  insureIndividualCostDAO.delInsureCost(insureIndividualVisitDTO);
              }
-          }
         }
         else{
             String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();//医保注册编码

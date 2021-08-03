@@ -93,13 +93,9 @@
         aka130_name, bka006, bka006_name, aac148, aac148_name, aac013, aac013_name, aae140, bka888, akc252, aac066,
         aab301, aac031, aae030_last, aae031_last, aae030_special, aae031_special, aaz267, baa027, baa027_name, akc193,
         akc193_name, aac158, akc026, baa301, aab300, akc009, bka010, bkh015, crte_id, crte_name, crte_time,card_iden
-        from insure_individual_basic
-        <where>
+        from insure_individual_basic  where  hosp_code = #{hospCode}
             <if test="id != null and id != ''">
                 and id = #{id}
-            </if>
-            <if test="hospCode != null and hospCode != ''">
-                and hosp_code = #{hospCode}
             </if>
             <if test="aac001 != null and aac001 != ''">
                 and aac001 = #{aac001}
@@ -266,8 +262,6 @@
             <if test="cardIden != null">
                 and card_iden = #{crteTime}
             </if>
-
-        </where>
     </select>
 
 
@@ -354,7 +348,7 @@
     <select id="getByVisitId" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
         select aae140,bka006,bka008,bka035,aac002,aac004,aac006,aae140 from insure_individual_basic
         where id = (
-        select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode})
+        select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode} and medical_reg_no = #{medicalRegNo})
         and hosp_code = #{hospCode}
     </select>
     <select id="queryInsurePatientPage" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">

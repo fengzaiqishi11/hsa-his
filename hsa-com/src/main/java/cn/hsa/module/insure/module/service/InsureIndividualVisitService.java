@@ -106,4 +106,15 @@ public interface InsureIndividualVisitService {
      * @Return
     **/
     WrapperResponse<Boolean> updateInsureInidivdual(Map<String,Object> map);
+
+    /**
+     * @Method selectInsureInfo
+     * @Desrciption  查询医保就诊信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/30 15:32
+     * @Return
+    **/
+    WrapperResponse<InsureIndividualVisitDTO> selectInsureInfo(Map<String,Object> map);
 }

@@ -660,11 +660,18 @@
                 birctrl_matn_date = #{birctrlMatnDate},
             </if>
             <if test="isOut != null and isOut != ''">
-                is_out = #{isOut}
+                is_out = #{isOut},
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insure_settle_id = #{insureSettleId},
+            </if>
+            <if test="isHalfSettle != null and isHalfSettle != ''">
+                is_half_settle = #{isHalfSettle},
+                settle_count =settle_count +1
             </if>
         </set>
         where
-        visit_id = #{id} and hosp_code =#{hospCode}
+        visit_id = #{id} and hosp_code =#{hospCode} and medical_reg_no = #{medicalRegNo}
     </update>
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
@@ -710,6 +717,9 @@
         <if test="isOut != null and isOut != ''">
             AND iiv.is_out = #{isOut}
         </if>
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            AND iiv.medical_reg_no = #{medicalRegNo}
+        </if>
     </select>
 
     <select id="getByVisitNo" resultMap="insureIndividualVisitDtoMap"
@@ -743,12 +753,17 @@
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
         WHERE iiv.visit_id = #{id} and iiv.hosp_code =#{hospCode}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiv.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="limitFlag == '1'.toString()">
+            and iiv.insure_settle_id is null
+        </if>
         <if test="keyword != null and keyword != ''">
             and ( iv.in_no like concat('%',#{keyword},'%')
             or iv.name like concat('%',#{keyword},'%')
             )
         </if>
-        order by settle_count desc limit 1;
     </select>
 
     <select id="queryInsureIndividualVisitByIds" parameterType="map"
@@ -767,7 +782,7 @@
         left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
-        WHERE iiv.hosp_code =#{hospCode} and iiv.visit_id in
+        WHERE iiv.hosp_code =#{hospCode}  and iiv.insure_settle_id is null and iiv.visit_id in
         <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -987,6 +1002,23 @@
         select DISTINCT a.id from inpt_visit a
         left join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
         where a.hosp_code = #{hospCode} and a.status_code in ('1','2','3','4','5','6')
+    </select>
+    <select id="getMedicalRegNo" resultType="java.lang.String">
+        select medical_reg_no from insure_individual_visit where hosp_code =#{hospCode} and visit_id =#{visitId}
+        and insure_settle_id is null order by crte_time desc limit 1
+    </select>
+    <select id="selectInsureInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select id, hosp_code, visit_id, mib_id, insure_org_code, insure_reg_code,
+               medicine_org_code, is_hospital, visit_no, aac001, medical_reg_no, aka130, aka130_name,
+               bka006, bka006_name, injury_borth_sn, visit_icd_code, visit_icd_name, visit_time,
+               visit_drpt_id, visit_drpt_name, visit_area_id, visit_area_name, visit_berth,
+               starting_price, shift_hosp_code, out_hosp_code, cause, remark, crte_id, crte_name,
+               crte_time, is_ecqr, pay_ord_id, pay_token, accessory_diagnosis_name, accessory_diagnosis_code,
+               insuplc_admdvs, mdtrt_cert_type, mdtrt_cert_no, omsgid, oinfno, pret_flag, fetus_cnt,
+               birctrl_matn_date, fetts, geso_val, latechb_flag, birctrl_type, fpsc_no,
+               matn_type, is_out, insure_settle_id, settle_count, is_half_settle from insure_individual_visit
+        where hosp_code =#{hospCode} and visit_id =#{visitId}
+               and insure_settle_id is null order by crte_time desc limit 1
     </select>
 
 </mapper>

@@ -6,6 +6,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.RequestInsure;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.inpt.InptFunction;
+import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -132,6 +133,16 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         String isHalfSettle = inptVisitDTO.getIsHalfSettle();
         Date startDate = inptVisitDTO.getFeeStartDate();
         Date endDate = inptVisitDTO.getFeeEndDate();
+        String feeStartDate = "";
+        String feeEndDate = "" ;
+
+        if(startDate !=null) {
+            feeStartDate = DateUtils.format(startDate, DateUtils.Y_M_D);
+        }
+        if(endDate !=null){
+            feeEndDate = DateUtils.format(endDate,DateUtils.Y_M_D);
+        }
+
         String crteName = inptVisitDTO.getCrteName();
         int batchCount = 100; // 定义分批处理的数据
         int count;
@@ -139,8 +150,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         Map<String,Object> insureVisitParam = new HashMap<String,Object>();
         insureVisitParam.put("id",visitId);
         insureVisitParam.put("hospCode",hospCode);
-
+        insureVisitParam.put("medicalRegNo",inptVisitDTO.getMedicalRegNo());
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
+
         if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
             throw new AppException("【" + inptVisitDTO.getName() + "】未完成医保登记。");
         }
@@ -156,8 +168,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         insureCostParam.put("insureRegCode",insureRegCode);// 医保机构编码
         insureCostParam.put("queryBaby","N");// 医保机构编码
         insureCostParam.put("isHalfSettle",isHalfSettle);// 是否中途结算
-        insureCostParam.put("feeStartDate",DateUtils.format(startDate,DateUtils.Y_M_D));
-        insureCostParam.put("feeEndDate",DateUtils.format(endDate,DateUtils.Y_M_D));// 是否中途结算
+        insureCostParam.put("feeStartDate",feeStartDate);
+        insureCostParam.put("feeEndDate",feeEndDate);// 是否中途结算
+
         //查询为上传的费用集合
         List<Map<String,Object>> insureCostList = insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
 
@@ -181,34 +194,37 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         }
         //保存本次传输费用信息
         List<InsureIndividualCostDO> insureIndividualCostDOList = new ArrayList<InsureIndividualCostDO>();
-        for (Map<String,Object> item : insureCostList){
-            count++;
-            InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
-            insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
-            insureIndividualCostDO.setHospCode(hospCode);//医院编码
-            insureIndividualCostDO.setVisitId(visitId);//患者id
-            insureIndividualCostDO.setCostId((String) item.get("id"));//费用id
-            insureIndividualCostDO.setSettleId(null);//结算id
-            insureIndividualCostDO.setIsHospital(Constants.SF.S);//是否住院 = 是
-            insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
-            insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
-            insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
-            insureIndividualCostDO.setGuestRatio((String)item.get("deductible"));//自付比例
-            insureIndividualCostDO.setPrimaryPrice((BigDecimal)item.get("realityPrice"));//原费用
-            insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
-            insureIndividualCostDO.setOrderNo(count+"");//顺序号
-            insureIndividualCostDO.setInsureIsTransmit(Constants.SF.F);
-            insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志 = 已传输
-            insureIndividualCostDO.setCrteId(crteId);//创建id
-            insureIndividualCostDO.setCrteName(crteName);//创建人姓名
-            insureIndividualCostDO.setCrteTime(new Date());//创建时间
-            insureIndividualCostDOList.add(insureIndividualCostDO);
-        }
-        insureIndividualCostDAO.insertInsureCost(insureIndividualCostDOList);
         Map<String,Object> isInsureUnifiedMap = new HashMap<>();
         isInsureUnifiedMap.put("hospCode",hospCode);
         isInsureUnifiedMap.put("code","UNIFIED_PAY");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
+            for (Map<String,Object> item : insureCostList){
+                count++;
+                InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
+                insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
+                insureIndividualCostDO.setHospCode(hospCode);//医院编码
+                insureIndividualCostDO.setVisitId(visitId);//患者id
+                insureIndividualCostDO.setCostId((String) item.get("id"));//费用id
+                insureIndividualCostDO.setSettleId(null);//结算id
+                insureIndividualCostDO.setIsHospital(Constants.SF.S);//是否住院 = 是
+                insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
+                insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
+                insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
+                insureIndividualCostDO.setGuestRatio((String)item.get("deductible"));//自付比例
+                insureIndividualCostDO.setPrimaryPrice((BigDecimal)item.get("realityPrice"));//原费用
+                insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
+                insureIndividualCostDO.setOrderNo(count+"");//顺序号
+                insureIndividualCostDO.setInsureIsTransmit(Constants.SF.F);
+                insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志 = 已传输
+                insureIndividualCostDO.setCrteId(crteId);//创建id
+                insureIndividualCostDO.setCrteName(crteName);//创建人姓名
+                insureIndividualCostDO.setCrteTime(new Date());//创建时间
+                insureIndividualCostDOList.add(insureIndividualCostDO);
+            }
+            insureIndividualCostDAO.insertInsureCost(insureIndividualCostDOList);
+        }
+        inptVisitDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
         Map<String, Object> resultDataMap = null;
         if (Constants.SF.S.equals(insureIndividualVisitDTO.getIsEcqr())){
             //电子凭证
@@ -219,13 +235,18 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             unifiedMap.put("insureCostList",insureCostList);
             unifiedMap.put("code",code);
             unifiedMap.put("crteName",crteName);
+            unifiedMap.put("crteId",crteId);
+            unifiedMap.put("startDate",startDate);
+            unifiedMap.put("isHalfSettle",isHalfSettle);
+            unifiedMap.put("endDate",endDate);
             unifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
             unifiedMap.put("count",count);
             unifiedMap.put("hospCode",hospCode);
             unifiedMap.put("inptCostDTOList",inptCostDTOList);
             unifiedMap.put("individualCostDTOList",individualCostDTOList);
             resultDataMap = insureUnifiedPayInptService.UP_2301(unifiedMap).getData();
-        }else{
+        }
+        else{
             //封装需要的请求医保入参
             inptVisitDTO.setInsureRegCode(insureRegCode);  // 医保注册编码
             inptVisitDTO.setAac001(insureIndividualVisitDTO.getAac001()); // 个人电脑号
@@ -282,29 +303,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                 }
             }
         }
-
-        if(!MapUtils.isEmpty(resultDataMap) && (Integer)MapUtils.get(resultDataMap, "num") > 0){
-            List<Map<String,Object>> list2  = MapUtils.get(resultDataMap, "list2");
-            if(!ListUtils.isEmpty(list2)){
-                if("1".equals(isHalfSettle)){
-                    // 如果是费用传输的时候，选择了中途结算，但是并没有实际结算，下一次的费用传输，应该覆盖上次的结算区间
-                    for(Map<String,Object> item : list2){
-                        item.put("insureIsTransmit","1");
-                        item.put("startDate",DateUtils.format(startDate,DateUtils.Y_M_D));
-                        item.put("isHalfSettle",isHalfSettle);
-                        item.put("endDate",DateUtils.format(endDate,DateUtils.Y_M_D));
-                        item.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
-                    }
-                }else{
-                    for(Map<String,Object> item : list2){
-                        item.put("insureIsTransmit","1");
-                    }
-                }
-                insureIndividualCostDAO.updateCostInsureStatus(list2);
-            }
-        }
         // 如果在费用传输的时候 选择了中途结算，则更新医保就诊表里面的结算次数,同时更新是否结算标志
-        //
         if("1".equals(isHalfSettle)){
             insureIndividualVisitDAO.updateInsureInidivdual(inptVisitDTO);
         }
@@ -648,7 +647,11 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
     /**
      * @param map
      * @Method updateLimitUserFlag
-     * @Desrciption 住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     *
+     * @Desrciption 1.住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     *              2.修改费用表报销标识
+     *              3.已经结算的费用不能修改
+     *
      * @Param
      * @Author fuhui
      * @Date 2021/7/20 9:20
@@ -656,7 +659,13 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
      */
     @Override
     public Boolean updateLimitUserFlag(Map<String, Object> map) {
-
+        InptCostDTO inptCostDTO =   insureIndividualCostDAO.queryIsSettleFee(map);
+        if(inptCostDTO !=null && "2".equals(inptCostDTO.getSettleCode())){
+            throw new AppException("已经结算的费用不能修改");
+        }
+        if(inptCostDTO ==null){
+            throw new AppException("费用表里面无该项目信息");
+        }
         return insureIndividualCostDAO.updateLimitUserFlag(map);
     }
 
@@ -672,7 +681,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
     @Override
     public PageDTO queryInptCostPage(InptVisitDTO inptVisitDTO) {
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
-        List<InptAdviceDetailDTO> inptCostDTOList =  insureIndividualCostDAO.queryInptCostPage(inptVisitDTO);
+        List<InptCostDTO> inptCostDTOList =  insureIndividualCostDAO.queryInptCostPage(inptVisitDTO);
         return PageDTO.of(inptCostDTOList);
     }
 }

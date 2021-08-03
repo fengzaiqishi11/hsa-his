@@ -44,6 +44,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
 //                sql_str = sql_str.replaceAll("\\{" + key + "}", map.get(key) == null ? "" : map.get(key) instanceof Integer?(Integer) map.get(key)+"":(String) map.get(key));
 //            }
 //            data = inptMrisInfoDAO.queryData(sql_str);
+        if (data!=null&&data.size()>0) {
             for (LinkedHashMap<String, Object> ma : data) {
                 Map diagnoseParam = new HashMap();
                 diagnoseParam.put("hospCode", (String) map.get("hospCode"));
@@ -113,6 +114,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
                 ma.putAll(operInfoMap);
                 ma.remove("visit_id");
             }
+        }
         return data;
     }
 }

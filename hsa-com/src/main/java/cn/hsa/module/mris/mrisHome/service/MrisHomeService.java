@@ -11,6 +11,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -287,5 +288,14 @@ public interface MrisHomeService {
      * @return String
      */
     @GetMapping("/service/mris/mrisHome/importMrisInfo")
-    WrapperResponse<String> importMrisInfo(Map map) throws Exception;
+    WrapperResponse<List<LinkedHashMap<String,Object>>> importMrisInfo(Map map) throws Exception;
+
+    /**@description 获取导出表头
+     * @auth liuliyun
+     * @date 2021/07/30
+     * @param map
+     * @return String
+     */
+    @GetMapping("/service/mris/mrisHome/getTableConfig")
+    WrapperResponse<Map> getTableConfig(Map map) throws Exception;
 }

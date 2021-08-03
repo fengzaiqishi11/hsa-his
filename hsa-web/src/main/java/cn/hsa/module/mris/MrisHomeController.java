@@ -22,8 +22,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.module.mris
@@ -333,45 +333,41 @@ public class MrisHomeController extends BaseController {
      * @Author: liuliyun
      * @Email: liyun.liu@powersi.com
      * @Date: 2021-07-19 17:25
-     * @Return: csv文件
+     * @Return: List<LinkedHashMap<String,Object>>
      **/
-    @GetMapping("/inptMrisInfoDownload")
-    public void inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res,String statusCode) throws Exception {
+    @PostMapping("/inptMrisInfoDownload")
+    public WrapperResponse<List<LinkedHashMap<String,Object>>> inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res,@RequestBody Map map) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map param =new HashMap();
         param.put("hospCode",sysUserDTO.getHospCode());
-        param.put("statusCode",statusCode);
+        param.put("statusCode",map.get("statusCode"));
+        param.put("keyword",map.get("keyword"));
+        param.put("startTime",map.get("startTime"));
+        param.put("endTime",map.get("endTime"));
         param.put("hospName",sysUserDTO.getHospName());
         if (sysUserDTO.getLoginBaseDeptDTO() != null) {
             param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
         }
-        WrapperResponse<String> returnDatas = mrisHomeService_consumer.importMrisInfo(param);
-        String path = returnDatas.getData();
-        try {
-            // path是指欲下载的文件的路径。
-            File file = new File(path);
-            // 取得文件名。
-            String filename = file.getName();
-            // 取得文件的后缀名。
-            String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
-
-            // 以流的形式下载文件。
-            InputStream fis = new BufferedInputStream(new FileInputStream(path));
-            byte[] buffer = new byte[fis.available()];
-            fis.read(buffer);
-            fis.close();
-            // 清空response
-            res.reset();
-            // 设置response的Header
-            res.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("utf-8"),"ISO8859-1"));
-            res.addHeader("Content-Length", "" + file.length());
-            OutputStream toClient = new BufferedOutputStream(res.getOutputStream());
-            res.setContentType("application/octet-stream");
-            toClient.write(buffer);
-            toClient.flush();
-            toClient.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+         return mrisHomeService_consumer.importMrisInfo(param);
+    }
+    /**
+     * @Menthod: getTableConfig
+     * @Desrciption: 获取导出表头
+     * @Param: 1. hospCode: 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-30 10:24
+     * @Return: Map
+     **/
+    @GetMapping("/getTableConfig")
+    public WrapperResponse<Map> getTableConfig(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map param =new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
         }
+        return mrisHomeService_consumer.getTableConfig(param);
     }
 }

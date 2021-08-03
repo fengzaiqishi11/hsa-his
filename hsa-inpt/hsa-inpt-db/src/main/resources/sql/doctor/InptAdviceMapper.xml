@@ -1885,7 +1885,7 @@
         --         医嘱开始时间小于等于当前时间
         and date(a.long_start_time) &lt;= date(#{endDate})
         --         预停时间不为空,那么需要大于当前时间
-        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date(a.plan_stop_time) &gt; date(#{endDate})))
+        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date(a.plan_stop_time) &gt;= date(#{endDate})))
         and date(ifnull(a.last_exec_time,a.long_start_time)) &lt; date(#{endDate})
         and a.exec_dept_id = #{deptId}
         and ifnull(a.advance_days,'0') = '0'

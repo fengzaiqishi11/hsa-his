@@ -811,7 +811,7 @@
         select
         id, hosp_code, visit_id, baby_id, iat_id, iatd_group_no, iatd_seq_no, advice_exec_id, source_code, source_id,
         old_cost_id, source_dept_id, in_dept_id, bfc_id, item_code,
-        (case item_code
+        (case
         when item_code ='1' then (select bd.code from base_drug bd where item_id = bd.id and bd.hosp_code =hosp_code )
         when item_code='2' then (select bm.code from base_material bm where item_id =  bm.id  and bm.hosp_code = hosp_code )
         when item_code = '4' then (select ba.code from base_advice ba where item_id = ba.id and ba.hosp_code = hosp_code)

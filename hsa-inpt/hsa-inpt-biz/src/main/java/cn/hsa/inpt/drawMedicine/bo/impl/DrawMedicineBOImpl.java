@@ -22,8 +22,6 @@ import cn.hsa.module.phar.pharinbackdrug.entity.PharInWaitReceiveDO;
 import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONPObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
@@ -455,6 +453,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
      */
     @Override
     public void saveAdvanceTakeMedicine(Map<String, Object> map,String type) {
+        String hospCode = MapUtils.get(map,"hospCode","");
          //新增提前领药
         if ("tqly".equals(type)){
             //领药天数
@@ -464,15 +463,65 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
             if(StringUtils.isEmpty(advanceType)){
                 throw new RuntimeException("请选择领药单据类型!");
             }
-            List<PharInWaitReceiveDTO> pharInWaitReceiveDTOList = JSON.parseArray(MapUtils.get(map,"pharInWaitReceiveDTOList",""),PharInWaitReceiveDTO.class);
-            if(ListUtils.isEmpty(pharInWaitReceiveDTOList)){
-                throw new RuntimeException("没有需要提前领药的数据!");
-            }
-            List<String> adviceIds = pharInWaitReceiveDTOList.stream().map(PharInWaitReceiveDTO::getAdviceId).distinct().collect(Collectors.toList());
 
             Map<String,Object> advanceMap = inptAdviceDAO.getMedicineAdvance(map) ;
             if(advanceMap != null){
-                throw new RuntimeException("当前有未配药的领药申请,请先配药!");
+                throw new RuntimeException("不允许重复提前申请相同类型的药品!");
+            }
+
+            Map parmMap = new HashMap();
+            parmMap.put("hospCode", hospCode);
+            parmMap.put("id", advanceType);
+            BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
+            baseOrderReceiveDTO.setHospCode(hospCode);
+            baseOrderReceiveDTO.setId(advanceType);
+            parmMap.put("baseOrderReceiveDTO",baseOrderReceiveDTO);
+            baseOrderReceiveDTO = baseOrderReceiveService.getById(parmMap).getData();
+            if(baseOrderReceiveDTO == null ){
+                throw new RuntimeException("未获取到领药单据类型!");
+            }
+            String deptId = MapUtils.get(map,"deptId","");
+            String endDate = MapUtils.get(map,"endDate","");
+            parmMap.clear();
+            parmMap.put("deptId",deptId);
+            parmMap.put("hospCode",hospCode);
+            parmMap.put("endDate",endDate);
+
+            //8.是否紧急领药
+            if("1".equals(baseOrderReceiveDTO.getIsEmergency())){
+                throw new RuntimeException("紧急领药不允许提前领药!");
+            }
+            //1.判断科室是否可用
+            if(StringUtils.isNotEmpty(baseOrderReceiveDTO.getDeptIds())){
+                if (!Arrays.asList(baseOrderReceiveDTO.getDeptIds().split(",")).contains(deptId)){
+                    throw new RuntimeException(baseOrderReceiveDTO.getName()+"在当前科室不可用!");
+                }
+            }
+            //2.用法
+            if(StringUtils.isNotEmpty(baseOrderReceiveDTO.getUsageCodes())){
+                List<String > usageCodes = Arrays.asList(baseOrderReceiveDTO.getUsageCodes().split(","));
+                parmMap.put("usageCodes",usageCodes);
+            }else{
+                parmMap.put("usageCodes",Arrays.asList(new String []{""}));
+            }
+            //3.是否材料
+            parmMap.put("isMaterial",baseOrderReceiveDTO.getIsMaterial());
+            //4.是否大输液
+            parmMap.put("isIvdrip",baseOrderReceiveDTO.getIsLvp());
+            //5.是否是特殊药品
+            parmMap.put("isPh",baseOrderReceiveDTO.getIsPh());
+            //6.是否中草药
+            parmMap.put("isHerb",baseOrderReceiveDTO.getIsHerb());
+            //7.是否出院带药
+            parmMap.put("isGive",baseOrderReceiveDTO.getIsGive());
+            //8.是否全部
+            parmMap.put("isAll",baseOrderReceiveDTO.getIsAll());
+            //9.是否按病人
+            parmMap.put("isPatient",baseOrderReceiveDTO.getIsPatient());
+
+            List <String> adviceIds = inptAdviceDAO.selectAdviceByDeptAndType(parmMap);
+            if(ListUtils.isEmpty(adviceIds)){
+                throw new RuntimeException("没有需要提前领药的数据!");
             }
             //新增提前领药记录
             map.put("id",SnowflakeUtils.getId());
@@ -487,7 +536,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
                     paramMap.put("id",SnowflakeUtils.getId());
                     paramMap.put("advance_id",MapUtils.get(map,"id",""));
                     paramMap.put("advice_id",adviceId);
-                    paramMap.put("hosp_code",MapUtils.get(map,"hospCode",""));
+                    paramMap.put("hosp_code",hospCode);
                     mapList.add(paramMap);
                 }
                 //新增关联表

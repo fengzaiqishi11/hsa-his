@@ -1887,7 +1887,7 @@
         --         预停时间不为空,那么需要大于当前时间
         and (a.plan_stop_time is null or (a.plan_stop_time is not null and date(a.plan_stop_time) &gt; date(#{endDate})))
         and a.exec_dept_id = #{deptId}
-        and a.advance_days &gt; 0
+        and ifnull(a.advance_days,'0') = '0'
 
         ) aaa  where 1=1
 

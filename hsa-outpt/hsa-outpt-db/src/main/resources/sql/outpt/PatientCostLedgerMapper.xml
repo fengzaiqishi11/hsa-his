@@ -142,10 +142,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by a.bfc_id,c.name
@@ -273,10 +273,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by d.id
@@ -313,10 +313,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            a.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
     </select>
@@ -368,10 +368,10 @@
         <!--过滤条件增加医生名 称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by d.out_dept_id
@@ -409,10 +409,10 @@
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
             and (
-            outpt_doctor_name like concat('%', #{doctorName}, '%')
-            or zz_doctor_name like concat('%', #{doctorName}, '%')
-            or jz_doctor_name like concat('%', #{doctorName}, '%')
-            or zg_doctor_name like concat('%', #{doctorName}, '%')
+            a.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
         group by a.out_dept_id

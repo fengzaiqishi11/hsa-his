@@ -138,4 +138,9 @@ public class InptLongCostDO implements Serializable {
      * 项目类别（XMLB）
      */
     private String itemCode;
+
+    /**
+     * 药房ID（XMLB）
+     */
+    private String pharId;
 }

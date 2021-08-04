@@ -1657,6 +1657,10 @@
 		<if test="status_code != null and status_code !=''">
 			and visit.status_code = #{status_code}
 		</if>
+		<!--病人类型 -->
+		<if test="patient_code != null and patient_code !=''">
+			and visit.patient_code = #{patient_code}
+		</if>
 		<!--入院开始时间-->
 		<if test="in_start_time != null and in_start_time !=''">
 			and  date(visit.in_time) &gt;= date(#{in_start_time})

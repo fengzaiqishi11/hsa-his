@@ -290,6 +290,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          * 省外医保  接口无数据返回。只能查询本地保存的费用数据
          */
         if("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) && data !=null && "1".equals(data.getValue())){
+
             Map<String,Object> setlinfoMap  = insureIndividualSettleDAO.querySettleForMap(map);
             List<Map<String,Object>> setldetailListMap = insureIndividualSettleDAO.queryInsureFundListMap(map);
             outptMap.put("setlinfo",setlinfoMap);

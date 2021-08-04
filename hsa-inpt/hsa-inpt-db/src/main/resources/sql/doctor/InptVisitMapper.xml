@@ -740,17 +740,24 @@
 		a.is_visit, a.is_first_visit, a.tran_in_code, a.in_dept_id, a.in_disease_id, a.in_remark,a.advance_payment,
 		(select name from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseName,
 		(select nation_code from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseCode,
-		(select id from base_disease where hosp_code = #{hospCode}
+		<!-- 门诊诊断表中没有主诊断的情况下，查询门诊病历表中的诊断 luoyong 2021.8.4-->
+		<!--(select id from base_disease where hosp_code = #{hospCode}
 		and id in (
 		select disease_id from outpt_diagnose
 		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})
 		) as outptDiseaseId,
 		(select name from base_disease where hosp_code = #{hospCode} and id in (
 		select disease_id from outpt_diagnose
-		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) as outptDiseaseName,
-		(select id from base_dept where
-		code = (select ward_code from base_dept where id = a.in_dept_id and hosp_code = #{hospCode})
-		and hosp_code = #{hospCode})as inWardId
+		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) as outptDiseaseName,-->
+		IFNULL(
+			(select id from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})),
+			(SELECT id from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code )))
+		) as outptDiseaseId,
+		IFNULL(
+			(select name from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) ,
+			(SELECT name from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code)))
+		) as outptDiseaseName,
+		(select id from base_dept where code = (select ward_code from base_dept where id = a.in_dept_id and hosp_code = #{hospCode}) and hosp_code = #{hospCode}) as inWardId
 		from outpt_visit a
 		<where>
 			a.hosp_code = #{hospCode}

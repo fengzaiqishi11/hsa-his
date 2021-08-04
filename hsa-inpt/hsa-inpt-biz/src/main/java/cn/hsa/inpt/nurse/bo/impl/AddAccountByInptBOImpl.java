@@ -648,6 +648,7 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setTotalNumUnitCode(inptLongCostDTO.getUnitCode()) ;
                 inptCostDTO.setHerbNoteCode(null);
                 inptCostDTO.setUseCode(inptLongCostDTO.getUseCode()) ;
+                inptCostDTO.setPharId(inptLongCostDTO.getPharId());
                 inptCostDTO.setHerbNum(null);
                 inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptLongCostDTO.getTotalNum(),inptLongCostDTO.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 inptCostDTO.setPreferentialPrice(new BigDecimal(0));
@@ -656,7 +657,6 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setDoctorId(userId);
                 inptCostDTO.setDoctorName(userName);
                 inptCostDTO.setDeptId(loginDeptId) ;
-                inptCostDTO.setPharId(inptVisitById.getItemId()) ;
                 inptCostDTO.setIsDist(Constants.SF.F);
                 inptCostDTO.setIsGive(inptLongCostDTO.getUseCode()) ;
                 inptCostDTO.setBackCode(Constants.TYZT.YFY) ;
@@ -929,9 +929,11 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     if(dto.getTotalNumUnitCode().equals(md.getSplitUnitCode())){
                         wdto.setSplitNum(dto.getTotalNum());//拆零数量
                         wdto.setNum(BigDecimalUtils.divide(dto.getTotalNum(), md.getSplitRatio()).setScale(2,   BigDecimal.ROUND_HALF_UP));//总数量
+                        wdto.setUnitCode(md.getSplitUnitCode());
                     }else{
                         wdto.setSplitNum(BigDecimalUtils.multiply(dto.getTotalNum(),md.getSplitRatio() ));//拆零数量
                         wdto.setNum(dto.getTotalNum());//总数量
+                        wdto.setUnitCode(md.getUnitCode());
                     }
                     wdto.setSplitPrice(md.getSplitPrice());//拆零单价
                     wdto.setPrice(md.getPrice());//大单位单价
@@ -945,10 +947,9 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     wdto.setUsageCode(dto.getUsageCode());
                     wdto.setVisitId(dto.getVisitId());
                     wdto.setGroupNo("0");
-
                     wdto.setStatusCode(Constants.FYZT.DL);//0、待领，1、请领，2、配药，3、发药
                     wdto.setPharId(dto.getPharId());//发药药房id
-                    wdto.setUseCode(md.getUseCode());//用药性质
+                    wdto.setUseCode(dto.getUseCode());//用药性质
                     wdto.setDeptId(loginDeptId);//申请科室
                     wdto.setCostId(costId);//费用明细id
                     wdto.setCrteId(userId);
@@ -1056,16 +1057,20 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     if(dto.getTotalNumUnitCode().equals(drug.getSplitUnitCode())){
                         wdto.setSplitNum(dto.getTotalNum());//拆零数量
                         wdto.setNum(BigDecimalUtils.divide(dto.getTotalNum(), drug.getSplitRatio()).setScale(2,   BigDecimal.ROUND_HALF_UP));//总数量
+                        wdto.setUnitCode(drug.getSplitUnitCode());
                     }else{
                         wdto.setSplitNum(BigDecimalUtils.multiply(dto.getTotalNum(),drug.getSplitRatio() ));//拆零数量
                         wdto.setNum(dto.getTotalNum());//总数量
+                        wdto.setUnitCode(drug.getUnitCode());
                     }
                     wdto.setSplitPrice(drug.getSplitPrice());//拆零单价
                     wdto.setPrice(drug.getPrice());//大单位单价
                     wdto.setTotalPrice(dto.getTotalPrice());//总金额
                     wdto.setStatusCode(Constants.FYZT.DL);//0、待领，1、请领，2、配药，3、发药
                     wdto.setPharId(dto.getPharId());//发药药房id
-                    wdto.setUseCode(drug.getUseCode());//用药性质
+                    wdto.setUseCode(dto.getUseCode());//用药性质
+                    wdto.setDosage(drug.getDosage());
+                    wdto.setDosageUnitCode(drug.getDosageUnitCode()) ;
                     wdto.setDeptId(loginDeptId);//申请科室
                     wdto.setCostId(costId);//费用明细id
                     wdto.setCrteId(userId);

@@ -315,6 +315,7 @@ public class InptVisitController extends BaseController {
         paramMap.put("out_end_time", req.getParameter("out_end_time"));
         paramMap.put("js_start_time", req.getParameter("js_start_time"));
         paramMap.put("js_end_time", req.getParameter("js_end_time"));
+        paramMap.put("patient_code", req.getParameter("patient_code"));
 
         return inptVisitService_consumer.queryPatients(paramMap);
     }

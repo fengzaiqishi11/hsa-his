@@ -17,6 +17,37 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="classQueueId" column="classQueueId" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="code" jdbcType="VARCHAR"/>
+        <result property="deptTypeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="upDeptCode" column="upDeptCode" jdbcType="VARCHAR"/>
+        <result property="triageId" column="triage_id" jdbcType="VARCHAR"/>
+        <result property="triageName" column="triage_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO" id="OutptClassifyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="visitCode" column="visit_code" jdbcType="VARCHAR"/>
+        <result property="registerCode" column="register_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isExpert" column="is_expert" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="classQueueId" column="classQueueId" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="code" jdbcType="VARCHAR"/>
+        <result property="deptTypeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="upDeptCode" column="upDeptCode" jdbcType="VARCHAR"/>
+        <result property="triageId" column="triage_id" jdbcType="VARCHAR"/>
+        <result property="triageName" column="triage_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO" id="OutptClassifyCostMap">
@@ -87,6 +118,17 @@
             order by visit_code  desc
     </select>
 
+    <!-- 查询带有班次队列id的挂号类别信息-->
+    <select id="queryAllWithClassQueueId" resultMap="OutptClassifyMap">
+
+        select  ocq.id as classQueueId,ocq.dept_id,ocq.hosp_code,ocq.triage_id,bad.name as triage_name,oc.id ,
+                oc.`name`,oc.register_code,oc.visit_code ,oc.is_expert ,bd.name as deptName,
+                bd.code,bd.type_code,bd.up_dept_code as upDeptCode from outpt_classes_queue ocq
+                left join outpt_classify oc on ocq.cy_id = oc.id and ocq.hosp_code = oc.hosp_code
+                left join base_dept bd on ocq.dept_id = bd.id and ocq.hosp_code = bd.hosp_code
+                left join base_dept bad on ocq.triage_id = bad.id and ocq.hosp_code = bad.hosp_code
+        where  ocq.queue_date = #{queueDate} and ocq.hosp_code = #{hospCode}
+    </select>
     <!--优惠类型名称是否重复-->
     <select id="queryNameIsExist" resultType="java.lang.Integer">
       select count(name) from outpt_classify

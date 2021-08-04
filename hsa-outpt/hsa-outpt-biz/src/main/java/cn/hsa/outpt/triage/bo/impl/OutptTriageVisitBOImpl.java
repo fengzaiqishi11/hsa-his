@@ -14,6 +14,7 @@ import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -95,7 +96,7 @@ public class OutptTriageVisitBOImpl implements OutptTriageVisitBO {
     public List<OutptTriageVisitDTO> queryPage(Map map){
 
         OutptTriageVisitDTO outptTriageVisitDTO = (OutptTriageVisitDTO) map.get("outptTriageVisitDTO");
-
+        PageHelper.startPage(outptTriageVisitDTO.getPageNo(),outptTriageVisitDTO.getPageSize());
         return outptTriageVisitDAO.queryPage(outptTriageVisitDTO);
     }
 
@@ -286,40 +287,10 @@ public class OutptTriageVisitBOImpl implements OutptTriageVisitBO {
         }
         outptTriageVisitDTO.setIsLoss(Constants.SF.S);
         outptTriageVisitDTO.setTriageStartCode(Constants.FZZT.HAVE_BEEN_CALLED);
+        outptTriageVisitDTO.setIsCall(Constants.SF.F);
         outptTriageVisitDTO.setLossTime(new Date());
 
-
-        Map callQueueServerParams = new HashMap();
-        callQueueServerParams.put("hospCode", MapUtils.get(map,"hospCode"));
-        callQueueServerParams.put("code", "MISS_QUEUE_SERVER_URL");
-
-        SysParameterDTO queueMissServerInfo = sysParameterService.getParameterByCode(callQueueServerParams).getData();
-
-        if (queueMissServerInfo == null) {
-            throw new AppException("请维护系统参数【 MISS_QUEUE_SERVER_URL 】叫号系统的过号接口的地址再进行过号操作");
-        }
-
-        String queueServerUrl = queueMissServerInfo.getValue();
-        Map<String,Object> callParams = new HashMap<>(4);
-        callParams.put("url",queueServerUrl);
-
-        JSONObject data = new JSONObject();
-        data.put("hospCode", MapUtils.get(map,"hospCode"));
-        data.put("registerId", outptTriageVisitDTO.getRegisterId());
-
-        JSONObject param = new JSONObject();
-        param.put("data",data);
-        callParams.put("param",param.toJSONString());
-        // 调用叫号服务器过号接口
-        String callResult = HttpConnectUtil.doPost(callParams);
-        JSONObject jObj = JSON.parseObject(callResult);
-        Integer code = jObj.getInteger("code");
-        Integer success = new Integer(0);
         int affectRows = updateTriageStartCodeByRegisterId(outptTriageVisitDTO);
-
-        if (!success.equals(code)) {
-            throw new AppException("过号失败，失败信息："+jObj.toJSONString());
-        }
         return affectRows > 0;
     }
 

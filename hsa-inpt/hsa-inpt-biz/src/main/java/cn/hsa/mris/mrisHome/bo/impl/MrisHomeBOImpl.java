@@ -82,25 +82,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     public PageDTO queryOutHospPatientPage(InptVisitDTO inptVisitDTO) {
         // 设置分页
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
-         // liuliyun 20210727 珠海病案号更改 start
-         Map param=new HashMap();
-         param.put("hospCode",inptVisitDTO.getHospCode());
-         param.put("code","BAH_SF");
-         SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(param).getData();
-         if (sysParameterDTO==null){
-             sysParameterDTO=new SysParameterDTO();
-             sysParameterDTO.setValue("0");
-         }
-         List<InptVisitDTO> patientInfoList=new ArrayList<>();
-         if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
-             // 查询
-             patientInfoList = mrisHomeDAO.queryOutHospPatientPageZ(inptVisitDTO);
-             // liuliyun 20210727 珠海病案号更改 end
-         }else {
-             // 查询
-             patientInfoList = mrisHomeDAO.queryOutHospPatientPage(inptVisitDTO);
-         }
-         return PageDTO.of(patientInfoList);
+
+        // 查询
+        List<InptVisitDTO> patientInfoList = mrisHomeDAO.queryOutHospPatientPage(inptVisitDTO);
+        return PageDTO.of(patientInfoList);
     }
 
     /**

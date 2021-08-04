@@ -290,6 +290,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          * 省外医保  接口无数据返回。只能查询本地保存的费用数据
          */
         if("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) && data !=null && "1".equals(data.getValue())){
+
             Map<String,Object> setlinfoMap  = insureIndividualSettleDAO.querySettleForMap(map);
             List<Map<String,Object>> setldetailListMap = insureIndividualSettleDAO.queryInsureFundListMap(map);
             outptMap.put("setlinfo",setlinfoMap);
@@ -856,7 +857,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             orgCode = data.getValue(); // 获取医疗机构编码
         }
         String hospCode = MapUtils.get(map,"hospCode");
-        Map<String,Object> dataMap = new HashMap<>();
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> inputMap = new HashMap<>();
         deptDTOList.stream().forEach(deptDTO -> {
@@ -882,7 +882,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             mapList.add(paramMap);
         });
         inputMap.put("deptinfo",mapList);
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, inputMap);
         map.put("deptDTOList",deptDTOList);
         baseDeptService_consumer.updateBatchDept(map).getData();
         return map;

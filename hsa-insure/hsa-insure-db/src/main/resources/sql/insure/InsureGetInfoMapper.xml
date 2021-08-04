@@ -10,6 +10,11 @@
              ifnull((select settle_no from insure_setl_info where insure_setl_info.settle_id = a.insureSettleId and insure_setl_info.visit_id = a.visit_id limit 1),0) as settleNo,
             (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
             (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
+            (select iib.bka035_name from insure_individual_basic iib where d.mib_id = iib.id) as bka035_name,
+            (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'SPGA_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as spgaNurscareDays,
+            (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'lV1_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as lv1NurscareDays,
+            (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'SCD_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as scdNurscareDays,
+            (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'lV3_NURSE_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as lv3NursecareDays,
             d.medical_reg_no,
             a.settle_id,
             a.insureSettleId,
@@ -53,7 +58,6 @@
             e.work_phone,
             e.work_address,
             e.work_post_code,
-            f.sp_psn_type,
             e.baby_birth_weight,
             e.baby_in_weight,
             e.in_way,
@@ -73,6 +77,8 @@
             e.is_inpt,
             e.zg_doctor_name,
             e.zg_doctor_id,
+            e.zr_nurse_id,
+            e.zr_nurse_name,
             g.start_time,
             g.end_time,
             a.omsgid,
@@ -88,6 +94,8 @@
         where a.insureSettleId = #{insureSettleId} and a.state = '0'
         order by a.visit_id
     </select>
+
+
 
     <select id="getOutSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select

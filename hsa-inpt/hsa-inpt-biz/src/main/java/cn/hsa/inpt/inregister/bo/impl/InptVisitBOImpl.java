@@ -1213,7 +1213,38 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("入院科室名称不可为空");
         }
         //设置住院号
-        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        // 20210803 liuliyun 珠海住院号生成
+        Map sysParam=new HashMap();
+        sysParam.put("hospCode",inptVisitDTO.getHospCode());
+        sysParam.put("code","BAH_SF");
+        SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(sysParam).getData();
+        // 未配置系统参数时，添加默认值
+        if (sysParameterDTO ==null){
+            sysParameterDTO=new SysParameterDTO();
+            sysParameterDTO.setValue("0");
+        }
+        String orderNo ="";
+        if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
+            // 住院次数获取(未获取，默认1次)
+            Map countMap=new HashMap();
+            countMap.put("hospCode",inptVisitDTO.getHospCode());
+            countMap.put("certCode",inptVisitDTO.getCertCode());
+            countMap.put("certNo",inptVisitDTO.getCertNo());
+            List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
+            int inCnt = 1;
+            if (info == null|| info.size() ==0) {
+                inCnt = 1;
+                orderNo = getOrderNo(inptVisitDTO.getHospCode(), "361")+"-00"+inCnt;
+            }else {
+                if (info.get(0).get("total_in")!=null) {
+                    inCnt = (int) info.get(0).get("total_in");
+                    inCnt = inCnt + 1;
+                }
+                orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
+            }
+        }else {
+            orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        }
         inptVisitDTO.setInNo(orderNo);
 
         // 档案表操作

@@ -318,6 +318,14 @@ public class InsureSetlInfoDO implements Serializable {
      */
     private String chfpdrCode;
     /**
+     * 责任护士代码
+     */
+    private String zrNurseName;
+    /**
+     * 责任护士代名称
+     */
+    private String zrNurseCode;
+    /**
      * 结算开始日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")

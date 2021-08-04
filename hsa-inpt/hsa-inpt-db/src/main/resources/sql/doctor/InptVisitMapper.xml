@@ -1823,7 +1823,16 @@
 		order by crte_time desc
 	</select>
 	<select id="queryByCertNo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-		select status_code from inpt_visit where status_code="2" and hosp_code = #{hospCode} and cert_no = #{certNo}
+		select
+		       status_code
+		from inpt_visit
+		where status_code='2'
+		<if test="hospCode != null and hospCode != ''">
+			and hosp_code = #{hospCode}
+		</if>
+		<if test="certNo != null and certNo != ''">
+			and cert_no = #{certNo}
+		</if>
 	</select>
 
 	<!--	修改病重类的字段-->

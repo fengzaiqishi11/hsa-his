@@ -245,10 +245,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     @Override
     public String save(InptVisitDTO inptVisitDTO) {
         if (StringUtils.isEmpty(inptVisitDTO.getId())) {
-            if(queryByCertNo(inptVisitDTO) == null){
-                return insert(inptVisitDTO);
-            }else if("2".equals(queryByCertNo(inptVisitDTO).getStatusCode())){
-                throw new AppException("该病人已住院，不可重复住院！");
+            // 排除证件类别为其他的，证件类别为其他的直接进行入院登记
+            if (StringUtils.isNotEmpty(inptVisitDTO.getCertCode()) && !Constants.ZJLB.QT.equals(inptVisitDTO.getCertCode())) {
+                // 校验是否已登记在院
+                InptVisitDTO visitDTO = this.queryByCertNo(inptVisitDTO);
+                if (visitDTO != null && StringUtils.isNotEmpty(visitDTO.getStatusCode()) && Constants.BRZT.ZY.equals(visitDTO.getStatusCode())) {
+                    throw new AppException("该病人已住院，不可重复住院！");
+                }
             }
             return insert(inptVisitDTO);
         } else {
@@ -1375,9 +1378,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
 //        pf.setInProfile(inptVisitDTO.getInNo());
         pf.setOutProfile(wr.getData().getOutProfile()); //门诊档案号
+        pf.setTotalOut(wr.getData().getTotalOut() == null ? 0 : wr.getData().getTotalOut()); //门诊次数
+        pf.setOutptLastVisitTime(wr.getData().getOutptLastVisitTime()); // 最后门诊就诊时间
         pf.setInProfile(wr.getData().getInProfile()); //住院病案号
-        pf.setInptLastVisitTime(DateUtils.getNow());
-        pf.setTotalIn(1);
+        pf.setTotalIn(wr.getData().getTotalIn() == null ? 1 : wr.getData().getTotalIn()); // 住院次数
+        pf.setInptLastVisitTime(wr.getData().getInptLastVisitTime() == null ? DateUtils.getNow() : wr.getData().getInptLastVisitTime()); // 最后住院就诊时间
         pf.setContactAddress(inptVisitDTO.getAddress());
         pf.setPatientCode(inptVisitDTO.getPatientCode());
         pf.setPreferentialTypeId(inptVisitDTO.getPreferentialTypeId());

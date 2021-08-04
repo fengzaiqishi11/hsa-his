@@ -118,14 +118,19 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
                         extendDTO = update(outptProfileFileDTO);
                     }
                 } else if (type.equals("1") || type.equals("2")) {
-                    //判断此身份证是否建档
-                    OutptProfileFileDTO newFile = outptProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
-                    if(newFile != null){
-                        newFile.setType(type);
-                        newFile.setHospCode(outptProfileFileDTO.getHospCode());
-                        extendDTO = update(newFile);
-                    }else{
+                    if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+                        // 证件类别为其他类型时，直接建档
                         extendDTO = insert(outptProfileFileDTO);
+                    } else {
+                        //判断此身份证是否建档
+                        OutptProfileFileDTO newFile = outptProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
+                        if(newFile != null){
+                            newFile.setType(type);
+                            newFile.setHospCode(outptProfileFileDTO.getHospCode());
+                            extendDTO = update(newFile);
+                        } else{
+                            extendDTO = insert(outptProfileFileDTO);
+                        }
                     }
                 }
             }
@@ -271,6 +276,10 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             extendDTO.setInProfile(inProfile);
             extendDTO.setOutProfile(outProfile);
             extendDTO.setProfileId(outptProfileFileExtendDTO.getProfileId());
+            extendDTO.setTotalIn(outptProfileFileExtendDTO.getTotalIn());
+            extendDTO.setTotalOut(outptProfileFileExtendDTO.getTotalOut());
+            extendDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getInptLastVisitTime());
+            extendDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getOutptLastVisitTime());
         } else {
             throw new AppException("新增档案从表数据失败");
         }
@@ -316,6 +325,10 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             extendDTO.setInProfile(extendByProfileId.getInProfile());
             extendDTO.setOutProfile(extendByProfileId.getOutProfile());
             extendDTO.setProfileId(extendByProfileId.getProfileId());
+            extendDTO.setTotalIn(extendByProfileId.getTotalIn());
+            extendDTO.setTotalOut(extendByProfileId.getTotalOut());
+            extendDTO.setInptLastVisitTime(extendByProfileId.getInptLastVisitTime());
+            extendDTO.setOutptLastVisitTime(extendByProfileId.getOutptLastVisitTime());
         } else {
             throw new AppException("修改档案从表数据失败");
         }
@@ -332,7 +345,12 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
      **/
     @Override
     public Boolean isCertNoExist(OutptProfileFileDTO outptProfileFileDTO) {
-        return outptProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true: false;
+        if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+            // 证件类别为其他，直接返回false
+            return false;
+        } else {
+            return outptProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true: false;
+        }
     }
 
     /**
@@ -359,7 +377,7 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
      * @Return boolean
      **/
     public boolean checkCard(String cardNo, String certCode) {
-        if (StringUtils.isEmpty(cardNo)) {
+        if (StringUtils.isEmpty(cardNo) && !Constants.ZJLB.QT.equals(certCode)) {
             throw new AppException("证件号为空，请检查后重新输入");
         } else if (StringUtils.isEmpty(certCode)) {
             throw new AppException("证件类型不能为空，请检查后重新输入");

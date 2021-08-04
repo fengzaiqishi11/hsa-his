@@ -753,4 +753,14 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return java.util.List
    */
   List<Map> queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO);
+
+  /**
+   * @Description: 住院收费员收入统计，按缴款时间
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/8/3 10:16
+   * @Return
+   */
+  List<Map> queryCollectorInComeStaZYJK(Map map);
 }

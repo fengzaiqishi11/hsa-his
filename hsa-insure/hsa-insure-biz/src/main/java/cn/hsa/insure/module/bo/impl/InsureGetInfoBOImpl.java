@@ -385,10 +385,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             insureSettleInfoDTO1.setChfpdrCode(settleInfoDTO.getZgDoctorId());
 
             setlinfo.put("zr_Nurse_Name",settleInfoDTO.getZrNurseName()); // 责任护士名 *******
-            insureSettleInfoDTO1.setZr_Nurse_Name(settleInfoDTO.getZrNurseName());
+            insureSettleInfoDTO1.setZrNurseName(settleInfoDTO.getZrNurseName());
 
             setlinfo.put("zr_Nurse_Code",settleInfoDTO.getZrNurseId()); // 责任护士代码 *******
-            insureSettleInfoDTO1.setZr_Nurse_Code(settleInfoDTO.getZrNurseId());
+            insureSettleInfoDTO1.setZrNurseCode(settleInfoDTO.getZrNurseId());
 
             if(StringUtils.isEmpty(settleInfoDTO.getInvoiceDetailId()) || StringUtils.isEmpty(settleInfoDTO.getInvoiceNo())){
                 throw new AppException("该病人未开发票，请先开具发票！");

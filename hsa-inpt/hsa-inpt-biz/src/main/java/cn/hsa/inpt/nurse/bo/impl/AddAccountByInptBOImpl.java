@@ -656,7 +656,11 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setDoctorId(userId);
                 inptCostDTO.setDoctorName(userName);
                 inptCostDTO.setDeptId(loginDeptId) ;
-                inptCostDTO.setPharId(inptVisitById.getItemId()) ;
+                if((Constants.YYXZ.CG.equals(inptLongCostDTO.getUseCode())  || Constants.YYXZ.CYDY.equals(inptLongCostDTO.getUseCode())) && Constants.XMLB.CL.equals(inptLongCostDTO.getItemCode())){
+                    inptCostDTO.setPharId(inptLongCostDTO.getPharId());
+                }else {
+                    inptCostDTO.setPharId(inptVisitById.getItemId());
+                }
                 inptCostDTO.setIsDist(Constants.SF.F);
                 inptCostDTO.setIsGive(inptLongCostDTO.getUseCode()) ;
                 inptCostDTO.setBackCode(Constants.TYZT.YFY) ;

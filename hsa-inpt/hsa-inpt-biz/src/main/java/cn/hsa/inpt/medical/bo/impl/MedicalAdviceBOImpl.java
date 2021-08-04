@@ -2874,7 +2874,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //提前领药天数
         int days = 0;
         if (StringUtils.isNotEmpty(inptAdviceDTO.getAdvanceDays())){
-            //提前领药天数为2时领明天的药,为1时 不做提前领药
             days = Integer.parseInt(inptAdviceDTO.getAdvanceDays());
             if (days<0){
                 days = 0;
@@ -2922,7 +2921,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (plantTime!=null && plantTime.compareTo(endTime)<=0) {
             //预停日期不需要计费（预停日期-1）
             lsYttz = true;
-            endTime = DateUtils.dateAdd(plantTime,-1) ;
+            //预停医嘱当天需要生成费用 -- 2021-08-03 pengbo
+            //endTime = DateUtils.dateAdd(plantTime,-1) ;
         }
 
         Map<String, Object> map = new HashMap<>();

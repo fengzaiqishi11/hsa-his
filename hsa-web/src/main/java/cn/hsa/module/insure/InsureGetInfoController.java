@@ -3,8 +3,9 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.inpt.entity.InsureReadCardDO;
+import cn.hsa.module.insure.inpt.service.InsureReadCardService;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
-import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class InsureGetInfoController extends BaseController {
     // 信息采集数据上传配置维护
     @Resource
     private InsureGetInfoService insureGetInfoService_consumer;
+
+    @Resource
+    private InsureReadCardService insureReadCardService_consumer;
 
     /**
      * @Method getSettleInfo
@@ -175,5 +179,48 @@ public class InsureGetInfoController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("insureSettleInfoDTO",insureSettleInfoDTO);
         return insureGetInfoService_consumer.queryInsure(map);
+    }
+
+    /**
+     * @Method getReadCard
+     * @Desrciption 身份证密码校验
+     * @Param map
+     * @Author liaojiguang
+     * @Date   2021-07-29 16:35
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @GetMapping("getReadIdCard")
+    public WrapperResponse<Map<String,Object>> getReadCard(InsureReadCardDO insureReadCardDO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("idcard",insureReadCardDO.getIdcard());
+        map.put("fixmedinsCode ",insureReadCardDO.getFixmedinsCode());
+        map.put("insuAdmdvs",insureReadCardDO.getInsuAdmdvs());
+        map.put("inputPassword",insureReadCardDO.getInputPassword());
+        return insureReadCardService_consumer.getReadIdCard(map);
+    }
+
+    /**
+     * @Method updateReadIdCard
+     * @Desrciption 身份证修改密码
+     * @Param map
+     * @Author liaojiguang
+     * @Date   2021-07-30 10:11
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @GetMapping("updateReadIdCard")
+    public WrapperResponse<Map<String,Object>> updateReadIdCard(InsureReadCardDO insureReadCardDO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("idcard",insureReadCardDO.getIdcard());
+        map.put("psnName",insureReadCardDO.getPsnName());
+        map.put("insuAdmdvs",insureReadCardDO.getInsuAdmdvs());
+        map.put("password",insureReadCardDO.getPassword());
+        map.put("oldPassword",insureReadCardDO.getOldPassword());
+        map.put("fixmedinsCode",insureReadCardDO.getFixmedinsCode());
+        map.put("insureRegCode",insureReadCardDO.getInsureRegCode());
+        return insureReadCardService_consumer.updateReadIdCard(map);
     }
 }

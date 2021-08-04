@@ -1823,12 +1823,27 @@
 		order by crte_time desc
 	</select>
 	<select id="queryByCertNo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-		select status_code from inpt_visit where status_code="2" and hosp_code = #{hospCode} and cert_no = #{certNo}
+		select
+		       status_code
+		from inpt_visit
+		where status_code='2'
+		<if test="hospCode != null and hospCode != ''">
+			and hosp_code = #{hospCode}
+		</if>
+		<if test="certNo != null and certNo != ''">
+			and cert_no = #{certNo}
+		</if>
 	</select>
 
 	<!--	修改病重类的字段-->
 	<update id="updateIllness">
 		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
 	</update>
+
+    <!--获取档案信息 liuliyun 20210803-->
+	<select id="getBaseProfileInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from base_profile_file
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
+    </select>
 
 </mapper>

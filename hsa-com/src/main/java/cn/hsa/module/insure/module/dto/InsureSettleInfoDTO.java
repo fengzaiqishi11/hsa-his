@@ -221,6 +221,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String baa027; // 参保地
 
+    private String bka035_name; // 特殊人员类型
+
     private String aac001; // 个人电脑号
 
     private String medicalRegNo; // 医保登记号
@@ -245,7 +247,26 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String isInpt;//是否有出院31天再住院计划
     private String zgDoctorName;//主诊医生姓名
     private String zgDoctorId;//主诊医生代码
+    private String zrNurseName;//责任护士姓名
+    private String zrNurseId;//责任护士代码
     private String omsgid;//业务流水号
     private String invoiceDetailId;//票据代码
     private String invoiceNo;//票据号码
+    /**
+     * 特级护理天数
+     */
+    private String spgaNurscareDays;
+    /**
+//     * 一级护理天数
+//     */
+    private String lv1NurscareDays;
+//    /**
+//     * 二级护理天数
+//     */
+    private String scdNurscareDays;
+//    /**
+//     * 三级护理天数
+//     */
+    private String lv3NursecareDays;
+
 }

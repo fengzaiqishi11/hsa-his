@@ -402,4 +402,15 @@ public interface InptVisitDAO {
     List<InptVisitDTO> queryBabyInptVisitPage(InptVisitDTO inptVisitDTO);
 
     void updateIllness(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Method: getBaseProfileInfo
+     * @Description: 获取入院次数
+     * @Param: Map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/08/03 15:15
+     * @Return: List<Map>
+     **/
+    List<Map> getBaseProfileInfo(Map map);
 }

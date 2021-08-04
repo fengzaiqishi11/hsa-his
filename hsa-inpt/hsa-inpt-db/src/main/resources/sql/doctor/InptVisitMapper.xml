@@ -741,17 +741,24 @@
 		a.is_visit, a.is_first_visit, a.tran_in_code, a.in_dept_id, a.in_disease_id, a.in_remark,a.advance_payment,
 		(select name from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseName,
 		(select nation_code from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseCode,
-		(select id from base_disease where hosp_code = #{hospCode}
+		<!-- 门诊诊断表中没有主诊断的情况下，查询门诊病历表中的诊断 luoyong 2021.8.4-->
+		<!--(select id from base_disease where hosp_code = #{hospCode}
 		and id in (
 		select disease_id from outpt_diagnose
 		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})
 		) as outptDiseaseId,
 		(select name from base_disease where hosp_code = #{hospCode} and id in (
 		select disease_id from outpt_diagnose
-		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) as outptDiseaseName,
-		(select id from base_dept where
-		code = (select ward_code from base_dept where id = a.in_dept_id and hosp_code = #{hospCode})
-		and hosp_code = #{hospCode})as inWardId
+		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) as outptDiseaseName,-->
+		IFNULL(
+			(select id from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})),
+			(SELECT id from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code )))
+		) as outptDiseaseId,
+		IFNULL(
+			(select name from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) ,
+			(SELECT name from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code)))
+		) as outptDiseaseName,
+		(select id from base_dept where code = (select ward_code from base_dept where id = a.in_dept_id and hosp_code = #{hospCode}) and hosp_code = #{hospCode}) as inWardId
 		from outpt_visit a
 		<where>
 			a.hosp_code = #{hospCode}
@@ -901,6 +908,11 @@
 	<delete id="deleteById">
         delete from inpt_visit where id = #{id} and hosp_code = #{hospCode}
     </delete>
+
+	<!-- 修改某个病人状态为作废 -->
+	<update id="invalidPatientStatus">
+		update inpt_visit set status_code = #{statusCode} where id = #{id} and hosp_code = #{hospCode}
+	</update>
 
 	<!--通过医嘱ID获取住院病人信息-->
 	<select id="getVisitByAdviceId" resultMap="InptVisitMap">
@@ -1666,6 +1678,10 @@
 		<if test="status_code != null and status_code !=''">
 			and visit.status_code = #{status_code}
 		</if>
+		<!--病人类型 -->
+		<if test="patient_code != null and patient_code !=''">
+			and visit.patient_code = #{patient_code}
+		</if>
 		<!--入院开始时间-->
 		<if test="in_start_time != null and in_start_time !=''">
 			and  date(visit.in_time) &gt;= date(#{in_start_time})
@@ -1839,12 +1855,27 @@
 		order by crte_time desc
 	</select>
 	<select id="queryByCertNo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-		select status_code from inpt_visit where status_code="2" and hosp_code = #{hospCode} and cert_no = #{certNo}
+		select
+		       status_code
+		from inpt_visit
+		where status_code='2'
+		<if test="hospCode != null and hospCode != ''">
+			and hosp_code = #{hospCode}
+		</if>
+		<if test="certNo != null and certNo != ''">
+			and cert_no = #{certNo}
+		</if>
 	</select>
 
 	<!--	修改病重类的字段-->
 	<update id="updateIllness">
 		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
 	</update>
+
+    <!--获取档案信息 liuliyun 20210803-->
+	<select id="getBaseProfileInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from base_profile_file
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
+    </select>
 
 </mapper>

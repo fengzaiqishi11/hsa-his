@@ -1,9 +1,11 @@
 package cn.hsa.module.stro.adjust.dao;
 
 import cn.hsa.module.stro.adjust.dto.StroAdjustDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *@Package_name: cn.hsa.module.stro.adjust.dao
@@ -89,4 +91,58 @@ public interface StroAdjustDao {
     **/
     int updateAdjustPriceById(@Param("list") List<StroAdjustDTO> stroAdjustDTOS);
 
+    /**
+     * @Method selectJudgeStoOutDruag
+     * @Desrciption 查看出库表和明细表里面是否有未审核的药品
+     * @Param [itemList]
+     * @Author zhangguorui
+     * @Date   2021/8/3 10:08
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String,String>> selectJudgeStoOutDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    /**
+     * @Method selectJudgePhrDruag
+     * @Desrciption 查看采购表和明细表里面是否有未审核的药品
+     * @Param [itemList]
+     * @Author zhangguorui
+     * @Date   2021/8/3 10:08
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String, String>> selectJudgePhrDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    /**
+     * @Method selectJudgeStoInDruag
+     * @Desrciption 查看入库表和明细表里面是否有未审核的药品
+     * @Param [druagList, hospCode]
+     * @Author zhangguorui
+     * @Date   2021/8/3 15:57
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String, String>> selectJudgeStoInDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    /**
+     * @Method selectJudgeInventoryDruag
+     * @Desrciption 查看盘点表和明细表里面是否有未审核的药品
+     * @Param [druagList, hospCode]
+     * @Author zhangguorui
+     * @Date   2021/8/3 16:15
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String, String>> selectJudgeInventoryDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    /**
+     * @Method selectJudgeIncdecDruag
+     * @Desrciption 查看报损表以及明细表中是否包含未审核药品
+     * @Param [druagList, hospCode]
+     * @Author zhangguorui
+     * @Date   2021/8/3 16:20
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String, String>> selectJudgeIncdecDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    /**
+     * @Method selectJudgeconfirmDruag
+     * @Desrciption 查看退库确认
+     * @Param [druagList, hospCode]
+     * @Author zhangguorui
+     * @Date   2021/8/3 17:13
+     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
+     */
+    List<Map<String, String>> selectJudgeconfirmDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
 }

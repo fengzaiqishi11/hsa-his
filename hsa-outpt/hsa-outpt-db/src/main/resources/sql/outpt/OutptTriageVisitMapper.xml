@@ -492,12 +492,12 @@
     <insert id="insertOutptTriageVisit" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" >
         insert into
             outpt_triage_visit
-        (`id`, `hosp_code`, `register_id`, `visit_id`, `dq_id`, `triage_id`, `triage_name`, `triage_no`, `clinic_id`,
+        (`id`, `hosp_code`, `register_id`, `visit_id`, `cq_id`,`dq_id`, `triage_id`, `triage_name`, `triage_no`, `clinic_id`,
          `doctor_id`, `doctor_name`,`clinic_name`, `dept_id`, `dept_name`, `sort_no`, `name`, `triage_start_code`,
          `is_call`, `call_time`, `call_number`, `is_loss`,`loss_time`, `remark`, `triage_peo_id`, `triage_peo_name`,
          `triage_peo_time`, `crte_id`, `crte_name`, `crte_time`)
         values
-        (#{id}, #{hospCode}, #{registerId}, #{visitId}, #{dqId}, #{triageId}, #{triageName}, #{triageNo}, #{clinicId},
+        (#{id}, #{hospCode}, #{registerId}, #{visitId}, #{cqId},#{dqId}, #{triageId}, #{triageName}, #{triageNo}, #{clinicId},
          #{doctorId}, #{doctorName},#{clinicName}, #{deptId}, #{deptName}, #{sortNo}, #{name}, #{triageStartCode},
          #{isCall}, #{callTime}, #{callNumber}, #{isLoss},#{lossTime}, #{remark}, #{triagePeoId}, #{triagePeoName},
          #{triagePeoTime}, #{crteId}, #{crteName}, #{crteTime})
@@ -549,6 +549,7 @@
         AND ifnull( b.is_cancel, '0' ) = '0'
         AND date( b.register_time ) = date(
         #{registerTime})
+        AND b.register_time &lt;= #{registerTime}
     </select>
 
 

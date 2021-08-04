@@ -24,11 +24,28 @@ import java.util.List;
 @ToString(callSuper = true)
 public class OutptClassifyDTO extends OutptClassifyDO implements Serializable {
   private static final long serialVersionUID = 568394639280356022L;
-  private List<OutptClassifyCostDTO> outptClassifyCostDTOS;    //挂号类别费用对象
-  private List<String> ids;    //用于挂号费用删除的id
-  private String deptName; // 挂号科室名称
+  /** 挂号类别费用对象 **/
+  private List<OutptClassifyCostDTO> outptClassifyCostDTOS;
+  /** /用于挂号费用删除的id **/
+  private List<String> ids;
+  /** 挂号科室名称 **/
+  private String deptName;
 
   private List<String> deptIds;
-  private String deptCode;  //科室编码
-  private List<String> deptCodes;  //科室编码列表
+  /** 科室编码 **/
+  private String deptCode;
+  /** 上级科室编码 **/
+  private String upDeptCode;
+  /** 科室类型编码 **/
+  private String deptTypeCode;
+  /** 科室编码列表 **/
+  private List<String> deptCodes;
+  /** 班次队列ID **/
+  private String classQueueId;
+  /** 班次队列日期 **/
+  private String queueDate;
+  /** 分诊台Id **/
+  private String triageId;
+  /** 分诊台名称 **/
+  private String triageName;
 }

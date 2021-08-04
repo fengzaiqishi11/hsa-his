@@ -80,7 +80,7 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
      */
     private String registerCode;
 
-    //优惠类别
+    /** 优惠类别  **/
     private String preferentialTypeId;
 
     /**
@@ -100,36 +100,43 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
      */
     private String keyword;
 
-    //挂号明细信息
+    /** 挂号明细信息 **/
     List<OutptRegisterDetailDto> regDetailList;
 
-    //挂号明细ID串
+    /** 挂号明细ID串 **/
     private String regDetailIds;
-    //优惠类别ID
+    /** 优惠类别ID **/
     private String preferentialId;
-    //档案ID
+    /** 档案ID **/
     private String profileId;
-    //医院级别
+    /** 医院级别 **/
     private String levelCode;
-    // 是否就诊
+    /** 是否就诊 **/
     private String isVisit;
-    // 婚姻状况代码
+    /** 婚姻状况代码 **/
     private String marryCode;
-    //民族代码
+    /** 民族代码 **/
     private String nationCode;
 
     /**
-     * @Description: 用于微信小程序接口
+     *  用于微信小程序接口
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date 2021-06-22 16:35
      */
-    // 挂号类别名称
+    /** 挂号类别名称 **/
     private String classifyName;
-    // 挂号明细表的状态标志
+    /** 挂号明细表的状态标志 **/
     private String statusCode;
-    // 科室地址
+    /** 科室地址 **/
     private String place;
-    // 就诊时间
+    /** 就诊时间 **/
     private String visitTime;
+
+    /** 挂号时选择的挂号类别所属队列ID **/
+    private String classQueueId;
+    /** 分诊台Id **/
+    private String triageId;
+    /** 分诊台名称 **/
+    private String triageName;
 }

@@ -372,4 +372,15 @@ public interface InsureIndividualCostDAO {
      * @Return
     **/
     InptCostDTO queryIsSettleFee(Map<String, Object> map);
+
+    /**
+     * @Method queryIsTransmitFee
+     * @Desrciption  查询已经上传的费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/3 18:25
+     * @Return
+    **/
+    InsureIndividualCostDTO queryIsTransmitFee(Map<String, Object> map);
 }

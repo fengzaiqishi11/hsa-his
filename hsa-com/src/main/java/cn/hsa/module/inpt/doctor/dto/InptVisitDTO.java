@@ -364,4 +364,16 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String isUnified ;
     private String feeParam;
     private String insureSettleId;
+    //中途结算住院开始时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date midWayStartDate;
+    //中途结算住院结束时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date midWayEndDate;
+    private String isMidWaySettle; // 是否中途结算
+    private int  settleCount ;
+
+
 }

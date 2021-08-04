@@ -344,13 +344,14 @@
     </select>
     <!--    分页查询住院病人类型是医保的数据集-->
     <select id="queryInptPatientPage" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,iv.bed_name,
+        select distinct iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,iv.bed_name,
         iv.age, iv.age_unit_code,iv.status_code,b.aka130_name as aka130Name,iv.in_disease_name,iv.in_disease_icd10,
         in_dept_name,iv.insure_org_code,iv.zz_doctor_name,iv.crte_time,iv.crte_name,b.insure_reg_code,b.medical_reg_no,
+        b.is_half_settle,
         b.aac001,b.aka130,b.medicine_org_code,b.visit_icd_code as visitIcdCode ,b.visit_icd_name as visitIcdName
         from inpt_visit iv inner join insure_individual_visit b
         on iv.id = b.visit_id and iv.hosp_code = b.hosp_code
-        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6')
+        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6') and b.insure_settle_id is null
         and iv.patient_code !='0'
         <if test="name != null and name != ''">
             and iv.name like concat('%',#{name},'%')
@@ -627,7 +628,7 @@
         FROM
         insure_individual_cost
         WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
-        <if test="medicalRegNo !=NULL and medicalRegNo !='' ">
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
             and insure_register_no  = #{medicalRegNo}
         </if>
         <if test="insureIsTransmit !=null and insureIsTransmit != ''">
@@ -837,6 +838,7 @@
             iim.standard_code standardCode,
             iim.check_price checkCode,
             iim.lmt_user_flag lmtUserFlag,
+            ic.is_reimburse  isReimburse,
             iim.manufacturer manufacturer,
             iim.tcmdrug_used_way tcmdrugUsedWay
         FROM
@@ -860,6 +862,9 @@
     </select>
     <delete id="deleteOutptInsureCost">
         delete from insure_individual_cost where visit_id =#{id} and hosp_code = #{hospCode}
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
+            and  insure_register_no = #{medicalRegNo}
+        </if>
         <if test="insureSettleId !=null and insureSettleId !='' ">
             and  insure_settle_id is null
         </if>
@@ -1075,8 +1080,11 @@
                (select name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) deptName,
                ic.dept_id,ic.settle_code,ic.status_code, ic.is_cost, ic.cost_time,ic.lmt_user_flag,ic.lim_user_explain,
                ic.is_reimburse
-        from inpt_cost ic where ic.hosp_code =#{hospCode} and ic.visit_id =#{visitId}
-
+                from inpt_cost ic where ic.hosp_code =#{hospCode} and ic.visit_id =#{visitId}
+            <if test="keyword != null and keyword != ''">
+                and ( item_name like concat('%',#{keyword},'%')
+                )
+            </if>
     </select>
     <select id="selectHalfTransmitFee" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
         select id, hosp_code, visit_id, cost_id, settle_id, is_hospital, item_type,
@@ -1087,7 +1095,12 @@
                insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt, feedetl_sn,
                init_feedetl_sn, fee_start_time, fee_end_time, insure_register_no, settle_count
         from insure_individual_cost where visit_id =#{visitId} and hosp_code =#{hospCode} and insure_register_no =#{medicalRegNo}
-        and settle_count = #{settleCount} and insure_settle_id is null
+        <if test="insureSettleId == '1'.toString()">
+            and insure_settle_id is not null
+        </if>
+        <if test="insureSettleId == '0'.toString()">
+            and insure_settle_id is null
+        </if>
         order by fee_end_time desc limit 1
     </select>
     <select id="queryLasterCounter" resultType="java.lang.Integer">
@@ -1110,6 +1123,12 @@
                feedetl_sn, is_hosp_flag, lmt_user_flag, lim_user_explain, is_reimburse from inpt_cost
               where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
     </select>
-
+    <select id="queryIsTransmitFee" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select * from insure_individual_cost
+        where visit_id =#{visitId} and cost_id = #{id} and hosp_code =#{hospCode}
+        <if test="isTransmit == '1'.toString()">
+            and feedetl_sn is not null
+        </if>
+    </select>
 
 </mapper>

@@ -453,4 +453,19 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     public InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         return insureIndividualVisitDAO.selectInsureInfo(insureIndividualVisitDTO);
     }
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+    @Override
+    public Boolean updateInsureSettleId(Map<String, Object> settleMap)
+    {
+        return insureIndividualVisitDAO.updateInsureSettleId(settleMap);
+    }
 }

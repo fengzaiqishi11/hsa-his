@@ -187,7 +187,15 @@
                 AND ics.baby_id = #{babyId}
             </if>
     </select>
-
+    <!-- 根据结算id查询最近的中途结算次数 -->
+    <select id="selectMidWaySettleMaxTimes" resultType="java.util.Map">
+        select c.visit_id as visitId, c.settle_count as settleCount, c.is_half_settle as isHalfSettle,
+               case when s.settle_time = (select max(settle_time) from inpt_settle where hosp_code = c.hosp_code and visit_id = c.visit_id and status_code = '0' and is_settle = '1')
+                        then '1'
+                    else '0' end isLast
+        from insure_individual_cost c left join inpt_settle s on c.settle_id = s.id
+        where c.hosp_code = #{hospCode} and c.visit_id = #{visitId} and c.settle_id = #{settleId} limit 1
+    </select>
     <insert id="batchInsert" parameterType="java.util.List">
         insert into
         inpt_cost_settle

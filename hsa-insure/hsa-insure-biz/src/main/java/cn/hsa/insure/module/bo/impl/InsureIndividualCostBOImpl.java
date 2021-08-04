@@ -131,6 +131,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         String crteId = inptVisitDTO.getCrteId();
         String code = inptVisitDTO.getCode();
         String isHalfSettle = inptVisitDTO.getIsHalfSettle();
+        if(StringUtils.isEmpty(isHalfSettle)){
+            isHalfSettle ="0";
+        }
         Date startDate = inptVisitDTO.getFeeStartDate();
         Date endDate = inptVisitDTO.getFeeEndDate();
         String feeStartDate = "";
@@ -305,6 +308,12 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         }
         // 如果在费用传输的时候 选择了中途结算，则更新医保就诊表里面的结算次数,同时更新是否结算标志
         if("1".equals(isHalfSettle)){
+            Integer settleCount =    insureIndividualVisitDAO.queryLasterCounter(insureIndividualVisitDTO);
+            if(settleCount == null){
+                inptVisitDTO.setSettleCount(1); // 中途结算次数
+            }else{
+                inptVisitDTO.setSettleCount(++settleCount); // 中途结算次数
+            }
             insureIndividualVisitDAO.updateInsureInidivdual(inptVisitDTO);
         }
         resultMap.put("name",inptVisitDTO.getName());
@@ -665,6 +674,11 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         }
         if(inptCostDTO ==null){
             throw new AppException("费用表里面无该项目信息");
+        }
+        map.put("1","isTransmit");
+        InsureIndividualCostDTO individualCostDTO =  insureIndividualCostDAO.queryIsTransmitFee(map);
+        if(individualCostDTO !=null){
+            throw new AppException("该费用明细已上传到医保,不能修改报销标识");
         }
         return insureIndividualCostDAO.updateLimitUserFlag(map);
     }

@@ -214,5 +214,39 @@ public interface InsureIndividualVisitDAO {
      * @Return
      */
     InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method selectIsHalfSettleInfo
+     * @Desrciption  查询中途结算的就诊信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/3 19:54
+     * @Return
+    **/
+    InsureIndividualVisitDTO selectIsHalfSettleInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+
+    Boolean updateInsureSettleId(Map<String, Object> settleMap);
+    
+    /**
+     * @Method queryLasterCounter
+     * @Desrciption  查询中途结算次数
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/8/4 16:19
+     * @Return 
+    **/
+    Integer  queryLasterCounter(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }
 

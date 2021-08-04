@@ -142,8 +142,32 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
         String userName = (String) param.get("userName");//当前用户姓名
         String userCode =  (String) param.get("userCode");//当前用户工号
         try{
+            //处理人员信息
+            InptVisitDTO inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setHospCode(hospCode);//医院编码
+            inptVisitDTO.setId(visitId);//就诊id
+            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+            if (inptVisitDTO == null){throw new AppException("未找到患者信息。");}
+            String isHalfSettle = "0"; // 是否中途结算 1:中途结算 0：出院结算
             //查询结算信息
             InptSettleDO inptSettleDO = inptSettleDAO.selectByPrimaryKey(settleId);
+            // ==============取消结算，医保患者需要取消中途结算，必须从最近一次中途结算开始取消   start===============================
+            if (Integer.valueOf(inptVisitDTO.getPatientCode()) > 0) { // 病人类型大于0表示患者为医保患者
+                Map<String, Object> selectMap = new HashMap<>();
+                selectMap.put("hospCode", hospCode);
+                selectMap.put("settleId", settleId);
+                selectMap.put("visitId", visitId);
+                Map<String, Object> insureCost = inptCostSettleDAO.selectMidWaySettleMaxTimes(selectMap);
+                if (insureCost != null ) {
+                    isHalfSettle = MapUtils.get(insureCost, "isHalfSettle");
+                    int settleCount = MapUtils.get(insureCost, "settleCount");
+                    String isLast = MapUtils.get(insureCost, "isLast");
+                    if ("0".equals(isLast)) {
+                        throw new AppException("当前退费为第【" + settleCount + "】次中途结算，请从最后一次结算开始退费");
+                    }
+                }
+            }
+            // ==============取消结算，医保患者需要取消中途结算，必须从最近一次中途结算开始取消   start===============================
             if (inptSettleDO == null){return WrapperResponse.fail("未找到结算信息。",null);}
             //生成结算冲红信息
             String settleRedId = SnowflakeUtils.getId(); //结算冲红id
@@ -289,22 +313,22 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             }
             // ========================住院退费写备份表 end  2021年4月16日10:21:31=============
 
-            //处理人员信息
-            InptVisitDTO inptVisitDTO = new InptVisitDTO();
-            inptVisitDTO.setHospCode(hospCode);//医院编码
-            inptVisitDTO.setId(visitId);//就诊id
-            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
-            if (inptVisitDTO == null){throw new AppException("未找到患者信息。");}
-            //判断患者是否是出院状态，如果是出院状态则修改为 预出院状态
-            if (Constants.BRZT.CY.equals(inptVisitDTO.getStatusCode())){
-                //修改参数
-                InptVisitDTO inptVisitDTO1 = new InptVisitDTO();
-                inptVisitDTO1.setHospCode(hospCode);//医院编码
-                inptVisitDTO1.setId(visitId);//就诊id
-                inptVisitDTO1.setStatusCode(Constants.BRZT.YCY);//病人状态 = 预出院状态
-                inptVisitDAO.updateInptVisit(inptVisitDTO1);
+            // ==============取消结算，医保患者需要取消中途结算，病人状态不更新  ghq start=======2021年7月29日16:36:54========================
+            if (isHalfSettle == null ) {
+                throw new AppException("无法区分取消出院结算还是取消中途结算，请联系管理员查看insure_individual_cost表中【是否中途结算】是否有值");
             }
-
+            if ("0".equals(isHalfSettle)) {
+                //判断患者是否是出院状态，如果是出院状态则修改为 预出院状态
+                if (Constants.BRZT.CY.equals(inptVisitDTO.getStatusCode())){
+                    //修改参数
+                    InptVisitDTO inptVisitDTO1 = new InptVisitDTO();
+                    inptVisitDTO1.setHospCode(hospCode);//医院编码
+                    inptVisitDTO1.setId(visitId);//就诊id
+                    inptVisitDTO1.setStatusCode(Constants.BRZT.YCY);//病人状态 = 预出院状态
+                    inptVisitDAO.updateInptVisit(inptVisitDTO1);
+                }
+            }
+            // ==============取消结算，医保患者需要取消中途结算，病人状态不更新  ghq end========2021年7月29日16:36:59======================
 
 
             //TODO 判断是否是医保病人（如果是医保病人，走医保取消结算接口 并且 生成医保结算冲红记录保存insure_individual_settle）
@@ -372,7 +396,8 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                    Map<String,Object> outptMap = MapUtils.get(reMap,"output");
                    Map<String,Object> setlInfoMap = MapUtils.get(outptMap,"setlinfo");
                    if(!MapUtils.isEmpty(setlInfoMap)){
-                        inptCostSettleDAO.updateInsureSettleCost(settleMap);
+                        insureIndividualVisitService.updateInsureSettleId(settleMap).getData(); //取消结算，更新医保就诊表的结算id
+                        inptCostSettleDAO.updateInsureSettleCost(settleMap); // TR35H9  取消结算，更新医保费用表的结算id
                     }
                     InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
                     individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));

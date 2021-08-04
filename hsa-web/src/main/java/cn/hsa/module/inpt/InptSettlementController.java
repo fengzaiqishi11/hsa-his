@@ -55,7 +55,16 @@ public class InptSettlementController extends BaseController {
     public WrapperResponse queryInptvisitByPage(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());//医院编码
-        inptVisitDTO.setStatusCode(Constants.BRZT.YCY);//当前状态 = 预出院
+        String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+            inptVisitDTO.setStatusCode(Constants.BRZT.ZY);//当前状态 = 在院
+            inptVisitDTO.setMidWayStartDate(inptVisitDTO.getStartDate());
+            inptVisitDTO.setMidWayEndDate(inptVisitDTO.getEndDate());
+            inptVisitDTO.setStartDate(null);
+            inptVisitDTO.setEndDate(null);
+        }else {
+            inptVisitDTO.setStatusCode(Constants.BRZT.YCY);//当前状态 = 预出院
+        }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码
         param.put("inptVisitDTO",inptVisitDTO);//查询条件
@@ -71,14 +80,19 @@ public class InptSettlementController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @GetMapping("/queryInptCostByList")
-    public WrapperResponse queryInptCostByList(@Param("id") String id, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
+    public WrapperResponse queryInptCostByList(@Param("id") String id, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode, HttpServletRequest req, HttpServletResponse res){        SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
             return WrapperResponse.fail("参数错误。",null);
         }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码
         param.put("id",id);//就诊id
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+            param.put("patientCode", Integer.valueOf(patientCode)); // 病人类型
+        }else {
+            param.put("patientCode", null); // 病人类型
+        }
+
         param.put("statusCode",Constants.ZTBZ.ZC);//状态标志
         param.put("settleCodes",new String[]{Constants.JSZT.WJS,Constants.JSZT.YUJS});//结算状态 = 未结算、预结算
         param.put("backCode",Constants.TYZT.YFY);//退费状态 = 已发药

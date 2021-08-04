@@ -511,7 +511,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
              insureUnifiedPayParam.put("hospCode",insureIndividualVisitDTO.getHospCode());
              insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
              insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
-
+             insureUnifiedPayParam.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
              insureUnifiedPayParam.put("id",inptVisitDTO.getId());
              insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
              // 删除医保费用数据

@@ -152,6 +152,7 @@ public class InptBoImpl extends HsafBO implements InptBo {
         String visitId = (String) param.get("visitId");//就诊id
         String userName = (String) param.get("userName"); // 经办人
         String code = (String) param.get("code"); // 操作人编码
+        String medicalRegNo = MapUtils.get(param,"medicalRegNo");
         InptVisitDTO inptVisitDTO = (InptVisitDTO) param.get("inptVisitDTO");
         Map<String, Object> isInsureUnifiedMap = new HashMap<>();
         isInsureUnifiedMap.put("hospCode", hospCode);
@@ -161,6 +162,7 @@ public class InptBoImpl extends HsafBO implements InptBo {
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
         insureIndividualVisitDTO.setVisitId(visitId);//就诊id
+        insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
         insureIndividualVisitDTO.setCode(code);
         InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();//查询条件
         if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
@@ -177,11 +179,10 @@ public class InptBoImpl extends HsafBO implements InptBo {
                 throw new AppException("未获取到医保个人基本信息。");
             }
             insureIndividualBasicDTO = insureIndividualBasicDTOList.get(0);
-        }else{
+        }
+        else{
             Map<String, Object> insureVisitParam = new HashMap<String, Object>();
             insureVisitParam.put("hospCode", hospCode);//医院编码
-            insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
-            insureIndividualVisitDTO.setVisitId(inptVisitDTO.getId());//就诊id
             insureVisitParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
             insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(insureVisitParam).getData();
         }

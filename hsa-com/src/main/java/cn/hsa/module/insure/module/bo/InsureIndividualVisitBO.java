@@ -113,4 +113,15 @@ public interface InsureIndividualVisitBO {
      * @Return
      */
     InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+    Boolean updateInsureSettleId(Map<String, Object> settleMap);
 }

@@ -171,6 +171,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String code = inptVisitDTO.getCode();
         String hospCode = inptVisitDTO.getHospCode();//医院编码
         String treatmentCode = inptVisitDTO.getTreatmentCode();
+        String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
+        String medicalRegNo = inptVisitDTO.getMedicalRegNo();
         //《========新生婴儿试算========》
         InptBabyDTO inptBabyDTO=new InptBabyDTO();
         inptBabyDTO.setVisitId(id);
@@ -231,10 +233,18 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
             costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
-            List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+            List<InptCostDO> inptCostDOList = new ArrayList<>();
+            // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+                costParam.put("isMidWaySettle", isMidWaySettle);
+                inptCostDOList = inptCostDAO.queryMidWaySettleInptCostList(costParam);
+            } else {
+                inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+            }
+            // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
             if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
-                throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
+                throw new AppException("该医保病人费用已经正常结算");
             }
             for (InptCostDO dto : inptCostDOList) {
                 if (dto.getIsOk().equals("0")) {
@@ -292,6 +302,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
                 insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
                 insureIndividualVisitDTO.setVisitId(id);//就诊id
+                insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
                 insureVisitParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
                 if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
                     List<InsureIndividualVisitDTO> insureIndividualVisitDTOS = insureIndividualVisitService.findByCondition(insureVisitParam);
@@ -575,7 +586,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String id = (String) param.get("id");//就诊id
         String code = param.get("userCode").toString();
         String userName = param.get("userName").toString();
+        String medicalRegNo = MapUtils.get(param,"medicalRegNo");
         String hospCode = (String) param.get("hospCode");//医院编码
+        String isMidWaySettle = MapUtils.get(param, "isMidWaySettle"); // 是否中途结算，1：是 0：否  中途结算不改变出院状态
         String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key))) return WrapperResponse.fail("当前患者正在结算，请稍后再试。", null);
         try {
@@ -614,7 +627,15 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
             costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
-            List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+            List<InptCostDO> inptCostDOList = new ArrayList<>();
+            // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+                costParam.put("isMidWaySettle", isMidWaySettle);
+                inptCostDOList = inptCostDAO.queryMidWaySettleInptCostList(costParam);
+            } else {
+                inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+            }
+            // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             // if (inptCostDOList == null || inptCostDOList.isEmpty()){return WrapperResponse.fail("未找到结算费用信息，请刷新。",null);}
 
             //获取当前患者信息参数
@@ -837,7 +858,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             InptVisitDTO inptVisitDTO1 = new InptVisitDTO();
             inptVisitDTO1.setId(id);//id
             inptVisitDTO1.setHospCode(hospCode);//医院编码
-            inptVisitDTO1.setStatusCode(Constants.BRZT.CY);//当前状态 = 出院状态
+            if (isMidWaySettle != null && "0".equals(isMidWaySettle)) {
+                inptVisitDTO1.setStatusCode(Constants.BRZT.CY);//当前状态 = 出院状态
+            } else {
+                inptVisitDTO1.setStatusCode(Constants.BRZT.ZY);//当前状态 = 在院状态
+            }
             inptVisitDTO1.setTreatmentCode(inptVisitDTO.getTreatmentCode());
             inptVisitDAO.updateInptVisit(inptVisitDTO1);
 
@@ -867,6 +892,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
                 insureIndividualVisitDTO.setHospCode(hospCode);//医院编码
                 insureIndividualVisitDTO.setVisitId(id);//就诊id
+                insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
                 insureVisitParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
                 if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
                     List<InsureIndividualVisitDTO> insureIndividualVisitDTOS = insureIndividualVisitService.findByCondition(insureVisitParam);
@@ -1126,6 +1152,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             map.put("insureSettleId",insureSettleId);
             inptVisitDTO.setHospCode(hospCode);
             inptVisitDTO.setId(visitId);
+            inptVisitDTO.setInsureSettleId(insureSettleId);
             inptVisitDTO.setMedicalRegNo(medicalRegNo);
             map.put("inptVisitDTO",inptVisitDTO);
             insureIndividualVisitService.updateInsureInidivdual(map);  // 更新就诊信息
@@ -1250,13 +1277,18 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     public Boolean editDischargeInpt(Map<String, Object> map) {
         String id = MapUtils.get(map,"id");
         String hospCode = MapUtils.get(map,"hospCode");
+        String medicalRegNo = MapUtils.get(map,"medicalRegNo");
+        String inHalfSettle = MapUtils.get(map,"inHalfSettle");
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         insureIndividualVisitDTO.setHospCode(hospCode);
         insureIndividualVisitDTO.setVisitId(id);
+        insureIndividualVisitDTO.setIsHalfSettle(inHalfSettle);
+        insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
         insureIndividualVisitDTO.setIsOut(Constants.SF.S);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(map).getData();
         map.put("visitId",id);
+        map.put("medicalRegNo",medicalRegNo);
         insureUnifiedPayInptService_consumer.UP_2402(map);
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setId(id);

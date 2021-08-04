@@ -1687,10 +1687,6 @@
 		<if test="js_end_time != null and js_end_time !=''">
 			and date(settle.settle_time) &lt;= date(#{js_end_time})
 		</if>
-		<!--病人类型 luoyong 2021.8.4-->
-		<if test="patient_code != null and patient_code !=''">
-			and visit.patient_code = #{patient_code}
-		</if>
 		order by visit.in_time desc
 	</select>
 

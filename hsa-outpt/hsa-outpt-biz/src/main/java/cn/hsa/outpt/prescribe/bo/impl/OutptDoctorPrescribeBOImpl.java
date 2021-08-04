@@ -41,6 +41,8 @@ import cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
+import cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO;
+import cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
@@ -77,6 +79,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      */
     @Resource
     private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    /** 分诊病人列表数据库访问接口 **/
+    @Resource
+    private OutptTriageVisitDAO outptTriageVisitDAO;
 
     /**
      * 就诊信息数据库访问接口
@@ -872,6 +878,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         }
         //更新就诊状态
         outptDoctorPrescribeDAO.updateIsVisit(outptVisitDTO);
+        // 更新分诊表分诊状态
+        OutptTriageVisitDTO triageVisitDTO = new OutptTriageVisitDTO();
+        triageVisitDTO.setHospCode(outptVisitDTO.getHospCode());
+        triageVisitDTO.setTriageStartCode(Constants.FZZT.HAVE_BEEM_VISITED);
+        triageVisitDTO.setRegisterId(outptVisitDTO.getRegisterId());
+        outptTriageVisitDAO.updateOutptTriageVisit(triageVisitDTO);
         //更新费用表医生信息，用于表报统计
         outptDoctorPrescribeDAO.updateOutptCostDoctor(outptVisitDTO);
         //门诊是否自动提交

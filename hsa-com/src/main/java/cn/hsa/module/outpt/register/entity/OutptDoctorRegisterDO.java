@@ -31,7 +31,8 @@ public class OutptDoctorRegisterDO extends PageDO implements Serializable {
     private String id;
 
     private String hospCode;
-
+    /** 队列排序号 **/
+    private String seqNo;
     private String dqId;
 
     private String registerTime;

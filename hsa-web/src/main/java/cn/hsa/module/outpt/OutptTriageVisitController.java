@@ -46,7 +46,7 @@ public class OutptTriageVisitController extends BaseController {
     public WrapperResponse<PageDTO> queryPage(OutptTriageVisitDTO outptTriageVisitDTO,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
         outptTriageVisitDTO.setHospCode(userDTO.getHospCode());
-        outptTriageVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId());
+        outptTriageVisitDTO.setTriageId(userDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode",userDTO.getHospCode());
         map.put("outptTriageVisitDTO",outptTriageVisitDTO);

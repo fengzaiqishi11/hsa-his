@@ -901,6 +901,11 @@
         delete from inpt_visit where id = #{id} and hosp_code = #{hospCode}
     </delete>
 
+	<!-- 修改某个病人状态为作废 -->
+	<update id="invalidPatientStatus">
+		update inpt_visit set status_code = #{statusCode} where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
 	<!--通过医嘱ID获取住院病人信息-->
 	<select id="getVisitByAdviceId" resultMap="InptVisitMap">
 		select distinct a.* from inpt_visit a join inpt_advice b on a.id=b.visit_id where a.hosp_code=#{hospCode} and
@@ -1822,12 +1827,27 @@
 		order by crte_time desc
 	</select>
 	<select id="queryByCertNo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-		select status_code from inpt_visit where status_code="2" and hosp_code = #{hospCode} and cert_no = #{certNo}
+		select
+		       status_code
+		from inpt_visit
+		where status_code='2'
+		<if test="hospCode != null and hospCode != ''">
+			and hosp_code = #{hospCode}
+		</if>
+		<if test="certNo != null and certNo != ''">
+			and cert_no = #{certNo}
+		</if>
 	</select>
 
 	<!--	修改病重类的字段-->
 	<update id="updateIllness">
 		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
 	</update>
+
+    <!--获取档案信息 liuliyun 20210803-->
+	<select id="getBaseProfileInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from base_profile_file
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
+    </select>
 
 </mapper>

@@ -63,14 +63,18 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                         return update(outptProfileFileDTO) > 0;
                     }
                 } else if (type.equals("1") || type.equals("2")) {
-                    //判断此身份证是否建档
-                    OutptProfileFileDTO newFile = baseProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
-                    if (newFile != null) {
-                        newFile.setType(type);
-                        newFile.setHospCode(outptProfileFileDTO.getHospCode());
-                        return update(outptProfileFileDTO) > 0;
-                    } else {
+                    if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
                         return insert(outptProfileFileDTO) > 0;
+                    } else {
+                        //判断此身份证是否建档
+                        OutptProfileFileDTO newFile = baseProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
+                        if (newFile != null) {
+                            newFile.setType(type);
+                            newFile.setHospCode(outptProfileFileDTO.getHospCode());
+                            return update(outptProfileFileDTO) > 0;
+                        } else {
+                            return insert(outptProfileFileDTO) > 0;
+                        }
                     }
                 }
             }
@@ -106,7 +110,12 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return java.lang.Boolean
      **/
     public Boolean isCertNoExist(OutptProfileFileDTO outptProfileFileDTO) {
-        return baseProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true : false;
+        if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+            // 证件类别为其他，直接返回false
+            return false;
+        } else {
+            return baseProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true : false;
+        }
     }
 
     /**
@@ -189,12 +198,20 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
         //新增
         if ("2".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
             //门诊
-            outptProfileFileDTO.setTotalOut(1);
-            outptProfileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
+            if (outptProfileFileDTO.getTotalOut() == null) {
+                outptProfileFileDTO.setTotalOut(1);
+            }
+            if (outptProfileFileDTO.getOutptLastVisitTime() == null) {
+                outptProfileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
+            }
         } else if ("3".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
             //住院
-            outptProfileFileDTO.setTotalIn(1);
-            outptProfileFileDTO.setInptLastVisitTime(DateUtils.getNow());
+            if (outptProfileFileDTO.getTotalIn() == null) {
+                outptProfileFileDTO.setTotalIn(1);
+            }
+            if (outptProfileFileDTO.getInptLastVisitTime() == null) {
+                outptProfileFileDTO.setInptLastVisitTime(DateUtils.getNow());
+            }
         }
         outptProfileFileDTO.setPym(PinYinUtils.toFirstPY(outptProfileFileDTO.getName()));
         outptProfileFileDTO.setWbm(WuBiUtils.getWBCode(outptProfileFileDTO.getName()));
@@ -210,7 +227,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return boolean
      **/
     private boolean checkCard(String cardNo, String certCode) {
-        if (StringUtils.isEmpty(cardNo)) {
+        if (StringUtils.isEmpty(cardNo) && !Constants.ZJLB.QT.equals(certCode)) {
             throw new AppException("证件号为空，请检查后重新输入");
         } else if (StringUtils.isEmpty(certCode)) {
             throw new AppException("证件类型不能为空，请检查后重新输入");

@@ -39,5 +39,6 @@
     <dubbo:reference id="doctorAdviceService_consumer" interface="cn.hsa.module.inpt.doctor.service.DoctorAdviceService" check="false"/>
     <!-- 公共配置业务服务层接口 -->
     <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false" />
-
+    <!--码表-->
+    <dubbo:reference id="sysCodeService_consumer" interface="cn.hsa.module.sys.code.service.SysCodeService" check="false" />
 </beans>

@@ -514,9 +514,9 @@
             and a.visit_id = #{visitId}
         </if>
         <if test="keyword != null and keyword != ''">
-            and e.name like concat('%',#{keyword},'%')
+            and (e.name like concat('%',#{keyword},'%')
             or b.invoice_no like concat('%',#{keyword},'%')
-            or a.settle_no like concat('%',#{keyword},'%')
+            or a.settle_no like concat('%',#{keyword},'%'))
         </if>
         <if test="startTimeYMD != null and startTimeYMD != ''">
             and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(DATE_ADD(#{startTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')

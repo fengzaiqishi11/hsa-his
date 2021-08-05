@@ -233,7 +233,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<Map> list = new ArrayList<Map>();
         if ("1".equals(bblx)) {  // 查询住院的收费员收入统计
             if("1".equals(statusCode)) { // 住院收费员收入统计（按缴款时间）
-                list = patientCostLedgerDAO.queryCollectorInComeStaDetail(map);
+                list = patientCostLedgerDAO.queryCollectorInComeStaZYJK(map);
             } else if ("0".equals(statusCode)) {  // 住院收费员收入统计（按结算时间）
                 list = patientCostLedgerDAO.queryCollectorInComeSta(map);
             } else {
@@ -1167,6 +1167,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "3" :
             case "7" :
+            case "10" :
+            case "11" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> doctorIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getDoctorId));
                 // 组装固定表头
@@ -1176,8 +1178,16 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     headItemMap3.put("label","开方医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
-                }else {
+                }else if ("7".equals(flag)){
                     headItemMap3.put("label","管床医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else if ("10".equals(flag)){
+                    headItemMap3.put("label","经治医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else {
+                    headItemMap3.put("label","主治医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
                 }
@@ -1721,6 +1731,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "3" :
             case "7" :
+            case "10" :
+            case "11" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> doctorIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getDoctorId));
                 // 组装固定表头
@@ -1730,8 +1742,16 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     headItemMap3.put("label","开方医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
-                }else {
+                }else if ("7".equals(flag)){
                     headItemMap3.put("label","管床医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else if ("10".equals(flag)){
+                    headItemMap3.put("label","经治医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else {
+                    headItemMap3.put("label","主治医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
                 }

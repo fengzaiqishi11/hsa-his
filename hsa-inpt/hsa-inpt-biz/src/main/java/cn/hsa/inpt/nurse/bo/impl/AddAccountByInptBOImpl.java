@@ -161,8 +161,9 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
             Map<String,Object> m = new HashMap<>();
             m.put("hospCode",hospCode);
             m.put("pharInWaitReceiveDTOs",getPharInWaitDtoList);
-            //待领表新增记录
-            pharInWaitReceiveService_consumer.insertPharInWaitBatch(m);
+            //待领表新增记录（考虑到事务统一 2021-08-05-pengbo）
+            // pharInWaitReceiveService_consumer.insertPharInWaitBatch(m);
+            inptCostDAO.insertPharInWaitReceiveBatch(getPharInWaitDtoList);
         }
         //更新患者的合计费用
         if (StringUtils.isEmpty(inptVisitDTO.getBabyId())) {

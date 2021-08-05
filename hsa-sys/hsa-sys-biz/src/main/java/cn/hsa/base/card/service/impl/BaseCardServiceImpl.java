@@ -85,7 +85,7 @@ public class BaseCardServiceImpl extends HsafService implements BaseCardService 
      **/
     @Override
     public WrapperResponse<Boolean> updateStatusCode(Map map) {
-        return WrapperResponse.success(baseCardBO.updateStatusCode(MapUtils.get(map, "baseCardDTO")));
+        return WrapperResponse.success(baseCardBO.updateStatusCode(MapUtils.get(map, "baseCardDTO"), MapUtils.get(map, "baseCardChangeDO")));
     }
 
     /**

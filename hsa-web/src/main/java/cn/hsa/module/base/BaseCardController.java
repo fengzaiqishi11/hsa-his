@@ -4,9 +4,11 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 import cn.hsa.module.base.card.service.BaseCardService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -109,9 +111,18 @@ public class BaseCardController extends BaseController {
             throw new RuntimeException("未选择操作");
         }
         Map map = new HashMap();
-        //map.put("hospCode", hospCode);
+        // 一卡通异动表
+        BaseCardChangeDO baseCardChangeDO = new BaseCardChangeDO();
+        baseCardChangeDO.setHospCode(baseCardDTO.getHospCode());
+        baseCardChangeDO.setProfileId(baseCardDTO.getProfileId());
+        baseCardChangeDO.setCardId(baseCardDTO.getId());
+        baseCardChangeDO.setStatusCode(baseCardDTO.getStatusCode());
+        baseCardChangeDO.setCrteId(sysUserDTO.getId());
+        baseCardChangeDO.setCrteName(sysUserDTO.getName());
+        baseCardChangeDO.setCrteTime(DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("baseCardDTO", baseCardDTO);
+        map.put("baseCardChangeDO", baseCardChangeDO);
         return baseCardService_consumer.updateStatusCode(map);
     }
 

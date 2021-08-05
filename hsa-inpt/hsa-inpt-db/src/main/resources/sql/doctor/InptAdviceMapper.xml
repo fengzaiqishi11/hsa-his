@@ -1170,7 +1170,8 @@
         case insure.is_match
         when '1' then '医保' else '自费' end as isMatch
         from inpt_cost cost
-        left join insure_item_match insure on (cost.item_id = insure.hosp_item_id and cost.hosp_code = insure.hosp_code)
+        left join insure_individual_visit iiv on iiv.visit_id = cost.visit_id and iiv.hosp_code = cost.hosp_code
+        left join insure_item_match insure on cost.item_id = insure.hosp_item_id and cost.hosp_code = insure.hosp_code and iiv.insure_reg_code = insure.insure_reg_code
         where cost.hosp_code = #{hospCode}
         and cost.iat_id in
         <foreach collection="iatIdList" item="item" open="(" close=")" separator=",">
@@ -1488,6 +1489,7 @@
     <!-- 获取辅助计费明细数据 -->
     <select id="getAssistDetail" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO">
     SELECT
+        a.name,
         bd.id id,
         bd.hosp_code hospCode,
         bd.ac_code acCode,
@@ -1803,6 +1805,127 @@
             (#{item.id}, #{item.advance_id}, #{item.advice_id},#{item.hosp_code})
         </foreach>
     </insert>
+
+    <!--根据visitIds，itemIds查询出对应的医嘱明细表数据-->
+    <select id="queryInptAdviceDetail" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        SELECT
+        a.*
+        FROM
+        inpt_advice_detail a
+        left join inpt_advice b on a.hosp_code = b.hosp_code and a.ia_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and a.item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by a.ia_id, b.group_no, b.group_seq_no asc
+    </select>
+
+    <!--根据医嘱ids字符串和visitId从处方明细表副表查询出处方列表-->
+    <select id="queryAdviceByIdsAndVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        select
+            *
+        from inpt_advice_detail
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and FIND_IN_SET(ia_id, #{idsStr})
+    </select>
+
+    <!--更新医嘱明细表副表数据，限制用药字段-->
+    <update id="updateInptAdviceDetail" parameterType="java.util.List">
+        <foreach collection="detailsExtDTOS" item="item" separator=";">
+            update inpt_advice_detail
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
+
+    <!--根据科室,领药单据，查询提前领药的医嘱-->
+
+    <select id="selectAdviceByDeptAndType" resultType="String">
+        select DISTINCT aaa.id from (select
+        distinct a.id,a.item_code,(case when a.item_code ='1' then c.good_name else d.name end ) as item_name,c.is_lvp,
+        c.ph_code,c.big_type_code,a.use_code,a.usage_code,a.yylx
+        from
+        inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
+        LEFT JOIN base_drug c ON a.item_id = c.id  and a.hosp_code = c.hosp_code AND a.item_code = '1'
+        LEFT JOIN base_material d ON a.item_id = d.id and a.hosp_code = d.hosp_code AND a.item_code = '2'
+        where 1=1  and a.item_code in ('1','2')
+        and a.hosp_code=#{hospCode}
+        --         已提交
+        and a.is_submit='1'
+        --         长期医嘱
+        and a.is_long='0'
+        --         已核收
+        and a.is_check='1'
+        --         排除停嘱并核收
+        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         非据收医嘱
+        and (a.is_reject is null or a.is_reject='0')
+        --         在院
+        and b.status_code='2'
+        --         医嘱开始时间小于等于当前时间
+        and date(a.long_start_time) &lt;= date(#{endDate})
+        and date(ifnull(a.last_exec_time,a.long_start_time)) &lt; date(#{endDate})
+        and a.exec_dept_id = #{deptId}
+        and ifnull(a.advance_days,'0') = '0'
+        and A.use_code in ('1','4')
+
+        ) aaa  where 1=1
+
+        <if test="isAll != null and isAll == '0'.toString()">
+            and
+            -- 用法 >
+            <if test="usageCodes != null and usageCodes.size()>0">
+                 aaa.usage_code in
+                <foreach collection="usageCodes" open="(" close=")" item="usageCode" separator=",">
+                    #{usageCode}
+                </foreach>
+            </if>
+            -- 材料>
+            <if test="isMaterial != null and isMaterial == '1'.toString()">
+                or aaa.item_code ='2'
+            </if>
+            -- 大输液>
+            <if test="isIvdrip != null and isIvdrip == '1'.toString()">
+                or ifnull(aaa.is_lvp,'') = '1'
+            </if>
+            -- 特殊药品>
+            <if test="isPh != null and isPh == '1'.toString()">
+                or ifnull(aaa.ph_code,'') != '5'
+            </if>
+            -- 中草药>
+            <if test="isHerb != null and isHerb == '1'.toString()">
+                or ifnull(aaa.big_type_code,'') = '2'
+            </if>
+            -- 出院带药>
+            <if test="isGive != null and isGive == '1'.toString()">
+                or aaa.use_code ='4'
+            </if>
+            -- 叫病人>
+            <if test="isPatient != null and isPatient == '1'.toString()">
+                or aaa.yylx ='2'
+            </if>
+        </if>
+    </select>
 
 
 </mapper>

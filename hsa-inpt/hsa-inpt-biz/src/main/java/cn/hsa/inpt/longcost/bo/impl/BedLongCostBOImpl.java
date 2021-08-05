@@ -2,6 +2,9 @@ package cn.hsa.inpt.longcost.bo.impl;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.bmm.dao.BaseMaterialDAO;
+import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
+import cn.hsa.module.base.bmm.service.BaseMaterialService;
 import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
 import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
@@ -9,6 +12,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.longcost.bo.BedLongCostBO;
 import cn.hsa.module.inpt.longcost.dao.BedLongCostDAO;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,6 +40,9 @@ public class BedLongCostBOImpl implements BedLongCostBO {
 
     @Resource
     private InptCostDAO inptCostDAO;
+
+    @Resource
+    private BaseMaterialService baseMaterialService;
 
     /**
      * 费用优惠
@@ -332,7 +339,90 @@ public class BedLongCostBOImpl implements BedLongCostBO {
 
             costList.add(costDTO);
         }
+
+        //材料申请单
+        if (!ListUtils.isEmpty(costList)){
+            buildPharInWaitReceive(costList);
+        }
+
         return costList;
+    }
+
+    private void buildPharInWaitReceive (List<InptCostDTO> costList){
+        if (ListUtils.isEmpty(costList)){
+            return;
+        }
+        List<PharInWaitReceiveDTO> pharInWaitReceiveDTOList = new ArrayList<PharInWaitReceiveDTO>();
+        PharInWaitReceiveDTO waitReceiveDTO = null;
+        Map parmMap = null;
+        for (InptCostDTO inptCostDTO:costList){
+            if (Constants.XMLB.CL.equals(inptCostDTO.getItemCode()) && (Constants.YYXZ.CG.equals(inptCostDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(inptCostDTO.getUseCode()))){
+                waitReceiveDTO = new PharInWaitReceiveDTO();
+                //获取材料信息
+                BaseMaterialDTO materialDTO = new BaseMaterialDTO();
+                parmMap = new HashMap();
+                parmMap.put("hospCode",inptCostDTO.getHospCode());
+                materialDTO.setId(inptCostDTO.getItemId());
+                materialDTO.setHospCode(inptCostDTO.getHospCode());
+                parmMap.put("baseMaterialDTO",materialDTO);
+                materialDTO = baseMaterialService.getById(parmMap).getData();
+                if(materialDTO == null ){
+                    continue;
+                }
+                waitReceiveDTO.setPrice(materialDTO.getPrice());
+                waitReceiveDTO.setSplitPrice(materialDTO.getSplitPrice());
+                waitReceiveDTO.setSplitRatio(materialDTO.getSplitRatio());
+                waitReceiveDTO.setSplitUnitCode(materialDTO.getSplitUnitCode());
+                waitReceiveDTO.setUnitCode(materialDTO.getUnitCode());
+                //根据单位判断单价是单价还是拆零单价
+                if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getUnitCode())) {
+                    waitReceiveDTO.setNum(inptCostDTO.getTotalNum());
+                    waitReceiveDTO.setSplitNum(BigDecimalUtils.multiply(inptCostDTO.getTotalNum(), materialDTO.getSplitRatio()));
+                } else if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getSplitUnitCode())) {
+                    waitReceiveDTO.setNum((BigDecimalUtils.divide(inptCostDTO.getTotalNum(), materialDTO.getSplitRatio()).setScale(2, BigDecimal.ROUND_HALF_UP)));
+                    waitReceiveDTO.setSplitNum(inptCostDTO.getTotalNum());
+                } else {
+                    continue;
+                }
+                waitReceiveDTO.setId(SnowflakeUtils.getId());
+                waitReceiveDTO.setHospCode(inptCostDTO.getHospCode());
+                waitReceiveDTO.setAdviceId(null);
+                waitReceiveDTO.setGroupNo(null);
+                waitReceiveDTO.setVisitId(inptCostDTO.getVisitId());
+                waitReceiveDTO.setBabyId(inptCostDTO.getBabyId());
+                waitReceiveDTO.setItemCode(inptCostDTO.getItemCode());
+                waitReceiveDTO.setItemId(inptCostDTO.getItemId());
+                waitReceiveDTO.setItemName(materialDTO.getName());
+                waitReceiveDTO.setSpec(inptCostDTO.getSpec());
+                waitReceiveDTO.setDosage(inptCostDTO.getDosage());
+                waitReceiveDTO.setDosageUnitCode(inptCostDTO.getDosageUnitCode());
+                waitReceiveDTO.setChineseDrugNum(null);
+                waitReceiveDTO.setStatusCode("0");
+                waitReceiveDTO.setPharId(inptCostDTO.getPharId());
+                waitReceiveDTO.setUsageCode(inptCostDTO.getUsageCode());
+                waitReceiveDTO.setUseCode(inptCostDTO.getUseCode());
+                //申请科室ID
+                waitReceiveDTO.setDeptId(inptCostDTO.getDeptId());
+                //是否紧急默认不紧急,需要加急在页面设置
+                waitReceiveDTO.setIsEmergency("0");
+                waitReceiveDTO.setIsBack("0");
+                waitReceiveDTO.setCostId(inptCostDTO.getId());
+                waitReceiveDTO.setCrteId(inptCostDTO.getCheckId());
+                waitReceiveDTO.setCrteName(inptCostDTO.getCheckName());
+                waitReceiveDTO.setCrteTime(new Date());
+                //开单单位
+                waitReceiveDTO.setCurrUnitCode(inptCostDTO.getTotalNumUnitCode());
+                //保留两位小数 四舍五入
+                waitReceiveDTO.setTotalPrice(inptCostDTO.getRealityPrice());
+                if (waitReceiveDTO != null) {
+                    inptCostDTO.setIsWait(Constants.SF.S);
+                }
+                pharInWaitReceiveDTOList.add(waitReceiveDTO);
+            }
+        }
+        if (!ListUtils.isEmpty(pharInWaitReceiveDTOList)){
+            inptCostDAO.insertPharInWaitReceiveBatch(pharInWaitReceiveDTOList);
+        }
     }
 
     /**

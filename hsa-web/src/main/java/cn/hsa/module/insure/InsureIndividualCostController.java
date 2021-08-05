@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Package_name: cn.hsa.module.insure
@@ -159,5 +160,42 @@ public class InsureIndividualCostController extends BaseController {
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("inptVisitDTO",inptVisitDTO);
         return insureIndividualCostService_consumer.queryInptPatientPage(map);
+    }
+
+    /**
+     * @Method updateLimitUserFlag
+     * @Desrciption  住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/20 9:20
+     * @Return
+     **/
+    @PostMapping("/updateLimitUserFlag")
+    public WrapperResponse <Boolean> updateLimitUserFlag(@RequestBody Map<String,Object> map ,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureIndividualCostService_consumer.updateLimitUserFlag(map);
+    }
+
+    /**
+     * @Method queryInptCostPage
+     * @Desrciption  根据就诊id 查询住院费用明细数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/20 13:49
+     * @Return
+     **/
+    @GetMapping("/queryInptCostPage")
+    public WrapperResponse<PageDTO> queryInptCostPage(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res){
+        Map<String,Object> map  = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        map.put("hospCode",hospCode);
+        inptVisitDTO.setHospCode(hospCode);
+        map.put("inptVisitDTO",inptVisitDTO);
+        return insureIndividualCostService_consumer.queryInptCostPage(map);
+
     }
 }

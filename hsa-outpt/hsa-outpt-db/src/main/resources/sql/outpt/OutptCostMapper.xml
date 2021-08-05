@@ -81,6 +81,9 @@
         <result property="outptPrescribeCrteTime" column="prescribeCrteTime" jdbcType="TIMESTAMP"/>
         <result property="code" column="xmlbcode" jdbcType="VARCHAR"/>
         <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="stockOccupy" column="stock_occupy" jdbcType="VARCHAR"/>
+        <result property="stockNum" column="stock_num" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 门诊处方数据库映射配置 -->
@@ -241,6 +244,7 @@
         <result property="pym" column="pym" jdbcType="VARCHAR"/>
         <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
         <result property="isVisit" column="is_visit" jdbcType="VARCHAR"/>
+        <result property="isPhys" column="is_phys" jdbcType="VARCHAR"/>
         <result property="isFirstVisit" column="is_first_visit" jdbcType="VARCHAR"/>
         <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
         <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
@@ -1163,6 +1167,14 @@
         </foreach>
     </delete>
 
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteFCFCostByIds">
+        DELETE FROM outpt_cost WHERE op_id is null and settle_code in ('0','1') and hosp_code = #{hospCode} and id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
     <!-- 根据条件参数查询数据列表 -->
     <select id="findByCondition" resultMap="outptCostDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         SELECT
@@ -1247,6 +1259,7 @@
         pym,
         wbm,
         is_visit,
+        is_phys,
         is_first_visit,
         in_dept_id,
         in_disease_id,
@@ -1281,6 +1294,9 @@
         </if>
         <if test="genderCode != null and genderCode != ''">
             AND gender_code = #{genderCode}
+        </if>
+        <if test="isPhys != null and isPhys != ''">
+            AND is_phys =#{isPhys}
         </if>
         <if test="keyword != null and keyword != ''">
             AND(
@@ -1322,32 +1338,84 @@
         )
         </if>
         <if test='type == "1"'>
-        AND(
+            AND(
             NOT EXISTS(
-                select
-                id
-                from
-                outpt_cost
-                where
-                hosp_code = #{hospCode}
-                and source_code = '1'
-                and visit_id = outpt_visit.id
-                and status_code = '0'
-                and settle_code in ('0','1')
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and visit_id = outpt_visit.id
+            and status_code = '0'
+            and settle_code in ('0','1')
             )
             AND NOT EXISTS(
-                select
-                id
-                from
-                outpt_prescribe
-                where
-                hosp_code = #{hospCode}
-                and visit_id = outpt_visit.id
-                and is_settle = '0'
-                and is_cancel = '0'
-                and is_submit = '1'
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and visit_id = outpt_visit.id
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
             )
-        )
+            )
+        </if>
+        <if test='type == "2"'>
+            AND (
+            EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            OR EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
+        </if>
+        <if test='type == "3"'>
+            AND(
+            NOT EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            AND NOT EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
         </if>
         order by crte_time desc
     </select>
@@ -1481,7 +1549,9 @@
         bd.good_pym,
         bd.good_wbm,
         '0' as is_cg,
-        ss.num - IFNULL(ss.stock_occupy,0) AS stockNum,
+        ss.num as stock_num,
+        ss.split_num,
+        ss.stock_occupy,
         bd.rate_code rateCode
         FROM
             stro_stock ss
@@ -1528,7 +1598,9 @@
         bm.pym AS good_pym,
         bm.wbm AS good_wbm,
         '0' as is_cg,
-        ss.num - IFNULL(ss.stock_occupy,0) AS stockNum,
+        ss.num as stock_num,
+        ss.split_num,
+        ss.stock_occupy,
         '' rateCode
         FROM
             stro_stock ss
@@ -1574,7 +1646,9 @@
         name_pym as good_pym,
         name_wbm as good_wbm,
         is_cg,
-        null AS stockNum,
+        null as stock_num,
+        null as split_num,
+        null as stock_occupy,
         '' rateCode
         FROM
         base_item

@@ -24,6 +24,20 @@ public interface Constants {
     }
 
     /**
+     * 证件类别（ZJLB）
+     */
+    class ZJLB {
+        public static final String JMSFZ = "01"; // 居民身份证
+        public static final String JMHKB = "02"; // 居民户口簿
+        public static final String HZ = "03"; // 护照
+        public static final String JGZ = "04"; // 军官证
+        public static final String JSZ = "05"; // 驾驶证
+        public static final String GATXZ = "06"; // 港澳居民来往内地通行证
+        public static final String TWTXZ = "07"; // 台湾居民来往内地通行证
+        public static final String QT = "99"; // 其他
+    }
+
+    /**
      * 来源标志（LYBZ）
      */
     class LYBZ {

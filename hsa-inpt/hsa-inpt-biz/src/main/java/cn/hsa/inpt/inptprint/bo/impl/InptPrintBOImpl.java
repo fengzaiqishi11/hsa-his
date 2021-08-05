@@ -379,7 +379,6 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
    **/
   @Override
   public List<InptAdvicePrintDTO> updateAdvicePrint(InptAdvicePrintDTO inptAdvicePrintDTO) {
-    inptAdvicePrintDTO.setIsValid(null);
     // 根据就诊id查询医嘱主信息
     List<InptAdvicePrintDTO> inptAdviceDTOS = inptPrintDAO.queryAdviceByVistiId(inptAdvicePrintDTO);
     // 查询医嘱打印表信息

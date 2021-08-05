@@ -42,7 +42,7 @@ public class InptSettlementController extends BaseController {
 
     @Resource
     private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
-    
+
     /**
      * @Menthod queryInptvisitByPage
      * @Desrciption  查询可出院结算的用户信息
@@ -55,7 +55,16 @@ public class InptSettlementController extends BaseController {
     public WrapperResponse queryInptvisitByPage(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());//医院编码
-        inptVisitDTO.setStatusCode(Constants.BRZT.YCY);//当前状态 = 预出院
+        String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+            inptVisitDTO.setStatusCode(Constants.BRZT.ZY);//当前状态 = 在院
+            inptVisitDTO.setMidWayStartDate(inptVisitDTO.getStartDate());
+            inptVisitDTO.setMidWayEndDate(inptVisitDTO.getEndDate());
+            inptVisitDTO.setStartDate(null);
+            inptVisitDTO.setEndDate(null);
+        }else {
+            inptVisitDTO.setStatusCode(Constants.BRZT.YCY);//当前状态 = 预出院
+        }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码
         param.put("inptVisitDTO",inptVisitDTO);//查询条件
@@ -71,14 +80,19 @@ public class InptSettlementController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @GetMapping("/queryInptCostByList")
-    public WrapperResponse queryInptCostByList(@Param("id") String id, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
+    public WrapperResponse queryInptCostByList(@Param("id") String id, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode, HttpServletRequest req, HttpServletResponse res){        SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
             return WrapperResponse.fail("参数错误。",null);
         }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码
         param.put("id",id);//就诊id
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+            param.put("patientCode", Integer.valueOf(patientCode)); // 病人类型
+        }else {
+            param.put("patientCode", null); // 病人类型
+        }
+
         param.put("statusCode",Constants.ZTBZ.ZC);//状态标志
         param.put("settleCodes",new String[]{Constants.JSZT.WJS,Constants.JSZT.YUJS});//结算状态 = 未结算、预结算
         param.put("backCode",Constants.TYZT.YFY);//退费状态 = 已发药
@@ -113,6 +127,24 @@ public class InptSettlementController extends BaseController {
         return inptSettlementService_consumer.saveCostTrial(param);
     }
 
+    /**
+     * @Method insureUnifiedPayInpt
+     * @Desrciption 住院预结算
+     * @Param
+     *
+     * @Author 曹亮
+     * @Date   2021/7/14 11:17
+     * @Return
+     **/
+    @PostMapping("/insureUnifiedPayInpt")
+    public WrapperResponse<Map<String,Object>> insureUnifiedPayInpt(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode", sysUserDTO.getHospCode());//医院编码
+        param.put("visitId",inptVisitDTO.getVisitId());
+        param.put("inptVisitDTO",inptVisitDTO);//请求参数
+        return inptSettlementService_consumer.insureUnifiedPayInpt(param);
+    }
 
     /**
      * @Menthod saveSettle
@@ -211,7 +243,7 @@ public class InptSettlementController extends BaseController {
         map.put("inptVisitDTO", inptVisitDTO);
         return inptSettlementService_consumer.queryDiagnose(map);
     }
-    
+
     /**
      * @Method editDischargeInpt
      * @Desrciption  医保出院办理
@@ -219,8 +251,8 @@ public class InptSettlementController extends BaseController {
      *
      * @Author fuhui
      * @Date   2021/5/28 11:40 
-     * @Return 
-    **/
+     * @Return
+     **/
     @PostMapping("/editDischargeInpt")
     public WrapperResponse<Boolean> editDischargeInpt(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
@@ -258,6 +290,9 @@ public class InptSettlementController extends BaseController {
         if (StringUtils.isEmpty(inptVisitDTO.getId())){
             return WrapperResponse.fail("参数错误。",null);
         }
+        if (StringUtils.isEmpty(inptVisitDTO.getBabyId())){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
+        }
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());//医院编码
         inptVisitDTO.setCrteId(sysUserDTO.getId());//当前登录用户id
         inptVisitDTO.setCrteName(sysUserDTO.getName());//当前登录用户名
@@ -287,6 +322,9 @@ public class InptSettlementController extends BaseController {
                 || StringUtils.isEmpty((String) params.get("settleId")) || params.get("inptPay") == null || !params.containsKey("isInvoice")){
             return WrapperResponse.fail("参数错误。",null);
         }
+        if (!params.containsKey("babyId") || StringUtils.isEmpty((String) params.get("babyId"))){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
+        }
         List<InptPayDO> inptPayDOList = JSONArray.parseArray(JSON.toJSONString(params.get("inptPay")), InptPayDO.class);//支付方式信息
         params.put("hospCode", sysUserDTO.getHospCode());//医院编码
         params.put("userId", sysUserDTO.getId());//当前登录用户id
@@ -314,6 +352,9 @@ public class InptSettlementController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
             return WrapperResponse.fail("参数错误。",null);
+        }
+        if (StringUtils.isEmpty(babyId)){
+            return WrapperResponse.fail("参数错误,请刷新浏览器或联系管理员",null);
         }
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("hospCode", sysUserDTO.getHospCode());//医院编码

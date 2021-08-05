@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.doctor.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -173,4 +174,26 @@ public interface DoctorAdviceBO {
      * @Return boolean
      **/
     Boolean saveInptAdviceZCY (Map<String,Object> parmMap);
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 08:48
+     * @Return:
+     **/
+    List<InsureItemMatchDTO> queryLimitDrugList(InptAdviceDTO inptAdviceDTO);
+
+    /**
+     * @Menthod: updateInptAdviceDetailLmt
+     * @Desrciption: 更新医嘱明细表限制用药相关字段
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 10:39
+     * @Return:
+     **/
+    Boolean updateInptAdviceDetailLmt(List<InsureItemMatchDTO> insureItemMatchDTOS);
 }

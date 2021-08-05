@@ -345,6 +345,9 @@
             a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
             a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
             a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
+            a.crte_time,
+            otv.triage_start_code as triageStatusCode,
+            otv.is_call as isCanCall,
             case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
             from outpt_visit a
             join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
@@ -352,6 +355,7 @@
         left join base_disease d on c.disease_id = d.id and c.hosp_code = d.hosp_code
             left join sys_parameter e on e.code = 'MZYS_EKCFNL' and a.hosp_code = e.hosp_code
                 and (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(a.birthday)), '%Y')+0) &lt;= e.value
+        left join outpt_triage_visit otv on a.hosp_code = otv.hosp_code and a.register_id = otv.register_id
             <!-- 待接诊 -->
             <if test="operType == '1'.toString() ">
                 left join sys_parameter f on f.code = 'GH_JS' and a.hosp_code = f.hosp_code
@@ -386,7 +390,7 @@
             <if test="id != null and id != ''" >
                 and a.id = #{id}
             </if>
-        )a order by a.type, a.visitTime desc
+        ) a order by a.type, a.visitTime desc
     </select>
 
     <!--  获取历史病历记录 -->
@@ -2144,4 +2148,98 @@
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
     </select>
 
+    <!--根据visitIds，itemIds查询出对应的费用表数据-->
+    <select id="queryOuptCost" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+        *
+        FROM
+        outpt_cost
+        WHERE hosp_code = #{hospCode}
+        and status_code = '0'
+        <if test="visitIds != null and visitIds.size() > 0">
+            and visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by crte_time asc
+    </select>
+
+    <!--根据visitIds，itemIds查询出对应的处方明细表副表数据-->
+    <select id="queryOuptPreDetailExt" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
+        SELECT
+        a.*
+        FROM
+        outpt_prescribe_detail_ext a
+        left join outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+        and b.is_cancel = '0'
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and a.item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by a.op_id, a.group_no, a.group_seq_no asc
+    </select>
+
+    <!--根据处方ids和visitId从处方明细表副表查询出处方列表-->
+    <select id="queryPrescribeListByIdsAndVisitId" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
+        select
+               *
+        from outpt_prescribe_detail_ext
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and FIND_IN_SET(op_id, #{ids})
+    </select>
+
+    <!--更新费用表数据，限制用药字段-->
+    <update id="updateOuptCost" parameterType="java.util.List">
+        <foreach collection="costDTOS" item="item" separator=";">
+            update outpt_cost
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
+
+    <!--更新处方明细表副表数据，限制用药字段-->
+    <update id="updateOuptPreDetailExt" parameterType="java.util.List">
+        <foreach collection="detailsExtDTOS" item="item" separator=";">
+            update outpt_prescribe_detail_ext
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
 </mapper>

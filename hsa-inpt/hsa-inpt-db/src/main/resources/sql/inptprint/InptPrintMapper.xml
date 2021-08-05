@@ -367,6 +367,7 @@
     <result property="longStartTime" column="long_start_time" jdbcType="TIMESTAMP"/>
     <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
     <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+    <result property="isStopMyself" column="is_stop_myself" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--通过实体作为筛选条件查询医嘱信息-->
@@ -384,6 +385,7 @@
       <if test="isLong != null and isLong != ''">
         and is_long = #{isLong}
       </if>
+    order by long_start_time
   </select>
 
   <select id="queryAdvicePrintByIds" resultMap="InptAdvicePrintMap">
@@ -419,10 +421,12 @@
     ia.item_id,ia.item_code,ia.yylx,ia.type_code,ia.total_num,ia.total_num_unit_code,ia.use_code,ia.dosage,ia.dosage_unit_code,
     a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
     DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,
-    (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName, bd.big_type_code
+    (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName, bd.big_type_code,
+    ba.is_stop_myself
     from inpt_advice_print a
     left join inpt_advice ia on ia.id = a.ia_id and ia.hosp_code = a.hosp_code
     left JOIN base_drug bd on ia.hosp_code = bd.hosp_code and ia.item_id = bd.id
+    left join base_advice ba on ia.hosp_code = ba.hosp_code and ia.item_id = ba.id
     where a.hosp_code = #{hospCode}
       <if test="id != null and id != ''">
         and a.id = #{id}
@@ -541,7 +545,7 @@
       <if test='queryBaby =="N"'>
           and (ia.baby_id is null or ia.baby_id = '')
       </if>
-      order by a.seq_no
+      order by a.long_start_time,a.seq_no
   </select>
 
   <!--批量新增新增所医嘱打印信息-->

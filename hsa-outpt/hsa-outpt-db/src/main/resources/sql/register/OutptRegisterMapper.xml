@@ -940,6 +940,7 @@
             <if test="profileId != null and profileId != ''">
                 profile_id = #{profileId,jdbcType=VARCHAR},
             </if>
+            seq_no = ifnull(seq_no,0)+1
         </set>
         where
         id = #{id} and hosp_code = #{hospCode,jdbcType=VARCHAR}

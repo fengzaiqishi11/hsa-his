@@ -95,8 +95,8 @@ public class InsureUnifiedPayInptServiceImpl extends HsafService implements Insu
      * @Return:
      **/
     @Override
-    public WrapperResponse<Boolean> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
-        return WrapperResponse.success(insureUnifiedPayInptBO.editCancelInptSettle(insureUnifiedMap));
+    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+        return insureUnifiedPayInptBO.editCancelInptSettle(insureUnifiedMap);
     }
 
     /**

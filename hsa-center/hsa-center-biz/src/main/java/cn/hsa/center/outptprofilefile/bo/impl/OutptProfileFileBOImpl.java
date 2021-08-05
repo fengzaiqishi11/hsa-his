@@ -4,24 +4,27 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.center.outptprofilefile.bo.OutptProfileFileBO;
 import cn.hsa.module.center.outptprofilefile.dao.OutptProfileFileDAO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.syncorderrule.service.SyncOrderRuleService;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.*;
 
 /**
  * @Package_name: cn.hsa.center.outptprofilefile.bo.impl
@@ -40,6 +43,12 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
 
     @Resource
     private SyncOrderRuleService syncOrderRuleService;
+
+    @Resource
+    private BaseOrderRuleService baseOrderRuleService_consumer;
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Method getById
@@ -93,7 +102,7 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
     @Override
     public OutptProfileFileExtendDTO save(OutptProfileFileDTO outptProfileFileDTO) {
         //校验身份证格式是否正确
-        checkCard(outptProfileFileDTO.getCertNo());
+        checkCard(outptProfileFileDTO.getCertNo(), outptProfileFileDTO.getCertCode());
         if(StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
             String type = outptProfileFileDTO.getType();
             OutptProfileFileExtendDTO extendDTO = null;
@@ -102,21 +111,26 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
                     if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
                         //判断身份证是否存在
                         if (isCertNoExist(outptProfileFileDTO)) {
-                            throw new AppException("身份证号重复，请重新输入");
+                            throw new AppException("证件号重复，请重新输入");
                         }
                         extendDTO = insert(outptProfileFileDTO);
                     }else{
                         extendDTO = update(outptProfileFileDTO);
                     }
                 } else if (type.equals("1") || type.equals("2")) {
-                    //判断此身份证是否建档
-                    OutptProfileFileDTO newFile = outptProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
-                    if(newFile != null){
-                        newFile.setType(type);
-                        newFile.setHospCode(outptProfileFileDTO.getHospCode());
-                        extendDTO = update(newFile);
-                    }else{
+                    if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+                        // 证件类别为其他类型时，直接建档
                         extendDTO = insert(outptProfileFileDTO);
+                    } else {
+                        //判断此身份证是否建档
+                        OutptProfileFileDTO newFile = outptProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
+                        if(newFile != null){
+                            newFile.setType(type);
+                            newFile.setHospCode(outptProfileFileDTO.getHospCode());
+                            extendDTO = update(newFile);
+                        } else{
+                            extendDTO = insert(outptProfileFileDTO);
+                        }
                     }
                 }
             }
@@ -223,10 +237,36 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             //初始化设置住院次数
             outptProfileFileExtendDTO.setTotalIn(0);
         }
-
-        // 不管何种方式 只要是新增的从表数据都给他生成住院号和门诊号
-        String inProfile = syncOrderRuleService.getOrderNo("36").getData();
-        String outProfile = syncOrderRuleService.getOrderNo("104").getData();
+        // 20210726 liuliyun 珠海病案号生成
+        Map sysParam=new HashMap();
+        sysParam.put("hospCode",outptProfileFileDTO.getHospCode());
+        sysParam.put("code","BAH_SF");
+        SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(sysParam).getData();
+        // 未配置系统参数时，添加默认值
+        if (sysParameterDTO ==null){
+            sysParameterDTO=new SysParameterDTO();
+            sysParameterDTO.setValue("0");
+        }
+        String inProfile ="";
+        if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
+            Map inMap = new HashMap();
+            inMap.put("hospCode", outptProfileFileDTO.getHospCode());
+            inMap.put("typeCode", "361");
+            inProfile = baseOrderRuleService_consumer.getOrderNo(inMap).getData();
+        }else {
+            // 不管何种方式 只要是新增的从表数据都给他生成住院号和门诊号
+            // 调用本地的规则服务，生成住院号和门诊号
+            Map inMap = new HashMap();
+            inMap.put("hospCode", outptProfileFileDTO.getHospCode());
+            inMap.put("typeCode", "36");
+            inProfile = baseOrderRuleService_consumer.getOrderNo(inMap).getData();
+        }
+        Map outMap = new HashMap();
+        outMap.put("hospCode", outptProfileFileDTO.getHospCode());
+        outMap.put("typeCode", "104");
+        String outProfile = baseOrderRuleService_consumer.getOrderNo(outMap).getData();
+//        String inProfile = syncOrderRuleService.getOrderNo("36").getData();
+//        String outProfile = syncOrderRuleService.getOrderNo("104").getData();
         outptProfileFileExtendDTO.setInProfile(inProfile);
         outptProfileFileExtendDTO.setOutProfile(outProfile);
         Integer integer = outptProfileFileDAO.insertExtend(outptProfileFileExtendDTO);
@@ -236,6 +276,10 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             extendDTO.setInProfile(inProfile);
             extendDTO.setOutProfile(outProfile);
             extendDTO.setProfileId(outptProfileFileExtendDTO.getProfileId());
+            extendDTO.setTotalIn(outptProfileFileExtendDTO.getTotalIn());
+            extendDTO.setTotalOut(outptProfileFileExtendDTO.getTotalOut());
+            extendDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getInptLastVisitTime());
+            extendDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getOutptLastVisitTime());
         } else {
             throw new AppException("新增档案从表数据失败");
         }
@@ -281,6 +325,10 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
             extendDTO.setInProfile(extendByProfileId.getInProfile());
             extendDTO.setOutProfile(extendByProfileId.getOutProfile());
             extendDTO.setProfileId(extendByProfileId.getProfileId());
+            extendDTO.setTotalIn(extendByProfileId.getTotalIn());
+            extendDTO.setTotalOut(extendByProfileId.getTotalOut());
+            extendDTO.setInptLastVisitTime(extendByProfileId.getInptLastVisitTime());
+            extendDTO.setOutptLastVisitTime(extendByProfileId.getOutptLastVisitTime());
         } else {
             throw new AppException("修改档案从表数据失败");
         }
@@ -297,7 +345,12 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
      **/
     @Override
     public Boolean isCertNoExist(OutptProfileFileDTO outptProfileFileDTO) {
-        return outptProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true: false;
+        if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+            // 证件类别为其他，直接返回false
+            return false;
+        } else {
+            return outptProfileFileDAO.isCertNoExist(outptProfileFileDTO) != null ? true: false;
+        }
     }
 
     /**
@@ -323,24 +376,64 @@ public class OutptProfileFileBOImpl extends HsafBO implements OutptProfileFileBO
      * @Date   2020/9/22 16:50
      * @Return boolean
      **/
-    public boolean checkCard(String cardNo) {
-        if (StringUtils.isEmpty(cardNo)) {
-            throw new AppException("身份证号为空，请检查后重新输入");
+    public boolean checkCard(String cardNo, String certCode) {
+        if (StringUtils.isEmpty(cardNo) && !Constants.ZJLB.QT.equals(certCode)) {
+            throw new AppException("证件号为空，请检查后重新输入");
+        } else if (StringUtils.isEmpty(certCode)) {
+            throw new AppException("证件类型不能为空，请检查后重新输入");
         } else {
-            Pattern pattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
-            if(cardNo.length() == 15){
-                Matcher isNum = pattern.matcher(cardNo);
-                if(!isNum.matches()){
-                    throw new AppException("身份证号15位时只能为纯数字，请检查后重新输入");
+            if (Constants.ZJLB.JMSFZ.equals(certCode)) { // 居民身份证
+                Pattern pattern = compile("^-?\\d+(\\.\\d+)?$");
+                if(cardNo.length() == 15){
+                    Matcher isNum = pattern.matcher(cardNo);
+                    if(!isNum.matches()){
+                        throw new AppException("身份证号15位时只能为纯数字，请检查后重新输入");
+                    }
+                }else if(cardNo.length() == 18){
+                    Matcher isNum = pattern.matcher(cardNo.substring(0,17));
+                    Boolean flag = cardNo.substring(17,18) == "X"?true:false;
+                    if(!isNum.matches() && !flag){
+                        throw new AppException("身份证号18位时只能前17位为纯数字，最后1位为大写英文字母X，请检查后重新输入");
+                    }
+                }else{
+                    throw new AppException("身份证号只能为15位或者18位，请检查后重新输入");
                 }
-            }else if(cardNo.length() == 18){
-                Matcher isNum = pattern.matcher(cardNo.substring(0,17));
-                Boolean flag = cardNo.substring(17,18) == "X"?true:false;
-                if(!isNum.matches() && !flag){
-                    throw new AppException("身份证号18位时只能前17位为纯数字，最后1位为大写英文字母X，请检查后重新输入");
+            } else if (Constants.ZJLB.JMHKB.equals(certCode)) { // 户口本
+                Pattern pattern = compile("\\\\d{9}");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("居民户口薄格式有误，请检查后重新出入");
                 }
-            }else{
-                throw new AppException("身份证号只能为15位或者18位，请检查后重新输入");
+            }else if (Constants.ZJLB.GATXZ.equals(certCode)) { // 港澳通行证
+                Pattern pattern = compile("^[HMhm]{1}([0-9]{10}|[0-9]{8})$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("港澳通行证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.TWTXZ.equals(certCode)) { // 台湾通行证
+                Pattern pattern = compile("^\\d{8}|^[a-zA-Z0-9]{10}|^\\d{18}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("台湾通行证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.JGZ.equals(certCode)) { // 军官证
+                Pattern pattern = compile("^[\\\\u4E00-\\\\u9FA5](字第)([0-9a-zA-Z]{4,8})(号?)$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("军官证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.JSZ.equals(certCode)) { // 驾驶证
+                Pattern pattern = compile("\\\\d{12}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("驾驶证格式有误，请检查后重新出入");
+                }
+            } else if (Constants.ZJLB.HZ.equals(certCode)) { // 护照
+                Pattern pattern = compile("^([a-zA-z]|[0-9]){5,17}$");
+                Matcher matcher = pattern.matcher(cardNo);
+                if (!matcher.matches()) {
+                    throw new AppException("护照格式有误，请检查后重新出入");
+                }
             }
         }
         return true;

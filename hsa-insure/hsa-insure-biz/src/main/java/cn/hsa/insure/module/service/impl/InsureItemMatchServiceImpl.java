@@ -289,4 +289,18 @@ public class InsureItemMatchServiceImpl extends HsafService implements InsureIte
     public WrapperResponse<Map<String,Object>> insertInsureItemInfos(Map map) {
         return WrapperResponse.success(insureItemMatchBO.insertInsureItemInfos(map));
     }
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    @Override
+    public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap) {
+        return WrapperResponse.success(insureItemMatchBO.queryLimitDrugList(MapUtils.get(paramMap, "insureItemMatchDTO")));
+    }
 }

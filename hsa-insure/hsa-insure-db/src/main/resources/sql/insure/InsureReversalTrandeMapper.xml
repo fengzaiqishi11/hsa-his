@@ -161,7 +161,7 @@
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
             AND c.aae140 IS NOT NULL
-            AND e.settle_state = '1'
+            AND e.settle_state = '1' and e.insureSettleId is not null
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
@@ -187,6 +187,7 @@
     <!--医药机构费用结算对明细账查询-->
     <select id="queryDataWith3202" resultType="java.util.Map">
         SELECT
+            c.aac002 as name,
             e.insure_reg_code as insureRegCode,
             t.aac001 as psn_no,
             e.settle_id,
@@ -198,6 +199,8 @@
             c.aae140 as insutype,
             t.is_hospital,
             e.clr_type ,
+            if (e.state = '0','0','1') as refd_setl_flag,
+            e.state,
             e.clr_optins,
             t.insure_reg_code as setl_optins,
             e.total_price as medfee_sumamt,
@@ -218,6 +221,10 @@
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND e.insure_reg_code = #{insureRegCode}
+        </if>
+        /*开始日期*/
         <if test="startDate != null and startDate != '' ">
             and date(e.crte_time) &gt;= date(#{startDate})
         </if>
@@ -225,14 +232,8 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
-        <if test="list != null and list.size() > 0">
-            and (c.aae140,t.is_hospital) IN
-            <foreach collection="list" separator="," open="(" close=")" item="item">
-                (#{item.insutype},#{item.is_hospital})
-            </foreach>
-        </if>
-        <if test="refdSetlFlag == '0'">
-            and e.state = '0'
+        <if test="clrType != null and clrType != ''">
+            and e.clr_type = #{clrType}
         </if>
     </select>
 

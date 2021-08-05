@@ -86,9 +86,12 @@
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
             outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
         from base_profile_file
-        where cert_code = '01' and cert_no = #{certNo}
+        where cert_no = #{certNo}
         <if test="id != null and id != ''">
             and id != #{id}
+        </if>
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
         </if>
         order by crte_time desc limit 1
     </select>
@@ -104,7 +107,10 @@
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
             outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
         from base_profile_file
-        where cert_code = '01' and cert_no = #{certNo}
+        where cert_no = #{certNo}
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
         order by crte_time desc limit 1
     </select>
 

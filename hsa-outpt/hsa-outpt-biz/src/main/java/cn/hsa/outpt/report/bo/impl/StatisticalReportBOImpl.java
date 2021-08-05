@@ -291,8 +291,11 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
             //4：住院汇总、6：住院汇总(注射)
             resultList = statisticalReportDAO.queryInSumAntibiosisDrug(paramMap);
         }else if("7".equals(statisWay)){
-            //4：门诊、住院汇总
-            resultList = statisticalReportDAO.queryOutInSumAntibiosisDrug(paramMap);
+            //4：门诊明细汇总
+            resultList = statisticalReportDAO.queryOnlyOutSumAntibiosisDrug(paramMap);
+        }else if("8".equals(statisWay)) {
+            //4：住院明细汇总
+            resultList = statisticalReportDAO.queryOnlyInSumAntibiosisDrug(paramMap);
         }
 
         return PageDTO.of(resultList);

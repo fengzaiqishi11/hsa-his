@@ -222,7 +222,6 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         Map<String, String> delBasicParam = new HashMap<String, String>();
         delBasicParam.put("hospCode", hospCode);
         delBasicParam.put("aac001", aac001);
-        insureIndividualBasicDAO.deleteByAac001(delBasicParam);
         //医保个人基本信息
         InsureIndividualBasicDO insureIndividualBasicDO = new InsureIndividualBasicDO();
         insureIndividualBasicDO.setId(iIBId);//主键id
@@ -439,5 +438,34 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     @Override
     public Boolean updateInsureInidivdual(InptVisitDTO inptVisitDTO) {
         return insureIndividualVisitDAO.updateInsureInidivdual(inptVisitDTO);
+    }
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method selectInsureInfo
+     * @Desrciption 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/30 15:32
+     * @Return
+     */
+    @Override
+    public InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        return insureIndividualVisitDAO.selectInsureInfo(insureIndividualVisitDTO);
+    }
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+    @Override
+    public Boolean updateInsureSettleId(Map<String, Object> settleMap)
+    {
+        return insureIndividualVisitDAO.updateInsureSettleId(settleMap);
     }
 }

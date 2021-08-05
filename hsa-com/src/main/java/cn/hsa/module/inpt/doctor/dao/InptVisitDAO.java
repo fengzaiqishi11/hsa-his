@@ -59,6 +59,17 @@ public interface InptVisitDAO {
     List<InptVisitDTO> queryInptVisitPageS(InptVisitDTO inptVisitDTO);
 
     /**
+     * @param individualSettleDTO
+     * @Method updateInsureSettleById
+     * @Desrciption 更新医保结算表
+     * @Param
+     * @Author liaojiguang
+     * @Date 2021/7/22 20:05
+     * @Return
+     */
+    Boolean updateInsureSettleById(InsureIndividualSettleDTO individualSettleDTO);
+
+    /**
     * @Method insertInptVisit
     * @Desrciption 单个新增
     * @param inptVisitDTO
@@ -99,6 +110,8 @@ public interface InptVisitDAO {
      * @Return java.lang.Boolean
      **/
     Integer deleteById(InptVisitDTO inptVisitDTO);
+
+    Integer invalidPatientStatus(InptVisitDTO inptVisitDTO);
 
     /**
      * @Method: getVisitByAdviceId
@@ -389,4 +402,15 @@ public interface InptVisitDAO {
     List<InptVisitDTO> queryBabyInptVisitPage(InptVisitDTO inptVisitDTO);
 
     void updateIllness(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Method: getBaseProfileInfo
+     * @Description: 获取入院次数
+     * @Param: Map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/08/03 15:15
+     * @Return: List<Map>
+     **/
+    List<Map> getBaseProfileInfo(Map map);
 }

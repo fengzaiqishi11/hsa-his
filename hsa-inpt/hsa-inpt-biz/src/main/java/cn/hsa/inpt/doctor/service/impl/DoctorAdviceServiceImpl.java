@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -246,4 +247,31 @@ public class DoctorAdviceServiceImpl extends HsafService implements DoctorAdvice
         return WrapperResponse.success(doctorAdviceBO.saveInptAdviceZCY(paramMap));
     }
 
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 08:48
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap) {
+        return WrapperResponse.success(doctorAdviceBO.queryLimitDrugList(MapUtils.get(paramMap, "inptAdviceDTO")));
+    }
+
+    /**
+     * @Menthod: updateInptAdviceDetailLmt
+     * @Desrciption: 更新医嘱明细表限制用药相关字段
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 10:39
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateInptAdviceDetailLmt(Map map) {
+        return WrapperResponse.success(doctorAdviceBO.updateInptAdviceDetailLmt(MapUtils.get(map, "insureItemMatchDTOS")));
+    }
 }

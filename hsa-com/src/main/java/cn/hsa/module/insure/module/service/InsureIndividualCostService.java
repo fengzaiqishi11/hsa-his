@@ -188,4 +188,25 @@ public interface InsureIndividualCostService {
      * @Return
      **/
     Map<String,String> insurCostTransmissionJob(Map map);
+    /**
+     * @Method updateLimitUserFlag
+     * @Desrciption  住院医生站开完医嘱保存，填写报销标识以后。修改这些报销标识
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/20 9:20
+     * @Return
+     **/
+    WrapperResponse<Boolean> updateLimitUserFlag(Map<String, Object> map);
+
+    /**
+     * @Method queryInptCostPage
+     * @Desrciption  根据就诊id 查询住院费用明细数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/20 13:49
+     * @Return
+     **/
+    WrapperResponse<PageDTO> queryInptCostPage(Map<String, Object> map);
 }

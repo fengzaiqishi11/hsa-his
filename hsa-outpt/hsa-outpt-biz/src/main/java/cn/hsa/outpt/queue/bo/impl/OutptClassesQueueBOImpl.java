@@ -20,6 +20,7 @@ import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -172,6 +173,23 @@ public class OutptClassesQueueBOImpl implements OutptClassesQueueBO {
 
     private void buildDocList(OutptClassesQueueDto outptClassesQueueDto, List<OutptDoctorQueueDto> doctorList) {
         if (!ListUtils.isEmpty(doctorList)) {
+            List<String> doctorIdList = new ArrayList<>(15);
+            doctorList.forEach(dto ->{
+                doctorIdList.add(dto.getDoctorId());
+            });
+            Map<String,Object> param = new HashMap<>(8);
+            param.put("hospCode",outptClassesQueueDto.getHospCode());
+            param.put("queueDate",outptClassesQueueDto.getQueueDateTem());
+            param.put("classId",outptClassesQueueDto.getCsId());
+            param.put("doctorIdList",doctorIdList);
+            // 校验医生当天是否存在队列之中
+            List<Map<String,Object>> doctorQueueExistList = outptClassesQueueDao.queryDoctorQueueOfTodayByClassifyIdDoctorId(param);
+            if(!ListUtils.isEmpty(doctorQueueExistList)) {
+                throw new AppException("医生【"+doctorQueueExistList.get(0).get("doctorName")+"】"
+                        +doctorQueueExistList.get(0).get("queueDate")+"日,已在挂号类别【"
+                        +doctorQueueExistList.get(0).get("classOfShift")
+                        +"】存在【"+doctorQueueExistList.get(0).get("className")+"】队列数据") ;
+            }
             //处理医生队列数据
             doctorList.forEach(dto -> {
                 //校验参数

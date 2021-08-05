@@ -53,7 +53,7 @@
         <result property="advancePayment" column="advance_payment" jdbcType="NUMERIC"/>
     </resultMap>
 
-    <insert id="insurtInsureSettleInfo" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO" >
+    <insert id="insertInsureSettleInfo" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO" >
         insert into
             insure_individual_settle
         (
@@ -108,7 +108,12 @@
             ext07,
             ext08,
             ext09,
-            ext10
+            ext10,
+         omsgid,
+         oinfno,
+         clr_type,
+         clr_way,
+         clr_optins
         ) values (
                      #{id,jdbcType=VARCHAR},
                      #{hospCode,jdbcType=VARCHAR},
@@ -161,7 +166,12 @@
                      #{ext07,jdbcType=VARCHAR},
                      #{ext08,jdbcType=VARCHAR},
                      #{ext09,jdbcType=VARCHAR},
-                     #{ext10,jdbcType=VARCHAR}
+                     #{ext10,jdbcType=VARCHAR},
+                     #{omsgid,jdbcType=VARCHAR},
+                     #{oinfno,jdbcType=VARCHAR},
+                     #{clrType,jdbcType=VARCHAR},
+                     #{clrWay,jdbcType=VARCHAR},
+                     #{clrOptins,jdbcType=VARCHAR}
                  )
     </insert>
 
@@ -218,7 +228,7 @@
             ext08              = #{ext08,jdbcType=VARCHAR},
             ext09              = #{ext09,jdbcType=VARCHAR},
             ext10              = #{ext10,jdbcType=VARCHAR}
-        where id = #{id}
+        where id = #{id} and hosp_code = #{hospCode}
     </update>
 
 
@@ -591,18 +601,24 @@
                 omsgid = #{omsgid,jdbcType=VARCHAR},
             </if>
             <if test="oinfno != null and oinfno != ''">
-                oinfno = #{oinfno,jdbcType=VARCHAR}
+                oinfno = #{oinfno,jdbcType=VARCHAR},
+            </if>
+            <if test="clrOptins != null and clrOptins != ''">
+                clr_optins = #{clrOptins,jdbcType=VARCHAR},
+            </if>
+            <if test="clrWay != null and clrWay != ''">
+                clr_way = #{clrWay,jdbcType=VARCHAR},
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insureSettleId = #{insureSettleId,jdbcType=VARCHAR},
+            </if>
+            <if test="clrType != null and clrType != ''">
+                clr_type = #{clrType,jdbcType=VARCHAR}
             </if>
         </set>
-        where 1=1
-        <if test="hospCode != null and hospCode != ''">
-            and hosp_code = #{hospCode,jdbcType=VARCHAR}
-        </if>
-        <if test="visitId != null and visitId != ''">
-            and  visit_id = #{visitId,jdbcType=VARCHAR}
-        </if>
+        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId} and settle_id =#{settleId}
         <if test="state != null and state != ''">
-            and  state != #{state,jdbcType=VARCHAR}
+            and  state = #{state,jdbcType=VARCHAR}
         </if>
         <if test="settleState != null and settleState != ''">
             and  settle_state = #{settleState,jdbcType=VARCHAR}

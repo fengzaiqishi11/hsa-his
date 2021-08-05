@@ -119,6 +119,11 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
         private BigDecimal miPrice;  // 统筹支付金额
         private BigDecimal selfPrice;  // 个人支付金额
 
+        private BigDecimal settleTakePrice; // 结算补收
+        private BigDecimal settleBackPrice; // 结算退款
+        private BigDecimal apTotalPrice; // 预交金合计
+        private BigDecimal inptSettleRealityPrice; // 住院结算支付的优惠后总金额
+
 
 
     //财务分类编码  yzb 0305
@@ -154,4 +159,9 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     private String inNo;
     // 住院天数
     private String inDays;
+
+    // 占用库存
+    private BigDecimal stockOccupy;
+    // 拆零库存
+    private BigDecimal splitNum;
 }

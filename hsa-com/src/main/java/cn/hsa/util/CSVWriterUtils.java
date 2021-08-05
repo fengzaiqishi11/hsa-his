@@ -36,7 +36,7 @@ public class CSVWriterUtils {
                     for (String head : csvHead) {
                         if (map.get(head) instanceof String) {
                             cellData = map.get(head) == null ? "" : (String)map.get(head);
-                            csvBody.append(cellData.replaceAll(",", " ").replaceAll("[/r/n]"," ")).append(",");
+                            csvBody.append(cellData.replaceAll(",", " ").replaceAll("\n"," ").replaceAll("[/r/n]"," ")).append(",");
                         } else {
                             csvBody.append(map.get(head) == null ? "" : map.get(head)).append(",");
                         }
@@ -87,9 +87,11 @@ public class CSVWriterUtils {
         // 获取昨天或更久的文件夹
         File[] files = new File(url).listFiles();
 
-        // 删除昨天或更久的文件夹
-        for (File file : files)
-            delteFile(file);
+        if (files!=null) {
+            // 删除昨天或更久的文件夹
+            for (File file : files)
+                delteFile(file);
+        }
     }
     // 递归删除文件
     private static void delteFile(File file) {

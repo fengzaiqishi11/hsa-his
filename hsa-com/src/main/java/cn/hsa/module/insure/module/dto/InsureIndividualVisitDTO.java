@@ -104,4 +104,7 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date aac006;
         private String gend;
+        private String outModeCode;
+        private int settleCount; // 中途结算次数
+        private String  isHalfSettle; //是否中途结算
 }

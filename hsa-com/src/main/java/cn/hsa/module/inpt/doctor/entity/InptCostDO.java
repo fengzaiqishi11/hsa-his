@@ -328,4 +328,16 @@ public class InptCostDO extends PageDO implements Serializable {
 
     private String feedetlSn; //医保费用明细流水号
 
+    /**
+     * 限制使用标志
+     */
+    private String lmtUserFlag;
+    /**
+     * 限制使用说明
+     */
+    private String limUserExplain;
+    /**
+     * 是否报销
+     */
+    private String isReimburse;
 }

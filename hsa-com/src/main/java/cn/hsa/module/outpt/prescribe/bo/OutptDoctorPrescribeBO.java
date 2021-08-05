@@ -2,6 +2,7 @@ package cn.hsa.module.outpt.prescribe.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -421,4 +422,26 @@ public interface OutptDoctorPrescribeBO {
      * @Return List<Map<String, Object>>
      */
     List<Map<String, Object>> checkStock(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 11:42
+     * @Return:
+     */
+    List<InsureItemMatchDTO> queryLimitDrugList(OutptPrescribeDTO outptPrescribeDTO);
+
+    /**
+     * @Menthod: updateOuptCostAndPreDetailExt
+     * @Desrciption: 更新费用表以及处方明细表副表限制用药相关字段()
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     **/
+    Boolean updateOuptCostAndPreDetailExt(List<InsureItemMatchDTO> insureItemMatchDTOS);
 }

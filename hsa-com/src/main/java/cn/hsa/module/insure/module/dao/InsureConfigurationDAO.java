@@ -2,6 +2,7 @@ package cn.hsa.module.insure.module.dao;
 
 
 
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
 import org.apache.ibatis.annotations.Param;
@@ -169,6 +170,18 @@ public interface InsureConfigurationDAO {
     int queryCodeIsExist(InsureConfigurationDTO insureConfigurationDTO);
 
     /**
+     * @Method queryInsurePrimaryPrice
+     * @Desrciption
+     * @Param
+     * map
+     * @Author caoliang
+     * @Date   2021-7-15 14:32
+     * @Return Integer
+     *
+     * @return*/
+    InsureConfigurationDTO queryInsurePrimaryPrice(InptVisitDTO inptVisitDTO);
+
+    /**
      * @Method queryInsureIndividualConfig()
      * @Desrciption  根据
      * @Param
@@ -176,6 +189,6 @@ public interface InsureConfigurationDAO {
      * @Author fuhui
      * @Date   2020/11/18 14:12
      * @Return
-    **/
+     **/
     InsureConfigurationDTO queryInsureIndividualConfig(InsureConfigurationDTO insureConfigurationDTO);
 }

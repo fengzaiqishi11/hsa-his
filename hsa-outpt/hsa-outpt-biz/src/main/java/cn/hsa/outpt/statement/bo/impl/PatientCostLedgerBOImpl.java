@@ -4,6 +4,7 @@ import cn.hsa.base.DynamicTable;
 import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.util.PageInfo;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
@@ -16,6 +17,7 @@ import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -101,7 +103,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         //动态拼接sql
         StringBuffer sqlStr = new StringBuffer();
         if(ListUtils.isEmpty(inptCostDTOSAll)){
-            return PageDTO.of(null);
+            return PageDTO.of(new ArrayList());
         }
         for (InptCostDTO inptCostDTO : inptCostDTOSAll) {
             sqlStr.append("sum((case when a.bfc_id = '");
@@ -231,7 +233,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<Map> list = new ArrayList<Map>();
         if ("1".equals(bblx)) {  // 查询住院的收费员收入统计
             if("1".equals(statusCode)) { // 住院收费员收入统计（按缴款时间）
-                list = patientCostLedgerDAO.queryCollectorInComeStaDetail(map);
+                list = patientCostLedgerDAO.queryCollectorInComeStaZYJK(map);
             } else if ("0".equals(statusCode)) {  // 住院收费员收入统计（按结算时间）
                 list = patientCostLedgerDAO.queryCollectorInComeSta(map);
             } else {
@@ -333,6 +335,52 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<Map<String, Object>> list = new ArrayList<>();
         return PageDTO.of(list);
     }
+
+    /**
+     * @Method queryOutptDeptIncomeTableHead
+     * @Desrciption 门诊科室/医生收入统计
+     @params [inptVisitDTO]
+      * @Author chenjun
+     * @Date   2020-11-12 10:44
+     * @Return java.util.List<java.util.Map>
+     **/
+    @Override
+    public Map queryOutptDeptIncomeTableHead(InptVisitDTO inptVisitDTO) {
+        List<Map> listTableConfig = new ArrayList<>();
+        Map retMap = new HashMap();
+        List<OutptCostDTO> outptCostDTOList = patientCostLedgerDAO.queryOutptCostBfcGroup(inptVisitDTO);
+        if(ListUtils.isEmpty(outptCostDTOList)){
+            return retMap;
+        }
+
+        Map tableMap = null;
+        tableMap = new HashMap();
+        tableMap.put("id", SnowflakeUtils.getId());
+        tableMap.put("label", "开方科室");
+        tableMap.put("prop", "dept_name");
+        listTableConfig.add(tableMap);
+
+        tableMap = new HashMap();
+        tableMap.put("id", SnowflakeUtils.getId());
+        tableMap.put("label", "总金额");
+        tableMap.put("prop", "reality_price");
+        tableMap.put("showSummary", true);
+        tableMap.put("toFixed", "2");
+        listTableConfig.add(tableMap);
+        for (OutptCostDTO outptCostDTO : outptCostDTOList) {
+            tableMap = new HashMap();
+            tableMap.put("id", SnowflakeUtils.getId());
+            tableMap.put("label", outptCostDTO.getBfcName());
+            tableMap.put("prop", outptCostDTO.getBfcId() + "aa");
+            tableMap.put("showSummary", true);
+            tableMap.put("toFixed", "2");
+            listTableConfig.add(tableMap);
+        }
+        retMap.put("listTableConfig", listTableConfig);
+        return retMap;
+    }
+
+
     /**
      * @Method queryOutptDeptIncome
      * @Desrciption 门诊科室/医生收入统计
@@ -342,93 +390,44 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      * @Return java.util.List<java.util.Map>
      **/
     @Override
-    public Map queryOutptDeptIncome(InptVisitDTO inptVisitDTO) {
-        List<Map> list = new ArrayList<>();
-        List<Map> listTableConfig = new ArrayList<>();
-        Map retMap = new HashMap();
-        if("1".equals(inptVisitDTO.getType())){
-            List<OutptCostDTO> outptCostDTOList = patientCostLedgerDAO.queryOutptCostBfcGroup(inptVisitDTO);
-            if(ListUtils.isEmpty(outptCostDTOList)){
-                return retMap;
-            }
-            //动态拼接sql
-            StringBuffer sqlStr = new StringBuffer();
-            outptCostDTOList.stream()
-                    .filter(dto -> StringUtils.isNotEmpty(dto.getBfcId()) && StringUtils.isNotEmpty(dto.getBfcName()))
-                    .forEach(dto -> sqlStr.append("(select ifnull(sum(price),0) from outpt_cost where bfc_id = ")
-                            .append("'")
-                            .append(dto.getBfcId())
-                            .append("'")
-                            .append(" and dept_id = a.dept_id) as  ")
-                            .append(dto.getBfcName())
-                            .append(","));
-            String sqlStrTem = sqlStr.substring(0, sqlStr.length()-1);
-            inptVisitDTO.setSqlStr(sqlStrTem.toString());
-            list = patientCostLedgerDAO.queryOutptDeptIncome(inptVisitDTO);
-            //组装表头数据
-            if(ListUtils.isEmpty(list)){
-                return retMap;
-            }
-            Map map = list.get(0);
-            map.forEach((k, v) -> {
-                Map tableMap = new HashMap();
-                tableMap.put("id", SnowflakeUtils.getId());
-                tableMap.put("label", k);
-                tableMap.put("prop", k);
-                tableMap.put("showSummary", "true");
-
-                if(!"开方科室".equals(k)&&!"人次".equals(k)){
-                    tableMap.put("toFixed", "2");
-                }
-
-                listTableConfig.add(tableMap);
-            });
-            retMap.put("listTableConfig", listTableConfig);
-            retMap.put("list", list);
+    public PageDTO queryOutptDeptIncome(InptVisitDTO inptVisitDTO) {
+        List<Map<String ,Object>> list = new ArrayList<>();
+        List<OutptCostDTO> outptCostDTOList = patientCostLedgerDAO.queryOutptCostBfcGroup(inptVisitDTO);
+        if(ListUtils.isEmpty(outptCostDTOList)){
+            PageDTO.of(list);
         }
-        return retMap;
-    }
+        //动态拼接sql
+        StringBuffer caseSql = new StringBuffer();
+        StringBuffer sumSql = new StringBuffer();
+        outptCostDTOList.stream().forEach(dto -> caseSql.append("(case when bfc_id='"+ dto.getBfcId() +"' then reality_price else 0 end ) as '"+dto.getBfcId()+"aa' ,"));
+        outptCostDTOList.stream().forEach(dto -> sumSql.append("sum(c."+ dto.getBfcId() +"aa) as "+ dto.getBfcId() +"aa,"));
+        String caseStr = caseSql.toString() ;
+        String sumStr = sumSql.toString() ;
+        inptVisitDTO.setCaseSqlStr(caseStr.substring(0,caseStr.length()-1));
+        inptVisitDTO.setSumSqlStr(sumStr.substring(0,sumStr.length()-1));
 
 
-    public List<Map> getTbHead(InptVisitDTO inptVisitDTO) {
-        List<Map> listTableConfig = new ArrayList<>();
-        List<Map> list = new ArrayList<>();
-        if("1".equals(inptVisitDTO.getType())){
-            List<OutptCostDTO> outptCostDTOList = patientCostLedgerDAO.queryOutptCostBfcGroup(inptVisitDTO);
-            if (!ListUtils.isEmpty(outptCostDTOList)){
-                StringBuffer sqlStr = new StringBuffer();
-                outptCostDTOList.stream()
-                        .filter(dto -> StringUtils.isNotEmpty(dto.getBfcId()) && StringUtils.isNotEmpty(dto.getBfcName()))
-                        .forEach(dto -> sqlStr.append("(select ifnull(sum(price),0) from outpt_cost where bfc_id = ")
-                                .append("'")
-                                .append(dto.getBfcId())
-                                .append("'")
-                                .append(" and dept_id = a.dept_id) as  ")
-                                .append(dto.getBfcName())
-                                .append(","));
-                String sqlStrTem = sqlStr.substring(0, sqlStr.length()-1);
-                inptVisitDTO.setSqlStr(sqlStrTem.toString());
-                //动态拼接sql
-                list = patientCostLedgerDAO.queryOutptDeptIncome(inptVisitDTO);
-                if (!ListUtils.isEmpty(list)){
-                    Map map = list.get(0);
-                    map.forEach((k, v) -> {
-                        Map tableMap = new HashMap();
-                        tableMap.put("id", SnowflakeUtils.getId());
-                        tableMap.put("label", k);
-                        tableMap.put("prop", k);
-                        tableMap.put("showSummary", "true");
-
-                        if(!"开方科室".equals(k)&&!"人次".equals(k)){
-                            tableMap.put("toFixed", "2");
-                        }
-
-                        listTableConfig.add(tableMap);
-                    });
+        Integer pageNo = inptVisitDTO.getPageNo();
+        Integer pageSize =inptVisitDTO.getPageSize();
+        PageHelper.startPage(pageNo, pageSize);
+        list = patientCostLedgerDAO.queryOutptDeptIncome(inptVisitDTO);
+        if(ListUtils.isEmpty(list)){
+            PageDTO.of(list);
+        }
+        Map<String,BigDecimal> sumData = new HashMap<>();
+        for (Map<String ,Object> map :list){
+            for (String key :map.keySet()){
+                if("dept_id".equals(key) || "dept_name".equals(key)){
+                    continue;
                 }
+                String lable = key + "Sum" ;
+                if (!sumData.containsKey(lable)){
+                    sumData.put(lable,new BigDecimal(0));
+                }
+                sumData.put(lable,sumData.get(lable).add((BigDecimal) map.get(key)));
             }
         }
-        return listTableConfig;
+        return PageDTO.of(list,sumData);
     }
     /**
      * @Method queryInptMedication
@@ -1168,6 +1167,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "3" :
             case "7" :
+            case "10" :
+            case "11" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> doctorIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getDoctorId));
                 // 组装固定表头
@@ -1177,8 +1178,16 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     headItemMap3.put("label","开方医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
-                }else {
+                }else if ("7".equals(flag)){
                     headItemMap3.put("label","管床医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else if ("10".equals(flag)){
+                    headItemMap3.put("label","经治医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else {
+                    headItemMap3.put("label","主治医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
                 }
@@ -1722,6 +1731,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "3" :
             case "7" :
+            case "10" :
+            case "11" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> doctorIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getDoctorId));
                 // 组装固定表头
@@ -1731,8 +1742,16 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     headItemMap3.put("label","开方医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
-                }else {
+                }else if ("7".equals(flag)){
                     headItemMap3.put("label","管床医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else if ("10".equals(flag)){
+                    headItemMap3.put("label","经治医生");
+                    headItemMap3.put("prop","name");
+                    tableHeader.put("name",headItemMap3);
+                }else {
+                    headItemMap3.put("label","主治医生");
                     headItemMap3.put("prop","name");
                     tableHeader.put("name",headItemMap3);
                 }
@@ -2796,6 +2815,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         PageHelper.startPage(pageNo, pageSize);
         List<Map> list = patientCostLedgerDAO.queryCollectorInComeStaDetail(map);
         return PageDTO.of(list);
+    }
+    /**
+     * @Method queryOutMedicationGet
+     * @Desrciption 门诊用药统计
+     * @Param [map]
+     * @Author zhangguorui
+     * @Date   2021/7/23 15:57
+     * @Return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO) {
+        PageHelper.startPage(pharOutDistributeDTO.getPageNo(),pharOutDistributeDTO.getPageSize());
+        return PageDTO.of(patientCostLedgerDAO.queryOutMedicationGet(pharOutDistributeDTO));
     }
 
 }

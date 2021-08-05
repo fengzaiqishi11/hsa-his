@@ -573,116 +573,128 @@
 
     <!--库存效期查询-->
     <select id="queryValidityWarningPage" resultMap="StroStockMap">
-            select
-                a.id,
-                a.hosp_code,
-                a.biz_id,
-                a.location_no,
-                a.item_code,
-                a.item_id,
-                a.item_name,
-                a.prep_code,
-                ifnull( a.num, 0 ) num,
-                a.unit_code,
-                ifnull( a.buy_price_all, 0 ) buy_price_all,
-                ifnull( a.sell_price_all, 0 ) sell_price_all,
-                ifnull( a.split_num, 0 ) split_num,
-                a.split_unit_code,
-                ifnull( a.stock_max, 0 ) stock_max,
-                ifnull( a.stock_min, 0 ) stock_min,
-                ifnull( a.stock_occupy, 0 ) stock_occupy,
-                ifnull( a.split_price, 0 ) split_price,
-                b.spec AS spec,
-                b.split_ratio AS split_ratio,
-                b.price AS buyPrice,
-                b.price AS sellPrice,
-                b.CODE,
-                l.batch_no,
-                l.expiry_date,
-                ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
-            FROM
-                stro_stock a,
-                stro_stock_detail l,
-                base_drug b
-                where a.hosp_code = l.hosp_code
-                and a.item_code = l.item_code
-                and a.biz_id = l.biz_id
-                and a.item_id = l.item_id
-                and a.hosp_code = b.hosp_code
-                and a.item_id = b.id
-                and a.item_code = '1'
-                and a.hosp_code = #{hospCode}
-                <if test="itemCode != null and itemCode !=''">
-                    and a.item_code = #{itemCode}
-                </if>
-                <if test="warDate != null">
-                    and l.expiry_date &lt;= #{warDate}
-                </if>
-                <if test="itemName != null and itemName != ''">
-                    and (
-                    a.item_name like CONCAT('%',#{itemName},'%')
-                    or b.usual_pym like CONCAT('%',#{itemName},'%')
-                    or b.usual_wbm like CONCAT('%',#{itemName},'%')
-                    or b.good_pym like CONCAT('%',#{itemName},'%')
-                    or b.good_wbm like CONCAT('%',#{itemName},'%')
-                    )
-                </if>
+        (select
+        a.id,
+        a.hosp_code,
+        a.biz_id,
+        a.location_no,
+        a.item_code,
+        a.item_id,
+        a.item_name,
+        a.prep_code,
+        ifnull( a.num, 0 ) num,
+        a.unit_code,
+        ifnull( a.buy_price_all, 0 ) buy_price_all,
+        ifnull( a.sell_price_all, 0 ) sell_price_all,
+        ifnull( a.split_num, 0 ) split_num,
+        a.split_unit_code,
+        ifnull( a.stock_max, 0 ) stock_max,
+        ifnull( a.stock_min, 0 ) stock_min,
+        ifnull( a.stock_occupy, 0 ) stock_occupy,
+        ifnull( a.split_price, 0 ) split_price,
+        b.spec AS spec,
+        b.split_ratio AS split_ratio,
+        b.price AS buyPrice,
+        b.price AS sellPrice,
+        b.CODE,
+        l.batch_no,
+        l.expiry_date,
+        ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
+        FROM
+        stro_stock a,
+        stro_stock_detail l,
+        base_drug b
+        where a.hosp_code = l.hosp_code
+        and a.item_code = l.item_code
+        and a.biz_id = l.biz_id
+        and a.item_id = l.item_id
+        and a.hosp_code = b.hosp_code
+        and a.item_id = b.id
+        and a.item_code = '1'
+        and a.biz_id = #{bizId}
+        and a.hosp_code = #{hospCode}
+        and a.num > 0
+        <if test="itemCode != null and itemCode !=''">
+            and a.item_code = #{itemCode}
+        </if>
+        <if test="warDate != null">
+            and l.expiry_date &lt;= #{warDate}
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            a.item_name like CONCAT('%',#{itemName},'%')
+            or b.usual_pym like CONCAT('%',#{itemName},'%')
+            or b.usual_wbm like CONCAT('%',#{itemName},'%')
+            or b.good_pym like CONCAT('%',#{itemName},'%')
+            or b.good_wbm like CONCAT('%',#{itemName},'%')
+            )
+        </if>)
 
 
-                union all
+        union all
 
-                select
-                a.id,
-                a.hosp_code,
-                a.biz_id,
-                a.location_no,
-                a.item_code,
-                a.item_id,
-                a.item_name,
-                a.prep_code,
-                ifnull( a.num, 0 ) num,
-                a.unit_code,
-                ifnull( a.buy_price_all, 0 ) buy_price_all,
-                ifnull( a.sell_price_all, 0 ) sell_price_all,
-                ifnull( a.split_num, 0 ) split_num,
-                a.split_unit_code,
-                ifnull( a.stock_max, 0 ) stock_max,
-                ifnull( a.stock_min, 0 ) stock_min,
-                ifnull( a.stock_occupy, 0 ) stock_occupy,
-                ifnull( a.split_price, 0 ) split_price,
-                b.spec AS spec,
-                b.split_ratio AS split_ratio,
-                b.price AS buyPrice,
-                b.price AS sellPrice,
-                b.CODE,
-                l.batch_no,
-                l.expiry_date,
-                ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
-            FROM
-                stro_stock a,
-                stro_stock_detail l,
-                base_material b
-                where a.hosp_code = l.hosp_code
-                and a.item_code = l.item_code
-                and a.biz_id = l.biz_id
-                and a.item_id = l.item_id
-                and a.hosp_code = b.hosp_code
-                and a.item_id = b.id
-                and a.item_code = '2'
-                and a.hosp_code = #{hospCode}
-                <if test="itemCode != null and itemCode !=''">
-                    and a.item_code = #{itemCode}
-                </if>
-                <if test="warDate != null">
-                    and l.expiry_date &lt;= #{warDate}
-                </if>
-                <if test="itemName != null and itemName != ''">
-                    and (
-                    a.item_name like CONCAT('%',#{itemName},'%')
-                    or b.pym like CONCAT('%',#{itemName},'%')
-                    or b.wbm like CONCAT('%',#{itemName},'%')
-                    )
-                </if>
+        (select
+        a.id,
+        a.hosp_code,
+        a.biz_id,
+        a.location_no,
+        a.item_code,
+        a.item_id,
+        a.item_name,
+        a.prep_code,
+        ifnull( a.num, 0 ) num,
+        a.unit_code,
+        ifnull( a.buy_price_all, 0 ) buy_price_all,
+        ifnull( a.sell_price_all, 0 ) sell_price_all,
+        ifnull( a.split_num, 0 ) split_num,
+        a.split_unit_code,
+        ifnull( a.stock_max, 0 ) stock_max,
+        ifnull( a.stock_min, 0 ) stock_min,
+        ifnull( a.stock_occupy, 0 ) stock_occupy,
+        ifnull( a.split_price, 0 ) split_price,
+        b.spec AS spec,
+        b.split_ratio AS split_ratio,
+        b.price AS buyPrice,
+        b.price AS sellPrice,
+        b.CODE,
+        l.batch_no,
+        l.expiry_date,
+        ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
+        FROM
+        stro_stock a,
+        stro_stock_detail l,
+        base_material b
+        where a.hosp_code = l.hosp_code
+        and a.item_code = l.item_code
+        and a.biz_id = l.biz_id
+        and a.item_id = l.item_id
+        and a.hosp_code = b.hosp_code
+        and a.item_id = b.id
+        and a.item_code = '2'
+        and a.biz_id = #{bizId}
+        and a.hosp_code = #{hospCode}
+        and a.num > 0
+        <if test="itemCode != null and itemCode !=''">
+            and a.item_code = #{itemCode}
+        </if>
+        <if test="warDate != null">
+            and l.expiry_date &lt;= #{warDate}
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            a.item_name like CONCAT('%',#{itemName},'%')
+            or b.pym like CONCAT('%',#{itemName},'%')
+            or b.wbm like CONCAT('%',#{itemName},'%')
+            )
+        </if>)
+        <choose>
+            <when  test="isSort == 1">
+                order by expiry_date asc
+            </when>
+            <otherwise>
+                order by expiry_date desc
+            </otherwise>
+        </choose>
 
     </select>
 

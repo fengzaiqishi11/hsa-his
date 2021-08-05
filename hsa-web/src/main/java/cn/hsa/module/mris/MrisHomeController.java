@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.module.mris
@@ -322,5 +323,51 @@ public class MrisHomeController extends BaseController {
         map.put("crteId",sysUserDTO.getId());
         map.put("crteName",sysUserDTO.getName());
         return WrapperResponse.success(mrisHomeService_consumer.updateMrisFeesInfo(map));
+    }
+
+    /**
+     * @Menthod: inptMrisInfoDownload
+     * @Desrciption:
+     * @Param: 1. hospCode: 医院编码
+     * 2. data: 入参 code-科室编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-19 17:25
+     * @Return: List<LinkedHashMap<String,Object>>
+     **/
+    @PostMapping("/inptMrisInfoDownload")
+    public WrapperResponse<List<LinkedHashMap<String,Object>>> inptMrisInfoDownload(HttpServletRequest req, HttpServletResponse res,@RequestBody Map map) throws Exception {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map param =new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("statusCode",map.get("statusCode"));
+        param.put("keyword",map.get("keyword"));
+        param.put("startTime",map.get("startTime"));
+        param.put("endTime",map.get("endTime"));
+        param.put("hospName",sysUserDTO.getHospName());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
+         return mrisHomeService_consumer.importMrisInfo(param);
+    }
+    /**
+     * @Menthod: getTableConfig
+     * @Desrciption: 获取导出表头
+     * @Param: 1. hospCode: 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-30 10:24
+     * @Return: Map
+     **/
+    @GetMapping("/getTableConfig")
+    public WrapperResponse<Map> getTableConfig(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map param =new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
+        return mrisHomeService_consumer.getTableConfig(param);
     }
 }

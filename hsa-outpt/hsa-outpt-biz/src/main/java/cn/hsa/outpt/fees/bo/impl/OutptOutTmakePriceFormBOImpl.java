@@ -227,6 +227,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setState(Constants.ZTBZ.BCH);
             Map selectInsureMap = new HashMap();
             selectInsureMap.put("hospCode",hospCode);
+            insureIndividualSettleDO.setSettleState("1");
             selectInsureMap.put("insureIndividualSettleDO",insureIndividualSettleDO);
             outptVisitDAO.updateInsureSettleInfo(insureIndividualSettleDO);
             // insureIndividualSettleService_consumer.updateByPrimaryKey(selectInsureMap);
@@ -253,6 +254,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setPortionPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getPortionPrice()));
             insureIndividualSettleDO.setCrteId(outptVisitDTO.getCrteId());
             insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());
+            insureIndividualSettleDO.setSettleState("1");
             insureIndividualSettleDO.setCrteTime(outptVisitDTO.getCrteTime());
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);
@@ -260,7 +262,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 由于分布式事务不回滚问题，直接写sql处理
             // insureIndividualSettleService_consumer.insert(insertMap);
-            outptVisitDAO.insurtInsureSettleInfo(insureIndividualSettleDO);
+            outptVisitDAO.insertInsureSettleInfo(insureIndividualSettleDO);
             /**
              * 查询医院医保配置（直接走医保还是走统一支付平台）
              * 门诊取消结算前（也就是全退）需要删除his医保就诊费用表
@@ -275,6 +277,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("crteName",outptVisitDTO.getCrteName());
             map.put("hospCode",hospCode);  // 医院编码
             map.put("visitId",visitId); //就诊id
+            map.put("id",visitId); //就诊id
             map.put("oldOutptSettleDTO",oldOutptSettleDTO);
             SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
             if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
@@ -283,15 +286,38 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 map.put("insureSettleId",insureSettleId);
                 map.put("personalPrice",personalPrice);
                 Map<String,Object> resultMap = insureUnifiedPayOutptService_consumer.UP_2208(map).getData();
-                if(!MapUtils.isEmpty(resultMap)){
-                    insureIndividualCostService_consumer.deleteOutptInsureCost(map);
-                }
+                System.out.println("==========================resultMap:" + resultMap.toString());
+                Map<String,Object> cancelReturnData =  MapUtils.get(resultMap,"output");
+                Map<String,Object> setlInfoMap = MapUtils.get(cancelReturnData,"setlinfo");
+                Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+                    if(data == true){
+                        MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
+                        insureIndividualCostService_consumer.deleteOutptInsureCost(map);
+                    }
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
-                individualSettleDTO.setOinfno(MapUtils.get(resultMap,"msgId"));
-                individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"funtionCode"));
+                individualSettleDTO.setOinfno(MapUtils.get(resultMap,"funtionCode"));
+                individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"msgId"));
+                individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
+                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
+                    individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
+                }else{
+                    individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrOptins());
+                }
+                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
+                    individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
+                }else {
+                    individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrWay());
+                }
+                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_type"))){
+                    individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
+                }
+                else {
+                    individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrType());
+                }
                 individualSettleDTO.setHospCode(hospCode);
                 individualSettleDTO.setVisitId(visitId);
-                individualSettleDTO.setState(Constants.SF.F);
+                individualSettleDTO.setState("2");
+                individualSettleDTO.setSettleId(redSettleId);
                 individualSettleDTO.setSettleState("1");
                 outptVisitDAO.updateInsureSettle(individualSettleDTO);
 //                insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
@@ -607,7 +633,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
@@ -1045,7 +1071,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 部分退且已经发药
                         if (!isAllOut) {

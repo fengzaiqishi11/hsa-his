@@ -1499,8 +1499,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureItemMatchDTOList.add(insureItemMatchDTO);
                 }
             }
-        } else {
-            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity()));
+        }
+        else {
+            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (k1, k2) -> k1));
             InsureItemMatchDTO insureItemMatchDTO = null;
             for (BaseItemDTO baseItemDTO : baseItemDTOList) {
                 if (!collect.isEmpty() && collect.containsKey(baseItemDTO.getNationCode()) && !StringUtils.isEmpty(baseItemDTO.getNationCode())) {
@@ -2594,26 +2595,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCheckPrice(null);
                 // 医保目录标志（0.甲、1.乙、2.全自费）
                 itemDTO.setDirectory(null);
-
-                // 生效日期
-                String strStart = MapUtils.get(item, "begndate");
-                if (!StringUtils.isEmpty(strStart) && !"null".equals(strStart)) {
-                    Date date = new Date(strStart);
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                    itemDTO.setTakeDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                } else {
-                    itemDTO.setTakeDate(null);
-                }
-                String strEnd = MapUtils.get(item, "begndate");
-                //失效日期
-                if (!StringUtils.isEmpty(strEnd) && !"null".equals(strEnd)) {
-                    Date date = new Date(strEnd);
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                    itemDTO.setTakeDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                } else {
-                    itemDTO.setLoseDate(null);
-                }
-
+                itemDTO.setTakeDate(null);
+                itemDTO.setLoseDate(null);
                 // 拼音码
                 itemDTO.setPym(null);
                 // 五笔码
@@ -2703,8 +2686,16 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCheckPrice(null);
                 // 医保目录标志（0.甲、1.乙、2.全自费）
                 itemDTO.setDirectory(null);
-                itemDTO.setTakeDate(DateUtils.parse(MapUtils.get(item,"begndate"),DateUtils.Y_M_D));
-                itemDTO.setLoseDate(DateUtils.parse(MapUtils.get(item,"enddate"),DateUtils.Y_M_D));
+                if(StringUtils.isEmpty(MapUtils.get(item,"begndate"))){
+                    itemDTO.setTakeDate(null);
+                }else{
+                    itemDTO.setTakeDate(DateUtils.parse(MapUtils.get(item,"begndate"),DateUtils.Y_M_D));
+                }
+                if(StringUtils.isEmpty(MapUtils.get(item,"enddate"))){
+                    itemDTO.setLoseDate(null);
+                }else{
+                    itemDTO.setLoseDate(DateUtils.parse(MapUtils.get(item,"enddate"),DateUtils.Y_M_D));
+                }
                 // 拼音码
                 itemDTO.setPym(null);
                 // 五笔码
@@ -2789,23 +2780,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setDirectory(MapUtils.get(item, "nat_ins_paypolicy"));
                 // 生效日期
                 // 生效日期
-                String strStart = MapUtils.get(item, "begndate");
-                if (!StringUtils.isEmpty(strStart) && !"null".equals(strStart)) {
-                    Date date = new Date(strStart);
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                    itemDTO.setTakeDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                } else {
-                    itemDTO.setTakeDate(null);
-                }
-                String strEnd = MapUtils.get(item, "begndate");
-                //失效日期
-                if (!StringUtils.isEmpty(strEnd) && !"null".equals(strEnd)) {
-                    Date date = new Date(strEnd);
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                    itemDTO.setLoseDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                } else {
-                    itemDTO.setLoseDate(null);
-                }
+                itemDTO.setTakeDate(null);
+                itemDTO.setLoseDate(null);
                 // 拼音码
                 itemDTO.setPym(null);
                 // 五笔码
@@ -2821,11 +2797,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCompoundLogo(MapUtils.get(item, "compound_logo"));
                 itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
                 // 如果第一次根据版本号下载返回回来的数据的大小  大于默认数量，则继续使用当前版本号
-                if(num > (recordCounts / size)){
-                    itemDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
-                    itemDTO.setVerName(ver); // 版本号
-                }
+                itemDTO.setVerName(MapUtils.get(item, "ver_name"));
                 itemDTO.setDownLoadType(listType);
                 insureItemDTOList.add(itemDTO);
             }
@@ -2891,45 +2863,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCheckPrice(null);
                 // 医保目录标志（0.甲、1.乙、2.全自费）
                 itemDTO.setDirectory("");
-                map.put("code", "HOSP_APPR_FLAG");
-                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
-                if (sysParameterDTO != null && !StringUtils.isEmpty(sysParameterDTO.getValue())) {
-                    String value = sysParameterDTO.getValue();
-                    Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
-                    if (stringObjectMap.containsKey(insureRegCode)) {
-                        // 生效日期
-                        String strStart = MapUtils.get(item, "begndate");
-                        if (!StringUtils.isEmpty(strStart) && !"null".equals(strStart)) {
-                            Date date = new Date(strStart);
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                            itemDTO.setTakeDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                        } else {
-                            itemDTO.setTakeDate(null);
-                        }
-                        String strEnd = MapUtils.get(item, "begndate");
-                        //失效日期
-                        if (!StringUtils.isEmpty(strEnd) && !"null".equals(strEnd)) {
-                            Date date = new Date(strEnd);
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                            itemDTO.setLoseDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-                        } else {
-                            itemDTO.setLoseDate(null);
-                        }
-                    } else {
-                        // 生效日期
-                        if (!StringUtils.isEmpty(MapUtils.get(item, "begndate")) && !"null".equals(MapUtils.get(item, "begndate"))) {
-                            itemDTO.setTakeDate(DateUtils.parse(MapUtils.get(item, "begndate"), DateUtils.Y_M_DH_M_S));
-                        } else {
-                            itemDTO.setTakeDate(null);
-                        }
-                        //失效日期
-                        if (!StringUtils.isEmpty(MapUtils.get(item, "enddate")) && !"null".equals(MapUtils.get(item, "enddate"))) {
-                            itemDTO.setLoseDate(DateUtils.parse(MapUtils.get(item, "enddate"), DateUtils.Y_M_DH_M_S));
-                        } else {
-                            itemDTO.setLoseDate(null);
-                        }
-                    }
-                }
+                itemDTO.setTakeDate(null);
+                itemDTO.setLoseDate(null);
                 // 拼音码
                 itemDTO.setPym("");
                 // 五笔码
@@ -2945,11 +2880,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCompoundLogo(MapUtils.get(item, "compound_logo")); // 复方标志
                 itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
                 // 如果第一次根据版本号下载返回回来的数据的大小  大于默认数量，则继续使用当前版本号
-                if(num > (recordCounts / size)){
-                    itemDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
-                    itemDTO.setVerName(ver); // 版本号
-                }
+                itemDTO.setVerName(MapUtils.get(item, "ver_name"));
                 itemDTO.setDownLoadType(listType);
                 insureItemDTOList.add(itemDTO);
             }
@@ -3003,7 +2934,12 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             //医保中心项目编码
             itemDTO.setItemCode(MapUtils.get(item, "med_list_codg"));
             // 医保中心项目名称
-            itemDTO.setItemName(MapUtils.get(item, "drug_prodname"));
+            if(StringUtils.isEmpty(MapUtils.get(item, "drug_prodname")) || "无".equals(MapUtils.get(item, "drug_prodname"))||
+                    "null".equals(MapUtils.get(item, "drug_prodname"))){
+                itemDTO.setItemName(MapUtils.get(item, "drug_genname"));
+            }else{
+                itemDTO.setItemName(MapUtils.get(item, "drug_prodname"));
+            }
             // 医保中心项目规格
             itemDTO.setItemSpec(MapUtils.get(item, "drug_spec"));
             // 医保中心项目剂型
@@ -3024,22 +2960,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             // 生效日期
             // 生效日期
             String strStart = MapUtils.get(item, "begndate");
-            if (!StringUtils.isEmpty(strStart) && !"null".equals(strStart)) {
-                Date date = new Date(strStart);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                itemDTO.setTakeDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-            } else {
-                itemDTO.setTakeDate(null);
-            }
+            itemDTO.setTakeDate(null);
             String strEnd = MapUtils.get(item, "begndate");
             //失效日期
-            if (!StringUtils.isEmpty(strEnd) && !"null".equals(strEnd)) {
-                Date date = new Date(strEnd);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
-                itemDTO.setLoseDate(DateUtils.parse(simpleDateFormat.format(date), DateUtils.Y_M_DH_M_S));
-            } else {
-                itemDTO.setLoseDate(null);
-            }
+            itemDTO.setLoseDate(null);
             // 拼音码
             itemDTO.setPym(MapUtils.get(item, "pinyin"));
             // 五笔码

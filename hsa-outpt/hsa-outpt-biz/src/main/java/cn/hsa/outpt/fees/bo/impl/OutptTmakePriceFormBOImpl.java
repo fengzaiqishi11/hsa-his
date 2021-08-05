@@ -227,9 +227,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     public WrapperResponse queryOutptCostList(Map param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String visitId = (String) param.get("visitId");//患者id
+        String isPhys = (String) param.get("isPhys") == null ? "" : (String) param.get("isPhys");//是否为体检信息
         String preferentialTypeId = (String) param.get("preferentialTypeId");//优惠类型id
         //获取费用数据
-        param.put("sourceCode", Constants.FYLYFS.ZJHJSF);//划价收费费用
+        //为了区分查询体检和其他收费数据,添加个前端传递参数isPhys
+        param.put("sourceCode", isPhys.equals("1") ? Constants.FYLYFS.QTFY : Constants.FYLYFS.ZJHJSF);//划价收费费用
         List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryDrugMaterialByVisitId(param);
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setHospCode(hospCode);
@@ -328,6 +330,36 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             // 官红强 2021年1月26日20:50:53 试算时不再计算优惠金额，直接取费用明细（处方病人直接取费用，直接划价收费病人还是需要计算优惠）
             List<OutptCostDTO> outptCostDTOList = this.customVerifyCouponPrice(outptVisitDTO, 0);
+
+            // =======================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    start ===============
+            List<String> deleteCost = new ArrayList<>();  // 需要删除的非处方费用
+            List<OutptCostDTO> tempoutptCostDTOList = new ArrayList<>();
+            tempoutptCostDTOList.addAll(outptCostDTOList);  // 复制处方费用
+            List<OutptCostDTO> temp = outptVisitDTO.getOutptCostDTOList(); // 结算页面传递的需要收费的费用
+            // 得到需要删除的费用
+            for (int i = tempoutptCostDTOList.size()-1; i>=0; i--) {
+                if ("1".equals(tempoutptCostDTOList.get(i).getSourceCode())) {
+                    tempoutptCostDTOList.remove(i);
+                    continue;
+                }
+                for (int j = 0; j < temp.size(); j++) {
+                    if (tempoutptCostDTOList.get(i).getId().equals(temp.get(j).getId())) {
+                        tempoutptCostDTOList.remove(i);
+                        break;
+                    }
+                }
+            }
+            // 获取需要删除费用的id集合
+            if (!ListUtils.isEmpty(tempoutptCostDTOList)) {
+                for (OutptCostDTO dec : tempoutptCostDTOList) {
+                    deleteCost.add(dec.getId());
+                }
+                String[] ids = deleteCost.toArray(new String[deleteCost.size()]);
+                outptCostDAO.deleteFCFCostByIds(ids, outptVisitDTO.getHospCode());
+                outptCostDTOList.removeAll(tempoutptCostDTOList);
+            }
+            // ====================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    end ===============
+
 
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
                 return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试", null);
@@ -1076,7 +1108,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             pharOutReceiveDO.setTotalPrice((BigDecimal) pharOutReceiveMap.get(pharId).get("totalPrice"));//总金额
             Boolean isDist = Constants.SF.F.equals(outptCostDTOList.get(0).getIsDist());//判断是否已发药
             pharOutReceiveDO.setStatusCode(isDist ? Constants.LYZT.QL : Constants.LYZT.FY);//发药状态
-            pharOutReceiveDO.setDeptId(depId);//申请科室
+            pharOutReceiveDO.setDeptId((String) pharOutReceiveMap.get(pharId).get("sourceDeptId"));//申请科室
             pharOutReceiveDO.setCrteId(userId);//创建人
             pharOutReceiveDO.setCrteName(userName);//创建人姓名
             pharOutReceiveDO.setCrteTime(new Date());//创建时间
@@ -1196,6 +1228,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                             Map<String, Object> receiveMap = new HashMap<String, Object>();
                             receiveMap.put("id", SnowflakeUtils.getId());//领药申请单id
                             receiveMap.put("totalPrice", outptCostDTO.getRealityPrice());//总金额
+                            receiveMap.put("sourceDeptId", outptCostDTO.getSourceDeptId());//申请科室ID
                             pharOutReceiveMap.put(outptCostDTO.getPharId(), receiveMap);
                         } else {
                             BigDecimal price = (BigDecimal) pharOutReceiveMap.get(outptCostDTO.getPharId()).get("totalPrice");
@@ -3209,6 +3242,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 throw new AppException("未查找到医保个人信息，请做医保登记。");
             }
         }
+
         insureVisitParam.put("id",visitId);
         insureVisitParam.put("hospCode",hospCode);
         insureVisitParam.put("insureSettleId","1");  //作为sql条件判断 删除医保结算id不为空的数据
@@ -3226,6 +3260,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     /**
      * @param outptVisitDTO
      * @Method checkSettleMoney
+     * 费用做判断验证之前，需要判断是否已经做了医保登记，是否已经医保结算，一个医保登记号，只能有一笔正常的结算信息
      * @Desrciption 门诊预结算之前，需要判断his产生的费用，是否和上传到医保的费用相等。
      *  feeMap：包含医保匹配的费用集数据，以及包含匹配费用的总和
      *  sumRealityPrice：表示本次匹配费用且未传输的总金额
@@ -3255,6 +3290,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          */
         insureIndividualCostService_consumer.deleteOutptInsureCost(map);
         Map<String, Object> feeMap = commonInsureCost(map);
+        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+        individualSettleDTO.setHospCode(hospCode);
+        individualSettleDTO.setVisitId(visitId);
+        individualSettleDTO.setState(Constants.SF.S);
+        individualSettleDTO.setSettleState(Constants.SF.S);
+        individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
+        if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){
+            throw new AppException("一次门诊医保登记,只能有一笔正常的结算记录");
+        }
         List<Map<String,Object>> insureCostList = MapUtils.get(feeMap,"insureCostList");
         List<OutptCostDTO> outptCostDTOList = outptVisitDTO.getOutptCostDTOList();
         if(ListUtils.isEmpty(outptCostDTOList)){

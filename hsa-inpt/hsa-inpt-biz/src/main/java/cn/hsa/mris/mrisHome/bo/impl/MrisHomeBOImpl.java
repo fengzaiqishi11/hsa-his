@@ -85,7 +85,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         // 查询
         List<InptVisitDTO> patientInfoList = mrisHomeDAO.queryOutHospPatientPage(inptVisitDTO);
-         return PageDTO.of(patientInfoList);
+        return PageDTO.of(patientInfoList);
     }
 
     /**

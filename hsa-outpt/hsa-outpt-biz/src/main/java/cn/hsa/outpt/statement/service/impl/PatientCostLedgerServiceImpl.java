@@ -173,10 +173,24 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
    **/
   @Override
-  public WrapperResponse<Map> queryOutptDeptIncome(Map paraMap) {
+  public WrapperResponse<Map> queryOutptDeptIncomeTableHead(Map paraMap) {
     InptVisitDTO inptVisitDTO = MapUtils.get(paraMap, "inptVisitDTO");
-    Map map = patientCostLedgerBO.queryOutptDeptIncome(inptVisitDTO);
+    Map map = patientCostLedgerBO.queryOutptDeptIncomeTableHead(inptVisitDTO);
     return WrapperResponse.success(map);
+  }
+  /**
+   * @Method queryOutptDeptIncome
+   * @Desrciption 门诊科室/医生收入统计
+   @params [paraMap]
+    * @Author chenjun
+   * @Date   2020-11-12 10:15
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryOutptDeptIncome(Map paraMap) {
+    InptVisitDTO inptVisitDTO = MapUtils.get(paraMap, "inptVisitDTO");
+    PageDTO pageDTO = patientCostLedgerBO.queryOutptDeptIncome(inptVisitDTO);
+    return WrapperResponse.success(pageDTO);
   }
 
   /**
@@ -418,6 +432,19 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
   @Override
   public WrapperResponse<PageDTO> queryTollCollectorIncomeStatistics(Map map) {
     return WrapperResponse.success(patientCostLedgerBO.queryTollCollectorIncomeStatistics(map));
+  }
+
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [map]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:56
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @Override
+  public WrapperResponse<PageDTO> queryOutMedicationGet(Map map) {
+    return WrapperResponse.success(patientCostLedgerBO.queryOutMedicationGet(MapUtils.get(map,"pharOutDistributeDTO")));
   }
 
 }

@@ -156,7 +156,7 @@ public class InsureSetlInfoDO implements Serializable {
     /**
      * 新生儿入院类型
      */
-    private BigDecimal nwbAdmType;
+    private String nwbAdmType;
     /**
      * 新生儿出生体重
      */
@@ -227,6 +227,8 @@ public class InsureSetlInfoDO implements Serializable {
      * 中医诊断代码
      */
     private String tcmDiseCode;
+
+    private String inSituationName; // 入院病情
     /**
      * 诊断代码计数
      */
@@ -316,6 +318,14 @@ public class InsureSetlInfoDO implements Serializable {
      */
     private String chfpdrCode;
     /**
+     * 责任护士代码
+     */
+    private String zrNurseName;
+    /**
+     * 责任护士代名称
+     */
+    private String zrNurseCode;
+    /**
      * 结算开始日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
@@ -383,6 +393,6 @@ public class InsureSetlInfoDO implements Serializable {
 
     private String settleNo;
 
-    
+
 
 }

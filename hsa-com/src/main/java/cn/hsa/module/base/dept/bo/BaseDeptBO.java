@@ -117,6 +117,7 @@ public interface BaseDeptBO {
      * @Return baseDeptDTO 科室维护信息数据传输对象
      **/
     List<BaseDeptDTO> getDeptTypeCode(BaseDeptDTO baseDeptDTO);
+    List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO);
 
     /**
     * @Method getDeptInfoByLoginDeptId

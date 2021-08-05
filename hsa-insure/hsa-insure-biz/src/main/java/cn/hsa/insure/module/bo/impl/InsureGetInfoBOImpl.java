@@ -3,16 +3,16 @@ package cn.hsa.insure.module.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.bo.InsureGetInfoBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.HttpConnectUtil;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -36,6 +35,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
+
+    @Resource
+    private InsureIndividualCostDAO insureIndividualCostDAO;
+
+    @Resource
+    private InsureUnifiedBaseBOImpl insureUnifiedBaseBOImpl;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -54,9 +59,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Map insertSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO) {
         String aaa = insureGetInfoDAO.getSetlInfoLocal(insureSettleInfoDTO);
-        if (StringUtils.isNotEmpty(aaa)) {
-            throw new AppException("该结算单已经上传");
-        }
+        /*if (StringUtils.isEmpty(insureSettleInfoDTO.getUpload())) {
+            if (StringUtils.isNotEmpty(aaa)) {
+                throw new AppException("该结算单已经上传");
+            }
+        }*/
         DecimalFormat df = new DecimalFormat("0.00");
         // 获取医疗机构信息
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
@@ -67,6 +74,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map> payInfoListMap = new ArrayList<>();
         List<Map> opspdiseinfoListMap = new ArrayList<>();
         List<Map> diseinfoListMap = new ArrayList<>();
+        List<Map> diseinfoListMapIsNotMain = new ArrayList<>();
+        Map diseinfoMap = new HashMap();
         List<Map> iteminfoListMap = new ArrayList<>();
         List<Map> oprninfoListMap = new ArrayList<>();
         List<Map> icuinfoListMap = new ArrayList<>();
@@ -77,10 +86,113 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         } else if(insureSettleInfoDTO.getIsHospital().equals("0")){
             settleInfoDTO = insureGetInfoDAO.getOutSetlInfo(insureSettleInfoDTO);
         }
-        List<InsureIndividualFundDTO> payinfoList = insureGetInfoDAO.queryPayinfo(insureSettleInfoDTO);
+
         List<OpspdiseInfoDTO> opspdiseinfoList = insureGetInfoDAO.queryOpspdiseinfo(insureSettleInfoDTO);
         List<DiseInfoDTO> diseinfoList = insureGetInfoDAO.queryDiseinfo(insureSettleInfoDTO);
-        List<ItemInfoDTO> iteminfoList = insureGetInfoDAO.queryIteminfo(insureSettleInfoDTO);
+        List<Map<String, Object>> feeDetailMapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureSettleId",insureSettleInfoDTO.getInsureSettleId());
+        map.put("visitId",insureSettleInfoDTO.getVisitId());
+        map.put("hospCode",insureSettleInfoDTO.getHospCode());
+        if("1".equals(insureSettleInfoDTO.getIsHospital())){
+            feeDetailMapList = insureGetInfoDAO.selectIsSetlleFee(map);
+        }else{
+            Map<String, Object> stringObjectMap = insureUnifiedBaseBOImpl.queryFeeDetailInfo(map);
+            feeDetailMapList = MapUtils.get(stringObjectMap, "outptMap");
+        }
+        if (!ListUtils.isEmpty(feeDetailMapList)) {
+            Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
+            Map<String, Object> pMap = null;
+            for (String key : groupMap.keySet()) {
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00);//总费用
+                BigDecimal fulamtOwnpayAmt = new BigDecimal(0.00);//全自付
+                /*BigDecimal preselfpayAmt = new BigDecimal(0.00);*/
+                BigDecimal claaSumfee = new BigDecimal(0.00);//甲类
+                BigDecimal clabAmt = new BigDecimal(0.00);//乙类
+                BigDecimal othAmt = new BigDecimal(0.00);//其他
+                BigDecimal clabAmtSum = new BigDecimal(0.00);//全自付金额
+                BigDecimal fqzfjs = new BigDecimal(0.00);//非全自付金额
+                BigDecimal clabAmtProp = new BigDecimal(0.0000);//全自付比例
+                BigDecimal feeSumamt = new BigDecimal(0.00);//费用总额
+                BigDecimal x = new BigDecimal(1.0000);//
+                DecimalFormat df1 = new DecimalFormat("0.00");
+                String medChrgitm =null;
+                System.out.println(key + "=====" + groupMap.get(key));
+                Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+                if (iterator.hasNext()) {
+                    pMap = new HashMap<>();
+                    List<Map<String, Object>> listMap1 = groupMap.get(key);
+                    for (Map<String, Object> item : listMap1) {
+                        feeSumamt = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString())));//费用总额
+                        clabAmtSum = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString())));//全自付金额
+                        if(StringUtils.isNotEmpty(MapUtils.get(item, "selfpay_prop"))){
+                            clabAmtProp = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "selfpay_prop").toString())));//全自付比例
+                        }
+                        if (("01").equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            claaSumfee = BigDecimalUtils.add(claaSumfee, feeSumamt);
+                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(clabAmtSum.toString()))));
+                        } else if (("02").equals(MapUtils.get(item, "chrgitm_lv"))){
+                            fqzfjs = BigDecimalUtils.multiply(feeSumamt,BigDecimalUtils.subtract(x,clabAmtProp));//非全自付金额
+                            clabAmt = BigDecimalUtils.add(clabAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(fqzfjs.toString()))));
+                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(clabAmtSum.toString()))));
+                            othAmt = BigDecimalUtils.add(othAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert((BigDecimalUtils.subtract(feeSumamt,fqzfjs)).toString()))));
+                        }else{
+                            othAmt = BigDecimalUtils.add(othAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert((BigDecimalUtils.subtract(feeSumamt,clabAmtSum)).toString()))));
+                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(clabAmtSum.toString()))));
+                        }
+                        if (MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
+                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(MapUtils.get(item, "det_item_fee_sumamt"), 2));
+                        } else {
+                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        }
+                        medChrgitm = MapUtils.get(item, "med_chrgitm_type");
+                    }
+                    pMap.put("amt", sumDetItemFeeSumamt);
+                    pMap.put("fulamt_ownpay_amt", fulamtOwnpayAmt);
+                    pMap.put("claa_sumfee", claaSumfee);
+                    pMap.put("clab_amt", clabAmt);
+                    pMap.put("oth_amt", othAmt);
+                    pMap.put("med_chrgitm", medChrgitm);
+                    pMap.put("medChrgitmType", key);
+                    iteminfoListMap.add(pMap);
+                }
+            }
+        }
+
+        // 基金支付信息
+        List<Map<String, Object>> setldetailList = new ArrayList<>();
+        List<InsureIndividualFundDTO> payinfoList = insureGetInfoDAO.queryPayinfo(insureSettleInfoDTO);
+        Map<String, Object> stringObjectMap2 = insureUnifiedBaseBOImpl.querySettleDeInfo(map);
+        setldetailList = MapUtils.get(stringObjectMap2, "setldetail");
+        Map<String, Object> setlinfoMap = MapUtils.get(stringObjectMap2, "setlinfo");
+        if (!ListUtils.isEmpty(setldetailList)) {
+            for(Map<String, Object> map1 : setldetailList){
+                Map payInfo = new HashMap();
+                payInfo.put("fund_pay_type",map1.get("fund_pay_type"));
+                payInfo.put("fund_payamt",map1.get("fund_payamt"));
+                payInfoListMap.add(payInfo);
+            }
+        }
+
+        /*if (payinfoList.size() > 0) {
+            for (InsureIndividualFundDTO individualFundDTO : payinfoList){
+                Map payInfo = new HashMap();
+                if (StringUtils.isNotEmpty(individualFundDTO.getFundPayType())) {
+                    payInfo.put("fund_pay_type",individualFundDTO.getFundPayType());
+                    payInfo.put("fund_payamt",individualFundDTO.getFundPayamt());
+                } else {
+                    payInfo.put("fund_pay_type","310100");
+                    payInfo.put("fund_payamt","0.00");
+                }
+                payInfoListMap.add(payInfo);
+            }
+        } else {
+            Map payInfo = new HashMap();
+            payInfo.put("fund_pay_type","310100");
+            payInfo.put("fund_payamt","0.00");
+            payInfoListMap.add(payInfo);
+        }*/
+        //List<ItemInfoDTO> iteminfoList = insureGetInfoDAO.queryIteminfo(insureSettleInfoDTO);
         List<OprninfoDTO> oprninfoList = insureGetInfoDAO.queryOprninfo(insureSettleInfoDTO);
         List<IcuInfoDTO> icuinfoList = insureGetInfoDAO.queryIcuinfo(insureSettleInfoDTO);
 
@@ -91,7 +203,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             insureSettleInfoDTO1.setId(SnowflakeUtils.getId());
             insureSettleInfoDTO1.setHospCode(settleInfoDTO.getHospCode());
             insureSettleInfoDTO1.setVisitId(settleInfoDTO.getVisitId());
-            insureSettleInfoDTO1.setSettleId(settleInfoDTO.getSettleId());
+            insureSettleInfoDTO1.setSettleId(settleInfoDTO.getInsureSettleId());
             insureSettleInfoDTO1.setCrteId(insureSettleInfoDTO.getCrteId());
             insureSettleInfoDTO1.setCrteName(insureSettleInfoDTO.getCrteName());
             insureSettleInfoDTO1.setCrteTime(DateUtils.getNow());
@@ -99,6 +211,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("psn_no",settleInfoDTO.getAac001()); // 就诊ID
             setlinfo.put("setl_id",settleInfoDTO.getInsureSettleId()); // 结算ID
             setlinfo.put("hi_no",settleInfoDTO.getAac001()); //医保编号
+            setlinfo.put("dcla_time",settleInfoDTO.getDclaTime()); //结算清单申报时间
+            setlinfo.put("settleNo",settleInfoDTO.getSettleNo());// 清单流水号
+            setlinfo.put("hi_setl_lv",settleInfoDTO.getHiSetlLv());//医保结算等级
             insureSettleInfoDTO1.setHiNo(settleInfoDTO.getAac001());
             insureSettleInfoDTO1.setFixmedinsName(insureSettleInfoDTO.getHospName());
             setlinfo.put("fixmedins_name",insureSettleInfoDTO.getHospName()); // 定点医药机构名称
@@ -129,50 +244,187 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("certno",settleInfoDTO.getCertNo()); // 证件号码
 //            insureSettleInfoDTO1.setPrfs(settleInfoDTO.getOccupationCode());
 //            setlinfo.put("prfs",settleInfoDTO.getOccupationCode()); // 职业
-            insureSettleInfoDTO1.setPrfs("1");
-            setlinfo.put("prfs","1"); // 职业
+            if(StringUtils.isNotEmpty(settleInfoDTO.getOccupationCode())){
+                insureSettleInfoDTO1.setPrfs(settleInfoDTO.getOccupationCode());
+                setlinfo.put("prfs",settleInfoDTO.getOccupationCode()); // 职业
+            } else {
+                insureSettleInfoDTO1.setPrfs("1");
+                setlinfo.put("prfs","1"); // 职业
+            }
             if(StringUtils.isNotEmpty(settleInfoDTO.getAka130())){
                 insureSettleInfoDTO1.setHiType(settleInfoDTO.getAka130());
                 setlinfo.put("hi_type",settleInfoDTO.getAka130()); // 医保类型
             } else {
                 insureSettleInfoDTO1.setHiType("1");
-                setlinfo.put("hi_type","1"); // 医保类型
+                setlinfo.put("hi_type","1"); // 医保类型0
             }
-            insureSettleInfoDTO1.setInsulic(settleInfoDTO.getVisitId());
-            setlinfo.put("insuplc",settleInfoDTO.getInsuplcAdmdvs()); // 参保地 *******
-            insureSettleInfoDTO1.setInsulic(settleInfoDTO.getInsuplcAdmdvs());
-            insureSettleInfoDTO1.setIptMedType(settleInfoDTO.getAka130());
+            if(StringUtils.isNotEmpty(settleInfoDTO.getAddress())){
+                insureSettleInfoDTO1.setHiType(settleInfoDTO.getAddress());
+                setlinfo.put("curr_addr",settleInfoDTO.getAddress()); // 现住址
+            } else {
+                insureSettleInfoDTO1.setHiType("中国");
+                setlinfo.put("curr_addr","中国"); // 现住址
+            }
+            if(StringUtils.isNotEmpty(settleInfoDTO.getInsuplcAdmdvs())) {
+                setlinfo.put("insuplc", settleInfoDTO.getInsuplcAdmdvs()); // 参保地 *******
+                insureSettleInfoDTO1.setInsulic(settleInfoDTO.getInsuplcAdmdvs());
+            }else{
+                insureSettleInfoDTO1.setInsulic("中国");
+                setlinfo.put("insuplc","中国"); // 参保地 *******
+            }
             setlinfo.put("ipt_med_type",settleInfoDTO.getAka130()); // 住院医疗类型
+            insureSettleInfoDTO1.setIptMedType(settleInfoDTO.getAka130());
+
+            setlinfo.put("emp_name",settleInfoDTO.getWork()); // 工作单位 *******
+            insureSettleInfoDTO1.setEmpName(settleInfoDTO.getWork());
+
+            setlinfo.put("emp_addr",settleInfoDTO.getWorkAddress()); // 工作单位地址 *******
+            insureSettleInfoDTO1.setEmpAddr(settleInfoDTO.getWorkAddress());
+
+            setlinfo.put("emp_tel",settleInfoDTO.getWorkPhone()); // 工作单位电话 *******
+            insureSettleInfoDTO1.setEmpTel(settleInfoDTO.getWorkPhone());
+
+            setlinfo.put("poscode",settleInfoDTO.getWorkPostCode()); // 工作单位邮编 *******
+            insureSettleInfoDTO1.setPoscode(settleInfoDTO.getWorkPostCode());
+            if(StringUtils.isNotEmpty(settleInfoDTO.getBabyBirthWeight()) ){
+                if(!"-".equals(settleInfoDTO.getBabyBirthWeight())){
+                    setlinfo.put("nwb_bir_wt",settleInfoDTO.getBabyBirthWeight()); // 新生儿出生体重 *******
+                    insureSettleInfoDTO1.setNwbBirWt(new BigDecimal(settleInfoDTO.getBabyBirthWeight()));
+                }
+            }
+
+            if(StringUtils.isNotEmpty(settleInfoDTO.getBabyInWeight()) ) {
+                if (!"-".equals(settleInfoDTO.getBabyInWeight())) {
+                    setlinfo.put("nwb_adm_w", settleInfoDTO.getBabyInWeight()); // 新生儿入院体重 *******
+                    insureSettleInfoDTO1.setNwbAdmWt(new BigDecimal(settleInfoDTO.getBabyInWeight()));
+                }
+            }
+            setlinfo.put("opsp_diag_caty",settleInfoDTO.getVisitDrptName()); // 诊断科别 *******
+            insureSettleInfoDTO1.setOpspDiagCaty(settleInfoDTO.getVisitDrptName());
+
+            setlinfo.put("opsp_mdtrt_date",settleInfoDTO.getVisitTime()); // 就诊日期 *******
+            insureSettleInfoDTO1.setOpspMdtrtDate(settleInfoDTO.getVisitTime());
+
+            setlinfo.put("adm_way",settleInfoDTO.getInWay()); // 入院途径 *******
+            insureSettleInfoDTO1.setAdmWay(settleInfoDTO.getInWay());
+
+            setlinfo.put("adm_time",settleInfoDTO.getInTime()); // 入院时间 *******
+            insureSettleInfoDTO1.setAdmTime(settleInfoDTO.getInTime());
+
             if (StringUtils.isNotEmpty(settleInfoDTO.getInDeptCode())) {
                 insureSettleInfoDTO1.setAdmCaty(settleInfoDTO.getInDeptCode());
                 setlinfo.put("adm_caty",settleInfoDTO.getInDeptCode()); // 入院科别
-                insureSettleInfoDTO1.setDscgCaty(settleInfoDTO.getOutDeptCode());
-                setlinfo.put("dscg_caty",settleInfoDTO.getOutDeptCode()); // 出院科别
             } else {
                 insureSettleInfoDTO1.setAdmCaty("111111");
                 setlinfo.put("adm_caty","111111"); // 入院科别
+            }
+            if (StringUtils.isNotEmpty(settleInfoDTO.getOutDeptCode())) {
+                insureSettleInfoDTO1.setDscgCaty(settleInfoDTO.getOutDeptCode());
+                setlinfo.put("dscg_caty",settleInfoDTO.getOutDeptCode()); // 出院科别
+            } else {
                 insureSettleInfoDTO1.setDscgCaty("111111");
                 setlinfo.put("dscg_caty","111111"); // 出院科别
             }
-            insureSettleInfoDTO1.setBillCode(settleInfoDTO.getVisitId());
-            setlinfo.put("bill_code",settleInfoDTO.getVisitId()); // 票据代码**********
-            insureSettleInfoDTO1.setBillNo(settleInfoDTO.getVisitId());
-            setlinfo.put("bill_no",settleInfoDTO.getVisitId()); // 票据号码**********
+
+            insureSettleInfoDTO1.setRefldeptDept(settleInfoDTO.getTurnDeptIds());
+            setlinfo.put("refldept_dept",settleInfoDTO.getTurnDeptIds()); // 转科科别
+
+            setlinfo.put("dscg_time",settleInfoDTO.getOutTime()); // 出院时间 *******
+            insureSettleInfoDTO1.setDscgTime(settleInfoDTO.getOutTime());
+
+            setlinfo.put("act_ipt_days",settleInfoDTO.getInDays()); // 实际住院天数 *******
+            insureSettleInfoDTO1.setActIptDays(settleInfoDTO.getInDays());
+
+            setlinfo.put("otp_wm_dise",settleInfoDTO.getOutptDiseaseName()); // 门（急）诊诊断 *******
+            insureSettleInfoDTO1.setOptWmDise(settleInfoDTO.getOutptDiseaseName());
+
+            setlinfo.put("wm_dise_code",settleInfoDTO.getVisitIcdCode()); // 疾病代码 *******
+            insureSettleInfoDTO1.setWmDiswCode(settleInfoDTO.getVisitIcdCode());
+
+            setlinfo.put("in_situation_name",settleInfoDTO.getInSituationName()); // 入院病情 *******
+            insureSettleInfoDTO1.setInSituationName(settleInfoDTO.getInSituationName());
+
+            setlinfo.put("in_situation_name",settleInfoDTO.getInSituationName()); // 其他诊断 *******
+            insureSettleInfoDTO1.setInSituationName(settleInfoDTO.getInSituationName());
+            if(StringUtils.isNotEmpty(settleInfoDTO.getInptBeforeDay()) && StringUtils.isNotEmpty(settleInfoDTO.getInptBeforeHour()) && StringUtils.isNotEmpty(settleInfoDTO.getInptBeforeMinute())) {
+                if(!("-".equals(settleInfoDTO.getInptBeforeDay()) && "-".equals(settleInfoDTO.getInptBeforeHour()) && "-".equals(settleInfoDTO.getInptBeforeMinute()))){
+                    insureSettleInfoDTO1.setPwcryBfadmcomaDura(settleInfoDTO.getInptBeforeDay() + "/" + settleInfoDTO.getInptBeforeHour() + "/" + settleInfoDTO.getInptBeforeMinute());
+                    setlinfo.put("pwcry_bfadm_coma_dura", (settleInfoDTO.getInptBeforeDay() + "/" + settleInfoDTO.getInptBeforeHour() + "/" + settleInfoDTO.getInptBeforeMinute())); // 入院前昏迷时长
+                }
+            }
+            if(StringUtils.isNotEmpty(settleInfoDTO.getInptLastDay()) && StringUtils.isNotEmpty(settleInfoDTO.getInptLastHour()) && StringUtils.isNotEmpty(settleInfoDTO.getInptLastMinute())){
+                if(!("-".equals(settleInfoDTO.getInptLastDay()) && "-".equals(settleInfoDTO.getInptLastHour()) && "-".equals(settleInfoDTO.getInptLastMinute()))){
+                    insureSettleInfoDTO1.setPwcryAfadmcomaDura(settleInfoDTO.getInptLastDay() + "/"  + settleInfoDTO.getInptLastHour() + "/" + settleInfoDTO.getInptLastMinute());
+                    setlinfo.put("pwcry_afadm_coma_dura",(settleInfoDTO.getInptLastDay() + "/"  + settleInfoDTO.getInptLastHour() + "/" + settleInfoDTO.getInptLastMinute())); // 入院后昏迷时长
+                }
+            }
+
+
+            setlinfo.put("spgaNurscare_Days",settleInfoDTO.getSpgaNurscareDays()); // 特级护理天数 *******
+            insureSettleInfoDTO1.setScdNurscareDays(settleInfoDTO.getSpgaNurscareDays());
+
+            setlinfo.put("lv1Nurscare_Days",settleInfoDTO.getLv1NurscareDays()); // 一级护理天数 *******
+            insureSettleInfoDTO1.setLv1NurscareDays(settleInfoDTO.getLv1NurscareDays());
+
+            setlinfo.put("scdNurscare_Days",settleInfoDTO.getScdNurscareDays()); // 二级护理天数 *******
+            insureSettleInfoDTO1.setScdNurscareDays(settleInfoDTO.getScdNurscareDays());
+//
+            setlinfo.put("lv3Nursecare_Days",settleInfoDTO.getLv3NursecareDays()); // 三级护理天数 *******
+            insureSettleInfoDTO1.setLv3NursecareDays(settleInfoDTO.getLv3NursecareDays());
+
+            setlinfo.put("dscg_way",settleInfoDTO.getOutModeName()); // 离院方式 *******
+            insureSettleInfoDTO1.setDscgWay(settleInfoDTO.getOutModeName());
+
+            setlinfo.put("days_rinp_flag_31",settleInfoDTO.getIsInpt()); // 是否有出院31天再住院计划 *******
+            insureSettleInfoDTO1.setDaysRinpFlag31(settleInfoDTO.getIsInpt());
+
+            setlinfo.put("chfpdr_name",settleInfoDTO.getZgDoctorName()); // 主诊医生姓名 *******
+            insureSettleInfoDTO1.setChfpdrName(settleInfoDTO.getZgDoctorName());
+
+            setlinfo.put("chfpdr_code",settleInfoDTO.getZgDoctorId()); // 主诊医生代码 *******
+            insureSettleInfoDTO1.setChfpdrCode(settleInfoDTO.getZgDoctorId());
+
+            setlinfo.put("zr_Nurse_Name",settleInfoDTO.getZrNurseName()); // 责任护士名 *******
+            insureSettleInfoDTO1.setZrNurseName(settleInfoDTO.getZrNurseName());
+
+            setlinfo.put("zr_Nurse_Code",settleInfoDTO.getZrNurseId()); // 责任护士代码 *******
+            insureSettleInfoDTO1.setZrNurseCode(settleInfoDTO.getZrNurseId());
+
+            if(StringUtils.isEmpty(settleInfoDTO.getInvoiceDetailId()) || StringUtils.isEmpty(settleInfoDTO.getInvoiceNo())){
+                throw new AppException("该病人未开发票，请先开具发票！");
+            }
+            insureSettleInfoDTO1.setBillCode(settleInfoDTO.getInvoiceDetailId());
+            setlinfo.put("bill_code",settleInfoDTO.getInvoiceDetailId()); // 票据代码**********
+            insureSettleInfoDTO1.setBillNo(settleInfoDTO.getInvoiceNo());
+            setlinfo.put("bill_no",settleInfoDTO.getInvoiceNo()); // 票据号码**********
             insureSettleInfoDTO1.setBizSn(settleInfoDTO.getId());
-            setlinfo.put("biz_sn",settleInfoDTO.getId()); // 业务流水号
-            insureSettleInfoDTO1.setPsnSelfpay(settleInfoDTO.getPersonPrice());
-            setlinfo.put("psn_selfpay",df.format(settleInfoDTO.getPersonPrice())); // 个人自付
-            insureSettleInfoDTO1.setPsnOwnpay(settleInfoDTO.getPersonPrice());
-            setlinfo.put("psn_ownpay",df.format(settleInfoDTO.getPersonPrice())); // 个人自费
-            insureSettleInfoDTO1.setAcctPay(settleInfoDTO.getPersonalPrice());
+            setlinfo.put("biz_sn",settleInfoDTO.getOmsgid()); // 业务流水号
+            DecimalFormat df1 = new DecimalFormat("0.00");
+
+
+//            insureSettleInfoDTO1.setPsnSelfpay(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(setlinfoMap, "psn_pay").toString()))));//上传
+            BigDecimal psnownpay = BigDecimalUtils.convert(df1.format(BigDecimalUtils.add(BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"preselfpay_amt").toString()),
+                    BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"fulamt_ownpay_amt").toString()))));
+            BigDecimal psnselfpay = BigDecimalUtils.subtract(MapUtils.get(setlinfoMap,"psn_pay"), psnownpay);
+            insureSettleInfoDTO1.setPsnSelfpay(psnselfpay);//上传
+            setlinfo.put("psn_selfpay",df.format(psnselfpay)); // 个人自付
+
+            insureSettleInfoDTO1.setPsnOwnpay(BigDecimalUtils.convert(df1.format(BigDecimalUtils.add(BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"preselfpay_amt").toString()),
+                    BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"fulamt_ownpay_amt").toString())))));
+            setlinfo.put("psn_ownpay",df.format(BigDecimalUtils.convert(df1.format(BigDecimalUtils.add(BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"preselfpay_amt").toString()),
+                    BigDecimalUtils.convert(MapUtils.get(setlinfoMap,"fulamt_ownpay_amt").toString())))))); // 个人自费
+
+            insureSettleInfoDTO1.setAcctPay(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(setlinfoMap, "acct_pay").toString()))));
             setlinfo.put("acct_pay",df.format(settleInfoDTO.getPersonalPrice())); // 个人账户支出
-            insureSettleInfoDTO1.setPsnCashpay(settleInfoDTO.getPersonPrice());
-            setlinfo.put("psn_cashpay",df.format(settleInfoDTO.getPersonPrice())); // 个人现金支付
-            insureSettleInfoDTO1.setHiPaymtd(settleInfoDTO.getSettleway());
-            setlinfo.put("hi_paymtd",settleInfoDTO.getSettleway()); // 医保支付方式 *********
+
+            insureSettleInfoDTO1.setPsnCashpay(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(setlinfoMap, "cash_payamt").toString()))));
+            setlinfo.put("psn_cashpay",df.format(setlinfoMap.get("cash_payamt"))); // 个人现金支付
+
+            insureSettleInfoDTO1.setHiPaymtd((String) setlinfoMap.get("clr_way"));
+            setlinfo.put("hi_paymtd",settleInfoDTO.getSettleway()); // 医保支付方式 *********（有个pay_way_name：医疗支付方式mris_base_info表）
             insureSettleInfoDTO1.setHsorg(insureConfigurationDTO1.getName());
             setlinfo.put("hsorg",insureConfigurationDTO1.getName()); // 医保机构
-            insureSettleInfoDTO1.setHsorgOpter(settleInfoDTO.getInsureOrgCode());
+            insureSettleInfoDTO1.setHsorgOpter((String) setlinfoMap.get("opter_name"));
             setlinfo.put("hsorg_opter",settleInfoDTO.getInsureOrgCode()); // 医保机构经办人
             insureSettleInfoDTO1.setMedinsFillDept(settleInfoDTO.getInsureOrgCode());
             setlinfo.put("medins_fill_dept",settleInfoDTO.getInsureOrgCode()); // 医疗机构填报部门
@@ -185,92 +437,69 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 insureSettleInfoDTO1.setNtly("中国");
                 setlinfo.put("ntly","中国"); //国籍
             }
-                if(StringUtils.isNotEmpty(settleInfoDTO.getContactName())){
-                    insureSettleInfoDTO1.setConerName(settleInfoDTO.getContactName());
-                    setlinfo.put("coner_name",settleInfoDTO.getContactName()); // 联系人姓名
-                } else {
-                    insureSettleInfoDTO1.setConerName("亲人");
-                    setlinfo.put("coner_name","亲人"); // 联系人姓名
-                }
-                if (StringUtils.isNotEmpty(settleInfoDTO.getInDeptCode())) {
-                    insureSettleInfoDTO1.setAdmCaty(settleInfoDTO.getInDeptCode());
-                    setlinfo.put("adm_caty",settleInfoDTO.getInDeptCode()); // 入院科别
-                    insureSettleInfoDTO1.setDscgCaty(settleInfoDTO.getOutDeptCode());
-                    setlinfo.put("dscg_caty",settleInfoDTO.getOutDeptCode()); // 出院科别
-                } else {
-                    insureSettleInfoDTO1.setAdmCaty("111111");
-                    setlinfo.put("adm_caty","111111"); // 入院科别
-                    insureSettleInfoDTO1.setDscgCaty("111111");
-                    setlinfo.put("dscg_caty","111111"); // 出院科别
-                }
-                if(StringUtils.isNotEmpty(settleInfoDTO.getContactName())){
-                    insureSettleInfoDTO1.setConerName(settleInfoDTO.getContactName());
-                    setlinfo.put("coner_name",settleInfoDTO.getContactName()); // 联系人姓名
-                } else {
-                    insureSettleInfoDTO1.setConerName("亲人");
-                    setlinfo.put("coner_name","亲人"); // 联系人姓名
-                }
-                if (StringUtils.isNotEmpty(settleInfoDTO.getContactRelaCode())){
-                    insureSettleInfoDTO1.setPatnRlts(settleInfoDTO.getContactRelaCode());
-                    setlinfo.put("patn_rlts",settleInfoDTO.getContactRelaCode()); // 与患者关系
-                } else {
-                    insureSettleInfoDTO1.setPatnRlts("亲人");
-                    setlinfo.put("patn_rlts","亲人"); // 与患者关系
-                }
+//            if(StringUtils.isNotEmpty(settleInfoDTO.getContactName())){
+//                insureSettleInfoDTO1.setConerName(settleInfoDTO.getContactName());
+//                setlinfo.put("coner_name",settleInfoDTO.getContactName()); // 联系人姓名
+//            } else {
+//                insureSettleInfoDTO1.setConerName("无");
+//                setlinfo.put("coner_name","无"); // 联系人姓名
+//            }
 
-                if (StringUtils.isNotEmpty(settleInfoDTO.getContactAddress())){
-                    insureSettleInfoDTO1.setConerAddr(settleInfoDTO.getContactAddress());
-                    setlinfo.put("coner_addr",settleInfoDTO.getContactAddress()); // 联系人地址
-                }else{
-                    insureSettleInfoDTO1.setConerAddr("中国");
-                    setlinfo.put("coner_addr","中国"); // 联系人地址
-                }
-
-                if (StringUtils.isNotEmpty(settleInfoDTO.getContactPhone())){
-                    insureSettleInfoDTO1.setConerTel(settleInfoDTO.getContactPhone());
-                    setlinfo.put("coner_tel",settleInfoDTO.getContactPhone()); // 联系人电话
-                } else {
-                    insureSettleInfoDTO1.setConerTel("120");
-                    setlinfo.put("coner_tel","120"); // 联系人电话
-                }
-                insureSettleInfoDTO1.setSetlBegnDate(settleInfoDTO.getCrteTime());
-                setlinfo.put("setl_begn_date",settleInfoDTO.getCrteTime()); // 结算开始日期
-                insureSettleInfoDTO1.setSetlEnDate(settleInfoDTO.getCrteTime());
-                setlinfo.put("setl_end_date",settleInfoDTO.getCrteTime()); // 结算结束日期
-            // 基金支付信息
-            if (payinfoList.size() > 0) {
-                for (InsureIndividualFundDTO individualFundDTO : payinfoList){
-                    Map payInfo = new HashMap();
-                    if (StringUtils.isNotEmpty(individualFundDTO.getFundPayType())) {
-                        payInfo.put("fund_pay_type",individualFundDTO.getFundPayType());
-                        payInfo.put("fund_payamt",individualFundDTO.getFundPayamt());
-                    } else {
-                        payInfo.put("fund_pay_type","999998");
-                        payInfo.put("fund_payamt","0.00");
-                    }
-                    payInfoListMap.add(payInfo);
-                }
+            if(StringUtils.isNotEmpty(settleInfoDTO.getContactName())){
+                insureSettleInfoDTO1.setConerName(settleInfoDTO.getContactName());
+                setlinfo.put("coner_name",settleInfoDTO.getContactName()); // 联系人姓名
             } else {
-                Map payInfo = new HashMap();
-                payInfo.put("fund_pay_type","310100");
-                payInfo.put("fund_payamt","0.00");
-                payInfoListMap.add(payInfo);
+                insureSettleInfoDTO1.setConerName(settleInfoDTO.getName());
+                setlinfo.put("coner_name",settleInfoDTO.getName()); // 联系人姓名
             }
+            if (StringUtils.isNotEmpty(settleInfoDTO.getContactRelaCode())){
+                insureSettleInfoDTO1.setPatnRlts(settleInfoDTO.getContactRelaCode());
+                setlinfo.put("patn_rlts",settleInfoDTO.getContactRelaCode()); // 与患者关系
+            } else {
+                insureSettleInfoDTO1.setPatnRlts("1");
+                setlinfo.put("patn_rlts","1"); // 与患者关系
+            }
+
+            if (StringUtils.isNotEmpty(settleInfoDTO.getContactAddress())){
+                insureSettleInfoDTO1.setConerAddr(settleInfoDTO.getContactAddress());
+                setlinfo.put("coner_addr",settleInfoDTO.getContactAddress()); // 联系人地址
+            }else{
+                insureSettleInfoDTO1.setConerAddr("中国");
+                setlinfo.put("coner_addr","中国"); // 联系人地址
+            }
+
+            if (StringUtils.isNotEmpty(settleInfoDTO.getContactPhone())){
+                insureSettleInfoDTO1.setConerTel(settleInfoDTO.getContactPhone());
+                setlinfo.put("coner_tel",settleInfoDTO.getContactPhone()); // 联系人电话
+            } else {
+                insureSettleInfoDTO1.setConerTel("120");
+                setlinfo.put("coner_tel","120"); // 联系人电话
+            }
+
+            setlinfo.put("spPsnType",settleInfoDTO.getBka035_name()); // 特殊病人类型
+            insureSettleInfoDTO1.setSpPsnType(settleInfoDTO.getBka035_name());
+
+            insureSettleInfoDTO1.setSetlBegnDate(settleInfoDTO.getStartTime());
+            setlinfo.put("setl_begn_date",settleInfoDTO.getStartTime()); // 结算开始日期
+            insureSettleInfoDTO1.setSetlEnDate(settleInfoDTO.getEndTime());
+            setlinfo.put("setl_end_date",settleInfoDTO.getEndTime()); // 结算结束日期
+
+
             if(insureSettleInfoDTO.getIsHospital().equals("0")){
                 if (opspdiseinfoList.size() > 0) {
                     // 门诊慢特病诊断信息
                     for(OpspdiseInfoDTO opspdiseinfoDTO : opspdiseinfoList){
                         Map opspdiseinfo = new HashMap();
                         opspdiseinfo.put("diag_name",opspdiseinfoDTO.getName());// 诊断名称
-                        opspdiseinfo.put("diag_code",opspdiseinfoDTO.getDiseaseId());// 诊断代码
-                        opspdiseinfo.put("oprn_oprt_code","null"); // 手术操作代码
-                        opspdiseinfo.put("oprn_oprt_name","null"); // 手术操作名称
+                        opspdiseinfo.put("diag_code",opspdiseinfoDTO.getDiseaseId());// 疾病代码
+                        opspdiseinfo.put("oprn_oprt_code",opspdiseinfoDTO.getOperDiseaseIcd9()); // 手术操作代码
+                        opspdiseinfo.put("oprn_oprt_name",opspdiseinfoDTO.getOperDiseaseName()); // 手术操作名称
                         opspdiseinfoListMap.add(opspdiseinfo);
                     }
                 } else {
                     Map opspdiseinfo = new HashMap();
                     opspdiseinfo.put("diag_name","无");// 诊断名称
-                    opspdiseinfo.put("diag_code","0000");// 诊断代码
+                    opspdiseinfo.put("diag_code","0000");// 疾病代码
                     opspdiseinfo.put("oprn_oprt_name","无"); // 手术操作名称
                     opspdiseinfo.put("oprn_oprt_code","0000"); // 手术操作代码
                     opspdiseinfoListMap.add(opspdiseinfo);
@@ -281,10 +510,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     for (DiseInfoDTO diseInfoDTO : diseinfoList){
                         Map diseinfo = new HashMap();
                         diseinfo.put("diag_type",diseInfoDTO.getTypeCode()); // 诊断类别
-                        diseinfo.put("diag_code",diseInfoDTO.getDiseaseId()); // 诊断代码
-                        diseinfo.put("diag_name",diseInfoDTO.getName()); // 诊断名称
+                        diseinfo.put("diag_code",diseInfoDTO.getDiseaseId()); // 疾病代码
+                        diseinfo.put("diag_name",diseInfoDTO.getName()); // 疾病名称
                         diseinfo.put("maindiag_flag",diseInfoDTO.getIsMain()); // 主诊断标志
                         diseinfoListMap.add(diseinfo);
+                        if(diseInfoDTO.getIsMain().equals("1")){
+                            diseinfoMap = diseinfo;
+                        } else {
+                            diseinfoListMapIsNotMain.add(diseinfo);
+                        }
                     }
                 } else {
                     Map diseinfo = new HashMap();
@@ -296,11 +530,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
 
             }
-            if (iteminfoList.size() > 0) {
+           /* if (iteminfoList.size() > 0) {
                 // 收费项目信息
                 for (ItemInfoDTO itemInfoDTO : iteminfoList){
                     Map iteminfo = new HashMap();
                     iteminfo.put("med_chrgitm",itemInfoDTO.getItemType()); // 医疗收费项目
+
                     iteminfo.put("amt",df.format(itemInfoDTO.getApplyLastPrice())); // 金额
                     iteminfo.put("claa_sumfee","0"); // 甲类费用合计
                     iteminfo.put("clab_amt","0"); // 乙类金额
@@ -310,11 +545,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     iteminfoListMap.add(iteminfo);
 
                 }
-            }
+            }*/
 
             // 手术操作信息
             if(oprninfoList.size() > 0 ){
-                int i = 0;
                 for (OprninfoDTO oprninfoDTO : oprninfoList){
                     Map oprninfo = new HashMap();
                     oprninfo.put("oprn_oprt_type",oprninfoDTO.getRank()); //手术操作类别
@@ -322,15 +556,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     oprninfo.put("oprn_oprt_name",oprninfoDTO.getOperDiseaseName()); //名称
                     oprninfo.put("oprn_oprt_code",oprninfoDTO.getOperDiseaseIcd9()); // 代码
                     oprninfo.put("oprn_oprt_date",oprninfoDTO.getOperPlanTime()); // 日期
+                    oprninfo.put("anst_way",oprninfoDTO.getAnaCode()); // 麻醉方式
                     oprninfo.put("oper_dr_name",oprninfoDTO.getDoctorName()); //主刀医生名称
                     oprninfo.put("oper_dr_code",oprninfoDTO.getDoctorId()); //主刀医生编码
-                    if (i == 0) {
-                        oprninfo.put("main_oprn_flag","1"); // 手术操作标志，广州市医保必须传 1
-                    } else {
-                        oprninfo.put("main_oprn_flag","0");
-                    }
+
+                    oprninfo.put("assistant_id1",oprninfoDTO.getAssistantId1()); //手术一助编码
+                    oprninfo.put("oassistant_name1",oprninfoDTO.getAssistantName1()); // 手术一助名称
+                    oprninfo.put("oassistant_name2",oprninfoDTO.getAssistantName2()); // 手术2助名称
+                    oprninfo.put("assistant_id2",oprninfoDTO.getAssistantId2()); // 手术2助编码
+                    oprninfo.put("oassistant_name3",oprninfoDTO.getAssistantName3()); //手术3助名称
+                    oprninfo.put("assistant_id3",oprninfoDTO.getAssistantId3()); //手术3助编码
+                    oprninfo.put("ana_id1",oprninfoDTO.getAnaId1()); //第一麻醉医生代码
+                    oprninfo.put("ana_name1",oprninfoDTO.getAnaName1()); // 第一麻醉医生名称
+                    oprninfo.put("ana_id2",oprninfoDTO.getAnaId2()); // 第2麻醉医生代码
+                    oprninfo.put("ana_name2",oprninfoDTO.getAnaName2()); // 第2麻醉医生名称
+                    oprninfo.put("ana_id3",oprninfoDTO.getAnaId3()); //第3麻醉医生代码
+                    oprninfo.put("ana_name3",oprninfoDTO.getAnaName3()); //第3麻醉医生名称
+
                     oprninfoListMap.add(oprninfo);
-                    i++;
                 }
             } else {
                 Map oprninfo = new HashMap();
@@ -338,19 +581,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 oprninfo.put("oprn_oprt_name","无"); //名称
                 oprninfo.put("oprn_oprt_code","0000"); // 代码
                 oprninfo.put("oprn_oprt_date",DateUtils.format(DateUtils.getNow(),DateUtils.Y_M_D)); // 日期
+                oprninfo.put("anst_way","无"); // 麻醉方式
                 oprninfo.put("oper_dr_name","无"); //主刀医生名称
                 oprninfo.put("oper_dr_code","0000"); //主刀医生编码
-                oprninfo.put("main_oprn_flag","1"); // 手术操作标志，广州市医保必须传 1
+
                 oprninfoListMap.add(oprninfo);
             }
+
+
+
             if (icuinfoList.size() > 0 ) {
                 // 重症监护信息
-                    Map icuinfo = new HashMap();
+                Map icuinfo = new HashMap();
 //            icuinfo.put("scs_cutd_ward_type",""); // 重症监护病房类型
 //            icuinfo.put("scs_cutd_inpool_time","");// 重症监护进入时间
 //            icuinfo.put("scs_cutd_exit_time",""); // 重症监护退出时间
 //            icuinfo.put("scs_cutd_sum_dura",""); // 重症监护合计时长
-                    icuinfoListMap.add(icuinfo);
+                icuinfoListMap.add(icuinfo);
             }
 
             listMap.put("setlinfo",setlinfo);
@@ -360,6 +607,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             listMap.put("iteminfo",iteminfoListMap);
             listMap.put("oprninfo",oprninfoListMap);
             listMap.put("icuinfo",icuinfoListMap);
+            listMap.put("diseinfoMap",diseinfoMap);
+            listMap.put("setlinfoMap",setlinfoMap);
+            listMap.put("diseinfoListMapIsNotMain",diseinfoListMapIsNotMain);
             if (StringUtils.isEmpty(insureSettleInfoDTO.getUpload())) {
                 /**
                  * 公共入参
@@ -387,6 +637,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 if(!"0".equals(resultMap.get("infcode").toString())){
                     throw new AppException((String)resultMap.get("err_msg"));
                 }
+
+
                 Map resultData = (Map) resultMap.get("output");
                 Map resultSetl = (Map) resultData.get("data");
                 insureSettleInfoDTO1.setSettleNo((String) resultSetl.get("setl_list_id"));
@@ -538,11 +790,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<InptCostDTO> costDTOList = new ArrayList<>();
         if (insureSettleInfoDTO.getLx().equals("1")) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
-             costDTOList = insureGetInfoDAO.queryInCost(insureSettleInfoDTO);
+            costDTOList = insureGetInfoDAO.queryInCost(insureSettleInfoDTO);
         }
         if (insureSettleInfoDTO.getLx().equals("2")) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
-             costDTOList = insureGetInfoDAO.queryOutCost(insureSettleInfoDTO);
+            costDTOList = insureGetInfoDAO.queryOutCost(insureSettleInfoDTO);
         }
         return PageDTO.of(costDTOList);
     }
@@ -561,8 +813,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         List<InsureUploadCostDTO> costDTOList = new ArrayList();
 
-            PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
-            costDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
+        PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
+        costDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
 
         return PageDTO.of(costDTOList);
     }
@@ -620,6 +872,50 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         return PageDTO.of(itemInfoDTOList);
 
+    }
+
+    /**
+     * @Description: 年龄工具类
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-06-25
+     */
+    public String getAgeDetail(String date) {
+        //如果有空格
+        int index = date.indexOf(" ");
+        if (index != -1) {
+            date = date.substring(0, index);
+        }
+        String[] data = date.split("-");
+        Calendar birthday = new GregorianCalendar(Integer.valueOf(data[0]), Integer.valueOf(data[1]), Integer.valueOf(data[2]));
+        Calendar now = Calendar.getInstance();
+        int day = now.get(Calendar.DAY_OF_MONTH) - birthday.get(Calendar.DAY_OF_MONTH);
+        //月份从0开始计算，所以需要+1
+        int month = now.get(Calendar.MONTH) + 1 - birthday.get(Calendar.MONTH);
+        int year = now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
+        //按照减法原理，先day相减，不够向month借；然后month相减，不够向year借；最后year相减。
+        if (day < 0) {
+            month -= 1;
+            now.add(Calendar.MONTH, -1);//得到上一个月，用来得到上个月的天数。
+            day = day + now.getActualMaximum(Calendar.DAY_OF_MONTH);
+        }
+        if (month < 0) {
+            month = (month + 12) % 12;
+            year--;
+        }
+        //System.out.println("年龄：" + year +"岁" + month +"月" + day +"天");
+        StringBuffer tag = new StringBuffer();
+        if (year > 0) {
+            tag.append(year + "岁");
+        }
+        if (month > 0) {
+            tag.append(month + "月");
+        }
+        if (year == 0 && month == 0 && day == 0) {
+            tag.append("今日出生");
+        }
+        return String.valueOf(tag);
     }
 
 }

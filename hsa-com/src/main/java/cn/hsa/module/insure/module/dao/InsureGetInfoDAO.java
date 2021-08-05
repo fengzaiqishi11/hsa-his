@@ -6,6 +6,7 @@ import cn.hsa.module.insure.module.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InsureGetInfoDAO {
 
@@ -52,6 +53,17 @@ public interface InsureGetInfoDAO {
      * @Return java.util.List<cn.hsa.module.insure.module.dto.PayInfoDTO>
      **/
     List<OpspdiseInfoDTO> queryOpspdiseinfo(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+     * @Method selectIsSetlleFee
+     * @Desrciption  查询已经结算完成的费用明细集合
+     * @Param
+     *
+     * @Author caoliang
+     * @Date   2021/7/20 17:35
+     * @Return
+     **/
+    List<Map<String, Object>> selectIsSetlleFee(Map<String, Object> map);
 
     /**
      * @Method queryDiseinfo

@@ -70,7 +70,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     @Resource
     private BaseDeptService baseDeptService_consumer;
-    
+
     @Resource
     private InsureUnifiedPayInptService insureUnifiedPayInptService;
 
@@ -142,8 +142,10 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         String hospCode = (String) map.get("hospCode");//医院编码
         String visitId = (String) map.get("visitId");//就诊id
+        String medicalRegNo = MapUtils.get(map, "medicalRegNo");
         Map<String, Object> insureVisitParam = new HashMap<String, Object>();
         insureVisitParam.put("id", visitId);
+        insureVisitParam.put("medicalRegNo",medicalRegNo);
         insureVisitParam.put("hospCode", hospCode);
         insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
         if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
@@ -162,6 +164,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     public Map<String, Object> queryVisitInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         Map<String, Object> paramMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
@@ -267,7 +270,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         configurationDTO.setHospCode(hospCode);  // 医院编码
         configurationDTO.setOrgCode(medicineOrgCode); // 医疗机构编码
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
-        String mdtrtareaAdmvs = configurationDTO.getMdtrtareaAdmvs();
+        if(configurationDTO ==null){
+            throw new AppException("获取医保配置信息为空");
+        }
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("setl_id", insureSettleId);
@@ -287,7 +292,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         /**
          * 省外医保  接口无数据返回。只能查询本地保存的费用数据
          */
-        if("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) && data !=null && "1".equals(data.getValue())){
+        if(("03".equals(insureIndividualVisitDTO.getMdtrtCertType())  || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data !=null && "1".equals(data.getValue())){
             Map<String,Object> setlinfoMap  = insureIndividualSettleDAO.querySettleForMap(map);
             List<Map<String,Object>> setldetailListMap = insureIndividualSettleDAO.queryInsureFundListMap(map);
             outptMap.put("setlinfo",setlinfoMap);
@@ -347,21 +352,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                     List<Map<String, Object>> listMap = groupMap.get(key);
                     for (Map<String, Object> item : listMap) {
                         DecimalFormat df1 = new DecimalFormat("0.00");
-                        if (MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(MapUtils.get(item, "det_item_fee_sumamt"), 2));
-                        } else {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                        }
-                        if (MapUtils.get(item, "fulamt_ownpay_amt").toString().indexOf(".") > 0) {
-                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.scale(MapUtils.get(item, "fulamt_ownpay_amt"), 2));
-                        } else {
-                            fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-                        }
-                        if (MapUtils.get(item, "preselfpay_amt").toString().indexOf(".") > 0) {
-                            preselfpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.scale(MapUtils.get(item, "preselfpay_amt"), 2));
-                        } else {
-                            preselfpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString()))));
-                        }
+                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                        preselfpayAmt = BigDecimalUtils.add(preselfpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString()))));
                     }
                     pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
                     pMap.put("fulamtOwnpayAmt", fulamtOwnpayAmt);
@@ -401,6 +394,33 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
         Map<String, Object> resultDataMap = new HashMap<>();
         resultDataMap.put("outptMap", outptMap);
+        return resultDataMap;
+    }
+
+    /**
+     * @Method querySettleDeInfo
+     * @Desrciption 结算信息查询
+     * @Param
+     * @Author caoliang
+     * @Date 2021/7/19 19:00
+     * @Return
+     **/
+    public Map<String, Object> querySettleDeInfo(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureSettleId = MapUtils.get(map, "insureSettleId");
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("setl_id", insureSettleId);
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        paramMap.put("data", dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap);
+        List<Map<String, Object>> setldetail = MapUtils.get(MapUtils.get(resultMap, "output"),"setldetail");
+        Map<String, Object> setlinfo = MapUtils.get(MapUtils.get(resultMap, "output"),"setlinfo");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        resultDataMap.put("setldetail", setldetail);
+        resultDataMap.put("setlinfo", setlinfo);
         return resultDataMap;
     }
 
@@ -839,7 +859,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             orgCode = data.getValue(); // 获取医疗机构编码
         }
         String hospCode = MapUtils.get(map,"hospCode");
-        Map<String,Object> dataMap = new HashMap<>();
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> inputMap = new HashMap<>();
         deptDTOList.stream().forEach(deptDTO -> {
@@ -865,7 +884,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             mapList.add(paramMap);
         });
         inputMap.put("deptinfo",mapList);
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, inputMap);
         map.put("deptDTOList",deptDTOList);
         baseDeptService_consumer.updateBatchDept(map).getData();
         return map;

@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -192,4 +193,28 @@ public interface DoctorAdviceService {
      * @Return boolean
      **/
     WrapperResponse<Boolean> saveInptAdviceZCY(Map<String,Object> paramMap);
+
+    /**
+     * @Menthod: queryLimitDrugList
+     * @Desrciption: 查询医保限制级用药列表
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 08:48
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/queryLimitDrugList")
+    WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap);
+
+    /**
+     * @Menthod: updateInptAdviceDetailLmt
+     * @Desrciption: 更新医嘱明细表限制用药相关字段
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-22 10:39
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/updateInptAdviceDetailLmt")
+    WrapperResponse<Boolean> updateInptAdviceDetailLmt(Map map);
 }

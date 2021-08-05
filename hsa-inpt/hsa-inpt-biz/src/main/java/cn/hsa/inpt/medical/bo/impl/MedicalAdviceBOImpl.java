@@ -55,6 +55,7 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -410,11 +411,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 if (parameterDTO != null && !StringUtils.isEmpty(parameterDTO.getValue())) {
                     cxfBaseItem = getBaseItemDTOByCode(medicalAdviceDTO.getHospCode(), parameterDTO.getValue());
                 }
-
-                if (cxfBaseItem == null){
-                    return ;
-                }
-
                 /**
                  * 判断是否合管 医技分类、容器、标本不能为空,有空表示不合管
                  * 1.根据医技分类、容器、标本判断是否合管
@@ -1401,7 +1397,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = new InptCostDTO();
                 //计费时间=计费当天日期+当前时间(时分秒)
                 Date date = DateUtils.parse(startTime + " " + DateUtils.format(DateUtils.getNow(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-
+                if (baseAssistCalcDetailDO.getItemId() == null ){
+                    throw new AppException(baseAssistCalcDetailDO.getName() +"配置项目错误!");
+                }
                 //辅助计费 有可能为 3 项目，2材料
                 if("3".equals(baseAssistCalcDetailDO.getItemCode())){
                     //获取项目信息
@@ -1605,6 +1603,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
         //循环明细,组装医嘱明细数据,入库
         for (BaseAssistCalcDetailDTO detailDTO:assistCalcDetailDTOList) {
+            if (detailDTO.getItemId() == null ){
+                throw new AppException(detailDTO.getName() +"配置项目错误!");
+            }
             //医嘱明细对象
             InptAdviceDetailDTO inptAdviceDetailDTO = new InptAdviceDetailDTO();
             if (Constants.XMLB.CL.equals(detailDTO.getItemCode())) {//材料
@@ -2357,6 +2358,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //材料
         Map<String, BaseMaterialDTO> materiaMap = new HashMap<>();
 
+        // 获取医保限制用药用药参数 luoyong 2021.07.28/14:21
+        SysParameterDTO sysParameterDTO = getSysParameterDTO(medicalAdviceDTO.getHospCode(), "INSURE_DEFAULT_REG_CODE");
+
         //获取医嘱集合
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(medicalAdviceDTO.getHospCode(), adviceIds);
         if (ListUtils.isEmpty(inptAdviceDTOList)) {
@@ -2490,6 +2494,18 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
                 //住院领药申请
                 produceWaitReceive(inptCostDTO, inptAdviceDTO, medicalAdviceDTO, date, msgList, inWaitReceiveDTOS, drugMap, materiaMap);
+
+                // 根据医保限制用药系统参数(INSURE_DEFAULT_REG_CODE)，判断是否需要更新费用表中相关医保限制用药字段 luoyong 2021.07.28/14:21
+                if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                    Map parse = (Map) JSON.parse(sysParameterDTO.getValue());
+                    String isLmtDrugFlag = MapUtils.get(parse, "isLmtDrugFlag");
+                    // 开启了限制用药
+                    if (StringUtils.isNotEmpty(isLmtDrugFlag) && "1".equals(isLmtDrugFlag)) {
+                        inptCostDTO.setLmtUserFlag(inptAdviceDetailDTO.getLmtUserFlag());
+                        inptCostDTO.setLimUserExplain(inptAdviceDetailDTO.getLimUserExplain());
+                        inptCostDTO.setIsReimburse(inptAdviceDetailDTO.getIsReimburse());
+                    }
+                }
 
                 inptCostDTOs.add(inptCostDTO);
 
@@ -2858,7 +2874,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //提前领药天数
         int days = 0;
         if (StringUtils.isNotEmpty(inptAdviceDTO.getAdvanceDays())){
-            //提前领药天数为2时领明天的药,为1时 不做提前领药
             days = Integer.parseInt(inptAdviceDTO.getAdvanceDays());
             if (days<0){
                 days = 0;
@@ -2906,7 +2921,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (plantTime!=null && plantTime.compareTo(endTime)<=0) {
             //预停日期不需要计费（预停日期-1）
             lsYttz = true;
-            endTime = DateUtils.dateAdd(plantTime,-1) ;
+            //预停医嘱当天需要生成费用 -- 2021-08-03 pengbo
+            //endTime = DateUtils.dateAdd(plantTime,-1) ;
         }
 
         Map<String, Object> map = new HashMap<>();
@@ -3313,8 +3329,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //停嘱时间
             Date stopTime = medicalAdviceDTO.getCheckTime() ;
             if(dto.getStopTime() != null){
-                inptAdviceDTO.setStopTime(dto.getStopTime());
+                stopTime = dto.getStopTime();
             }
+            inptAdviceDTO.setStopTime(stopTime);
             //获取带教医生信息
             SysUserDTO sysUserDTO = getSysUserDTO(adviceDTO);
             //代教医生 实习医生老师

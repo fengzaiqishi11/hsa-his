@@ -46,4 +46,9 @@ public class InsureItemMatchDTO extends InsureItemMatchDO implements Serializabl
         private String typeCode ; //项目类别
         private String lmtUserFlag ; //限制使用标志
         private String limUserExplain; // 限制使用说明
+        private String visitId; //就诊id
+        /**
+         * 是否报销
+         */
+        private String isReimburse;
 }

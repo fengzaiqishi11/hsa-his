@@ -99,6 +99,34 @@
         </foreach>
     </insert>
 
+    <select id="queryDoctorQueueOfTodayByClassifyIdDoctorId" parameterType="map" resultType="map">
+        SELECT
+            oc.`name` as className,
+            oc.start_date,
+            oc.end_date,
+            odq.doctor_id as doctorId,
+            odq.doctor_name as doctorName,
+            ocq.queue_date as queueDate,
+            occ.weeks,
+            ocy.`name` as classOfShift
+        FROM
+            outpt_classes oc
+                left join outpt_classes_queue ocq on oc.hosp_code = ocq.hosp_code and oc.id = ocq.cs_id
+                left join outpt_doctor_queue odq on ocq.hosp_code = odq.hosp_code and ocq.id = odq.cq_id
+                left join outpt_classify_classes occ on ocq.cc_id = occ.id and ocq.hosp_code = occ.hosp_code
+                left join outpt_classify ocy on occ.cy_id = ocy.id and occ.hosp_code = ocy.hosp_code
+
+        WHERE
+            odq.doctor_id in
+            <foreach collection="doctorIdList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+            and ocq.hosp_code = #{hospCode}
+          and ocq.queue_date = date(#{queueDate})
+          and oc.id = #{classId}
+
+    </select>
+
     <insert id="insertDoctorRegisterBatch">
         insert into outpt_doctor_register
         (

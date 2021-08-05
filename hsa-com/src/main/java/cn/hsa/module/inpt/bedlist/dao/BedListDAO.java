@@ -5,6 +5,7 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -344,4 +345,32 @@ public interface BedListDAO {
      * @Return
      **/
     Integer getMaxSeqNoByDeptCode(@Param("hospCode") String hospCode, @Param("deptCode") String deptCode);
+
+    /**
+     * @Method insertDiagnose
+     * @Description 将出院诊断信息插入到诊断管理表
+     * @Param InptDiagnoseDTO
+     * @Author liuliyun
+     * @Date 2021/7/23 14:15
+     * @Return boolean
+     **/
+    boolean insertDiagnose(InptDiagnoseDTO inptDiagnoseDTO);
+    /**
+     * @Method getInptDiagnose
+     * @Description 查询除入院诊断之外的主诊断
+     * @Param hospCode,visitId
+     * @Author liuliyun
+     * @Date 2021/7/23 14:30
+     * @Return Integer
+     **/
+    Integer getInptDiagnose(@Param("hospCode") String hospCode,@Param("visitId")String visitId);
+    /**
+     * @Method getInptDiagnose
+     * @Description 查询是否已经存在出院诊断
+     * @Param hospCode,visitId
+     * @Author liuliyun
+     * @Date 2021/7/23 14:50
+     * @Return Integer
+     **/
+    Integer getInptDiagnoseByVisitId(@Param("hospCode") String hospCode,@Param("visitId")String visitId,@Param("diseaseId") String diseaseId);
 }

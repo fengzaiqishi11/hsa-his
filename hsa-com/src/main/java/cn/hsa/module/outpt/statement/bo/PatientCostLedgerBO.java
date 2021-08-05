@@ -129,7 +129,9 @@ public interface PatientCostLedgerBO {
    * @Date   2020-11-12 10:44
    * @Return java.util.List<java.util.Map>
    **/
-  Map queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+  PageDTO queryOutptDeptIncome(InptVisitDTO inptVisitDTO);
+
+  Map queryOutptDeptIncomeTableHead (InptVisitDTO inptVisitDTO);
 
   /**
    * @Menthod stroBusinessSummary
@@ -293,4 +295,13 @@ public interface PatientCostLedgerBO {
    * @Return
    */
   PageDTO queryTollCollectorIncomeStatistics(Map map);
+  /**
+   * @Method queryOutMedicationGet
+   * @Desrciption 门诊科室用药统计
+   * @Param [map]
+   * @Author zhangguorui
+   * @Date   2021/7/23 15:56
+   * @Return cn.hsa.base.PageDTO
+   */
+  PageDTO queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO);
 }

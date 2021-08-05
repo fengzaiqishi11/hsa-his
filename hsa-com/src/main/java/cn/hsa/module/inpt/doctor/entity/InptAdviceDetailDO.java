@@ -98,4 +98,12 @@ public class InptAdviceDetailDO extends PageDO implements Serializable {
      * 财务分类ID
      */
     private String bfcId;
+    /**
+     * 限制使用标志
+     */
+    private String lmtUserFlag;
+    /**
+     * 限制使用说明
+     */
+    private String limUserExplain;
 }

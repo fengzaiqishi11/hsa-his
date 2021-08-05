@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.mris.mrisHome.bo.InptMrisInfoBO;
 import cn.hsa.module.mris.mrisHome.bo.MrisHomeBO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.MrisControlDO;
@@ -12,13 +13,16 @@ import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO;
 import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.CSVWriterUtils;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.inpt.medicalRecode.service.impl
@@ -36,6 +40,12 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
 
     @Resource
     private MrisHomeBO mrisHomeBO;
+
+    @Resource
+    InptMrisInfoBO inptMrisInfoBO;
+    //系统参数
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Method: queryOutHospPatientPage
@@ -344,4 +354,35 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
         InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
         return mrisHomeBO.queryAllDiagnose(inptVisitDTO);
     }
+
+    @Override
+    public WrapperResponse<List<LinkedHashMap<String,Object>>> importMrisInfo(Map map) throws Exception {
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
+//        String rootPath = System.getProperty("user.dir")+"/data/files/";
+//        String hospName= (String) map.get("hospName");
+//        String fileName="hqmsts_"+hospName+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
+//        CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
+//        String path = rootPath+"/"+fileName+".csv";
+        return WrapperResponse.success(mrisInfos);
+    }
+    @Override
+    public WrapperResponse<Map> getTableConfig(Map map) throws Exception {
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
+        Map retMap = new HashMap();
+        List<Map> listTableConfig = new ArrayList<>();
+        if (mrisInfos!=null&&mrisInfos.size()>0) {
+            LinkedHashMap<String, Object> configMap = mrisInfos.get(0);
+            configMap.forEach((k, v) -> {
+                Map tableMap = new HashMap();
+                tableMap.put("id", k);
+                tableMap.put("label", k);
+                tableMap.put("prop", k);
+                tableMap.put("minWidth", "120");
+                listTableConfig.add(tableMap);
+            });
+            retMap.put("listTableConfig", listTableConfig);
+        }
+        return WrapperResponse.success(retMap);
+    }
+
 }

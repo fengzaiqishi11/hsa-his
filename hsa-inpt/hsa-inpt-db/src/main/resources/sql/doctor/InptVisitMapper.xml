@@ -1048,10 +1048,10 @@
 
 		<if test="statusCode != null and statusCode != ''">
 		  <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
-			  AND iv.status_code in ('2','5') and iiv.is_half_settle = '1'
+			  AND iv.status_code in ('2','5') and iiv.is_half_settle = '1' and  iiv.insure_settle_id is null
 		  </if>
 			<if test="isMidWaySettle != null and isMidWaySettle == '0'.toString()">
-				AND iv.status_code = #{statusCode} and iiv.is_half_settle != '1'
+				AND iv.status_code = #{statusCode} and (iiv.is_half_settle is null or iiv.is_half_settle!='1')
 			</if>
 		</if>
 		<if test="startDate != null">

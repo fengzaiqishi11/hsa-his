@@ -327,5 +327,60 @@ public interface InsureIndividualCostDAO {
      * @Date 2021/7/20 13:49
      * @Return
      */
-    List<InptAdviceDetailDTO> queryInptCostPage(InptVisitDTO inptVisitDTO);
+    List<InptCostDTO> queryInptCostPage(InptVisitDTO inptVisitDTO);
+    
+    /**
+     * @Method 查询中途结算时：选择的费用区间
+     * @Desrciption  
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/7/28 9:31
+     * @Return 
+    **/
+    InsureIndividualCostDTO selectHalfTransmitFee(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method batchInsertCost
+     * @Desrciption  批量更新费用数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/31 18:42
+     * @Return
+    **/
+    void batchInsertCost(@Param("individualCostDTOList") List<InsureIndividualCostDTO> individualCostDTOList);
+
+    /**
+     * @Method queryLasterCounter
+     * @Desrciption  获取中途结算次数
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/2 17:53
+     * @Return
+    **/
+    Integer queryLasterCounter(   InsureIndividualVisitDTO insureIndividualVisitDTO );
+
+    /**
+     * @Method queryIsSettleFee
+     * @Desrciption  查询已经结算的费用明细信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/3 11:15
+     * @Return
+    **/
+    InptCostDTO queryIsSettleFee(Map<String, Object> map);
+
+    /**
+     * @Method queryIsTransmitFee
+     * @Desrciption  查询已经上传的费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/3 18:25
+     * @Return
+    **/
+    InsureIndividualCostDTO queryIsTransmitFee(Map<String, Object> map);
 }

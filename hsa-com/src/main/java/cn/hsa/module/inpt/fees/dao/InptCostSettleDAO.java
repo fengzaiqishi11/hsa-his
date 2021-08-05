@@ -110,4 +110,14 @@ public interface InptCostSettleDAO {
     int batchInsert(List<InptCostSettleDO> inptCostSettleDOList);
 
     Boolean updateInsureSettleCost(Map<String, Object> settleMap);
+
+    /**
+     * @Description: 查询医保中途结算最大次数
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/7/29 16:05
+     * @Return
+     */
+    Map<String, Object> selectMidWaySettleMaxTimes(Map<String, Object> selectMap);
 }

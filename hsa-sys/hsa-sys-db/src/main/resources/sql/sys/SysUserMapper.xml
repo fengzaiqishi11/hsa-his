@@ -278,6 +278,196 @@
 			</if>
 		</where>
 	</select>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="queryBedUserAll" resultMap="SysUserMap">
+    select
+    a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+    a.nation_code,
+    a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+    a.introduce, a.speciality,
+    a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+    a.work_date, a.work_type_code,
+    a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+    a.ph_code,
+    a.opeartion_code,
+    a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+    a.crte_id,a.crte_name,
+    a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,
+    b.name as deptName
+    from sys_user a
+    join sys_user_system s on a.hosp_code = s.hosp_code and a.code = s.user_code
+    and s.dept_code = #{loginDeptCode} and s.system_code = #{systemCode}
+    left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+    <where>
+      a.hosp_code = #{hospCode}
+      <if test="id != null and id != ''">
+        and a.id = #{id}
+      </if>
+      <if test="deptId != null and deptId != ''">
+        and b.id = #{deptId}
+      </if>
+      <if test="ids != null">
+        and a.id in
+        <foreach collection="ids" separator="," item="item" open="(" close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="workTypeList != null and workTypeList.size() > 0">
+        and a.work_type_code in
+        <foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+          #{workTypeCode}
+        </foreach>
+        and a.status_code = "0"
+      </if>
+      <if test="deptCode != null and deptCode != ''">
+        and a.dept_code = #{deptCode}
+      </if>
+      <if test="code != null and code != ''">
+        and a.code = #{code}
+      </if>
+      <if test="password != null and password != ''">
+        and a.password = #{password}
+      </if>
+      <if test="isInJob != null and isInJob != ''">
+        and a.is_in_job = #{isInJob}
+      </if>
+      <if test="name != null and name != ''">
+        and a.name = #{name}
+      </if>
+      <if test="age != null">
+        and a.age = #{age}
+      </if>
+      <if test="birthday != null">
+        and a.birthday = #{birthday}
+      </if>
+      <if test="genderCode != null and genderCode != ''">
+        and a.gender_code = #{genderCode}
+      </if>
+      <if test="nationCode != null and nationCode != ''">
+        and a.nation_code = #{nationCode}
+      </if>
+      <if test="nativePlace != null and nativePlace != ''">
+        and a.native_place = #{nativePlace}
+      </if>
+      <if test="marryCode != null and marryCode != ''">
+        and a.marry_code = #{marryCode}
+      </if>
+      <if test="isPm != null and isPm != ''">
+        and a.is_pm = #{isPm}
+      </if>
+      <if test="inPmDate != null">
+        and a.in_pm_date = #{inPmDate}
+      </if>
+      <if test="certCode != null and certCode != ''">
+        and a.cert_code = #{certCode}
+      </if>
+      <if test="certNo != null and certNo != ''">
+        and a.cert_no = #{certNo}
+      </if>
+      <if test="photoImage != null and photoImage != ''">
+        and a.photo_image = #{photoImage}
+      </if>
+      <if test="signImage != null and signImage != ''">
+        and a.sign_image = #{signImage}
+      </if>
+      <if test="introduce != null and introduce != ''">
+        and a.introduce = #{introduce}
+      </if>
+      <if test="speciality != null and speciality != ''">
+        and a.speciality = #{speciality}
+      </if>
+      <if test="address != null and address != ''">
+        and a.address = #{address}
+      </if>
+      <if test="email != null and email != ''">
+        and a.email = #{email}
+      </if>
+      <if test="phone != null and phone != ''">
+        and a.phone = #{phone}
+      </if>
+      <if test="educationCode != null and educationCode != ''">
+        and a.education_code = #{educationCode}
+      </if>
+      <if test="majorCode != null and majorCode != ''">
+        and a.major_code = #{majorCode}
+      </if>
+      <if test="school != null and school != ''">
+        and a.school = #{school}
+      </if>
+      <if test="schoolDate != null">
+        and a.school_date = #{schoolDate}
+      </if>
+      <if test="schoolImage != null and schoolImage != ''">
+        and a.school_image = #{schoolImage}
+      </if>
+      <if test="workDate != null">
+        and a.work_date = #{workDate}
+      </if>
+      <if test="workTypeCode != null and workTypeCode != ''">
+        and a.work_type_code = #{workTypeCode}
+      </if>
+      <if test="dutiesCode != null and dutiesCode != ''">
+        and a.duties_code = #{dutiesCode}
+      </if>
+      <if test="pracCertiNo != null and pracCertiNo != ''">
+        and a.prac_certi_no = #{pracCertiNo}
+      </if>
+      <if test="pracCertiName != null and pracCertiName != ''">
+        and a.prac_certi_name = #{pracCertiName}
+      </if>
+      <if test="durgCode != null and durgCode != ''">
+        and a.durg_code = #{durgCode}
+      </if>
+      <if test="antibacterialCode != null and antibacterialCode != ''">
+        and a.antibacterial_code = #{antibacterialCode}
+      </if>
+      <if test="phCode != null and phCode != ''">
+        and a.ph_code = #{phCode}
+      </if>
+      <if test="opeartionCode != null and opeartionCode != ''">
+        and a.opeartion_code = #{opeartionCode}
+      </if>
+      <if test="pswdErrCnt != null">
+        and a.pswd_err_cnt = #{pswdErrCnt}
+      </if>
+      <if test="lastLoginTime != null">
+        and a.last_login_time = #{lastLoginTime}
+      </if>
+      <if test="lastLoginIp != null and lastLoginIp != ''">
+        and a.last_login_ip = #{lastLoginIp}
+      </if>
+      <if test="statusCode != null and statusCode != ''">
+        and a.status_code = #{statusCode}
+      </if>
+      <if test="pym != null and pym != ''">
+        and a.pym = #{pym}
+      </if>
+      <if test="wbm != null and wbm != ''">
+        and a.wbm = #{wbm}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and a.crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and a.crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and a.crte_time = #{crteTime}
+      </if>
+      <if test="signaturePath != null and signaturePath != ''">
+        and a.signature_path = #{signaturePath}
+      </if>
+      <if test="doctorIntro != null and doctorIntro != ''">
+        and a.doctor_intro = #{doctorIntro}
+      </if>
+      <if test="isGuide != null and isGuide != ''">
+        and a.is_guide = #{isGuide}
+      </if>
+    </where>
+  </select>
+
 	<!--查询执行护士-->
     <select id="queryExecuteNurseInfo" resultMap="SysUserMap">
         select

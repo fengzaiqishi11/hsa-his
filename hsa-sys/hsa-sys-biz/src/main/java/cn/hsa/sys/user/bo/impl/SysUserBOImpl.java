@@ -110,6 +110,9 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
      **/
     @Override
     public List<SysUserDTO> queryAll(SysUserDTO sysUserDTO) {
+         if("1".equals(sysUserDTO.getFlag())) {
+           return this.sysUserDAO.queryBedUserAll(sysUserDTO);
+         }
         return this.sysUserDAO.queryAll(sysUserDTO);
     }
 

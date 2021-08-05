@@ -1173,7 +1173,7 @@
         select *
         from insure_individual_visit
         where hosp_code = #{hospCode}
-          and medical_reg_no = #{psn_no}
+          and medical_reg_no = #{mdtrt_id}
           and aac001 = #{psn_no}
     </select>
 

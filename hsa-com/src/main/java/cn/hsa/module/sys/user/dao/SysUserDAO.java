@@ -42,6 +42,20 @@ public interface SysUserDAO {
      **/
     List<SysUserDTO> queryAll(SysUserDTO sysUserDTO);
 
+
+    /**
+    * @Menthod queryAll
+    * @Desrciption 查询安床医生和护士  按权限
+    *
+    * @Param
+    * [sysUserDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/8/4 16:07
+    * @Return java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>
+    **/
+    List<SysUserDTO> queryBedUserAll(SysUserDTO sysUserDTO);
+
     /**
      * @Method queryPage
      * @Desrciption 分页查询人员信息
@@ -193,7 +207,7 @@ public interface SysUserDAO {
     * @Desrciption  通过科室编码deptCode查询用户系统表，找到可以操作此科室用户编码（userCode），再去用户表通过userCode找到相应的用户
      * @param map
     * @Author xingyu.xie
-    * @Date   2020/9/1 11:45 
+    * @Date   2020/9/1 11:45
     * @Return java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>
     **/
     List<SysUserDTO> queryUserByOperationDeptId(Map map);

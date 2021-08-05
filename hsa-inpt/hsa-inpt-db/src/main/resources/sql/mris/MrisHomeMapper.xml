@@ -823,7 +823,7 @@
             a.in_mode_code as inWay,
             bf.native_place as nativePlace,
             bf.native_address as nativeAdress,
-            a.patient_code as payWayCode
+            code_9.remark as payWayCode
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id
@@ -836,6 +836,7 @@
              left join sys_code_detail code_6 on (a.in_situation_code = code_6.value and code_6.c_code ='RYQK')
              left join sys_code_detail code_7 on (a.out_situation_code = code_7.value and code_7.c_code = 'CYBQ')
              left join sys_code_detail code_8 on (a.out_mode_code = code_8.value and code_8.c_code = 'CYFS')
+             left join sys_code_detail code_9 on (a.patient_code = code_9.value and code_9.c_code = 'BRLX')
         WHERE a.hosp_code = #{hospCode}
         AND a.id = #{visitId}
         limit 1

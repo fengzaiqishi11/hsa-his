@@ -1,5 +1,6 @@
 package cn.hsa.module.outpt.outptclassify.dao;
 
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO;
 import org.apache.ibatis.annotations.Param;
@@ -43,6 +44,7 @@ public interface OutptClassifyDAO {
   **/
   List<OutptClassifyDTO> queryAllandPage(OutptClassifyDTO outptClassifyDTO);
 
+  List<OutptClassifyDTO> queryAllWithClassQueueId(OutptClassifyDTO classifyDTO);
   /**
   * @Menthod queryNameIsExist
   * @Desrciption 查询该挂号类别是否已存在

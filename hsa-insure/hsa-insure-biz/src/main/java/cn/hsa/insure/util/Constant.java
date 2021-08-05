@@ -755,6 +755,11 @@ public interface Constant {
             public static final String UP_1314 = "1314"; // 中医证候目录下载
             public static final String UP_1315 = "1315"; // 中医证候目录下载
         }
+
+        public static class CARD {
+            public static final String UP_1602 = "1602"; // 身份证密码校验
+            public static final String UP_1603 = "1603"; // 修改身份证密码
+        }
     }
 
 }

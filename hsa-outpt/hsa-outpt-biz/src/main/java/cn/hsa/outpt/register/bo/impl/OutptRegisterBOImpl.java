@@ -249,8 +249,6 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         disposeHisGh(outptRegisterDTO, outptVisitDTO, ghid, ghdh, jzid, sysdate, hospCode, docId, docName);
         // 处理门诊挂号费用
         disposeGhfy(regDetailList, outptRegisterDTO, ghid, jzid, hospCode, docId, docName, sysdate);
-        // 向分诊队列插入数据
-         disposeTriageVisit(outptVisitDTO, outptRegisterDTO, ghid, ghdh, jzid, hospCode);
         String settleId = "";
         // 在挂号处直接收费 直接插入数据进挂号结算表
         if (SFJS){
@@ -276,6 +274,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         mapPatamater.put("hospCode", hospCode);
         mapPatamater.put("code", "GH_FSD_SF");
         SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(mapPatamater).getData();
+        String seqNo = "";
         if("1".equals(sysParameterDTO.getValue())){ //开启
             //挂号到医生
             if(!StringUtils.isEmpty(outptRegisterDTO.getDoctorId())){
@@ -286,11 +285,12 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 }else{
                     //非加号
                     // 挂号表绑定号源明细数据 挂号id，医院编码，坐诊队列id
-                    updateRegisterDrid(ghid, hospCode, outptRegisterDTO.getDqId(), outptVisitDTO.getProfileId());
+                    seqNo = updateRegisterDrid(ghid, hospCode, outptRegisterDTO.getDqId(), outptVisitDTO.getProfileId());
                 }
             }
         }
-
+        // 向分诊队列插入数据
+        disposeTriageVisit(outptVisitDTO, outptRegisterDTO, ghid, seqNo, jzid, hospCode);
         // TODO: 2020/8/19 调用建档接口
         //判断有无证件号码
         if(!StringUtils.isEmpty(outptVisitDTO.getCertNo())){
@@ -501,19 +501,43 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         Map map = new HashMap();
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
         baseDeptDTO.setHospCode(outptClassifyDTO.getHospCode());
-//        baseDeptDTO.setTypeCode("M");
         map.put("baseDeptDTO", baseDeptDTO);
         map.put("hospCode" , outptClassifyDTO.getHospCode());
 
-//        WrapperResponse<List<BaseDeptDTO>> response = baseDeptService.queryAll(map);
         List<BaseDeptDTO> deptList = outptRegisterDAO.queryDeptAll(baseDeptDTO);
         List<String> deptIds = deptList.stream().map(BaseDeptDTO :: getId).collect(Collectors.toList());
         OutptClassifyDTO outptClassifyDTOTem = new OutptClassifyDTO();
         outptClassifyDTOTem.setHospCode(outptClassifyDTO.getHospCode());
         outptClassifyDTOTem.setDeptIds(deptIds);
         outptClassifyDTOTem.setIsValid("1");
-        List<OutptClassifyDTO> classifyList = outptClassifyDAO.queryAllandPage(outptClassifyDTOTem);
-        Map<String, List<OutptClassifyDTO>> deptClassMap = classifyList.stream().collect(Collectors.groupingBy(OutptClassifyDTO::getDeptId));
+        List<OutptClassifyDTO> classifyList = null;
+
+        Map queueIngUpParams = new HashMap();
+        queueIngUpParams.put("hospCode", outptClassifyDTO.getHospCode());
+        queueIngUpParams.put("code", "QUEUING_UP_SF");
+
+        // 是否开启排队叫号
+        SysParameterDTO queuingUpInfo = sysParameterService.getParameterByCode(queueIngUpParams).getData();
+        if(Constants.SF.S.equals(queuingUpInfo.getValue())){
+            outptClassifyDTOTem.setQueueDate(DateUtils.format(new Date(),DateUtils.Y_M_D));
+            classifyList = outptClassifyDAO.queryAllWithClassQueueId(outptClassifyDTOTem);
+            List<BaseDeptDTO> deptListNew = new ArrayList<>(5);
+            Map<String, List<OutptClassifyDTO>> deptClassMap = classifyList.stream().collect(Collectors.groupingBy(OutptClassifyDTO::getDeptId));
+            for (List<OutptClassifyDTO> classifyDTOList : deptClassMap.values()) {
+                BaseDeptDTO baseDeptDTO1 = new BaseDeptDTO();
+                baseDeptDTO1.setId(classifyDTOList.get(0).getDeptId());
+                baseDeptDTO1.setName(classifyDTOList.get(0).getDeptName());
+                baseDeptDTO1.setHospCode(classifyDTOList.get(0).getHospCode());
+                baseDeptDTO1.setTypeCode(classifyDTOList.get(0).getDeptTypeCode());
+                baseDeptDTO1.setCode(classifyDTOList.get(0).getDeptCode());
+                baseDeptDTO1.setUpDeptCode(classifyDTOList.get(0).getUpDeptCode());
+                baseDeptDTO1.setChildren(classifyDTOList);
+                deptListNew.add(baseDeptDTO1);
+            }
+            return deptListNew;
+        }else {
+         classifyList = outptClassifyDAO.queryAllandPage(outptClassifyDTOTem);
+         Map<String, List<OutptClassifyDTO>> deptClassMap = classifyList.stream().collect(Collectors.groupingBy(OutptClassifyDTO::getDeptId));
 
 
         List<BaseDeptDTO> deptListNew = new ArrayList<>();
@@ -524,6 +548,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             }
         }
         return deptListNew;
+        }
     }
 
     @Override
@@ -746,20 +771,22 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
      * @param outptVisitDTO 处理后的门诊病人信息
      * @param outptRegisterDTO   处理后的门诊挂号信息
      * @param ghid 挂号ID
-     * @param ghdh 挂号单号
+     * @param seqNo  队列排序号
      * @param jzid 就诊ID
      * @param hospCode 医院编码
      * @Author: luonianxin
      * @Email: nianxin.luo@powersi.com
      * @Date: 2021/6/22 19:37
      **/
-    private void disposeTriageVisit(OutptVisitDTO outptVisitDTO, OutptRegisterDTO outptRegisterDTO, String ghid, String ghdh, String jzid, String hospCode) {
+    private void disposeTriageVisit(OutptVisitDTO outptVisitDTO, OutptRegisterDTO outptRegisterDTO, String ghid, String  seqNo, String jzid, String hospCode) {
         OutptTriageVisitDTO outptTriageVisitDTO = new OutptTriageVisitDTO();
         outptTriageVisitDTO.setId(SnowflakeUtils.getId());
         outptTriageVisitDTO.setHospCode(hospCode);
         outptTriageVisitDTO.setRegisterId(ghid);
         outptTriageVisitDTO.setVisitId(jzid);
         outptTriageVisitDTO.setDqId(outptRegisterDTO.getDqId());
+        outptTriageVisitDTO.setTriageId(outptRegisterDTO.getTriageId());
+        outptTriageVisitDTO.setTriageName(outptRegisterDTO.getTriageName());
 
         String triageCode = null;
 
@@ -825,20 +852,19 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         // 分诊单号
         outptTriageVisitDTO.setTriageNo(orderNo.getData());
 
-        // 就诊人姓名
         outptTriageVisitDTO.setName(outptVisitDTO.getName());
         outptTriageVisitDTO.setIsValid(Constants.SF.S);
         outptTriageVisitDTO.setDeptId(outptRegisterDTO.getDeptId());
         outptTriageVisitDTO.setDeptName(outptRegisterDTO.getDeptName());
         outptTriageVisitDTO.setCrteId(outptRegisterDTO.getCrteId());
         outptTriageVisitDTO.setCrteName(outptRegisterDTO.getCrteName());
+        outptTriageVisitDTO.setCqId(outptRegisterDTO.getClassQueueId());
         outptTriageVisitDTO.setCrteTime(DateUtils.getNow());
+        outptTriageVisitDTO.setTriagePeoTime(DateUtils.getNow());
         if(outptTriageVisitDTO.getSortNo() == null)
-        outptTriageVisitDTO.setSortNo(getSequenceNoByCond(outptRegisterDTO.getDeptId(),null,hospCode));
+        outptTriageVisitDTO.setSortNo("".equals(seqNo)?getSequenceNoByCond(outptRegisterDTO.getDeptId(),null,hospCode):Integer.valueOf(seqNo));
 
         outptTriageVisitDao.insertOutptTriageVisit(outptTriageVisitDTO);
-
-        // 调用叫号系统的挂号接口，将挂号到医生的病人信息传输给叫号系统,
         // 挂号到部门的在分诊台分诊时触发
         if (outptTriageVisitDTO.getDoctorId() != null) {
             // 查询系统参数中配置的排队叫号接口
@@ -988,14 +1014,13 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
 
 
     /**
-     * @Method updateRegisterDrid
-     * @Desrciption 更新号源表和挂号表信息
+     * 更新号源表和挂号表信息
      @params [registerId, hospCode, dqId, profileId]
-      * @Author chenjun
+     * @Author:  chenjun
      * @Date   2020/8/19 14:15
-     * @Return void
+     * @return  java.lang.String 当前号源的队列排序号
      **/
-    private void updateRegisterDrid(String registerId, String hospCode, String dqId, String profileId){
+    private String updateRegisterDrid(String registerId, String hospCode, String dqId, String profileId){
         Date nowDate = new Date();
         String nowHms = "08:30:00";
         Map map = new HashMap();
@@ -1004,6 +1029,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         map.put("isUse", "0");
         map.put("isLock", "0");
         map.put("isAdd", "0");
+        // 号源排序号
+        String seqNo = "";
+
         //按时间排序查询出所有大于当前时间号源
         List<OutptDoctorRegisterDO> list = outptRegisterDAO.queryDoctorRegisterByTime(map);
         if(ListUtils.isEmpty(list)){
@@ -1020,7 +1048,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptRegisterDTO.setHospCode(hospCode);
         outptRegisterDTO.setId(registerId);
         outptRegisterDTO.setDrId(outptDoctorRegisterDO.getId());
-
+        seqNo = outptDoctorRegisterDO.getSeqNo();
         //挂号表绑定号源id
         outptRegisterDAO.updateByPrimaryKeySelective(outptRegisterDTO);
 
@@ -1031,6 +1059,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptDoctorRegisterDOUpdate.setProfileId(profileId);
         //修改号源表状态，已锁定
         outptRegisterDAO.updateDoctorRegisterStatus(outptDoctorRegisterDOUpdate);
+        return seqNo;
     }
 
     private void insertDoctouRegisterIsAdd(String hospCode, String dqId, String profileId, String docId, String docName){

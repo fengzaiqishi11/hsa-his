@@ -394,6 +394,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         dataMap.put("setl_id",MapUtils.get(parameterMap, "setl_id"));//结算ID
         dataMap.put("psn_no",MapUtils.get(parameterMap, "psn_no"));//人员编号
         dataMap.put("mdtrt_id",MapUtils.get(parameterMap, "mdtrt_id"));//人员编号
+
+
+
         Map<String, Object> resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
 
         return resultMap;

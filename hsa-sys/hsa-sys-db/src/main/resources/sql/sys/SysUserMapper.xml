@@ -55,6 +55,7 @@
 		<result property="signaturePath" column="signature_path" jdbcType="VARCHAR"/>
 		<result property="doctorIntro" column="doctor_intro" jdbcType="VARCHAR"/>
 		<result property="isGuide" column="is_guide" jdbcType="VARCHAR"/>
+		<result property="isAnaesthesia" column="is_anaesthesia" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.sys.user.dto.SysUserSystemDTO" id="SysUserSystemMap">
@@ -84,7 +85,7 @@
           prac_certi_name, durg_code, antibacterial_code, ph_code,
           opeartion_code, pswd_err_cnt, last_login_time, last_login_ip,
           status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path,
-          doctor_intro, is_guide
+          doctor_intro, is_guide,is_anaesthesia
         from sys_user
         where hosp_code = #{hospCode} and id = #{id}
     </select>
@@ -103,7 +104,7 @@
 		a.opeartion_code,
 		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
 		a.crte_id,a.crte_name,
-		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,
+		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,a.is_anaesthesia,
 		b.name as deptName
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
@@ -271,6 +272,9 @@
 			</if>
 			<if test="isGuide != null and isGuide != ''">
 				and a.is_guide = #{isGuide}
+			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				and a.is_anaesthesia = #{isAnaesthesia}
 			</if>
 		</where>
 	</select>
@@ -503,7 +507,7 @@
 		a.opeartion_code,
 		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
 		a.crte_id,a.crte_name,
-		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,
+		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,a.is_anaesthesia,
 		b.name as deptName
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
@@ -654,14 +658,17 @@
 				a.wbm like concat('%',#{keyword},'%')
 				)
 			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				and a.is_anaesthesia = #{isAnaesthesia}
+			</if>
 		</where>
 		order by a.code asc
 	</select>
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="" useGeneratedKeys="true">
-        insert into sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro, is_guide)
-        values (#{id}, #{hospCode}, #{deptCode}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{isPm}, #{inPmDate}, #{certCode}, #{certNo}, #{photoImage}, #{signImage}, #{introduce}, #{speciality}, #{address}, #{email}, #{phone}, #{educationCode}, #{majorCode}, #{school}, #{schoolDate}, #{schoolImage}, #{workDate}, #{workTypeCode}, #{dutiesCode}, #{pracCertiNo}, #{pracCertiName}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{opeartionCode}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime}, #{signaturePath}, #{doctorIntro}, '0')
+        insert into sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro, is_guide,is_anaesthesia)
+        values (#{id}, #{hospCode}, #{deptCode}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{isPm}, #{inPmDate}, #{certCode}, #{certNo}, #{photoImage}, #{signImage}, #{introduce}, #{speciality}, #{address}, #{email}, #{phone}, #{educationCode}, #{majorCode}, #{school}, #{schoolDate}, #{schoolImage}, #{workDate}, #{workTypeCode}, #{dutiesCode}, #{pracCertiNo}, #{pracCertiName}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{opeartionCode}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime}, #{signaturePath}, #{doctorIntro}, '0',#{isAnaesthesia})
     </insert>
 
 	<!--通过主键修改数据-->
@@ -807,6 +814,9 @@
 			<if test="isGuide != null and isGuide != ''">
 				is_guide = #{isGuide},
 			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				is_anaesthesia = #{isAnaesthesia},
+			</if>
 		</set>
 		where id= #{id} and hosp_code = #{hospCode}
 	</update>
@@ -922,7 +932,7 @@
 		native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality,
 		address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code,
 		duties_code, prac_certi_no, durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt,
-		last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro,is_guide
+		last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro,is_guide,is_anaesthesia
 		from sys_user
 		where sys_user.hosp_code = #{hospCode}
 		<if test="workTypeCode != null and workTypeCode.size()>0">
@@ -1038,7 +1048,7 @@
 		a.opeartion_code,
 		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
 		a.crte_id,a.crte_name,
-		a.crte_time,a.signature_path, a.doctor_intro,a.is_guide,
+		a.crte_time,a.signature_path, a.doctor_intro,a.is_guide,a.is_anaesthesia
 		b.name as deptName
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code

@@ -26,7 +26,7 @@
         order by seq_no
     </select>
     <select id="getMrisBaseInfo" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
-       select b.visit_id, IFNULL(b.yljg_code,'-')  as A01,
+       select b.visit_id, IFNULL(CONCAT("\t",b.yljg_code),'-')  as A01,
         IFNULL(b.hosp_name,'-') as A02,
         IFNULL(b.in_profile,'-') as A48,
         IFNULL(b.in_cnt,'-') as A49,
@@ -873,7 +873,7 @@
         IFNULL(c.fy06,0) as D34
        from mris_base_info b LEFT JOIN mris_cost c on c.hosp_code= #{hospCode} and  b.visit_id = c.visit_id
        left join inpt_visit v on v.hosp_code=#{hospCode} and  b.visit_id = v.id
-       where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL AND b.out_time IS NOT NULL
+       where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL
        <if test="keyword != null and keyword !=''">
           and CONCAT(v.name,v.phone,v.cert_no,v.in_no) LIKE CONCAT('%',#{keyword},'%')
        </if>

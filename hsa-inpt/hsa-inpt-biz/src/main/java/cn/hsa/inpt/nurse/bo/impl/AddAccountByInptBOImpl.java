@@ -648,6 +648,7 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setTotalNumUnitCode(inptLongCostDTO.getUnitCode()) ;
                 inptCostDTO.setHerbNoteCode(null);
                 inptCostDTO.setUseCode(inptLongCostDTO.getUseCode()) ;
+                inptCostDTO.setPharId(inptLongCostDTO.getPharId());
                 inptCostDTO.setHerbNum(null);
                 inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptLongCostDTO.getTotalNum(),inptLongCostDTO.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 inptCostDTO.setPreferentialPrice(new BigDecimal(0));
@@ -656,7 +657,6 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setDoctorId(userId);
                 inptCostDTO.setDoctorName(userName);
                 inptCostDTO.setDeptId(loginDeptId) ;
-                inptCostDTO.setPharId(inptVisitById.getItemId()) ;
                 inptCostDTO.setIsDist(Constants.SF.F);
                 inptCostDTO.setIsGive(inptLongCostDTO.getUseCode()) ;
                 inptCostDTO.setBackCode(Constants.TYZT.YFY) ;

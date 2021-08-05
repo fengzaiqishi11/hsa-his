@@ -161,6 +161,12 @@
         ic.cost_time,
         ic.crte_id,
         ic.crte_name,
+        date_format(
+        IFNULL(        (select iis.crte_time from insure_individual_settle iis where iis.visit_id = ic.visit_id
+        and iis.hosp_code = ic.hosp_code and iis.visit_id =#{visitId} and iis.state='0'
+        and iis.insureSettleId is not null order by crte_time desc limit 1 ),  (select iv.in_time from inpt_visit iv where
+        iv.hosp_code = ic.hosp_code and iv.id = ic.visit_id and iv.id=#{visitId}),"%Y-%m-%d") AS statrtDate,
+        DATE_FORMAT(now(),"%Y-%m-%d") as endDate,
         ic.crte_time,
         iim.deductible,
         iim.is_trans,
@@ -248,6 +254,13 @@
             ic.crte_id,
             ic.crte_name,
             ic.crte_time,
+            date_format(
+            IFNULL(        DATE_ADD((select iic.fee_end_time from insure_individual_cost iic where iic.visit_id = ic.visit_id
+            and iic.hosp_code = ic.hosp_code and iic.visit_id =#{item.id}
+            and iic.insure_settle_id is not null order by crte_time desc limit 1 ),INTERVAL 1 DAY),
+                (select iv.in_time from inpt_visit iv where
+            iv.hosp_code = ic.hosp_code and iv.id = ic.visit_id and iv.id=#{item.id})),"%Y-%m-%d") AS startDate,
+            DATE_FORMAT(now(),"%Y-%m-%d") as endDate,
             iim.deductible,
             iim.is_trans,
             iim.insure_item_code,
@@ -331,13 +344,14 @@
     </select>
     <!--    分页查询住院病人类型是医保的数据集-->
     <select id="queryInptPatientPage" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,iv.bed_name,
+        select distinct iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,iv.bed_name,
         iv.age, iv.age_unit_code,iv.status_code,b.aka130_name as aka130Name,iv.in_disease_name,iv.in_disease_icd10,
-        in_dept_name,iv.insure_org_code,iv.zz_doctor_name,iv.crte_time,iv.crte_name,b.insure_reg_code,
+        in_dept_name,iv.insure_org_code,iv.zz_doctor_name,iv.crte_time,iv.crte_name,b.insure_reg_code,b.medical_reg_no,
+        b.is_half_settle,
         b.aac001,b.aka130,b.medicine_org_code,b.visit_icd_code as visitIcdCode ,b.visit_icd_name as visitIcdName
         from inpt_visit iv inner join insure_individual_visit b
         on iv.id = b.visit_id and iv.hosp_code = b.hosp_code
-        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6')
+        where iv.hosp_code=#{hospCode} and iv.status_code in('2','5','6') and b.insure_settle_id is null
         and iv.patient_code !='0'
         <if test="name != null and name != ''">
             and iv.name like concat('%',#{name},'%')
@@ -465,6 +479,29 @@
             )
         </foreach>
     </insert>
+    <insert id="batchInsertCost">
+        insert into insure_individual_cost
+        (id, hosp_code, visit_id, cost_id, settle_id, is_hospital, item_type, item_code, item_name,
+         guest_ratio, primary_price, apply_last_price, order_no, transmit_code, crte_id, crte_name,
+         crte_time, rxSn, overlmtSelfpayAmt, chrgItemLv, fulamtOwnpayFlag, ownpayRea, hiLmtpric,
+         fulamt_ownpay_amt, overlmt_selfpay, preselfpay_amt, inscp_scp_amt, medChrgitmType, overlmt_amt,
+         lmt_used_flag, pric_uplmt_amt, insure_settle_id, insure_is_transmit,
+         batch_no, sum_fee, det_item_fee_sumamt, feedetl_sn,
+         fee_start_time, fee_end_time, insure_register_no, settle_count,is_half_settle)
+        values
+        <foreach collection="individualCostDTOList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.costId}, #{item.settleId},
+            #{item.isHospital},#{item.itemType}, #{item.itemCode}, #{item.itemName},#{item.guestRatio},
+            #{item.primaryPrice},#{item.applyLastPrice},#{item.orderNo},#{item.transmitCode},#{item.crteId},
+            #{item.crteName},#{item.crteTime},#{item.rxSn},#{item.overlmtSelfpayAmt},#{item.chrgItemLv},#{item.fulamtOwnpayFlag},
+            #{item.ownpayRea}, #{item.hiLmtpric}, #{item.fulamtOwnpayAmt}, #{item.overlmtSelfpay},#{item.preselfpayAmt},
+            #{item.inscpScpAmt}, #{item.medChrgitmType}, #{item.overlmtAmt},
+            #{item.lmtUsedFlag}, #{item.pricUplmtAmt},#{item.insureSettleId},#{item.insureIsTransmit},
+            #{item.batchNo}, #{item.sumFee},#{item.detItemFeeSumamt},#{item.feedetlSn},
+            #{item.feeStartTime},  #{item.feeEndTime}, #{item.insureRegisterNo},#{item.settleCount},#{item.isHalfSettle}
+            )
+        </foreach>
+    </insert>
 
     <!-- 查询费用传输、已传输、未传输费用信息-->
     <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -548,7 +585,9 @@
         iim.check_price checkCode,
         iim.manufacturer manufacturer,
         iim.tcmdrug_used_way tcmdrugUsedWay,
-        ic.is_reimburse as isReimburse
+        iim.lmt_user_flag lmtUserFlag,
+        ic.is_reimburse isReimburse
+
         FROM
         inpt_cost ic
         JOIN insure_item_match iim
@@ -568,6 +607,15 @@
         <if test="queryBaby != null and queryBaby =='N'.toString() " >
             and (ic.baby_id is null or trim(ic.baby_id) = '')
         </if>
+        <if test="isHalfSettle == '1'.toString() " >
+            <if test="feeStartDate != null and feeStartDate != '' ">
+                and date(ic.cost_time) &gt;= STR_TO_DATE(#{feeStartDate},'%Y-%m-%d')
+            </if>
+            /*结束日期*/
+            <if test="feeEndDate != null and feeEndDate != ''">
+                and date(ic.cost_time) &lt;= STR_TO_DATE(#{feeEndDate},'%Y-%m-%d')
+            </if>
+        </if>
         order by ic.total_price desc
     </select>
     <select id="queryLastestOrderNo" resultType="java.lang.String">
@@ -580,6 +628,9 @@
         FROM
         insure_individual_cost
         WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
+            and insure_register_no  = #{medicalRegNo}
+        </if>
         <if test="insureIsTransmit !=null and insureIsTransmit != ''">
             and insure_is_transmit is not null
         </if>
@@ -588,11 +639,16 @@
     <select id="queryInptCostList" parameterType="java.util.Map" resultType="java.lang.String">
         select sum(primary_price) from insure_individual_cost where hosp_code = #{hospCode} and visit_id =#{visitId}
                           and ifnull(insure_settle_id,'0') = '0'
-
+        <if test="medicalRegNo !=NULL and medicalRegNo !='' ">
+            and insure_register_no  = #{medicalRegNo}
+        </if>
+        <if test="isHalfSettle == '1'.toString() ">
+            and settle_count = #{settleCount}
+        </if>
     </select>
     <select id="selectInsureIndividualCost"
             resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
-        select iic.cost_id,iic.visit_id,iiv.medicine_org_code, iiv.aac001, iic.insure_is_transmit,ic.feedetl_sn
+        select iic.cost_id,iic.visit_id,iiv.medicine_org_code, iiv.aac001, iic.insure_is_transmit
         from insure_individual_cost iic left join insure_individual_visit iiv on
         iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
         join inpt_cost ic on ic.id = iic.cost_id and ic.hosp_code = iic.hosp_code
@@ -634,6 +690,12 @@
         <foreach collection="individualCostDTOList" item="item" index="index" open="" close="" separator=";">
             update insure_individual_cost
             <set>
+                <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
+                    feedetl_Sn = #{item.feedetl_sn},
+                </if>
+                <if test="item.fulamtOwnpayAmt !=null ">
+                    fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},
+                </if>
                 <if test="item.fulamtOwnpayAmt !=null ">
                     fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},
                 </if>
@@ -679,7 +741,20 @@
                     insure_is_transmit = #{item.insureIsTransmit},
                 </if>
                 <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
-                    feedetl_Sn = #{item.feedetl_sn}
+                    feedetl_Sn = #{item.feedetl_sn},
+                </if>
+                <if test="item.startDate !=null and item.startDate !='' ">
+                    fee_start_time = STR_TO_DATE(#{item.startDate},'%Y-%m-%d'),
+                </if>
+                <if test="item.endDate !=null and item.endDate !='' ">
+                    fee_end_time = STR_TO_DATE(#{item.endDate},'%Y-%m-%d'),
+                </if>
+                <if test="item.medicalRegNo !=null and item.medicalRegNo !='' ">
+                    insure_register_no = #{item.medicalRegNo},
+                </if>
+                <if test="item.isHalfSettle !=null and item.isHalfSettle != ''">
+                    is_half_settle = #{item.isHalfSettle},
+                    settle_count =settle_count +1
                 </if>
             </set>
             where  cost_id = #{item.id} and hosp_code =#{item.hospCode} and visit_id =#{item.visitId}
@@ -763,6 +838,7 @@
             iim.standard_code standardCode,
             iim.check_price checkCode,
             iim.lmt_user_flag lmtUserFlag,
+            ic.is_reimburse  isReimburse,
             iim.manufacturer manufacturer,
             iim.tcmdrug_used_way tcmdrugUsedWay
         FROM
@@ -786,6 +862,9 @@
     </select>
     <delete id="deleteOutptInsureCost">
         delete from insure_individual_cost where visit_id =#{id} and hosp_code = #{hospCode}
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
+            and  insure_register_no = #{medicalRegNo}
+        </if>
         <if test="insureSettleId !=null and insureSettleId !='' ">
             and  insure_settle_id is null
         </if>
@@ -980,17 +1059,76 @@
         and feedetl_sn is not null order by feedetl_sn desc limit 1
     </select>
     <update id="updateLimitUserFlag">
-        update inpt_advice_detail set lmt_user_flag =#{lmtUserFlag}
+        update inpt_cost set is_reimburse =#{isReimburse}
         where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
     </update>
-    <select id="queryInptCostPage" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
-        select ic.id, ic.hosp_code, ic.visit_id, ic.ia_id, ic.ba_id, ic.ia_group_no, ic.bfc_id, ic.item_code,
-               ic.item_id, ic.item_name, ic.num, ic.unit_code, ic.price,
-               ic.total_price, ic.use_code, ic.source_code, ic.lmt_user_flag as is_hosp_flag, ic.lim_user_explain,ic.lmt_user_flag
-        from inpt_advice_detail ic join insure_item_match iim on iim.hosp_item_id = ic.item_id
-        where ic.hosp_code =#{hospCode} and ic.visit_id =#{visitId}
+    <select id="queryInptCostPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select ic.id, ic.hosp_code, ic.visit_id, ic.baby_id, ic.iat_id, ic.iatd_group_no, ic.iatd_seq_no,
+               ic.in_dept_id, ic.bfc_id, ic.item_code,
+               item_id,
+               (case ic.item_code
+                    when ic.item_code ='1' then (select bd.code from base_drug bd where ic.item_id = bd.id and bd.hosp_code =ic.hosp_code )
+                    when ic.item_code='2' then (select bm.code from base_material bm where ic.item_id =  bm.id  and bm.hosp_code = ic.hosp_code )
+                    when ic.item_code = '4' then (select ba.code from base_advice ba where ic.item_id = ba.id and ba.hosp_code = ic.hosp_code)
+                    else (select bi.code from base_item bi where ic.item_id = bi.id and bi.hosp_code = ic.hosp_code)
+                   end
+                   ) as hospItemCode,
+               ic.item_name, ic.price, ic.num, ic.spec, ic.prep_code,
+               ic.dosage, dosage_unit_code, ic.usage_code, rate_id, speed_code, ic.use_days, ic.num_unit_code,
+               ic.total_num, ic.total_num_unit_code, ic.herb_note_code, ic.use_code, ic.herb_num, ic.total_price,
+               ic.preferential_price, ic.reality_price, ic.back_num, ic.back_code, ic.doctor_id, ic.doctor_name,
+               (select name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) deptName,
+               ic.dept_id,ic.settle_code,ic.status_code, ic.is_cost, ic.cost_time,ic.lmt_user_flag,ic.lim_user_explain,
+               ic.is_reimburse
+                from inpt_cost ic where ic.hosp_code =#{hospCode} and ic.visit_id =#{visitId}
+            <if test="keyword != null and keyword != ''">
+                and ( item_name like concat('%',#{keyword},'%')
+                )
+            </if>
     </select>
-
-
+    <select id="selectHalfTransmitFee" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select id, hosp_code, visit_id, cost_id, settle_id, is_hospital, item_type,
+               item_code, item_name, guest_ratio, primary_price, apply_last_price, order_no,
+               transmit_code, crte_id, crte_name, crte_time, rxSn, overlmtSelfpayAmt, chrgItemLv,
+               fulamtOwnpayFlag, ownpayRea, hiLmtpric, fulamt_ownpay_amt, overlmt_selfpay, preselfpay_amt,
+               inscp_scp_amt, medChrgitmType, overlmt_amt, lmt_used_flag, pric_uplmt_amt, insure_settle_id,
+               insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt, feedetl_sn,
+               init_feedetl_sn, fee_start_time, fee_end_time, insure_register_no, settle_count
+        from insure_individual_cost where visit_id =#{visitId} and hosp_code =#{hospCode} and insure_register_no =#{medicalRegNo}
+        <if test="insureSettleId == '1'.toString()">
+            and insure_settle_id is not null
+        </if>
+        <if test="insureSettleId == '0'.toString()">
+            and insure_settle_id is null
+        </if>
+        order by fee_end_time desc limit 1
+    </select>
+    <select id="queryLasterCounter" resultType="java.lang.Integer">
+        select settle_count from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+         and insure_register_no = #{medicalRegNo}
+       and insure_settle_id is not null order by feedetl_sn desc limit 1
+    </select>
+    <select id="queryIsSettleFee" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select id, hosp_code, visit_id, baby_id, iat_id, iatd_group_no,
+               iatd_seq_no, advice_exec_id, source_code, source_id, old_cost_id,
+               source_dept_id, in_dept_id, bfc_id, item_code, item_id, item_name, price,
+               num, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code,
+               use_days, num_unit_code, total_num, total_num_unit_code, herb_note_code, use_code, herb_num,
+               total_price, preferential_price, reality_price, back_num, back_code, doctor_id, doctor_name,
+               dept_id, phar_id, is_dist, is_give, is_ok, ok_id, ok_name, ok_time, settle_code, settle_id,
+               is_check, check_id, check_name, check_time, zz_doctor_id, zz_doctor_name, jz_doctor_id,
+               jz_doctor_name, zg_doctor_id, zg_doctor_name, exec_id, exec_name, exec_time, exec_dept_id,
+               plan_exec_time, status_code, is_cost, cost_time, crte_id, crte_name, crte_time, is_wait,
+               distribute_all_detail_id,
+               feedetl_sn, is_hosp_flag, lmt_user_flag, lim_user_explain, is_reimburse from inpt_cost
+              where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
+    </select>
+    <select id="queryIsTransmitFee" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select * from insure_individual_cost
+        where visit_id =#{visitId} and cost_id = #{id} and hosp_code =#{hospCode}
+        <if test="isTransmit == '1'.toString()">
+            and feedetl_sn is not null
+        </if>
+    </select>
 
 </mapper>

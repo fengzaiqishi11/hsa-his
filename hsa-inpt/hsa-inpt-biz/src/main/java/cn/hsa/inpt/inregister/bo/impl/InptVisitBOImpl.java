@@ -245,10 +245,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     @Override
     public String save(InptVisitDTO inptVisitDTO) {
         if (StringUtils.isEmpty(inptVisitDTO.getId())) {
-            if(queryByCertNo(inptVisitDTO) == null){
-                return insert(inptVisitDTO);
-            }else if("2".equals(queryByCertNo(inptVisitDTO).getStatusCode())){
-                throw new AppException("该病人已住院，不可重复住院！");
+            // 排除证件类别为其他的，证件类别为其他的直接进行入院登记
+            if (StringUtils.isNotEmpty(inptVisitDTO.getCertCode()) && !Constants.ZJLB.QT.equals(inptVisitDTO.getCertCode())) {
+                // 校验是否已登记在院
+                InptVisitDTO visitDTO = this.queryByCertNo(inptVisitDTO);
+                if (visitDTO != null && StringUtils.isNotEmpty(visitDTO.getStatusCode()) && Constants.BRZT.ZY.equals(visitDTO.getStatusCode())) {
+                    throw new AppException("该病人已住院，不可重复住院！");
+                }
             }
             return insert(inptVisitDTO);
         } else {
@@ -319,7 +322,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (c) {
             throw new AppException("当前存在预交金余额，无法取消入院登记");
         }
-        inptVisitDAO.deleteById(inptVisitById);
+        inptVisitById.setStatusCode(Constants.BRZT.ZF);
+        inptVisitDAO.invalidPatientStatus(inptVisitById);
         return true;
     }
 
@@ -511,7 +515,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
              insureUnifiedPayParam.put("hospCode",insureIndividualVisitDTO.getHospCode());
              insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
              insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
-
+             insureUnifiedPayParam.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
              insureUnifiedPayParam.put("id",inptVisitDTO.getId());
              insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
              // 删除医保费用数据
@@ -975,7 +979,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 Map<String, Object> insureUnifiedPayParam = new HashMap<>();
                 insureUnifiedPayParam.put("hospCode",insureInptRegisterDTO.getHospCode());
                 insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
-                insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
+//                insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
                 /**统一支付平台调用   结束*/
             }else{
                 if (!Constants.BRLX.SNYDBR.equals(inptVisitDTO.getPatientCode()) && !Constants.BRLX.SWYDBR.equals(inptVisitDTO.getPatientCode())) {
@@ -1209,7 +1213,38 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("入院科室名称不可为空");
         }
         //设置住院号
-        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        // 20210803 liuliyun 珠海住院号生成
+        Map sysParam=new HashMap();
+        sysParam.put("hospCode",inptVisitDTO.getHospCode());
+        sysParam.put("code","BAH_SF");
+        SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(sysParam).getData();
+        // 未配置系统参数时，添加默认值
+        if (sysParameterDTO ==null){
+            sysParameterDTO=new SysParameterDTO();
+            sysParameterDTO.setValue("0");
+        }
+        String orderNo ="";
+        if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
+            // 住院次数获取(未获取，默认1次)
+            Map countMap=new HashMap();
+            countMap.put("hospCode",inptVisitDTO.getHospCode());
+            countMap.put("certCode",inptVisitDTO.getCertCode());
+            countMap.put("certNo",inptVisitDTO.getCertNo());
+            List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
+            int inCnt = 1;
+            if (info == null|| info.size() ==0) {
+                inCnt = 1;
+                orderNo = getOrderNo(inptVisitDTO.getHospCode(), "361")+"-00"+inCnt;
+            }else {
+                if (info.get(0).get("total_in")!=null) {
+                    inCnt = (int) info.get(0).get("total_in");
+                    inCnt = inCnt + 1;
+                }
+                orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
+            }
+        }else {
+            orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        }
         inptVisitDTO.setInNo(orderNo);
 
         // 档案表操作
@@ -1374,9 +1409,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
 //        pf.setInProfile(inptVisitDTO.getInNo());
         pf.setOutProfile(wr.getData().getOutProfile()); //门诊档案号
+        pf.setTotalOut(wr.getData().getTotalOut() == null ? 0 : wr.getData().getTotalOut()); //门诊次数
+        pf.setOutptLastVisitTime(wr.getData().getOutptLastVisitTime()); // 最后门诊就诊时间
         pf.setInProfile(wr.getData().getInProfile()); //住院病案号
-        pf.setInptLastVisitTime(DateUtils.getNow());
-        pf.setTotalIn(1);
+        pf.setTotalIn(wr.getData().getTotalIn() == null ? 1 : wr.getData().getTotalIn()); // 住院次数
+        pf.setInptLastVisitTime(wr.getData().getInptLastVisitTime() == null ? DateUtils.getNow() : wr.getData().getInptLastVisitTime()); // 最后住院就诊时间
         pf.setContactAddress(inptVisitDTO.getAddress());
         pf.setPatientCode(inptVisitDTO.getPatientCode());
         pf.setPreferentialTypeId(inptVisitDTO.getPreferentialTypeId());

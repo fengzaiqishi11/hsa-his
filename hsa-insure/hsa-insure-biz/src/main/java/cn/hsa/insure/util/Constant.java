@@ -666,6 +666,8 @@ public interface Constant {
             public static final String UP_5261 = "5261"; // 结算单查询
             public static final String UP_5262 = "5262"; // 结算信息查询
             public static final String UP_5265 = "5265"; // 结算单下载
+            public static final String UP_5269 = "5269"; // 异地门诊结算单下载
+            public static final String UP_5270 = "5270"; // 异地住院结算单下载
         }
 
         public static class INPT {

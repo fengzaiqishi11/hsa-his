@@ -229,5 +229,9 @@ public class SysUserDO extends PageDO implements Serializable {
      * 是否阅读指引
      */
     private String isGuide;
+    /**
+     * 是否具有麻醉权
+     */
+    private String isAnaesthesia;
 
 }

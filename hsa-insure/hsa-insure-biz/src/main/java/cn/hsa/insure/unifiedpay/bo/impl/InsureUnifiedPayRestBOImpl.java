@@ -1499,8 +1499,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureItemMatchDTOList.add(insureItemMatchDTO);
                 }
             }
-        } else {
-            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity()));
+        }
+        else {
+            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (k1, k2) -> k1));
             InsureItemMatchDTO insureItemMatchDTO = null;
             for (BaseItemDTO baseItemDTO : baseItemDTOList) {
                 if (!collect.isEmpty() && collect.containsKey(baseItemDTO.getNationCode()) && !StringUtils.isEmpty(baseItemDTO.getNationCode())) {

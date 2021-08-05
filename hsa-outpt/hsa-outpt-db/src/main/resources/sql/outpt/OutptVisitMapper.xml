@@ -616,7 +616,7 @@
                 clr_type = #{clrType,jdbcType=VARCHAR}
             </if>
         </set>
-        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId}
+        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId} and settle_id =#{settleId}
         <if test="state != null and state != ''">
             and  state = #{state,jdbcType=VARCHAR}
         </if>

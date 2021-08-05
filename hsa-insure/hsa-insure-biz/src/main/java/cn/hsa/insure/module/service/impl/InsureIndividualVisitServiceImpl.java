@@ -140,4 +140,33 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
         InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
         return WrapperResponse.success(insureIndividualVisitBO.updateInsureInidivdual(inptVisitDTO));
     }
+
+    /**
+     * @param map
+     * @Method selectInsureInfo
+     * @Desrciption 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/30 15:32
+     * @Return
+     */
+    @Override
+    public WrapperResponse<InsureIndividualVisitDTO> selectInsureInfo(Map<String, Object> map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        return WrapperResponse.success(insureIndividualVisitBO.selectInsureInfo(insureIndividualVisitDTO));
+    }
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+    @Override
+    public  WrapperResponse<Boolean> updateInsureSettleId(Map<String, Object> settleMap) {
+        return WrapperResponse.success(insureIndividualVisitBO.updateInsureSettleId(settleMap));
+    }
 }

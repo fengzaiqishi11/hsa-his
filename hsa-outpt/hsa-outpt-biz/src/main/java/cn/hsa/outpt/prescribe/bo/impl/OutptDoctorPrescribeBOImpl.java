@@ -2918,7 +2918,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         return outptCostDTOList;
     }
 
-
+    
 
     /**
      * @Method: buildOperInfo
@@ -2932,60 +2932,49 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     private void buildOperInfo(List<OutptPrescribeDTO> outptPrescribeDTOList, OutptVisitDTO outptVisitDTO) {
         for(OutptPrescribeDTO outptPrescribeDTO : outptPrescribeDTOList){
             for (OutptPrescribeDetailsDTO outptPrescribeDetailsDTO : outptPrescribeDTO.getOutptPrescribeDetailsDTOList()) {
-                //医嘱目录
-                if (Constants.XMLB.YZML.equals(outptPrescribeDetailsDTO.getItemCode()) ) {
-                    List<BaseItemDTO> baseItemList = outptDoctorPrescribeDAO.getAdviceDetail(outptPrescribeDetailsDTO);
-                    //手术申请
-                    if(!ListUtils.isEmpty(baseItemList.stream().filter(s-> "5".equals(s.getYzlb())).collect(Collectors.toList()))){
-                        OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
-                        operInfoRecordDTO.setId(SnowflakeUtils.getId());
-                        operInfoRecordDTO.setHospCode(outptPrescribeDetailsDTO.getHospCode());
-                        operInfoRecordDTO.setVisitId(outptPrescribeDetailsDTO.getVisitId());
-                        operInfoRecordDTO.setAdviceId(outptPrescribeDetailsDTO.getOpId());
-                        operInfoRecordDTO.setName(outptVisitDTO.getName());
-                        operInfoRecordDTO.setGenderCode(outptVisitDTO.getGenderCode());
-                        operInfoRecordDTO.setAge(outptVisitDTO.getAge());
-                        operInfoRecordDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
-                        operInfoRecordDTO.setDeptId(outptPrescribeDTO.getDeptId());
-                        // 手术处方内容
-                        operInfoRecordDTO.setContent(outptPrescribeDetailsDTO.getPrescribePrefix()+
-                                outptPrescribeDetailsDTO.getItemName()+outptPrescribeDetailsDTO.getPrescribeSuffix());
-                        // 诊断
-                        String diagnoseIds = outptPrescribeDTO.getDiagnoseIds();
-                        if (StringUtils.isNotEmpty(diagnoseIds)){
-                            operInfoRecordDTO.setInDiseaseId(diagnoseIds.split(",")[0]);
-                            //根据ID获取ICD10编码
-                            Map map = new HashMap();
-                            BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
-                            baseDiseaseDTO.setHospCode(outptVisitDTO.getHospCode());
-                            baseDiseaseDTO.setId(diagnoseIds.split(",")[0]);
-                            map.put("hospCode", outptVisitDTO.getHospCode());
-                            map.put("baseDiseaseDTO", baseDiseaseDTO);
-                            BaseDiseaseDTO diseaseDTO = baseDiseaseService_consumer.getById(map).getData();
-                            if (diseaseDTO != null) {
-                                operInfoRecordDTO.setInDiseaseIcd10(diseaseDTO.getNationCode());
-                                operInfoRecordDTO.setInDiseaseName(diseaseDTO.getName());
-                            }
-                        }
-                        // 手术的医嘱id和名称
-                        operInfoRecordDTO.setOperDiseaseId(outptPrescribeDetailsDTO.getItemId());
-                        operInfoRecordDTO.setOperDiseaseName(outptPrescribeDetailsDTO.getItemName());
-                        //执行科室
-                        // operInfoRecordDTO.setOperDeptId(outptPrescribeDetailsDTO.getExecDeptId());
-                        // 总价格
-                        operInfoRecordDTO.setTotalPrice(outptPrescribeDetailsDTO.getTotalPrice());
-                        // 状态 待申请
-                        operInfoRecordDTO.setStatusCode("0");
-                        // 主刀医生
-                        operInfoRecordDTO.setDoctorName(outptPrescribeDTO.getCrteName());
-                        operInfoRecordDTO.setDoctorId(outptPrescribeDTO.getCrteId());
-                        // 创建人
-                        operInfoRecordDTO.setCrteId(outptPrescribeDTO.getCrteId());
-                        operInfoRecordDTO.setCrteName(outptPrescribeDTO.getCrteName());
-                        operInfoRecordDTO.setCrteTime(outptPrescribeDTO.getCrteTime());
-                        outptDoctorPrescribeDAO.insertSurgery(operInfoRecordDTO);
+
+                OperInfoRecordDTO operInfoRecordDTO = outptPrescribeDetailsDTO.getOperInfoRecordDTO();
+                if(operInfoRecordDTO == null)return;
+                operInfoRecordDTO.setId(SnowflakeUtils.getId());
+                operInfoRecordDTO.setHospCode(outptPrescribeDetailsDTO.getHospCode());
+                operInfoRecordDTO.setVisitId(outptPrescribeDetailsDTO.getVisitId());
+                operInfoRecordDTO.setAdviceId(outptPrescribeDetailsDTO.getOpId());
+                operInfoRecordDTO.setName(outptVisitDTO.getName());
+                operInfoRecordDTO.setGenderCode(outptVisitDTO.getGenderCode());
+                operInfoRecordDTO.setAge(outptVisitDTO.getAge());
+                operInfoRecordDTO.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
+                operInfoRecordDTO.setDeptId(outptPrescribeDTO.getDeptId());
+                // 疾病ICD
+                String diagnoseIds = outptPrescribeDTO.getDiagnoseIds();
+                if (StringUtils.isNotEmpty(diagnoseIds)){
+                    operInfoRecordDTO.setInDiseaseId(diagnoseIds.split(",")[0]);
+                    //根据ID获取ICD10编码
+                    Map map = new HashMap();
+                    BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
+                    baseDiseaseDTO.setHospCode(outptVisitDTO.getHospCode());
+                    baseDiseaseDTO.setId(diagnoseIds.split(",")[0]);
+                    map.put("hospCode", outptVisitDTO.getHospCode());
+                    map.put("baseDiseaseDTO", baseDiseaseDTO);
+                    BaseDiseaseDTO diseaseDTO = baseDiseaseService_consumer.getById(map).getData();
+                    if (diseaseDTO != null) {
+                        operInfoRecordDTO.setInDiseaseIcd10(diseaseDTO.getNationCode());
+                        operInfoRecordDTO.setInDiseaseName(diseaseDTO.getName());
                     }
                 }
+                // 手术的医嘱id和名称
+                operInfoRecordDTO.setOperDiseaseId(outptPrescribeDetailsDTO.getItemId());
+                operInfoRecordDTO.setOperDiseaseName(outptPrescribeDetailsDTO.getItemName());
+                operInfoRecordDTO.setTotalPrice(outptPrescribeDetailsDTO.getTotalPrice());
+                // 状态 待申请
+                operInfoRecordDTO.setStatusCode("0");
+                // 主刀医生
+                operInfoRecordDTO.setDoctorName(outptPrescribeDTO.getCrteName());
+                operInfoRecordDTO.setDoctorId(outptPrescribeDTO.getCrteId());
+                // 创建人
+                operInfoRecordDTO.setCrteId(outptPrescribeDTO.getCrteId());
+                operInfoRecordDTO.setCrteName(outptPrescribeDTO.getCrteName());
+                operInfoRecordDTO.setCrteTime(outptPrescribeDTO.getCrteTime());
+                outptDoctorPrescribeDAO.insertSurgery(operInfoRecordDTO);
             }
         }
     }

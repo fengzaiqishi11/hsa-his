@@ -1055,7 +1055,7 @@
         </foreach>
     </select>
     <select id="selectLastFeedSn" resultType="java.lang.String">
-        select feedetl_sn from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+        select feedetl_sn from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId} and insure_register_no =#{medicalRegNo}
         and feedetl_sn is not null order by feedetl_sn desc limit 1
     </select>
     <update id="updateLimitUserFlag">

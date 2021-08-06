@@ -1030,66 +1030,66 @@
     </select>
     <select id="selectInsureInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         select id,
-               hosp_code,
-               visit_id,
-               mib_id,
-               insure_org_code,
-               insure_reg_code,
-               medicine_org_code,
-               is_hospital,
-               visit_no,
-               aac001,
-               medical_reg_no,
-               aka130,
-               aka130_name,
-               bka006,
-               bka006_name,
-               injury_borth_sn,
-               visit_icd_code,
-               visit_icd_name,
-               visit_time,
-               visit_drpt_id,
-               visit_drpt_name,
-               visit_area_id,
-               visit_area_name,
-               visit_berth,
-               starting_price,
-               shift_hosp_code,
-               out_hosp_code,
-               cause,
-               remark,
-               crte_id,
-               crte_name,
-               crte_time,
-               is_ecqr,
-               pay_ord_id,
-               pay_token,
-               accessory_diagnosis_name,
-               accessory_diagnosis_code,
-               insuplc_admdvs,
-               mdtrt_cert_type,
-               mdtrt_cert_no,
-               omsgid,
-               oinfno,
-               pret_flag,
-               fetus_cnt,
-               birctrl_matn_date,
-               fetts,
-               geso_val,
-               latechb_flag,
-               birctrl_type,
-               fpsc_no,
-               matn_type,
-               is_out,
-               insure_settle_id,
-               settle_count,
-               is_half_settle
+        hosp_code,
+        visit_id,
+        mib_id,
+        insure_org_code,
+        insure_reg_code,
+        medicine_org_code,
+        is_hospital,
+        visit_no,
+        aac001,
+        medical_reg_no,
+        aka130,
+        aka130_name,
+        bka006,
+        bka006_name,
+        injury_borth_sn,
+        visit_icd_code,
+        visit_icd_name,
+        visit_time,
+        visit_drpt_id,
+        visit_drpt_name,
+        visit_area_id,
+        visit_area_name,
+        visit_berth,
+        starting_price,
+        shift_hosp_code,
+        out_hosp_code,
+        cause,
+        remark,
+        crte_id,
+        crte_name,
+        crte_time,
+        is_ecqr,
+        pay_ord_id,
+        pay_token,
+        accessory_diagnosis_name,
+        accessory_diagnosis_code,
+        insuplc_admdvs,
+        mdtrt_cert_type,
+        mdtrt_cert_no,
+        omsgid,
+        oinfno,
+        pret_flag,
+        fetus_cnt,
+        birctrl_matn_date,
+        fetts,
+        geso_val,
+        latechb_flag,
+        birctrl_type,
+        fpsc_no,
+        matn_type,
+        is_out,
+        insure_settle_id,
+        settle_count,
+        is_half_settle
         from insure_individual_visit
         where hosp_code = #{hospCode}
-          and visit_id = #{visitId}
-          and insure_settle_id is null
+        and visit_id = #{visitId}
+        and insure_settle_id is null
         <if test="medicalRegNo !=null and medicalRegNo !='' ">
-            and medical_reg_no  = #{medicalRegNo}
+            and medical_reg_no = #{medicalRegNo}
         </if>
         order by crte_time desc
         limit 1
@@ -1167,6 +1167,14 @@
           and insure_settle_id is not null
         order by crte_time desc
         limit 1
+    </select>
+    <select id="queryInsureIndividualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select *
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and medical_reg_no = #{mdtrt_id}
+          and aac001 = #{psn_no}
     </select>
 
 </mapper>

@@ -1295,8 +1295,7 @@
             ON ic.`bfc_id` = bfc.`id` AND ic.`hosp_code` = #{hospCode} AND bfc.`hosp_code` = #{hospCode}
             <if test="patientCode != null and patientCode gt 0">
                 left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id and ic.visit_id = iic.visit_id
-                and iic.insure_is_transmit = '1' and iic.insure_settle_id is null
-
+                and iic.insure_is_transmit = '1' and iic.insure_settle_id is null and iic.is_half_settle = '1'
             </if>
         WHERE ic.visit_id = #{id}
         <if test="settleId != null and settleId != ''">
@@ -1651,7 +1650,7 @@
         c.*
         from
         inpt_cost c left join insure_individual_cost iic on c.hosp_code = iic.hosp_code and c.id = iic.cost_id and c.visit_id = iic.visit_id
-        and iic.insure_is_transmit = '1' and iic.insure_settle_id is null
+        and iic.insure_is_transmit = '1' and iic.insure_settle_id is null and iic.is_half_settle = '1'
         where
         c.hosp_code = #{hospCode}
         AND DATE_FORMAT(c.cost_time, '%Y-%m-%d') BETWEEN DATE_FORMAT(iic.fee_start_time , '%Y-%m-%d')AND DATE_FORMAT(iic.fee_end_time, '%Y-%m-%d' )

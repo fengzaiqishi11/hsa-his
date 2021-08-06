@@ -225,8 +225,9 @@
         where  is_cancel = '0'
         and visit_id = #{visitId}
         and dept_id = #{deptId}
-        <!-- 预出院changeCode =5  这时候不需要根据source_type_code,source_id 取消费用 而是直接停掉这个人所有的 -->
+        <!-- 预出院 转科,  这时候不需要根据source_type_code,source_id 取消费用 而是直接停掉这个人所有的 -->
         <if  test="changeCode == null or changeCode == '' ">
+            and dept_id = #{deptId}
             and source_type_code = #{sourceTypeCode}
             and source_id in
             <foreach collection="bedIdList" item="item" open="(" close=")" separator=",">

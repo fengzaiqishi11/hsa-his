@@ -298,11 +298,20 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"funtionCode"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
-                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
+
+
+
+                // delete from 2021-8-6 liaojiguang
+                /*if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
                     individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
                 }else{
                     individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrOptins());
-                }
+                }*/
+
+                // add 2021-8-6 liaojiguang 使用就医地医保划区
+                individualSettleDTO.setClrOptins(MapUtils.get(resultMap,"mdtrtareaAdmvs"));
+
+
                 if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
                     individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
                 }else {

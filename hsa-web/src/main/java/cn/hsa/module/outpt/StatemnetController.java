@@ -12,6 +12,7 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DownloadFileUtil;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -575,6 +576,12 @@ public class StatemnetController extends BaseController {
   public WrapperResponse<Map> queryChargeDetail(@RequestBody Map paraMap,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO userDTO = getSession(req, res) ;
     paraMap.put("hospCode", userDTO.getHospCode());
+    Boolean statusCode = MapUtils.get(paraMap,"statusCode");
+    if(Boolean.TRUE.equals(statusCode)){
+      paraMap.put("statusCode", Constants.ZTBZ.ZC);
+    }else{
+      paraMap.remove("statusCode");
+    }
     return patientCostLedgerService_consumer.queryChargeDetail(paraMap);
   }
 
@@ -590,6 +597,13 @@ public class StatemnetController extends BaseController {
   public WrapperResponse<PageDTO> queryChargeDetailList(@RequestParam Map paraMap,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO userDTO = getSession(req, res) ;
     paraMap.put("hospCode", userDTO.getHospCode());
+
+    Boolean statusCode = Boolean.valueOf(MapUtils.get(paraMap,"statusCode"));
+    if(Boolean.TRUE.equals(statusCode)){
+      paraMap.put("statusCode", Constants.ZTBZ.ZC);
+    }else{
+      paraMap.remove("statusCode");
+    }
     return patientCostLedgerService_consumer.queryChargeDetailList(paraMap);
   }
 

@@ -139,4 +139,8 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
     private String triageId;
     /** 分诊台名称 **/
     private String triageName;
+    /**
+     * 居住地地址
+     */
+    private String nowAddress;
 }

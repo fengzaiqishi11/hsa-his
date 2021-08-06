@@ -99,6 +99,9 @@
             </foreach>
             )
         </if>
+        <if test="medicineOrgCode != null and medicineOrgCode != ''">
+            AND medicine_org_code = #{medicineOrgCode}
+        </if>
         <if test="name != null and name != ''">
             AND name like CONCAT('%',#{name},'%')
         </if>

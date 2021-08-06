@@ -25,4 +25,5 @@ public class InsureDictDTO extends InsureDictDO implements Serializable {
         private String label;
         private String[] codes;//编码
         private String type;
+        private String medicineOrgCode;
 }

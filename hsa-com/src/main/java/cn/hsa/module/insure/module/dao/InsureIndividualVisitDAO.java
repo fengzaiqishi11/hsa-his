@@ -248,5 +248,16 @@ public interface InsureIndividualVisitDAO {
      * @Return 
     **/
     Integer  queryLasterCounter(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method queryInsureIndividualVisit
+     * @Desrciption  查询医保就诊信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/5 10:33
+     * @Return
+    **/
+    InsureIndividualVisitDTO queryInsureIndividualVisit(Map<String, Object> dataMap);
 }
 

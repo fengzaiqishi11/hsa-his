@@ -416,6 +416,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         String insureRegCode = MapUtils.get(parameterMap, "insureRegCode");
 
         Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hospCode",hospCode);
         dataMap.put("setl_id", MapUtils.get(parameterMap, "setl_id"));//结算ID
         dataMap.put("psn_no", MapUtils.get(parameterMap, "psn_no"));//人员编号
         dataMap.put("mdtrt_id", MapUtils.get(parameterMap, "mdtrt_id"));//就医登记号

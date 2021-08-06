@@ -610,6 +610,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setCertNo(outptRegisterDTO.getCertNo());
         //电话号码
         outptVisitDTO.setPhone(outptRegisterDTO.getPhone());
+        //居住地地址
+        outptVisitDTO.setNowAddress(outptRegisterDTO.getNowAddress());
         //就诊号
         outptVisitDTO.setVisitNo(this.getOrderNo(outptRegisterDTO.getHospCode(), Constants.ORDERRULE.JZH));
         //就诊类别代码
@@ -3098,6 +3100,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
+        outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
         outptProfileFileDTO.setType("1");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);

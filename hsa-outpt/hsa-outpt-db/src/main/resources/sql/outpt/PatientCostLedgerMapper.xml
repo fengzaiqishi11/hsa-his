@@ -3521,7 +3521,7 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
-        <if test="statusCode != null and statusCode == '1'.toString()">
+        <if test="statusCode != null">
             and a.status_code = #{statusCode}
         </if>
         union all
@@ -3710,6 +3710,9 @@
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
         </if>
         group by a.item_name, a.spec,a.unit_code
     </select>

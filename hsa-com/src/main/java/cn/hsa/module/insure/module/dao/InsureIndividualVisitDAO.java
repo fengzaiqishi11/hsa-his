@@ -192,5 +192,72 @@ public interface InsureIndividualVisitDAO {
     List<InsureIndividualVisitDTO> queryInsureIndividualVisitByIds(Map<String,Object> insureVisitParam);
 
     List<String> queryAllInsureRegister(Map<String,String> selectMap);
+
+    /**
+     * @Method getMedicalRegNo
+     * @Desrciption  获取未结算的就医登记号
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/7/30 14:38
+     * @Return
+    **/
+    String getMedicalRegNo(Map<String, Object> map);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method selectInsureInfo
+     * @Desrciption 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/7/30 15:32
+     * @Return
+     */
+    InsureIndividualVisitDTO selectInsureInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method selectIsHalfSettleInfo
+     * @Desrciption  查询中途结算的就诊信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/3 19:54
+     * @Return
+    **/
+    InsureIndividualVisitDTO selectIsHalfSettleInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method updateInsureSettleId
+     * @Desrciption  取消结算更新医保就诊表的结算id
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/4 10:18
+     * @Return
+     **/
+
+    Boolean updateInsureSettleId(Map<String, Object> settleMap);
+    
+    /**
+     * @Method queryLasterCounter
+     * @Desrciption  查询中途结算次数
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/8/4 16:19
+     * @Return 
+    **/
+    Integer  queryLasterCounter(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method queryInsureIndividualVisit
+     * @Desrciption  查询医保就诊信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/5 10:33
+     * @Return
+    **/
+    InsureIndividualVisitDTO queryInsureIndividualVisit(Map<String, Object> dataMap);
 }
 

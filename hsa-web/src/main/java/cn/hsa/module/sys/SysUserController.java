@@ -146,12 +146,14 @@ public class SysUserController extends BaseController {
     {
         SysUserDTO sysUserDTOSession = getSession(req, res);
         sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+        sysUserDTO.setLoginDeptCode(sysUserDTOSession.getLoginBaseDeptDTO().getCode());
         //封装参数
         Map map = new HashMap();
         map.put("hospCode",sysUserDTOSession.getHospCode());
         map.put("sysUserDTO",sysUserDTO);
         return sysUserService_consumer.querySysUserAll(map);
     }
+
     /**
      * @Method queryPage
      * @Desrciption 分页查询人员信息

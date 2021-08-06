@@ -50,7 +50,7 @@
         iiv.aka130_name as aka130Name,iiv.bka006_name as bka006Name,iiv.visit_icd_name as visitIcdName
         from insure_unified_remote iur
         left join insure_individual_visit iiv on iiv.medical_reg_no = iur.MDTRT_ID and iiv.hosp_code = iur.hosp_code
-        left join insure_individual_basic iib on iib.hosp_code = iiv.hosp_code = iib.id = iiv.mib_id
+        left join insure_individual_basic iib on iib.hosp_code = iiv.hosp_code and iib.id = iiv.mib_id
         where iur.hosp_code =#{hospCode}
         <if test="keyword != null and keyword != ''">
             and ( iur.certno like concat('%',#{keyword},'%') or

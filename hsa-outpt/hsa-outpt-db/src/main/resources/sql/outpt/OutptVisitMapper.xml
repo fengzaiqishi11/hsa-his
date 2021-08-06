@@ -236,7 +236,7 @@
         insert into outpt_visit
         (
         id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
-        birthday, marry_code, nation_code, cert_code, cert_no, phone, visit_no, visit_code, patient_code,
+        birthday, marry_code, nation_code, cert_code, cert_no, phone, now_address, visit_no, visit_code, patient_code,
         preferential_type_id, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
         insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
         pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
@@ -244,7 +244,7 @@
         values
         (
         #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
-        #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
+        #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{nowAddress}, #{visitNo}, #{visitCode}, #{patientCode},
         #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
         #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
         #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
@@ -280,7 +280,7 @@
     <select id="getVisitById" resultMap="OutptVisitResultMap">
         select
         a.id, a.hosp_code, a.profile_id, a.register_id, a.register_no, a.name, a.gender_code, a.age, a.age_unit_code,
-        a.birthday, a.marry_code, a.nation_code, a.cert_code, a.cert_no, a.phone, a.visit_no, a.visit_code, a.patient_code,
+        a.birthday, a.marry_code, a.nation_code, a.cert_code, a.cert_no, a.phone, a.now_address, a.visit_no, a.visit_code, a.patient_code,
         a.preferential_type_id, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
         a.insure_patient_id, a.insure_remark, a.doctor_id, a.doctor_name, a.dept_id, a.dept_name, a.visit_time, a.remark,
         a.pym, a.wbm, a.is_visit, a.tran_in_code,  a.is_first_visit, a.crte_id, a.crte_name, a.crte_time, a.tran_in_code,
@@ -616,7 +616,7 @@
                 clr_type = #{clrType,jdbcType=VARCHAR}
             </if>
         </set>
-        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId}
+        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId} and settle_id =#{settleId}
         <if test="state != null and state != ''">
             and  state = #{state,jdbcType=VARCHAR}
         </if>

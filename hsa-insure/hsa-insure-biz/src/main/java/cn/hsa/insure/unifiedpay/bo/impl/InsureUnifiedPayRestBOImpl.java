@@ -1499,8 +1499,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureItemMatchDTOList.add(insureItemMatchDTO);
                 }
             }
-        } else {
-            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity()));
+        }
+        else {
+            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (k1, k2) -> k1));
             InsureItemMatchDTO insureItemMatchDTO = null;
             for (BaseItemDTO baseItemDTO : baseItemDTOList) {
                 if (!collect.isEmpty() && collect.containsKey(baseItemDTO.getNationCode()) && !StringUtils.isEmpty(baseItemDTO.getNationCode())) {
@@ -1938,6 +1939,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
         List<Map<String, Object>> dataResultMap = (List<Map<String, Object>>) outptMap.get("data");
+        if(ListUtils.isEmpty(dataResultMap)){
+            throw new AppException("调用"+ itemType +"功能号下载接口反参为空");
+        }
         int recordCounts = MapUtils.get(outptMap, "recordCounts");
         map.put("size", size);
         map.put("num", num);

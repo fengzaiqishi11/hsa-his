@@ -133,7 +133,8 @@ public class InptLongCostDO implements Serializable {
      * 用药性质
      */
     private String useCode;
-
+    /** 发药药房 **/
+    private String pharId;
     /**
      * 项目类别（XMLB）
      */

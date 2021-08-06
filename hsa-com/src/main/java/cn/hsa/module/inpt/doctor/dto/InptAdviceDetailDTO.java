@@ -46,5 +46,6 @@ public class InptAdviceDetailDTO extends InptAdviceDetailDO implements Serializa
      * 是否报销
      */
     private String isReimburse;
+    private String hospItemCode;
 
 }

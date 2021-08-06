@@ -234,6 +234,7 @@
         c.reality_price totalCost,
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
+        c.mi_price as miPrice,
         (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end) as inDay ,b.*
         from inpt_visit a
         join (
@@ -870,21 +871,29 @@
         ) tab
         order by tab.crteName desc
     </select>
+
     <!--住院收费员收如统计-按结算时间-->
     <select id="queryCollectorInComeSta" resultType="java.util.Map">
         select
         sum(a.reality_price) as realityPrice,            /**queryInPatient应结费用**/
-        sum(a.self_price) as actualPrice,             /**实收金额**/
+        sum(a.actual_price) as actualPrice,             /**实收金额**/
         sum(a.self_price) as selfPrice,                 /**个人支付**/
-        sum(a.ap_total_price) as apTotalPrice,          /**预交金抵充**/
+        sum(a.ap_offset_price) as apOffsetPrice,          /**预交金抵充**/
         sum(a.settle_take_price) as settleTakePrice,     /**结算补收**/
         sum(a.settle_back_price) as settleBackPrice,     /**结算退款**/
         max(a.crte_name) as crteName,
-        (select sum(a.total_price) from inpt_insure_pay b where b.settle_id in (GROUP_CONCAT(a.id)) and b.hosp_code = a.hosp_code and b.type_code = '4') wbh,
-        (select sum(a.total_price) from inpt_insure_pay b where b.settle_id in (GROUP_CONCAT(a.id)) and b.hosp_code = a.hosp_code and b.type_code = '5') nongHe,
-        (select sum(a.total_price) from inpt_insure_pay b where b.settle_id in (GROUP_CONCAT(a.id)) and b.hosp_code = a.hosp_code and (b.type_code = '1' or b.type_code = '2' or b.type_code = '3')) syb,
-        (select sum(price) from inpt_advance_pay c where c.settle_id in (GROUP_CONCAT(a.id)) and c.hosp_code = a.hosp_code and c.status_code = '0' and a.is_settle = '1') settledAdvancePay,
-        (select sum(price) from inpt_advance_pay c where c.settle_id in (GROUP_CONCAT(a.id)) and c.hosp_code = a.hosp_code and c.status_code = '0' and a.is_settle = '0') unSettledAdvancePay
+        sum(a.mi_price) as miPrice,
+        (select sum(c.price) from inpt_advance_pay c where c.hosp_code = a.hosp_code and c.status_code = '0' and c.is_settle = '0'
+        and c.crte_id = a.crte_id
+        <if test="startDate != null">
+            and date(c.crte_time) &gt;=date(#{startDate})
+        </if>
+        <if test="endDate != null">
+            and date(c.crte_time) &lt;= date(#{endDate})
+        </if>
+        group by c.crte_id
+        ) settledAdvancePay,
+        sum(a.ap_total_price) as unSettledAdvancePay
 
         from inpt_settle a
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
@@ -898,6 +907,34 @@
         </if>
         group by a.crte_id
     </select>
+
+    <!--住院收费员收如统计-按缴款时间-->
+    <select id="queryCollectorInComeStaZYJK" resultType="java.util.Map">
+        select
+        sum(a.total_price) as realityPrice,            /**queryInPatient应结费用**/
+        sum(a.reality_total_price) as actualPrice,             /**实收金额**/
+        0 as selfPrice,                 /**个人支付**/
+        sum(a.yjcd_total_price) as apTotalPrice,          /**预交金抵充**/
+        0 as settleTakePrice,     /**结算补收**/
+        sum(a.back_total_price) as settleBackPrice,     /**结算退款**/
+        max(a.crte_name) as crteName,
+        sum(a.insure_total_price) as miPrice,
+        sum(a.yjss_total_price) as settledAdvancePay,
+        sum(a.yjjs_total_price) as  unSettledAdvancePay
+
+        from outin_daily a
+        where a.hosp_code = #{hospCode} and a.type_code = '2'
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(a.end_time) &gt;=date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(a.end_time) &lt;= date(#{endDate})
+        </if>
+        group by a.crte_id
+    </select>
+
     <!--住院收费员收入明细统计-->
     <select id="queryCollectorInComeStaDetail" resultType="java.util.Map">
         select * from
@@ -3484,6 +3521,9 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
+        <if test="statusCode != null and statusCode == '1'.toString()">
+            and a.status_code = #{statusCode}
+        </if>
         union all
 
         SELECT
@@ -3528,6 +3568,9 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
+        <if test="statusCode != null">
+            and a.status_code = #{statusCode}
+        </if>
         ) aa order by name,bfc_id,get_cost_time desc
 
     </select>
@@ -3564,6 +3607,10 @@
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
         </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+
         group by a.bfc_id,a.item_name,a.spec,a.num_unit_code
         union all
         select
@@ -3594,6 +3641,9 @@
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
         </if>
         group by a.bfc_id,a.item_name,a.spec,a.unit_code
     </select>
@@ -3627,6 +3677,9 @@
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
         </if>
         group by a.item_name, a.spec,a.num_unit_code
         union all
@@ -3701,6 +3754,9 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
+        <if test="statusCode != null and statusCode == '1'.toString()">
+            and a.status_code = #{statusCode}
+        </if>
         ) aa order by name,bfc_id,get_cost_time desc
     </select>
 
@@ -3735,6 +3791,9 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
         group by a.bfc_id,a.item_name,a.spec,a.num_unit_code
     </select>
 
@@ -3767,6 +3826,9 @@
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
         </if>
         group by a.item_name, a.spec,a.num_unit_code
     </select>
@@ -5483,12 +5545,12 @@
         sum(a.round_total_price) as truncPrice,     /**舍入金额**/
         max(a.crte_name) as crteName
         from outin_daily a
-        where a.hosp_code = #{hospCode} and a.is_ok = '1' and a.type_code = '1'
+        where a.hosp_code = #{hospCode} and a.type_code in ('1', '0')
         <if test="startDate != null">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and date(a.end_time) &gt;=date(#{startDate})
         </if>
         <if test="endDate != null">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and date(a.end_time) &lt;= date(#{endDate})
         </if>
         group by a.crte_id
     </select>

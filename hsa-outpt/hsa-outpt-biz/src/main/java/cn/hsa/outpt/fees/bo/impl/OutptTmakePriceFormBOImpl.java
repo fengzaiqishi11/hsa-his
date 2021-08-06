@@ -227,7 +227,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     public WrapperResponse queryOutptCostList(Map param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String visitId = (String) param.get("visitId");//患者id
-        String isPhys = (String) param.get("isPhys");//是否为体检信息
+        String isPhys = (String) param.get("isPhys") == null ? "" : (String) param.get("isPhys");//是否为体检信息
         String preferentialTypeId = (String) param.get("preferentialTypeId");//优惠类型id
         //获取费用数据
         //为了区分查询体检和其他收费数据,添加个前端传递参数isPhys

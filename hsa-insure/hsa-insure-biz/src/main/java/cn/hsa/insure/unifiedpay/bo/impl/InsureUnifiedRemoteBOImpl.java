@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,19 +56,18 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
 
     /**
      * @Method UP_3206  selectRemoteDetail
-     * @Desrciption  提取异地清分明细:就医地使用此交易提取省内异地外来就医月度结算清分明细,供医疗机构进行确认处理
-     * @Param  循环调用当前月份的3206接口  提取数据每次不能超过100条
-     * 
+     * @Desrciption 提取异地清分明细:就医地使用此交易提取省内异地外来就医月度结算清分明细,供医疗机构进行确认处理
+     * @Param 循环调用当前月份的3206接口  提取数据每次不能超过100条
      * @Author fuhui
-     * @Date   2021/4/23 12:47 
-     * @Return 
-    **/
-    public Map<String,Object> insertRemoteDetail(Map<String,Object>map){
+     * @Date 2021/4/23 12:47
+     * @Return
+     **/
+    public Map<String, Object> insertRemoteDetail(Map<String, Object> map) {
 
-        String hospCode = MapUtils.get(map,"hospCode");
-        String crteId = MapUtils.get(map,"crteId");
-        String crteName = MapUtils.get(map,"crteName");
-        String regCode = MapUtils.get(map,"insureRegCode");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String crteId = MapUtils.get(map, "crteId");
+        String crteName = MapUtils.get(map, "crteName");
+        String regCode = MapUtils.get(map, "insureRegCode");
         /**
          * 获取访问的url地址
          */
@@ -75,17 +75,17 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setRegCode(regCode); // 医疗机构编码;
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
-        List<Map<String,Object>> resultDataMap = null;
-        List<Map<String,Object>> sumDataMap = new ArrayList<>();
+        List<Map<String, Object>> resultDataMap = null;
+        List<Map<String, Object>> sumDataMap = new ArrayList<>();
         Map<String, Object> inputMap = null;
         Map<String, Object> dataMap = null;
-        Map<String,Object> paramMap = null;
-        List<Map<String, Object>> filterDataMap =null;
-                // 调用统一支付平台 上传费用明细
+        Map<String, Object> paramMap = null;
+        List<Map<String, Object>> filterDataMap = null;
+        // 调用统一支付平台 上传费用明细
         inputMap = new HashMap<>();
         dataMap = new HashMap<>();
         paramMap = new HashMap<>();
-        String msgId =  StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
         inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_3260);  // 交易编号
         inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
         inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
@@ -95,15 +95,15 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         /**
          * 公共入参
          */
-        String beganTime = MapUtils.get(map,"updtTime");
+        String beganTime = MapUtils.get(map, "updtTime");
         String yearStr = beganTime.substring(0, 4);
-        String monthStr = beganTime.substring(5,7);
-        dataMap.put("trt_year",yearStr);
-        dataMap.put("trt_month",monthStr);
-        Integer startRow =1;
-        do{
-            dataMap.put("startrow",startRow);
-            paramMap.put("data",dataMap);
+        String monthStr = beganTime.substring(5, 7);
+        dataMap.put("trt_year", yearStr);
+        dataMap.put("trt_month", monthStr);
+        Integer startRow = 1;
+        do {
+            dataMap.put("startrow", startRow);
+            paramMap.put("data", dataMap);
             inputMap.put("input", paramMap);  // 入参具体数据
             String json = JSONObject.toJSONString(inputMap);
             logger.info("提取异地清分明细入参:" + json);
@@ -111,41 +111,42 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
             if(StringUtils.isEmpty(resultJson)){
                 throw new AppException("无法访问统一支付平台");
             }
-            Map<String,Object> resultMap = JSONObject.parseObject(resultJson,Map.class);
-            if ("999".equals(MapUtils.get(resultMap,"code"))) {
+            Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
+            if ("999".equals(MapUtils.get(resultMap, "code"))) {
                 throw new AppException((String) resultMap.get("msg"));
             }
-            if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+            if (!MapUtils.get(resultMap, "infcode").equals("0")) {
                 throw new AppException((String) resultMap.get("err_msg"));
             }
             logger.info("提取异地清分明细回参:" + resultJson);
-            Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
-            resultDataMap =  MapUtils.get(outptMap,"data");
+            Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+            resultDataMap = MapUtils.get(outptMap, "data");
             filterDataMap = resultDataMap.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "mdtrt_id"))).
                     collect(Collectors.toList());
             startRow += resultDataMap.size();
             sumDataMap.addAll(filterDataMap);
-        }while (!ListUtils.isEmpty(filterDataMap) || startRow>=100);
-        map.put("sumDataMap",sumDataMap);
+        } while (!ListUtils.isEmpty(filterDataMap) && startRow >= 100);
+        map.put("sumDataMap", sumDataMap);
         InsureUnifiedRemoteDO insureUnifiedRemoteDO = new InsureUnifiedRemoteDO();
         List<InsureUnifiedRemoteDO> unifiedRemoteDOList = new ArrayList<>();
-        if(!ListUtils.isEmpty(sumDataMap)){
-            for(Map<String,Object> item :sumDataMap){
-                insureUnifiedRemoteDO= new InsureUnifiedRemoteDO();
+        if (!ListUtils.isEmpty(sumDataMap)) {
+            for (Map<String, Object> item : sumDataMap) {
+                insureUnifiedRemoteDO = new InsureUnifiedRemoteDO();
+                DecimalFormat df1 = new DecimalFormat("0.00");
                 insureUnifiedRemoteDO.setId(SnowflakeUtils.getId());
                 insureUnifiedRemoteDO.setHospCode(hospCode);
-                insureUnifiedRemoteDO.setSeqno(MapUtils.get(item,"seqno").toString());
+                insureUnifiedRemoteDO.setSeqno(MapUtils.get(item, "seqno").toString());
                 insureUnifiedRemoteDO.setTrtMonth(monthStr);
                 insureUnifiedRemoteDO.setTrtYear(yearStr);
-                insureUnifiedRemoteDO.setMdtrtarea(MapUtils.get(item,"mdtrtarea"));
-                insureUnifiedRemoteDO.setMedinsNo(MapUtils.get(item,"medins_no"));
-                insureUnifiedRemoteDO.setCertno(MapUtils.get(item,"certno"));
-                insureUnifiedRemoteDO.setMdtrtId(MapUtils.get(item,"mdtrt_id"));
-                insureUnifiedRemoteDO.setMdtrtSetlTime(DateUtils.parse(MapUtils.get(item,"mdtrt_setl_time"),DateUtils.Y_M_DH_M_S));
-                insureUnifiedRemoteDO.setSetlSn(MapUtils.get(item,"setl_sn"));
-                insureUnifiedRemoteDO.setFulamtAdvpayFlag(MapUtils.get(item,"fulamt_advpay_flag"));
-                insureUnifiedRemoteDO.setMedfeeSumamt(MapUtils.get(item,"medfee_sumamt"));
-                insureUnifiedRemoteDO.setOptinsPaySumamt(MapUtils.get(item,"optins_pay_sumamt"));
+                insureUnifiedRemoteDO.setMdtrtarea(MapUtils.get(item, "mdtrtarea"));
+                insureUnifiedRemoteDO.setMedinsNo(MapUtils.get(item, "medins_no"));
+                insureUnifiedRemoteDO.setCertno(MapUtils.get(item, "certno"));
+                insureUnifiedRemoteDO.setMdtrtId(MapUtils.get(item, "mdtrt_id"));
+                insureUnifiedRemoteDO.setMdtrtSetlTime(DateUtils.parse(MapUtils.get(item, "mdtrt_setl_time"), DateUtils.Y_M_DH_M_S));
+                insureUnifiedRemoteDO.setSetlSn(MapUtils.get(item, "setl_sn"));
+                insureUnifiedRemoteDO.setFulamtAdvpayFlag(MapUtils.get(item, "fulamt_advpay_flag"));
+                insureUnifiedRemoteDO.setMedfeeSumamt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "medfee_sumamt") == null ? "":MapUtils.get(item, "medfee_sumamt").toString()))));
+                insureUnifiedRemoteDO.setOptinsPaySumamt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "optins_pay_sumamt") == null ? "":MapUtils.get(item, "optins_pay_sumamt").toString()))));
                 insureUnifiedRemoteDO.setCrteId(crteId);
                 insureUnifiedRemoteDO.setCnfmFlag(null);
                 insureUnifiedRemoteDO.setCrteName(crteName);
@@ -156,18 +157,18 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         }
         insureUnifiedRemoteDO.setHospCode(hospCode);
         List<InsureUnifiedRemoteDO> insertRemoteList = new ArrayList<>();
-        List<InsureUnifiedRemoteDO> remoteDOList =  insureUnifiedRemoteDAO.queryAll(insureUnifiedRemoteDO);
+        List<InsureUnifiedRemoteDO> remoteDOList = insureUnifiedRemoteDAO.queryAll(insureUnifiedRemoteDO);
         Map<String, InsureUnifiedRemoteDO> collect = remoteDOList.stream().collect(Collectors.toMap(InsureUnifiedRemoteDO::getSetlSn, Function.identity(), (k1, k2) -> k1));
-        if(!ListUtils.isEmpty(unifiedRemoteDOList)){
-           for( InsureUnifiedRemoteDO unifiedRemoteDO : unifiedRemoteDOList){
-                if(!collect.isEmpty() && collect.containsKey(unifiedRemoteDO.getSetlSn())){
+        if (!ListUtils.isEmpty(unifiedRemoteDOList)) {
+            for (InsureUnifiedRemoteDO unifiedRemoteDO : unifiedRemoteDOList) {
+                if (!collect.isEmpty() && collect.containsKey(unifiedRemoteDO.getSetlSn())) {
                     break;
-                }else{
+                } else {
                     insertRemoteList.add(unifiedRemoteDO);
                 }
-           }
+            }
         }
-        if(!ListUtils.isEmpty(insertRemoteList)){
+        if (!ListUtils.isEmpty(insertRemoteList)) {
             insureUnifiedRemoteDAO.insertRemoteFeeDetail(insertRemoteList);
         }
         return map;
@@ -176,17 +177,16 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
 
     /**
      * @Method UP_3261 selectRemoteConfirmResult
-     * @Desrciption  异地清分结果确认:就医地使用此交易提交省内异地外来就医月度结算清分确认结果。
+     * @Desrciption 异地清分结果确认:就医地使用此交易提交省内异地外来就医月度结算清分确认结果。
      * @Param
-     *
      * @Author fuhui
-     * @Date   2021/4/23 12:47
+     * @Date 2021/4/23 12:47
      * @Return
      **/
-    public Map<String,Object> updateRemoteConfirmResult (Map<String,Object>map){
+    public Map<String, Object> updateRemoteConfirmResult(Map<String, Object> map) {
 
-        String hospCode = MapUtils.get(map,"hospCode");
-        String regCode = MapUtils.get(map,"insureRegCode");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String regCode = MapUtils.get(map, "insureRegCode");
         /**
          * 获取访问的url地址
          */
@@ -199,7 +199,7 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         // 调用统一支付平台 上传费用明细
         Map<String, Object> inputMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
-        List<Map<String,Object>> detailMapList  = new ArrayList<>();
+        List<Map<String, Object>> detailMapList = new ArrayList<>();
 
         /**
          * 公共入参
@@ -211,35 +211,35 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         inputMap.put("msgid", osgId);
         inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
-        String isFlag = MapUtils.get(map,"isFlag");
-        String beganTime = MapUtils.get(map,"updtTime");
+        String isFlag = MapUtils.get(map, "isFlag");
+        String beganTime = MapUtils.get(map, "updtTime");
         String yearStr = beganTime.substring(0, 4);
-        String monthStr = beganTime.substring(5,7);
-        dataMap.put("trt_year",yearStr);
-        dataMap.put("trt_month",monthStr);
+        String monthStr = beganTime.substring(5, 7);
+        dataMap.put("trt_year", yearStr);
+        dataMap.put("trt_month", monthStr);
         InsureUnifiedRemoteDO insureUnifiedRemoteDO = new InsureUnifiedRemoteDO();
         insureUnifiedRemoteDO.setHospCode(hospCode);
         insureUnifiedRemoteDO.setTrtYear(yearStr);
         insureUnifiedRemoteDO.setTrtMonth(monthStr);
         List<InsureUnifiedRemoteDO> unifiedRemoteDOList = insureUnifiedRemoteDAO.queryAll(insureUnifiedRemoteDO);
-        Map<String,Object> detailMap = null;
-        for(InsureUnifiedRemoteDO unifiedRemoteDO : unifiedRemoteDOList){
+        Map<String, Object> detailMap = null;
+        for (InsureUnifiedRemoteDO unifiedRemoteDO : unifiedRemoteDOList) {
             unifiedRemoteDO.setOmgsId(osgId);
             unifiedRemoteDO.setIsFlag("1");
             detailMap = new HashMap<>();
-            detailMap.put("certno",unifiedRemoteDO.getCertno());
-            detailMap.put("mdtrt_id",unifiedRemoteDO.getMdtrtId());
-            detailMap.put("mdtrt_setl_time",DateUtils.format(unifiedRemoteDO.getMdtrtSetlTime(),DateUtils.Y_M_DH_M_S));
-            detailMap.put("setl_sn",unifiedRemoteDO.getSetlSn());
-            detailMap.put("medfee_sumamt",unifiedRemoteDO.getMedfeeSumamt());
-            detailMap.put("optins_pay_sumamt",unifiedRemoteDO.getOptinsPaySumamt());
-            detailMap.put("cnfm_flag",isFlag);
+            detailMap.put("certno", unifiedRemoteDO.getCertno());
+            detailMap.put("mdtrt_id", unifiedRemoteDO.getMdtrtId());
+            detailMap.put("mdtrt_setl_time", DateUtils.format(unifiedRemoteDO.getMdtrtSetlTime(), DateUtils.Y_M_DH_M_S));
+            detailMap.put("setl_sn", unifiedRemoteDO.getSetlSn());
+            detailMap.put("medfee_sumamt", unifiedRemoteDO.getMedfeeSumamt());
+            detailMap.put("optins_pay_sumamt", unifiedRemoteDO.getOptinsPaySumamt());
+            detailMap.put("cnfm_flag", isFlag);
             detailMapList.add(detailMap);
         }
         String url = insureConfigurationDTO.getUrl();
         int batchCount = 100;
         String resultJson = "";
-        Map<String,Object> map1 =new HashMap<>();
+        Map<String, Object> map1 = new HashMap<>();
         List<Map<String, Object>> transmitList = new ArrayList<>();
         if (detailMapList.size() > 100) {
             int leng = 0;
@@ -248,28 +248,16 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
                 if (batchCount == transmitList.size() || i == transmitList.size() - 1) {
                     try {
                         if (leng > 0) {
-                            Thread.sleep(4000);
+                            Thread.sleep(2000);
                         }
                         map1 = new HashMap<>();
-                        dataMap.put("totalrow",batchCount);
-                        map1.put("data",dataMap);
-                        map1.put("detail",detailMapList);
-                        inputMap.put("input",map1);
-                        dataMap.put("data", transmitList);
+                        dataMap.put("totalrow", batchCount);
+                        map1.put("data", dataMap);
+                        map1.put("detail", detailMapList);
+                        inputMap.put("input", map1);
                         inputMap.put("input", dataMap);
                         String json = JSONObject.toJSONString(inputMap);
                         logger.info("异地清分结果确认入参:" + json);
-                        resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
-                        if(StringUtils.isEmpty(resultJson)){
-                            throw new AppException("无法访问统一支付平台");
-                        }
-                        Map<String,Object> resultMap = JSONObject.parseObject(resultJson,Map.class);
-                        if(!"0".equals(resultMap.get("infcode").toString())){
-                            throw new AppException((String)resultMap.get("err_msg"));
-                        }
-                        if("999".equals(resultMap.get("infcode").toString())){
-                            throw new AppException((String)resultMap.get("msg"));
-                        }
                         updateUnifiedRemoteFlag(unifiedRemoteDOList);
                         transmitList.clear();
                     } catch (Exception e) {
@@ -278,24 +266,23 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
                 }
             }
             leng++;
-        }
-        else {
-            dataMap.put("totalrow",unifiedRemoteDOList.size());
-            map1.put("data",dataMap);
-            map1.put("detail",detailMapList);
+        } else {
+            dataMap.put("totalrow", unifiedRemoteDOList.size());
+            map1.put("data", dataMap);
+            map1.put("detail", detailMapList);
             inputMap.put("input", map1);
             String json = JSONObject.toJSONString(inputMap);
             logger.info("异地清分结果确认入参入参:" + json);
             resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
-            if(StringUtils.isEmpty(resultJson)){
+            if (StringUtils.isEmpty(resultJson)) {
                 throw new AppException("无法访问统一支付平台");
             }
-            Map<String,Object> resultMap = JSONObject.parseObject(resultJson,Map.class);
-            if(!"0".equals(resultMap.get("infcode").toString())){
-                throw new AppException((String)resultMap.get("err_msg"));
+            Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
+            if (!"0".equals(resultMap.get("infcode").toString())) {
+                throw new AppException((String) resultMap.get("err_msg"));
             }
-            if("999".equals(resultMap.get("infcode").toString())){
-                throw new AppException((String)resultMap.get("msg"));
+            if ("999".equals(resultMap.get("infcode").toString())) {
+                throw new AppException((String) resultMap.get("msg"));
             }
             updateUnifiedRemoteFlag(unifiedRemoteDOList);
         }
@@ -309,16 +296,15 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
 
     /**
      * @Method UP_3262 updateRemoteConfirmBack
-     * @Desrciption  异地清分结果确认回退:就医地使用此交易回退已经提交的就医月度结算清分确认结果。
+     * @Desrciption 异地清分结果确认回退:就医地使用此交易回退已经提交的就医月度结算清分确认结果。
      * @Param
-     *
      * @Author fuhui
-     * @Date   2021/4/23 12:47
+     * @Date 2021/4/23 12:47
      * @Return
      **/
-    public Map<String,Object> updateRemoteConfirmBack(Map<String,Object>map){
-        String hospCode = MapUtils.get(map,"hospCode");
-        String regCode = MapUtils.get(map,"insureRegCode");
+    public Map<String, Object> updateRemoteConfirmBack(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String regCode = MapUtils.get(map, "insureRegCode");
         /**
          * 获取访问的url地址
          */
@@ -330,21 +316,21 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         // 调用统一支付平台 上传费用明细
         Map<String, Object> inputMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
-        Map<String,Object> detailMap  = new HashMap<>();
+        Map<String, Object> detailMap = new HashMap<>();
 
         /**
          * 公共入参
          */
-        inputMap.put("infno",Constant.UnifiedPay.REGISTER.UP_3262);  // 交易编号
+        inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_3262);  // 交易编号
         inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
         inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
-        String beganTime = MapUtils.get(map,"updtTime");
+        String beganTime = MapUtils.get(map, "updtTime");
         String yearStr = beganTime.substring(0, 4);
-        String monthStr = beganTime.substring(5,7);
+        String monthStr = beganTime.substring(5, 7);
 
         InsureUnifiedRemoteDO insureUnifiedRemoteDO = new InsureUnifiedRemoteDO();
         insureUnifiedRemoteDO.setHospCode(hospCode);
@@ -353,23 +339,23 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
         insureUnifiedRemoteDO.setIsFlag("1");
         List<InsureUnifiedRemoteDO> unifiedRemoteDOList = insureUnifiedRemoteDAO.queryAll(insureUnifiedRemoteDO);
 
-        dataMap.put("trt_year",yearStr);
-        dataMap.put("trt_month",monthStr);
-        dataMap.put("otransid","0");
+        dataMap.put("trt_year", yearStr);
+        dataMap.put("trt_month", monthStr);
+        dataMap.put("otransid", "0");
         inputMap.put("input", dataMap);  // 入参具体数据
         String json = JSONObject.toJSONString(inputMap);
         logger.info("异地清分结果确认回退入参:" + json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        if(StringUtils.isEmpty(resultJson)){
+        if (StringUtils.isEmpty(resultJson)) {
             throw new AppException("无法访问统一支付平台");
         }
-        Map<String,Object> resultMap = JSONObject.parseObject(resultJson,Map.class);
+        Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
         logger.info("异地清分结果确认回退回参:" + resultJson);
-        if(!"0".equals(resultMap.get("infcode").toString())){
-            throw new AppException((String)resultMap.get("err_msg"));
+        if (!"0".equals(resultMap.get("infcode").toString())) {
+            throw new AppException((String) resultMap.get("err_msg"));
         }
-        if("999".equals(resultMap.get("infcode").toString())){
-            throw new AppException((String)resultMap.get("msg"));
+        if ("999".equals(resultMap.get("infcode").toString())) {
+            throw new AppException((String) resultMap.get("msg"));
         }
         unifiedRemoteDOList.stream().forEach(insureUnifiedRemoteDO1 -> {
             insureUnifiedRemoteDO1.setIsFlag("0");
@@ -389,7 +375,7 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
      */
     @Override
     public PageDTO queryPage(InsureUnifiedRemoteDO insureUnifiedRemoteDO) {
-        PageHelper.startPage(insureUnifiedRemoteDO.getPageNo(),insureUnifiedRemoteDO.getPageSize());
+        PageHelper.startPage(insureUnifiedRemoteDO.getPageNo(), insureUnifiedRemoteDO.getPageSize());
         List<InsureUnifiedRemoteDO> insureUnifiedRemoteDOList = insureUnifiedRemoteDAO.queryPage(insureUnifiedRemoteDO);
         return PageDTO.of(insureUnifiedRemoteDOList);
     }
@@ -403,7 +389,7 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
      * @Date 2021/3/3 10:52
      * @Return
      **/
-    public InsureConfigurationDTO  getInsureConfiguration(InsureConfigurationDTO insureConfigurationDTO) {
+    public InsureConfigurationDTO getInsureConfiguration(InsureConfigurationDTO insureConfigurationDTO) {
         return insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
     }
 }

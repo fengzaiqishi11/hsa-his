@@ -317,6 +317,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 individualSettleDTO.setHospCode(hospCode);
                 individualSettleDTO.setVisitId(visitId);
                 individualSettleDTO.setState("2");
+                individualSettleDTO.setSettleId(redSettleId);
                 individualSettleDTO.setSettleState("1");
                 outptVisitDAO.updateInsureSettle(individualSettleDTO);
 //                insureUnifiedPayOutptService_consumer.UP_2202(map).getData();

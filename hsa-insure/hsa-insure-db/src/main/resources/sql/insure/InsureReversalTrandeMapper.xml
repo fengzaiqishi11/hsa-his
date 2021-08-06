@@ -103,6 +103,7 @@
                 t.medical_reg_no AS mdtrtId,
                 e.insureSettleId AS setlId,
                 e.settle_id,
+                t.aka130 as med_type,
                 t.aac001 AS psnNo,
                 c.aac003 AS psnName,
                 c.aac004 AS sex,
@@ -121,8 +122,11 @@
             AND c.hosp_code = t.hosp_code
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
-        <if test="psnNo != null and psnNo != ''">
-            AND t.aac001 like concat('%',#{psnNo},'%')
+        <if test="keyword != null and keyword != ''">
+          and  (or c.aac003 like concat('%',#{keyword},'%')
+            or t.medical_reg_no like concat('%',#{keyword},'%')
+            or  e.insureSettleId like concat('%',#{keyword},'%')
+            )
         </if>
         <if test="startDate != null and startDate != ''">
             and t.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')

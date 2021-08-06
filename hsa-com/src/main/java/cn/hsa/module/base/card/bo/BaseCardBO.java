@@ -2,6 +2,7 @@ package cn.hsa.module.base.card.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface BaseCardBO {
      * @Date: 2021-05-11 16:20
      * @Return: Boolean
      **/
-    Boolean updateStatusCode(BaseCardDTO baseCardDTO);
+    Boolean updateStatusCode(BaseCardDTO baseCardDTO, BaseCardChangeDO baseCardChangeDO);
 
     /**
      * @Menthod: resetPwd

@@ -123,7 +123,7 @@
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
         <if test="keyword != null and keyword != ''">
-          and  (or c.aac003 like concat('%',#{keyword},'%')
+          and  ( c.aac003 like concat('%',#{keyword},'%')
             or t.medical_reg_no like concat('%',#{keyword},'%')
             or  e.insureSettleId like concat('%',#{keyword},'%')
             )

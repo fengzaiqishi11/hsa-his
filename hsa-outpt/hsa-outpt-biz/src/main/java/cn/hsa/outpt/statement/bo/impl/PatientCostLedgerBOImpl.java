@@ -2830,4 +2830,10 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         return PageDTO.of(patientCostLedgerDAO.queryOutMedicationGet(pharOutDistributeDTO));
     }
 
+    @Override
+    public PageDTO queryInPatientDaily(InptVisitDTO inptVisitDTO) {
+        PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
+        return PageDTO.of(patientCostLedgerDAO.queryInPatientDaily(inptVisitDTO));
+    }
+
 }

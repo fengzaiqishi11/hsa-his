@@ -170,6 +170,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
              */
             Map<String,String> dataMap = new HashMap<>();
             String insureRegisterNo = insureIndividualVisitDTO.getMedicalRegNo();
+            map.put("medicalRegNo",insureRegisterNo);
             dataMap.put("medins_code",insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码
             dataMap.put("psn_no",insureIndividualVisitDTO.getAac001()); //个人电脑号
             dataMap.put("med_type",insureIndividualVisitDTO.getAka130()); //业务类型
@@ -212,9 +213,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
              */
             List<Map<String,Object>> mapList = new ArrayList<>();
             BigDecimal sumBigDecimal = new BigDecimal(0.00);
+            String feeNum =  insureIndividualCostDAO.selectLastFeedSn(map); // 判读是否是第一次传输
             int k =1;
             for (Map<String, Object> item : list2) {
-
                 Map<String, Object> objectMap = new HashMap<>();
                 String doctorId = MapUtils.get(item,"doctorId");
                 String doctorName = MapUtils.get(item,"doctorName");
@@ -222,7 +223,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 String feedetlSn = MapUtils.get(item,"id");
                 // 湖南省医保费用流水只能传15位  且费用明细流水号必须为非0的数字
                 if("1".equals(hnFeedetlSn)){
-                    String feeNum =  insureIndividualCostDAO.selectLastFeedSn(map); // 判读是否是第一次传输
                     if(StringUtils.isEmpty(feeNum)){
                         objectMap.put("feedetl_sn",k) ; // 费用明细流水号
                     }else{

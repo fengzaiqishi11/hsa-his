@@ -43,13 +43,6 @@
         <!--            <artifactId>hsaf-idgenerator</artifactId>-->
         <!--        </dependency>-->
 
-        <!-- JimuReport -->
-        <dependency>
-            <groupId>org.jeecgframework.jimureport</groupId>
-            <artifactId>spring-boot-starter-jimureport</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
         <!-- 认证安全组件 -->
         <dependency>
             <groupId>cn.hsa.hsaf.auth.security</groupId>

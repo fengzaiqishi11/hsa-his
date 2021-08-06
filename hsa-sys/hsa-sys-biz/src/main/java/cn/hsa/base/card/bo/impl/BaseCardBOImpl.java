@@ -2,9 +2,11 @@ package cn.hsa.base.card.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.card.bo.BaseCardBO;
 import cn.hsa.module.base.card.dao.BaseCardDAO;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.Constants;
@@ -122,7 +124,12 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
      * @Return: Boolean
      **/
     @Override
-    public Boolean updateStatusCode(BaseCardDTO baseCardDTO) {
+    public Boolean updateStatusCode(BaseCardDTO baseCardDTO, BaseCardChangeDO baseCardChangeDO) {
+        baseCardChangeDO.setId(SnowflakeUtils.getId());
+        int temp = baseCardDAO.insertBaseCardChange(baseCardChangeDO); // 一卡通异动表记录
+        if (temp == 0) {
+            throw new AppException("保存一卡通异动数据异常，请联系管理员");
+        }
         return baseCardDAO.updateStatusCode(baseCardDTO) > 0;
     }
 

@@ -112,4 +112,13 @@
          and card_type_code = #{cardTypeCode}
          and card_no = #{cardNo}
     </select>
+
+
+    <!--一卡通异动表写入记录-->
+    <insert id="insertBaseCardChange" parameterType="cn.hsa.module.base.card.entity.BaseCardChangeDO">
+        insert into base_card_change
+        (id, hosp_code, profile_id, card_id, status_code, crte_id, crte_name, crte_time)
+        values
+        (#{id}, #{hospCode}, #{profileId}, #{cardId}, #{statusCode}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
 </mapper>

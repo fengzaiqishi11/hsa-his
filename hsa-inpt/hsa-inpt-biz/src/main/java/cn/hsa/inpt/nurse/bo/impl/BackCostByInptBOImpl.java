@@ -319,8 +319,9 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             dto.setId(SnowflakeUtils.getId());
         }
         if(!ListUtils.isEmpty(pharInWaitReceiveDTOs)){
-            //新增负的待领记录
-            pharInWaitReceiveService_consumer.insertPharInWaitBatch(HandParamMap(hospCode,"pharInWaitReceiveDTOs",pharInWaitReceiveDTOs));
+            //新增负的待领记录 （考虑到事务统一 2021-08-05-pengbo）
+            // pharInWaitReceiveService_consumer.insertPharInWaitBatch(HandParamMap(hospCode,"pharInWaitReceiveDTOs",pharInWaitReceiveDTOs));
+            inptCostDAO.insertPharInWaitReceiveBatch(pharInWaitReceiveDTOs);
         }
 
         InptVisitDTO inptVisitDTO = new InptVisitDTO();

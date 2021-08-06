@@ -1,6 +1,7 @@
 package cn.hsa.module.base.card.dao;
 
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 
 import java.util.List;
 
@@ -79,4 +80,14 @@ public interface BaseCardDAO {
      * @Return: BaseCardDTO
      **/
     BaseCardDTO queryCardByNo(BaseCardDTO baseCardDTO);
+
+    /**
+     * @Description: 一卡通异动表写入记录
+     * @Param: 
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/5 15:17
+     * @Return 
+     */
+    int insertBaseCardChange(BaseCardChangeDO baseCardChangeDO);
 }

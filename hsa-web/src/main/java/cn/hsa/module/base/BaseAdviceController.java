@@ -324,7 +324,6 @@ public class BaseAdviceController extends BaseController {
 
     /**合管条码打印查询
     * @Method queryPipePrintPage
-    * @Desrciption
     * @param paramMap
     * @Author liuqi1
     * @Date   2021/4/25 11:31

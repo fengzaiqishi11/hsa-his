@@ -860,10 +860,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO1.setHospCode(hospCode);//医院编码
             if (isMidWaySettle != null && "0".equals(isMidWaySettle)) {
                 inptVisitDTO1.setStatusCode(Constants.BRZT.CY);//当前状态 = 出院状态
-            }
-            inptVisitDTO1.setTreatmentCode(inptVisitDTO.getTreatmentCode());
-            inptVisitDAO.updateInptVisit(inptVisitDTO1);
+                inptVisitDTO1.setTreatmentCode(inptVisitDTO.getTreatmentCode());
+                inptVisitDAO.updateInptVisit(inptVisitDTO1);
 
+            }
             //医保结算
             String patientCode = inptVisitDTO.getPatientCode();
             Integer intPatientCode = Integer.valueOf(patientCode);

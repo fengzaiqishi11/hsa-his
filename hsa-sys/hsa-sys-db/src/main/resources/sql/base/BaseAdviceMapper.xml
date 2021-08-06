@@ -407,6 +407,12 @@
         <if test="queryType != null and queryType == 'zy'.toString()">
             and 1=2
         </if>
+        <if test="printStatus != null and printStatus == '1'.toString()">
+            and ma.print_time is null
+        </if>
+        <if test="printStatus != null and printStatus == '2'.toString()">
+            and ma.print_time is not null
+        </if>
         group by ma.merge_id
 
         union all
@@ -452,6 +458,12 @@
         </if>
         <if test="queryType != null and queryType == 'mz'.toString()">
             and 1=2
+        </if>
+        <if test="printStatus != null and printStatus == '1'.toString()">
+            and ma.print_time is null
+        </if>
+        <if test="printStatus != null and printStatus == '2'.toString()">
+            and ma.print_time is not null
         </if>
         group by ma.merge_id
         ) tab1

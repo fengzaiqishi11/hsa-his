@@ -313,6 +313,11 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupThree(paraMap);
             PageHelper.clearPage();
             sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupThreeSum(paraMap);
+        } else if ("5".equals(MapUtils.get(paraMap, "sumCode"))){
+            //按业务类型、项目、科室分组
+            datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOne(paraMap);
+            PageHelper.clearPage();
+            sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOneSum(paraMap);
         } else {
             //按业务类型、项目明细
             datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupFour(paraMap);

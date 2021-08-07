@@ -1090,5 +1090,8 @@
                fund_pay_type_name, setl_proc_info, insure_settle_id from insure_individual_fund
             where visit_id =#{visitId} and hosp_code =#{hospCode}
     </select>
+    <select id="queryInptSettle" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        select * from inpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
+    </select>
 
 </mapper>

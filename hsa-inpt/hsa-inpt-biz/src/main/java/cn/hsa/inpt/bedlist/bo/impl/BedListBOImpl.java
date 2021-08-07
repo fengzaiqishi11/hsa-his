@@ -507,8 +507,8 @@ public class BedListBOImpl implements BedListBO {
         longCostDTO.setCancelRemark(cancelRemark);
         String changeCode = MapUtils.getEmptyErr(map, "changeCode", "床位异动失败：异动类型不能为空");
         //预出院停所有
-        if(Constants.YDLX.YCY.equals(changeCode)){
-            longCostDTO.setChangeCode(Constants.YDLX.YCY);
+        if(Constants.YDLX.YCY.equals(changeCode) || Constants.YDLX.ZK.equals(changeCode)){
+            longCostDTO.setChangeCode(changeCode);
         }
         bedListDAO.stopInptLongCost(longCostDTO);
     }

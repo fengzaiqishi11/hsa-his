@@ -233,8 +233,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // insureIndividualSettleService_consumer.updateByPrimaryKey(selectInsureMap);
 
             // 冲红
+            String insureRedSettleId = SnowflakeUtils.getId();
             insureIndividualSettleDO.setSettleId(redSettleId);
-            insureIndividualSettleDO.setId(SnowflakeUtils.getId());
+            insureIndividualSettleDO.setId(insureRedSettleId);
             insureIndividualSettleDO.setState(Constants.ZTBZ.CH);
             insureIndividualSettleDO.setHospCode(hospCode);
             insureIndividualSettleDO.setTotalPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getTotalPrice()));
@@ -298,31 +299,40 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"funtionCode"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
-                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
+
+
+
+                // delete from 2021-8-6 liaojiguang
+                /*if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_optins"))){
                     individualSettleDTO.setClrOptins(MapUtils.get(setlInfoMap,"clr_optins"));
                 }else{
                     individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrOptins());
-                }
-                if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
+                }*/
+
+                 /*if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
                     individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
                 }else {
                     individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrWay());
                 }
                 if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_type"))){
-                    individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
+
                 }
                 else {
                     individualSettleDTO.setClrOptins(insureIndividualSettleDO.getClrType());
-                }
+                }*/
+
+                // add 2021-8-6 liaojiguang 使用就医地医保划区
+                individualSettleDTO.setClrOptins(MapUtils.get(resultMap,"mdtrtareaAdmvs"));
+                individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
+                individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
+
                 individualSettleDTO.setHospCode(hospCode);
                 individualSettleDTO.setVisitId(visitId);
                 individualSettleDTO.setState("2");
                 individualSettleDTO.setSettleId(redSettleId);
                 individualSettleDTO.setSettleState("1");
+                individualSettleDTO.setId(insureRedSettleId);
                 outptVisitDAO.updateInsureSettle(individualSettleDTO);
-//                insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
-//                insureIndividualVisitService_consumer.deleteInsureVisitById(map).getData();
-
             }
             else {
                 /**

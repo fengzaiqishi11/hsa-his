@@ -616,15 +616,15 @@
                 clr_type = #{clrType,jdbcType=VARCHAR}
             </if>
         </set>
-        where 1=1 and  hosp_code = #{hospCode} and  visit_id = #{visitId} and settle_id =#{settleId}
+        where 1=1 and  hosp_code = #{hospCode} and id = #{id}
         <if test="state != null and state != ''">
             and  state = #{state,jdbcType=VARCHAR}
         </if>
         <if test="settleState != null and settleState != ''">
             and  settle_state = #{settleState,jdbcType=VARCHAR}
         </if>
-
     </update>
+
     <select id="getInsureBasicById" parameterType="java.util.Map" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
 		select b.*,a.insure_org_code,a.insure_reg_code,a.medical_reg_no as aaz217,a.visit_id from insure_individual_visit a
 		left join insure_individual_basic b on (a.mib_id = b.id and a.hosp_code = b.hosp_code)

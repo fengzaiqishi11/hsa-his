@@ -217,9 +217,9 @@
         l.item_name,
         abs(l.num) num,
         l.unit_code,
-        g.last_buy_price as buy_price,
+        case when l.item_code = '1' then bd.last_buy_price when l.item_code ='2' then bm.last_buy_price end buy_price,
         l.price AS sell_price,
-        abs( g.last_buy_price * l.num ) AS buy_price_all,
+        case when l.item_code = '1' then abs( bd.last_buy_price * l.num ) when l.item_code ='2' then ( bm.last_buy_price * l.num ) end buy_price_all,
         abs( l.price * l.num ) AS sell_price_all,
         l.split_ratio,
         l.split_num,
@@ -231,20 +231,16 @@
         e.phar_id as invoicingTargetId,
         (select dp.name from base_dept dp where dp.id = e.phar_id and dp.hosp_code = e.hosp_code) as invoicingTargetName
         FROM
-        phar_in_distribute e,
-        phar_in_distribute_detail l,
-        base_drug g,
-        stro_stock_detail s
-        where e.hosp_code = l.hosp_code
-        and e.id = l.distribute_id
-        and l.hosp_code = g.hosp_code
-        and l.item_id = g.id
-        and (l.hosp_code,l.id) in
-		<foreach collection="list" item="dto" open="(" close=")" separator=",">
+        phar_in_distribute_detail l
+        join phar_in_distribute e on e.id = l.distribute_id and  e.hosp_code = l.hosp_code
+        join stro_stock_detail s on l.hosp_code = s.hosp_code and l.stock_detail_id = s.id
+        left join base_drug bd on bd.id = l.item_id and bd.hosp_code = l.hosp_code
+        left join base_material bm on bm.id = l.item_id and bm.hosp_code = l.hosp_code
+        where
+        (l.hosp_code,l.id) in
+		    <foreach collection="list" item="dto" open="(" close=")" separator=",">
             (#{dto.hospCode},#{dto.id})
         </foreach>
-        and l.hosp_code = s.hosp_code
-        and l.stock_detail_id = s.id
     </select>
 
     <select id="queryPharInDistributeDetailById" resultType="java.math.BigDecimal">

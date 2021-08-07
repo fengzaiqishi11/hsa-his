@@ -997,7 +997,7 @@
         from insure_individual_visit iiv
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
-        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
+        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code and iiv.medical_reg_no = iis.medicalRegNo
         where iiv.hosp_code =#{hospCode} and iis.insureSettleId is not null and iis.state='0' and iis.settle_state='1'
         <if test="keyWord != null and keyWord != ''">
             and (

@@ -289,12 +289,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Date endTime = inptSettleDTO.getEndTime();
         int daysBetween = daysBetween(startTime, endTime);
         if ("1".equals(insureIndividualVisitDTO.getIsHalfSettle())) {
+            daysBetween = daysBetween +1;
             insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
         }else{
-            daysBetween -=1;
             insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
         }
-        insureIndividualVisitDTO.setSettleTime(insureIndividualVisitDTO.getSettleTime()); // 结算时间
+        insureIndividualVisitDTO.setSettleTime(inptSettleDTO.getSettleTime()); // 结算时间
         insureIndividualVisitDTO.setInTime(inptSettleDTO.getStartTime()); // 入院时间
         insureIndividualVisitDTO.setOutTime(inptSettleDTO.getEndTime());// 出院时间
         String medicineOrgCode = insureIndividualVisitDTO.getMedicineOrgCode();

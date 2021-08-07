@@ -690,8 +690,8 @@
         <foreach collection="individualCostDTOList" item="item" index="index" open="" close="" separator=";">
             update insure_individual_cost
             <set>
-                <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
-                    feedetl_Sn = #{item.feedetl_sn},
+                <if test="item.feedetlSn !=null and item.feedetlSn !='' ">
+                    feedetl_Sn = #{item.feedetlSn},
                 </if>
                 <if test="item.fulamtOwnpayAmt !=null ">
                     fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},

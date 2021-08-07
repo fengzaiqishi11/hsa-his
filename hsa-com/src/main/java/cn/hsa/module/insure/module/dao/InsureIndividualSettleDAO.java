@@ -2,6 +2,7 @@ package cn.hsa.module.insure.module.dao;
 
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualFundDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
@@ -173,5 +174,16 @@ public interface InsureIndividualSettleDAO {
      * @Return
     **/
     List<Map<String, Object>> queryInsureFundListMap(Map<String, Object> map);
+
+    /**
+     * @Method queryInptSettle
+     * @Desrciption  根据就诊id,his结算id,医院编码查询患者结算信息
+     * @Param map
+     *
+     * @Author fuhui
+     * @Date   2021/8/6 17:38
+     * @Return
+    **/
+    InptSettleDTO queryInptSettle(Map<String, Object> map);
 }
 

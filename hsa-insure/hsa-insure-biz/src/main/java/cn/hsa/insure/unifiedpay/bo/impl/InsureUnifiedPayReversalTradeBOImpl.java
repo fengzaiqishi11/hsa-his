@@ -34,6 +34,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -287,7 +289,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         dataMap.put("setl_optins", MapUtils.get(parameterMap, "clr_optins"));//结算经办机构
         dataMap.put("stmt_begndate", MapUtils.get(parameterMap, "stmt_begndate"));//对账开始日期
         dataMap.put("stmt_enddate", MapUtils.get(parameterMap, "stmt_enddate"));//对账结束日期
-        dataMap.put("medfee_sumamt", MapUtils.get(parameterMap, "medfee_sumamt"));//医疗费总额
+
+        // 保留两位小数
+        String medfeeSumamt = MapUtils.get(parameterMap, "medfee_sumamt").toString();
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        dataMap.put("medfee_sumamt", df1.format(medfeeSumamt)); //医疗费总额
         dataMap.put("fund_pay_sumamt", MapUtils.get(parameterMap, "fund_pay_sumamt"));//基金支付总额
         dataMap.put("acct_pay", MapUtils.get(parameterMap, "acct_pay"));//个人账户支付金额
         dataMap.put("fixmedins_setl_cnt", MapUtils.get(parameterMap, "fixmedins_setl_cnt"));//定点医药机构结算笔数

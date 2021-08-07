@@ -1059,7 +1059,7 @@
         and feedetl_sn is not null order by feedetl_sn desc limit 1
     </select>
     <update id="updateLimitUserFlag">
-        update inpt_cost set is_reimburse =#{isReimburse}
+        update inpt_cost set is_reimburse =#{isReimburse},lmt_user_flag = #{lmtUserFlag},lim_user_explain=#{limUserExplain}
         where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
     </update>
     <select id="queryInptCostPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">

@@ -489,12 +489,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                             insureIndividualCostDTO.setVisitId(visitId);//就诊id
                             insureIndividualCostDTO.setSettleId(null);
                             insureIndividualCostDTO.setIsHospital("1");
-                            insureIndividualCostDTO.setItemType(newFeedetlSnMap.get(feedetlSn).get("list_type").toString());
-                            insureIndividualCostDTO.setItemCode(newFeedetlSnMap.get(feedetlSn).get("medins_list_code").toString());
-                            insureIndividualCostDTO.setItemName(newFeedetlSnMap.get(feedetlSn).get("medins_list_name").toString());
-                            insureIndividualCostDTO.setCostId(newFeedetlSnMap.get(feedetlSn).get("id").toString());//费用id
-                            insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
-                            insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop").toString()); // 自付比例
+                            insureIndividualCostDTO.setItemType(newFeedetlSnMap.get(feedetlSn).get("list_type") == null?"":newFeedetlSnMap.get(feedetlSn).get("list_type").toString());
+                            insureIndividualCostDTO.setItemCode(newFeedetlSnMap.get(feedetlSn).get("medins_list_code") ==null?"":newFeedetlSnMap.get(feedetlSn).get("medins_list_code").toString());
+                            insureIndividualCostDTO.setItemName(newFeedetlSnMap.get(feedetlSn).get("medins_list_name") == null?"":newFeedetlSnMap.get(feedetlSn).get("medins_list_name").toString());
+                            insureIndividualCostDTO.setCostId(newFeedetlSnMap.get(feedetlSn).get("id") == null ?"":newFeedetlSnMap.get(feedetlSn).get("id").toString());//费用id
+                            insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn") ==null ? "": MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
+                            insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop") ==null ?"":MapUtils.get(item, "selfpay_prop").toString()); // 自付比例
                             insureIndividualCostDTO.setPrimaryPrice(BigDecimalUtils.convert(newFeedetlSnMap.get(MapUtils.get(item,"feedetl_sn")).get("det_item_fee_sumamt").toString())); // 上传到医保的费用
                             insureIndividualCostDTO.setApplyLastPrice(null);
                             insureIndividualCostDTO.setOrderNo(count +""); // 顺序号
@@ -512,7 +512,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                             insureIndividualCostDTO.setPricUplmtAmt(null);
                             insureIndividualCostDTO.setHiLmtpric(null);
                             insureIndividualCostDTO.setOverlmtSelfpay(null);
-                            insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString())))); // 符合政策范围金额
                             insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_selfpay")==null ?"": MapUtils.get(item, "overlmt_selfpay").toString()))));
                             insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_amt") == null ? "":MapUtils.get(item, "overlmt_amt").toString()))));
                             insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt") ==null ? "" :MapUtils.get(item, "preselfpay_amt").toString())))); // 先行自付金额

@@ -536,7 +536,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptSettleDO.setSettleBackPrice(refundPrice.negate());//结算退款
             inptSettleDO.setSettleBackCode(Constants.ZFFS.XJ);//退款方式默认现金
             inptSettleDO.setIsSettle(Constants.SF.F);//是否结算 = 否
-            inptSettleDO.setSettleTime(now);//结算时间
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+                inptSettleDO.setSettleTime(maxDate);// 中途结算的结算时间取最大时间
+            } else {
+                inptSettleDO.setSettleTime(now);//结算时间
+            }
             inptSettleDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志 = 正常
             inptSettleDO.setRedId(null);//冲红id
             inptSettleDO.setIsPrint(Constants.SF.F);//是否打印 = 否

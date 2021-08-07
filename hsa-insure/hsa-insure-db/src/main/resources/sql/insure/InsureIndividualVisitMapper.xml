@@ -990,7 +990,7 @@
         iiv.aka130_name, iiv.bka006, iiv.bka006_name, iiv.injury_borth_sn, iiv.visit_icd_code, iiv.visit_icd_name,
         iiv.visit_time, iiv.visit_drpt_id, iiv.visit_drpt_name, iiv.visit_area_id, iiv.visit_area_name, iiv.visit_berth,
         iiv.starting_price, iiv.shift_hosp_code, iiv.out_hosp_code, cause, iiv.remark, iiv.crte_id, iiv.crte_name,
-        iiv.crte_time,
+        iiv.crte_time,iis.settle_id as settleId,
         ( case iiv.is_hospital when '1' then iv.name when '0' then ov.name end) as aac003,
         is_ecqr, pay_ord_id, pay_token, accessory_diagnosis_name,iis.insureSettleId,
         accessory_diagnosis_code, insuplc_admdvs, mdtrt_cert_type, mdtrt_cert_no, iiv.omsgid, iiv.oinfno

@@ -107,4 +107,7 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String outModeCode;
         private int settleCount; // 中途结算次数
         private String  isHalfSettle; //是否中途结算
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date settleTime; // 结算时间
 }

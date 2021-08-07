@@ -691,7 +691,7 @@
             update insure_individual_cost
             <set>
                 <if test="item.feedetlSn !=null and item.feedetlSn !='' ">
-                    feedetl_Sn = #{item.feedetlSn},
+                    feedetl_sn = #{item.feedetlSn},
                 </if>
                 <if test="item.fulamtOwnpayAmt !=null ">
                     fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},

@@ -1080,9 +1080,6 @@
                 left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
                 where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode}
                 and iis.state='0' and iis.insureSettleId is not null
-
-
-
     </select>
     <select id="queryInsureFundListMap" resultType="java.util.Map">
         select id, hosp_code, visit_id, mib_id, fund_id, fund_name, indi_freeze_status, crte_id,

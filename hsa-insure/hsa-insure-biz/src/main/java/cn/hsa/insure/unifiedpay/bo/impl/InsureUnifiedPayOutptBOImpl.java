@@ -1057,6 +1057,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         }
         resultMap.put("msgId", msgId);
         resultMap.put("funtionCode", funtionCode);
+        resultMap.put("mdtrtareaAdmvs",insureConfigurationDTO.getMdtrtareaAdmvs());
         return resultMap;
     }
 

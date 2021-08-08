@@ -361,19 +361,16 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             insureIndividualCostDTO.setVisitId(visitId);
             insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item, "feedetl_sn")); // 费用明细流水号
             insureIndividualCostDTO.setHospCode(hospCode);
-
             String selfpayProp = DataTypeUtils.dataToNumString(MapUtils.get(item, "selfpay_prop")); // 自付比例
             String overlmtAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "overlmt_amt")); // 超限价金额
             String preselfpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "preselfpay_amt")); // 先行自付金额
             String inscpScpAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "inscp_scp_amt")); // 符合政策范围金额
             String fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fulamt_ownpay_amt")); // 全自费金额
-
             insureIndividualCostDTO.setGuestRatio(selfpayProp);
             insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(overlmtAmt));
             insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(preselfpayAmt));
             insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(inscpScpAmt));
             insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(fulamtOwnpayAmt));
-
             insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item, "med_chrgitm_type")); //医疗收费项目类别
             insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag"));
             insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item, "chrgitm_lv"));

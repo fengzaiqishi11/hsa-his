@@ -420,35 +420,39 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     public Map<String, Object> updateUP_5265(Map<String, Object> parameterMap) {
         String hospCode = MapUtils.get(parameterMap, "hospCode");
         String insureRegCode = MapUtils.get(parameterMap, "insureRegCode");
-
+        String setlId = MapUtils.get(parameterMap, "setl_id");
+        String psnNo = MapUtils.get(parameterMap, "psn_no");
+        String mdtrtId = MapUtils.get(parameterMap, "mdtrt_id");
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("hospCode",hospCode);
-        dataMap.put("setl_id", MapUtils.get(parameterMap, "setl_id"));//结算ID
-        dataMap.put("psn_no", MapUtils.get(parameterMap, "psn_no"));//人员编号
-        dataMap.put("mdtrt_id", MapUtils.get(parameterMap, "mdtrt_id"));//就医登记号
         Map<String, Object> resultMap = new HashMap<>();
-        InsureIndividualVisitDTO individualVisitDTO = insureIndividualVisitDAO.queryInsureIndividualVisit(dataMap);
+        InsureIndividualVisitDTO individualVisitDTO = insureIndividualVisitDAO.queryInsureIndividualVisit(parameterMap);
         if (individualVisitDTO == null) {
             throw new AppException("根据医保登记号和个人电脑号查询无此医保病人信息");
         }
-        String  insuplcAdmdvs = individualVisitDTO.getInsuplcAdmdvs(); // 就医地区划
-        String  medicineOrgCode = individualVisitDTO.getMedicineOrgCode();  // 医疗机构编码
+        String insuplcAdmdvs = individualVisitDTO.getInsuplcAdmdvs(); // 就医地区划
+        String medicineOrgCode = individualVisitDTO.getMedicineOrgCode();  // 医疗机构编码
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(medicineOrgCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-        if(insureConfigurationDTO == null){
+        if (insureConfigurationDTO == null) {
             throw new AppException("根据就诊人的医疗机构编码查询无此医保机构配置信息");
         }
         // 就诊人的参保地区划和就医地区划不一致就是异地
-        if(!insureConfigurationDTO.getMdtrtareaAdmvs().equals(insuplcAdmdvs)){
-            if("1".equals(individualVisitDTO.getIsHospital())){
+        if (!insureConfigurationDTO.getMdtrtareaAdmvs().equals(insuplcAdmdvs)) {
+            dataMap.put("mdtrtRegno", setlId);//结算ID
+            dataMap.put("mdtrtId", mdtrtId);//就医登记号
+            dataMap.put("medinsNo", insureConfigurationDTO.getOrgCode());//就医登记号
+            if ("1".equals(individualVisitDTO.getIsHospital())) {
                 resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5270, dataMap);
-            }else{
+            } else {
                 resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5269, dataMap);
             }
-        }else {
-             resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
+        } else {
+            dataMap.put("setl_id", setlId);//结算ID
+            dataMap.put("psn_no", psnNo);//人员编号
+            dataMap.put("mdtrt_id", mdtrtId);//就医登记号
+            resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
         }
         return resultMap;
     }

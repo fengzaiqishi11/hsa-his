@@ -313,6 +313,11 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupThree(paraMap);
             PageHelper.clearPage();
             sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupThreeSum(paraMap);
+        } else if ("5".equals(MapUtils.get(paraMap, "sumCode"))){
+            //按业务类型、项目、科室分组
+            datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOne(paraMap);
+            PageHelper.clearPage();
+            sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOneSum(paraMap);
         } else {
             //按业务类型、项目明细
             datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupFour(paraMap);
@@ -2828,6 +2833,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     public PageDTO queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO) {
         PageHelper.startPage(pharOutDistributeDTO.getPageNo(),pharOutDistributeDTO.getPageSize());
         return PageDTO.of(patientCostLedgerDAO.queryOutMedicationGet(pharOutDistributeDTO));
+    }
+
+    @Override
+    public PageDTO queryInPatientDaily(InptVisitDTO inptVisitDTO) {
+        PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
+        return PageDTO.of(patientCostLedgerDAO.queryInPatientDaily(inptVisitDTO));
     }
 
 }

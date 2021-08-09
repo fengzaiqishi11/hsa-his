@@ -357,5 +357,18 @@ public interface PatientCostLedgerService {
    */
   @GetMapping("/service/outpt/statement/queryOutMedicationGet")
   WrapperResponse<PageDTO> queryOutMedicationGet(Map map);
+
+
+  /**
+   * @Menthod queryInPatientDaily
+   * @Desrciption 在院病人实况查询   *
+   * @Param
+   * [inptVisitDTO]   *
+   * @Author liuliyun
+   * @Date   2021/08/05 11:19
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>>
+   **/
+  @GetMapping("/service/outpt/statement/queryInPatientDaily")
+  WrapperResponse<PageDTO> queryInPatientDaily(Map map);
 }
 

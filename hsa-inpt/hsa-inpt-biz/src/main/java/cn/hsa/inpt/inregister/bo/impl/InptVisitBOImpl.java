@@ -1213,7 +1213,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("入院科室名称不可为空");
         }
         //设置住院号
-        // 20210803 liuliyun 珠海住院号生成
+        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        inptVisitDTO.setInNo(orderNo);
+
+        // 档案表操作
+        OutptProfileFileExtendDTO extend = getProfileFileDTO(inptVisitDTO);
+        // 20210805 liuliyun 珠海住院号生成 start
         Map sysParam=new HashMap();
         sysParam.put("hospCode",inptVisitDTO.getHospCode());
         sysParam.put("code","BAH_SF");
@@ -1223,7 +1228,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             sysParameterDTO=new SysParameterDTO();
             sysParameterDTO.setValue("0");
         }
-        String orderNo ="";
         if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
             // 住院次数获取(未获取，默认1次)
             Map countMap=new HashMap();
@@ -1234,7 +1238,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             int inCnt = 1;
             if (info == null|| info.size() ==0) {
                 inCnt = 1;
-                orderNo = getOrderNo(inptVisitDTO.getHospCode(), "361")+"-00"+inCnt;
+                orderNo = extend.getInProfile()+"-00"+inCnt;
             }else {
                 if (info.get(0).get("total_in")!=null) {
                     inCnt = (int) info.get(0).get("total_in");
@@ -1242,14 +1246,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 }
                 orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
             }
-        }else {
-            orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+            inptVisitDTO.setInNo(orderNo);
         }
-        inptVisitDTO.setInNo(orderNo);
-
-        // 档案表操作
-        OutptProfileFileExtendDTO extend = getProfileFileDTO(inptVisitDTO);
-
+        // 20210805 liuliyun 珠海住院号生成 end
         //住院就诊表增加一条记录
         //设置ID
         String id = SnowflakeUtils.getId();

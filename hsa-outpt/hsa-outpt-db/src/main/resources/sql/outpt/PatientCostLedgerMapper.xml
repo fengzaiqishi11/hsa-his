@@ -1587,6 +1587,7 @@
     <select id="queryHospitalItemReportInfoGroupOne" resultType="java.util.LinkedHashMap">
         select
         t.bizCode,
+        t.dept_name,
         t.item_type,
         t.in_no,
         t.name,
@@ -3521,7 +3522,7 @@
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
         </if>
-        <if test="statusCode != null and statusCode == '1'.toString()">
+        <if test="statusCode != null">
             and a.status_code = #{statusCode}
         </if>
         union all
@@ -3710,6 +3711,9 @@
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
         </if>
         group by a.item_name, a.spec,a.unit_code
     </select>
@@ -5598,6 +5602,126 @@
             </if>
             group by b.dept_id, a.item_id
             ) A where A.splitNum != 0
+    </select>
+
+    <!--在院病人实况查询（在院/出院） 20210805 liuliyun-->
+    <select id="queryInPatientDaily" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+        a.id,
+        a.hosp_code,
+        a.profile_id,
+        a.in_profile,
+        a.in_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.age_unit_code,
+        a.birthday,
+        a.nation_code,
+        a.cert_code,
+        a.cert_no,
+        a.marry_code,
+        a.phone,
+        a.address,
+        a.preferential_type_id,
+        a.patient_code,
+        a.receive_hosp_name,
+        a.bed_id,
+        a.bed_name,
+        a.nursing_code,
+        a.diet_type,
+        a.Illness_code,
+        a.status_code,
+        a.in_ward_id,
+        a.in_dept_id,
+        a.in_dept_name,
+        a.in_time,
+        a.zz_doctor_id,
+        a.zz_doctor_name,
+        a.jz_doctor_id,
+        a.jz_doctor_name,
+        a.zg_doctor_id,
+        a.zg_doctor_name,
+        a.in_remark,
+        a.in_mode_code,
+        a.in_disease_id,
+        a.in_disease_name,
+        a.in_disease_icd10,
+        a.in_situation_code,
+        a.outpt_visit_no,
+        a.outpt_doctor_id,
+        a.outpt_doctor_name,
+        a.outpt_disease_id,
+        a.outpt_disease_name,
+        a.outpt_disease_icd10,
+        a.out_ward_id,
+        a.out_dept_id,
+        a.out_dept_name,
+        a.out_time,
+        a.out_disease_id,
+        a.out_disease_name,
+        a.out_disease_icd10,
+        a.out_oper_id,
+        a.out_oper_name,
+        a.out_oper_time,
+        a.out_situation_code,
+        a.out_remark,
+        a.out_mode_code,
+        a.is_archive,
+        a.archive_time,
+        a.archive_id,
+        a.archive_name,
+        a.insure_code,
+        a.insure_org_code,
+        a.insure_no,
+        a.insure_biz_code,
+        a.insure_treat_code,
+        a.insure_patient_id,
+        a.insure_remark,
+        a.total_advance,
+        (case s.id when null then a.total_cost else s.reality_price end) total_cost,
+        (case when s.settle_take_price != '0' then s.settle_take_price
+        when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
+        a.total_balance,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        s.settle_time as settleTime,
+        s.self_price,
+        s.mi_price,
+        (select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and a.id = c.visit_id) as drugCost,
+        (select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and a.id = c.visit_id)/a.total_cost as drugCostRate,
+        (select name from base_dept b where b.id = a.in_ward_id and b.hosp_code = a.hosp_code) as wardName,
+        bpf.source_tj_code,
+        bpf.total_in
+        from inpt_visit a
+        left join inpt_settle s on a.id=s.visit_id and a.hosp_code=s.hosp_code and s.is_settle='1' and s.status_code = '0'
+        left join base_profile_file bpf on a.profile_id = bpf.id
+        where a.hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%',#{keyword},'%') or a.in_no like concat('%',#{keyword},'%') or a.in_profile like concat('%',#{keyword},'%') or a.in_disease_name like concat('%',#{keyword},'%') or a.zz_doctor_name like concat('%',#{keyword},'%') or a.jz_doctor_name like concat('%',#{keyword},'%') or a.zg_doctor_name like concat('%',#{keyword},'%') or a.outpt_doctor_name like concat('%',#{keyword},'%') )
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="inWardId != null and inWardId != ''">
+            and a.in_ward_id = #{inWardId}
+        </if>
+        <if test="inDiseaseName != null and inDiseaseName != ''">
+            and a.in_disease_name like concat('%',#{inDiseaseName},'%')
+        </if>
+        /*当天出院*/
+        <if test="startDate != null and timeFlag == '1'.toString()">
+            and DATE_FORMAT(a.out_time,'%Y-%m-%d') = DATE_FORMAT(#{startDate},'%Y-%m-%d') and (a.status_code ='5' or a.status_code ='7')
+        </if>
+        /*当天在院*/
+        <if test="startDate != null and timeFlag == '0'.toString()">
+            and DATE_FORMAT(a.in_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{startDate},'%Y-%m-%d') and (a.out_time is null or DATE_FORMAT(a.out_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d'))
+            and a.status_code ='2'
+        </if>
     </select>
 
 </mapper>

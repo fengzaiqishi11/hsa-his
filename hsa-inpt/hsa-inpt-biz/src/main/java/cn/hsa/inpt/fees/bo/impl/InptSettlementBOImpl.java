@@ -189,10 +189,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             costParam.put("hospCode", hospCode);//医院编码
             costParam.put("visitId", id);//就诊id
             costParam.put("babyIds",babyIds);
-            costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             //获取婴儿费用信息
             List<InptCostDO> inptBabyCostDOList = inptCostDAO.queryInptCostList(costParam);
             if (inptBabyCostDOList!=null&&inptBabyCostDOList.size()>0){
@@ -229,10 +229,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             Map<String, Object> costParam = new HashMap<String, Object>();
             costParam.put("hospCode", hospCode);//医院编码
             costParam.put("visitId", id);//就诊id
-            costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = new ArrayList<>();
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
@@ -536,7 +536,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptSettleDO.setSettleBackPrice(refundPrice.negate());//结算退款
             inptSettleDO.setSettleBackCode(Constants.ZFFS.XJ);//退款方式默认现金
             inptSettleDO.setIsSettle(Constants.SF.F);//是否结算 = 否
-            inptSettleDO.setSettleTime(now);//结算时间
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+                inptSettleDO.setSettleTime(maxDate);// 中途结算的结算时间取最大时间
+            } else {
+                inptSettleDO.setSettleTime(now);//结算时间
+            }
             inptSettleDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志 = 正常
             inptSettleDO.setRedId(null);//冲红id
             inptSettleDO.setIsPrint(Constants.SF.F);//是否打印 = 否
@@ -623,10 +627,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             Map<String, Object> costParam = new HashMap<String, Object>();
             costParam.put("hospCode", hospCode);//医院编码
             costParam.put("visitId", id);//就诊id
-            costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = new ArrayList<>();
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
@@ -811,6 +815,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             InptSettleDO inptSettleDO1 = new InptSettleDO();
             inptSettleDO1.setId(settleId);//结算id
             inptSettleDO1.setIsSettle(Constants.SF.S);//是否结算 = 是
+            inptSettleDO1.setSourcePayCode("0"); // 0：his 1：微信 2：支付宝 3：自助机
             inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO1);
 
             //判断是否需要发票
@@ -1411,10 +1416,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             costParam.put("hospCode", hospCode);//医院编码
             costParam.put("visitId", id);//就诊id
             costParam.put("babyIds", babyIds);//婴儿Id
-            costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
             //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
             if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
@@ -1584,10 +1589,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             costParam.put("hospCode", hospCode);//医院编码
             costParam.put("visitId", id);//就诊id
             costParam.put("babyIds",babyIds);// 婴儿id
-            costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
             // if (inptCostDOList == null || inptCostDOList.isEmpty()){return WrapperResponse.fail("未找到结算费用信息，请刷新。",null);}
 
@@ -1707,6 +1712,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             InptSettleDO inptSettleDO1 = new InptSettleDO();
             inptSettleDO1.setId(settleId);//结算id
             inptSettleDO1.setIsSettle(Constants.SF.S);//是否结算 = 是
+            inptSettleDO1.setSourcePayCode("0"); // 0：his 1：微信 2：支付宝 3：自助机
             inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO1);
 
             //判断是否需要发票

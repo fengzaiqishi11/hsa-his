@@ -359,21 +359,18 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         for (Map<String, Object> item : resultDataMap) {
             insureIndividualCostDTO = new InsureIndividualCostDTO();
             insureIndividualCostDTO.setVisitId(visitId);
-            insureIndividualCostDTO.setCostId(MapUtils.get(item, "feedetl_sn")); // 费用明细流水号
+            insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item, "feedetl_sn")); // 费用明细流水号
             insureIndividualCostDTO.setHospCode(hospCode);
-
             String selfpayProp = DataTypeUtils.dataToNumString(MapUtils.get(item, "selfpay_prop")); // 自付比例
             String overlmtAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "overlmt_amt")); // 超限价金额
             String preselfpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "preselfpay_amt")); // 先行自付金额
             String inscpScpAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "inscp_scp_amt")); // 符合政策范围金额
             String fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fulamt_ownpay_amt")); // 全自费金额
-
             insureIndividualCostDTO.setGuestRatio(selfpayProp);
             insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(overlmtAmt));
             insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(preselfpayAmt));
             insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(inscpScpAmt));
             insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(fulamtOwnpayAmt));
-
             insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item, "med_chrgitm_type")); //医疗收费项目类别
             insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag"));
             insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item, "chrgitm_lv"));
@@ -1015,9 +1012,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             feeInfoMap.put("spec", item.get("spec") == null ? "" : item.get("spec").toString()); // 规格
             feeInfoMap.put("fee_ocur_time", DateUtils.format((Date) item.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生日期
             feeInfoMap.put("sin_dos_dscr", item.get("dosageUnitCode") == null ? "" : item.get("dosageUnitCode").toString()); // 计量单位
-            feeInfoMap.put("pric", BigDecimalUtils.scale(BigDecimalUtils.divide((BigDecimal) item.get("realityPrice"), (BigDecimal) item.get("totalNum")), 2)); // 单价
-            feeInfoMap.put("cnt", BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 2)); // 用量
-            feeInfoMap.put("det_item_fee_sumamt", BigDecimalUtils.scale((BigDecimal) item.get("realityPrice"), 2)); // 金额
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            String realityPrice = df1.format(BigDecimalUtils.convert(item.get("realityPrice") ==null ?"":item.get("realityPrice").toString()));
+            feeInfoMap.put("det_item_fee_sumamt", BigDecimalUtils.convert(realityPrice)); // 明细项目费用总额
+            feeInfoMap.put("cnt", MapUtils.get(item,"totalNum"));//  数量
+            feeInfoMap.put("pric", MapUtils.get(item, "price"));// 单价
             feeInfoMap.put("opp_serial_fee", count++); //费用序号
             feeInfoMap.put("rxno", item.get("insureItemCode") == null ? "" : item.get("insureItemCode").toString()); // 处方号
             feeInfoMap.put("bilg_dr_code", ""); // 处方医生编号
@@ -1055,6 +1054,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         }
         resultMap.put("msgId", msgId);
         resultMap.put("funtionCode", funtionCode);
+        resultMap.put("mdtrtareaAdmvs",insureConfigurationDTO.getMdtrtareaAdmvs());
         return resultMap;
     }
 

@@ -763,4 +763,14 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return
    */
   List<Map> queryCollectorInComeStaZYJK(Map map);
+
+  /**
+   * @Menthod queryInPatientDaily
+   * @Desrciption 按条件查询病人信息
+   * @Param [inptVisitDTO]
+   * @Author liuliyun
+   * @Date   2021/08/05 11:53
+   * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+   **/
+  List<InptVisitDTO> queryInPatientDaily(InptVisitDTO inptVisitDTO);
 }

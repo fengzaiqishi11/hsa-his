@@ -398,6 +398,10 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             stroInvoicingDTO.setSellPriceAll(stroStockDTO.getSellPriceAll());
             //时间戳
             stroStockDetailDTO.setCrteTimeStamp(System.nanoTime());
+            // 库存单价
+            stroInvoicingDTO.setNewPrice(stroStockDetailDTO.getSellPrice());
+            // 库存拆零单价
+            stroInvoicingDTO.setNewSplitPrice(stroStockDetailDTO.getSplitPrice());
             //台账数据
             stroInvoicingDTOList.add(this.setInvoicingValue(stroInvoicingDTO, stroStockDetailDTO));
 
@@ -759,7 +763,10 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
           stroInvoicingDTO.setSellPriceAll(stroStockDTO.getSellPriceAll());
           //时间戳
           stroStockDetailDTO.setCrteTimeStamp(System.nanoTime());
-
+          // 库存单价
+          stroInvoicingDTO.setNewPrice(stroStockDetailDTO.getNewPrice());
+          // 库存拆零单价
+          stroInvoicingDTO.setNewSplitPrice(stroStockDetailDTO.getNewSplitPrice());
           StroInvoicingDTO stroInvoicingDTO1 = this.setInvoicingValue(stroInvoicingDTO, stroStockDetailDTO);
           // 批号
           stroInvoicingDTO1.setBatchNo(maxStockDetailDTO.getBatchNo());
@@ -794,7 +801,7 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
      *  1.查询各项目的库存明细信息
      *  2.根据库位id给查询出的库存明细进行分组
      *  3.循环遍历库存明细，分别给各库位每条明细库存，添加进销存记录
-     *
+     *  4.调价中的进销存的数据 ，库存单价和零售单价都是最新的单价。零售单价也是如此
      * @Param
      * []
      *
@@ -870,8 +877,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             stroInvoicingDTO.setOutinCode(map.get("type").toString());
             // 插入其他参数
             StroInvoicingDTO newStroInvoicing = this.setInvoicingValue(stroInvoicingDTO, itemStockDetail);
-            // 调价后零售金额
-            newStroInvoicing.setSellPrice(stroStockDetailDTO.getSellPrice());
+            // 调价后单价
+            newStroInvoicing.setSellPrice(stroStockDetailDTO.getNewPrice());
             //创建人ID
             newStroInvoicing.setCrteId(stroStockDetailDTO.getCrteId());
             // 创建时间
@@ -883,7 +890,11 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             // 时间戳
             newStroInvoicing.setCrteTimeStamp(System.nanoTime());
             // 拆零单价
-            newStroInvoicing.setSplitPrice(stroStockDetailDTO.getSplitPrice());
+            newStroInvoicing.setSplitPrice(stroStockDetailDTO.getNewSplitPrice());
+            // 库存拆零单价 -- new_split_price
+            newStroInvoicing.setNewSplitPrice(stroStockDetailDTO.getNewSplitPrice());
+            // 库存单价 -- new_price
+            newStroInvoicing.setNewPrice(stroStockDetailDTO.getNewPrice());
             stroInvoicingDTOList.add(newStroInvoicing);
           }
         }
@@ -1221,6 +1232,14 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         invoicingOut.setBabyId(stroStockDetailDTO.getBabyId());
         // 发药明细汇总ID
         invoicingOut.setDistributeAllDetailId(stroStockDetailDTO.getDistributeAllDetailId());
+        // 新价格（库存价格）
+        invoicingOut.setNewPrice(invoicingOut.getSellPrice());
+        // 原价格
+        invoicingOut.setSellPrice(stroStockDetailDTO.getSellPrice());
+        // 新拆零单价（库存拆零单价）
+        invoicingOut.setNewSplitPrice(invoicingOut.getSplitPrice());
+        // 原拆零单价
+        invoicingOut.setSplitPrice(stroStockDetailDTO.getSplitPrice());
         //当前单位
         if (!StringUtils.isEmpty(stroStockDetailDTO.getCurrUnitCode())) {
           invoicingOut.setCurrUnitCode(stroStockDetailDTO.getCurrUnitCode());
@@ -1258,8 +1277,15 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             stroStockDetailDTO.setBatchNo(stroStockDetail.getBatchNo());
             //获取批次数量
             StroStockDetailDTO StockDetailBatchNoNum = stroStockDao.getStockDetailBatchNoNum(stroStockDetailDTO);
-
             StroInvoicingDTO stroInvoicingDTO = new StroInvoicingDTO();
+            // 设置库存价格
+            stroInvoicingDTO.setNewPrice(stroStockDetail.getNewPrice());
+            // 设置库存拆零价格
+            stroInvoicingDTO.setNewSplitPrice(stroStockDetail.getNewSplitPrice());
+            // 设置原价格
+            stroInvoicingDTO.setSellPrice(stroStockDetail.getSellPrice());
+            // 设置原拆零价格
+            stroInvoicingDTO.setSplitPrice(stroStockDetail.getSplitPrice());
             //出库数量
             stroInvoicingDTO.setNum(BigDecimalUtils.multiply(stroStockDetail.getNum(), BigDecimal.valueOf(-1)));
             //拆零数量

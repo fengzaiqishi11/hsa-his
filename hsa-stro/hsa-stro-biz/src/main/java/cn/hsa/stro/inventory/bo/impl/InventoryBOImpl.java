@@ -293,7 +293,7 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
                         stroStockDetailDTO.setSplitUnitCode(stroInventoryDetailDTO.getSplitUnitCode());
                         stroStockDetailDTO.setSplitRatio(stroInventoryDetailDTO.getSplitRatio());
                         stroStockDetailDTO.setHospCode(stroInventoryDetailDTO.getHospCode());
-                        stroStockDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitBuyPrice());
+                        stroStockDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
                         stroStockDetailDTO.setInvoicingTargetName(stroInventoryDetailDTO.getInvoicingTargetName());
                         stroStockDetailDTO.setInvoicingTargetId(stroInventoryDetailDTO.getInvoicingTargetId());
                         //查询库存明细数据
@@ -301,6 +301,10 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
                                 stroInventoryDetailDTO.getBatchNo(),inventoryDTO.getBizId(),inventoryDTO.getHospCode());
                         if (stockDetailDTO != null) {
                             stroStockDetailDTO.setExpiryDate(stockDetailDTO.getExpiryDate());
+                            // 库存拆零单价
+                            stroStockDetailDTO.setNewSplitPrice(stockDetailDTO.getSplitPrice());
+                            // 库存单价
+                            stroStockDetailDTO.setNewPrice(stockDetailDTO.getSellPrice());
                         }
                         stroStockDetailDTOList.add(stroStockDetailDTO);
                     } else { //需要报损
@@ -311,7 +315,7 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
                         stroIncdecDetailDTO.setItemName(stroInventoryDetailDTO.getItemName());
                         stroIncdecDetailDTO.setSellPrice(stroInventoryDetailDTO.getSellPrice());
                         stroIncdecDetailDTO.setBuyPrice(stroInventoryDetailDTO.getBuyPrice());
-                        stroIncdecDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitBuyPrice());
+                        stroIncdecDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
                         stroIncdecDetailDTO.setBatchNo(stroInventoryDetailDTO.getBatchNo());
                         stroIncdecDetailDTO.setExpiryDate(stroInventoryDetailDTO.getExpiryDate());
                         stroIncdecDetailDTO.setBeforeNum(stroInventoryDetailDTO.getBeforeNum());

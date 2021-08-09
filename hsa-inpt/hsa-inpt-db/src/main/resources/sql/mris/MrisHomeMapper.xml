@@ -88,6 +88,7 @@
 
             WHERE  mbi.hosp_code = #{hospCode}
             AND  mbi.visit_id = #{id}
+            order by iiv.crte_time desc limit 1
     </select>
 
     <!-- 插入数据 病案患者基本信息-->

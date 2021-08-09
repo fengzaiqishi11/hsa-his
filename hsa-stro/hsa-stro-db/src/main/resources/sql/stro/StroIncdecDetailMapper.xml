@@ -205,7 +205,9 @@
             l.batch_no,
             l.expiry_date,
             l.profit_loss_type,
-            c.audit_id crteId,c.audit_name crteName
+            c.audit_id crteId,c.audit_name crteName,
+            l.split_price as new_split_price,
+            l.sell_price as new_price
         FROM
             stro_incdec_detail l,
             stro_incdec c

@@ -769,6 +769,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 } else {
                     mrisDiagnoseDO.setDiseaseName("其他诊断");
                 }
+                if ("1".equals(mrisDiagnoseDO.getDiseaseCode2())) {
+                    mrisDiagnoseDO.setDiseaseName2("主要诊断");
+                } else if ("0".equals(mrisDiagnoseDO.getDiseaseCode2())){
+                    mrisDiagnoseDO.setDiseaseName2("其他诊断");
+                }
                 mrisDiagnoseDO.setId(SnowflakeUtils.getId());
                 mrisDiagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
                 mrisDiagnoseDO.setMbiId(mbiId);
@@ -949,7 +954,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 mrisOperInfoDO.setHospCode(String.valueOf(map.get("hospCode")));
                 mrisOperInfoDO.setMbiId(String.valueOf(map.get("mrisId")));
                 mrisOperInfoDO.setVisitId(String.valueOf(map.get("visitId")));
-                mrisOperInfoDO.setOperTime(DateUtils.format(operInfoRecordDO.getCrteTime(),"YYYY-MM-DD"));
+                mrisOperInfoDO.setOperTime(DateUtils.format(operInfoRecordDO.getCrteTime(),"yyyy-MM-dd'T'HH:mm:ss.SSS"));
+                mrisOperInfoDO.setOperDoctorId(operInfoRecordDO.getDoctorId()); // 术者
+                mrisOperInfoDO.setAssistantId4(operInfoRecordDO.getAssistantId1()); // I 助
+                mrisOperInfoDO.setAssistantId2(operInfoRecordDO.getAssistantId2()); // II 助
                 mrisOperInfoDO.setColumnsNum(n + "");
                 mrisOperInfoDOList.add(mrisOperInfoDO);
                 n++;
@@ -1025,7 +1033,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     if ("1".equals(inptDiagnoseList.get(i+1).getIsMain())) {
                         mrisDiagnoseDO.setDiseaseCode2("1");
                         mrisDiagnoseDO.setDiseaseName2("主要诊断");
-                    } else {
+                    } else if ("0".equals(inptDiagnoseList.get(i+1).getIsMain())) {
                         mrisDiagnoseDO.setDiseaseCode2("0");
                         mrisDiagnoseDO.setDiseaseName2("其他诊断");
                     }

@@ -229,6 +229,8 @@
         s.expiry_date,
         s.id,
         e.phar_id as invoicingTargetId,
+        s.sell_price as new_price,
+        s.split_price as new_split_price,
         (select dp.name from base_dept dp where dp.id = e.phar_id and dp.hosp_code = e.hosp_code) as invoicingTargetName
         FROM
         phar_in_distribute e,

@@ -660,4 +660,14 @@ public class StatemnetController extends BaseController {
     return patientCostLedgerService_consumer.queryItemName( paraMap);
 
   };
+
+  @GetMapping("/queryInPatientDaily")
+  public WrapperResponse<PageDTO> queryInPatientDaily(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.queryInPatientDaily(map);
+  }
 }

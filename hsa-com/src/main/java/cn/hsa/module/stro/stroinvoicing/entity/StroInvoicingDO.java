@@ -93,4 +93,8 @@ public class StroInvoicingDO  extends PageDO implements Serializable {
     private String invoicingTargetName;
     // 进销存目标ID
     private String invoicingTargetId;
+    // 新价格
+    private BigDecimal newPrice;
+    // 新拆零价格
+    private BigDecimal newSplitPrice;
 }

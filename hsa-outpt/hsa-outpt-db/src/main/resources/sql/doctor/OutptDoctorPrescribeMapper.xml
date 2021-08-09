@@ -479,7 +479,8 @@
             patient_code = #{patientCode},
             preferential_type_id = #{preferentialTypeId},
             visit_code = #{visitCode},
-            remark = #{remark}
+            remark = #{remark},
+            now_address = #{nowAddress}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 

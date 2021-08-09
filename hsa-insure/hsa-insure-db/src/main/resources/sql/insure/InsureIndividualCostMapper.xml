@@ -690,8 +690,8 @@
         <foreach collection="individualCostDTOList" item="item" index="index" open="" close="" separator=";">
             update insure_individual_cost
             <set>
-                <if test="item.feedetl_sn !=null and item.feedetl_sn !='' ">
-                    feedetl_Sn = #{item.feedetl_sn},
+                <if test="item.feedetlSn !=null and item.feedetlSn !='' ">
+                    feedetl_sn = #{item.feedetlSn},
                 </if>
                 <if test="item.fulamtOwnpayAmt !=null ">
                     fulamt_ownpay_amt = #{item.fulamtOwnpayAmt},
@@ -1059,7 +1059,7 @@
         and feedetl_sn is not null order by feedetl_sn desc limit 1
     </select>
     <update id="updateLimitUserFlag">
-        update inpt_cost set is_reimburse =#{isReimburse}
+        update inpt_cost set is_reimburse =#{isReimburse},lmt_user_flag = #{lmtUserFlag},lim_user_explain=#{limUserExplain}
         where visit_id =#{visitId} and id = #{id} and hosp_code =#{hospCode}
     </update>
     <select id="queryInptCostPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">

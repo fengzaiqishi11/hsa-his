@@ -304,4 +304,15 @@ public interface PatientCostLedgerBO {
    * @Return cn.hsa.base.PageDTO
    */
   PageDTO queryOutMedicationGet(PharOutDistributeDTO pharOutDistributeDTO);
+
+
+  /**
+   * @Menthod queryInPatientDaily
+   * @Desrciption 在院病人实况统计报表
+   * @Param [map]
+   * @Author liuliyun
+   * @Date   2021/08/05 11:21
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO queryInPatientDaily(InptVisitDTO inptVisitDTO);
 }

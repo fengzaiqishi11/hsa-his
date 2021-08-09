@@ -219,4 +219,8 @@ public class OutptVisitDO extends PageDO implements Serializable {
      * 是否为体检登记
      */
     private String isPhys;
+    /**
+     * 居住地地址
+     */
+    private String nowAddress;
 }

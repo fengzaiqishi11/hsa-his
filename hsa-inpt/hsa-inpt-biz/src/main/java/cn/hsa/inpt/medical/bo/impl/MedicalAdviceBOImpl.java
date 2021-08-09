@@ -2923,6 +2923,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             lsYttz = true;
             //预停医嘱当天需要生成费用 -- 2021-08-03 pengbo
             //endTime = DateUtils.dateAdd(plantTime,-1) ;
+            endTime = plantTime ;
         }
 
         Map<String, Object> map = new HashMap<>();

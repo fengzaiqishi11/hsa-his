@@ -990,14 +990,14 @@
         iiv.aka130_name, iiv.bka006, iiv.bka006_name, iiv.injury_borth_sn, iiv.visit_icd_code, iiv.visit_icd_name,
         iiv.visit_time, iiv.visit_drpt_id, iiv.visit_drpt_name, iiv.visit_area_id, iiv.visit_area_name, iiv.visit_berth,
         iiv.starting_price, iiv.shift_hosp_code, iiv.out_hosp_code, cause, iiv.remark, iiv.crte_id, iiv.crte_name,
-        iiv.crte_time,
+        iiv.crte_time,iis.settle_id as settleId,
         ( case iiv.is_hospital when '1' then iv.name when '0' then ov.name end) as aac003,
         is_ecqr, pay_ord_id, pay_token, accessory_diagnosis_name,iis.insureSettleId,
         accessory_diagnosis_code, insuplc_admdvs, mdtrt_cert_type, mdtrt_cert_no, iiv.omsgid, iiv.oinfno
         from insure_individual_visit iiv
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
-        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
+        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code and iiv.medical_reg_no = iis.medicalRegNo
         where iiv.hosp_code =#{hospCode} and iis.insureSettleId is not null and iis.state='0' and iis.settle_state='1'
         <if test="keyWord != null and keyWord != ''">
             and (

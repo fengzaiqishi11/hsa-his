@@ -101,6 +101,12 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
         return PageDTO.of(list);
     }
 
+    @Override
+    public List<OutptProfileFileDTO> queryBaseProfileByIds(OutptProfileFileDTO outptProfileFileDTO) {
+        outptProfileFileDTO.setIsValid(Constants.SF.S);
+        return baseProfileFileDAO.queryPage(outptProfileFileDTO);
+    }
+
     /**
      * @Method isCertNoExist
      * @Desrciption 暂时只可判断档案表是否有该条身份证对应的档案信息

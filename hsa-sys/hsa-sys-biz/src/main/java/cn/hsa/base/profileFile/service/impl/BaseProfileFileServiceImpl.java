@@ -63,6 +63,11 @@ public class BaseProfileFileServiceImpl extends HsafService implements BaseProfi
         return WrapperResponse.success(baseProfileFileBO.queryPage(MapUtils.get(map, "outptProfileFileDTO")));
     }
 
+    @Override
+    public WrapperResponse<List<OutptProfileFileDTO>> queryBaseProfileByIds(Map map) {
+        return WrapperResponse.success(baseProfileFileBO.queryBaseProfileByIds(MapUtils.get(map, "outptProfileFileDTO")));
+    }
+
     /**
      * @Method isCertNoExist
      * @Desrciption  暂时只做判断身份证是否重复

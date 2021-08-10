@@ -142,5 +142,7 @@ public class OutptPrescribeDetailsDTO extends OutptPrescribeDetailsDO {
     private String settleTime;
     /** 手术信息 **/
     private OperInfoRecordDTO operInfoRecordDTO;
+    /** 医技类型式代码 PACSXMLX、LISXMLX **/
+    private String technologyCode;
 }
 

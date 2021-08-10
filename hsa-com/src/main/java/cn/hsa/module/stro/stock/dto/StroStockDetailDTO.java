@@ -30,6 +30,10 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private BigDecimal splitBuyPrice = BigDecimal.valueOf(0);
     //拆零零售单价
     private BigDecimal splitSellPrice = BigDecimal.valueOf(0);
+    // 拆零新单价
+    private BigDecimal newSplitPrice = BigDecimal.valueOf(0);
+    // 新单价
+    private BigDecimal newPrice = BigDecimal.valueOf(0);
     //剂型代码
     private String prepCode;
     //单据号

@@ -829,7 +829,7 @@
       <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
       '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
       a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, stock.stock_occupy stockOccupy,stock.split_num splitNum, '0' isWz,
-      a.usual_name,a.usual_wbm, a.usual_pym
+      a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code
       from base_drug a
       left join(
       select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -884,7 +884,7 @@
       a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
       drugRemark, '' drugImgPath,
       f.name prodName, null stockNum, null stockOccupy,null splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-      a.pym usual_pym
+      a.pym usual_pym ,'' as technology_code
       from base_material a
       left join(
       select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -922,7 +922,7 @@
       a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
       a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
       '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-      usual_name,a.wbm usual_wbm, a.pym usual_pym
+      usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code
       from base_advice a
       left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
       left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
@@ -1497,7 +1497,7 @@
         case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type,
         '4' itemCode, null pharId, null rateId, null bfcId, b.id execDeptId, c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself,'4' bigTypeCode, a.type_code typeCode,
-        case when e.id is null then '0' else '1' end isWz
+        case when e.id is null then '0' else '1' end isWz, a.technology_code as technologyCode
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code

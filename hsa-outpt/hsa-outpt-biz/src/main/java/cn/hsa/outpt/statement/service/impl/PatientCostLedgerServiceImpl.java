@@ -447,4 +447,19 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     return WrapperResponse.success(patientCostLedgerBO.queryOutMedicationGet(MapUtils.get(map,"pharOutDistributeDTO")));
   }
 
+
+  /**
+   * @Menthod queryInPatientDaily
+   * @Desrciption 在院病人实况统计报表
+   * @Param [map]
+   * @Author liuliyun
+   * @Date   2021/08/05 11:21
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryInPatientDaily(Map map) {
+    InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.queryInPatientDaily(inptVisitDTO));
+  }
+
 }

@@ -292,8 +292,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         // 向分诊队列插入数据
         disposeTriageVisit(outptVisitDTO, outptRegisterDTO, ghid, seqNo, jzid, hospCode);
         // TODO: 2020/8/19 调用建档接口
-        //判断有无证件号码
-        if(!StringUtils.isEmpty(outptVisitDTO.getCertNo())){
+        //判断有无证件号码，证件类别未其他也进行建档操作
+        if(!StringUtils.isEmpty(outptVisitDTO.getCertNo()) || (StringUtils.isNotEmpty(outptVisitDTO.getCertCode()) && Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode()))){
             OutptProfileFileDTO outptProfileFileDTO = new OutptProfileFileDTO();
             outptProfileFileDTO.setId(outptVisitDTO.getProfileId());
             outptProfileFileDTO.setHospCode(hospCode);
@@ -330,8 +330,10 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
 //            outptProfileFileDTO.setOutProfile(ghdh);
             outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getOutProfile()); //门诊档案号
             outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getInProfile()); //住院病案号
-            outptProfileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
-            outptProfileFileDTO.setTotalOut(1);
+            outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getOutptLastVisitTime()); // 门诊最后就诊时间
+            outptProfileFileDTO.setTotalOut(outptProfileFileExtendDTO.getTotalOut() == null ? 1 : outptProfileFileExtendDTO.getTotalOut()); // 累计门诊次数
+            outptProfileFileDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getInptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getInptLastVisitTime()); // 住院最后就诊时间
+            outptProfileFileDTO.setTotalIn(outptProfileFileExtendDTO.getTotalIn() == null ? 0 : outptProfileFileExtendDTO.getTotalIn()); // 累计住院次数
             outptProfileFileDTO.setPatientCode(outptVisitDTO.getPatientCode());
             outptProfileFileDTO.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
             outptProfileFileDTO.setContactAddress(outptVisitDTO.getContactAddress());

@@ -71,4 +71,6 @@ public interface BaseProfileFileBO {
      * @Return java.util.List<cn.hsa.base.TreeMenuNode>
      **/
     List<TreeMenuNode> getAddressTree(OutptProfileFileDTO outptProfileFileDTO);
+
+    List<OutptProfileFileDTO> queryBaseProfileByIds(OutptProfileFileDTO outptProfileFileDTO);
 }

@@ -387,6 +387,12 @@
         <if test="certCode != null and certCode != ''">
             and cert_code = #{certCode}
         </if>
+        <if test="ids != null and ids.size() > 0">
+            and a.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
         order by a.crte_time desc
     </select>
 

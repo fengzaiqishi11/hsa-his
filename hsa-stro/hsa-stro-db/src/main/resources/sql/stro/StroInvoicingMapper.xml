@@ -52,7 +52,9 @@
         DATE_FORMAT(a.expiry_date,'%Y-%m-%d') expiry_date, a.crte_id, a.crte_name, a.crte_time, b.name bizName,a.invoicing_target_id,
         a.invoicing_target_name,round(ifnull((a.surplus_num*a.split_ratio),0),0) splitSurplusNum,
         (case a.item_code when '1' then c.spec when '2' then d.spec end ) spec,
-        (case a.item_code when '1' then c.code when '2' then d.code end ) code
+        (case a.item_code when '1' then c.code when '2' then d.code end ) code,
+        ifnull(a.new_price,0) new_price,
+        ifnull(a.new_split_price,0) new_split_price
         from stro_invoicing a left join base_dept b on a.biz_id=b.id and a.hosp_code=b.hosp_code
         left join base_drug c on a.item_code='1' and c.id=a.item_id and c.hosp_code=a.hosp_code
         left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code
@@ -142,7 +144,7 @@
             split_price, split_unit_code, batch_no, batch_surplus_num,
             expiry_date, crte_id, crte_name, crte_time, curr_unit_code, up_surplus_num,
             up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all,crte_time_stamp,
-            invoicing_target_id,invoicing_target_name
+            invoicing_target_id,invoicing_target_name,new_price,new_split_price
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -178,7 +180,9 @@
             #{item.sellPriceAll},
             #{item.crteTimeStamp},
             #{item.invoicingTargetId},
-            #{item.invoicingTargetName}
+            #{item.invoicingTargetName},
+            #{item.newPrice},
+            #{item.newSplitPrice}
             )
         </foreach>
     </insert>

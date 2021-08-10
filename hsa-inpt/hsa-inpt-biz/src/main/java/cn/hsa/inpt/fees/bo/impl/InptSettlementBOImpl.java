@@ -510,8 +510,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             Date minDate = null;
             Date maxDate = null;
             if (!inptCostDOList.isEmpty()) {
-                minDate = inptCostDOList.get(0).getCrteTime(); //费用开始时间
-                maxDate = inptCostDOList.get(inptCostDOList.size() - 1).getCrteTime(); //费用结束时间
+                minDate = inptCostDOList.get(0).getCostTime(); //费用开始时间
+                maxDate = inptCostDOList.get(inptCostDOList.size() - 1).getCostTime(); //费用结束时间
             }
             //封装结算信息
             InptSettleDO inptSettleDO = new InptSettleDO();
@@ -1470,8 +1470,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             Date minDate = null;
             Date maxDate = null;
             if (!inptCostDOList.isEmpty()) {
-                minDate = inptCostDOList.get(0).getCrteTime(); //费用开始时间
-                maxDate = inptCostDOList.get(inptCostDOList.size() - 1).getCrteTime(); //费用结束时间
+                minDate = inptCostDOList.get(0).getCostTime(); //费用开始时间
+                maxDate = inptCostDOList.get(inptCostDOList.size() - 1).getCostTime(); //费用结束时间
             }
             //封装结算信息
             InptSettleDO inptSettleDO = new InptSettleDO();

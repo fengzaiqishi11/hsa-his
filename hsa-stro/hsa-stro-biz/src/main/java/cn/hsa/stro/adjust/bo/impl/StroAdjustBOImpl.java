@@ -357,7 +357,7 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         List<Map<String, String>> inventoryMap = stroAdjustDao.selectJudgeInventoryDruag(druagList, hospCode);
         // 判断报损报益
         List<Map<String, String>> incdecMap = stroAdjustDao.selectJudgeIncdecDruag(druagList, hospCode);
-        // 退库确认
+        // 入库确认、退库确认
         List<Map<String, String>> confirmMap = stroAdjustDao.selectJudgeconfirmDruag(druagList, hospCode);
         // 把上面所有的map 全部封装到 resultMapList中，做一个全部汇总提示
         List<Map<String,String>> resultMapList = new ArrayList<>();

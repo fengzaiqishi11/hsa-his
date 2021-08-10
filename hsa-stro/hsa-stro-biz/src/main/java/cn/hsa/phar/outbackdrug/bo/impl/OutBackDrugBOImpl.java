@@ -219,7 +219,14 @@ public class OutBackDrugBOImpl  extends HsafBO implements OutBackDrugBO {
                 throw new AppException("此发药明细记录的库存明细不存在");
             }
             stockDetailDTO.setBuyPrice(byId.getBuyPrice());
-            stockDetailDTO.setSellPrice(byId.getSellPrice());
+            // 原价格
+            stockDetailDTO.setSellPrice(item.getPrice());
+            // 原零售单价
+            stockDetailDTO.setSplitPrice(item.getSplitPrice());
+            // 库存单价
+            stockDetailDTO.setNewPrice(byId.getSellPrice());
+            // 库存零售价格
+            stockDetailDTO.setNewSplitPrice(byId.getSplitPrice());
             stockDetailDTO.setExpiryDate(byId.getExpiryDate());
             //算出购进拆零单价
             stockDetailDTO.setSplitBuyPrice(BigDecimalUtils.divide(byId.getBuyPrice(),item.getSplitRatio()));

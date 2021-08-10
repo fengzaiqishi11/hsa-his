@@ -1587,6 +1587,7 @@
     <select id="queryHospitalItemReportInfoGroupOne" resultType="java.util.LinkedHashMap">
         select
         t.bizCode,
+        t.dept_name,
         t.item_type,
         t.in_no,
         t.name,

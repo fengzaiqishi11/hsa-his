@@ -377,7 +377,7 @@
       speed_code, is_skin, is_positive, exec_id, exec_name, second_exec_id, second_exec_name, last_exec_time,
       check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id,
       stop_check_name, stop_check_time, is_long, crte_id, crte_name, crte_time,long_start_time,
-      cancel_id,cancel_name,cancel_time
+      cancel_id,cancel_name,cancel_time,skin_result_code
       from inpt_advice where hosp_code = #{hospCode} and visit_id = #{visitId} and is_submit='1'
       <if test="ids1 != null and ids1 != ''">
         and find_in_set(id,#{ids1})
@@ -416,7 +416,7 @@
     a.is_skin, a.is_positive, a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.last_exec_time, a.check_id, a.check_name,
     a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name, a.stop_check_time,
     a.is_long, a.crte_id, a.crte_name, a.crte_time, a.is_in_print, a.is_stop_print, a.is_exec_print, a.is_skin_print, a.is_in_check_print,
-    a.is_stop_check_print,a.seq_no,a.cancel_id,a.cancel_name,a.cancel_time,
+    a.is_stop_check_print,a.seq_no,a.cancel_id,a.cancel_name,a.cancel_time,a.skin_result_code,
     DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,
     ia.item_id,ia.item_code,ia.yylx,ia.type_code,ia.total_num,ia.total_num_unit_code,ia.use_code,ia.dosage,ia.dosage_unit_code,
     a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
@@ -668,6 +668,9 @@
         </if>
         <if test="item.cancelTime != null">
           cancel_time = #{item.cancelTime},
+        </if>
+        <if test="item.skinResultCode != null">
+          skin_result_code = #{item.skinResultCode},
         </if>
       </set>
       where id = #{item.id} and hosp_code = #{item.hospCode}

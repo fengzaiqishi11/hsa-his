@@ -11,6 +11,7 @@ import cn.hsa.module.oper.operpatientrecord.dto.OperPatientRecordDTO;
 import cn.hsa.module.oper.operpatientrecord.service.OperPatientRecordService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -142,8 +143,15 @@ public class OperInfoRecordController extends BaseController {
     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO>>
     * @throws
     */
-    @RequestMapping("getOperInfoRecord")
-    public WrapperResponse<PageDTO> getOperInfoRecord(OperInfoRecordDTO operInfoRecordDTO, HttpServletRequest req, HttpServletResponse res){
+    @RequestMapping(value = "getOperInfoRecord",method = RequestMethod.GET)
+    public WrapperResponse<PageDTO> getOperInfoRecord(@RequestParam Map<String,String> param, HttpServletRequest req, HttpServletResponse res){
+        OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
+        operInfoRecordDTO.setStartTime(param.get("startTime"));
+        operInfoRecordDTO.setEndTime(param.get("endTime"));
+        operInfoRecordDTO.setKeyword(param.get("keyword"));
+        operInfoRecordDTO.setStatusCode(param.get("statusCode"));
+        operInfoRecordDTO.setPageNo(Integer.valueOf(param.get("pageNo")));
+        operInfoRecordDTO.setPageSize(Integer.valueOf(param.get("pageSize")));
         SysUserDTO sysUserDTO = getSession(req, res);
         operInfoRecordDTO.setHospCode(sysUserDTO.getHospCode());
         Map map = new HashMap<>();

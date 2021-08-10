@@ -130,7 +130,8 @@ public class BaseDrugDTO extends BaseDrugDO implements Serializable {
     private String visitId;
     //查询类型
     private String yzmlType;
-    private String model; //材料型号
+    /** 材料型号 **/
+    private String model;
     private String hospItemId;
     private String molssItemId;
     private String pqccItemId;
@@ -148,49 +149,53 @@ public class BaseDrugDTO extends BaseDrugDO implements Serializable {
     private String insureItemPrepCode;
     //医保中心项目价格
     private BigDecimal insureItemPrice;
-    //自费比例
+    /** 自费比例 **/
     private String deductible;
-    //本位码
+    /** 本位码 **/
     private String standardCode;
-    //限价
+    /** 限价 **/
     private BigDecimal checkPrice;
-    //生产厂家
+    /** 生产厂家 **/
     private String manufacturer;
-    //审核状态代码（SHZT）
+    /** 审核状态代码（SHZT） **/
     private String auditCode;
-    //是否匹配（SF）
+    /** 是否匹配（SF） **/
     private String isMatch;
-    //是否传输（SF）
+    /** 是否传输（SF） **/
     private String isTrans;
-    //是否有效（SF）
+    /** 是否有效（SF）**/
     private String isValid;
-    //生效日期
+    /** 生效日期 **/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date takeDate;
-    //失效日期
+    /** 失效日期 **/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date loseDate;
-    //拼音码
+    /** 拼音码 **/
     private String pym;
-    //五笔码
+    /** 五笔码 **/
     private String wbm;
-    //创建人ID
+    /** 创建人ID **/
     private String crteId;
-    //创建人姓名
+    /** 创建人姓名 **/
     private String crteName;
-    //创建时间
+    /** 创建时间 **/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
     private String name;
-    private String lmtUserFlag ; //限制使用标志
-
-    private String limUserExplain; // 限制使用说明
-
-    private String deptId; // 就诊科室id
+    /** 限制使用标志 **/
+    private String lmtUserFlag ;
+    /** 限制使用说明 **/
+    private String limUserExplain;
+    /** 就诊科室id **/
+    private String deptId;
 
     private String bName;
-    private String downLoadFlag ; // 下载过滤标识
+    /** 下载过滤标识 **/
+    private String downLoadFlag ;
+    /** 医技分类代码 **/
+    private String technologyCode;
 }

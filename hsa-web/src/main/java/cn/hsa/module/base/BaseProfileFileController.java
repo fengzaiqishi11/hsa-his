@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
@@ -90,7 +91,7 @@ public class BaseProfileFileController extends BaseController {
     @GetMapping("/isCertNoExist")
     public WrapperResponse<Boolean> isCertNoExist(OutptProfileFileDTO outptProfileFileDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        if (StringUtils.isEmpty(outptProfileFileDTO.getCertNo())){
+        if (StringUtils.isEmpty(outptProfileFileDTO.getCertNo()) && !Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())){
             throw new RuntimeException("未检查到身份证号");
         }
         outptProfileFileDTO.setHospCode(sysUserDTO.getHospCode());

@@ -1075,11 +1075,12 @@
                iiv.mdtrt_cert_type as psn_cert_type, iiv.mdtrt_cert_no as certno
                 from insure_individual_settle iis
                left join insure_individual_visit iiv on iiv.visit_id = iis.visit_id and iiv.hosp_code = iis.hosp_code
+                    and iis.medicalRegNo = iiv.medical_reg_no
                left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
                left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
                 left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
-                where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode}
-                and iis.state='0' and iis.insureSettleId is not null
+                where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode} and iis.insureSettleId = #{insureSettleId}
+                and iis.state='0' and iis.insureSettleId is not null and  iis.medicalRegNo =#{medicalRegNo}
     </select>
     <select id="queryInsureFundListMap" resultType="java.util.Map">
         select id, hosp_code, visit_id, mib_id, fund_id, fund_name, indi_freeze_status, crte_id,

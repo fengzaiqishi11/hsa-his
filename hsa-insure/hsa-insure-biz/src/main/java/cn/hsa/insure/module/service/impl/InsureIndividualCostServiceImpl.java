@@ -287,4 +287,19 @@ public class InsureIndividualCostServiceImpl implements InsureIndividualCostServ
         InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
         return WrapperResponse.success(insureIndividualCostBO.queryInptCostPage(inptVisitDTO));
     }
+
+    /**
+     * @param map
+     * @Method deleteInptHisCost
+     * @Desrciption 删除his本地费用
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 10:59
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> deleteInptHisCost(Map<String, Object> map) {
+        InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
+        return WrapperResponse.success(insureIndividualCostBO.deleteInptHisCost(inptVisitDTO));
+    }
 }

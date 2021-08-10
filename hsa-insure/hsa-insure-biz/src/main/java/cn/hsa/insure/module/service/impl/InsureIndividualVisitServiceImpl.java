@@ -169,4 +169,33 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
     public  WrapperResponse<Boolean> updateInsureSettleId(Map<String, Object> settleMap) {
         return WrapperResponse.success(insureIndividualVisitBO.updateInsureSettleId(settleMap));
     }
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method queryAllInsureIndiviualVisit
+     * @Desrciption 根据就诊id 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 19:59
+     * @Return
+     * @return
+     */
+    @Override
+    public WrapperResponse<List<InsureIndividualVisitDTO>> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam) {
+        return WrapperResponse.success(insureIndividualVisitBO.queryAllInsureIndiviualVisit(insureUnifiedPayParam));
+    }
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method  selectMaxAndMinRegisterTime
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 20:56
+     * @Return
+     */
+    @Override
+    public WrapperResponse<InsureIndividualVisitDTO> selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam) {
+        return WrapperResponse.success(insureIndividualVisitBO.selectMaxAndMinRegisterTime(insureUnifiedPayParam));
+    }
 }

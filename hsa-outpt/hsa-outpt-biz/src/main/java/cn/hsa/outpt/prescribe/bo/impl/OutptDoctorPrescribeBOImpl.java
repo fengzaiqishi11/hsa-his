@@ -1851,7 +1851,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                     medicalApplyDTO.setImpDeptId(outptPrescribeDetailsDTO.getDeptId());
                     medicalApplyDTO.setOpdId(outptPrescribeDetailsDTO.getId());
                     medicalApplyDTO.setContent(outptPrescribeDetailsDTO.getContent());
-                    medicalApplyDTO.setMedicType(outptPrescribeDetailsDTO.getTechnologyCode());
+                    medicalApplyDTO.setMedicType(outptPrescribeDTO.getTypeCode());
                     medicalApplyDTO.setIsMerge(Constants.SF.F);
                     // 条形码
                         String barCode = getOrderNo(outptPrescribeDetailsDTO.getHospCode(), Constants.ORDERRULE.TXM );

@@ -412,6 +412,10 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
                 // 进销存目标id
                 stockDetailDTO.setInvoicingTargetId(detailDO.getVisitId());
                 stockDetailDTO.setDistributeAllDetailId(detailDO.getDistributeAllDetailId());
+                // 原零售单价
+                stockDetailDTO.setSellPrice(detailDO.getPrice());
+                // 原拆零单价
+                stockDetailDTO.setSplitPrice(detailDO.getSplitPrice());
                 stockDetailLst.add(stockDetailDTO);
             }
 

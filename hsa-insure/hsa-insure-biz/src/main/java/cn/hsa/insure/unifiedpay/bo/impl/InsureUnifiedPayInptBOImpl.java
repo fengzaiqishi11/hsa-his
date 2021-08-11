@@ -1062,6 +1062,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         }
         //就诊信息参数mdtrtinfo
         Map<String, Object> mdtrtinfoMap = new HashMap<>();
+        mdtrtinfoMap.put("ipt_otp_no", insureInptRegisterDTO.getInNo());//	住院/门诊号
         mdtrtinfoMap.put("psn_no", insureInptRegisterDTO.getAac001());//	人员编号
         mdtrtinfoMap.put("insutype", inptVisitDTO.getInsureIndividualBasicDTO().getAae140()); // // TODO	险种类型
         mdtrtinfoMap.put("coner_name", insureInptRegisterDTO.getAae004());//	联系人姓名

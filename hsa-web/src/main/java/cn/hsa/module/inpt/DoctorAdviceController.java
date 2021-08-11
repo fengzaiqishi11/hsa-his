@@ -109,17 +109,8 @@ public class DoctorAdviceController extends BaseController {
         }
 
         Map paramMap = new HashMap();
-        SysUserSystemDTO sysUserSystemDTO = new SysUserSystemDTO();
-        sysUserSystemDTO.setDeptCode(sysUserDTO.getLoginBaseDeptDTO().getId());
-        sysUserSystemDTO.setSystemCode(sysUserDTO.getSystemCode());
-        sysUserSystemDTO.setHospCode(sysUserDTO.getHospCode());
-        sysUserSystemDTO.setUserCode(sysUserDTO.getCode());
-        paramMap.put("sysUserSystemDTO",sysUserSystemDTO);
         //医院编码
         paramMap.put("hospCode", sysUserDTO.getHospCode());
-        //带教医生
-        List<SysUserSystemDTO> sysUserSystemDTOS = (List<SysUserSystemDTO>) sysUserService_consumer.queryUserSysPage(paramMap).getData().getResult();
-
         for(InptAdviceDTO inptAdviceDTO : inptAdviceTDTO.getInptAdviceDTOList()){
             //医院编码
             inptAdviceDTO.setHospCode(sysUserDTO.getHospCode());
@@ -129,11 +120,6 @@ public class DoctorAdviceController extends BaseController {
             inptAdviceDTO.setCrteName(sysUserDTO.getName());
             //就诊科室
             inptAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
-
-            if(!ListUtils.isEmpty(sysUserSystemDTOS)){
-                inptAdviceDTO.setTeachDoctorId(sysUserSystemDTOS.get(0).getTeacherCode());
-                inptAdviceDTO.setTeachDoctorName(sysUserSystemDTOS.get(0).getTeacherName());
-            }
         }
         //医嘱信息
         paramMap.put("inptAdviceDTOList", inptAdviceTDTO.getInptAdviceDTOList());
@@ -287,6 +273,22 @@ public class DoctorAdviceController extends BaseController {
         if(inptAdviceTDTO == null || StringUtils.isEmpty(inptAdviceTDTO.getIds())){
             throw new RuntimeException("提交医嘱不能为空");
         }
+        Map paramMap = new HashMap();
+        SysUserSystemDTO sysUserSystemDTO = new SysUserSystemDTO();
+        sysUserSystemDTO.setDeptCode(sysUserDTO.getLoginBaseDeptDTO().getCode());
+        sysUserSystemDTO.setSystemCode(sysUserDTO.getSystemCode());
+        sysUserSystemDTO.setHospCode(sysUserDTO.getHospCode());
+        sysUserSystemDTO.setUserCode(sysUserDTO.getCode());
+        paramMap.put("sysUserSystemDTO",sysUserSystemDTO);
+        //医院编码
+        paramMap.put("hospCode", sysUserDTO.getHospCode());
+        //带教医生
+        SysUserDTO sysUserDTO1 = sysUserService_consumer.querySysUserHaveTeachDoctor(paramMap).getData();
+        if(sysUserDTO1 != null){
+            inptAdviceTDTO.setTeachDoctorId(sysUserDTO1.getId());
+            inptAdviceTDTO.setTeachDoctorName(sysUserDTO1.getName());
+        }
+
         for(InptAdviceDTO inptAdviceDTO : inptAdviceTDTO.getInptAdviceDTOList()){
             //医院编码
             inptAdviceDTO.setHospCode(sysUserDTO.getHospCode());
@@ -299,7 +301,8 @@ public class DoctorAdviceController extends BaseController {
         inptAdviceTDTO.setSubmitName(sysUserDTO.getName());
         //操作科室
         inptAdviceTDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
-        Map paramMap = new HashMap();
+
+        paramMap.clear();
         //医院编码
         paramMap.put("hospCode", sysUserDTO.getHospCode());
         //医嘱信息

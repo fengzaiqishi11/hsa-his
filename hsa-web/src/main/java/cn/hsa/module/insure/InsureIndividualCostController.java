@@ -198,4 +198,24 @@ public class InsureIndividualCostController extends BaseController {
         return insureIndividualCostService_consumer.queryInptCostPage(map);
 
     }
+
+    /**
+     * @Method deleteInptHisCost
+     * @Desrciption  删除his本地费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/9 10:59
+     * @Return
+    **/
+    @PostMapping("/deleteInptHisCost")
+    public WrapperResponse <Boolean> deleteInptHisCost(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res){
+        Map<String,Object> map  = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        map.put("hospCode",hospCode);
+        inptVisitDTO.setHospCode(hospCode);
+        map.put("inptVisitDTO",inptVisitDTO);
+        return insureIndividualCostService_consumer.deleteInptHisCost(map);
+    }
 }

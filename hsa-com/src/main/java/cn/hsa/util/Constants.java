@@ -1022,4 +1022,27 @@ public interface Constants {
         /** 西药 **/
         public static final String Western_Medicine = "0";
     }
+
+    /**
+     *  医技申请表单据状态(SQDZT)
+     * @Author: zhangguorui
+     * @Date: 2021/8/10 15:19
+     **/
+    class SQDZT {
+
+        /** 保存(处方提交) **/
+        public static final String Prescription_Submitted = "1";
+        /** 结算待发送(结算) **/
+        public static final String Settlement_To_Be_Sent = "2";
+        /** 结算已发送(定时器发送) **/
+        public static final String Settlement_Sent = "3";
+        /** 退费待接收(退费等待相应) **/
+        public static final String Refund_Waiting_For_Response = "5";
+        /** 退费已接收(退费已相应,如果第三方没有相关接口那么退费时默认该状态) **/
+        public static final String Refund_Received = "6";
+        /** 已登记(第三方接口返回登记状态,登记后不允许退费,需要接口返回) **/
+        public static final String Charge_Registered = "7";
+        /** 完成(接收到结果) **/
+        public static final String Charge_Completed = "8";
+    }
 }

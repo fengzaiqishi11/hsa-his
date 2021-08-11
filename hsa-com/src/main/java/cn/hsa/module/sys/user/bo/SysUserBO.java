@@ -129,7 +129,7 @@ public interface SysUserBO {
     * @Desrciption  通过科室编码deptCode查询用户系统表，找到可以操作此科室用户编码（userCode），再去用户表通过userCode找到相应的用户
      * @param map
     * @Author xingyu.xie
-    * @Date   2020/9/1 11:37 
+    * @Date   2020/9/1 11:37
     * @Return java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>
     **/
     List<SysUserDTO> queryUserByOperationDeptId(Map map);
@@ -176,4 +176,8 @@ public interface SysUserBO {
     List<SysUserDTO> queryAllByWorkTypeCode(SysUserDTO sysUserDTO);
 
     Boolean insertUpload(Map map);
+
+    SysUserDTO querySysUserHaveTeachDoctor(Map map);
+
+    Boolean checkSysUserHaveTeachDoctor(Map map);
 }

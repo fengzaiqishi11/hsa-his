@@ -468,7 +468,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //就诊信息
         OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(outptRegisterDTO);
         //是否需要建档案
-        if(StringUtils.isEmpty(outptVisitDTO.getProfileId()) && StringUtils.isNotEmpty(outptVisitDTO.getCertNo())){
+        if(StringUtils.isEmpty(outptVisitDTO.getProfileId()) && (StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode()))) {
             OutptProfileFileExtendDTO opf = this.getFprFileId(outptVisitDTO);
             //档案ID
             outptVisitDTO.setProfileId(opf.getProfileId());
@@ -1598,6 +1598,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 List<BaseItemDTO> baseItemList = outptDoctorPrescribeDAO.getAdviceDetail(outptPrescribeDetails);
                 List<OutptPrescribeDetailsExtDTO> extDTOList = new ArrayList<>();
                 for(BaseItemDTO baseItemDTO : baseItemList){
+                    if(StringUtils.isEmpty(baseItemDTO.getId())){
+                        throw new AppException("医嘱目录【"+outptPrescribeDetails.getItemName()+"】配置有误!");
+                    }
+
                     OutptPrescribeDetailsExtDTO outptPrescribeDetailsExtDTO = new OutptPrescribeDetailsExtDTO();
                     //主键
                     outptPrescribeDetailsExtDTO.setId(SnowflakeUtils.getId());
@@ -2918,7 +2922,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         return outptCostDTOList;
     }
 
-    
+
 
     /**
      * @Method: buildOperInfo
@@ -3114,8 +3118,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
 //        outptProfileFileDTO.setOutProfile(outptVisitDTO.getVisitNo());
         outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getData().getOutProfile()); //门诊档案号
         outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getData().getInProfile()); //住院病案号
-        outptProfileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
-        outptProfileFileDTO.setTotalOut(1);
+        outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getData().getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getOutptLastVisitTime()); // 门诊最后就诊时间
+        outptProfileFileDTO.setTotalOut(outptProfileFileExtendDTO.getData().getTotalOut() == null ? 1 : outptProfileFileExtendDTO.getData().getTotalOut()); // 累计门诊次数
+        outptProfileFileDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getData().getInptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getInptLastVisitTime()); // 住院最后就诊时间
+        outptProfileFileDTO.setTotalIn(outptProfileFileExtendDTO.getData().getTotalIn() == null ? 0 : outptProfileFileExtendDTO.getData().getTotalIn()); // 累计住院次数
         outptProfileFileDTO.setPatientCode(outptVisitDTO.getPatientCode());
         outptProfileFileDTO.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
         outptProfileFileDTO.setContactAddress(outptVisitDTO.getContactAddress());

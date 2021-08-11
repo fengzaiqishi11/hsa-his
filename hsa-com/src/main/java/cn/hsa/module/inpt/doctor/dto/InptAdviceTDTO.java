@@ -42,6 +42,14 @@ public class InptAdviceTDTO implements Serializable {
      * 提交人
      */
     private String submitName;
+    /**
+     * 带教医生id
+     */
+    private String teachDoctorId;
+    /**
+     * 带教医生姓名
+     */
+    private String teachDoctorName;
 
     /**
      * 提交时间

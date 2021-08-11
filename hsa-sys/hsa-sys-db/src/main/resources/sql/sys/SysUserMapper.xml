@@ -1228,4 +1228,28 @@
 		</foreach>
 	</select>
 
+	<select id="querySysUserHaveTeachDoctor" resultMap="SysUserMap" >
+		SELECT
+			c.*
+		FROM
+			sys_user a,
+			sys_user_system b,
+			sys_user c
+		WHERE
+			a.code = b.user_code
+			AND a.hosp_code = b.hosp_code
+			AND b.teacher_code = c.code
+			AND b.hosp_code = c.hosp_code
+			AND a.hosp_code = #{hospCode}
+			and b.dept_code = #{deptCode}
+			and b.system_code =#{systemCode}
+			AND a.code = #{userCode}
+			<if test="code != null and code != ''">
+				and c.code = #{code}
+			</if>
+			<if test="password != null and password != ''">
+				and c.password = #{password}
+			</if>
+	</select>
+
 </mapper>

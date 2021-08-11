@@ -110,4 +110,10 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private Date settleTime; // 结算时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date maxRegister; // 最晚登记时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date minRegister;// 最早登记时间
 }

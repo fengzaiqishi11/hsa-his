@@ -209,4 +209,15 @@ public interface InsureIndividualCostService {
      * @Return
      **/
     WrapperResponse<PageDTO> queryInptCostPage(Map<String, Object> map);
+
+    /**
+     * @Method deleteInptHisCost
+     * @Desrciption  删除his本地费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/9 10:59
+     * @Return
+     **/
+    WrapperResponse<Boolean> deleteInptHisCost(Map<String, Object> map);
 }

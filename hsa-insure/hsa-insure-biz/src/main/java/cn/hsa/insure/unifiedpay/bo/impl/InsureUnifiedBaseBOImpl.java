@@ -262,13 +262,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      */
 
     public static int daysBetween(Date date1, Date date2) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date1);
-        long time1 = cal.getTimeInMillis();
-        cal.setTime(date2);
-        long time2 = cal.getTimeInMillis();
-        long between_days = (time2 - time1) / (1000 * 3600 * 24);
-        return Integer.parseInt(String.valueOf(between_days));
+        return DateUtils.differentDays(date1, date2);
     }
 
     public Map<String, Object> querySettleInfo(Map<String, Object> map) {
@@ -285,6 +279,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          *              2.天数需要根据医保结算表的结束时间和开始时间计算
          */
         InptSettleDTO inptSettleDTO = insureIndividualSettleDAO.queryInptSettle(map);
+        if(inptSettleDTO == null){
+            throw new AppException("根据就诊Id,结算id查询患者结算信息为空");
+        }
         Date startTime = inptSettleDTO.getStartTime();
         Date endTime = inptSettleDTO.getEndTime();
         int daysBetween = daysBetween(startTime, endTime);
@@ -326,8 +323,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          */
         if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
             Map<String, Object> setlinfoMap = insureIndividualSettleDAO.querySettleForMap(map);
-
-
             List<Map<String, Object>> setldetailListMap = insureIndividualSettleDAO.queryInsureFundListMap(map);
             outptMap.put("setlinfo", setlinfoMap);
             outptMap.put("setldetail", setldetailListMap);
@@ -341,6 +336,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
             insureIndividualBasicDTO.setHospCode(hospCode);
             insureIndividualBasicDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+            insureIndividualBasicDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
             map.put("insureIndividualBasicDTO", insureIndividualBasicDTO);
             insureIndividualBasicDTO = insureIndividualBasicService.getByVisitId(map).getData();
             setlinfoMap.put("emp_name", insureIndividualBasicDTO.getBka008());

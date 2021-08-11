@@ -172,7 +172,7 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
     * @Desrciption  通过科室编码deptCode查询用户系统表，找到可以操作此科室用户编码（userCode），再去用户表通过userCode找到相应的用户
      * @param map
     * @Author xingyu.xie
-    * @Date   2020/9/1 11:34 
+    * @Date   2020/9/1 11:34
     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.sys.user.dto.SysUserDTO>
     **/
     @Override
@@ -180,7 +180,7 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
     public WrapperResponse<List<SysUserDTO>> queryUserByOperationDeptId(Map map) {
         return WrapperResponse.success(sysUserBO.queryUserByOperationDeptId(map));
     }
-    
+
 
     @Override
     @PostMapping("/service/sys/user/queryUserSysPage")
@@ -261,5 +261,14 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
     @Override
     public WrapperResponse<Boolean> upLoad(Map map) {
         return WrapperResponse.success(sysUserBO.insertUpload(map));
+    }
+
+    @Override
+    public WrapperResponse<SysUserDTO> querySysUserHaveTeachDoctor(Map map) {
+        return WrapperResponse.success(sysUserBO.querySysUserHaveTeachDoctor(map));
+    }
+    @Override
+    public WrapperResponse<Boolean> checkSysUserHaveTeachDoctor(Map map) {
+        return WrapperResponse.success(sysUserBO.checkSysUserHaveTeachDoctor(map));
     }
 }

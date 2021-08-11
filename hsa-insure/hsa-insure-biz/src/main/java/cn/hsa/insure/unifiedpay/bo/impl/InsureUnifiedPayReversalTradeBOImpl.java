@@ -452,5 +452,12 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         return resultMap;
     }
 
+    public static void main(String args[]) {
+        String  medfeeSumamt = "10.1254";
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        String a = df1.format(BigDecimalUtils.convert(medfeeSumamt)); //医疗费总额
+        System.out.println(a);
+    }
+
 
 }

@@ -130,4 +130,26 @@ public interface InsureIndividualVisitService {
      * @Return
      **/
     WrapperResponse<Boolean> updateInsureSettleId(Map<String, Object> settleMap);
+    
+    /**
+     * @Method queryAllInsureIndiviualVisit
+     * @Desrciption  根据就诊id 查询医保就诊信息
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/8/9 19:59 
+     * @Return 
+    **/
+    WrapperResponse<List<InsureIndividualVisitDTO>> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam);
+    
+    /**
+     * @Method 
+     * @Desrciption  
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/8/9 20:56 
+     * @Return 
+    **/
+    WrapperResponse<InsureIndividualVisitDTO> selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
 }

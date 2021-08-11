@@ -997,7 +997,8 @@
         from insure_individual_visit iiv
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
-        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code and iiv.medical_reg_no = iis.medicalRegNo
+        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code and
+        iiv.medical_reg_no = iis.medicalRegNo
         where iiv.hosp_code =#{hospCode} and iis.insureSettleId is not null and iis.state='0' and iis.settle_state='1'
         <if test="keyWord != null and keyWord != ''">
             and (
@@ -1175,6 +1176,53 @@
         where hosp_code = #{hospCode}
           and medical_reg_no = #{mdtrt_id}
           and aac001 = #{psn_no}
+    </select>
+    <select id="queryAllInsureIndiviualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select id,
+               hosp_code,
+               visit_id,
+               mib_id,
+               insure_org_code,
+               insure_reg_code,
+               medicine_org_code,
+               is_hospital,
+               visit_no,
+               aac001,
+               medical_reg_no,
+               aka130,
+               aka130_name,
+               bka006,
+               bka006_name,
+               injury_borth_sn,
+               visit_icd_code,
+               visit_icd_name,
+               visit_time,
+               visit_drpt_id,
+               visit_drpt_name,
+               visit_area_id,
+               visit_area_name,
+               crte_id,
+               crte_name,
+               crte_time,
+               insuplc_admdvs,
+               mdtrt_cert_type,
+               mdtrt_cert_no,
+               is_out,
+               insure_settle_id,
+               settle_count,
+               is_half_settle
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{id}
+    </select>
+    <select id="selectMaxAndMinRegisterTime"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select max(crte_time) as maxRegister, min(crte_time) as minRegister
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{id}
+        group by crte_time
     </select>
 
 </mapper>

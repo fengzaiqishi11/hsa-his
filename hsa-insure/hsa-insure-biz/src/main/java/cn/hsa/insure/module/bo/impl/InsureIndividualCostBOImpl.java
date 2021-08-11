@@ -14,8 +14,10 @@ import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.bo.InsureIndividualCostBO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -24,6 +26,7 @@ import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import scala.App;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -56,6 +59,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
 
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private InsureIndividualSettleDAO insureIndividualSettleDAO;
     /**
      * @return java.lang.Boolean
      * @throws
@@ -697,5 +703,35 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
         List<InptCostDTO> inptCostDTOList =  insureIndividualCostDAO.queryInptCostPage(inptVisitDTO);
         return PageDTO.of(inptCostDTOList);
+    }
+
+    /**
+     * @param inptVisitDTO
+     * @Method deleteInptHisCost
+     * @Desrciption 删除his本地费用
+     *              1.如果该患者的存在正常的医保结算记录，则不允许删除his本地费用
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 10:59
+     * @Return
+     */
+    @Override
+    public Boolean deleteInptHisCost(InptVisitDTO inptVisitDTO) {
+        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+        individualSettleDTO.setHospCode(inptVisitDTO.getHospCode());
+        individualSettleDTO.setVisitId(inptVisitDTO.getId());
+        individualSettleDTO.setSettleState(Constants.SF.S);
+        individualSettleDTO.setState(Constants.SF.F);
+        individualSettleDTO.setMedicalRegNo(inptVisitDTO.getMedicalRegNo());
+        individualSettleDTO= insureIndividualSettleDAO.querySettle(individualSettleDTO);
+        if(individualSettleDTO !=null){
+            throw new AppException("该患者存在正常的医保结算信息,不能删除HIS本地费用");
+        }
+
+//        List <InsureIndividualCostDTO> costDTOList =  insureIndividualCostDAO.queryIsTransmitInptFee(inptVisitDTO);
+//        if(!ListUtils.isEmpty(costDTOList)){
+//            throw new AppException("请先撤销医保费用,再删除his本地费用");
+//        }
+        return insureIndividualCostDAO.deleteInptHisCost(inptVisitDTO);
     }
 }

@@ -210,4 +210,8 @@ public class InptAdvicePrintDO extends PageDO implements Serializable {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date cancelTime;
+  /**
+   * 皮试结果
+   */
+  private String skinResultCode;
 }

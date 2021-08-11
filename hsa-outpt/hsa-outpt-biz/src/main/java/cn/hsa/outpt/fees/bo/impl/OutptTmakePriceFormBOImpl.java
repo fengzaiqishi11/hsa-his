@@ -1107,7 +1107,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             pharOutReceiveDO.setWindowId((String) windosList.get(0).get("id"));//发药窗口
             pharOutReceiveDO.setTotalPrice((BigDecimal) pharOutReceiveMap.get(pharId).get("totalPrice"));//总金额
             Boolean isDist = Constants.SF.F.equals(outptCostDTOList.get(0).getIsDist());//判断是否已发药
-            pharOutReceiveDO.setStatusCode(isDist ? Constants.LYZT.QL : Constants.LYZT.FY);//发药状态
+            pharOutReceiveDO.setStatusCode(Constants.LYZT.QL);//发药状态
             pharOutReceiveDO.setDeptId((String) pharOutReceiveMap.get(pharId).get("sourceDeptId"));//申请科室
             pharOutReceiveDO.setCrteId(userId);//创建人
             pharOutReceiveDO.setCrteName(userName);//创建人姓名

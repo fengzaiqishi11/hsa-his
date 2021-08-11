@@ -3142,9 +3142,19 @@
                 ifnull(B.zg_doctor_name,t.zz_doctor_name) as doctorName,
             </if>
             <!-- 按开方医生 -->
-            <if test="'7'.toString() != flag">
+            <if test="'7'.toString() != flag and '10'.toString() != flag and '11'.toString() != flag">
                 ifnull(B.doctor_id,'0') as doctorId,
                 ifnull(B.doctor_name,t.zz_doctor_name) as doctorName,
+            </if>
+            <!-- 按经治医生 -->
+            <if test="'10'.toString() == flag">
+                ifnull(B.jz_doctor_id,'0') as doctorId,
+                ifnull(B.jz_doctor_name,t.zz_doctor_name) as doctorName,
+            </if>
+            <!-- 按主治医生 -->
+            <if test="'11'.toString() == flag">
+                ifnull(B.zz_doctor_id,'0') as doctorId,
+                ifnull(B.zz_doctor_name,t.zz_doctor_name) as doctorName,
             </if>
             <!-- 按所属科室 -->
             <if test="'4'.toString() == flag">
@@ -3170,7 +3180,7 @@
                 as deptName,
             </if>
             <!-- 按开方科室 -->
-            <if test="'1'.toString() == flag or '2'.toString() == flag or '3'.toString() == flag or '8'.toString() == flag">
+            <if test="'1'.toString() == flag or '2'.toString() == flag or '3'.toString() == flag or '8'.toString() == flag or '10'.toString() == flag or '11'.toString() == flag">
                 ifnull(B.dept_id,'0') as deptId,
                 ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
                 as deptName,

@@ -989,7 +989,8 @@
         select
         odq.id,
         odq.doctor_id as doctorId,
-        CONCAT(odq.doctor_name,'（',css.name,'）') as doctorName,
+        odq.doctor_name as doctorName,
+        css.name as classesName,
         sum(odq.register_num) as registerNum,
         odq.cq_id as cqId,
         sum((select count(*) from outpt_doctor_register where dq_id = odq.id and (is_use = 0 and is_lock = 0))) as isUserRegister

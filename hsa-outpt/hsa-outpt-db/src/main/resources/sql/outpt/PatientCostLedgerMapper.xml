@@ -224,7 +224,7 @@
         a.insure_treat_code,
         a.insure_patient_id,
         a.insure_remark,
-        a.total_advance,
+        case when ib.id is null then a.total_advance else 0 end as total_advance,
         a.total_cost,
         a.total_balance,
         a.crte_id,

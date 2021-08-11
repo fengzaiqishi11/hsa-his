@@ -6,6 +6,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import org.apache.ibatis.annotations.Param;
@@ -383,4 +384,26 @@ public interface InsureIndividualCostDAO {
      * @Return
     **/
     InsureIndividualCostDTO queryIsTransmitFee(Map<String, Object> map);
+
+    /**
+     * @param inptVisitDTO
+     * @Method deleteInptHisCost
+     * @Desrciption 删除his本地费用
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 10:59
+     * @Return
+     */
+    Boolean deleteInptHisCost(InptVisitDTO inptVisitDTO);
+    
+    /**
+     * @Method queryIsTransmitInptFee
+     * @Desrciption  查询his已经上传的费用数据
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/8/9 17:22
+     * @Return 
+    **/
+    List<InsureIndividualCostDTO> queryIsTransmitInptFee(InptVisitDTO inptVisitDTO);
 }

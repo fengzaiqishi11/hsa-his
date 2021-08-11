@@ -1471,6 +1471,8 @@
         is_reject = '0',
         reject_remark = null,
         is_submit = '1',
+        teach_doctor_id = #{teachDoctorId},
+        teach_doctor_name = #{teachDoctorName},
         submit_id = #{submitId},
         submit_name = #{submitName},
         submit_time = now()

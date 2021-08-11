@@ -158,9 +158,9 @@
         a.profile_id,
         a.in_profile,
         a.in_no,
-        a.name,
-        a.gender_code,
-        a.age,
+        case when ib.id is null then a.name else ib.name end as name,
+        case when ib.id is null then a.gender_code else ib.gender_code end as gender_code,
+        case when ib.id is null then a.age else 0 end as age,
         a.age_unit_code,
         a.birthday,
         a.nation_code,
@@ -170,7 +170,7 @@
         a.phone,
         a.address,
         a.preferential_type_id,
-        a.patient_code,
+        case when ib.id is null then a.patient_code else '' end as patient_code,
         a.receive_hosp_name,
         a.bed_id,
         a.bed_name,
@@ -181,7 +181,7 @@
         a.in_ward_id,
         a.in_dept_id,
         a.in_dept_name,
-        a.in_time,
+        case when ib.id is null then a.in_time else ib.birth_time end as in_time,
         a.zz_doctor_id,
         a.zz_doctor_name,
         a.jz_doctor_id,
@@ -191,7 +191,7 @@
         a.in_remark,
         a.in_mode_code,
         a.in_disease_id,
-        a.in_disease_name,
+        case when ib.id is null then a.in_disease_name else '' end as in_disease_name,
         a.in_disease_icd10,
         a.in_situation_code,
         a.outpt_visit_no,
@@ -224,7 +224,7 @@
         a.insure_treat_code,
         a.insure_patient_id,
         a.insure_remark,
-        a.total_advance,
+        case when ib.id is null then a.total_advance else 0 end as total_advance,
         a.total_cost,
         a.total_balance,
         a.crte_id,
@@ -235,10 +235,13 @@
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         c.mi_price as miPrice,
-        (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end) as inDay ,b.*
+        case when ib.id is null then (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
+        else (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
+        b.*
         from inpt_visit a
-        join (
-        select ${sqlStr} d.id visistID
+        left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
+        left join (
+        select ${sqlStr} d.id visistID, c.baby_id
         from inpt_visit d
         join inpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
         left join inpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
@@ -280,9 +283,9 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
-        group by d.id
-        ) b on a.id = b.visistID
-        left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
+        group by c.baby_id, d.id
+        ) b on c.visit_id = b.visistID and (c.baby_id = b.baby_id || (b.baby_id is null and c.baby_id is null) )
+        left join inpt_baby ib on ib.hosp_code = a.hosp_code and ib.visit_id = a.id and ib.id = c.baby_id
         where a.hosp_code = #{hospCode}
         <if test="statusCode != null and statusCode != ''">
             and a.status_code = #{statusCode}
@@ -320,6 +323,7 @@
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        order by a.out_time desc
     </select>
 
     <!--病人科室-->

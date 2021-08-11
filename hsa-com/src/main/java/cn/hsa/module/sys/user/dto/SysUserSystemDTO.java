@@ -29,4 +29,6 @@ public class SysUserSystemDTO extends SysUserSystemDO implements Serializable {
     private List<String> deptCodes;           //存储多个科室
     private List<String> deptNames;           //存储多个科室名称
     private String teacherName ; //带教医生名字
+    private String code ;
+    private String password;
 }

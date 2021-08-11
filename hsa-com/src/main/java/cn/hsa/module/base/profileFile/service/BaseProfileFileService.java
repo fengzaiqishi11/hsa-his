@@ -49,6 +49,18 @@ public interface BaseProfileFileService {
     WrapperResponse<PageDTO> queryPage(Map map);
 
     /**
+     * @Menthod: queryBaseProfileByIds
+     * @Desrciption: 条件查询档案列表
+     * @Param: outptProfileFileDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-05-07 11:12
+     * @Return: PageDTO
+     **/
+    @GetMapping("/service/base/baseProfileFile/queryBaseProfileByIds")
+    WrapperResponse<List<OutptProfileFileDTO>> queryBaseProfileByIds(Map map);
+
+    /**
      * @Method isCertNoExist
      * @Desrciption  暂时只做判断身份证是否重复
      * @Param

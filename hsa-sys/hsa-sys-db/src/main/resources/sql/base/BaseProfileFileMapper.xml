@@ -84,7 +84,7 @@
             take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
             expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
-            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
         from base_profile_file
         where cert_no = #{certNo}
         <if test="id != null and id != ''">
@@ -105,7 +105,7 @@
             take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
             expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
-            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
         from base_profile_file
         where cert_no = #{certNo}
         <if test="certCode != null and certCode != ''">
@@ -150,7 +150,7 @@
             take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
             expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
-            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
         from  base_profile_file
         <!--where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}-->
         where hosp_code = #{hospCode} and is_valid = '1' and id = #{id}
@@ -387,6 +387,12 @@
         <if test="certCode != null and certCode != ''">
             and cert_code = #{certCode}
         </if>
+        <if test="ids != null and ids.size() > 0">
+            and a.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
         order by a.crte_time desc
     </select>
 
@@ -399,7 +405,7 @@
             take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
             expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
-            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
         from  base_profile_file
         where hosp_code = #{hospCode}
         and id = #{id}

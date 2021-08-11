@@ -710,4 +710,33 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         }
         return true;
     }
+
+    @Override
+    public SysUserDTO querySysUserHaveTeachDoctor(Map map) {
+        SysUserSystemDTO sysUserSystemDTO  = MapUtils.get(map,"sysUserSystemDTO");
+        if(sysUserSystemDTO == null){
+            throw new AppException("未获取到医生信息!");
+        }
+        SysUserDTO sysUserDTO = sysUserDAO.querySysUserHaveTeachDoctor(sysUserSystemDTO);
+
+        return sysUserDTO;
+    }
+
+    @Override
+    public Boolean checkSysUserHaveTeachDoctor(Map map) {
+        SysUserSystemDTO sysUserSystemDTO  = MapUtils.get(map,"sysUserSystemDTO");
+        if(sysUserSystemDTO == null){
+            throw new AppException("未获取到医生信息!");
+        }
+        if(StringUtils.isEmpty(sysUserSystemDTO.getPassword())){
+            throw new AppException("密码不能为空!");
+        }
+        sysUserSystemDTO.setPassword(MD5Utils.getMd5AndSha(sysUserSystemDTO.getPassword()));
+
+       SysUserDTO sysUserDTO = sysUserDAO.querySysUserHaveTeachDoctor(sysUserSystemDTO);
+        if(sysUserDTO == null){
+            throw new AppException("验证失败!");
+        }
+        return true;
+    }
 }

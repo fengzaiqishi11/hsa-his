@@ -869,6 +869,10 @@
             and  insure_settle_id is null
         </if>
     </delete>
+    <delete id="deleteInptHisCost">
+        delete  from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{id}
+        and insure_settle_id  is null
+    </delete>
     <select id="selectCostIsTransmit" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO" parameterType="map">
         select (select sum(iic.primary_price) from insure_individual_cost iic where iic.hosp_code = ic.hosp_code
         and iic.visit_id = ic.visit_id group by iic.visit_id) as uploadRealityPrice,
@@ -1056,7 +1060,7 @@
     </select>
     <select id="selectLastFeedSn" resultType="java.lang.String">
         select feedetl_sn from insure_individual_cost where hosp_code =#{hospCode} and visit_id =#{visitId} and insure_register_no =#{medicalRegNo}
-        and feedetl_sn is not null order by feedetl_sn desc limit 1
+        and feedetl_sn is not null order by  CAST(feedetl_sn AS UNSIGNED) desc limit 1
     </select>
     <update id="updateLimitUserFlag">
         update inpt_cost set is_reimburse =#{isReimburse},lmt_user_flag = #{lmtUserFlag},lim_user_explain=#{limUserExplain}
@@ -1129,6 +1133,10 @@
         <if test="isTransmit == '1'.toString()">
             and feedetl_sn is not null
         </if>
+    </select>
+    <select id="queryIsTransmitInptFee" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select * from insure_individual_cost  where visit_id =#{id}  and hosp_code =#{hospCode}
+        and insure_register_no = #{medicalRegNo} and  insure_settle_id is  null
     </select>
 
 </mapper>

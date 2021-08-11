@@ -124,4 +124,26 @@ public interface InsureIndividualVisitBO {
      * @Return
      **/
     Boolean updateInsureSettleId(Map<String, Object> settleMap);
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method queryAllInsureIndiviualVisit
+     * @Desrciption 根据就诊id 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 19:59
+     * @Return
+     */
+    List<InsureIndividualVisitDTO> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam);
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method  selectMaxAndMinRegisterTime
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 20:56
+     * @Return
+     */
+    InsureIndividualVisitDTO selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
 }

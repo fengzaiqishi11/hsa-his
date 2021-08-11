@@ -60,4 +60,8 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
 
     // 医嘱是否停自身
     private String isStopMyself;
+
+    private String  teachDoctorId ;
+
+    private String  teachDoctorName ;
 }

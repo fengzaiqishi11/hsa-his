@@ -1618,7 +1618,7 @@
     <!-- 获取医嘱信息 -->
     <select id="getAdviceDetail" resultMap="BaseItemMap" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select if(b.type_code = '3', c.id, e.id) id, if(b.type_code = '3', c.name, e.name) name, if(b.type_code = '3', c.spec, e.spec) spec,
-        num num, if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
+        if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
         a.is_cost isCost, b.type_code, b.unit_code, b.use_code,case when b.type_code = '2' then bb.clf end pharId
         from base_advice a
         join base_advice_detail b on a.code = b.advice_code and a.hosp_code = b.hosp_code

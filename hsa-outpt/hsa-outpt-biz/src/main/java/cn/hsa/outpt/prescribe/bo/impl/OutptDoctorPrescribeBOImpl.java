@@ -1598,6 +1598,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 List<BaseItemDTO> baseItemList = outptDoctorPrescribeDAO.getAdviceDetail(outptPrescribeDetails);
                 List<OutptPrescribeDetailsExtDTO> extDTOList = new ArrayList<>();
                 for(BaseItemDTO baseItemDTO : baseItemList){
+                    if(StringUtils.isEmpty(baseItemDTO.getId())){
+                        throw new AppException("医嘱目录【"+outptPrescribeDetails.getItemName()+"】配置有误!");
+                    }
+
                     OutptPrescribeDetailsExtDTO outptPrescribeDetailsExtDTO = new OutptPrescribeDetailsExtDTO();
                     //主键
                     outptPrescribeDetailsExtDTO.setId(SnowflakeUtils.getId());
@@ -2918,7 +2922,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         return outptCostDTOList;
     }
 
-    
+
 
     /**
      * @Method: buildOperInfo

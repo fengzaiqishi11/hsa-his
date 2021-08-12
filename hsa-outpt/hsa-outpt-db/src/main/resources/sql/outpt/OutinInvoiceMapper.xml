@@ -1488,13 +1488,14 @@
     <select id="getMZGHCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select c.name as xmName, a.name as patientName, a.crte_time as settleTime, d.price, d.num as totalNum, d.preferential_price, a.dept_name as deptName, d.reality_price, d.reality_price as selfPrice,
         a.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode, a.crte_name as crteName, a.crte_time as crteTime, bfc.name as bfcName, bfc.code as bfcCode,
-        scd.name as fpglName, scd.value as fpglKey
+        scd.name as fpglName, scd.value as fpglKey, a.doctor_name as registerDoctorName, cd.name as visitCode
         from outpt_register a
         left join outpt_register_detail d on a.visit_id = d.visit_id and a.hosp_code = d.hosp_code
         left join sys_code_detail c on d.item_code = c.value and c.c_code = 'XMLB' and c.hosp_code = #{hospCode}
         left join outpt_visit v on a.visit_id =v.id
         join base_finance_classify bfc on bfc.id = d.bfc_id and bfc.hosp_code = d.hosp_code
         join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        join sys_code_detail cd on a.visit_code = cd.value and cd.hosp_code = #{hospCode} and cd.c_code = 'JZLB'
         where a.hosp_code = #{hospCode} and a.register_no = #{settleNo}
 
     </select>

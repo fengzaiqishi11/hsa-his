@@ -426,7 +426,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             query.setHospCode(baseAdviceDetailDTO.getHospCode());
 
             // 根据材料和项目的code编码，查询出所有此code的医嘱详细数据（每个code在一个医嘱内不允许重复）
-            List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = baseAdviceDetailDAO.queryPage(query);
+            List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = baseAdviceDetailDAO.queryBaseAdviceByItemCode(query);
             // 不为空则修改医嘱详细和医嘱
             if (!ListUtils.isEmpty(baseAdviceDetailDTOS)) {
 

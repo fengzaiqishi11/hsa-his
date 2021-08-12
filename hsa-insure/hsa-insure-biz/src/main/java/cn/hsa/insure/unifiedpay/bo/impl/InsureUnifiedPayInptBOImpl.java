@@ -702,6 +702,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("acct_used_flag",insureAccoutFlag);// 个人账户使用标志
         dataMap.put("insutype",insureIndividualVisitDTO.getAae140());//险种类型
         dataMap.put("invono",""); // 发票号
+        dataMap.put("med_type",insureIndividualVisitDTO.getAka130());
 
         /**
          * 是否开启中途结算

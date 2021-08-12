@@ -121,9 +121,9 @@
     </select>
 
 	<select id="queryInsureRegisterPage" resultMap="InptVisitMap">
-		select DISTINCT b.medical_reg_no, a.*,c.disease_id as inDiagnoseId from inpt_visit a
+		select  b.medical_reg_no, a.*,c.disease_id as inDiagnoseId from inpt_visit a
 		left join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
-		left join inpt_diagnose c on (a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1')
+		left join inpt_diagnose c on (a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1' and c.type_code = '201')
 		where a.hosp_code = #{hospCode} and a.status_code in ('1','2','3','4','5','6')
 		<if test="isInsureRegister == '0'.toString() ">
 			and (b.id is null or (b.insure_settle_id is not null and b.is_half_settle ='1'))

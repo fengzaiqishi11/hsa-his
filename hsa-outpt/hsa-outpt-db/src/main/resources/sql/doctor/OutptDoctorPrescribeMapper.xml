@@ -1701,6 +1701,7 @@
         bd.start_time startTime,
         bd.end_time endTime,
         bd.num,
+        a.name,
     CASE
             WHEN bd.type_code = '3' THEN
             b.id
@@ -1770,7 +1771,7 @@
         AND b.hosp_code = d.hosp_code
         LEFT JOIN base_finance_classify e ON c.bfc_code = e.CODE
         AND c.hosp_code = e.hosp_code
-        where a.hosp_code = #{hospCode} and a.id = #{id} and bd.is_valid = '1'
+        where a.hosp_code = #{hospCode} and a.id = #{id} and bd.is_valid = '1' and a.is_valid ='1'
     </select>
 
     <!--  获取最大组号 -->

@@ -292,9 +292,12 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
      */
     @Override
     public Boolean updatePrintFlag(InptAdviceDTO inptAdviceDTO) {
-        if (ListUtils.isEmpty(inptAdviceDTO.getInptAdviceExecIds())){
+        if (ListUtils.isEmpty(inptAdviceDTO.getIds())){
             throw new RuntimeException("未选择打印的记录");
         }
+        /*if (ListUtils.isEmpty(inptAdviceDTO.getInptAdviceExecIds())){
+            throw new RuntimeException("未选择打印的记录");
+        }*/
         if (StringUtils.isNotEmpty(inptAdviceDTO.getPrintType()) && ("1".equals(inptAdviceDTO.getPrintType()) || "2".equals(inptAdviceDTO.getPrintType()) || "3".equals(inptAdviceDTO.getPrintType()) || "5".equals(inptAdviceDTO.getPrintType()) || "14".equals(inptAdviceDTO.getPrintType()) || "16".equals(inptAdviceDTO.getPrintType()))){
             /**
              * 拼接打印标志：由于输液瓶贴(1)、输液治疗卡(2)、输液一栏卡(3)、皮下肌肉执行卡(5)、留观输液瓶贴(14)、输液治疗卡(16)共用同一条数据，打印标志需根据不同的类型设置不同的打印标志

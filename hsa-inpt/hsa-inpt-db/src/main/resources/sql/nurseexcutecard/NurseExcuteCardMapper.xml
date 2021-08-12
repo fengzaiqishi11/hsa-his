@@ -273,10 +273,11 @@
       iv.name,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
       bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
       ba.container_code as containerCode ,
-      ba.specimen_code as specimenCode,iae.is_print as isPrint,
-      DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' ) as execPlaneTime,
-      iae.plan_exec_time as execPlaneTime1,
-      iae.id as inptAdviceExecId,
+      ba.specimen_code as specimenCode,
+      MIN(iae.is_print) as isPrint,
+      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
+      MIN(iae.plan_exec_time) as execPlaneTime1,
+      MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
       CONCAT(
       iv.name,'/',
@@ -334,6 +335,7 @@
       <if test="printType =='11'.toString()">
         and ba.biz_code is not null and ba.biz_code != '' and i.is_stop = '0'
       </if>
+        group by i.id
       )
       union all
       (select distinct ia.id, ia.hosp_code, ia.visit_id,
@@ -350,10 +352,11 @@
       iv.name ,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
       bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
       ba.container_code as containerCode ,
-      ba.specimen_code as specimenCode,iae.is_print as isPrint,
-      DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' ) as execPlaneTime,
-      iae.plan_exec_time as execPlaneTime1,
-      iae.id as inptAdviceExecId,
+      ba.specimen_code as specimenCode,
+      MIN(iae.is_print) as isPrint,
+      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
+      MIN(iae.plan_exec_time) as execPlaneTime1,
+      MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
       CONCAT(
       iv.name,'/',
@@ -412,7 +415,9 @@
       </if>
       <if test="adviceType !=null and adviceType !=''">
         and ia.is_long=#{adviceType}
-      </if>)
+      </if>
+        GROUP BY ia.id
+          )
     ) A  where 1=1
 
     <if test="typeCode !=null and typeCode !=''">
@@ -430,6 +435,12 @@
             and id in
             <foreach collection="inptAdviceExecIds" item="id" separator="," open="(" close=")">
                 #{id}
+            </foreach>
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and advice_id in
+            <foreach collection="ids" item="adviceId" separator="," open="(" close=")">
+                #{adviceId}
             </foreach>
         </if>
     </select>
@@ -451,10 +462,11 @@
       iv.name,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
       bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
       ba.container_code as containerCode ,
-      ba.specimen_code as specimenCode,iae.is_print as isPrint,
-      DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' ) as execPlaneTime,
-      iae.plan_exec_time as execPlaneTime1,
-      iae.id as inptAdviceExecId,
+      ba.specimen_code as specimenCode,
+      MIN(iae.is_print) as isPrint,
+      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
+      MIN(iae.plan_exec_time) as execPlaneTime1,
+      MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
       CONCAT(
       iv.name,'/',
@@ -512,6 +524,7 @@
       <if test="printType =='11'.toString()">
         and ba.biz_code is not null and ba.biz_code != '' and i.is_stop = '0'
       </if>
+        group by i.id
       )
       union all
       (select distinct ia.id, ia.hosp_code, ia.visit_id,
@@ -528,10 +541,11 @@
       iv.name ,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
       bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
       ba.container_code as containerCode ,
-      ba.specimen_code as specimenCode,iae.is_print as isPrint,
-      DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' ) as execPlaneTime,
-      iae.plan_exec_time as execPlaneTime1,
-      iae.id as inptAdviceExecId,
+      ba.specimen_code as specimenCode,
+      MIN(iae.is_print) as isPrint,
+      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
+      MIN(iae.plan_exec_time) as execPlaneTime1,
+      MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
       CONCAT(
       iv.name,'/',
@@ -590,7 +604,9 @@
       </if>
       <if test="adviceType !=null and adviceType !=''">
         and ia.is_long=#{adviceType}
-      </if>)
+      </if>
+        GROUP BY ia.id
+        )
       ) A  where 1=1
       <if test="typeCode !=null and typeCode !=''">
         and A.type_code=#{typeCode}

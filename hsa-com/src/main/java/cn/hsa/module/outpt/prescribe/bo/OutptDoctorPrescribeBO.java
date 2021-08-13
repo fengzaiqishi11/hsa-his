@@ -444,6 +444,4 @@ public interface OutptDoctorPrescribeBO {
      * @Return:
      **/
     Boolean updateOuptCostAndPreDetailExt(List<InsureItemMatchDTO> insureItemMatchDTOS);
-
-    BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 }

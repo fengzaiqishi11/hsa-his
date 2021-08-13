@@ -484,16 +484,4 @@ public interface OutptDoctorPrescribeService {
      **/
     @PostMapping("/service/outpt/outptDoctorPrescribe/updateOuptCostAndPreDetailExt")
     WrapperResponse<Boolean> updateOuptCostAndPreDetailExt(Map map);
-
-    /**
-     * @Menthod: queryLimitDrugList
-     * @Desrciption: 查询医保限制级用药列表
-     * @Param: outptVisitDTO
-     * @Author: luoyong
-     * @Email: luoyong@powersi.com.cn
-     * @Date: 2021-07-19 11:42
-     * @Return:
-     **/
-    @GetMapping("/service/outpt/outptDoctorPrescribe/getBaseDrug")
-    WrapperResponse<BaseDrugDTO> getBaseDrug(Map paramMap);
 }

@@ -3818,11 +3818,6 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         return true;
     }
 
-    @Override
-    public BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO) {
-        return outptDoctorPrescribeDAO.getBaseDrug(outptPrescribeDetailsDTO);
-    }
-
     /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode

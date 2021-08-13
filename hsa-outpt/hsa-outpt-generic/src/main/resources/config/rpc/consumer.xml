@@ -71,5 +71,7 @@
     <!-- 统一支付平台 门诊service -->
     <dubbo:reference id="insureIndividualCostService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false" />
     <dubbo:reference id="insureIndividualBasicService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" check="false" />
+    <!--库存校验-->
+    <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
 </beans>
 

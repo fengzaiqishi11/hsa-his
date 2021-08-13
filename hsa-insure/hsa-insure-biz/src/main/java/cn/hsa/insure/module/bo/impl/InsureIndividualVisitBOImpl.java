@@ -468,4 +468,33 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     {
         return insureIndividualVisitDAO.updateInsureSettleId(settleMap);
     }
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method queryAllInsureIndiviualVisit
+     * @Desrciption 根据就诊id 查询医保就诊信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 19:59
+     * @Return
+     */
+    @Override
+    public List<InsureIndividualVisitDTO> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam) {
+
+        return insureIndividualVisitDAO.queryAllInsureIndiviualVisit(insureUnifiedPayParam);
+    }
+
+    /**
+     * @param insureUnifiedPayParam
+     * @Method selectMaxAndMinRegisterTime
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 20:56
+     * @Return
+     */
+    @Override
+    public InsureIndividualVisitDTO selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam) {
+        return insureIndividualVisitDAO.selectMaxAndMinRegisterTime(insureUnifiedPayParam);
+    }
 }

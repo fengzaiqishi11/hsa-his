@@ -1367,7 +1367,7 @@
         <if test="backCode != null and backCode != ''">
             AND back_code = #{backCode}
         </if>
-        order by crte_time ASC
+        order by cost_time ASC
     </select>
 
     <select id="queryCostList" resultMap="inptCostDOMap">

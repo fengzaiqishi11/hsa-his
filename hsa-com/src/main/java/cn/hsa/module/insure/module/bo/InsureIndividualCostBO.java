@@ -210,4 +210,15 @@ public interface InsureIndividualCostBO {
      * @Return
      */
     PageDTO queryInptCostPage( InptVisitDTO inptVisitDTO );
+
+    /**
+     * @param inptVisitDTO
+     * @Method deleteInptHisCost
+     * @Desrciption 删除his本地费用
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/9 10:59
+     * @Return
+     */
+    Boolean deleteInptHisCost(InptVisitDTO inptVisitDTO);
 }

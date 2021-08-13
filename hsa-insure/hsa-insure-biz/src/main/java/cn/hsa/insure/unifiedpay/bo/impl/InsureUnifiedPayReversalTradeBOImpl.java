@@ -12,12 +12,7 @@ import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.HttpConnectUtil;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.SneakyThrows;
@@ -293,7 +288,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         // 保留两位小数
         String medfeeSumamt = MapUtils.get(parameterMap, "medfee_sumamt").toString();
         DecimalFormat df1 = new DecimalFormat("0.00");
-        dataMap.put("medfee_sumamt", df1.format(medfeeSumamt)); //医疗费总额
+        dataMap.put("medfee_sumamt", df1.format(BigDecimalUtils.convert(medfeeSumamt))); //医疗费总额
         dataMap.put("fund_pay_sumamt", MapUtils.get(parameterMap, "fund_pay_sumamt"));//基金支付总额
         dataMap.put("acct_pay", MapUtils.get(parameterMap, "acct_pay"));//个人账户支付金额
         dataMap.put("fixmedins_setl_cnt", MapUtils.get(parameterMap, "fixmedins_setl_cnt"));//定点医药机构结算笔数
@@ -455,6 +450,13 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
         }
         return resultMap;
+    }
+
+    public static void main(String args[]) {
+        String  medfeeSumamt = "10.1254";
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        String a = df1.format(BigDecimalUtils.convert(medfeeSumamt)); //医疗费总额
+        System.out.println(a);
     }
 
 

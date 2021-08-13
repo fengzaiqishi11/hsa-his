@@ -426,7 +426,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             query.setHospCode(baseAdviceDetailDTO.getHospCode());
 
             // 根据材料和项目的code编码，查询出所有此code的医嘱详细数据（每个code在一个医嘱内不允许重复）
-            List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = baseAdviceDetailDAO.queryPage(query);
+            List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = baseAdviceDetailDAO.queryBaseAdviceByItemCode(query);
             // 不为空则修改医嘱详细和医嘱
             if (!ListUtils.isEmpty(baseAdviceDetailDTOS)) {
 
@@ -703,8 +703,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
     /**合管条码打印查询
     * @Method queryPipePrintPage
     * @Desrciption
-    * @param paramMap
-    * @Author liuqi1
+    * @param paramMap  queryType 值为mz查询门诊数据，zy查询住院数据,其余的查询全院数据
+    * @Author   liuqi1,luonianxin
     * @Date   2021/4/25 11:37
     * @Return java.util.Map
     **/
@@ -717,12 +717,43 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
 
         List<Map<String, Object>> list = null;
         String queryType = MapUtils.get(paramMap, "queryType");
-        // queryType 值为mz查询门诊数据，zy查询住院数据,其余的查询全院数据
+        List<String> documentStatusList = getStatusListNeed2Query(MapUtils.get(paramMap, "isValid"));
+        paramMap.put("statList",documentStatusList);
         list = baseAdviceDAO.queryPtPipePrintPage(paramMap);
 
         return PageDTO.of(list);
     }
 
+    /**
+     *  根据页面传递参数 是否查询退费 返回申请单状态列表
+     * @param isValid
+     * @return 医技申请单据状态
+     */
+    private List<String> getStatusListNeed2Query(String isValid){
+        List<String> list = new ArrayList<>(8);
+
+        if(Constants.SF.F.equals(isValid)){
+            list.add(Constants.SQDZT.Refund_Waiting_For_Response);
+            list.add(Constants.SQDZT.Refund_Received);
+            return list;
+        }
+        if(Constants.SF.S.equals(isValid)){
+            list.add(Constants.SQDZT.Prescription_Submitted);
+            list.add(Constants.SQDZT.Settlement_To_Be_Sent);
+            list.add(Constants.SQDZT.Settlement_Sent);
+            list.add(Constants.SQDZT.Charge_Completed);
+            list.add(Constants.SQDZT.Charge_Registered);
+            return list;
+        }
+        list.add(Constants.SQDZT.Prescription_Submitted);
+        list.add(Constants.SQDZT.Settlement_To_Be_Sent);
+        list.add(Constants.SQDZT.Settlement_Sent);
+        list.add(Constants.SQDZT.Charge_Completed);
+        list.add(Constants.SQDZT.Charge_Registered);
+        list.add(Constants.SQDZT.Refund_Waiting_For_Response);
+        list.add(Constants.SQDZT.Refund_Received);
+        return list;
+    }
     /**合管条码打印更新
      * @Method updateWithPipePrint
      * @Desrciption

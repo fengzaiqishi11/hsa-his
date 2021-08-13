@@ -3113,8 +3113,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     //向上取整
                     tzNum = BigDecimal.valueOf(Math.ceil(tzNum.doubleValue()));
                 }
-                costDTO.setBackNum(BigDecimal.valueOf(Math.ceil(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum).doubleValue())));
-                costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+
+                if (Constants.XMLB.YP.equals(costDTO.getItemCode()) || Constants.XMLB.CL.equals(costDTO.getItemCode())){
+                    costDTO.setBackNum(BigDecimal.valueOf(Math.ceil(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum).doubleValue())));
+                    costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+                }else{
+                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+                }
+
                 //过滤掉退费数量为0的费用
                 if (costDTO.getBackNum().compareTo(BigDecimal.valueOf(0)) > 0) {
                     backCostList.add(costDTO);
@@ -3334,12 +3341,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             }
             inptAdviceDTO.setStopTime(stopTime);
             //获取带教医生信息
-            SysUserDTO sysUserDTO = getSysUserDTO(adviceDTO);
+            //SysUserDTO sysUserDTO = getSysUserDTO(adviceDTO);
             //代教医生 实习医生老师
-            if (sysUserDTO != null) {
-                inptAdviceDTO.setTeachDoctorId(sysUserDTO.getId());
-                inptAdviceDTO.setTeachDoctorName(sysUserDTO.getName());
-            }
+            //if (sysUserDTO != null) {
+                //inptAdviceDTO.setTeachDoctorId(sysUserDTO.getId());
+                //inptAdviceDTO.setTeachDoctorName(sysUserDTO.getName());
+            //}
             inptAdviceDTO.setStopDoctorId(adviceDTO.getCrteId());
             inptAdviceDTO.setStopDoctorName(adviceDTO.getCrteName());
             //停嘱审核人

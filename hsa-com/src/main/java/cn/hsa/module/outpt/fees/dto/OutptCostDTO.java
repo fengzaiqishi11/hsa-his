@@ -164,4 +164,10 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     private BigDecimal stockOccupy;
     // 拆零库存
     private BigDecimal splitNum;
+
+    // 挂号医生姓名
+    private String registerDoctorName;
+
+    // 就诊类别
+    private String visitCode;
 }

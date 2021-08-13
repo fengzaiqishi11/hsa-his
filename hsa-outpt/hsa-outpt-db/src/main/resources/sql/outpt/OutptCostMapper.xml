@@ -1652,8 +1652,8 @@
         '' rateCode
         FROM
         base_item
-        WHERE is_out = '1'
-        AND is_valid = '1'
+        WHERE is_valid = '1'
+        AND (is_out = '1' or is_out is null)
         AND hosp_code = #{hospCode}
         ) A LEFT JOIN base_preferential bp
         ON A.item_id = bp.biz_code AND bp.pf_type_code = #{pfTypeCode} AND bp.hosp_code = #{hospCode}
@@ -1706,8 +1706,8 @@
         good_wbm
         FROM
         base_drug
-        WHERE is_out = '1'
-        AND is_valid = '1'
+        WHERE  is_valid = '1'
+        AND (is_out = '1' or is_out is null)
         AND hosp_code = #{hospCode}
         UNION ALL
         SELECT
@@ -1767,8 +1767,8 @@
         name_wbm as good_wbm
         FROM
         base_item
-        WHERE is_out = '1'
-        AND is_valid = '1'
+        WHERE is_valid = '1'
+        AND (is_out = '1' or is_out is null )
         AND hosp_code = #{hospCode}
         ) A
         <where>

@@ -2854,6 +2854,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             baseAssistCalcDTOList.get(0).setId(jfid);
             List<BaseAssistCalcDetailDTO> baseAssistCalcDetailDOList = outptDoctorPrescribeDAO.getAssistDetail(baseAssistCalcDTOList.get(0));
             for(BaseAssistCalcDetailDTO baseAssistCalcDetailDO : baseAssistCalcDetailDOList){
+                if(StringUtils.isEmpty(baseAssistCalcDetailDO.getItemId())){
+                    throw new AppException("辅助计费【"+baseAssistCalcDetailDO.getName()+"】配置有误!");
+                }
                 OutptCostDTO outptCostDTO = new OutptCostDTO();
                 //主键
                 outptCostDTO.setId(SnowflakeUtils.getId());

@@ -279,15 +279,17 @@
       MIN(iae.plan_exec_time) as execPlaneTime1,
       MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
-      CONCAT(
-      iv.name,'/',
-      IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-      iv.gender_code),'-'),'/',
-      IFNULL(iv.age,'-'),
-      IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-      iv.age_unit_code),'')
-      ) AS patientInfo
-      from inpt_advice i inner join inpt_visit iv on i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+        CONCAT(
+        iv.NAME,'/',
+        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
+        WHEN '1' THEN '男' WHEN '2' THEN '女'
+        WHEN '9' THEN '未说明的性别' ELSE '' END ),
+        '/',IFNULL( iv.age, '-' ),
+        (CASE iv.age_unit_code
+        WHEN '1' THEN '岁' WHEN '2' THEN '月'
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        ) AS patientInfo
+        from inpt_advice i inner join inpt_visit iv on i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = i.hosp_code and iv.status_code = '2'
       <if test="keyword !=null and keyword != ''">
         and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
@@ -297,7 +299,8 @@
       left join base_advice ba on i.item_id = ba.id and i.hosp_code = ba.hosp_code
       join inpt_advice_exec iae on iae.advice_id =i.id and iae.hosp_code = i.hosp_code
       <if test="queryDate !=null and queryDate != ''">
-        and (DATE_FORMAT(iae.plan_exec_time,'%Y-%m-%d'))= #{queryDate}
+          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
+          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
       </if>
       where i.hosp_code=#{hospCode}
         <if test="printFlag != null and printFlag == '0'.toString()">
@@ -358,15 +361,17 @@
       MIN(iae.plan_exec_time) as execPlaneTime1,
       MIN(iae.id) as inptAdviceExecId,
       (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
-      CONCAT(
-      iv.name,'/',
-      IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-      iv.gender_code),'-'),'/',
-      IFNULL(iv.age,'-'),
-      IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-      iv.age_unit_code),'')
-      ) AS patientInfo
-      from inpt_advice ia inner join inpt_visit iv on ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+        CONCAT(
+        iv.NAME,'/',
+        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
+        WHEN '1' THEN '男' WHEN '2' THEN '女'
+        WHEN '9' THEN '未说明的性别' ELSE '' END ),
+        '/',IFNULL( iv.age, '-' ),
+        (CASE iv.age_unit_code
+        WHEN '1' THEN '岁' WHEN '2' THEN '月'
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        ) AS patientInfo
+        from inpt_advice ia inner join inpt_visit iv on ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
       <if test="keyword !=null and keyword != ''">
         and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
@@ -376,7 +381,8 @@
       left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
       join inpt_advice_exec iae on iae.advice_id =ia.id and iae.hosp_code = ia.hosp_code
       <if test="queryDate !=null and queryDate != ''">
-        and (DATE_FORMAT(iae.plan_exec_time,'%Y-%m-%d'))= #{queryDate}
+          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
+          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
       </if>
       left join phar_in_wait_receive piwr on piwr.advice_id = ia.id and piwr.hosp_code = ia.hosp_code
       where ia.hosp_code=#{hospCode}

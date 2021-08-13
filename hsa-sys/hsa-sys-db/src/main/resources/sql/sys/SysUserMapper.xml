@@ -856,11 +856,7 @@
 	<update id="updateSysUserSystem">
 		<foreach collection="list" item="item" index="index" separator=";">
 			update sys_user_system
-			<set>
-				<if test="item.teacherCode != null">
-					teacher_code = #{item.teacherCode},
-				</if>
-			</set>
+			set	teacher_code = #{item.teacherCode}
 			where hosp_code = #{item.hospCode}
 			and user_code = #{item.userCode}
 			and system_code = #{item.systemCode}

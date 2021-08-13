@@ -210,7 +210,7 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
             cardRechargeChangeDO.setStartBalance(beforeChange.getEndbalance());
-            if (BigDecimalUtils.greater(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice())) {
+            if (BigDecimalUtils.greater(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice())) {
                 BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndbalance(), cardRechargeChangeDO.getPrice());
                 cardRechargeChangeDO.setEndbalance(end);
                 cardRechargeChangeDO.setPrice(BigDecimalUtils.negate(cardRechargeChangeDO.getPrice()));

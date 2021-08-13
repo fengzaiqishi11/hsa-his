@@ -1,9 +1,12 @@
 package cn.hsa.module.base.card.dao;
 
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.base.card.entity.BaseCardChangeDO;
+import cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.base.card.dao
@@ -90,4 +93,61 @@ public interface BaseCardDAO {
      * @Return 
      */
     int insertBaseCardChange(BaseCardChangeDO baseCardChangeDO);
+
+    /**
+     * @Description: 一卡通充值异动写入记录
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/06 10:55
+     * @Return
+     */
+    int insertBaseCardRechargeChange(BaseCardRechargeChangeDO cardRechargeChangeDO);
+
+
+    /**
+     * @Description: 一卡通充值异动写入记录
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/06 10:55
+     * @Return
+     */
+    BaseCardRechargeChangeDTO findCardRechargeInfoById(Map map);
+
+
+    /**
+     * @Description: 查询一卡通充值记录
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/07 13:54
+     * @Return
+     */
+    List<BaseCardRechargeChangeDTO> findCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO);
+
+    /**
+     * @Menthod: queryPaitentPage
+     * @Desrciption: 分页查询档案信息
+     * @Param: baseCardDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-07 16:31
+     * @Return: PageDTO
+     **/
+    List<BaseCardDTO> queryPaitentPage(BaseCardDTO baseCardDTO);
+
+    /**
+     * @Menthod: queryPaitentCardRechargeInfoList
+     * @Desrciption: 分页查询一卡通异动信息
+     * @Param: cardRechargeChangeDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-10 16:26
+     * @Return: PageDTO
+     **/
+    List<BaseCardRechargeChangeDTO> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO cardRechargeChangeDTO);
+
+    Boolean updateCardAccountBalance(BaseCardDTO baseCardDTO);
+
 }

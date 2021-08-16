@@ -380,4 +380,19 @@ public class BigDecimalUtils {
         }
         return result;
     }
+
+    /**
+     * @Method 比较b1是否等于b2
+     * @Description     *
+     * @Param     *
+     * @Author liuliyun
+     * @Date 2021/08/13 15:17
+     * @Return
+     **/
+    public static boolean equalTo(BigDecimal b1, BigDecimal b2) {
+        if (b1 == null || b2 == null) {
+            return false;
+        }
+        return b1.compareTo(b2) == 0;
+    }
 }

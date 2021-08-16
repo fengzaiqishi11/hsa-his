@@ -364,4 +364,20 @@ public class BigDecimalUtils {
     public static BigDecimal negate(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value.negate();
     }
+
+    /**
+     * @Method getBigDecimalDifference
+     * @Desrciption 实现多个BigDecimal 相减
+     * @Param [minuend, arg]
+     * @Author zhangguorui
+     * @Date   2021/8/10 16:53
+     * @Return java.math.BigDecimal
+     */
+    public static BigDecimal subtractMany(BigDecimal minuend, BigDecimal... args) {
+        BigDecimal result = minuend;
+        for (BigDecimal subtrahend : args) {
+            result = result.subtract(subtrahend);
+        }
+        return result;
+    }
 }

@@ -110,4 +110,16 @@ public class InptSettleDTO extends InptSettleDO implements Serializable {
         private String queryBaby;
 
         private String babyName;
+        /**
+         * 门诊医生
+         * */
+        private String outptDoctorName;
+        /**
+         * 经治医生
+         */
+        private String jzDoctorName;
+        /**
+         * 主管医生
+         */
+        private String zgDoctorName;
 }

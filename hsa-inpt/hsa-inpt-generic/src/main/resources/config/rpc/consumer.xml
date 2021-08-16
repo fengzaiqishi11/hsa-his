@@ -119,5 +119,5 @@
     <dubbo:reference id="ouptVisitService_consumer"  interface="cn.hsa.module.outpt.visit.service.OutptVisitService" check="false"/>
     <dubbo:reference id="ouptCostService_consumer"  interface="cn.hsa.module.outpt.fees.service.OutptCostKeepAccountsService" check="false"/>
     <!--库存校验-->
-    <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer"/>
+    <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer" check="false"/>
 </beans>

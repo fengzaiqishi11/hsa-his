@@ -90,14 +90,16 @@
             resultType="cn.hsa.module.base.card.dto.BaseCardDTO">
         select
             (select name from base_profile_file b where profile_id = b.id and b.hosp_code = hosp_code) as name,
-            card_no,
-            status_code,
-            card_type_code,
-            crte_time,
-            crte_name
-        from base_card
-        where hosp_code = #{hospCode}
-        and profile_id = #{profileId}
+            a.*
+        from base_card a
+        where a.hosp_code = #{hospCode}
+        and a.profile_id = #{profileId}
+        <if test="statusCode != null and statusCode != ''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and a.card_no like concat('%', #{keyword}, '%')
+        </if>
     </select>
 
     <!--根据IC卡类型和卡号校验是否重复-->
@@ -121,4 +123,102 @@
         values
         (#{id}, #{hospCode}, #{profileId}, #{cardId}, #{statusCode}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
+
+    <!--一卡通充值异动记录表-->
+    <insert id="insertBaseCardRechargeChange" parameterType="cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO">
+       insert into base_card_recharge_change
+       (id,hosp_code,profile_id,card_id,status_code,pay_code,price,start_balance,start_balance_encryption,end_balance,end_balance_encryption,settle_type,settle_id,daily_settle_id,crte_id,crte_name,crte_time)
+       values (#{id},#{hospCode},#{profileId},#{cardId},#{statusCode},#{payCode},#{price}, #{startBalance},#{startBalanceEncryption},#{endbalance},#{endBalanceEncryption},#{settleType},#{settleId},#{dailySettleId},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--根据一卡通id 和档案id 查询最后一条充值退费记录-->
+    <select id="findCardRechargeInfoById"  resultType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO">
+        select id,hosp_code,profile_id,card_id,status_code,pay_code,price,start_balance,start_balance_encryption,end_balance,
+        end_balance_encryption,settle_type,settle_id,daily_settle_id,crte_id,crte_name,crte_time
+        from base_card_recharge_change
+        where hosp_code=#{hospCode} and profile_id =#{profileId} and card_id=#{id} order by crte_time desc limit 1
+    </select>
+
+    <!--根据一卡通id 和档案id 查询充值退费记录-->
+    <select id="findCardRechargeInfoList" parameterType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO" resultType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO">
+        select id,hosp_code,profile_id,card_id,status_code,pay_code,price,start_balance,start_balance_encryption,end_balance,
+        end_balance_encryption,settle_type,settle_id,daily_settle_id,crte_id,crte_name,crte_time
+        from base_card_recharge_change
+        where hosp_code=#{hospCode}
+        and profile_id =#{profileId}
+        and card_id=#{cardId}
+        and status_code in ('6','7')
+        order by crte_time desc
+    </select>
+
+    <!--分页查询病人信息数据-->
+    <select id="queryPaitentPage" parameterType="cn.hsa.module.base.card.dto.BaseCardDTO"
+            resultType="cn.hsa.module.base.card.dto.BaseCardDTO">
+        SELECT a.id as profile_id,
+        a.name,
+        a.age,
+        a.gender_code,
+        a.phone,
+        a.cert_code,
+        a.cert_no,
+        a.out_profile,
+        a.in_profile
+        FROM base_profile_file a
+        where a.hosp_code = #{hospCode}  and is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%', #{keyword}, '%') or a.cert_no like concat('%', #{keyword}, '%') or a.out_profile like concat('%', #{keyword}, '%') or a.in_profile like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="startDate != null">
+            and a.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            and a.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        ORDER BY a.crte_time desc
+    </select>
+
+    <!--查询发卡病人的一卡通异动记录-->
+    <select id="queryPaitentCardRechargeInfoList" parameterType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO" resultType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO">
+    select CONCAT(
+		a.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		a.gender_code),'-'),'/',
+		IFNULL(a.age,'-')) AS keyword,
+		a.in_profile,a.out_profile,a.cert_no,b.card_type_code,b.card_no,b.status_code as cardStatusCode,b.crte_time as cardTime,
+		c.status_code,c.pay_code,c.end_balance,c.start_balance,c.price,c.crte_time,c.crte_name
+    from base_profile_file a
+    JOIN base_card b
+    ON a.hosp_code = b.hosp_code and a.id = b.profile_id
+    JOIN base_card_recharge_change c
+    on b.hosp_code = c.hosp_code and b.profile_id = c.profile_id and b.id = c.card_id
+    where a.hosp_code = #{hospCode}
+    <if test="keyword != null and keyword != ''">
+        and (a.name like concat('%', #{keyword}, '%')
+        or a.cert_no like concat('%', #{keyword}, '%')
+        or a.out_profile like concat('%', #{keyword}, '%')
+        or a.in_profile like concat('%', #{keyword}, '%')
+        or b.card_no like concat('%', #{keyword}, '%'))
+    </if>
+    <if test="startDate != null">
+        and c.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+    </if>
+    <if test="endDate != null">
+        and c.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+    </if>
+    <if test="statusCode != null and statusCode != ''">
+        and c.status_code = #{statusCode}
+    </if>
+    <if test="crteId != null and crteId != ''">
+        and c.crte_id = #{crteId}
+    </if>
+    order by a.name,c.crte_time desc
+    </select>
+
+    <!--更新一卡通余额-->
+    <update id="updateCardAccountBalance" parameterType="cn.hsa.module.base.card.dto.BaseCardDTO">
+        UPDATE base_card
+        set account_balance = #{accountBalance}
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
 </mapper>

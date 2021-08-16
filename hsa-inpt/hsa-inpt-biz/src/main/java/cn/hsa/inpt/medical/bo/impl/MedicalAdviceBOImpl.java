@@ -47,8 +47,6 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
-import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -158,9 +156,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     //住院患者
     @Resource
     private InptVisitDAO inptVisitDAO;
-
-    @Resource
-    private OutptDoctorPrescribeService outptDoctorPrescribeService_consumer;
 
 
     /**

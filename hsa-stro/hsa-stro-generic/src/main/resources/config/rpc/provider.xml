@@ -61,4 +61,6 @@
     <dubbo:service interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveService" ref="pharOutReceiveService_provider"/>
     <!-- 领药申请明细 -->
     <dubbo:service interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService" ref="pharOutReceiveDetailService_provider"/>
+    <!--校验库存-->
+    <dubbo:service interface="cn.hsa.module.stro.stock.service.CheckStockService" ref="checkStockService_provider"/>
 </beans>

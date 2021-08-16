@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.inptguarantee.dao.InptGuaranteeDAO">
+
+    <resultMap type="cn.hsa.module.inpt.inptguarantee.dto.InptGuaranteeDTO" id="InptGuaranteeMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="guaranteeNo" column="guarantee_no" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="guaranteeId" column="guarantee_id" jdbcType="VARCHAR"/>
+        <result property="guaranteeName" column="guarantee_name" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="InptGuaranteeMap">
+        select
+          id, hosp_code, visit_id, guarantee_no, price, remark, guarantee_id, guarantee_name, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+        from his_v2.inpt_guarantee
+        where id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllInptGuarantee" resultMap="InptGuaranteeMap">
+        select
+          id, hosp_code, visit_id, guarantee_no, price, remark, guarantee_id, guarantee_name, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+        from inpt_guarantee
+        where  hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != ''">
+              and visit_id = #{visitId}
+            </if>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="guaranteeNo != null and guaranteeNo != ''">
+                and guarantee_no = #{guaranteeNo}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="guaranteeId != null and guaranteeId != ''">
+                and guarantee_id = #{guaranteeId}
+            </if>
+            <if test="guaranteeName != null and guaranteeName != ''">
+                and guarantee_name = #{guaranteeName}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="ids != null and ids.size()>0">
+              and id in
+              <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+              </foreach>
+            </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllInptGuaranteeByIds" resultMap="InptGuaranteeMap">
+    select
+    id, hosp_code, visit_id, guarantee_no, price, remark, guarantee_id, guarantee_name, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+    from inpt_guarantee
+    where  hosp_code = #{hospCode}
+    and id in
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_guarantee(id,hosp_code, visit_id, guarantee_no, price, remark, guarantee_id, guarantee_name, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time)
+        values (#{id},#{hospCode}, #{visitId}, #{guaranteeNo}, #{price}, #{remark}, #{guaranteeId}, #{guaranteeName}, #{crteId}, #{crteName}, #{crteTime}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update inpt_guarantee
+        <set>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="guaranteeNo != null">
+                guarantee_no = #{guaranteeNo},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="guaranteeId != null">
+                guarantee_id = #{guaranteeId},
+            </if>
+            <if test="guaranteeName != null">
+                guarantee_name = #{guaranteeName},
+            </if>
+            <if test="auditCode != null">
+                audit_code = #{auditCode},
+            </if>
+            <if test="auditId != null">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateAuditCode">
+      update inpt_guarantee set audit_code = #{auditCode}
+      where
+      hosp_code = #{hospCode}
+      <if test="ids != null and ids.size()>0">
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </update>
+
+   <select id="getVisitById" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+     select * from inpt_visit where id = #{id} and hosp_code = #{hospCode}
+   </select>
+
+   <update id="updatePeopleGuaranteeBalance">
+     update inpt_visit set guarantee_balance = #{guaranteeBalance}
+     where hosp_code = #{hospCode} and id = #{id}
+   </update>
+
+</mapper>

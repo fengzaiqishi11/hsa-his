@@ -812,7 +812,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
                                 (("0".equals(baseOrderReceiveDto.getIsHerb())) ? (StringUtils.isEmpty(dto.getBigTypeCode()) || !"2".equals(dto.getBigTypeCode())) : "2".equals(dto.getBigTypeCode())) &&
                                 (("0".equals(baseOrderReceiveDto.getIsGive())) ? (StringUtils.isEmpty(dto.getUseCode()) || !"4".equals(dto.getUseCode())) : "4".equals(dto.getUseCode())) &&
                                 (("0".equals(baseOrderReceiveDto.getIsEmergency())) ? (StringUtils.isEmpty(dto.getIsEmergency()) || "0".equals(dto.getIsEmergency())) : "1".equals(dto.getIsEmergency())) &&
-                                (("0".equals(baseOrderReceiveDto.getIsMaterial())) ? (StringUtils.isEmpty(dto.getItemCode()) || !"2".equals(dto.getItemCode())) : "2".equals(dto.getItemCode()))) {
+                                (("0".equals(baseOrderReceiveDto.getIsMaterial())) ? (StringUtils.isEmpty(dto.getItemCode()) || (!"2".equals(dto.getItemCode())) || "1".equals(baseOrderReceiveDto.getIsGive())) : "2".equals(dto.getItemCode()))) {
                     String[] usageCodeSz = baseOrderReceiveDto.getUsageCodes().split(",");
                     List<String> usageCodeList = Arrays.asList(usageCodeSz);
                     if ((StringUtils.isEmpty(baseOrderReceiveDto.getUsageCodes()) ||StringUtils.isEmpty(dto.getUsageCode()) || usageCodeList.contains(dto.getUsageCode()))) {

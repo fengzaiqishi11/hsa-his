@@ -3,6 +3,7 @@ package cn.hsa.module.insure.module.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -220,4 +221,26 @@ public interface InsureIndividualCostService {
      * @Return
      **/
     WrapperResponse<Boolean> deleteInptHisCost(Map<String, Object> map);
+
+    /**
+     * @Method selectInsureIndividualCost
+     * @Desrciption  查询已经保存到医保费用表的数据
+     * @Param insureIndividualVisitDTO：医保患者个人就诊信息
+     *
+     * @Author fuhui
+     * @Date   2021/8/16 8:55
+     * @Return
+    **/
+    WrapperResponse<List<InsureIndividualCostDTO> > selectInsureIndividualCost(Map<String, Object> insureVisitParam);
+
+    /**
+     * @Method delInsureCost
+     * @Desrciption  删除医保本地费用数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/16 9:15
+     * @Return
+    **/
+    WrapperResponse<Integer> delInsureCost(Map<String, Object> insureVisitParam);
 }

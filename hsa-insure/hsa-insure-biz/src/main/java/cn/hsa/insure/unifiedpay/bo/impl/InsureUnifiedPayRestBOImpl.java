@@ -2689,16 +2689,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 itemDTO.setCheckPrice(null);
                 // 医保目录标志（0.甲、1.乙、2.全自费）
                 itemDTO.setDirectory(null);
-                if(StringUtils.isEmpty(MapUtils.get(item,"begndate"))){
-                    itemDTO.setTakeDate(null);
-                }else{
-                    itemDTO.setTakeDate(DateUtils.parse(MapUtils.get(item,"begndate"),DateUtils.Y_M_D));
-                }
-                if(StringUtils.isEmpty(MapUtils.get(item,"enddate"))){
-                    itemDTO.setLoseDate(null);
-                }else{
-                    itemDTO.setLoseDate(DateUtils.parse(MapUtils.get(item,"enddate"),DateUtils.Y_M_D));
-                }
+                itemDTO.setTakeDate(null);
+                itemDTO.setLoseDate(null);
                 // 拼音码
                 itemDTO.setPym(null);
                 // 五笔码

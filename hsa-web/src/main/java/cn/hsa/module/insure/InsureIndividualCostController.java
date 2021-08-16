@@ -50,11 +50,6 @@ public class InsureIndividualCostController extends BaseController {
     public WrapperResponse<PageDTO> queryPage(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String,Object> param = new HashMap<String,Object>();
-        String ids = inptVisitDTO.getVisitIds();
-        if (!StringUtils.isEmpty(ids)) {
-            List<String> idsList = Arrays.asList(ids.split(","));
-            inptVisitDTO.setIds(idsList);
-        }
         param.put("hospCode",sysUserDTO.getHospCode());
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
         inptVisitDTO.setCrteId(sysUserDTO.getId());//创建人id

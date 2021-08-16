@@ -1,12 +1,10 @@
 package cn.hsa.module.insure.module.dao;
 
 
-import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import org.apache.ibatis.annotations.Param;
@@ -278,6 +276,7 @@ public interface InsureIndividualCostDAO {
 
     /**
      * @param selectList
+     * @param inptVisitDTO
      * @Method queryAllPage
      * @Desrciption 查询已经匹配的费用数据集合
      * @Param
@@ -285,7 +284,7 @@ public interface InsureIndividualCostDAO {
      * @Date 2021/6/21 9:55
      * @Return
      */
-    List<InptCostDTO> queryAllPage(List<InptVisitDTO> selectList);
+    List<InptCostDTO> queryAllPage(InptVisitDTO inptVisitDTO);
 
     /**
      * @param selectList
@@ -296,7 +295,7 @@ public interface InsureIndividualCostDAO {
      * @Date 2021/6/21 9:55
      * @Return
      */
-    List<InptCostDTO> queryAllQueryUnMatchPage(List<InptVisitDTO> selectList);
+    List<InptCostDTO> queryAllQueryUnMatchPage(InptVisitDTO inptVisitDTO);
 
     /**
      * @Method selectLastFeedSn

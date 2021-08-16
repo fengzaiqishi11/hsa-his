@@ -364,4 +364,35 @@ public class BigDecimalUtils {
     public static BigDecimal negate(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value.negate();
     }
+
+    /**
+     * @Method getBigDecimalDifference
+     * @Desrciption 实现多个BigDecimal 相减
+     * @Param [minuend, arg]
+     * @Author zhangguorui
+     * @Date   2021/8/10 16:53
+     * @Return java.math.BigDecimal
+     */
+    public static BigDecimal subtractMany(BigDecimal minuend, BigDecimal... args) {
+        BigDecimal result = minuend;
+        for (BigDecimal subtrahend : args) {
+            result = result.subtract(subtrahend);
+        }
+        return result;
+    }
+
+    /**
+     * @Method 比较b1是否等于b2
+     * @Description     *
+     * @Param     *
+     * @Author liuliyun
+     * @Date 2021/08/13 15:17
+     * @Return
+     **/
+    public static boolean equalTo(BigDecimal b1, BigDecimal b2) {
+        if (b1 == null || b2 == null) {
+            return false;
+        }
+        return b1.compareTo(b2) == 0;
+    }
 }

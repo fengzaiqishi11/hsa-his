@@ -2,9 +2,12 @@ package cn.hsa.module.base.card.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.base.card.entity.BaseCardChangeDO;
+import cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.base.card.bo
@@ -70,4 +73,55 @@ public interface BaseCardBO {
      * @Return: Boolean
      **/
     Boolean updatePwd(BaseCardDTO baseCardDTO);
+
+    /**
+     * @Menthod: saveInCharge
+     * @Desrciption: 一卡通充值
+     * @Param: cardRechargeChangeDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date: 2021-08-06 10:17
+     * @Return: Boolean
+     **/
+    Boolean saveInCharge(BaseCardRechargeChangeDO cardRechargeChangeDO);
+
+
+    /**
+     * @Menthod: saveCardRefund
+     * @Desrciption: 一卡通退费
+     * @Param: cardRechargeChangeDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date: 2021-08-06 10:18
+     * @Return: Boolean
+     **/
+    Boolean saveCardRefund(BaseCardRechargeChangeDO cardRechargeChangeDO);
+
+    BaseCardRechargeChangeDTO getRechargeChangeInfo(Map map);
+
+    PageDTO getRechargeChangeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO);
+
+
+    /**
+     * @Menthod: queryPaitentPage
+     * @Desrciption: 分页查询档案信息
+     * @Param: baseCardDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-07 16:25
+     * @Return: PageDTO
+     **/
+    PageDTO queryPaitentPage(BaseCardDTO baseCardDTO);
+
+    /**
+     * @Menthod: queryPaitentCardRechargeInfoList
+     * @Desrciption: 分页查询一卡通异动信息
+     * @Param: baseCardRechargeChangeDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-10 16:34
+     * @Return: PageDTO
+     **/
+    PageDTO queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO);
+
 }

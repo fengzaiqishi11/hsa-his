@@ -23,12 +23,16 @@ import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
+import cn.hsa.module.stro.stock.dto.CheckStockDTO;
+import cn.hsa.module.stro.stock.dto.CheckStockRespDTO;
+import cn.hsa.module.stro.stock.service.CheckStockService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -87,6 +91,12 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
      */
     @Resource
     private InsureIndividualVisitService insureIndividualVisitService_consumer;
+
+    /**
+     * 库存校验service
+     * */
+    @Resource
+    private CheckStockService checkStockService_consumer;
 
     /**
     * @Method updateInptAdviceBatch
@@ -453,9 +463,26 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 //医生开处方/医嘱时校验库存时取未结算/未核收数量的时间间隔
                 String wjsykc = this.getSysParameter(inptAdviceDTO.getHospCode() , "MZYS_CF_WJSFYKC");
                 inptAdviceDTO.setWjsykc(wjsykc);
+                // add by zhangguorui
+                Map map = new HashMap();
+                map.put("hospCode", inptAdviceDTO.getHospCode());
+                CheckStockDTO checkStockDTO = new CheckStockDTO();
+                BeanUtils.copyProperties(inptAdviceDTO,checkStockDTO);
+                map.put("checkStockDTO", checkStockDTO);
+                // 调用住院库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
+                WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
+                CheckStockRespDTO checkStockRespDTO = checkResult.getData();
                 //判断库存
-                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
-                    throw new AppException(inptAdviceDTO.getItemName()+":库存不足");
+                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))
+                        || inptAdviceDTO.getTotalNum().compareTo(checkStockRespDTO.getResult()) > 0) {
+                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足," +
+                            "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
+                            "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
+                            "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
+                            checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
+                            "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
+                            checkStockRespDTO.getPrescribeInptNumber()) + "】"
+                    );
                 }
             }
         }

@@ -66,6 +66,15 @@ public interface BaseAdviceDetailDAO {
      * @Return java.util.List<cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO>
      **/
     List<BaseAdviceDetailDTO> queryPage(BaseAdviceDetailDTO baseAdviceDetailDTO);
+
+    /**
+     *  根据项目编码表查询医嘱详细信息
+     * @param baseAdviceDetailDTO
+     * @Date 2021/8/11
+     * @Author: luonianxin
+     * @return java.util.List<cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO>
+     */
+    List<BaseAdviceDetailDTO> queryBaseAdviceByItemCode(BaseAdviceDetailDTO baseAdviceDetailDTO);
     /**
      * @Menthod insert
      * @Desrciption 新增单条医嘱详细信息

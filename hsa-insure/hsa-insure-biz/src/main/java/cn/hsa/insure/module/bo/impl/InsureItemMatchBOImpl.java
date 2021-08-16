@@ -1209,8 +1209,16 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
             insureItemDTO.setProd(MapUtils.get(insureMap,"factory"));
             insureItemDTO.setDeductible(MapUtils.get(insureMap,"self_scale"));
             insureItemDTO.setDirectory(MapUtils.get(insureMap,"staple_flag"));
-            insureItemDTO.setTakeDate(DateUtils.parse(MapUtils.get(insureMap,"audit_date"),DateUtils.Y_M_DH_M_S));
-            insureItemDTO.setLoseDate(DateUtils.parse(MapUtils.get(insureMap,"expire_date"),DateUtils.Y_M_DH_M_S));
+
+            // add 时间数据处理 by liaojiguang on 2021-08-13
+            String auditDate = MapUtils.get(insureMap,"audit_date").toString();
+            String expireDate = MapUtils.get(insureMap,"expire_date").toString();
+            if (StringUtils.isNotEmpty(auditDate)) {
+                insureItemDTO.setTakeDate(DateUtils.parse(auditDate,DateUtils.Y_M_DH_M_S));
+            }
+            if (StringUtils.isNotEmpty(expireDate)) {
+                insureItemDTO.setLoseDate(DateUtils.parse(expireDate,DateUtils.Y_M_DH_M_S));
+            }
             insureItemDTO.setPym(MapUtils.get(insureMap,"code_py"));
             insureItemDTO.setWbm(MapUtils.get(insureMap,"code_wb"));
             insureItemDTO.setIsValid(MapUtils.get(insureMap,"audit_flag"));

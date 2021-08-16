@@ -447,7 +447,8 @@
     <dubbo:reference id="baseClinicService_consumer" interface="cn.hsa.module.base.clinic.service.BaseClinicService" check="false"/>
     <!-- 分诊队列服务 -->
     <dubbo:reference id="outptTriageVisitService_consumer" interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" check="false"/>
-
+    <!--库存校验-->
+    <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
 
 </beans>
 

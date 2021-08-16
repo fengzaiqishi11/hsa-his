@@ -268,4 +268,6 @@ public interface SysUserDAO {
     Boolean deleteSysUserRole(SysUserRoleDto sysUserRoleDto);
 
     Boolean insertBatch(List<SysUserDTO> sysUserDTOS);
+
+    SysUserDTO querySysUserHaveTeachDoctor(SysUserSystemDTO sysUserSystemDTO);
 }

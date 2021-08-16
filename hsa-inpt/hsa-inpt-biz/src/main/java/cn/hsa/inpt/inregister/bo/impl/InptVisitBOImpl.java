@@ -126,63 +126,63 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
 
         if (!ListUtils.isEmpty(inptVisitDTOS)) {
-            List<String> profileIds = new ArrayList<>();
-            for (int i = 0; i < inptVisitDTOS.size(); i++) {
-                if (StringUtils.isNotEmpty(inptVisitDTOS.get(i).getProfileId())) {
-                    profileIds.add(inptVisitDTOS.get(i).getProfileId());
-                }
-            }
-            // 去重复
-            List<String> newProfileIds = profileIds.stream().distinct().collect(Collectors.toList());
+            List<String> newProfileIds = inptVisitDTOS.stream().map(InptVisitDTO::getProfileId).distinct().collect(Collectors.toList());
 
             if (!ListUtils.isEmpty(newProfileIds)) {
-                List<OutptProfileFileDTO> data = queryProfileS(newProfileIds,inptVisitDTO.getHospCode());
-                if(ListUtils.isEmpty(data)){
-                    throw new AppException("存在已登记住院但未建档患者，请联系管理员进行处理");
-                }
-                // 存储处理后的就诊的患者的资料
-                Map profileMap = new HashMap();
+                // 根据档案ids查询查询本地档案信息
+                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds,inptVisitDTO.getHospCode());
 
-                for (int i = 0; i < data.size(); i++) {
-                    if (!profileMap.containsKey(data.get(i).getId())) {
-                        profileMap.put(data.get(i).getId(), data.get(i));
-                    }
-                }
+                if (!ListUtils.isEmpty(data)) {
+                    // 存储处理后的就诊的患者的资料
+                    Map<String, List<OutptProfileFileDTO>> profileMap = data.stream().collect(Collectors.groupingBy(OutptProfileFileDTO::getId));
 
-                for (int i = 0; i < inptVisitDTOS.size(); i++) {
-                    InptVisitDTO inptVisit = new InptVisitDTO();
-                    //设置医院编码
-                    inptVisit.setHospCode(inptVisitDTO.getHospCode());
-                    //住院就诊信息存入
-                    if (inptVisitDTOS.get(i) != null) {
-                        BeanUtils.copyProperties(inptVisitDTOS.get(i), inptVisit);
-                    }
-                    if (StringUtils.isNotEmpty(inptVisitDTOS.get(i).getProfileId())) {
-                        if (!profileMap.containsKey(inptVisitDTOS.get(i).getProfileId())) {
-                            throw new AppException("存在已入院未建档患者，请联系管理员进行处理");
+                    for (int i = 0; i < inptVisitDTOS.size(); i++) {
+                        InptVisitDTO inptVisit = new InptVisitDTO();
+                        //设置医院编码
+                        inptVisit.setHospCode(inptVisitDTO.getHospCode());
+                        //住院就诊信息存入
+                        if (inptVisitDTOS.get(i) != null) {
+                            BeanUtils.copyProperties(inptVisitDTOS.get(i), inptVisit);
                         }
-
-                        OutptProfileFileDTO opt = (OutptProfileFileDTO) profileMap.get(inptVisitDTOS.get(i).getProfileId());
-                        if (opt != null) {
-                            //档案信息存入
-                            inptVisit.setNativeAddress(opt.getNativeProv() + "," + opt.getNativeCity() + "," + opt.getNativeArea());
-                            inptVisit.setNowAddress(opt.getNowProv() + "," + opt.getNowCity() + "," + opt.getNowArea());
-                            inptVisit.setNativePostCode(opt.getNativePostCode());
-                            inptVisit.setNowPostCode(opt.getNowPostCode());
-                            inptVisit.setWork(opt.getWork());
-                            inptVisit.setWorkAddress(opt.getWorkAddress());
-                            inptVisit.setWorkPostCode(opt.getWorkPostCode());
-                            inptVisit.setWorkPhone(opt.getWorkPhone());
-                            inptVisit.setNativePlace(opt.getNativePlace());
-                            //入院次数
-                            inptVisit.setTotalIn(String.valueOf(opt.getTotalIn()));
+                        if (StringUtils.isNotEmpty(inptVisitDTOS.get(i).getProfileId())) {
+                            List<OutptProfileFileDTO> list = MapUtils.get(profileMap, inptVisitDTOS.get(i).getProfileId());
+                            if (!ListUtils.isEmpty(list)) {
+                                OutptProfileFileDTO opt = list.get(0);
+                                if (opt != null) {
+                                    //档案信息存入
+//                                    inptVisit.setNativeAddress(opt.getNativeProv() + "," + opt.getNativeCity() + "," + opt.getNativeArea());
+                                    inptVisit.setNativeAddress(opt.getNativeAddress());
+//                                    inptVisit.setNowAddress(opt.getNowProv() + "," + opt.getNowCity() + "," + opt.getNowArea());
+                                    inptVisit.setNowAddress(opt.getNowAddress());
+                                    inptVisit.setNativePostCode(opt.getNativePostCode());
+                                    inptVisit.setNowPostCode(opt.getNowPostCode());
+                                    inptVisit.setWork(opt.getWork());
+                                    inptVisit.setWorkAddress(opt.getWorkAddress());
+                                    inptVisit.setWorkPostCode(opt.getWorkPostCode());
+                                    inptVisit.setWorkPhone(opt.getWorkPhone());
+                                    inptVisit.setNativePlace(opt.getNativePlace());
+                                    //入院次数
+                                    inptVisit.setTotalIn(String.valueOf(opt.getTotalIn()));
+                                }
+                            }
                         }
+                        inptVisitDTOS.set(i, inptVisit);
                     }
-                    inptVisitDTOS.set(i, inptVisit);
                 }
             }
         }
         return PageDTO.of(inptVisitDTOS);
+    }
+
+    // 根据档案ids查询查询本地档案信息
+    private List<OutptProfileFileDTO> queryBaseProfileByIds(List<String> newProfileIds, String hospCode) {
+        OutptProfileFileDTO outptProfileFileDTO = new OutptProfileFileDTO();
+        outptProfileFileDTO.setIds(newProfileIds);
+        outptProfileFileDTO.setHospCode(hospCode);
+        Map map = new HashMap();
+        map.put("hospCode", hospCode);
+        map.put("outptProfileFileDTO", outptProfileFileDTO);
+        return baseProfileFileService_consumer.queryBaseProfileByIds(map).getData();
     }
 
     /**
@@ -211,7 +211,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
                 // 去掉重复的档案ID
                 List<String> newProfileIds = profileIds.stream().distinct().collect(Collectors.toList());
-                List<OutptProfileFileDTO> data = queryProfileS(newProfileIds,outptVisitDTO.getHospCode());
+//                List<OutptProfileFileDTO> data = queryProfileS(newProfileIds,outptVisitDTO.getHospCode());
+                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds,outptVisitDTO.getHospCode());
                 if(!ListUtils.isEmpty(data)){
                     Map profileMap = new HashMap();
                     for (int i = 0; i < data.size(); i++) {

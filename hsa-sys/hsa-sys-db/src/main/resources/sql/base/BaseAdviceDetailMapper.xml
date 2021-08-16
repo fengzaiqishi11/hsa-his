@@ -260,6 +260,15 @@
         </where>
     </select>
 
+    <select id="queryBaseAdviceByItemCode" resultMap="BaseAdviceDetailMap">
+        select
+            id, hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price,
+            is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from base_advice_detail
+        where hosp_code = #{hospCode}
+        and item_code = #{itemCode}
+    </select>
+
     <!--查询和项目和材料和药品三合一-->
     <select id="queryItemAndMaterialAndDrugPage" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO">
         SELECT

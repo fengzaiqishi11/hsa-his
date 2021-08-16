@@ -500,7 +500,10 @@
         (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
         (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
         (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
-        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf,
+        e.outpt_doctor_name,-- 门诊医生
+        e.jz_doctor_name,-- 经治医生
+        e.zg_doctor_name-- 主管医生
         FROM
         inpt_settle a
         left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code

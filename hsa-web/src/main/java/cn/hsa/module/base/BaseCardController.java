@@ -4,7 +4,9 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
+import cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.base.card.entity.BaseCardChangeDO;
+import cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO;
 import cn.hsa.module.base.card.service.BaseCardService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
@@ -178,4 +180,146 @@ public class BaseCardController extends BaseController {
         map.put("baseCardDTO", baseCardDTO);
         return baseCardService_consumer.getCardByProId(map);
     }
+
+
+    /**
+     * @Menthod: saveInCharge
+     * @Desrciption: 一卡通充值
+     * @Param: baseCardRechargeChangeDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date: 2021-08-06 10:10
+     * @Return: Boolean
+     **/
+    @GetMapping("/saveInCharge")
+    public WrapperResponse<Boolean> saveInCharge(BaseCardRechargeChangeDO baseCardRechargeChangeDO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseCardRechargeChangeDO.setCrteId(sysUserDTO.getId());
+        baseCardRechargeChangeDO.setCrteName(sysUserDTO.getName());
+        baseCardRechargeChangeDO.setCrteTime(DateUtils.getNow());
+        baseCardRechargeChangeDO.setHospCode(sysUserDTO.getHospCode());
+        if (StringUtils.isEmpty(baseCardRechargeChangeDO.getProfileId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("baseCardRechargeChangeDO", baseCardRechargeChangeDO);
+        return baseCardService_consumer.saveInCharge(map);
+    }
+
+    /**
+     * @Menthod: saveCardRefund
+     * @Desrciption: 一卡通退费
+     * @Param: baseCardRechargeChangeDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date: 2021-08-06 10:13
+     * @Return: Boolean
+     **/
+    @GetMapping("/saveCardRefund")
+    public WrapperResponse<Boolean> saveCardRefund(BaseCardRechargeChangeDO baseCardRechargeChangeDO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseCardRechargeChangeDO.setHospCode(sysUserDTO.getHospCode());
+        baseCardRechargeChangeDO.setCrteId(sysUserDTO.getId());
+        baseCardRechargeChangeDO.setCrteName(sysUserDTO.getName());
+        baseCardRechargeChangeDO.setCrteTime(DateUtils.getNow());
+        if (StringUtils.isEmpty(baseCardRechargeChangeDO.getProfileId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("baseCardRechargeChangeDO", baseCardRechargeChangeDO);
+        return baseCardService_consumer.saveCardRefund(map);
+    }
+
+    /**
+     * @Menthod: getCardChargeInfoByProId
+     * @Desrciption: 根据档案id查询一卡通信息
+     * @Param: baseCardDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-08-06 16:20
+     * @Return: BaseCardRechargeChangeDTO
+     **/
+    @GetMapping("/getCardChargeInfoByProId")
+    public WrapperResponse<BaseCardRechargeChangeDTO> getCardChargeInfoByProId(BaseCardDTO baseCardDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseCardDTO.setHospCode(sysUserDTO.getHospCode());
+        if (StringUtils.isEmpty(baseCardDTO.getProfileId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        if (StringUtils.isEmpty(baseCardDTO.getId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO .getHospCode());
+        map.put("profileId", baseCardDTO.getProfileId());
+        map.put("id",baseCardDTO.getId());
+        return baseCardService_consumer.getRechargeChangeInfo(map);
+    }
+
+    /**
+     * @Menthod: getCardChargeInfoList
+     * @Desrciption: 查询一卡通充值退费记录
+     * @Param: baseCardDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-08-07 14:05
+     * @Return: List<BaseCardRechargeChangeDTO>
+     **/
+    @GetMapping("/getCardChargeInfoList")
+    public WrapperResponse<PageDTO> getCardChargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseCardRechargeChangeDTO.setHospCode(sysUserDTO.getHospCode());
+        if (StringUtils.isEmpty(baseCardRechargeChangeDTO.getProfileId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        if (StringUtils.isEmpty(baseCardRechargeChangeDTO.getCardId())){
+            throw new RuntimeException("未选择档案人员信息");
+        }
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("baseCardRechargeChangeDTO", baseCardRechargeChangeDTO);
+        return baseCardService_consumer.getRechargeChangeInfoList(map);
+    }
+
+    /**
+     * @Menthod: queryPaitentPage
+     * @Desrciption: 分页查询档案信息
+     * @Param: baseCardDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-07 16:25
+     * @Return: PageDTO
+     **/
+    @GetMapping("/queryPaitentPage")
+    public WrapperResponse<PageDTO> queryPaitentPage(BaseCardDTO baseCardDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseCardDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("baseCardDTO", baseCardDTO);
+        return baseCardService_consumer.queryPaitentPage(map);
+    }
+
+
+    /**
+     * @Menthod: queryPaitentCardRechargeInfoList
+     * @Desrciption: 分页查询一卡通异动信息
+     * @Param: baseCardRechargeChangeDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date: 2021-08-10 16:49
+     * @Return: PageDTO
+     **/
+    @GetMapping("/queryPaitentCardRechargeInfoList")
+    public WrapperResponse<PageDTO> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO cardRechargeChangeDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        cardRechargeChangeDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("baseCardRechargeChangeDTO", cardRechargeChangeDTO);
+        return baseCardService_consumer.queryPaitentCardRechargeInfoList(map);
+    }
+
 }

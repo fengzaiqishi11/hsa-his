@@ -815,7 +815,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
                                 (("0".equals(baseOrderReceiveDto.getIsMaterial())) ? (StringUtils.isEmpty(dto.getItemCode()) || !"2".equals(dto.getItemCode())) : "2".equals(dto.getItemCode()))) {
                     String[] usageCodeSz = baseOrderReceiveDto.getUsageCodes().split(",");
                     List<String> usageCodeList = Arrays.asList(usageCodeSz);
-                    if ((StringUtils.isEmpty(dto.getUsageCode()) || usageCodeList.contains(dto.getUsageCode()))) {
+                    if ((StringUtils.isEmpty(baseOrderReceiveDto.getUsageCodes()) ||StringUtils.isEmpty(dto.getUsageCode()) || usageCodeList.contains(dto.getUsageCode()))) {
                         //药品筛选出来，改为请领状态
                         dto.setStatusCode("1");
                         //一个单据领取的药品集合

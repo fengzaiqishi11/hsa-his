@@ -461,4 +461,60 @@ public class SysUserController extends BaseController {
         map.put("crteId",sysUserDTOSession.getId());
         return this.sysUserService_consumer.upLoad(map);
     }
+
+    /**
+     * @Method querySysUserHaveTeachDoctor
+     * @Param [sysUserDTO]
+     * @description    判断当前医生是否有带教医生
+     * @author pengbo
+     * @date 2021/8/08 19:56
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<Boolean>
+     * @throws
+     */
+    @GetMapping("/querySysUserHaveTeachDoctor")
+    public WrapperResponse<SysUserDTO> querySysUserHaveTeachDoctor(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res)
+    {
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+        SysUserSystemDTO sysUserSystemDTO = new SysUserSystemDTO();
+        sysUserSystemDTO.setUserCode(sysUserDTOSession.getCode());
+        sysUserSystemDTO.setHospCode(sysUserDTOSession.getHospCode());
+        sysUserSystemDTO.setDeptCode(sysUserDTOSession.getLoginBaseDeptDTO().getCode());
+        sysUserSystemDTO.setSystemCode(sysUserDTOSession.getSystemCode());
+
+        //封装参数
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("sysUserSystemDTO",sysUserSystemDTO);
+        WrapperResponse<SysUserDTO> wrapperResponse = sysUserService_consumer.querySysUserHaveTeachDoctor(map);
+        return wrapperResponse;
+    }
+
+
+
+    /**
+     * @Method querySysUserHaveTeachDoctor
+     * @Param [sysUserDTO]
+     * @description    校验带教医生
+     * @author pengbo
+     * @date 2021/8/08 19:56
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<Boolean>
+     * @throws
+     */
+    @PostMapping("/checkSysUserHaveTeachDoctor")
+    public WrapperResponse<Boolean> checkSysUserHaveTeachDoctor(@RequestBody  SysUserSystemDTO sysUserSystemDTO, HttpServletRequest req, HttpServletResponse res)
+    {
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserSystemDTO.setUserCode(sysUserDTOSession.getCode());
+        sysUserSystemDTO.setHospCode(sysUserDTOSession.getHospCode());
+        sysUserSystemDTO.setDeptCode(sysUserDTOSession.getLoginBaseDeptDTO().getCode());
+        sysUserSystemDTO.setSystemCode(sysUserDTOSession.getSystemCode());
+        //封装参数
+        Map map = new HashMap();
+        map.put("hospCode",sysUserSystemDTO.getHospCode());
+        map.put("sysUserSystemDTO",sysUserSystemDTO);
+        WrapperResponse<Boolean> wrapperResponse = sysUserService_consumer.checkSysUserHaveTeachDoctor(map);
+        return wrapperResponse;
+    }
+
 }

@@ -195,4 +195,17 @@ public interface SysUserService {
 
 
     WrapperResponse<Boolean> upLoad(Map map);
+
+    WrapperResponse<SysUserDTO> querySysUserHaveTeachDoctor(Map map);
+
+    /**
+     * @Method checkSysUserHaveTeachDoctor
+     * @Param [map]
+     * @description   校验带教医生
+     * @author marong
+     * @date 2020/9/29 19:58
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>>
+     * @throws
+     */
+    WrapperResponse<Boolean> checkSysUserHaveTeachDoctor(Map map);
 }

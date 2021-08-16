@@ -340,6 +340,4 @@ public class InptCostDO extends PageDO implements Serializable {
      * 是否报销
      */
     private String isReimburse;
-
-    private String attributionCode;
 }

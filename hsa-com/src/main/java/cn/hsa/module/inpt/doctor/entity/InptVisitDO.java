@@ -382,4 +382,8 @@ public class InptVisitDO extends PageDO implements Serializable {
      * 危急值状态代码：0 正常，1、有危急值，2、已处理危急值
      */
     private String criticalValueCode;
+    /**
+     * 担保金额
+     */
+    private BigDecimal guaranteeBalance;
 }

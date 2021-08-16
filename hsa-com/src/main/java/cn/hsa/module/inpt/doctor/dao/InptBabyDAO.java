@@ -6,6 +6,7 @@ import cn.hsa.module.inpt.doctor.entity.InptBabyDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.inpt.doctor.dao
@@ -163,4 +164,15 @@ public interface InptBabyDAO {
      * @Return: List<InptBabyDTO>
      **/
     List<InptBabyDTO> queryAll(InptBabyDTO inptBabyDTO);
+
+
+    /**
+     * @Description: 查询婴儿总费用
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/12 19:49
+     * @Return
+     */
+    InptBabyDTO getBabyCost(Map param);
 }

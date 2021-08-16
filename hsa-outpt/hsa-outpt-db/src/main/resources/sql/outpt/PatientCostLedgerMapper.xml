@@ -283,6 +283,9 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        <if test="keyword != null and keyword != ''">
+            and d.name like concat('%', #{keyword}, '%')
+        </if>
         group by c.baby_id, d.id
         ) b on c.visit_id = b.visistID and (c.baby_id = b.baby_id || (b.baby_id is null and c.baby_id is null) )
         left join inpt_baby ib on ib.hosp_code = a.hosp_code and ib.visit_id = a.id and ib.id = c.baby_id
@@ -322,6 +325,9 @@
             or a.jz_doctor_name like concat('%', #{doctorName}, '%')
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and a.name like concat('%', #{keyword}, '%')
         </if>
         order by a.out_time desc
     </select>
@@ -379,6 +385,9 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        <if test="keyword != null and keyword != ''">
+            and d.name like concat('%', #{keyword}, '%')
+        </if>
         group by d.out_dept_id
         ) b on a.out_dept_id = b.out_dept_id
         left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
@@ -419,6 +428,9 @@
             or a.jz_doctor_name like concat('%', #{doctorName}, '%')
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and a.name like concat('%', #{keyword}, '%')
         </if>
         group by a.out_dept_id
     </select>

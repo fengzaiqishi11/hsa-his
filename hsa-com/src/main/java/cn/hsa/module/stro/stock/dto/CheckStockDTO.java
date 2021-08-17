@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @Package_name: cn.hsa.module.stro.stock.dto
@@ -38,5 +39,25 @@ public class CheckStockDTO implements Serializable {
      */
     private String hospCode;
 
+    /**
+     * 总数量单位
+     */
+    private String totalNumUnitCode;
 
+    /**
+     * 总数量
+     */
+    private BigDecimal totalNum;
+    /**
+     * 频率Id
+     */
+    private String rateId;
+    /**
+     * 天数
+     */
+    private Integer useDays;
+    /**
+     * 数量
+     */
+    private BigDecimal num;
 }

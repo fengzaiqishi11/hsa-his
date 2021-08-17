@@ -474,7 +474,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 CheckStockRespDTO checkStockRespDTO = checkResult.getData();
                 //判断库存
                 if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))
-                        || inptAdviceDTO.getTotalNum().compareTo(checkStockRespDTO.getResult()) > 0) {
+                        || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) > 0) {
                     throw new AppException(inptAdviceDTO.getItemName() + ":库存不足," +
                             "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
                             "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +

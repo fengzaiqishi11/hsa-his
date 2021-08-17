@@ -1,6 +1,7 @@
 package cn.hsa.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @Package_name: cn.hsa.util
@@ -394,5 +395,20 @@ public class BigDecimalUtils {
             return false;
         }
         return b1.compareTo(b2) == 0;
+    }
+    /**
+     * @Method multiplyMany
+     * @Desrciption 实现多个数相乘
+     * @Param [multiplyed, args]
+     * @Author zhangguorui
+     * @Date   2021/8/16 20:14
+     * @Return java.math.BigDecimal
+     */
+    public static BigDecimal multiplyMany(BigDecimal multiplyed, BigDecimal... args) {
+        BigDecimal result = multiplyed;
+        for (BigDecimal subtrahend : args) {
+            result = result.multiply(subtrahend);
+        }
+        return result;
     }
 }

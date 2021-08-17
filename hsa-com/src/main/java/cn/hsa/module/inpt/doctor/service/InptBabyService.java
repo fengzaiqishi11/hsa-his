@@ -68,4 +68,15 @@ public interface InptBabyService {
      **/
     @GetMapping("/service/inpt/baby/getById")
     WrapperResponse<InptBabyDTO> getById(Map map);
+
+    /**
+     * @Description: 查询婴儿总费用
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/12 19:16
+     * @Return
+     */
+    @GetMapping("/service/inpt/baby/getBabyCost")
+    WrapperResponse<InptBabyDTO> getBabyCost(Map map);
 }

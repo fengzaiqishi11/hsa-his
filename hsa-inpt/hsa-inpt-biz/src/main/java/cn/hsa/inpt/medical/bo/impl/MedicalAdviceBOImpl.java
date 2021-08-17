@@ -2049,7 +2049,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         inptCostDTO.setCrteTime(date);
 
         //交病人类型判断 如果交病人且为临时医嘱时   (重新赋值  总数量，总数量单位，单价，总价)
-        if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
+        //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
+        if("1".equals(adviceDTO.getIsLong())){
             inptCostDTO.setTotalNum(adviceDTO.getTotalNum());
             inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
             //药品

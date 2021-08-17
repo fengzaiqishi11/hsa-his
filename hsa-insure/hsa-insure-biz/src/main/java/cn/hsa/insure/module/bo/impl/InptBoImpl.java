@@ -13,6 +13,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -23,6 +24,7 @@ import cn.hsa.util.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,9 @@ public class InptBoImpl extends HsafBO implements InptBo {
 
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private InsureIndividualCostService insureIndividualCostService_consumer;
 
     /**
      * @Method udapteCanleInptSettle
@@ -165,6 +170,8 @@ public class InptBoImpl extends HsafBO implements InptBo {
         insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
         insureIndividualVisitDTO.setCode(code);
         InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();//查询条件
+        List<InsureIndividualCostDTO> individualCostDTOList = new ArrayList<>();
+        Map<String, Object> insureVisitParam = new HashMap<String, Object>();
         if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
             List<InsureIndividualVisitDTO> insureIndividualVisitDTOS = insureIndividualVisitDAO.findByCondition(insureIndividualVisitDTO);
             if (insureIndividualVisitDTOS == null || insureIndividualVisitDTOS.size() > 1 || insureIndividualVisitDTOS.size() == 0) {
@@ -181,31 +188,28 @@ public class InptBoImpl extends HsafBO implements InptBo {
             insureIndividualBasicDTO = insureIndividualBasicDTOList.get(0);
         }
         else{
-            Map<String, Object> insureVisitParam = new HashMap<String, Object>();
             insureVisitParam.put("hospCode", hospCode);//医院编码
             insureVisitParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
             insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(insureVisitParam).getData();
-        }
-        if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
             insureIndividualVisitDTO.setInsureIsTransmit("1"); //删除 只删除已经上传到医保的数据
+            individualCostDTOList = insureIndividualCostService_consumer.selectInsureIndividualCost(insureVisitParam).getData();
         }
-        List<InsureIndividualCostDTO> individualCostDTOList = insureIndividualCostDAO.selectInsureIndividualCost(insureIndividualVisitDTO);
-        List<InsureIndividualCostDTO> collect = individualCostDTOList.stream().
-                filter(insureIndividualCostDTO ->"1".equals(insureIndividualCostDTO.getInsureIsTransmit())).
-                collect(Collectors.toList());
         /**
          * 通过获取系统参数来判断 是走医保统一支付平台 还是调用自己的的医保接口
+         * 1.如果没有上传到医保的费用数据则不调用医保的费用撤销接口
          */
         if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
-              Map<String, Object> insureUnifiedMap = new HashMap<>();
-              insureUnifiedMap.put("individualCostDTOList",individualCostDTOList);
-              insureUnifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-              insureUnifiedMap.put("hospCode",hospCode);
-              boolean data = insureUnifiedPayInptService.UP_2302(insureUnifiedMap).getData();
-              if(data){
-                 //删除本次患者取消医保费用信息
-                 insureIndividualCostDAO.delInsureCost(insureIndividualVisitDTO);
-             }
+           if(!ListUtils.isEmpty(individualCostDTOList)){
+               Map<String, Object> insureUnifiedMap = new HashMap<>();
+               insureUnifiedMap.put("individualCostDTOList",individualCostDTOList);
+               insureUnifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+               insureUnifiedMap.put("hospCode",hospCode);
+               boolean data = insureUnifiedPayInptService.UP_2302(insureUnifiedMap).getData();
+               if(data){
+                   //删除本次患者取消医保费用信息
+                   insureIndividualCostService_consumer.delInsureCost(insureVisitParam).getData();
+               }
+           }
         }
         else{
             String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();//医保注册编码

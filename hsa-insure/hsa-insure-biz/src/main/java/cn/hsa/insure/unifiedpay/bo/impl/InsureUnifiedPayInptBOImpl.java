@@ -15,6 +15,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import scala.App;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -83,15 +85,43 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
     @Override
     public Map<String,Object> UP_2301(Map<String, Object> map) {
         String code = map.get("code").toString();
+        InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
         String crteName = map.get("crteName").toString();
         String hospCode =  map.get("hospCode").toString();
+        String isHalfSettle = MapUtils.get(map,"isHalfSettle");
+        String feeStartDate = MapUtils.get(map,"feeStartDate");
+        String feeEndDate = MapUtils.get(map,"feeEndDate");
         Integer count = (Integer) map.get("count");
         InsureIndividualVisitDTO insureIndividualVisitDTO  = (InsureIndividualVisitDTO) map.get("insureIndividualVisitDTO");
+        String insureRegCode = insureIndividualVisitDTO.getInsureOrgCode();
         String visitId = insureIndividualVisitDTO.getVisitId();
         map.put("visitId",visitId);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-        List<Map<String,Object>> insureCostList = (List<Map<String, Object>>) map.get("insureCostList");
+
+
+        Map<String, String> insureCostParam = new HashMap<String, String>();
+        insureCostParam.put("hospCode", hospCode);//医院编码
+        insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+        insureCostParam.put("visitId", visitId);//就诊id
+        insureCostParam.put("isMatch", Constants.SF.S);//是否匹配 = 是
+        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
+        insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
+        insureCostParam.put("queryBaby", "N");// 医保机构编码
+        insureCostParam.put("isHalfSettle", isHalfSettle);// 是否中途结算
+        insureCostParam.put("feeStartDate", feeStartDate);
+        insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算
+        List<Map<String,Object>> insureCostList =  insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
+        if(ListUtils.isEmpty(insureCostList)){
+            throw new AppException("没有可以上传的的医保匹配费用数据");
+        }
+        // 查询有退费的数据集合,且未上传的的数据集合
+        List<InptCostDTO> inptCostDTOList = insureIndividualCostDAO.queryBackInptFee(insureIndividualVisitDTO);
+        // 查询已经上传的费用数据
+        List<Map<String, Object>> individualCostDTOList = insureIndividualCostDAO.queryInsureInptCost(insureIndividualVisitDTO);
         int num = 0;
+        /**
+         * 本次上传如果没有正常的费用数据,则不上传到医保，直接把退费的数据插入到医保费用表
+         */
         if(!ListUtils.isEmpty(insureCostList)){
             for(Map<String,Object> item : insureCostList){
                 if("0".equals(MapUtils.get(item,"statusCode"))){
@@ -101,39 +131,50 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 }
             }
         }
-        map.put("num",num);
         if(num ==0){
+            // 直接把全开，全退的费用保存到费用表 但是不进行调用医保的操作
+            insertNotUpLoadFee(insureCostList,inptVisitDTO);
             return map;
-        }else{
-            List<InptCostDTO> inptCostDTOList = MapUtils.get(map,"inptCostDTOList");
-            List<Map<String,Object>> individualCostDTOList = MapUtils.get(map,"individualCostDTOList");
-            Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
+        }
+        else{
+            // 说明有正常的数据 需要调用医保接口
+            List<Map<String,Object>> list2 = new ArrayList<>();  // 处理
             List<Map<String,Object>> list1 = new ArrayList<>();
-            if(!ListUtils.isEmpty(insureCostList)){
-                for(Map<String,Object> item : insureCostList){
-                    if(collect.containsKey(MapUtils.get(item,"id"))){
-                        continue;
-                    }
-                    else if(collect.containsKey(MapUtils.get(item,"oldCostId")) &&
-                            BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
-                        continue;
-                    }
-                    else {
-                        list1.add(item);
+            List<Map<String,Object>> list3 = new ArrayList<>(); // 处理正负直接相抵的集合
+            if(!ListUtils.isEmpty(inptCostDTOList)){
+                Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
+                // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
+                //
+                if(!ListUtils.isEmpty(insureCostList)){
+                    for(Map<String,Object> item : insureCostList){
+                        if(collect.containsKey(MapUtils.get(item,"id"))){
+                            list3.add(item);
+                            continue;
+                        }
+                        else if(collect.containsKey(MapUtils.get(item,"oldCostId")) &&
+                                BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
+                            list3.add(item);
+                            continue;
+                        }
+                        else {
+                            list1.add(item);
+                        }
                     }
                 }
-            }
-
-            List<Map<String,Object>> list2 = new ArrayList<>();
-            if(!ListUtils.isEmpty(individualCostDTOList)){
-                for(Map<String,Object> item : individualCostDTOList){
-                    if(collect.containsKey(MapUtils.get(item,"costId"))){
-                        list2.add(item);
+                // 传退费对应的数据
+                if(!ListUtils.isEmpty(individualCostDTOList)){
+                    for(Map<String,Object> item : individualCostDTOList){
+                        if(collect.containsKey(MapUtils.get(item,"costId"))){
+                            list2.add(item);
+                        }
                     }
+                }
+
+                if(!ListUtils.isEmpty(list3)){
+                    insertNotUpLoadFee(list3,inptVisitDTO);
                 }
             }
             list2.addAll(list1);
-            map.put("list2",list2);
             List<InptCostDO> inptCostDOList = insureIndividualCostDAO.queryInptFeeCost(map);
             Map<String, InptCostDO> inptCostDOMap = inptCostDOList.stream().collect(Collectors.toMap(InptCostDO::getId,
                     Function.identity(), (k1, k2) -> k1));
@@ -186,7 +227,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             String zhSpecial ="";
             String hnFeedetlSn ="";
             String huNanSpecial = "";
-            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+            Map<String,Object> codeMap = new HashMap<>();
+            codeMap.put("code","HOSP_APPR_FLAG");
+            codeMap.put("hospCode",hospCode);
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(codeMap).getData();
             if(sysParameterDTO !=null && !StringUtils.isEmpty(sysParameterDTO.getValue())){
                 String value = sysParameterDTO.getValue();
                 Map<String,Object> stringObjectMap = JSON.parseObject(value,Map.class);
@@ -207,14 +251,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     }
                 }
             }
-
+            Integer k =1;
             /**
              * 第二部分入参
              */
             List<Map<String,Object>> mapList = new ArrayList<>();
             BigDecimal sumBigDecimal = new BigDecimal(0.00);
             String feeNum =  insureIndividualCostDAO.selectLastFeedSn(map); // 判读是否是第一次传输
-            int k =1;
             for (Map<String, Object> item : list2) {
                 Map<String, Object> objectMap = new HashMap<>();
                 String doctorId = MapUtils.get(item,"doctorId");
@@ -228,6 +271,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     }else{
                         k = Integer.parseInt(feeNum);
                         k+=2;
+                        feeNum = k.toString();
                         objectMap.put("feedetl_sn",k) ; // 费用明细流水号
                     }
                     if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
@@ -365,11 +409,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 objectMap.put("id",MapUtils.get(item,"id")) ; //
                 mapList.add(objectMap);
             }
-            /**
-             * 因为湖南省医保的住院费用流水号 做了调整 流水号调整未非0的数字 不能大于15位 而我们自己本地保存费用流水号
-             * 的字段是字符型 所以要对湖南省医保上传的流水号做出对应的调整 把上传的费用流水号改成数值型 同时存库为字符串型
-             * 利用深拷贝 赋值对象
-             */
             System.out.println("费用明细总金额为:"+ sumBigDecimal);
             System.out.println("费用传输的总数量为:" + mapList.size());
             map.put("mapList",mapList);
@@ -403,8 +442,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     logger.info("统一支付平台住院费用传输回参:" + resultJson);
                     Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
                     List<Map<String,Object>> resultDataMap =  MapUtils.get(outptMap,"result");
+                    listAllMap.addAll(resultDataMap);
                     insertInsureCost(resultDataMap,map, sumBigDecimal);
-//                    listAllMap.addAll(resultDataMap);
                 }
             }
             else{
@@ -427,13 +466,15 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 logger.info("统一支付平台住院费用传输回参:" + resultJson);
                 Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
                 List<Map<String,Object>> resultDataMap =  MapUtils.get(outptMap,"result");
-                insertInsureCost(resultDataMap,map,sumBigDecimal);
+                listAllMap.addAll(resultDataMap);
+                insertInsureCost(resultDataMap,map, sumBigDecimal);
             }
+            map.put("sumBigDecimal",sumBigDecimal);
+            map.put("listAllMap",listAllMap);
             return map;
         }
 
     }
-
     /**
      * @Method updateInsureCost
      * @Desrciption  费用传输以后：更新医保的反参数据
@@ -481,61 +522,62 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 }
                 if(!ListUtils.isEmpty(resultDataMap)){
                     for(Map<String, Object> item : resultDataMap){
-                            DecimalFormat df1 = new DecimalFormat("0.00");
-                            String feedetlSn = MapUtils.get(item,"feedetl_sn");
-                            insureIndividualCostDTO = new InsureIndividualCostDTO();
-                            insureIndividualCostDTO.setId(SnowflakeUtils.getId());
-                            insureIndividualCostDTO.setHospCode(hospCode);
-                            insureIndividualCostDTO.setVisitId(visitId);//就诊id
-                            insureIndividualCostDTO.setSettleId(null);
-                            insureIndividualCostDTO.setIsHospital("1");
-                            insureIndividualCostDTO.setItemType(newFeedetlSnMap.get(feedetlSn).get("list_type") == null?"":newFeedetlSnMap.get(feedetlSn).get("list_type").toString());
-                            insureIndividualCostDTO.setItemCode(newFeedetlSnMap.get(feedetlSn).get("medins_list_code") ==null?"":newFeedetlSnMap.get(feedetlSn).get("medins_list_code").toString());
-                            insureIndividualCostDTO.setItemName(newFeedetlSnMap.get(feedetlSn).get("medins_list_name") == null?"":newFeedetlSnMap.get(feedetlSn).get("medins_list_name").toString());
-                            insureIndividualCostDTO.setCostId(newFeedetlSnMap.get(feedetlSn).get("id") == null ?"":newFeedetlSnMap.get(feedetlSn).get("id").toString());//费用id
-                            insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn") ==null ? "": MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
-                            insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop") ==null ?"":MapUtils.get(item, "selfpay_prop").toString()); // 自付比例
-                            insureIndividualCostDTO.setPrimaryPrice(BigDecimalUtils.convert(newFeedetlSnMap.get(MapUtils.get(item,"feedetl_sn")).get("det_item_fee_sumamt").toString())); // 上传到医保的费用
-                            insureIndividualCostDTO.setApplyLastPrice(null);
-                            insureIndividualCostDTO.setOrderNo(count +""); // 顺序号
-                            insureIndividualCostDTO.setTransmitCode("1"); // 是否传输标志
-                            insureIndividualCostDTO.setCrteId(crteId);
-                            insureIndividualCostDTO.setRxSn(null);
-                            insureIndividualCostDTO.setInsureSettleId(null);
-                            insureIndividualCostDTO.setCrteName(crteName);
-                            insureIndividualCostDTO.setCrteTime(DateUtils.getNow());
-                            insureIndividualCostDTO.setHospCode(hospCode);  // 医院编码
-                            insureIndividualCostDTO.setInsureRegisterNo(insureRegisterNo); // 就医登记号
-                            insureIndividualCostDTO.setIsHalfSettle(isHalfSettle); // 是否中途结算
-                            insureIndividualCostDTO.setInsureIsTransmit("1");
-                            insureIndividualCostDTO.setBatchNo(null);
-                            insureIndividualCostDTO.setPricUplmtAmt(null);
-                            insureIndividualCostDTO.setHiLmtpric(null);
-                            insureIndividualCostDTO.setOverlmtSelfpay(null);
-                            insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_selfpay")==null ?"": MapUtils.get(item, "overlmt_selfpay").toString()))));
-                            insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_amt") == null ? "":MapUtils.get(item, "overlmt_amt").toString()))));
-                            insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt") ==null ? "" :MapUtils.get(item, "preselfpay_amt").toString())))); // 先行自付金额
-                            insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt") ==null ? "":MapUtils.get(item, "inscp_scp_amt").toString()))));
-                            insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") ==null ? "":MapUtils.get(item, "fulamt_ownpay_amt") .toString())))); // 全自费金额
-                            insureIndividualCostDTO.setDetItemFeeSumamt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") ==null ? "":MapUtils.get(item, "det_item_fee_sumamt") .toString())))); // 总金额
-                            insureIndividualCostDTO.setSumBigDecimalFee(sumBigDecimal);
-                            insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item,"med_chrgitm_type")); //医疗收费项目类别
-                            insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item,"lmt_used_flag"));
-                            insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item,"chrgitm_lv"));
-                            insureIndividualCostDTO.setSumFee(sumBigDecimal); // 本次上传到医保的费用总金额
-                            insureIndividualCostDTO.setIsHalfSettle(isHalfSettle); // 是否中途结算
-                            insureIndividualCostDTO.setFeeStartTime(startDate);
-                            insureIndividualCostDTO.setFeeEndTime(endDate);
-                            if("0".equals(isHalfSettle)){
-                                insureIndividualCostDTO.setSettleCount(0); // 中途结算次数
+                        DecimalFormat df1 = new DecimalFormat("0.00");
+                        String feedetlSn = MapUtils.get(item,"feedetl_sn");
+                        insureIndividualCostDTO = new InsureIndividualCostDTO();
+                        insureIndividualCostDTO.setId(SnowflakeUtils.getId());
+                        insureIndividualCostDTO.setHospCode(hospCode);
+                        insureIndividualCostDTO.setVisitId(visitId);//就诊id
+                        insureIndividualCostDTO.setSettleId(null);
+                        insureIndividualCostDTO.setIsHospital("1");
+                        insureIndividualCostDTO.setItemType(newFeedetlSnMap.get(feedetlSn).get("list_type").toString());
+                        insureIndividualCostDTO.setItemCode(newFeedetlSnMap.get(feedetlSn).get("medins_list_code").toString());
+                        insureIndividualCostDTO.setItemName(newFeedetlSnMap.get(feedetlSn).get("medins_list_name").toString());
+                        insureIndividualCostDTO.setCostId(newFeedetlSnMap.get(feedetlSn).get("id").toString());//费用id
+                        insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
+                        insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop").toString()); // 自付比例
+                        insureIndividualCostDTO.setPrimaryPrice(BigDecimalUtils.convert(newFeedetlSnMap.get(MapUtils.get(item,"feedetl_sn")).get("det_item_fee_sumamt").toString())); // 上传到医保的费用
+                        insureIndividualCostDTO.setApplyLastPrice(null);
+                        insureIndividualCostDTO.setOrderNo(count +""); // 顺序号
+                        insureIndividualCostDTO.setTransmitCode("1"); // 是否传输标志
+                        insureIndividualCostDTO.setCrteId(crteId);
+                        insureIndividualCostDTO.setRxSn(null);
+                        insureIndividualCostDTO.setInsureSettleId(null);
+                        insureIndividualCostDTO.setCrteName(crteName);
+                        insureIndividualCostDTO.setCrteTime(DateUtils.getNow());
+                        insureIndividualCostDTO.setHospCode(hospCode);  // 医院编码
+                        insureIndividualCostDTO.setInsureRegisterNo(insureRegisterNo); // 就医登记号
+                        insureIndividualCostDTO.setIsHalfSettle(isHalfSettle); // 是否中途结算
+                        insureIndividualCostDTO.setInsureIsTransmit("1");
+                        insureIndividualCostDTO.setBatchNo(null);
+                        insureIndividualCostDTO.setPricUplmtAmt(null);
+                        insureIndividualCostDTO.setHiLmtpric(null);
+                        insureIndividualCostDTO.setOverlmtSelfpay(null);
+                        insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString())))); // 符合政策范围金额
+                        insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_selfpay")==null ?"": MapUtils.get(item, "overlmt_selfpay").toString()))));
+                        insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "overlmt_amt") == null ? "":MapUtils.get(item, "overlmt_amt").toString()))));
+                        insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt") ==null ? "" :MapUtils.get(item, "preselfpay_amt").toString())))); // 先行自付金额
+                        insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt") ==null ? "":MapUtils.get(item, "inscp_scp_amt").toString()))));
+                        insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") ==null ? "":MapUtils.get(item, "fulamt_ownpay_amt") .toString())))); // 全自费金额
+                        insureIndividualCostDTO.setDetItemFeeSumamt(BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") ==null ? "":MapUtils.get(item, "det_item_fee_sumamt") .toString())))); // 总金额
+                        insureIndividualCostDTO.setSumBigDecimalFee(sumBigDecimal);
+                        insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item,"med_chrgitm_type")); //医疗收费项目类别
+                        insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item,"lmt_used_flag"));
+                        insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item,"chrgitm_lv"));
+                        insureIndividualCostDTO.setSumFee(sumBigDecimal); // 本次上传到医保的费用总金额
+                        insureIndividualCostDTO.setIsHalfSettle(isHalfSettle); // 是否中途结算
+                        insureIndividualCostDTO.setFeeStartTime(startDate);
+                        insureIndividualCostDTO.setFeeEndTime(endDate);
+                        if("0".equals(isHalfSettle)){
+                            insureIndividualCostDTO.setSettleCount(0); // 中途结算次数
+                        }else{
+                            if(settleCount == null){
+                                insureIndividualCostDTO.setSettleCount(1); // 中途结算次数
                             }else{
-                                if(settleCount == null){
-                                    insureIndividualCostDTO.setSettleCount(1); // 中途结算次数
-                                }else{
-                                    insureIndividualCostDTO.setSettleCount(++settleCount); // 中途结算次数
-                                }
+                                insureIndividualCostDTO.setSettleCount(++settleCount); // 中途结算次数
                             }
-                            individualCostDTOList.add(insureIndividualCostDTO);
+                        }
+                        individualCostDTOList.add(insureIndividualCostDTO);
                     }
                 }
             }
@@ -544,6 +586,59 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             insureIndividualCostDAO.batchInsertCost(individualCostDTOList);
         }
     }
+
+    /**
+     * @Method
+     * @Desrciption  保存未上传的费用数据
+     * @Param  insureCostList：未上传的费用集合
+     *          inptVisitDTO ：患者基本信息
+     *
+     * @Author fuhui
+     * @Date   2021/8/13 9:16
+     * @Return
+    **/
+    private void insertNotUpLoadFee(List<Map<String, Object>> insureCostList, InptVisitDTO inptVisitDTO) {
+        /**
+         *   获取最新的的顺序号
+         */
+        int count;
+        String orderNo = insureIndividualCostDAO.queryLastestOrderNo(inptVisitDTO);
+        if (StringUtils.isEmpty(orderNo)) {
+            count = 0;
+        } else {
+            count = Integer.parseInt(orderNo);
+        }
+        List<InsureIndividualCostDO> insureIndividualCostDOList = new ArrayList<InsureIndividualCostDO>();
+        String hospCode = inptVisitDTO.getHospCode();
+        String visitId = inptVisitDTO.getId();
+        String crteId = inptVisitDTO.getCrteId();
+        String crteName = inptVisitDTO.getCrteName();
+        for (Map<String,Object> item : insureCostList){
+            count++;
+            InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
+            insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
+            insureIndividualCostDO.setHospCode(hospCode);//医院编码
+            insureIndividualCostDO.setVisitId(visitId);//患者id
+            insureIndividualCostDO.setCostId((String) item.get("id"));//费用id
+            insureIndividualCostDO.setSettleId(null);//结算id
+            insureIndividualCostDO.setIsHospital(Constants.SF.S);//是否住院 = 是
+            insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
+            insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
+            insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
+            insureIndividualCostDO.setGuestRatio((String)item.get("deductible"));//自付比例
+            insureIndividualCostDO.setPrimaryPrice((BigDecimal)item.get("realityPrice"));//原费用
+            insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
+            insureIndividualCostDO.setOrderNo(count+"");//顺序号
+            insureIndividualCostDO.setInsureIsTransmit(Constants.SF.F);
+            insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志 = 已传输
+            insureIndividualCostDO.setCrteId(crteId);//创建id
+            insureIndividualCostDO.setCrteName(crteName);//创建人姓名
+            insureIndividualCostDO.setCrteTime(new Date());//创建时间
+            insureIndividualCostDOList.add(insureIndividualCostDO);
+        }
+        insureIndividualCostDAO.insertInsureCost(insureIndividualCostDOList);
+    }
+
     /**
      * @Method inpt_2302
      * @Desrciption 医保统一支付平台：住院业务模块--住院费用传输明细撤销
@@ -1339,8 +1434,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dscginfoMap.put("dise_code", insureIndividualVisitDTO.getBka006());//	病种编码
         dscginfoMap.put("dise_name", insureIndividualVisitDTO.getBka006Name());//	病种名称
         dscginfoMap.put("oprn_oprt_code", null);//	手术操作代码
-        dscginfoMap.put("oprn_oprt_name", null);//	手术操作名称
-        dscginfoMap.put("fpsc_no", insureIndividualVisitDTO.getFpscNo());//	计划生育服务证号
+         dscginfoMap.put("fpsc_no", insureIndividualVisitDTO.getFpscNo());//	计划生育服务证号
         dscginfoMap.put("matn_type", insureIndividualVisitDTO.getMatnType());//	生育类别
         dscginfoMap.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());//	计划生育手术类别
         dscginfoMap.put("latechb_flag", insureIndividualVisitDTO.getLatechbFlag());//	晚育标志

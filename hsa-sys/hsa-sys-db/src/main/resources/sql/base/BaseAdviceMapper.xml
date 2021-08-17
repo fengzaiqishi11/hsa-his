@@ -472,6 +472,13 @@
         <if test="printStatus != null and printStatus == '2'.toString()">
             and ma.print_time is not null
         </if>
+        <if test="statList != null">
+            and (document_sta is null or document_sta in
+            <foreach collection="statList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
         group by ma.merge_id
         ) tab1
         order by tab1.crte_time desc

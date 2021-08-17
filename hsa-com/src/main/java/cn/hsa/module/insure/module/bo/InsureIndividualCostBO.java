@@ -221,4 +221,26 @@ public interface InsureIndividualCostBO {
      * @Return
      */
     Boolean deleteInptHisCost(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method selectInsureIndividualCost
+     * @Desrciption 查询已经保存到医保费用表的数据
+     * @Param insureIndividualVisitDTO：医保患者个人就诊信息
+     * @Author fuhui
+     * @Date 2021/8/16 8:55
+     * @Return
+     */
+    List<InsureIndividualCostDTO> selectInsureIndividualCost(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method delInsureCost
+     * @Desrciption 删除医保本地费用数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/16 9:15
+     * @Return
+     */
+    Integer delInsureCost(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

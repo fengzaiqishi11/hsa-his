@@ -306,14 +306,15 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
             }
             //修改账号
             if(!ListUtils.isEmpty(updateList)){
-                for (int i = updateList.size()-1; i >=0; i--) {
-                    if(StringUtils.isEmpty(updateList.get(i).getTeacherCode())){
-                        updateList.remove(i);
-                    }
-                }
-                if(!ListUtils.isEmpty(updateList)){
-                    this.sysUserDAO.updateSysUserSystem(updateList);
-                }
+//                for (int i = updateList.size()-1; i >=0; i--) {
+//                    if(StringUtils.isEmpty(updateList.get(i).getTeacherCode())){
+//                        updateList.remove(i);
+//                    }
+//                }
+//                if(!ListUtils.isEmpty(updateList)){
+//                    this.sysUserDAO.updateSysUserSystem(updateList);
+//                }
+                this.sysUserDAO.updateSysUserSystem(updateList);
             }
         } else {
             //删除此用户已经建立的账号

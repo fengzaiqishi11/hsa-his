@@ -115,4 +115,7 @@
     <!-- 消息模板记录 -->
     <dubbo:service interface="cn.hsa.module.inpt.msg.service.MsgTempRecordService" ref="msgTempRecordService_provider"/>
     <dubbo:service interface="cn.hsa.module.inpt.medicaltechnology.service.MedicalTechnologyService" ref="medicalTechnologyService_provider"/>
+
+    <!-- 保证金管理 -->
+    <dubbo:service interface="cn.hsa.module.inpt.inptguarantee.service.InptGuaranteeService" ref="inptGuaranteeService_provider"/>
 </beans>

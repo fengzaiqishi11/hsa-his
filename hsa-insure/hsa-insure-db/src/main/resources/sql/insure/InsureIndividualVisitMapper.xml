@@ -796,10 +796,10 @@
         left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
         left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
         left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
-        WHERE iiv.hosp_code =#{hospCode} and iiv.insure_settle_id is null and iiv.visit_id in
-        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
+        WHERE iiv.hosp_code =#{hospCode} and iiv.insure_settle_id is null and iiv.visit_id=#{id}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiv.medical_reg_no = #{medicalRegNo}
+        </if>
         <if test="keyword != null and keyword != ''">
             and ( iv.in_no like concat('%',#{keyword},'%')
             or iv.name like concat('%',#{keyword},'%')
@@ -1049,38 +1049,14 @@
         visit_icd_code,
         visit_icd_name,
         visit_time,
-        visit_drpt_id,
-        visit_drpt_name,
-        visit_area_id,
-        visit_area_name,
-        visit_berth,
-        starting_price,
-        shift_hosp_code,
-        out_hosp_code,
-        cause,
-        remark,
         crte_id,
         crte_name,
         crte_time,
-        is_ecqr,
-        pay_ord_id,
-        pay_token,
-        accessory_diagnosis_name,
-        accessory_diagnosis_code,
         insuplc_admdvs,
         mdtrt_cert_type,
         mdtrt_cert_no,
         omsgid,
         oinfno,
-        pret_flag,
-        fetus_cnt,
-        birctrl_matn_date,
-        fetts,
-        geso_val,
-        latechb_flag,
-        birctrl_type,
-        fpsc_no,
-        matn_type,
         is_out,
         insure_settle_id,
         settle_count,
@@ -1194,14 +1170,6 @@
                aka130_name,
                bka006,
                bka006_name,
-               injury_borth_sn,
-               visit_icd_code,
-               visit_icd_name,
-               visit_time,
-               visit_drpt_id,
-               visit_drpt_name,
-               visit_area_id,
-               visit_area_name,
                crte_id,
                crte_name,
                crte_time,

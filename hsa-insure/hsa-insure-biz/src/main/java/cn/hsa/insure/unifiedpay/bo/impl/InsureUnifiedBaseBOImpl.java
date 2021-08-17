@@ -323,7 +323,13 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          */
         if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
             Map<String, Object> setlinfoMap = insureIndividualSettleDAO.querySettleForMap(map);
+            if(MapUtils.isEmpty(setlinfoMap)){
+                throw  new AppException("根据就诊id,结算id查询医保信息为空");
+            }
             List<Map<String, Object>> setldetailListMap = insureIndividualSettleDAO.queryInsureFundListMap(map);
+            if(ListUtils.isEmpty(setldetailListMap)){
+                throw  new AppException("根据就诊id,查询基金信息为空");
+            }
             outptMap.put("setlinfo", setlinfoMap);
             outptMap.put("setldetail", setldetailListMap);
             map.put("insureServiceType", "1"); //默认根据定点医疗机构去查找  1：定点医疗机构 2：定点零售药店
@@ -339,6 +345,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualBasicDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
             map.put("insureIndividualBasicDTO", insureIndividualBasicDTO);
             insureIndividualBasicDTO = insureIndividualBasicService.getByVisitId(map).getData();
+            if(insureIndividualBasicDTO == null){
+                throw new AppException("根据就诊id,个人信息id查询医保基本信息为空");
+            }
             setlinfoMap.put("emp_name", insureIndividualBasicDTO.getBka008());
             setlinfoMap.put("certno", insureIndividualBasicDTO.getAac002());
             setlinfoMap.put("brdy", DateUtils.format(MapUtils.get(setlinfoMap, "birthday"), DateUtils.Y_M_D));

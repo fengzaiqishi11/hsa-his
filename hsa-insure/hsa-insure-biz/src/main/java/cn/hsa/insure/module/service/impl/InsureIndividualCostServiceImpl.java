@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -302,4 +301,36 @@ public class InsureIndividualCostServiceImpl implements InsureIndividualCostServ
         InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
         return WrapperResponse.success(insureIndividualCostBO.deleteInptHisCost(inptVisitDTO));
     }
+
+    /**
+     * @param insureVisitParam
+     * @Method selectInsureIndividualCost
+     * @Desrciption 查询已经保存到医保费用表的数据
+     * @Param insureIndividualVisitDTO：医保患者个人就诊信息
+     * @Author fuhui
+     * @Date 2021/8/16 8:55
+     * @Return
+     * @return
+     */
+    @Override
+    public WrapperResponse<List<InsureIndividualCostDTO>> selectInsureIndividualCost(Map<String, Object> insureVisitParam) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(insureVisitParam,"insureIndividualVisitDTO");
+        return WrapperResponse.success(insureIndividualCostBO.selectInsureIndividualCost(insureIndividualVisitDTO));
+    }
+
+    /**
+     * @param insureVisitParam
+     * @Method delInsureCost
+     * @Desrciption 删除医保本地费用数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/16 9:15
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Integer> delInsureCost(Map<String, Object> insureVisitParam) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(insureVisitParam,"insureIndividualVisitDTO");
+        return WrapperResponse.success(insureIndividualCostBO.delInsureCost(insureIndividualVisitDTO));
+    }
+
 }

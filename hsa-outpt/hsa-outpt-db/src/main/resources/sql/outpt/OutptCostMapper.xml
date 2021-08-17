@@ -1324,16 +1324,17 @@
                 and settle_code in ('0','1')
             )
             OR EXISTS(
-                select
-                id
-                from
-                outpt_prescribe
-                where
-                hosp_code = #{hospCode}
-                and visit_id = outpt_visit.id
-                and is_settle = '0'
-                and is_cancel = '0'
-                and is_submit = '1'
+                SELECT
+                pp.id
+                FROM
+                outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
+                WHERE
+                pp.hosp_code = #{hospCode}
+                AND pp.visit_id = outpt_visit.id
+                AND pp.is_settle = '0'
+                AND pp.is_cancel = '0'
+                AND pp.is_submit = '1'
+                and cc.settle_code in ('0','1')
             )
         )
         </if>

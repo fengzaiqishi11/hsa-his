@@ -1,4 +1,4 @@
-package cn.hsa.module.base.card.entity;
+package cn.hsa.module.outpt.card.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,7 +26,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
 	private static final long serialVersionUID = 3028519173368205671L;
 

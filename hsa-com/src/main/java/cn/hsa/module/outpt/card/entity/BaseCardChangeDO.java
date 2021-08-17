@@ -1,4 +1,4 @@
-package cn.hsa.module.base.card.entity;
+package cn.hsa.module.outpt.card.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,16 +10,15 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * @Package_name: cn.hsa.module.base.card.entity
- * @Class_name: BaseCardRechargeChangeDO
+ * @Class_name: BaseCardChangeDO
  * @Describe:
  * @Author: guanhongqiang
  * @Eamil: hongqiang.guan@powersi.com.cn
- * @Date: 2021/8/5 19:15
+ * @Date: 2021/8/5 19:03
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 @Data
@@ -27,8 +26,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
-	private static final long serialVersionUID = 3028519173368205671L;
+public class BaseCardChangeDO extends PageDO implements Serializable {
+	private static final long serialVersionUID = -3866661862543157864L;
 
 	private String id;
 
@@ -40,24 +39,6 @@ public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
 
 	private String statusCode;
 
-	private String payCode;
-
-	private BigDecimal price;
-
-	private BigDecimal startBalance;
-
-	private BigDecimal startBalanceEncryption;
-
-	private BigDecimal endBalance;
-
-	private BigDecimal endBalanceEncryption;
-
-	private String settleType;
-
-	private String settleId;
-
-	private String dailySettleId;
-
 	private String crteId;
 
 	private String crteName;
@@ -65,5 +46,6 @@ public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date crteTime;
+
 
 }

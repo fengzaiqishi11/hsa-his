@@ -1325,15 +1325,16 @@
             )
             OR EXISTS(
                 select
-                id
+                pp.id
                 from
-                outpt_prescribe
+                outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
                 where
-                hosp_code = #{hospCode}
-                and visit_id = outpt_visit.id
-                and is_settle = '0'
-                and is_cancel = '0'
-                and is_submit = '1'
+                pp.hosp_code = #{hospCode}
+                and pp.visit_id = outpt_visit.id
+                and pp.is_settle = '0'
+                and pp.is_cancel = '0'
+                and pp.is_submit = '1'
+                and cc.settle_code in ('0','1')
             )
         )
         </if>

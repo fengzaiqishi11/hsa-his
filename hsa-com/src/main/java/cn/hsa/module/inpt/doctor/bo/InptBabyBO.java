@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.inpt.doctor.bo
@@ -59,4 +60,14 @@ public interface InptBabyBO {
      * @Return: InptBabyDTO
      **/
     InptBabyDTO getById(InptBabyDTO inptBabyDTO);
+
+    /**
+     * @Description: 查询婴儿总费用
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/12 19:47
+     * @Return
+     */
+    InptBabyDTO getBabyCost(Map parm);
 }

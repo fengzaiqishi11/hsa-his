@@ -1013,10 +1013,10 @@
         </if>
     </select>
 
-    <select id="queryAllInsureRegister" resultType="java.lang.String" parameterType="java.util.Map">
-        select DISTINCT a.id
+    <select id="queryAllInsureRegister" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO" parameterType="java.util.Map">
+        select DISTINCT b.*
         from inpt_visit a
-                 left join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
+        join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
         where a.hosp_code = #{hospCode}
           and a.status_code in ('1', '2', '3', '4', '5', '6')
     </select>

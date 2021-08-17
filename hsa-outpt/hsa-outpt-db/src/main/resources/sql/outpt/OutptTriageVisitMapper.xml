@@ -122,7 +122,7 @@
         <if test="keyword != null and keyword != ''">
             and c.register_time &gt;= date(#{keyword})
         </if>
-        order by c.register_time asc, a.sort_no asc
+        order by bc.number,a.doctor_id , a.sort_no
     </select>
     <!-- 查询诊室已叫号的最新信息 -->
     <select id="queryCalledTriageList"  resultType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">

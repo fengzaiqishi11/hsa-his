@@ -5515,10 +5515,11 @@
     <select id="queryCollectorInComeStaMZ" resultType="java.util.Map">
         select
         sum(t.totalPrice) as totalPrice,
-        sum(t.actualPrice) as actualPrice,
+        sum(t.totalPrice) -IFNULL(sum(t.insureTotalPrice),0)-IFNULL(sum(t.cardPrice),0)-IFNULL(sum(t.truncPrice),0) as actualPrice,
         sum(t.selfPrice) as selfPrice,
         sum(t.insureTotalPrice) as insureTotalPrice,
         sum(t.truncPrice) as truncPrice,
+        sum(t.cardPrice) as cardPrice,
         max(t.crteName) as crteName
 
         from (
@@ -5526,6 +5527,7 @@
         a.total_price as totalPrice, /**总费用**/
         a.actual_price as actualPrice, /**实收金额**/
         a.self_price as selfPrice, /**个人支付**/
+        a.card_price as cardPrice, /**一卡通支付**/
         a.mi_price as insureTotalPrice,
         a.trunc_price as truncPrice,
         a.crte_name as crteName,
@@ -5533,11 +5535,11 @@
         from outpt_settle a
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
-        <if test="startDate != null">
+        <if test="startDate != null and startDate != ''">
             and date(a.settle_time) &gt;=date(#{startDate})
         </if>
         /*结束日期*/
-        <if test="endDate != null">
+        <if test="endDate != null and endDate != ''">
             and date(a.settle_time) &lt;= date(#{endDate})
         </if>
 
@@ -5547,6 +5549,7 @@
         a.total_price as totalPrice, /**总费用**/
         a.reality_price as actualPrice, /**实收金额**/
         a.reality_price as selfPrice, /**个人支付**/
+        0 as cardPrice, /**一卡通支付**/
         0 as insureTotalPrice,
         0 as truncPrice,
         a.crte_name as crteName,
@@ -5555,11 +5558,11 @@
         from outpt_register_detail a
         where a.hosp_code = #{hospCode}
         /*开始日期*/
-        <if test="startDate != null">
+        <if test="startDate != null and startDate != ''">
             and date(a.crte_time) &gt;=date(#{startDate})
         </if>
         /*结束日期*/
-        <if test="endDate != null">
+        <if test="endDate != null and endDate != ''">
             and date(a.crte_time) &lt;= date(#{endDate})
         </if>
         ) t group by t.crteId
@@ -5567,22 +5570,51 @@
     <!--门诊收费员收入明细统计(缴款时间)-->
     <select id="queryCollectorInComeStaDetailMZ" resultType="java.util.Map">
         select
-        (sum(a.total_price) ) as totalPrice,            /**应结费用**/
-        sum(a.back_total_price) AS backTotalPrice,
-        (sum(a.reality_total_price) )as actualPrice,             /**实收金额**/
-        sum(a.insure_total_price) AS insureTotalPrice,         /**合同单位支付金额**/
-        sum(a.preferential_total_price) as preferentialTotalPrice,   /**优惠金额**/
-        sum(a.round_total_price) as truncPrice,     /**舍入金额**/
-        max(a.crte_name) as crteName
+        sum(c.totalPrice) as totalPrice,            /**应结费用**/
+        sum(c.backTotalPrice) AS backTotalPrice,
+        (sum(c.totalPrice)-sum(c.backTotalPrice)-sum(c.insureTotalPrice)-sum(c.preferentialTotalPrice)-sum(c.truncPrice)-sum(c.cardPrice)) as actualPrice,/**实收金额**/
+        sum(c.insureTotalPrice) AS insureTotalPrice,         /**合同单位支付金额**/
+        sum(c.preferentialTotalPrice) as preferentialTotalPrice,   /**优惠金额**/
+        sum(c.truncPrice) as truncPrice,     /**舍入金额**/
+        MAX(c.crteName) as crteName,
+        sum(c.cardPrice) as cardPrice from
+        (select 0 as totalPrice,
+        0 as backTotalPrice,
+        0 as actualPrice,
+        0 as insureTotalPrice,
+        0 as preferentialTotalPrice,
+        0 as truncPrice,
+        a.crte_name as crteName,
+        b.card_price as cardPrice,
+        a.crte_id
         from outin_daily a
-        where a.hosp_code = #{hospCode} and a.type_code in ('1', '0')
-        <if test="startDate != null">
+        LEFT JOIN outpt_settle b on a.hosp_code = b.hosp_code and  a.id = b.daily_settle_id
+        where a.hosp_code = #{hospCode} and a.type_code in ('1', '0') and b.card_price is not null and b.card_price !=''
+        <if test="startDate != null and startDate != ''">
             and date(a.end_time) &gt;=date(#{startDate})
         </if>
-        <if test="endDate != null">
+        <if test="endDate != null and endDate != ''">
             and date(a.end_time) &lt;= date(#{endDate})
         </if>
-        group by a.crte_id
+        union ALL
+        select
+        a.total_price as totalPrice,            /**应结费用**/
+        a.back_total_price AS backTotalPrice,
+        a.reality_total_price as actualPrice,             /**实收金额**/
+        a.insure_total_price AS insureTotalPrice,         /**合同单位支付金额**/
+        a.preferential_total_price as preferentialTotalPrice,   /**优惠金额**/
+        a.round_total_price as truncPrice,     /**舍入金额**/
+        a.crte_name as crteName,
+        0 as cardPrice,
+        a.crte_id
+        from outin_daily a
+        where a.hosp_code = #{hospCode} and a.type_code in ('1', '0')
+        <if test="startDate != null and startDate != ''">
+            and date(a.end_time) &gt;=date(#{startDate})
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date(a.end_time) &lt;= date(#{endDate})
+        </if>) c GROUP BY c.crte_id
     </select>
     <!--门诊领药统计查询-->
     <select id="queryOutMedicationGet" resultType="java.util.LinkedHashMap">

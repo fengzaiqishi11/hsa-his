@@ -53,6 +53,16 @@ public interface InsureDictBO {
     JSONObject queryInsureDictList(InsureDictDTO insureDictDTO);
 
     /**
+     * @Menthod queryInsureDictList2
+     * @Desrciption 根据查询条件查询医保码表列表
+     * @param insureDictDTO 查询条件
+     * @Author yuelong.chen
+     * @Date 2021/8/18 16:33
+     * @Return java.util.List<cn.hsa.module.insure.insureDict.entity.InsureDictDO>
+     */
+    JSONObject queryInsureDictList2(InsureDictDTO insureDictDTO);
+
+    /**
      * @Method queryDictValuePage()
      * @Desrciption  分页查询医保的码表值
      * @Param

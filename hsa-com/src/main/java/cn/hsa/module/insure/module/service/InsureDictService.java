@@ -72,6 +72,19 @@ public interface InsureDictService {
     @GetMapping("/service/insure/insureDict/queryInsureDictList")
     WrapperResponse queryInsureDictList(Map param);
 
+
+    /**
+     * @Menthod queryInsureDictList2
+     * @Desrciption 根据查询条件查询医保码表
+     * @param param 查询条件
+     * @Author yuelong.chen
+     * @Date 2021/8/18 16:33
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @GetMapping("/service/insure/insureDict/queryInsureDictList2")
+    WrapperResponse queryInsureDictList2(Map param);
+
+
     /**
      * @Method updateDictValue()
      * @Desrciption  更新医保码表数据

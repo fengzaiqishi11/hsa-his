@@ -169,12 +169,12 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         param.put("id",cardRechargeChangeDO.getCardId());
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
-            cardRechargeChangeDO.setStartBalance(beforeChange.getEndbalance());
-            BigDecimal end= BigDecimalUtils.add(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice());
-            cardRechargeChangeDO.setEndbalance(end);
+            cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+            BigDecimal end= BigDecimalUtils.add(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice());
+            cardRechargeChangeDO.setEndBalance(end);
         }else {
             cardRechargeChangeDO.setStartBalance(new BigDecimal(0));
-            cardRechargeChangeDO.setEndbalance(cardRechargeChangeDO.getPrice());
+            cardRechargeChangeDO.setEndBalance(cardRechargeChangeDO.getPrice());
         }
         if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
             cardRechargeChangeDO.setId(SnowflakeUtils.getId());
@@ -183,7 +183,7 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
             BaseCardDTO baseCardDTO =new BaseCardDTO();
             baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
             baseCardDTO.setId(cardRechargeChangeDO.getCardId());
-            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndbalance());
+            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
             // 更新一卡通表账户余额
             baseCardDAO.updateCardAccountBalance(baseCardDTO);
             return true;
@@ -209,10 +209,10 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         param.put("id",cardRechargeChangeDO.getCardId());
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
-            cardRechargeChangeDO.setStartBalance(beforeChange.getEndbalance());
-            if (BigDecimalUtils.greater(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndbalance(),cardRechargeChangeDO.getPrice())) {
-                BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndbalance(), cardRechargeChangeDO.getPrice());
-                cardRechargeChangeDO.setEndbalance(end);
+            cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+            if (BigDecimalUtils.greater(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice())) {
+                BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice());
+                cardRechargeChangeDO.setEndBalance(end);
                 cardRechargeChangeDO.setPrice(BigDecimalUtils.negate(cardRechargeChangeDO.getPrice()));
             }else {
                 throw new AppException("退费金额不能大于一卡通余额！");
@@ -226,7 +226,7 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         if (baseCardDAO.insertBaseCardRechargeChange(cardRechargeChangeDO) > 0) {
             BaseCardDTO baseCardDTO =new BaseCardDTO();
             baseCardDTO.setId(cardRechargeChangeDO.getCardId());
-            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndbalance());
+            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
             baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
             // 更新一卡通表账户余额
             baseCardDAO.updateCardAccountBalance(baseCardDTO);

@@ -86,4 +86,7 @@ public class OutptSettleDO extends PageDO implements Serializable {
         // 第一次结算id
         private String oneSettleId;
 
+        // 一卡通支付金额
+        private BigDecimal cardPrice;
+
 }

@@ -274,7 +274,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             Map<String,Object> costQueryParam = new HashMap<String,Object>();
             costQueryParam.put("hospCode",hospCode);//医院编码
             costQueryParam.put("visitId",visitId);//就诊id
-            costQueryParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
+            // costQueryParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
             costQueryParam.put("settleId",settleId);//结算id
             costQueryParam.put("settleCode",Constants.JSZT.YIJS);//结算状态 = 已结算
             List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costQueryParam);

@@ -216,4 +216,10 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String outptDoctorId;
     // 门诊医生姓名
     private String outptDoctorName;
+
+    // 门诊结算使用的一卡通卡号
+    private String cardNo;
+
+    // 门诊结算一卡通支付金额
+    private BigDecimal cardPrice;
 }

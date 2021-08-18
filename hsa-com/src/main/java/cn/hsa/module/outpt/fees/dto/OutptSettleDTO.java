@@ -164,4 +164,11 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
          * 处方id
          */
         private String opId;
+
+        // 一卡通账号
+        private String cardNo;
+
+        // 档案id
+        private String profileId;
+
 }

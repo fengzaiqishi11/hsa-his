@@ -128,7 +128,7 @@
     <insert id="insertBaseCardRechargeChange" parameterType="cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO">
        insert into base_card_recharge_change
        (id,hosp_code,profile_id,card_id,status_code,pay_code,price,start_balance,start_balance_encryption,end_balance,end_balance_encryption,settle_type,settle_id,daily_settle_id,crte_id,crte_name,crte_time)
-       values (#{id},#{hospCode},#{profileId},#{cardId},#{statusCode},#{payCode},#{price}, #{startBalance},#{startBalanceEncryption},#{endbalance},#{endBalanceEncryption},#{settleType},#{settleId},#{dailySettleId},#{crteId},#{crteName},#{crteTime})
+       values (#{id},#{hospCode},#{profileId},#{cardId},#{statusCode},#{payCode},#{price}, #{startBalance},#{startBalanceEncryption},#{endBalance},#{endBalanceEncryption},#{settleType},#{settleId},#{dailySettleId},#{crteId},#{crteName},#{crteTime})
     </insert>
 
     <!--根据一卡通id 和档案id 查询最后一条充值退费记录-->

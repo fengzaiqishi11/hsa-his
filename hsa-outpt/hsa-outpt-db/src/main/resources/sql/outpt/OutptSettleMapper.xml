@@ -17,6 +17,7 @@
         <result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
         <result column="self_price" property="selfPrice" jdbcType="DECIMAL" />
         <result column="mi_price" property="miPrice" jdbcType="DECIMAL" />
+        <result column="card_price" property="cardPrice" jdbcType="DECIMAL" />
         <result column="is_settle" property="isSettle" jdbcType="VARCHAR" />
         <result column="daily_settle_id" property="dailySettleId" jdbcType="VARCHAR" />
         <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
@@ -59,7 +60,8 @@
         order_no,
         crte_id,
         crte_name,
-        crte_time
+        crte_time,
+        card_price
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -116,6 +118,7 @@
           total_price,
           reality_price,
           trunc_price,
+          card_price,
           actual_price,
           self_price,
           mi_price,
@@ -143,6 +146,7 @@
           #{totalPrice,jdbcType=DECIMAL},
           #{realityPrice,jdbcType=DECIMAL},
           #{truncPrice,jdbcType=DECIMAL},
+          #{cardPrice,jdbcType=DECIMAL},
           #{actualPrice,jdbcType=DECIMAL},
           #{selfPrice,jdbcType=DECIMAL},
           #{miPrice,jdbcType=DECIMAL},
@@ -391,6 +395,9 @@
                 <if test="truncPrice != null">
                 trunc_price = #{truncPrice,jdbcType=DECIMAL},
                 </if>
+                <if test="cardPrice != null">
+                    card_price = #{cardPrice,jdbcType=DECIMAL},
+                </if>
                 <if test="actualPrice != null">
                 actual_price = #{actualPrice,jdbcType=DECIMAL},
                 </if>
@@ -496,6 +503,7 @@
             a.is_settle,
             a.crte_name,
             a.settle_time,
+            a.card_price as cardPrice,
             CONCAT(
             b.name,'/',
             IFNULL((select name from sys_code_detail where hosp_code = a.hosp_code and hosp_code = #{hospCode} and c_code = 'XB' and value = b.gender_code),'-'),'/',
@@ -560,11 +568,16 @@
         a.reality_price,
         d.name as preferentialTypeName,
         a.crte_time,
-        a.one_settle_id
+        a.one_settle_id,
+        a.card_price as cardPrice,
+        c.card_no as cardNo,
+        b.profile_id as profileId
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id
         left join base_preferential_type d on b.preferential_type_id = d.id
+        left join base_card_recharge_change bcrc on bcrc.settle_id = a.id and a.status_code = '0' and a.is_settle = '1'
+        left join base_card c on c.hosp_code = a.hosp_code and c.id = bcrc.card_id
         where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
         <if test="keyword != null and keyword != ''">
             and ( b.name LIKE CONCAT('%',#{keyword},'%')

@@ -64,6 +64,14 @@ public class OutptRegisterSettleDO extends PageDO implements java.io.Serializabl
     /** 支付方式代码（ZFFS，第三方对接） */
     private String payCode;
 
+    public BigDecimal getCardPrice() {
+        return cardPrice;
+    }
+
+    public void setCardPrice(BigDecimal cardPrice) {
+        this.cardPrice = cardPrice;
+    }
+
     /** 支付订单号（第三方订单号） */
     private String orderNo;
 
@@ -72,6 +80,9 @@ public class OutptRegisterSettleDO extends PageDO implements java.io.Serializabl
 
     /** 创建人姓名 */
     private String crteName;
+
+    // 一卡通支付金额
+    public BigDecimal cardPrice;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -399,5 +410,6 @@ public class OutptRegisterSettleDO extends PageDO implements java.io.Serializabl
     public void setCrteTime(Date crteTime) {
         this.crteTime = crteTime;
     }
+
 
 }

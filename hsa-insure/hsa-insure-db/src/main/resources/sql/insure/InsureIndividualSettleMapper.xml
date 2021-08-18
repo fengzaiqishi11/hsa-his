@@ -1039,6 +1039,7 @@
         where hosp_code = #{hospCode}
           and state = #{state}
           and settle_state = #{settleState}
+          and medicalRegNo = #{medicalRegNo}
           and visit_id = #{visitId}
             and insureSettleId is not null
             limit 1

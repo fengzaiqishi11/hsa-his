@@ -189,9 +189,9 @@ public interface InsureIndividualVisitDAO {
      */
     Boolean updateInsureInidivdual(InptVisitDTO inptVisitDTO);
 
-    List<InsureIndividualVisitDTO> queryInsureIndividualVisitByIds(Map<String,Object> insureVisitParam);
+    InsureIndividualVisitDTO queryInsureIndividualVisitByIds(Map<String,Object> insureVisitParam);
 
-    List<String> queryAllInsureRegister(Map<String,String> selectMap);
+    List<InsureIndividualVisitDTO> queryAllInsureRegister(Map<String,String> selectMap);
 
     /**
      * @Method getMedicalRegNo

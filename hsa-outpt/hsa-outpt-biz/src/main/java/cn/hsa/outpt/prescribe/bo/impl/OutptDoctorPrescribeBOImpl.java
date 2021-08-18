@@ -1009,7 +1009,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         if ((Constants.YYXZ.CG.equals(outptPrescribeDetailsDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(outptPrescribeDetailsDTO.getUseCode()))
                 && (Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) || Constants.XMLB.CL.equals(outptPrescribeDetailsDTO.getItemCode()))
                 && (ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO))
-                || outptPrescribeDetailsDTO.getTotalNum().compareTo(checkStockRespDTO.getResult()) > 0)) {
+                || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) > 0)) {
             throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足," +
                     "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
                     "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +

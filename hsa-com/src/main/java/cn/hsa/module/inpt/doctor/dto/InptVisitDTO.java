@@ -374,6 +374,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private Date midWayEndDate;
     private String isMidWaySettle; // 是否中途结算
     private int  settleCount ;
-
+    private String itemName; // 费用明细项目名称
 
 }

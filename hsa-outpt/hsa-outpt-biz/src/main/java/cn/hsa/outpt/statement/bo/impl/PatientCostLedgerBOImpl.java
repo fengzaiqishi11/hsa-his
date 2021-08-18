@@ -2051,7 +2051,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 tableMap.put("type", "idFilter");
                 tableMap.put("code", "deptList");
             }
-            if("total_price".equals(k) || "reality_price".equals(k)|| "preferential_price".equals(k)){
+            if("total_price".equals(k) || "reality_price".equals(k)|| "preferential_price".equals(k)
+                    || "num".equals(k) || "total_num".equals(k)){
                 tableMap.put("type", "money");
                 tableMap.put("showSummary", true);
                 tableMap.put("toFixed", 2);

@@ -3,9 +3,10 @@
 
 <mapper namespace="cn.hsa.module.stro.stock.dao.CheckStockDAO">
 
-    <!-- 获得库存、占存数量 -->
+    <!-- 获得库存、占存数量、单位、拆零单位 -->
     <select id="getStrockNumber" resultType="java.util.Map">
-        select ifnull(a.num,0) as strockNum,ifnull(a.stock_occupy,0) as stockOccupy,a.split_ratio as splitRatio
+        select ifnull(a.num,0) as strockNum,ifnull(a.stock_occupy,0) as stockOccupy,a.split_ratio as splitRatio,
+        a.unit_code as unitCode,a.split_unit_code as splitUnitCode
         from stro_stock a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
@@ -180,6 +181,13 @@
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
             ) d
+    </select>
+    <!--获得执行周期（execInterval）、每日次数（dailyTimes）-->
+    <select id="getRateMessage" resultType="java.util.Map">
+        select exec_interval as execInterval,daily_times as dailyTimes
+        from base_rate
+         where
+        id = #{rateId} and hosp_code = #{hospCode} and is_valid = '1'
     </select>
 
 </mapper>

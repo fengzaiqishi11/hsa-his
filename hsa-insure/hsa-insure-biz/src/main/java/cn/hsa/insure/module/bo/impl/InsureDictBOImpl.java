@@ -235,7 +235,7 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         JSONObject jsonObject = new JSONObject();
         //查询快捷配置信息
         Map<String,String> sysParameter = new HashMap<String,String>();
-        sysParameter.put("hospCode",insureDictDTO.getCode());//医院编码
+        sysParameter.put("hospCode",insureDictDTO.getHospCode());//医院编码
         sysParameter.put("code",insureDictDTO.getInsureRegCode());//医保机构编码
         sysParameter.put("isValid", Constants.SF.S);//是否有效
         jsonObject.put("config",insureDictDAO.querySysParameterByCode(sysParameter));

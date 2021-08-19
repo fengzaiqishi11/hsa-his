@@ -257,7 +257,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         // 处理his挂号数据
         disposeHisGh(outptRegisterDTO, outptVisitDTO, ghid, ghdh, jzid, sysdate, hospCode, docId, docName);
         // 处理门诊挂号费用
-        disposeGhfy(regDetailList, outptRegisterDTO, ghid, jzid, hospCode, docId, docName, sysdate);
+        disposeGhfy(regDetailList, outptRegisterDTO, ghid, jzid, hospCode, docId, docName, sysdate, price);
         String settleId = "";
         // 在挂号处直接收费 直接插入数据进挂号结算表
         if (SFJS){
@@ -653,7 +653,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptRegisterDAO.insert(outptRegisterDTO);
     }
 
-    private void disposeGhfy(List<OutptRegisterDetailDto> regDetaiolList,OutptRegisterDTO outptRegisterDTO,  String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate) {
+    private void disposeGhfy(List<OutptRegisterDetailDto> regDetaiolList,OutptRegisterDTO outptRegisterDTO,  String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, BigDecimal cardPrice) {
         // 处理挂号费用数据
         if (!ListUtils.isEmpty(regDetaiolList)) {
             for (OutptRegisterDetailDto dto : regDetaiolList) {
@@ -671,6 +671,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 dto.setCrteId(docId);
                 dto.setCrteName(docName);
                 dto.setCrteTime(sysdate);
+                dto.setCardPrice(cardPrice);
             }
             // TODO 插入挂号费用数据
             outptRegisterDAO.insertRegDetail(regDetaiolList);

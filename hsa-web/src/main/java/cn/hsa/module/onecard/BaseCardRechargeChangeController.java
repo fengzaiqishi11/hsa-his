@@ -2,6 +2,7 @@ package cn.hsa.module.onecard;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -47,6 +48,9 @@ public class BaseCardRechargeChangeController extends BaseController {
 		SysUserDTO sysUserDTO = getSession(req, res);
 		baseCardRechargeChangeDTO.setHospCode(sysUserDTO.getHospCode());
 		Map map = new HashMap();
+		if (baseCardRechargeChangeDTO == null || baseCardRechargeChangeDTO.getCardNo() == null || "".equals(baseCardRechargeChangeDTO.getCardNo())) {
+			throw new AppException("未获取到一卡通卡号，请输入正确卡号");
+		}
 		map.put("baseCardRechargeChangeDTO",baseCardRechargeChangeDTO);
 		map.put("hospCode",sysUserDTO.getHospCode());
 		return baseCardRechargeChangeService_consumer.getBaseCardRechargeChangeDTO(map);

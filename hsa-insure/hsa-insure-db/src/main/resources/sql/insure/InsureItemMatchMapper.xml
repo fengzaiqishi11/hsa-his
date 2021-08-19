@@ -185,6 +185,9 @@
             <if test="limUserExplain !=null and limUserExplain !='' ">
                 and lim_user_explain =#{limUserExplain}
             </if>
+            <if test="regCode != null and regCode != ''">
+                and insure_reg_code = #{regCode}
+            </if>
         </where>
         order by audit_code,crte_time desc
     </select>

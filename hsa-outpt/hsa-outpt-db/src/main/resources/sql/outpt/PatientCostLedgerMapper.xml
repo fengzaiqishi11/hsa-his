@@ -1649,6 +1649,9 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
+        <if test="name != null and name != ''">
+            and t.name  like '%${name}%'
+        </if>
         group by t.item_id,
         t.bfc_name,
         t.item_code,
@@ -1693,6 +1696,9 @@
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
+        </if>
+        <if test="name != null and name != ''">
+            and t.name  like '%${name}%'
         </if>
     </select>
 

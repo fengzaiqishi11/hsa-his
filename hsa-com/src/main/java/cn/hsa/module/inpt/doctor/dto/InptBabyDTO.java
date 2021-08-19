@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @Package_name: cn.hsa.module.inpt.doctor.dto
@@ -24,4 +25,6 @@ public class InptBabyDTO extends InptBabyDO implements Serializable {
      * keyword
      */
     private String keyword;
+
+    private BigDecimal totalBalance; // 总费用
 }

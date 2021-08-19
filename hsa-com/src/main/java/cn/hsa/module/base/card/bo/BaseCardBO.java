@@ -122,6 +122,6 @@ public interface BaseCardBO {
      * @Date: 2021-08-10 16:34
      * @Return: PageDTO
      **/
-    PageDTO queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO);
+    List<BaseCardRechargeChangeDTO> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO);
 
 }

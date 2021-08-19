@@ -313,6 +313,8 @@
     <dubbo:reference id="msgTempRecordService_consumer" interface="cn.hsa.module.inpt.msg.service.MsgTempRecordService" check="false"/>
     <!--  新生婴儿-->
     <dubbo:reference id="inptBabyService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptBabyService" check="false"/>
+    <!--  保证金管理-->
+    <dubbo:reference id="inptGuarantee_consumer" interface="cn.hsa.module.inpt.inptguarantee.service.InptGuaranteeService" check="false"/>
     <!-- ########################################### 住院子系统 consumer end ########################################### -->
 
     <!-- ########################################### 电子病历子系统consumer start ########################################### -->
@@ -450,5 +452,8 @@
     <!--库存校验-->
     <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
 
+
+    <!-- 一卡通异动服务 -->
+    <dubbo:reference id="baseCardRechargeChangeService_consumer" interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" check="false"/>
 </beans>
 

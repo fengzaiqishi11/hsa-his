@@ -388,4 +388,12 @@
             </if>
         </where>
     </select>
+    <!--查询婴儿总费用 liuliyun 20210812-->
+    <select id="getBabyCost" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        select sum(reality_price) as totalBalance
+        from inpt_cost
+        where baby_id =#{id}
+        and visit_id = #{visitId}
+        and hosp_code = #{hospCode}
+    </select>
 </mapper>

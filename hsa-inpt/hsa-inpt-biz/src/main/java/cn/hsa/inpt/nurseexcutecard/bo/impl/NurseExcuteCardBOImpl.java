@@ -92,6 +92,12 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         if(StringUtils.isEmpty(printType)){
           throw new AppException("打印类型为空");
         }
+        // 由于输液瓶贴、静脉输液卡、输液一览卡、留观输液瓶贴为同一组数据，需根据不同的打印单据类型过滤打印状态，增加一个是否共享（isShared）字段来区分
+        if (StringUtils.isNotEmpty(printType) && ("1".equals(printType) || "2".equals(printType) || "3".equals(printType) || "5".equals(printType) || "14".equals(printType) || "16".equals(printType))){
+            inptVisitDTO.setIsShared(Constants.SF.S);
+        } else {
+            inptVisitDTO.setIsShared(Constants.SF.F);
+        }
         if(!StringUtils.isEmpty(inptVisitDTO.getVisitIds())){
           String[] split = inptVisitDTO.getVisitIds().split(",");
           List<String> strings = Arrays.asList(split);
@@ -138,64 +144,6 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         List<InptAdviceDTO> adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
 
         return PageDTO.of(adviceDTOList);
-        /*List<InptAdviceDTO> list = new ArrayList<>();
-        if ("1".equals(printType) || "2".equals(printType) || "3".equals(printType) || "5".equals(printType) || "14".equals(printType) || "16".equals(printType)){
-            //根据打印类型、是否打印标志过滤数据
-            if (!ListUtils.isEmpty(adviceDTOList)){
-                for (InptAdviceDTO inptAdviceDTO : adviceDTOList) {
-                    String print = inptAdviceDTO.getIsPrint();
-                    if ("0".equals(print)){
-                        Map<String, String> m = new HashMap<>();
-                        m.put(printType, print);
-                        print = JSON.toJSONString(m);
-                    } else if ("1".equals(print)){
-                        Map<String, String> m = new HashMap<>();
-                        m.put(printType, print);
-                        print = JSON.toJSONString(m);
-                    }
-                    Map<String,String> map = (Map<String, String>) JSON.parse(print); //{'1':'1'}  2 {"1":"1","2":"1"}
-
-                    if ("0".equals(inptVisitDTO.getPrintFlag())){
-                        //未打印
-                        if (StringUtils.isEmpty(map.get(printType))){
-                            list.add(inptAdviceDTO);
-                        } else if (inptVisitDTO.getPrintFlag().equals(map.get(printType)) && StringUtils.isNotEmpty(map.get(printType))){
-                            list.add(inptAdviceDTO);
-                        }
-                    } else {
-                        //已打印
-                        if (inptVisitDTO.getPrintFlag().equals(map.get(printType)) && StringUtils.isNotEmpty(map.get(printType))){
-                            list.add(inptAdviceDTO);
-                        }
-                    }
-
-                    *//*for (String key : map.keySet()) {
-                        //key为单据类型
-                        String isPrint = map.get(printType); //获取当前打印类型的打印状态
-                        //判断页面传递的是否打印与数据库的对应类型的是否打印相同
-                        if ("0".equals(inptVisitDTO.getPrintFlag()) && (inptVisitDTO.getPrintFlag().equals(isPrint) || StringUtils.isEmpty(isPrint))){
-                            list.add(inptAdviceDTO);
-                        } else if ("1".equals(inptVisitDTO.getPrintFlag()) && inptVisitDTO.getPrintFlag().equals(isPrint) && key.equals(printType)){
-                            list.add(inptAdviceDTO);
-                        }
-                    }*//*
-                }
-            }
-        } else {
-            //其他单据类型
-            if (!ListUtils.isEmpty(adviceDTOList)){
-                for (InptAdviceDTO inptAdviceDTO : adviceDTOList) {
-                    if ("0".equals(inptVisitDTO.getPrintFlag()) && inptVisitDTO.getPrintFlag().equals(inptAdviceDTO.getIsPrint())){
-                        //未打印
-                        list.add(inptAdviceDTO);
-                    }else if ("1".equals(inptVisitDTO.getPrintFlag()) && inptVisitDTO.getPrintFlag().equals(inptAdviceDTO.getIsPrint())){
-                        list.add(inptAdviceDTO);
-                    }
-
-                }
-            }
-        }
-        return PageDTO.of(list);*/
     }
 
     /**
@@ -324,7 +272,8 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
             }
         } else {
             inptAdviceDTO.setIsPrint(Constants.SF.S);
-            if(!ListUtils.isEmpty(inptAdviceDTO.getInptAdviceExecIds())){
+//            if(!ListUtils.isEmpty(inptAdviceDTO.getInptAdviceExecIds())){
+            if(!ListUtils.isEmpty(inptAdviceDTO.getIds())){
               return nurseExcuteCardDAO.updatePrintFlag(inptAdviceDTO);
             } else {
               return false;

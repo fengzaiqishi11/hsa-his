@@ -80,8 +80,6 @@ public class OutptTriageVisitController {
         }
         outptTriageVisitDTO.setSign(hospCode);
         outptTriageVisitDTO.setHospCode(hospCode);
-        if("null".equals(outptTriageVisitDTO.getTriageId()))
-            outptTriageVisitDTO.setTriageId(null);
         Map map = new HashMap();
         map.put("hospCode",hospCode);
         map.put("outptTriageVisitDTO",outptTriageVisitDTO);

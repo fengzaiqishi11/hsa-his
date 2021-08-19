@@ -47,6 +47,8 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
+import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -156,6 +158,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     //住院患者
     @Resource
     private InptVisitDAO inptVisitDAO;
+
+    @Resource
+    private OutptDoctorPrescribeService outptDoctorPrescribeService_consumer;
 
 
     /**
@@ -1856,7 +1861,23 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         BaseMaterialDTO materialDTO = null;
         //获取药品/项目信息,如果拆分比为空,默认给1
         if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
-            drugDTO = drugMap.get(inptAdviceDetailDTO.getItemId());
+            //drugDTO = drugMap.get(inptAdviceDetailDTO.getItemId());
+            //---------2021-08-13 start
+            OutptPrescribeDetailsDTO outptPrescribeDetailsDTO = new OutptPrescribeDetailsDTO ();
+            outptPrescribeDetailsDTO.setHospCode(inptAdviceDetailDTO.getHospCode());
+            outptPrescribeDetailsDTO.setItemId(inptAdviceDetailDTO.getItemId());
+            outptPrescribeDetailsDTO.setLoginDeptId(adviceDTO.getInDeptId());
+
+            Map parmMap = new HashMap();
+            parmMap.put("hospCode",inptAdviceDetailDTO.getHospCode());
+            parmMap.put("outptPrescribeDetailsDTO",outptPrescribeDetailsDTO);
+            drugDTO = outptDoctorPrescribeService_consumer.getBaseDrug(parmMap).getData();
+
+            // 没有配置默认 1：单次向上取整
+            if(StringUtils.isEmpty(drugDTO.getTruncCode()) || "1".equals(drugDTO.getTruncCode())){
+                inptAdviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(inptAdviceDetailDTO.getNum().doubleValue())));
+            }
+            //---------2021-08-13
             //中草药药品做费用，不跟频率挂钩
             if("11".equals(adviceDTO.getTypeCode())) {
                 dailyTimes = 1 ;
@@ -2049,7 +2070,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         inptCostDTO.setCrteTime(date);
 
         //交病人类型判断 如果交病人且为临时医嘱时   (重新赋值  总数量，总数量单位，单价，总价)
-        if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
+        //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
+        if("1".equals(adviceDTO.getIsLong())){
             inptCostDTO.setTotalNum(adviceDTO.getTotalNum());
             inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
             //药品
@@ -3394,7 +3416,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             if(!ListUtils.isEmpty(baseAdviceDTOList)) {
                 //循环当前所有的医嘱目录,判断是否存在膳食类型、护理级别、病情标识
                 for(BaseAdviceDTO baseAdviceDTO:baseAdviceDTOList) {
-                    if("1".equals(baseAdviceDTO.getBizCode())) {//膳食类型
+                    if("1".equals(baseAdviceDTO.getBizType())) {//膳食类型
                         dietType = baseAdviceDTO.getBizCode();
                     } else if("2".equals(baseAdviceDTO.getBizType())) {//护理级别
                         nursingCode = baseAdviceDTO.getBizCode();

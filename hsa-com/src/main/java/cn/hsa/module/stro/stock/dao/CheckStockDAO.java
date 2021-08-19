@@ -73,4 +73,13 @@ public interface CheckStockDAO {
      * @Return java.math.BigDecimal
      */
     BigDecimal getInptCostNoPrescribeNumber(CheckStockDTO checkStockDTO);
+    /**
+     * @Method getRateMessage
+     * @Desrciption 获得执行周期（execInterval）、每日次数（dailyTimes）
+     * @Param [checkStockDTO]
+     * @Author zhangguorui
+     * @Date   2021/8/16 20:00
+     * @Return java.util.Map<java.lang.String,java.math.BigDecimal>
+     */
+    Map<String, BigDecimal> getRateMessage(CheckStockDTO checkStockDTO);
 }

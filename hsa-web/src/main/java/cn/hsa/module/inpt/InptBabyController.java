@@ -100,4 +100,28 @@ public class InptBabyController extends BaseController {
         return inptBabyService_consumer.getById(map);
     }
 
+
+    /**
+     * @Menthod: getBabyTotalCostById
+     * @Desrciption: 根据婴儿id查询婴儿总费用
+     * @Param: inptBabyDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-08-21 19:43
+     * @Return: InptBabyDTO
+     **/
+    @GetMapping("/getBabyTotalCostById")
+    public WrapperResponse<InptBabyDTO> getBabyTotalCostById(InptBabyDTO inptBabyDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(inptBabyDTO.getId())){
+            throw new RuntimeException("未选择婴儿信息");
+        }
+        inptBabyDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("id", inptBabyDTO.getId()); // 婴儿id
+        map.put("visitId",inptBabyDTO.getVisitId()); // 病人就诊id
+        return inptBabyService_consumer.getBabyCost(map);
+    }
+
 }

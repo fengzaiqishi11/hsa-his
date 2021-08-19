@@ -114,4 +114,18 @@ public class InptBabyBOImpl extends HsafBO implements InptBabyBO {
     public InptBabyDTO getById(InptBabyDTO inptBabyDTO) {
         return inptBabyDAO.getById(inptBabyDTO);
     }
+
+
+    /**
+     * @Description: 查询婴儿总费用
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/08/12 19:49
+     * @Return
+     */
+    @Override
+    public InptBabyDTO getBabyCost(Map param) {
+        return inptBabyDAO.getBabyCost(param);
+    }
 }

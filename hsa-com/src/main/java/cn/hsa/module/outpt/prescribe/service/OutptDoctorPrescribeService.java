@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.prescribe.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
+import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -483,4 +484,15 @@ public interface OutptDoctorPrescribeService {
      **/
     @PostMapping("/service/outpt/outptDoctorPrescribe/updateOuptCostAndPreDetailExt")
     WrapperResponse<Boolean> updateOuptCostAndPreDetailExt(Map map);
+    /**
+     * @Menthod: getBaseDrug
+     * @Desrciption: 获取药品及取整方式
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     **/
+    @PostMapping("/service/outpt/outptDoctorPrescribe/getBaseDrug")
+    WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap);
 }

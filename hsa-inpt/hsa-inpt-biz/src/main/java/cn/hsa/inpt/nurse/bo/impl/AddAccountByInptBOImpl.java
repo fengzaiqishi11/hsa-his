@@ -127,12 +127,21 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
     public Boolean saveAddAccountByInpt(Map<String,Object> map) {
         List<InptCostDTO> inptCostDTOs = MapUtils.get(map, "inptCostDTOs");
         checkAddAccountPamar(inptCostDTOs,map);
+
+
         String hospCode = MapUtils.get(map, "hospCode");
         String userId = MapUtils.get(map, "userId");
         String userName = MapUtils.get(map, "userName");
         String loginDeptId = MapUtils.get(map, "loginDeptId");
         String loginDeptName = MapUtils.get(map, "loginDeptName");
 
+        InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
+        inptAdviceDTO.setVisitId(inptCostDTOs.get(0).getVisitId());
+        inptAdviceDTO.setHospCode(hospCode);
+        InptVisitDTO visitDTOBalance = inptAdviceDAO.checkBalance(inptAdviceDTO);
+        if(visitDTOBalance != null){
+          throw new AppException("您已欠费，不能补记帐,最多欠费："+visitDTOBalance.getQfCose()+"元,您当前余额："+visitDTOBalance.getTotalBalance()+"元");
+        }
         List<InptCostDTO> itemDtoList = new ArrayList<>();//项目费用集合
         List<InptCostDTO> materialDtoList = new ArrayList<>();//材料费用集合
         List<InptCostDTO> baseDrugDTOList = new ArrayList<>();

@@ -1441,12 +1441,12 @@
         a.in_remark, a.in_mode_code, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.in_situation_code, a.outpt_visit_no, a.outpt_doctor_id,
         a.outpt_doctor_name, a.outpt_disease_id, a.outpt_disease_name, a.outpt_disease_icd10, a.out_ward_id, a.out_dept_id, a.out_dept_name, a.out_time,
         a.out_disease_id, a.out_disease_name, a.out_disease_icd10, a.out_oper_id, a.out_oper_name, a.out_oper_time, a.out_situation_code, a.out_remark,
-        a.out_mode_code,
+        a.out_mode_code,a.guarantee_balance,
         a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
-        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time, ifnull(b.value,0) qfCose
+        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time, (ifnull(b.value,0) + ifnull(a.guarantee_balance,0))  qfCose
         from inpt_visit a
         left join sys_parameter b on a.hosp_code = b.hosp_code and b.code = 'YZ_YJJQFFW'
-        where a.id = #{visitId} and a.hosp_code = #{hospCode} and a.total_balance &lt;= ifnull(b.value,0)*-1
+        where a.id = #{visitId} and a.hosp_code = #{hospCode} and (a.total_balance + ifnull(a.guarantee_balance,0)) &lt;= ifnull(b.value,0)*-1
     </select>
 
     <!-- 批量更新停嘱-->
@@ -1798,6 +1798,7 @@
 		and a.is_submit ='1'
 		and a.is_reject = '0'
 		and a.is_check='1'
+		order by a.check_time
 	</select>
 
     <insert id="insertMedicineAdvanceAdvice" parameterType="list">

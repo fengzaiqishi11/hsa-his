@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO">
+
+
+
+    <select id="getBaseCardRechargeChangeDTO" resultType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO" parameterType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO">
+        select r.*,
+        c.account_balance as accountBalance, c.card_no as cardNo, f.cert_no as certNo, c.status_code as cardStatusCode, f.name as patientName
+        from base_card c left join base_card_recharge_change r on c.id = r.card_id and c.hosp_code = r.hosp_code
+        left join base_profile_file f on f.hosp_code = c.hosp_code and f.id = c.profile_id
+        where c.hosp_code = #{hospCode} and c.account_balance &gt; 0
+            and c.card_no = #{cardNo}
+        order by r.crte_time desc limit 1
+    </select>
+
+    <insert id="insertBaseCardRechargeChange" parameterType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO">
+        insert into base_card_recharge_change
+       (id,hosp_code,profile_id,card_id,status_code,pay_code,price,start_balance,start_balance_encryption,end_balance,end_balance_encryption,settle_type,settle_id,daily_settle_id,crte_id,crte_name,crte_time)
+       values
+       (#{id},#{hospCode},#{profileId},#{cardId},#{statusCode},#{payCode},#{price}, #{startBalance},#{startBalanceEncryption},#{endBalance},#{endBalanceEncryption},#{settleType},#{settleId},#{dailySettleId},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <update id="updateCardAccountBalance" parameterType="java.util.Map">
+        UPDATE base_card
+        set account_balance = #{accountBalance}
+        where hosp_code = #{hospCode}
+        and profile_id = #{profileId} and card_no = #{cardNo}
+    </update>
+
+    <!-- 根据挂号id查询卡支付信息-->
+    <select id="selectRegisterBaseCardRechargeChange" resultType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO" parameterType="java.util.Map">
+        select
+        b.*
+        from base_card_recharge_change b, outpt_register_settle s
+        where b.settle_id = s.id and s.register_id = #{registerId}
+
+
+    </select>
+
+    <!-- 根据结算id查询门诊划价收费时一卡通卡支付异动记录-->
+    <select id="selectOutptBaseCardRechargeChange" resultType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO">
+        select bcrc.*
+        from  base_card_recharge_change bcrc
+        where bcrc.hosp_code = #{hospCode} and bcrc.settle_id = #{settleId}
+    </select>
+
+    <select id="selectLastChangeByCardId" parameterType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO" resultType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO">
+        select r.*, c.account_balance as accountBalance, c.card_no as cardNo
+         from base_card c left join base_card_recharge_change r on c.id = r.card_id and c.hosp_code = r.hosp_code
+         where r.hosp_code = #{hospCode} and r.card_id = #{cardId} order by crte_time desc limit 1
+    </select>
+
+</mapper>

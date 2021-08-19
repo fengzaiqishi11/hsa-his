@@ -313,7 +313,7 @@ public class BaseCardController extends BaseController {
      * @Return: PageDTO
      **/
     @GetMapping("/queryPaitentCardRechargeInfoList")
-    public WrapperResponse<PageDTO> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO cardRechargeChangeDTO, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<List<BaseCardRechargeChangeDTO>> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO cardRechargeChangeDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req,res);
         cardRechargeChangeDTO.setHospCode(sysUserDTO.getHospCode());
         Map map = new HashMap<>();

@@ -92,6 +92,17 @@ public class OutptRegisterDetailDO extends PageDO implements java.io.Serializabl
     /** 创建人姓名 */
     private String crteName;
 
+    // 一卡通支付金额
+    private BigDecimal cardPrice;
+
+    public BigDecimal getCardPrice() {
+        return cardPrice;
+    }
+
+    public void setCardPrice(BigDecimal cardPrice) {
+        this.cardPrice = cardPrice;
+    }
+
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;

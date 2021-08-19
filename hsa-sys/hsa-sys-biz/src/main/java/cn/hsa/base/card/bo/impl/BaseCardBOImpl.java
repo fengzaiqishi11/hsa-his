@@ -273,9 +273,9 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
      * @Return: PageDTO
      **/
     @Override
-    public PageDTO queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO) {
-        PageHelper.startPage(baseCardRechargeChangeDTO.getPageNo(), baseCardRechargeChangeDTO.getPageSize());
+    public List<BaseCardRechargeChangeDTO> queryPaitentCardRechargeInfoList(BaseCardRechargeChangeDTO baseCardRechargeChangeDTO) {
+        // PageHelper.startPage(baseCardRechargeChangeDTO.getPageNo(), baseCardRechargeChangeDTO.getPageSize());
         List<BaseCardRechargeChangeDTO> list = baseCardDAO.queryPaitentCardRechargeInfoList(baseCardRechargeChangeDTO);
-        return PageDTO.of(list);
+        return list;
     }
 }

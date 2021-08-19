@@ -186,7 +186,7 @@ public class BaseCardServiceImpl extends HsafService implements BaseCardService 
      * @Return: PageDTO
      **/
     @Override
-    public WrapperResponse<PageDTO> queryPaitentCardRechargeInfoList(Map map) {
+    public WrapperResponse<List<BaseCardRechargeChangeDTO>> queryPaitentCardRechargeInfoList(Map map) {
         return WrapperResponse.success(baseCardBO.queryPaitentCardRechargeInfoList(MapUtils.get(map, "baseCardRechargeChangeDTO")));
     }
 

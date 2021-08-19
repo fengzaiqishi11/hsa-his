@@ -179,39 +179,40 @@
 
     <!--查询发卡病人的一卡通异动记录-->
     <select id="queryPaitentCardRechargeInfoList" parameterType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO" resultType="cn.hsa.module.base.card.dto.BaseCardRechargeChangeDTO">
-    select CONCAT(
-		a.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		a.gender_code),'-'),'/',
-		IFNULL(a.age,'-')) AS keyword,
-		a.in_profile,a.out_profile,a.cert_no,b.card_type_code,b.card_no,b.status_code as cardStatusCode,b.crte_time as cardTime,
-		c.status_code,c.pay_code,c.end_balance,c.start_balance,c.price,c.crte_time,c.crte_name
-    from base_profile_file a
-    JOIN base_card b
-    ON a.hosp_code = b.hosp_code and a.id = b.profile_id
-    JOIN base_card_recharge_change c
-    on b.hosp_code = c.hosp_code and b.profile_id = c.profile_id and b.id = c.card_id
-    where a.hosp_code = #{hospCode}
-    <if test="keyword != null and keyword != ''">
-        and (a.name like concat('%', #{keyword}, '%')
-        or a.cert_no like concat('%', #{keyword}, '%')
-        or a.out_profile like concat('%', #{keyword}, '%')
-        or a.in_profile like concat('%', #{keyword}, '%')
-        or b.card_no like concat('%', #{keyword}, '%'))
-    </if>
-    <if test="startDate != null">
-        and c.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
-    </if>
-    <if test="endDate != null">
-        and c.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
-    </if>
-    <if test="statusCode != null and statusCode != ''">
-        and c.status_code = #{statusCode}
-    </if>
-    <if test="crteId != null and crteId != ''">
-        and c.crte_id = #{crteId}
-    </if>
-    order by a.name,c.crte_time desc
+        select
+        a.name,
+        a.gender_code,
+        a.age,
+        a.in_profile,a.out_profile,a.cert_no,b.card_type_code,b.card_no,b.status_code as cardStatusCode,b.crte_time as cardTime,
+        c.status_code,c.pay_code,c.end_balance,c.start_balance,c.price,c.crte_time,c.crte_name
+        from base_profile_file a
+        JOIN base_card b
+        ON a.hosp_code = b.hosp_code and a.id = b.profile_id
+        JOIN base_card_recharge_change c
+        on b.hosp_code = c.hosp_code and b.profile_id = c.profile_id and b.id = c.card_id
+        where a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%', #{keyword}, '%')
+            or a.cert_no like concat('%', #{keyword}, '%')
+            or a.in_profile like concat('%', #{keyword}, '%')
+            or b.card_no like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="startDate != null">
+            and c.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            and c.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and c.status_code = #{statusCode}
+        </if>
+        <if test="payCode != null and payCode != ''">
+            and c.pay_code = #{payCode}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and c.crte_id = #{crteId}
+        </if>
+        order by c.crte_time desc
     </select>
 
     <!--更新一卡通余额-->

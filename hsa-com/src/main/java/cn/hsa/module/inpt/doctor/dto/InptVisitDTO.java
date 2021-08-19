@@ -374,6 +374,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private Date midWayEndDate;
     private String isMidWaySettle; // 是否中途结算
     private int  settleCount ;
-
+    private String itemName; // 费用明细项目名称
+    /**
+     * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
+     */
+    private String isShared;
 
 }

@@ -14,6 +14,7 @@ import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
+import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.outpt.fees.bo.OutptOutTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dao.*;
 import cn.hsa.module.outpt.fees.dto.*;
@@ -94,7 +95,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private InsureIndividualVisitService insureIndividualVisitService_consumer;
     @Resource
     private InsureIndividualBasicService insureIndividualBasicService_consumer;
-
+    @Resource
+    private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
 
     /**
@@ -119,6 +121,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         String crteId = outptVisitDTO.getCrteId();
         String hospName = outptVisitDTO.getHospName();
         String crteName = outptVisitDTO.getCrteName();
+        BigDecimal settleSelfPrice = outptSettleDTO.getSelfPrice() == null? new BigDecimal(0) : outptSettleDTO.getSelfPrice();  // 已经支付的总金额
+        BigDecimal settleCardPrice = outptSettleDTO.getCardPrice() == null? new BigDecimal(0) : outptSettleDTO.getCardPrice(); // 已结算记录卡支付金额
+        BigDecimal settleActualPrice = outptSettleDTO.getActualPrice() == null ? new BigDecimal(0) : outptSettleDTO.getActualPrice();  // 已经支付的划价收费记录中 个人自付金额除一卡通支付后的其他方式支付总和
+
         selectMap.put("visitId", visitId);
         selectMap.put("hospCode", hospCode);
         selectMap.put("settleId", settleId);
@@ -392,19 +398,62 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
 
         Map chargeMap = (Map) wrapperResponse.getData();
+        OutptSettleDO outptSettleDo = (OutptSettleDO)chargeMap.get("outptSettle");
+        OutptSettleDTO newOutptSettleDTO = new OutptSettleDTO();
+        BeanUtils.copyProperties(outptSettleDo,newOutptSettleDTO);
+
+        // 需要重新设置创建人员
+        OutptVisitDTO visitDTO = (OutptVisitDTO) chargeMap.get("outptVisit");
+        visitDTO.setCrteId(crteId);
+        visitDTO.setCrteName(crteName);
+
+
         // 划价收费接口支付接口调用(支付方式默认为现金)
         List<OutptPayDO> outptPayDOlist = new ArrayList();
         OutptPayDO OutptPayDO = new OutptPayDTO();
         OutptPayDO.setPrice(new BigDecimal(0));
         OutptPayDO.setPayCode("1");
-        OutptPayDO.setPrice(moneyAgain);
-        outptPayDOlist.add(OutptPayDO);
+
+        // 没有使用卡支付,全部其他方式支付
+        if (BigDecimalUtils.isZero(settleCardPrice)) {
+            OutptPayDO.setPrice(moneyAgain);
+            outptPayDOlist.add(OutptPayDO);
+            // 设置一卡通卡号与卡支付金额
+            visitDTO.setCardNo(null);
+            visitDTO.setCardPrice(null);
+            visitDTO.setProfileId(null);
+        }
+        // 部分卡支付，部分其他方式支付
+        BigDecimal tempPrice = new BigDecimal(0);
+        BigDecimal cardPriceAgain = new BigDecimal(0); // 一卡通再收金额
+        if (BigDecimalUtils.greaterZero(settleCardPrice) && BigDecimalUtils.less(settleCardPrice, settleSelfPrice)) {
+            tempPrice = BigDecimalUtils.subtract(moneyAgain, settleActualPrice); // 重收金额 - 已经付现的金额
+            if (BigDecimalUtils.greaterZero(tempPrice)) { // 再收金额大于已经支付的现金金额
+                cardPriceAgain = BigDecimalUtils.subtract(tempPrice, outptSettleDo.getTruncPrice() == null? new BigDecimal(0): outptSettleDo.getTruncPrice());
+                // 设置一卡通卡号与卡支付金额
+                visitDTO.setCardNo(outptSettleDTO.getCardNo());
+                visitDTO.setCardPrice(cardPriceAgain);
+                visitDTO.setProfileId(outptSettleDTO.getProfileId());
+            } else {
+                // 设置一卡通卡号与卡支付金额
+                visitDTO.setCardNo(null);
+                visitDTO.setCardPrice(null);
+                visitDTO.setProfileId(null);
+            }
+            OutptPayDO.setPrice(moneyAgain);
+            outptPayDOlist.add(OutptPayDO);
+        }
+        //  全部卡支付，退费自动收时其他支付方式为空
+        if (BigDecimalUtils.equals(settleCardPrice, settleSelfPrice)) {
+            cardPriceAgain = BigDecimalUtils.subtract(moneyAgain, outptSettleDo.getTruncPrice() == null? new BigDecimal(0): outptSettleDo.getTruncPrice());
+            // 设置一卡通卡号与卡支付金额
+            visitDTO.setCardNo(outptSettleDTO.getCardNo());
+            visitDTO.setCardPrice(cardPriceAgain);
+            visitDTO.setProfileId(outptSettleDTO.getProfileId());
+        }
 
         Map<String,Object> chargeParams = new HashMap<>();
 
-        OutptSettleDO outptSettleDo = (OutptSettleDO)chargeMap.get("outptSettle");
-        OutptSettleDTO newOutptSettleDTO = new OutptSettleDTO();
-        BeanUtils.copyProperties(outptSettleDo,newOutptSettleDTO);
 
         // 判断是否使用发票
 //        if (StringUtils.isNotEmpty(outptSettleDTO.getInvoiceNo())) {
@@ -418,10 +467,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         newOutptSettleDTO.setActualPrice(newOutptSettleDTO.getRealityPrice());
         newOutptSettleDTO.setCrteId(crteId);
         newOutptSettleDTO.setCrteName(crteName);
-        // 需要重新设置创建人员
-        OutptVisitDTO visitDTO = (OutptVisitDTO) chargeMap.get("outptVisit");
-        visitDTO.setCrteId(crteId);
-        visitDTO.setCrteName(crteName);
+
 
         chargeParams.put("outptPayDOList",outptPayDOlist);
         chargeParams.put("outptVisitDTO",visitDTO);
@@ -822,6 +868,20 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 门诊结算信息对冲
         this.outptSettleInfoChangeRed(selectDTO,redSettleId);
 
+        // 门诊退费时需要更新消费异动表
+        if (outptSettleDTO.getCardPrice() != null && BigDecimalUtils.greaterZero(outptSettleDTO.getCardPrice())) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("crteId", outptVisitDTO.getCrteId());
+            map.put("crteName", outptVisitDTO.getCrteName());
+            map.put("settleId", outptSettleDTO.getId());
+            map.put("redSettleId", redSettleId );
+            map.put("hospCode", outptSettleDTO.getHospCode());
+            Boolean isTrue = baseCardRechargeChangeService.saveOutptTuiFei(map);
+            if (!isTrue) {
+                throw new AppException("一卡通退费失败，请联系管理员");
+            }
+        }
+
         // 门诊合同单位支付表冲红
         this.outptInsurePayChangeRed(selectDTO);
 
@@ -926,6 +986,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         // 金额置反
         selectOutptSettleDTO.setInvoicePrice(BigDecimalUtils.negate(selectOutptSettleDTO.getInvoicePrice()));
+        selectOutptSettleDTO.setCardPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getCardPrice()));
         selectOutptSettleDTO.setActualPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getActualPrice()));
         selectOutptSettleDTO.setMiPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getMiPrice()));
         selectOutptSettleDTO.setRealityPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getRealityPrice()));

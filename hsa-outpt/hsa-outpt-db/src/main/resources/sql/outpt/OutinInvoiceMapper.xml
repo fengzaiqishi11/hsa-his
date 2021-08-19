@@ -1526,7 +1526,7 @@
         b.bill_id AS invoiceId,
         b.bill_no AS invoiceNo,
         '0' AS settleType,
-        b.reality_price AS invoiceTotalPrice,
+        b.total_price AS invoiceTotalPrice,
         '0' AS miPrice,
         b.reality_price AS selfPrice,
         b.total_price AS settleTotalPrice,

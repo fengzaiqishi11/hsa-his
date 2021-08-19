@@ -74,4 +74,7 @@
     <dubbo:service interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" ref="outptTriageVisitService_provider"/>
     <!--分诊病人-->
     <dubbo:service interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" ref="outptTriageVisitService_provider"/>
+
+    <!--一卡通异动-->
+    <dubbo:service interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" ref="baseCardRechargeChangeService_provider"/>
 </beans>

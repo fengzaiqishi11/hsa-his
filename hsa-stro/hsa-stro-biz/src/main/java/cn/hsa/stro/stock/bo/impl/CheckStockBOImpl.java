@@ -2,7 +2,6 @@ package cn.hsa.stro.stock.bo.impl;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.stro.stock.bo.CheckStockBO;
 import cn.hsa.module.stro.stock.dao.CheckStockDAO;
 import cn.hsa.module.stro.stock.dto.CheckStockDTO;
@@ -48,12 +47,16 @@ public class CheckStockBOImpl implements CheckStockBO {
     public CheckStockRespDTO queryOutDrugOrMeterialStock(CheckStockDTO checkStockDTO) {
         // 参数校验
         checkOutParam(checkStockDTO);
-        // 获得库存、占存数量
+        // 获得库存、占存数量、库存单位、库存拆零单位
         Map<String, BigDecimal> strockMap = checkStockDAO.getStrockNumber(checkStockDTO);
         // 拆分比
         BigDecimal splitRatio = MapUtils.get(strockMap, "splitRatio");
         // 库存数量
         BigDecimal strockNum = MapUtils.get(strockMap, "strockNum");
+        // 库存单位
+        String unitCode = MapUtils.get(strockMap, "unitCode");
+        // 库存拆零单位
+        String splitUnitCode = MapUtils.get(strockMap, "splitUnitCode");
         // 库存拆零数量
         BigDecimal strockSplitNum = BigDecimalUtils.multiply(strockNum, splitRatio);
         // 获得占用库存
@@ -72,29 +75,43 @@ public class CheckStockBOImpl implements CheckStockBO {
         if ("1".equals(isCaculate)) {
             // 门诊未结算数量 保留4位小数
             totalNumberNoCaculate = checkStockDAO.getOuptCostTotalNumber(checkStockDTO)
-                    .setScale(4, BigDecimal.ROUND_HALF_UP);
+                    .setScale(2, BigDecimal.ROUND_HALF_UP);
             // 住院未核收数量
             totalNumberNoCheck = checkStockDAO.getInptCostTotalNumber(checkStockDTO)
-                    .setScale(4, BigDecimal.ROUND_HALF_UP);
+                    .setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         // 获得已结算未配药/已核收 未配药
         // 已结算未配药
         BigDecimal prescribeOuptNumber = checkStockDAO.getOuptCostNoPrescribeNumber(checkStockDTO)
-                .setScale(4, BigDecimal.ROUND_HALF_UP);
+                .setScale(2, BigDecimal.ROUND_HALF_UP);
         // 已核收未配药
         BigDecimal prescribeInptNumber = checkStockDAO.getInptCostNoPrescribeNumber(checkStockDTO)
-                .setScale(4, BigDecimal.ROUND_HALF_UP);
+                .setScale(2, BigDecimal.ROUND_HALF_UP);
         BigDecimal result = BigDecimalUtils.subtractMany(strockSplitNum, stockOccupy,
                 totalNumberNoCaculate, totalNumberNoCheck, prescribeOuptNumber, prescribeInptNumber);
+        // 通过频率Id 获得每日次数、执行周期
+        Map<String, BigDecimal> rateMap = checkStockDAO.getRateMessage(checkStockDTO);
+        // 每日次数
+        BigDecimal dailyTimes = MapUtils.get(rateMap, "dailyTimes");
+        // 执行周期
+        BigDecimal execInterval = MapUtils.get(rateMap, "execInterval");
+        // 频率 = 每日次数/执行周期
+        BigDecimal rate = BigDecimalUtils.divide(dailyTimes, execInterval);
+        // 执行天数
+        BigDecimal userDay = new BigDecimal(checkStockDTO.getUseDays());
+        // 通过单位返回结果 ，如果单位不一致，说明是大单位，需要使用频率*总量*天数 获得总数量
+        BigDecimal totalNum = BigDecimalUtils.multiplyMany(checkStockDTO.getNum(), rate, userDay)
+                .setScale(2, BigDecimal.ROUND_HALF_UP);
         // 封装返回参数
         CheckStockRespDTO checkStockRespDTO = new CheckStockRespDTO();
         checkStockRespDTO.setPrescribeInptNumber(prescribeInptNumber);
         checkStockRespDTO.setPrescribeOuptNumber(prescribeOuptNumber);
-        checkStockRespDTO.setStockOccupy(stockOccupy);
-        checkStockRespDTO.setStrockSplitNum(strockSplitNum);
+        checkStockRespDTO.setStockOccupy(stockOccupy.setScale(2, BigDecimal.ROUND_HALF_UP));
+        checkStockRespDTO.setStrockSplitNum(strockSplitNum.setScale(2, BigDecimal.ROUND_HALF_UP));
         checkStockRespDTO.setTotalNumberNoCaculate(totalNumberNoCaculate);
         checkStockRespDTO.setTotalNumberNoCheck(totalNumberNoCheck);
-        checkStockRespDTO.setResult(result);
+        // 所需数量 - 剩余数量
+        checkStockRespDTO.setResult(totalNum.subtract(result));
         return checkStockRespDTO;
     }
 
@@ -124,6 +141,10 @@ public class CheckStockBOImpl implements CheckStockBO {
         Optional.ofNullable(checkStockDTO.getHospCode()).orElseThrow(() -> new AppException("医院编码不能为空"));
         Optional.ofNullable(checkStockDTO.getPharId()).orElseThrow(() -> new AppException("发药药房id不能为空"));
         Optional.ofNullable(checkStockDTO.getItemId()).orElseThrow(() -> new AppException("项目id不能为空"));
+        Optional.ofNullable(checkStockDTO.getTotalNumUnitCode()).orElseThrow(() -> new AppException("总数量单位不能为空"));
+        Optional.ofNullable(checkStockDTO.getTotalNum()).orElseThrow(() -> new AppException("总数量不能为空"));
+        Optional.ofNullable(checkStockDTO.getRateId()).orElseThrow(() -> new AppException("频率ID不能为空"));
+        Optional.ofNullable(checkStockDTO.getUseDays()).orElseThrow(() -> new AppException("用药天数不能为空"));
     }
 
     /**

@@ -452,5 +452,8 @@
     <!--库存校验-->
     <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
 
+
+    <!-- 一卡通异动服务 -->
+    <dubbo:reference id="baseCardRechargeChangeService_consumer" interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" check="false"/>
 </beans>
 

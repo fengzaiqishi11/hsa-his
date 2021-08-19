@@ -143,4 +143,10 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
      * 居住地地址
      */
     private String nowAddress;
+
+    // 付款一卡通卡号
+    private String cardNo;
+
+    // 一卡通当前挂号付款金额
+    private BigDecimal cardPrice;
 }

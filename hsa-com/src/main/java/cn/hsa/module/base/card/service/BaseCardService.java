@@ -155,6 +155,6 @@ public interface BaseCardService {
      * @Return: PageDTO
      **/
     @GetMapping("/service/base/baseCard/queryPaitentCardRechargeInfoList")
-    WrapperResponse<PageDTO> queryPaitentCardRechargeInfoList(Map map);
+    WrapperResponse<List<BaseCardRechargeChangeDTO>> queryPaitentCardRechargeInfoList(Map map);
 
 }

@@ -444,4 +444,14 @@ public interface OutptDoctorPrescribeBO {
      * @Return:
      **/
     Boolean updateOuptCostAndPreDetailExt(List<InsureItemMatchDTO> insureItemMatchDTOS);
+    /**
+     * @Menthod: getBaseDrug
+     * @Desrciption: 获取药品及取整方式
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     **/
+    BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 }

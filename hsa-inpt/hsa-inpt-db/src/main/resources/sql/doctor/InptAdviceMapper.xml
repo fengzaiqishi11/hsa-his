@@ -1798,6 +1798,7 @@
 		and a.is_submit ='1'
 		and a.is_reject = '0'
 		and a.is_check='1'
+		order by a.check_time
 	</select>
 
     <insert id="insertMedicineAdvanceAdvice" parameterType="list">

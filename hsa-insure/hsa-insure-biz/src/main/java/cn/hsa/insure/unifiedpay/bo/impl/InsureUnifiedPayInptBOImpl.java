@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.ErrorHandler;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import scala.App;
 
 import javax.annotation.Resource;
@@ -1116,6 +1118,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("未查询到就诊地医保区划");
         }
 
+        if(StringUtils.isEmpty(inptVisitDTO.getZzDoctorId()) || StringUtils.isEmpty(inptVisitDTO.getZzDoctorName())){
+            throw  new AppException("该患者没有主治医生,请先安床");
+        }
+
         //入院诊断信息参数diseinfoList
         List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
         String dscg_maindiag_code = null;
@@ -1200,8 +1206,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	医疗类别
         mdtrtinfoMap.put("ipt_no", inptVisitDTO.getInNo());//	住院号
         mdtrtinfoMap.put("medrcdno", null);//	病历号
-        mdtrtinfoMap.put("atddr_no", inptVisitDTO.getCrteId());//inptVisitDTO.getZzDoctorId());//	主治医生编码
-        mdtrtinfoMap.put("chfpdr_name",inptVisitDTO.getCrteName());//inptVisitDTO.getZzDoctorName());//	主诊医师姓名
+        mdtrtinfoMap.put("atddr_no", inptVisitDTO.getZzDoctorId());//inptVisitDTO.getZzDoctorId());//	主治医生编码
+        mdtrtinfoMap.put("chfpdr_name",inptVisitDTO.getZzDoctorName());//inptVisitDTO.getZzDoctorName());//	主治医师姓名
         mdtrtinfoMap.put("adm_diag_dscr", dscg_maindiag_name);//	入院诊断描述
         mdtrtinfoMap.put("adm_dept_codg", inptVisitDTO.getInDeptId());//	入院科室编码
         mdtrtinfoMap.put("adm_dept_name", inptVisitDTO.getInDeptName());//	入院科室名称

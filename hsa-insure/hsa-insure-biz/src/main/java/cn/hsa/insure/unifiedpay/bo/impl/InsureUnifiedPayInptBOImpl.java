@@ -66,7 +66,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
     @Resource
     private DoctorAdviceService doctorAdviceService_consumer;
 
-
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -144,14 +143,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             if(!ListUtils.isEmpty(inptCostDTOList)){
                 Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
                 // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
-                //
-                if(!ListUtils.isEmpty(insureCostList)){
                     for(Map<String,Object> item : insureCostList){
-                        if(collect.containsKey(MapUtils.get(item,"id"))){
+                        if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"id"))){
                             list3.add(item);
                             continue;
                         }
-                        else if(collect.containsKey(MapUtils.get(item,"oldCostId")) &&
+                        else if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"oldCostId")) &&
                                 BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
                             list3.add(item);
                             continue;
@@ -159,7 +156,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         else {
                             list1.add(item);
                         }
-                    }
                 }
                 // 传退费对应的数据
                 if(!ListUtils.isEmpty(individualCostDTOList)){
@@ -173,8 +169,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 if(!ListUtils.isEmpty(list3)){
                     insertNotUpLoadFee(list3,inptVisitDTO);
                 }
+                list2.addAll(list1);
+            }else{
+                list2.addAll(insureCostList);
             }
-            list2.addAll(list1);
             List<InptCostDO> inptCostDOList = insureIndividualCostDAO.queryInptFeeCost(map);
             Map<String, InptCostDO> inptCostDOMap = inptCostDOList.stream().collect(Collectors.toMap(InptCostDO::getId,
                     Function.identity(), (k1, k2) -> k1));

@@ -235,8 +235,35 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         JSONObject jsonObject = new JSONObject();
         //查询快捷配置信息
         Map<String,String> sysParameter = new HashMap<String,String>();
-        sysParameter.put("hospCode",insureDictDTO.getHospCode());//医院编码
+        sysParameter.put("hospCode",insureDictDTO.getCode());//医院编码
         sysParameter.put("code",insureDictDTO.getInsureRegCode());//医保机构编码
+        sysParameter.put("isValid", Constants.SF.S);//是否有效
+        jsonObject.put("config",insureDictDAO.querySysParameterByCode(sysParameter));
+        //查询码表信息
+        jsonObject.put("insureDict",insureDictDAO.queryInsureDictList(insureDictDTO));
+        return jsonObject;
+    }
+
+
+    /**
+     * @Menthod queryInsureDictList2
+     * @Desrciption 根据查询条件查询医保码表列表
+     * @param insureDictDTO 查询条件
+     * @Author yuelong.chen
+     * @Date 2021/8/18 16:33
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+
+    @Override
+    public JSONObject queryInsureDictList2(InsureDictDTO insureDictDTO) {
+        if (StringUtils.isNotEmpty(insureDictDTO.getCode())){
+            insureDictDTO.setCodes(insureDictDTO.getCode().split(","));
+        }
+        JSONObject jsonObject = new JSONObject();
+        //查询快捷配置信息
+        Map<String,String> sysParameter = new HashMap<String,String>();
+        sysParameter.put("hospCode",insureDictDTO.getHospCode());//医院编码
+        sysParameter.put("code",insureDictDTO.getCode());//医保机构编码
         sysParameter.put("isValid", Constants.SF.S);//是否有效
         jsonObject.put("config",insureDictDAO.querySysParameterByCode(sysParameter));
         //查询码表信息

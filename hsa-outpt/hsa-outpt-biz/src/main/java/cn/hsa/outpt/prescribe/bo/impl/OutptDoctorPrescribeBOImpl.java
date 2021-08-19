@@ -997,26 +997,25 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         String wjsykc = MapUtils.getVS(mapParameter, "MZYS_CF_WJSFYKC", "24");
         outptPrescribeDetailsDTO.setWjsykc(wjsykc);
         // add by zhangguorui
-        Map map = new HashMap();
-        map.put("hospCode", outptPrescribeDetailsDTO.getHospCode());
-        CheckStockDTO checkStockDTO = new CheckStockDTO();
-        BeanUtils.copyProperties(outptPrescribeDetailsDTO,checkStockDTO);
-        map.put("checkStockDTO", checkStockDTO);
-        // 调用门诊库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
-        WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
-        CheckStockRespDTO checkStockRespDTO = checkResult.getData();
-        //判断库存
+//        Map map = new HashMap();
+//        map.put("hospCode", outptPrescribeDetailsDTO.getHospCode());
+//        CheckStockDTO checkStockDTO = new CheckStockDTO();
+//        BeanUtils.copyProperties(outptPrescribeDetailsDTO,checkStockDTO);
+//        map.put("checkStockDTO", checkStockDTO);
+//        // 调用门诊库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
+//        WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
+//        CheckStockRespDTO checkStockRespDTO = checkResult.getData();
+        //判断库存  || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) > 0)
         if ((Constants.YYXZ.CG.equals(outptPrescribeDetailsDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(outptPrescribeDetailsDTO.getUseCode()))
                 && (Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) || Constants.XMLB.CL.equals(outptPrescribeDetailsDTO.getItemCode()))
-                && (ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO))
-                || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) > 0)) {
-            throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足," +
-                    "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
-                    "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
-                    "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
-                    checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
-                    "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
-                    checkStockRespDTO.getPrescribeInptNumber()) + "】"
+                && (ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO)))) {
+            throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足,"
+//                    "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
+//                    "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
+//                    "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
+//                    checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
+//                    "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
+//                    checkStockRespDTO.getPrescribeInptNumber()) + "】"
             );
         }
 

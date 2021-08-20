@@ -690,4 +690,19 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
     public WrapperResponse<Boolean> updateOuptCostAndPreDetailExt(Map map) {
         return WrapperResponse.success(outptDoctorPrescribeBO.updateOuptCostAndPreDetailExt(MapUtils.get(map, "insureItemMatchDTOS")));
     }
+
+    /**
+     * @param parmMap
+     * @Menthod: getBaseDrug
+     * @Desrciption: 获取药品及取整方式
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     */
+    @Override
+    public WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap) {
+        return WrapperResponse.success(outptDoctorPrescribeBO.getBaseDrug(MapUtils.get(parmMap, "outptPrescribeDetailsDTO")));
+    }
 }

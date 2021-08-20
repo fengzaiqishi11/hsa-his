@@ -24,7 +24,7 @@
     <select id="queryById" resultMap="InptGuaranteeMap">
         select
           id, hosp_code, visit_id, guarantee_no, price, remark, guarantee_id, guarantee_name, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
-        from his_v2.inpt_guarantee
+        from inpt_guarantee
         where id = #{id}
     </select>
 

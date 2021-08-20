@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.ErrorHandler;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import scala.App;
 
 import javax.annotation.Resource;
@@ -65,7 +67,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
     @Resource
     private DoctorAdviceService doctorAdviceService_consumer;
-
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -144,14 +145,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             if(!ListUtils.isEmpty(inptCostDTOList)){
                 Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
                 // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
-                //
-                if(!ListUtils.isEmpty(insureCostList)){
                     for(Map<String,Object> item : insureCostList){
-                        if(collect.containsKey(MapUtils.get(item,"id"))){
+                        if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"id"))){
                             list3.add(item);
                             continue;
                         }
-                        else if(collect.containsKey(MapUtils.get(item,"oldCostId")) &&
+                        else if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"oldCostId")) &&
                                 BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
                             list3.add(item);
                             continue;
@@ -159,7 +158,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         else {
                             list1.add(item);
                         }
-                    }
                 }
                 // 传退费对应的数据
                 if(!ListUtils.isEmpty(individualCostDTOList)){
@@ -173,8 +171,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 if(!ListUtils.isEmpty(list3)){
                     insertNotUpLoadFee(list3,inptVisitDTO);
                 }
+                list2.addAll(list1);
+            }else{
+                list2.addAll(insureCostList);
             }
-            list2.addAll(list1);
             List<InptCostDO> inptCostDOList = insureIndividualCostDAO.queryInptFeeCost(map);
             Map<String, InptCostDO> inptCostDOMap = inptCostDOList.stream().collect(Collectors.toMap(InptCostDO::getId,
                     Function.identity(), (k1, k2) -> k1));
@@ -1118,6 +1118,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("未查询到就诊地医保区划");
         }
 
+        if(StringUtils.isEmpty(inptVisitDTO.getZzDoctorId()) || StringUtils.isEmpty(inptVisitDTO.getZzDoctorName())){
+            throw  new AppException("该患者没有主治医生,请先安床");
+        }
+
         //入院诊断信息参数diseinfoList
         List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
         String dscg_maindiag_code = null;
@@ -1202,8 +1206,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	医疗类别
         mdtrtinfoMap.put("ipt_no", inptVisitDTO.getInNo());//	住院号
         mdtrtinfoMap.put("medrcdno", null);//	病历号
-        mdtrtinfoMap.put("atddr_no", inptVisitDTO.getCrteId());//inptVisitDTO.getZzDoctorId());//	主治医生编码
-        mdtrtinfoMap.put("chfpdr_name",inptVisitDTO.getCrteName());//inptVisitDTO.getZzDoctorName());//	主诊医师姓名
+        mdtrtinfoMap.put("atddr_no", inptVisitDTO.getZzDoctorId());//inptVisitDTO.getZzDoctorId());//	主治医生编码
+        mdtrtinfoMap.put("chfpdr_name",inptVisitDTO.getZzDoctorName());//inptVisitDTO.getZzDoctorName());//	主治医师姓名
         mdtrtinfoMap.put("adm_diag_dscr", dscg_maindiag_name);//	入院诊断描述
         mdtrtinfoMap.put("adm_dept_codg", inptVisitDTO.getInDeptId());//	入院科室编码
         mdtrtinfoMap.put("adm_dept_name", inptVisitDTO.getInDeptName());//	入院科室名称

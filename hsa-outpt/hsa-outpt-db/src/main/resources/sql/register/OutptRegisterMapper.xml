@@ -542,12 +542,16 @@
         b.settle_time AS settleTime,-- 结算时间
         d.patient_code AS patientCode,
         ifnull(d.is_visit,'0') as isVisit,
-        e.register_code AS registerCode  -- 挂号类型名称
+        e.register_code AS registerCode,  -- 挂号类型名称
+        b.card_price as cardPrice,
+        bc.card_no as cardNo
         FROM
         outpt_register a
         inner JOIN outpt_register_settle b ON a.id = b.register_id
         inner JOIN outpt_visit d ON a.visit_id = d.id
         inner JOIN outpt_classify e ON a.cf_id = e.id
+        left join base_card_recharge_change bcrc on bcrc.settle_id = b.id and bcrc.hosp_code = b.hosp_code
+        left join base_card bc on bc.hosp_code = b.hosp_code and bc.id = bcrc.card_id
         WHERE
         a.hosp_code = #{hospCode} and a.is_cancel = '0' and (d.is_visit = '0' or d.is_visit is null)
         <if test="keyword != null and keyword != ''">
@@ -720,6 +724,7 @@
             register_id,
             total_price,
             preferential_price,
+            card_price,
             reality_price,
             settle_time,
             daily_settle_id,
@@ -738,6 +743,7 @@
                      #{registerId,jdbcType=VARCHAR},
                      #{totalPrice,jdbcType=DECIMAL},
                      #{preferentialPrice,jdbcType=DECIMAL},
+                     #{cardPrice,jdbcType=DECIMAL},
                      #{realityPrice,jdbcType=DECIMAL},
                      #{settleTime,jdbcType=TIMESTAMP},
                      #{dailySettleId,jdbcType=VARCHAR},
@@ -815,7 +821,7 @@
     <insert id="insertRegDetail" parameterType="list">
         INSERT INTO outpt_register_detail (
         id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
-        price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, card_price, reality_price,
         unit_code, status_code, origin_id, crte_id, crte_name, crte_time
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
@@ -835,6 +841,7 @@
             #{item.preferentialId},
             #{item.totalPrice},
             #{item.preferentialPrice},
+            #{item.cardPrice},
             #{item.realityPrice},
             #{item.unitCode},
             #{item.statusCode},
@@ -856,6 +863,7 @@
             register_id,
             total_price,
             preferential_price,
+            card_price,
             reality_price,
             settle_time,
             daily_settle_id,
@@ -874,6 +882,7 @@
                      #{registerId,jdbcType=VARCHAR},
                      #{totalPrice,jdbcType=DECIMAL},
                      #{preferentialPrice,jdbcType=DECIMAL},
+                     #{cardPrice,jdbcType=DECIMAL},
                      #{realityPrice,jdbcType=DECIMAL},
                      #{settleTime,jdbcType=TIMESTAMP},
                      #{dailySettleId,jdbcType=VARCHAR},

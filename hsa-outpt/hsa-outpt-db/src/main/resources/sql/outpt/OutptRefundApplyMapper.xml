@@ -69,7 +69,8 @@
         a.reality_price,
         d.name as preferentialTypeName,
         a.crte_time,
-        ifnull(m.status, '0') as status
+        ifnull(m.status, '0') as status,
+        a.card_price as cardPrice
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id

@@ -191,7 +191,7 @@ public interface InsureIndividualVisitDAO {
 
     InsureIndividualVisitDTO queryInsureIndividualVisitByIds(Map<String,Object> insureVisitParam);
 
-    List<String> queryAllInsureRegister(Map<String,String> selectMap);
+    List<InsureIndividualVisitDTO> queryAllInsureRegister(Map<String,String> selectMap);
 
     /**
      * @Method getMedicalRegNo

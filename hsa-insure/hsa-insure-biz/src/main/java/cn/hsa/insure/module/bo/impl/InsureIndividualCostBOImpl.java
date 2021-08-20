@@ -644,7 +644,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             resultMap.put("info", "【" + hospCode + "】医保费用定时传输未启用！");
             return resultMap;
         }
-        // KafKa消费者状态
+       /* // KafKa消费者状态
         Boolean networkFlag = true;
 
         // 启用统一支付平台标志 UNIFIED_PAY == 1
@@ -677,24 +677,25 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                 resultMap.put("info", "【" + hospCode + "】kafka服务检测不通过，医保中间件服务未启动！异常错误：" + e.getMessage());
                 return resultMap;
             }
-        }
+        }*/
 
-        if (networkFlag) {
-            Map<String, String> selectMap = new HashMap<>();
-            selectMap.put("hospCode", hospCode);
-            List<String> idList = insureIndividualVisitDAO.queryAllInsureRegister(selectMap);
-            if (!ListUtils.isEmpty(idList)) {
-                for (String id : idList) {
-                    inptVisitDTO.setId(id);
-                    try {
-                        this.saveFeeTransmit(inptVisitDTO);
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                        resultMap.put("msg", "【" + id + "】传输服务出现异常！ 异常信息：" + e.getMessage());
-                    }
+
+        Map<String, String> selectMap = new HashMap<>();
+        selectMap.put("hospCode", hospCode);
+        List<InsureIndividualVisitDTO> idList = insureIndividualVisitDAO.queryAllInsureRegister(selectMap);
+        if (!ListUtils.isEmpty(idList)) {
+            for (InsureIndividualVisitDTO visitDTO : idList) {
+                inptVisitDTO.setId(visitDTO.getVisitId());
+                inptVisitDTO.setMedicalRegNo(visitDTO.getMedicalRegNo());
+                try {
+                    this.saveFeeTransmit(inptVisitDTO);
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    resultMap.put("msg", "【" + visitDTO.getAac002() + "】传输服务出现异常！ 异常信息：" + e.getMessage());
                 }
             }
         }
+
         resultMap.put("code", "1");
         resultMap.put("info", "【" + hospCode + "】医保传输服务定时执行完成！");
         return resultMap;

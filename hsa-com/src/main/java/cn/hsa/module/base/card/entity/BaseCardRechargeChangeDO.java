@@ -48,7 +48,7 @@ public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
 
 	private BigDecimal startBalanceEncryption;
 
-	private BigDecimal endbalance;
+	private BigDecimal endBalance;
 
 	private BigDecimal endBalanceEncryption;
 

@@ -3850,6 +3850,24 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     }
 
     /**
+     * @param outptPrescribeDetailsDTO
+     * @Menthod: getBaseDrug
+     * @Desrciption: 获取药品及取整方式
+     * @Param: insureItemMatchDTOS
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-07-19 19:51
+     * @Return:
+     */
+    @Override
+    public BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO) {
+        if(outptPrescribeDetailsDTO == null ){
+            return null;
+        }
+        return outptDoctorPrescribeDAO.getBaseDrug(outptPrescribeDetailsDTO);
+    }
+
+    /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode
      * @return

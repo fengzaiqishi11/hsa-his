@@ -180,6 +180,9 @@
             and iim.audit_code='1'
             and iim.is_valid ='1'
         </if>
+        <if test="itemName != null and itemName !=''">
+            and ic.item_name  like concat('%',#{itemName},'%')
+        </if>
     </select>
 
     <!--    查询已匹配和未匹配项目的费用信息-->

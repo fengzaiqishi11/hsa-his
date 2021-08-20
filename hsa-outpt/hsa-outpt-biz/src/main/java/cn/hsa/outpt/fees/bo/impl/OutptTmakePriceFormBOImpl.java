@@ -6,6 +6,9 @@ import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
+import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
+import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
+import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
 import cn.hsa.module.outpt.fees.entity.*;
@@ -170,6 +173,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
     @Resource
     private LisData lisData;
+
+    @Resource
+    SysParameterService sysParameterService;
+
+    @Resource
+    private BaseCardRechargeChangeDAO baseCardRechargeChangeDAO;
+    @Resource
+    private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
 
     /**
@@ -912,6 +923,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         String code = outptVisitDTO.getCode(); // 操作人编码
         List<Map<String, Object>> outinInvoiceList = null;//返回发票打印的费用统计信息
 
+        String cardNo = outptVisitDTO.getCardNo(); // 一卡通卡号
+        BigDecimal cardPrice = outptVisitDTO.getCardPrice();  //一卡通支付金额
+        String profileId = outptVisitDTO.getProfileId();  // 患者档案id
+
         //生成redis结算Key，医院编码 + 证件号码 + 划价收费KEY
         String key = new StringBuilder(hospCode).append(StringUtils.isEmpty(visitId) ? outptVisitDTO.getCertNo() : visitId)
                 .append(Constants.OUTPT_FEES_REDIS_KEY).toString();
@@ -987,11 +1002,82 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 return WrapperResponse.fail("支付失败，该患者费用信息错误，请刷新后重试。", null);
             }
 
+            // 使用一卡通  start ========================
+            // 校验是否使用一卡通，校验一卡通余额，档案id，卡状态
+            if (cardPrice == null) {
+                cardPrice = new BigDecimal(0);
+            }
+            BigDecimal tempCardPrice = new BigDecimal(0);
+            if (cardNo != null) { // 门诊划价收费时，页面传入的一卡通账号为空，没有使用一卡通
+                Map<String, Object> map = new HashMap<>();
+                map.put("code", "SF_YKTCZ");
+                map.put("hospCode", hospCode);
+                WrapperResponse<SysParameterDTO> wr = sysParameterService.getParameterByCode(map);
+                if (wr.getData().getValue() != null && ("2".equals(wr.getData().getValue()) || "4".equals(wr.getData().getValue()) || "6".equals(wr.getData().getValue()) || "8".equals(wr.getData().getValue()))) {
+                    // 1、查询一卡通的余额是否足够，且状态是否为正常
+                    BaseCardRechargeChangeDTO dto = new BaseCardRechargeChangeDTO();
+                    dto.setHospCode(hospCode);
+                    dto.setCardNo(cardNo);
+                    BaseCardRechargeChangeDTO baseCardRechargeChangeDTO = null;
+                    if (BigDecimalUtils.greaterZero(cardPrice) || (cardNo != null && !cardNo.equals(""))) {
+                        baseCardRechargeChangeDTO = baseCardRechargeChangeDAO.getBaseCardRechargeChangeDTO(dto);
+                    }
+
+                    // 2、需要校验当前挂号的档案id与卡的档案id一致，
+                    if (baseCardRechargeChangeDTO == null && BigDecimalUtils.greaterZero(cardPrice)) {
+                        throw new AppException("结算支付时查询就诊卡出错，请联系管理员");
+                    }
+                    if (baseCardRechargeChangeDTO != null && BigDecimalUtils.greaterZero(cardPrice)) {
+                        if (baseCardRechargeChangeDTO.getProfileId() == null || !baseCardRechargeChangeDTO.getProfileId().equals(profileId)) {
+                            throw new AppException("结算支付时查询就诊卡档案id与当前患者档案id不一致，请联系管理员");
+                        }
+                        if (baseCardRechargeChangeDTO.getCardStatusCode() == null || !"0".equals(baseCardRechargeChangeDTO.getCardStatusCode())) {
+                            throw new AppException("结算支付时查询就诊卡状态非正常状态，不能使用该卡");
+                        }
+                        if (baseCardRechargeChangeDTO.getAccountBalance() == null || BigDecimalUtils.less(baseCardRechargeChangeDTO.getAccountBalance(), cardPrice)){
+                            throw new AppException("结算支付时查询就诊卡余额小于需要支付的金额，不能支付");
+                        }
+                        if (!BigDecimalUtils.equals(baseCardRechargeChangeDTO.getAccountBalance(), baseCardRechargeChangeDTO.getEndBalance())) {
+                            throw new AppException("结算支付时查询就诊卡余额与上一次异动后金额不一致，不能支付");
+                        }
+                        // 更新一卡通充值、消费异动表，更新一卡通主表余额
+                        baseCardRechargeChangeDTO.setId(SnowflakeUtils.getId());
+                        baseCardRechargeChangeDTO.setStatusCode("8"); // 卡异动状态 8： 消费
+                        baseCardRechargeChangeDTO.setPayCode(null);  // 支付方式
+                        baseCardRechargeChangeDTO.setPrice(BigDecimalUtils.negate(cardPrice));
+                        baseCardRechargeChangeDTO.setStartBalance(baseCardRechargeChangeDTO.getEndBalance());
+                        baseCardRechargeChangeDTO.setStartBalanceEncryption(baseCardRechargeChangeDTO.getStartBalanceEncryption());
+                        baseCardRechargeChangeDTO.setEndBalance(BigDecimalUtils.subtract(baseCardRechargeChangeDTO.getStartBalance(), cardPrice));
+                        baseCardRechargeChangeDTO.setEndBalanceEncryption(null);
+                        baseCardRechargeChangeDTO.setSettleType("03");
+                        baseCardRechargeChangeDTO.setSettleId(settleId);
+                        baseCardRechargeChangeDTO.setCrteId(userId);
+                        baseCardRechargeChangeDTO.setCrteName(userName);
+                        baseCardRechargeChangeDTO.setCrteTime(new Date());
+                        // 新增一卡通消费异动
+                        int temp1 = baseCardRechargeChangeDAO.insertBaseCardRechargeChange(baseCardRechargeChangeDTO);
+                        Map<String, Object> baseCardMap = new HashMap<>();
+                        baseCardMap.put("hospCode", hospCode);
+                        baseCardMap.put("profileId", profileId);
+                        baseCardMap.put("cardNo", cardNo);
+                        baseCardMap.put("accountBalance", baseCardRechargeChangeDTO.getEndBalance());
+                        // 更新一卡通主表余额
+                        int temp2 = baseCardRechargeChangeDAO.updateCardAccountBalance(baseCardMap);
+                        if (temp1 <= 0 || temp2 <= 0) {
+                            throw new AppException("保存一卡通异动异常，未写入数据，请联系管理员");
+                        }
+                        tempCardPrice = cardPrice;
+                    }
+                }
+            }
+            // 使用一卡通  end ========================
+
             // 5、 保存结算信息（支付方式与各方式金额）
-            boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1);
+            boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1, tempCardPrice);
             if (isChange) {
                 return WrapperResponse.fail("支付失败；本次账户支付金额小于当前支付金额！", null);
             }
+
             // 6、 根据费用信息修改本次结算的费用状态
             Map<String, Object> costParam = new HashMap<String, Object>();
             costParam.put("settleCode", Constants.JSZT.YIJS);//费用状态 = 已结算
@@ -1003,7 +1089,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptSettleDO.setId(settleId);//结算id
             SysParameterDO sysParameterDO = getSysParameter(hospCode, Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
             BigDecimal ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
-            outptSettleDO.setActualPrice(ssje);//实收金额
+            outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
+            outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
             outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
             outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
@@ -1134,7 +1221,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @Date 2021/2/8 11:19
      * @Return
      */
-    private boolean saveOutptPays(List<OutptPayDO> outptPayDOList, String hospCode, String settleId, String visitId, OutptSettleDTO outptSettleDTO1) {
+    private boolean saveOutptPays(List<OutptPayDO> outptPayDOList, String hospCode, String settleId, String visitId, OutptSettleDTO outptSettleDTO1, BigDecimal cardPrice) {
         boolean isChange = false;
         List<OutptPayDO> outptPayDOS = new ArrayList<OutptPayDO>();
         BigDecimal actualPrice = new BigDecimal(0);
@@ -1152,6 +1239,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
         }
 
+        actualPrice = BigDecimalUtils.add(actualPrice, cardPrice); // 实际支付金额加上一卡通扣除金额
         //BigDecimal ssje = BigDecimalUtils.subtract(outptSettleDTO1.getSelfPrice(), outptSettleDTO1.getTruncPrice()); // 实收金额= 个人自付金额-舍人金额
         //判断 实收金额 >= 需支付金额
         int greater = BigDecimalUtils.compareTo(outptSettleDTO1.getSelfPrice(), actualPrice);

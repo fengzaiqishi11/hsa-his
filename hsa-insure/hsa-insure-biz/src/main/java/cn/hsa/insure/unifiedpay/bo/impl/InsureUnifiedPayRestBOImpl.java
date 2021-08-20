@@ -1061,7 +1061,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 integer = insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
             }
 
-        } else if (Constants.XMLB.CL.equals(itemCode)) {
+        }
+        else if (Constants.XMLB.CL.equals(itemCode)) {
             BaseMaterialDTO baseMaterialDTO = new BaseMaterialDTO();
             baseMaterialDTO.setHospCode(hospCode);
             baseMaterialDTO.setIsValid("1");
@@ -1079,7 +1080,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 integer = insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
             }
 
-        } else if (Constants.XMLB.XM.equals(itemCode)) {
+        }
+        else if (Constants.XMLB.XM.equals(itemCode)) {
             BaseItemDTO baseItemDTO = new BaseItemDTO();
             baseItemDTO.setHospCode(hospCode);
             baseItemDTO.setIsValid("1");
@@ -1189,7 +1191,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
 
                 }
             }
-        } else {
+        }
+        else {
             collect = insureDiseaseDTOList.stream().collect(Collectors.toMap(InsureDiseaseDTO::getInsureIllnessCode, Function.identity(), (k1, k2) -> k1));
             for (BaseDiseaseDTO baseDiseaseDTO : baseDiseaseDTOList) {
                 if (!collect.isEmpty() && collect.containsKey(baseDiseaseDTO.getNationCode()) && !StringUtils.isEmpty(baseDiseaseDTO.getNationCode())) {
@@ -1423,7 +1426,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
         if (!ListUtils.isEmpty(matchDTOList)) {
             List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity()));
+            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(),(k1, k2) -> k1));
             if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
                 for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
                     if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {
@@ -1556,7 +1559,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
         if (!ListUtils.isEmpty(matchDTOList)) {
             List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity()));
+            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(), (k1, k2) -> k1));
             if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
                 for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
                     if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {
@@ -1700,7 +1703,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
         if (!ListUtils.isEmpty(matchDTOList)) {
             List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity()));
+            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(),(k1, k2) -> k1));
             if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
                 for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
                     if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {

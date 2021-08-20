@@ -64,4 +64,6 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
     private String  teachDoctorId ;
 
     private String  teachDoctorName ;
+
+    private String itemName;
 }

@@ -142,6 +142,25 @@ public class InsureDictController extends BaseController {
     }
 
     /**
+     * @Menthod queryInsureDictList2
+     * @Desrciption 根据查询条件查询医保字典列表
+     * @param insureDictDTO 查询条件
+     * @Author yuelong.chen
+     * @Date 2021/8/18 16:33
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @GetMapping("/queryInsureDictList2")
+    public WrapperResponse queryInsureDictList2(InsureDictDTO insureDictDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureDictDTO.setHospCode(sysUserDTO.getHospCode());
+        Map param = new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());//医院编码
+        param.put("insureDictDTO",insureDictDTO);//查询条件
+        return insureDictService_consumer.queryInsureDictList2(param);
+    }
+
+
+    /**
      * @Method queryDictValuePage()
      * @Desrciption  分页查询医保的码表值
      * @Param

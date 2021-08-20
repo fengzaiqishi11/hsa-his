@@ -10,9 +10,7 @@
         from base_card c left join base_card_recharge_change r on c.id = r.card_id and c.hosp_code = r.hosp_code
         left join base_profile_file f on f.hosp_code = c.hosp_code and f.id = c.profile_id
         where c.hosp_code = #{hospCode} and c.account_balance &gt; 0
-        <if test="cardNo != null and cardNo != ''">
             and c.card_no = #{cardNo}
-        </if>
         order by r.crte_time desc limit 1
     </select>
 

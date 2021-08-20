@@ -430,11 +430,24 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(medicineOrgCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        String mdtrtareaAdmvs = insureConfigurationDTO.getMdtrtareaAdmvs();
         if (insureConfigurationDTO == null) {
             throw new AppException("根据就诊人的医疗机构编码查询无此医保机构配置信息");
         }
+        if(StringUtils.isEmpty(mdtrtareaAdmvs)){
+            throw new AppException("医保配置信息管理里面就医地区划信息为空");
+        }
+        if(StringUtils.isEmpty(insuplcAdmdvs)){
+            throw new AppException("该医保患者的参参保地区划为空");
+        }
         // 就诊人的参保地区划和就医地区划不一致就是异地
-        if (!insureConfigurationDTO.getMdtrtareaAdmvs().equals(insuplcAdmdvs)) {
+        if (mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4))) {
+            dataMap.put("setl_id", setlId);//结算ID
+            dataMap.put("psn_no", psnNo);//人员编号
+            dataMap.put("mdtrt_id", mdtrtId);//就医登记号
+            resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
+
+        } else {
             dataMap.put("mdtrtRegno", setlId);//结算ID
             dataMap.put("mdtrtId", mdtrtId);//就医登记号
             dataMap.put("medinsNo", insureConfigurationDTO.getOrgCode());//就医登记号
@@ -443,11 +456,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             } else {
                 resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5269, dataMap);
             }
-        } else {
-            dataMap.put("setl_id", setlId);//结算ID
-            dataMap.put("psn_no", psnNo);//人员编号
-            dataMap.put("mdtrt_id", mdtrtId);//就医登记号
-            resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
         }
         return resultMap;
     }

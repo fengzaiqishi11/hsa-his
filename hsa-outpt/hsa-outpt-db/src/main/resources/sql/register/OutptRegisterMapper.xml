@@ -821,7 +821,7 @@
     <insert id="insertRegDetail" parameterType="list">
         INSERT INTO outpt_register_detail (
         id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
-        price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, card_price, reality_price,
         unit_code, status_code, origin_id, crte_id, crte_name, crte_time
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
@@ -841,6 +841,7 @@
             #{item.preferentialId},
             #{item.totalPrice},
             #{item.preferentialPrice},
+            #{item.cardPrice},
             #{item.realityPrice},
             #{item.unitCode},
             #{item.statusCode},

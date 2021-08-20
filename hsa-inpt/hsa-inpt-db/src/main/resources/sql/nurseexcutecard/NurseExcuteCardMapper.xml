@@ -92,6 +92,12 @@
             #{id}
           </foreach>
         </if>
+        <if test="ids != null and ids.size() > 0">
+            and advice_id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
         and hosp_code = #{hospCode}
     </update>
 
@@ -303,14 +309,22 @@
           AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
       </if>
       where i.hosp_code=#{hospCode}
-        <if test="printFlag != null and printFlag == '0'.toString()">
-            and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
-        </if>
-        <!--护理单据对应、已打印的-->
-        <if test="printFlag != null and printFlag == '1'.toString()">
-            and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
-        </if>
       and i.use_code in ('2','3') and i.is_check='1'
+      <!--数据共享标志为1，需根据单据类型判断打印状态-->
+      <if test="isShared != null and isShared == '1'.toString()">
+          <!--护理单据对应、未打印的-->
+          <if test="printFlag != null and printFlag == '0'.toString()">
+              and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
+          </if>
+          <!--护理单据对应、已打印的-->
+          <if test="printFlag != null and printFlag == '1'.toString()">
+              and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
+          </if>
+      </if>
+      <!--数据共享标志为0，直接根据打印标志拍段打印状态-->
+      <if test="isShared != null and isShared == '0'.toString()">
+        and iae.is_print = #{printFlag}
+      </if>
       <if test="isStop !=null and isStop != ''">
         and i.is_stop = #{isStop}
       </if>
@@ -386,15 +400,23 @@
       </if>
       left join phar_in_wait_receive piwr on piwr.advice_id = ia.id and piwr.hosp_code = ia.hosp_code
       where ia.hosp_code=#{hospCode}
-        <if test="printFlag != null and printFlag == '0'.toString()">
-            and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
-        </if>
-        <!--护理单据对应、已打印的-->
-        <if test="printFlag != null and printFlag == '1'.toString()">
-            and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
-        </if>
       and (( ia.item_code = '1' and piwr.status_code >'0' and ia.use_code ='1') or (ia.item_code != '1'))
       and ia.is_check='1'
+      <!--数据共享标志为1，需根据单据类型判断打印状态-->
+      <if test="isShared != null and isShared == '1'.toString()">
+          <!--护理单据对应、未打印的-->
+          <if test="printFlag != null and printFlag == '0'.toString()">
+              and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
+          </if>
+          <!--护理单据对应、已打印的-->
+          <if test="printFlag != null and printFlag == '1'.toString()">
+              and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
+          </if>
+      </if>
+      <!--数据共享标志为0，直接根据打印标志拍段打印状态-->
+      <if test="isShared != null and isShared == '0'.toString()">
+          and iae.is_print = #{printFlag}
+      </if>
       <if test="isStop !=null and isStop != ''">
         and ia.is_stop = #{isStop}
       </if>

@@ -99,6 +99,12 @@ public class InsureDictServiceImpl extends HsafService implements InsureDictServ
     }
 
 
+    @Override
+    public WrapperResponse queryInsureDictList2(Map param) {
+        return WrapperResponse.success(insureDictBO.queryInsureDictList2(MapUtils.get(param,"insureDictDTO")));
+    }
+
+
     /**
      * @Method updateDictValue()
      * @Desrciption  更新医保码表数据

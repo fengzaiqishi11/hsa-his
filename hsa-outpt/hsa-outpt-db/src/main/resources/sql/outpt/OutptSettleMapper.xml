@@ -516,10 +516,10 @@
             and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
         </if>
         <if test="startTime != null and startTime != ''">
-            and a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+            and a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endTime != null and endTime != ''">
-            and a.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+            and a.settle_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="chargeId != null and chargeId != ''">
             and a.crte_id = #{chargeId}

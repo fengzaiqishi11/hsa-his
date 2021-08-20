@@ -35,14 +35,14 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         /**
          * 收费开始日期
          */
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
         private String startTime;
         /**
          * 收费结束日期
          */
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
         private String endTime;
         /**
          * 收费员id

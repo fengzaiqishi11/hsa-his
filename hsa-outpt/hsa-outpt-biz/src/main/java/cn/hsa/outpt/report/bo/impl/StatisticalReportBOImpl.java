@@ -204,7 +204,10 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         Integer pageSize =Integer.parseInt((String) paramMap.get("pageSize"));
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = statisticalReportDAO.queryOutptWorkLog(paramMap);
-
+        // 如果为空 那么直接返回null，走下面会报内存异常
+        if (ListUtils.isEmpty(list)){
+            return PageDTO.of(list);
+        }
         //根据个人档案ids查询档案信息
         List<String> proIds = new ArrayList<>();
         for (Map<String, Object> map : list) {

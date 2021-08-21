@@ -617,6 +617,19 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         logger.info("项目互认信息查询回参:" + resultJson);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "bilgiteminfo");
+        // 模拟数据
+       /* Map map1 = new HashMap();
+        map1.put("psn_no","434324234432");
+        map1.put("rpotc_no","202145678934589");
+        map1.put("rpotc_type_code","123");
+        map1.put("exam_rpotc_name","测试检测报告");
+        map1.put("rpt_date","2021-06-09");
+        map1.put("fixmedins_code","LT0748");
+        map1.put("exam_rslt_poit_flag","1");
+        map1.put("exam_rslt_abn","1");
+        map1.put("examCcls","434324234432");
+        List<Map<String, Object>> resultDataMap = new ArrayList<>();
+        resultDataMap.add(map1);*/
         map.put("resultDataMap", resultDataMap);
         return map;
     }
@@ -718,8 +731,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
+        // 人员编号
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
-        dataMap.put("rpotc_no", MapUtils.get(map, "rpotcNo"));
+        // 报告单号
+        dataMap.put("rpotc_no", "rpotcNo");
+        // 机构编码
         dataMap.put("fixmedins_code", MapUtils.get(map, "fixmedinsCode"));
 
         paramMap.put("data", dataMap);
@@ -731,6 +747,41 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
         logger.info("报告明细信息查询回参:" + resultJson);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        // Map<String, Object> outptMap = new HashMap<>();
+        // checkreportdetails inspectionreportinformation inspectiondetails
+/*        Map checkreportdetails = new HashMap();
+        checkreportdetails.put("psn_no","123");
+        checkreportdetails.put("rpotc_no","666");
+        checkreportdetails.put("rpt_date","777");
+        checkreportdetails.put("rpotc_type_code","7");
+        checkreportdetails.put("exam_rpotc_name","8");
+        checkreportdetails.put("exam_rslt_poit_flag","9");
+        checkreportdetails.put("exam_rslt_abn","0");
+        checkreportdetails.put("exam_ccls","12");
+        checkreportdetails.put("bilgDrName","23");
+        outptMap.put("checkreportdetails",checkreportdetails);
+
+        Map inspectionreportinformation = new HashMap();
+        inspectionreportinformation.put("psn_no","123");
+        inspectionreportinformation.put("rpotc_no","666");
+        inspectionreportinformation.put("exam_item_code","777");
+        inspectionreportinformation.put("exam_item_name","7");
+        inspectionreportinformation.put("rpt_date","8");
+        inspectionreportinformation.put("rpot_doc","9");
+        outptMap.put("inspectionreportinformation",inspectionreportinformation);
+
+        // inspectiondetails
+        Map inspectiondetails = new HashMap();
+        inspectiondetails.put("rpotc_no","1232");
+        inspectiondetails.put("exam_mtd","1232");
+        inspectiondetails.put("ref_val","1232");
+        inspectiondetails.put("exam_unt","1232");
+        inspectiondetails.put("exam_rslt_val","1232");
+        inspectiondetails.put("exam_rslt_qual","1232");
+        inspectiondetails.put("exam_item_detl_code","1232");
+        inspectiondetails.put("exam_item_detl_name","1232");
+        inspectiondetails.put("exam_rslt_abn","1232");
+        outptMap.put("inspectiondetails",inspectiondetails);*/
         map.put("resultDataMap", outptMap);
         return map;
     }

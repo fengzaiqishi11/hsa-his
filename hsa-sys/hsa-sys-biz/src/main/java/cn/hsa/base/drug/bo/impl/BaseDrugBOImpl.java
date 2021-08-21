@@ -16,7 +16,9 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.drug.bo.BaseDrugBO;
 import cn.hsa.module.base.drug.dao.BaseDrugDAO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
+import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
@@ -76,6 +78,9 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
 
     public final static Map PREPMAP = new HashMap() {{
         put("241", "口服常释剂型");
@@ -400,12 +405,32 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
      */
     @Override
     public Boolean insertInsureDrugMatch(Map<String, Object> map) {
-        map.put("code", "UNIFIED_PAY");
+        /*map.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
         if(sys ==null || !Constants.SF.S.equals(sys.getValue())){
             throw new AppException("请先配置走医保统一支付平台,再进行药品医保同步操作");
-        }
+        }*/
         String insureRegCode = MapUtils.get(map,"regCode");
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(MapUtils.get(map,"hospCode")); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", MapUtils.get(map,"hospCode"));
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+        if (StringUtils.isEmpty(isUnifiedPay) || !"1".equals(isUnifiedPay)) {
+            throw new AppException("请先配置走医保统一支付平台,再进行药品医保同步操作");
+        }
+
         String crteId =  MapUtils.get(map,"crteId");
         String crteName =  MapUtils.get(map,"crteName");
         BaseDrugDTO baseDrugDTO = new BaseDrugDTO();

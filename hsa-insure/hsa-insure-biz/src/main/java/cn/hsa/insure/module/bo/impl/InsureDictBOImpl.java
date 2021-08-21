@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.module.insure.module.bo.InsureDictBO;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureDictDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
@@ -51,6 +52,9 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
 
     @Resource
     private InsureUnifiedPayRestService insureUnifiedPayRestService;
+
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
     /**
      * @Method queryInsureDict
@@ -129,9 +133,24 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         map.put("type",insureDictDTO.getType());
         map.put("remark",insureDictDTO.getRemark());
         map.put("insureRegCode",insureDictDTO.getRegCode());
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureDictDTO.getRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         List<InsureDictDO> insureDictDOList = null;
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+        /*SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sys != null && Constants.SF.S.equals(sys.getValue())) {*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             Map<String, Object> data = insureUnifiedPayRestService.insertUnifiedDict(map).getData();
             insureDictDOList = MapUtils.get(data,"insureDictDTOList");
         }else{
@@ -256,20 +275,9 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
 
     @Override
     public JSONObject queryInsureDictList2(InsureDictDTO insureDictDTO) {
-        if (StringUtils.isNotEmpty(insureDictDTO.getCode())){
-            insureDictDTO.setCodes(insureDictDTO.getCode().split(","));
-        }
         JSONObject jsonObject = new JSONObject();
-        //查询快捷配置信息
-        Map<String,String> sysParameter = new HashMap<String,String>();
-        sysParameter.put("hospCode",insureDictDTO.getHospCode());//医院编码
-        sysParameter.put("code",insureDictDTO.getCode());//医保机构编码
-        sysParameter.put("isValid", Constants.SF.S);//是否有效
-        jsonObject.put("config",insureDictDAO.querySysParameterByCode(sysParameter));
         //查询码表信息
-        jsonObject.put("insureDict",insureDictDAO.queryInsureDictList(insureDictDTO));
+        jsonObject.put("insureDict",insureDictDAO.queryInsureDictList2(insureDictDTO));
         return jsonObject;
     }
-
-
 }

@@ -1131,4 +1131,9 @@
             and cq_id = #{cqId}
         </if>
     </select>
+
+    <!--根据就诊id查询挂号记录(outpt_register)-->
+    <select id="getOutptRegisterByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.entity.OutptRegisterDO">
+
+    </select>
 </mapper>

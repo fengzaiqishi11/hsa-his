@@ -89,6 +89,21 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
 
         String hospCode = visitDTO.getHospCode();
         String orgCode = visitDTO.getInsureOrgCode();
+
+        String insureRegCode = visitDTO.getInsureRegCode();
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         insureIndividualVisitDTO.setIsAdviceEntry("0");
         List<InptAdviceDTO> adviceDTOList = this.queryMatchAdvice(insureIndividualVisitDTO);
         if (ListUtils.isEmpty(adviceDTOList)) {
@@ -100,14 +115,16 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
          * 先操作日志表，后调用医保接口
          */
         this.operateInsureLog(visitDTO);
-        Map<String,Object> isInsureUnifiedMap = new HashMap<>();
+        Map<String, Object> adviceParamMap =null;
+        List<Map<String,Object>> paramMapList = new ArrayList<>();
+
+       /* Map<String,Object> isInsureUnifiedMap = new HashMap<>();
         isInsureUnifiedMap.put("hospCode", hospCode);
         isInsureUnifiedMap.put("code", "UNIFIED_PAY");
         // 根据系统判断 是否走医保统一支付平台调用接口
-        Map<String, Object> adviceParamMap =null;
-        List<Map<String,Object>> paramMapList = new ArrayList<>();
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
-        if(sysParameterDTO!=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+        if(sysParameterDTO!=null && Constants.SF.S.equals(sysParameterDTO.getValue())){*/
+        if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             paramMapList = handlerParamter(visitDTO,adviceDTOList);
             Map<String,Object> paramDataMap = new HashMap<>();
             paramDataMap.put("data",paramMapList);

@@ -32,4 +32,6 @@
     <dubbo:reference id="insureItemMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureItemMatchService" check="false"/>
     <!-- 医保管理子系统 -> 疾病匹配 -->
     <dubbo:reference id="insureDiseaseMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" check="false"/>
+    <!-- 医保管理子系统 -> 医保配置信息 -->
+    <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
 </beans>

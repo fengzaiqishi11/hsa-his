@@ -421,4 +421,9 @@ public class InptAdviceDO extends PageDO implements Serializable {
      */
     private String advanceDays;
 
+    /**
+     * 是否上传
+     */
+    private String isInsureUpload;
+
 }

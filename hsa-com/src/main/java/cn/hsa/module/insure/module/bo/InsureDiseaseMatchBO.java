@@ -128,4 +128,6 @@ public interface InsureDiseaseMatchBO {
      * @Return
      */
     PageDTO queryPageInsureDisease(InsureDiseaseDTO insureDiseaseDTO);
+
+    PageDTO queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseDTO);
 }

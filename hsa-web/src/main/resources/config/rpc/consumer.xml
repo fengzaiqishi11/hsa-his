@@ -455,5 +455,7 @@
 
     <!-- 一卡通异动服务 -->
     <dubbo:reference id="baseCardRechargeChangeService_consumer" interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" check="false"/>
+    <!-- 医保输血记录服务 -->
+    <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
 </beans>
 

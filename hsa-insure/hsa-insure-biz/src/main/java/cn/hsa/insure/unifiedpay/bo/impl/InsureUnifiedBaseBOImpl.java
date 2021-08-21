@@ -579,29 +579,14 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Date 2021/4/23 12:47
      * @Return
      **/
+    @Override
     public Map<String, Object> queryItemConfirm(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
-        /**
-         * 获取访问的url地址
-         */
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
-        insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
-        Map<String, Object> inputMap = new HashMap<>();
+        // 查询数据条件字段map
         Map<String, Object> dataMap = new HashMap<>();
+        // 查询数据参数map
         Map<String, Object> paramMap = new HashMap<>();
-
-        /**
-         * 公共入参
-         */
-        inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_5401);  // 交易编号
-        inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
-        inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
-        inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-        inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-        inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         dataMap.put("exam_org_code", MapUtils.get(map, "examOrgCode"));
@@ -609,14 +594,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("exam_item_code", MapUtils.get(map, "examItemCode"));
         dataMap.put("exam_item_name", MapUtils.get(map, "examItemName"));
         paramMap.put("data", dataMap);
-        inputMap.put("input", paramMap);
-        String json = JSONObject.toJSONString(inputMap);
-        logger.info("项目互认信息查询入参:" + json);
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
-        logger.info("项目互认信息查询回参:" + resultJson);
-        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
-        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "bilgiteminfo");
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "5401", paramMap);
+        List<Map<String, Object>> resultDataMap= MapUtils.get(resultMap, "bilgiteminfo");
         map.put("resultDataMap", resultDataMap);
         return map;
     }

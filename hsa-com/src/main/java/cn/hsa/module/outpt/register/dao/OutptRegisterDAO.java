@@ -194,4 +194,7 @@ public interface OutptRegisterDAO {
      * @Return:  影响行数
      **/
     int insertRegisterDetail(List<OutptRegisterDetailDto> list);
+
+    // 根据就诊id查询挂号记录(outpt_register)
+    OutptRegisterDO getOutptRegisterByVisitId(Map<String, Object> map);
 }

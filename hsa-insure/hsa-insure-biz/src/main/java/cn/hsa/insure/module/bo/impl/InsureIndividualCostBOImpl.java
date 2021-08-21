@@ -13,9 +13,11 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.bo.InsureIndividualCostBO;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
@@ -63,6 +65,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
 
     @Resource
     private InsureIndividualSettleDAO insureIndividualSettleDAO;
+
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
     /**
      * @return java.lang.Boolean
@@ -153,6 +158,20 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         }
         String insureRegCode = insureIndividualVisitDTO.getInsureOrgCode();
         String cardIden = insureIndividualVisitDTO.getCardIden();
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         //判断是否有传输费用信息
         Map<String, String> insureCostParam = new HashMap<String, String>();
         insureCostParam.put("hospCode", hospCode);//医院编码
@@ -176,12 +195,13 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         }
         //保存本次传输费用信息
         List<InsureIndividualCostDO> insureIndividualCostDOList = new ArrayList<InsureIndividualCostDO>();
-        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+       /*Map<String, Object> isInsureUnifiedMap = new HashMap<>();
         isInsureUnifiedMap.put("hospCode", hospCode);
         isInsureUnifiedMap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();*/
         List<Map<String, Object>> insureCostList = new ArrayList<>();
-        if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
+//        if(sysParameterDTO ==null || !"1".equals(sysParameterDTO.getValue())){
+        if(StringUtils.isEmpty(isUnifiedPay) || !"1".equals(isUnifiedPay)){
             //查询未上传的费用集合
             insureCostList = insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
             if (insureCostList == null || insureCostList.isEmpty()) {
@@ -219,7 +239,8 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         if (Constants.SF.S.equals(insureIndividualVisitDTO.getIsEcqr())) {
             //电子凭证
             //transpond.to(hospCode,insureRegCode,Constant.FUNCTION.);
-        } else if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+//        } else if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+        } else if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             //通过获取系统参数来判断 是走医保统一支付平台 还是调用自己的的医保接口
             Map<String, Object> unifiedMap = new HashMap<>();
             unifiedMap.put("code", code);

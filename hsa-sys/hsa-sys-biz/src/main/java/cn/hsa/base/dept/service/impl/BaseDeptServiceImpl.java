@@ -291,4 +291,18 @@ public class BaseDeptServiceImpl extends HsafService implements BaseDeptService 
         List<BaseDeptDTO> deptDTOList = MapUtils.get(map,"deptDTOList");
         return WrapperResponse.success(baseDeptBO.updateBatchDept(deptDTOList));
     }
+
+    /**
+     * @Menthod: uploadDeptInfo
+     * @Desrciption: 统一支付平台【3401】-科室信息上传
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-13 16:01
+     * @Return: List<BaseDeptDTO>
+     **/
+    @Override
+    public WrapperResponse<List<BaseDeptDTO>> uploadDeptInfo(Map map) {
+        return WrapperResponse.success(baseDeptBO.queryBaseDeptByInsure(MapUtils.get(map, "baseDeptDTO")));
+    }
 }

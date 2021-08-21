@@ -93,8 +93,20 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     public Map<String, Object> queryUnifiedDept(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String regCode = MapUtils.get(map, "regCode");
+        if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构");
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO dto = new InsureConfigurationDTO();
+        dto.setHospCode(hospCode);
+        dto.setRegCode(regCode);
+        dto.setIsValid(Constants.SF.S);
+        InsureConfigurationDTO insureConfigurationDTO = this.getInsureConfiguration(dto);
+        if (insureConfigurationDTO == null) {
+            throw new RuntimeException("该【" + regCode + "】未能查询到对应的医保配置信息");
+        }
         Map<String, Object> dataMap = new HashMap<>();
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.REGISTER.UP_5101, dataMap);
+        // 统一支付平台返参
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_5101, dataMap);
+        logger.debug("统一支付平台【科室信息查询5101】返参：" + JSONObject.toJSONString(resultMap));
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "feedetail");
         map.put("resultDataMap", resultDataMap);
@@ -308,8 +320,23 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         paramMap.put("data", dataMap);
-        map.put("code", "UNIFIED_PAY");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        /*map.put("code", "UNIFIED_PAY");
+        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();*/
+
         Map<String, Object> outptMap = new HashMap<>();
         InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
         individualSettleDTO.setHospCode(hospCode);
@@ -321,7 +348,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         /**
          * 省外医保  接口无数据返回。只能查询本地保存的费用数据
          */
-        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
+//        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
+        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             Map<String, Object> setlinfoMap = insureIndividualSettleDAO.querySettleForMap(map);
             if(MapUtils.isEmpty(setlinfoMap)){
                 throw  new AppException("根据就诊id,结算id查询医保信息为空");
@@ -846,35 +874,57 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Override
     public Map<String, Object> updateUnifiedDeptInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        BaseDeptDTO deptDTO = baseDeptService_consumer.getById(map).getData();
-        map.put("code", "HOSP_INSURE_CODE");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
-        String orgCode = "";
-        if (data != null) {
-            orgCode = data.getValue(); // 获取医疗机构编码
+        String regCode = MapUtils.get(map, "regCode");
+        if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
+        String code = MapUtils.get(map, "hosp_dept_codg");
+        if (StringUtils.isEmpty(code)) {
+            throw new RuntimeException("未传入需要变更的科室编码");
         }
+
+        // 根据医保机构编码查询医保配置信息, 获取医保统筹区编码
+        InsureConfigurationDTO dto = new InsureConfigurationDTO();
+        dto.setHospCode(hospCode);
+        dto.setRegCode(regCode);
+        dto.setIsValid(Constants.SF.S);
+        InsureConfigurationDTO insureConfigurationDTO = this.getInsureConfiguration(dto);
+        if (insureConfigurationDTO == null) {
+            throw new RuntimeException("该【" + regCode + "】未能查询到对应的医保配置信息");
+        }
+
+        BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+        baseDeptDTO.setIsValid(Constants.SF.S); // 有效
+        baseDeptDTO.setCode(code);
+        baseDeptDTO.setHospCode(hospCode);
+        map.put("baseDeptDTO", baseDeptDTO);
+        // 获取未上传的科室信息
+        List<BaseDeptDTO> deptDTOList = baseDeptService_consumer.uploadDeptInfo(map).getData();
+        if (ListUtils.isEmpty(deptDTOList)) {
+            throw new RuntimeException("该科室编码【" + code + "】未能查询到记录");
+        }
+        BaseDeptDTO deptDTO = deptDTOList.get(0);
+
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("hosp_dept_codg", deptDTO.getId()); // 医院科室编码  主键id当编码
-        paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
-        paramMap.put("begntime", deptDTO.getBegntime()); // 开始时间
-        paramMap.put("endtime", deptDTO.getEndtime()); // 开始时间
-        paramMap.put("itro", deptDTO.getIntro()); // 简介
-        paramMap.put("dept_resper_name", deptDTO.getDeptResperName()); // 科室负责人姓名
-        paramMap.put("dept_resper_tel", deptDTO.getDeptResperTel()); // 科室负责人电话
-        paramMap.put("dept_med_serv_scp", deptDTO.getDeptMedServScp()); // 科室医疗服务范围
+        paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
         paramMap.put("caty", deptDTO.getNationCode()); // 科别
+        paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
+        paramMap.put("begntime", deptDTO.getCrteTime()); // 开始时间
+//        paramMap.put("endtime", deptDTO.getEndtime()); // 开始时间
+        paramMap.put("itro", deptDTO.getIntro()); // 简介
+        paramMap.put("dept_resper_name", deptDTO.getPersonName()); // 科室负责人姓名
+        paramMap.put("dept_resper_tel", deptDTO.getPhone()); // 科室负责人电话
+//        paramMap.put("dept_med_serv_scp", deptDTO.getDeptMedServScp()); // 科室医疗服务范围
         paramMap.put("dept_estbdat", deptDTO.getCrteTime()); // 科室成立日期
-        paramMap.put("aprv_bed_cnt", deptDTO.getAprvBedCnt()); // 批准床位数量
-        paramMap.put("hi_crtf_bed_cnt", deptDTO.getHiCrtfBedCnt());
-        paramMap.put("poolarea_no", deptDTO.getPoolareaNo());
-        paramMap.put("dr_psncnt", deptDTO.getDrPsncnt());
-        paramMap.put("phar_psncnt", deptDTO.getPharPsncnt());
-        paramMap.put("nurs_psncnt", deptDTO.getNursPsncnt());
-        paramMap.put("tecn_psncnt", deptDTO.getTecnPsncnt());
-        paramMap.put("memo", deptDTO.getRemark());
+        paramMap.put("aprv_bed_cnt", Integer.parseInt(deptDTO.getBedNum())); // 批准床位数量
+//        paramMap.put("hi_crtf_bed_cnt", deptDTO.getHiCrtfBedCnt()); // 医保认可床位数
+        paramMap.put("poolarea_no", insureConfigurationDTO.getAttrCode()); // 统筹区编号
+        paramMap.put("dr_psncnt", Integer.parseInt(deptDTO.getDoctorNum())); // 医生人数
+        paramMap.put("phar_psncnt", Integer.parseInt(deptDTO.getDrugNum())); // 药师人数
+        paramMap.put("nurs_psncnt", Integer.parseInt(deptDTO.getNurseNum())); // 护士人数
+        paramMap.put("tecn_psncnt", Integer.parseInt(deptDTO.getMedicNum())); // 技师人数
+        paramMap.put("memo", deptDTO.getRemark()); // 备注
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("deptinfo", paramMap);
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3402, dataMap);
         return resultMap;
     }
 
@@ -889,43 +939,100 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      */
     @Override
     public Map<String, Object> updateUnifiedDept(Map<String, Object> map) {
-        List<BaseDeptDTO> deptDTOList = baseDeptService_consumer.queryAll(map).getData();
-        map.put("code", "HOSP_INSURE_CODE");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
-        String orgCode = "";
-        if (data != null) {
-            orgCode = data.getValue(); // 获取医疗机构编码
-        }
+        String regCode = MapUtils.get(map, "regCode");
+        if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
         String hospCode = MapUtils.get(map, "hospCode");
-        List<Map<String, Object>> mapList = new ArrayList<>();
+
+        // 根据医疗机构编码查询医保配置信息, 获取医保统筹区编码
+        InsureConfigurationDTO dto = new InsureConfigurationDTO();
+        dto.setHospCode(hospCode);
+        dto.setRegCode(regCode);
+        dto.setIsValid(Constants.SF.S);
+        InsureConfigurationDTO insureConfigurationDTO = this.getInsureConfiguration(dto);
+        if (insureConfigurationDTO == null) {
+            throw new RuntimeException("该【" + regCode + "】未能查询到对应的医保配置信息");
+        }
+
+        // 获取未上传的科室信息
+        BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+        baseDeptDTO.setIsUpload(Constants.SF.F); // 未上传
+        baseDeptDTO.setIsValid(Constants.SF.S); // 有效
+        baseDeptDTO.setHospCode(hospCode);
+        String attrCode = insureConfigurationDTO.getAttrCode(); // 医保归属地区划
+        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+            // 湖南省科室上传为单条数据上传
+            String code = MapUtils.get(map, "code");
+            if (StringUtils.isEmpty(code)) throw new RuntimeException("湖南省科室上传需单条记录上传，请先选择需要上传的科室");
+            baseDeptDTO.setCode(code);
+        }
+        map.put("baseDeptDTO", baseDeptDTO);
+        List<BaseDeptDTO> deptDTOList = baseDeptService_consumer.uploadDeptInfo(map).getData();
+        if (ListUtils.isEmpty(deptDTOList)) {
+            throw new RuntimeException("未发现需要上传的科室信息");
+        }
+        log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+
+        // 入参封装
         Map<String, Object> inputMap = new HashMap<>();
-        deptDTOList.stream().forEach(deptDTO -> {
+        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+            BaseDeptDTO deptDTO = deptDTOList.get(0);
+            // 设置上传状态未已上传
+            deptDTO.setIsUpload(Constants.SF.S); // 已上传
+
             Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("hosp_dept_codg", deptDTO.getId()); // 医院科室编码  主键id当编码
-            paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
-            paramMap.put("begntime", deptDTO.getBegntime()); // 开始时间
-            paramMap.put("endtime", deptDTO.getEndtime()); // 开始时间
-            paramMap.put("itro", deptDTO.getIntro()); // 简介
-            paramMap.put("dept_resper_name", deptDTO.getDeptResperName()); // 科室负责人姓名
-            paramMap.put("dept_resper_tel", deptDTO.getDeptResperTel()); // 科室负责人电话
-            paramMap.put("dept_med_serv_scp", deptDTO.getDeptMedServScp()); // 科室医疗服务范围
+            paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
             paramMap.put("caty", deptDTO.getNationCode()); // 科别
+            paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
+            paramMap.put("begntime", deptDTO.getCrteTime()); // 开始时间
+            paramMap.put("endtime", null); // 结束时间
+            paramMap.put("itro", deptDTO.getIntro()); // 简介
+            paramMap.put("dept_resper_name", deptDTO.getPersonName()); // 科室负责人姓名
+            paramMap.put("dept_resper_tel", deptDTO.getPhone()); // 科室负责人电话
+            paramMap.put("dept_med_serv_scp", null); // 科室医疗服务范围
             paramMap.put("dept_estbdat", deptDTO.getCrteTime()); // 科室成立日期
-            paramMap.put("aprv_bed_cnt", deptDTO.getAprvBedCnt()); // 批准床位数量
-            paramMap.put("hi_crtf_bed_cnt", deptDTO.getHiCrtfBedCnt());
-            paramMap.put("poolarea_no", deptDTO.getPoolareaNo());
-            paramMap.put("dr_psncnt", deptDTO.getDrPsncnt());
-            paramMap.put("phar_psncnt", deptDTO.getPharPsncnt());
-            paramMap.put("nurs_psncnt", deptDTO.getNursPsncnt());
-            paramMap.put("tecn_psncnt", deptDTO.getTecnPsncnt());
-            paramMap.put("memo", deptDTO.getRemark());
-            mapList.add(paramMap);
-        });
-        inputMap.put("deptinfo", mapList);
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, inputMap);
+            paramMap.put("aprv_bed_cnt", Integer.parseInt(deptDTO.getBedNum())); // 批准床位数量
+            paramMap.put("hi_crtf_bed_cnt", null); // 医保认可床位数
+            paramMap.put("poolarea_no", insureConfigurationDTO.getAttrCode()); // 统筹区编号
+            paramMap.put("dr_psncnt", Integer.parseInt(deptDTO.getDoctorNum())); // 医生人数
+            paramMap.put("phar_psncnt", Integer.parseInt(deptDTO.getDrugNum())); // 药师人数
+            paramMap.put("nurs_psncnt", Integer.parseInt(deptDTO.getNurseNum())); // 护士人数
+            paramMap.put("tecn_psncnt", Integer.parseInt(deptDTO.getMedicNum())); // 技师人数
+            paramMap.put("memo", deptDTO.getRemark()); // 备注
+            inputMap.put("deptinfo", paramMap);
+        } else {
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            deptDTOList.stream().forEach(deptDTO -> {
+                // 设置上传状态未已上传
+                deptDTO.setIsUpload(Constants.SF.S); // 已上传
+
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
+                paramMap.put("caty", deptDTO.getNationCode()); // 科别
+                paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
+                paramMap.put("begntime", DateUtils.parse(DateUtils.format(deptDTO.getCrteTime(), DateUtils.Y_M_DH_M_S), DateUtils.Y_M_DH_M_S)); // 开始时间
+                paramMap.put("endtime", null); // 结束时间
+                paramMap.put("itro", deptDTO.getIntro()); // 简介
+                paramMap.put("dept_resper_name", deptDTO.getPersonName()); // 科室负责人姓名
+                paramMap.put("dept_resper_tel", deptDTO.getPhone()); // 科室负责人电话
+                paramMap.put("dept_med_serv_scp", null); // 科室医疗服务范围
+                paramMap.put("dept_estbdat", DateUtils.parse(DateUtils.format(deptDTO.getCrteTime(), DateUtils.Y_M_DH_M_S), DateUtils.Y_M_DH_M_S)); // 科室成立日期
+                paramMap.put("aprv_bed_cnt", Integer.parseInt(deptDTO.getBedNum())); // 批准床位数量
+                paramMap.put("hi_crtf_bed_cnt", null); // 医保认可床位数
+                paramMap.put("poolarea_no", insureConfigurationDTO.getAttrCode()); // 统筹区编号
+                paramMap.put("dr_psncnt", Integer.parseInt(deptDTO.getDoctorNum())); // 医生人数
+                paramMap.put("phar_psncnt", Integer.parseInt(deptDTO.getDrugNum())); // 药师人数
+                paramMap.put("nurs_psncnt", Integer.parseInt(deptDTO.getNurseNum())); // 护士人数
+                paramMap.put("tecn_psncnt", Integer.parseInt(deptDTO.getMedicNum())); // 技师人数
+                paramMap.put("memo", deptDTO.getRemark()); // 备注
+                mapList.add(paramMap);
+            });
+            inputMap.put("deptinfo", mapList);
+        }
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap);
+        // 上传完成后，更新本地科室表上传状态
         map.put("deptDTOList", deptDTOList);
         baseDeptService_consumer.updateBatchDept(map).getData();
-        return map;
+        return resultMap;
     }
 
     /**
@@ -940,25 +1047,48 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Override
     public Map<String, Object> deleteUnifiedDeptInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        String id = MapUtils.get(map, "id");
-        String code = MapUtils.get(map, "code");
-        String deptName = MapUtils.get(map, "name");
+        String regCode = MapUtils.get(map, "regCode");
+        if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
+        String code = MapUtils.get(map, "hosp_dept_codg");
+        String deptName = MapUtils.get(map, "hosp_dept_name");
         String startTime = MapUtils.get(map, "begntime");
-        map.put("code", "HOSP_INSURE_CODE");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
-        String orgCode = "";
-        if (data != null) {
-            orgCode = data.getValue(); // 获取医疗机构编码
+
+        BaseDeptDTO deptDTO = new BaseDeptDTO();
+        deptDTO.setHospCode(hospCode);
+        deptDTO.setCode(code);
+        map.put("baseDeptDTO", deptDTO);
+
+        // 根据科室id、code查询科室信息
+        BaseDeptDTO baseDeptDTO = baseDeptService_consumer.getById(map).getData();
+        if (baseDeptDTO == null) {
+            throw new RuntimeException("【" + deptName  + "】科室不存在");
         }
+
+        // 根据医疗机构编码查询医保配置信息, 获取医保统筹区编码
+        InsureConfigurationDTO dto = new InsureConfigurationDTO();
+        dto.setHospCode(hospCode);
+        dto.setRegCode(regCode);
+        dto.setIsValid(Constants.SF.S);
+        InsureConfigurationDTO insureConfigurationDTO = this.getInsureConfiguration(dto);
+        if (insureConfigurationDTO == null) {
+            throw new RuntimeException("该【" + regCode + "】未能查询到对应的医保配置信息");
+        }
+
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("hosp_dept_codg", code);
         dataMap.put("hosp_dept_name", deptName);
         dataMap.put("begntime", startTime);
         paramMap.put("data", dataMap);
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_3403, paramMap);
-        map.put("isUpload", "0");
-        baseDeptService_consumer.update(map).getData();
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3403, paramMap);
+
+        // 科室上传撤销后，更改上传状态为未上传
+        List<BaseDeptDTO> deptDTOList = new ArrayList<>();
+        deptDTO.setIsUpload(Constants.SF.F);
+        deptDTO.setId(baseDeptDTO.getId());
+        deptDTOList.add(deptDTO);
+        map.put("deptDTOList", deptDTOList);
+        baseDeptService_consumer.updateBatchDept(map).getData();
         return resultMap;
     }
 

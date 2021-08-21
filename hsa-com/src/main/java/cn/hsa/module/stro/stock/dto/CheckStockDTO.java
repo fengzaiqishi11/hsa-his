@@ -60,4 +60,14 @@ public class CheckStockDTO implements Serializable {
      * 数量
      */
     private BigDecimal num;
+
+    /**
+     * 门诊处方明细id/或者 医嘱id
+     */
+    private String id;
+    /**
+     * 处方id:新增的时候处方id为null，编辑的时候处方id不为空。
+     * 所以编辑的时候忽略掉当前处方的所有药品数量
+     */
+    private String opId;
 }

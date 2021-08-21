@@ -1734,7 +1734,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         //校验时间格式
         String startTime = outptSettleDTO.getStartTime();
         String endTime = outptSettleDTO.getEndTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             sdf.parse(startTime);
         } catch (Exception e) {

@@ -202,4 +202,16 @@ public interface BaseDeptService {
      * @Return 
     **/
     WrapperResponse<Boolean> updateBatchDept(Map<String, Object> map);
+
+    /**
+     * @Menthod: uploadDeptInfo
+     * @Desrciption: 统一支付平台【3401】-科室信息上传
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-13 16:01
+     * @Return: List<BaseDeptDTO>
+     **/
+    @GetMapping("/service/insure/insureDept/uploadDeptInfo")
+    WrapperResponse<List<BaseDeptDTO>> uploadDeptInfo(Map map);
 }

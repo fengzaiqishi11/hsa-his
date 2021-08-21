@@ -60,6 +60,16 @@ public interface InsureDictDAO {
      */
     List<InsureDictDO> queryInsureDictList(InsureDictDTO insureDictDTO);
 
+    /**
+     * @Menthod queryInsureDictList
+     * @Desrciption 查询医保字典信息
+     * @param insureDictDTO 查询条件
+     * @Author yuelong.chen
+     * @Date 2021/8/20 9:17
+     * @Return java.util.List<cn.hsa.module.insure.insureDict.entity.InsureDictDO>
+     */
+    List<InsureDictDO> queryInsureDictList2(InsureDictDTO insureDictDTO);
+
     boolean insertInsureDict (@Param("insureDictDTOList") List<InsureDictDO> insureDictDTOList);
     boolean deleteInsureDict(InsureDictDTO insureDictDTO);
 

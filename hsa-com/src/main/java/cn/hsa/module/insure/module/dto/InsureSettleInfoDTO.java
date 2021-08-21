@@ -38,6 +38,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dclaTime; // 申报时间
 
     private String psnName; // 人员姓名 *
+    private String psnCertType;
 
     private String gend; // 性别 *
 
@@ -269,4 +270,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 //     */
     private String lv3NursecareDays;
 
+    private String iptOptNo;
+    private String isTransmit ;
+    private String isMatch;
+    private String orgCode;
 }

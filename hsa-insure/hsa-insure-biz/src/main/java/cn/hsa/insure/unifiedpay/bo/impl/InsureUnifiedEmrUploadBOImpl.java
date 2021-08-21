@@ -21,6 +21,7 @@ import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -321,15 +322,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
+        //  输入-基本信息（节点标识：baseinfo）
         Map<String,Object> baseinfoMap = queryEmcBaseInfo(map);
+        // 输入-诊断信息（节点标识：diseinfo）
         Map<String,Object> diseaseInfoMap = queryDiseaseInfo(map);
-        Map<String,Object> operationMap = queryOperationInfo(map);
+        // 病案首页流水号
+        MrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"mrisBaseInfoDTO");
+        String mid = mrisBaseInfoDTO.getId();
+        // 输入-手术记录（节点标识：oprninfo）
+        Map<String,Object> operationMap = queryOperationInfo(map,mid);
+        //  输入-重症监护信息（节点标识：icuinfo）
         Map<String,Object> icuinfoMap = queryIcuinInfo(map);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("baseinfo",baseinfoMap);
         paramMap.put("diseinfo",MapUtils.get(diseaseInfoMap,"mapList1"));
         paramMap.put("oprninfo",MapUtils.get(operationMap,"oprationMapList"));
-        paramMap.put("icuinfo",MapUtils.get(operationMap,"icuinfoMapList"));
+        paramMap.put("icuinfo",MapUtils.get(icuinfoMap,"icuinfoMapList"));
         Map<String,Object> resultMap = commonInsureUnified(hospCode,orgCode,Constant.UnifiedPay.INPT.UP_4401,paramMap);
         return true;
     }
@@ -362,10 +370,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         httpParam.put("input",paramMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("调用功能号【"+functionCode+"】的入参为"+json);
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        logger.info("调用功能号【"+functionCode+"】的反参为"+resultJson);
-        Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
-        return resultMap;
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        logger.info("调用功能号【"+functionCode+"】的反参为"+resultStr);
+        logger.info("医保统一支付平台入院办理回参:" + resultStr);
+        if (StringUtils.isEmpty(resultStr)){
+            throw new RuntimeException("调用统一支付平台无响应!");
+        }
+
+        Map<String, Object> m = (Map) JSON.parse(resultStr);
+        String resultCode = MapUtils.get(m,"infcode","");
+        if (StringUtils.isEmpty(resultCode)){
+            throw new RuntimeException("调用统一支付平台无响应!");
+        }
+        if (!"0".equals(resultCode)){
+            throw new RuntimeException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
+        }
+        return m;
     }
 
     /**
@@ -400,7 +420,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Date   2021/4/27 14:31
      * @Return
     **/
-    private Map<String, Object> queryOperationInfo(Map<String, Object> map) {
+    private Map<String, Object> queryOperationInfo(Map<String, Object> map,String mid) {
         InsureIndividualVisitDTO insureIndividualVisitDTO =MapUtils.get(map,"insureIndividualVisitDTO");
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
@@ -410,7 +430,6 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         Map<String,Object> paramMap = null;
         List<MrisOperInfoDO> operInfoDOList = mrisHomeService_consumer.queryAllOperation(map);
         if(!ListUtils.isEmpty(operInfoDOList)){
-            int count =0;
             for(MrisOperInfoDO mrisOperInfoDO : operInfoDOList){
                 paramMap = new HashMap<>();
                 paramMap.put("oprn_oprt_date",mrisOperInfoDO.getOperTime()); // 手术操作日期
@@ -454,6 +473,48 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 paramMap.put("ipt_medcas_hmpg_sn",mrisOperInfoDO.getMbiId()); // 住院病案首页流水号
                 oprationMapList.add(paramMap);
             }
+        }else{
+            paramMap = new HashMap<>();
+            paramMap.put("oprn_oprt_date",""); // 手术操作日期
+            paramMap.put("oprn_oprt_name","无"); // 手术操作名称
+            paramMap.put("oprn_oprt_code","无"); // 手术操作代码
+            paramMap.put("oprn_oprt_sn","无"); // 手术操作序列号
+            paramMap.put("oprn_lv_code","无"); // 手术级别代码
+            paramMap.put("oprn_lv_name","无"); // 手术级别名称
+            paramMap.put("oper_name","无"); // 手术者姓名
+            paramMap.put("asit_1_name","无"); // 助手Ⅰ姓名
+            paramMap.put("asit_name2","无"); // 助手Ⅱ姓名
+            paramMap.put("sinc_heal_lv",""); // 手术切口愈合等级
+            paramMap.put("sinc_heal_lv_code","无"); // 手术切口愈合等级代码
+            paramMap.put("anst_mtd_name","无"); // 麻醉-方法名称
+            paramMap.put("anst_mtd_code","无"); // 麻醉-方法代码
+            paramMap.put("anst_dr_name","无"); // 麻醉医师姓名
+            paramMap.put("oprn_oper_part","无"); //手术操作部位
+            paramMap.put("oprn_oper_part_code","无"); // 手术操作部位代码
+            paramMap.put("oprn_con_time",""); // 手术持续时间
+            paramMap.put("anst_lv_name",""); // 麻醉分级名称
+            paramMap.put("anst_lv_code",""); // 麻醉分级代码
+            paramMap.put("oprn_patn_type",""); // 手术患者类型
+            paramMap.put("oprn_patn_type _code",""); //手术患者类型代码
+            paramMap.put("main_oprn_flag",""); // 主要手术标志
+            paramMap.put("anst_asa_lv_code",""); // 麻醉ASA分级名称
+            paramMap.put("anst_asa_lv_name",""); // 麻醉ASA分级名称
+            paramMap.put("anst_medn_code",""); // 麻醉药物代码
+            paramMap.put("anst_medn_name",""); // 麻醉药物名称
+            paramMap.put("anst_medn_dos",""); // 麻醉药物剂量
+            paramMap.put("unt",""); //计量单位
+            paramMap.put("anst_begntime",""); // 麻醉开始时间
+            paramMap.put("anst_endtime",""); //麻醉结束时间
+            paramMap.put("anst_copn_code",""); // 麻醉合并症代码
+            paramMap.put("anst_copn_name",""); // 麻醉合并症名称
+            paramMap.put("anst_copn_dscr",""); // 麻醉合并症描述
+            paramMap.put("pacu_begntime",""); // 复苏室开始时间
+            paramMap.put("pacu_endtime",""); // 复苏室结束时间
+            paramMap.put("canc_oprn_flag",""); //取消手术标志
+            paramMap.put("vali_flag",Constants.SF.S); // 有效标志
+            paramMap.put("mdtrt_sn",insureIndividualVisitDTO.getMedicalRegNo());  //  就医流水号
+            paramMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+            oprationMapList.add(paramMap);
         }
         map.put("oprationMapList",oprationMapList);
         return map;

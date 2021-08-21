@@ -116,26 +116,26 @@
             <if test="statusCode =='7'">
                 and b.id is not null
                 <if test="startDate != null">
-                    and date(b.settle_time) &gt;= date(#{startDate})
+                    and b.settle_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(b.settle_time) &lt;= date(#{endDate})
+                    and b.settle_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='5'">
                 <if test="startDate != null">
-                    and date(d.out_time) &gt;= date(#{startDate})
+                    and d.out_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.out_time) &lt;= date(#{endDate})
+                    and d.out_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='2'">
                 <if test="startDate != null">
-                    and date(d.in_time) &gt;= date(#{startDate})
+                    and d.in_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.in_time) &lt;= date(#{endDate})
+                    and d.in_time &lt;= #{endDate}
                 </if>
             </if>
         </if>
@@ -251,26 +251,26 @@
             <if test="statusCode =='7'.toString()">
 
                 <if test="startDate != null">
-                    and date(c.settle_time) &gt;= date(#{startDate})
+                    and c.settle_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(c.settle_time) &lt;= date(#{endDate})
+                    and c.settle_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='5'.toString()">
                 <if test="startDate != null">
-                    and date(d.out_time) &gt;= date(#{startDate})
+                    and d.out_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.out_time) &lt;= date(#{endDate})
+                    and d.out_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='2'.toString()">
                 <if test="startDate != null">
-                    and date(d.in_time) &gt;= date(#{startDate})
+                    and d.in_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.in_time) &lt;= date(#{endDate})
+                    and d.in_time &lt;= #{endDate}
                 </if>
             </if>
         </if>
@@ -294,26 +294,26 @@
             and a.status_code = #{statusCode}
             <if test="statusCode =='7'.toString()">
                 <if test="startDate != null">
-                    and date(c.settle_time) &gt;= date(#{startDate})
+                    and c.settle_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(c.settle_time) &lt;= date(#{endDate})
+                    and c.settle_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='5'.toString()">
                 <if test="startDate != null">
-                    and date(a.out_time) &gt;= date(#{startDate})
+                    and a.out_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(a.out_time) &lt;= date(#{endDate})
+                    and a.out_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='2'.toString()">
                 <if test="startDate != null">
-                    and date(a.in_time) &gt;= date(#{startDate})
+                    and a.in_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(a.in_time) &lt;= date(#{endDate})
+                    and a.in_time &lt;= #{endDate}
                 </if>
             </if>
         </if>
@@ -353,26 +353,26 @@
             <if test="statusCode =='7'.toString()">
                 and c.id is not null
                 <if test="startDate != null">
-                    and date(c.settle_time) &gt;= date(#{startDate})
+                    and c.settle_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(c.settle_time) &lt;= date(#{endDate})
+                    and c.settle_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='5'.toString()">
                 <if test="startDate != null">
-                    and date(d.out_time) &gt;= date(#{startDate})
+                    and d.out_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.out_time) &lt;= date(#{endDate})
+                    and d.out_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='2'.toString()">
                 <if test="startDate != null">
-                    and date(d.in_time) &gt;= date(#{startDate})
+                    and d.in_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(d.in_time) &lt;= date(#{endDate})
+                    and d.in_time &lt;= #{endDate}
                 </if>
             </if>
         </if>
@@ -397,26 +397,26 @@
             <if test="statusCode =='7'.toString()">
 
                 <if test="startDate != null">
-                    and date(c.settle_time) &gt;= date(#{startDate})
+                    and c.settle_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(c.settle_time) &lt;= date(#{endDate})
+                    and c.settle_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='5'.toString()">
                 <if test="startDate != null">
-                    and date(a.out_time) &gt;= date(#{startDate})
+                    and a.out_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(a.out_time) &lt;= date(#{endDate})
+                    and a.out_time &lt;= #{endDate}
                 </if>
             </if>
             <if test="statusCode =='2'.toString()">
                 <if test="startDate != null">
-                    and date(a.in_time) &gt;= date(#{startDate})
+                    and a.in_time &gt;= #{startDate}
                 </if>
                 <if test="endDate != null">
-                    and date(a.in_time) &lt;= date(#{endDate})
+                    and a.in_time &lt;= #{endDate}
                 </if>
             </if>
         </if>
@@ -530,11 +530,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -597,11 +597,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=#{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.crte_time) &lt;= (#{endDate})
+            and a.crte_time &lt;= #{endDate}
         </if>
 
         <if test="keyword != null and keyword != ''">
@@ -661,11 +661,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.crte_time) &lt;= (#{endDate})
+            and a.crte_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -724,11 +724,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=#{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -758,10 +758,10 @@
         ifnull(a.num,0) &lt; 0
         and a.hosp_code = #{hospCode}
         <if test="startTime != null">
-            and date(a.crte_time) >= date(#{startTime})
+            and a.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endTime != null">
-            and date(a.crte_time) &lt;= date(#{endTime})
+            and a.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
@@ -795,10 +795,10 @@
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
-            and date(e.crte_time) >= date(#{startTime})
+            and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endTime != null">
-            and date(e.crte_time) &lt;= date(#{endTime})
+            and e.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
@@ -833,10 +833,10 @@
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
-            and date(e.crte_time) >= date(#{startTime})
+            and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endTime != null">
-            and date(e.crte_time) &lt;= date(#{endTime})
+            and e.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
@@ -866,10 +866,10 @@
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where ifnull(a.num,0) &lt; 0 and a.hosp_code = #{hospCode}
         <if test="startTime != null">
-            and date(a.crte_time) >= date(#{startTime})
+            and a.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endTime != null">
-            and date(a.crte_time) &lt;= date(#{endTime})
+            and a.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
@@ -902,12 +902,12 @@
         (select sum(c.price) from inpt_advance_pay c where c.hosp_code = a.hosp_code and c.status_code = '0' and c.is_settle = '0'
         and c.crte_id = a.crte_id
         <if test="startDate != null">
-            and date(c.crte_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(c.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         <if test="endDate != null">
-            and date(c.crte_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(c.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
-        group by c.crte_id
+         group by c.crte_id
         ) settledAdvancePay,
         sum(a.ap_total_price) as unSettledAdvancePay
 
@@ -915,11 +915,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.settle_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         group by a.crte_id
     </select>
@@ -942,11 +942,11 @@
         where a.hosp_code = #{hospCode} and a.type_code = '2'
         /*开始日期*/
         <if test="startDate != null">
-            and date(a.end_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(a.end_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null">
-            and date(a.end_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.end_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         group by a.crte_id
     </select>
@@ -966,11 +966,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -986,11 +986,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1007,11 +1007,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1028,11 +1028,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1049,11 +1049,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1071,11 +1071,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1092,11 +1092,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1111,11 +1111,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1131,11 +1131,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1151,11 +1151,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1283,27 +1283,27 @@
         </if>
         /*开始日期*/
         <if test="startDate != null and timeFlag == '0'.toString()">
-            and DATE_FORMAT(a.in_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            and DATE_FORMAT(a.in_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and timeFlag == '0'.toString()">
-            and DATE_FORMAT(a.in_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+            and DATE_FORMAT(a.in_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*开始日期*/
         <if test="startDate != null and timeFlag == '1'.toString()">
-            and DATE_FORMAT(a.out_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            and DATE_FORMAT(a.out_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and timeFlag == '1'.toString() ">
-            and DATE_FORMAT(a.out_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+            and DATE_FORMAT(a.out_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*开始日期*/
         <if test="startDate != null and timeFlag == '2'.toString()">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and timeFlag == '2'.toString() ">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
@@ -1509,11 +1509,11 @@
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(b.cost_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(b.cost_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(b.cost_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(b.cost_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         UNION ALL
         SELECT
@@ -1550,11 +1550,11 @@
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(b.crte_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(b.crte_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         UNION ALL
         SELECT
@@ -1592,11 +1592,11 @@
         where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(b.crte_time) &gt;= date(#{startDate})
+            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(b.crte_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
     </sql>
     <!--门诊住院项目使用量统计查询,按业务类型、开方医生、项目、就诊病人分组-->
@@ -1778,11 +1778,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startTime != null and startTime != ''">
-            and date(a.crte_time) &gt;= date(#{startTime})
+            and a.crte_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endTime != null and endTime != ''">
-            and date(a.crte_time) &lt;= date(#{endTime})
+            and a.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         /*项目名称*/
         <if test="keyword != null and keyword != ''">
@@ -1852,11 +1852,11 @@
         from stro_invoicing sid
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;=date(#{endDate})
+            and sid.crte_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -1970,11 +1970,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;= date(#{endDate})
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2105,11 +2105,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;= date(#{endDate})
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2174,11 +2174,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;= date(#{endDate})
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2311,11 +2311,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;= date(#{endDate})
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
         /*药房*/
@@ -2451,11 +2451,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and date(sid.crte_time) &gt;=date(#{startDate})
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(sid.crte_time) &lt;= date(#{endDate})
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2694,11 +2694,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(siv.crte_time) &gt;=date(#{startDate})
+            and siv.crte_time &gt;=#{startDate}
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(siv.crte_time) &lt;= date(#{endDate})
+            and siv.crte_time &lt;= #{endDate}
         </if>
         <if test="code != null and code != ''">
             and item_code = #{code}
@@ -2743,11 +2743,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         group by a.item_id
     </select>
@@ -2781,11 +2781,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         group by a.item_id,a.batch_no
     </select>
@@ -2846,11 +2846,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         group by a.order_no
     </select>
@@ -2878,11 +2878,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         group by (case a.item_code when '1' then b.bfc_code when '2' then c.bfc_code end)
 
@@ -2920,11 +2920,11 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
     </select>
 
@@ -2960,10 +2960,10 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endDate != null and endDate !='' ">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
     </select>
@@ -3094,11 +3094,11 @@
             A.hosp_code = #{hospCode}
             and A.is_settle = '1' and b.settle_code = '2'
             <if test="startDate != null and startDate !='' ">
-                and date(A.settle_time) &gt;=date(#{startDate})
+                and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             /*结束日期*/
             <if test="endDate != null and endDate != '' ">
-                and date(A.settle_time) &lt;= date(#{endDate})
+                and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
             union all
             <!-- 挂号结算费用 -->
@@ -3135,11 +3135,11 @@
             and A.status_code = '0'
             and B.status_code = '0'
             <if test="startDate != null and startDate !='' ">
-                and date(A.settle_time) &gt;=date(#{startDate})
+                and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             /*结束日期*/
             <if test="endDate != null and endDate != '' ">
-                and date(A.settle_time) &lt;= date(#{endDate})
+                and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
         <!-- 全部科室/医生收入 -->
@@ -3224,21 +3224,21 @@
             <!-- 按计费时间 -->
             <if test="statement == '4'.toString()">
                 <if test="startDate != null and startDate !='' ">
-                    and date(B.cost_time) &gt;=date(#{startDate})
+                    and B.cost_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
                 </if>
                 /*结束日期*/
                 <if test="endDate != null and endDate != '' ">
-                    and date(B.cost_time) &lt;= date(#{endDate})
+                    and B.cost_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
                 </if>
             </if>
             <!-- 按结算时间 -->
             <if test="statement == '2'.toString() or statement == '3'.toString()">
                 <if test="startDate != null and startDate !='' ">
-                    and date(A.settle_time) &gt;=date(#{startDate})
+                    and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
                 </if>
                 /*结束日期*/
                 <if test="endDate != null and endDate != '' ">
-                    and date(A.settle_time) &lt;=date(#{endDate})
+                    and A.settle_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
                 </if>
             </if>
         </if>
@@ -4757,10 +4757,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4770,10 +4770,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and settle.crte_time &gt;= #{startDate}
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and settle.crte_time &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4783,10 +4783,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4803,10 +4803,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode} and a.settle_code = '2'
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4816,10 +4816,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode} and a.settle_code = '2'
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4829,10 +4829,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4850,10 +4850,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4863,10 +4863,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
@@ -4876,10 +4876,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4896,10 +4896,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4916,10 +4916,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4936,10 +4936,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and date(settle.crte_time) &gt;= date(#{startDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and date(settle.crte_time) &lt;= date(#{endDate})
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>
@@ -4958,10 +4958,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
 
@@ -4977,10 +4977,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
         <if test="type == null or type == '' ">
@@ -4996,10 +4996,10 @@
             join inpt_cost_settle ics on a.id=ics.cost_id
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
+                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
         )a left join base_dept b on a.dept_id = b.id and a.hosp_code = b.hosp_code
@@ -5040,25 +5040,25 @@
         select a.bfc_id, a.name, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )))
+        where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by a.bfc_id, b.name
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )))
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by a.bfc_id, b.name
         union all
         <include refid="getInptCost"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and (
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d'))
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s'))
         or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' ))
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' ))
         )
         group by a.bfc_id, b.name
         )a group by a.bfc_id, a.name
@@ -5066,18 +5066,18 @@
         select a.bfc_id, a.name, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         union all
         <include refid="getInptCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         )a group by a.bfc_id, a.name
         )a on a.bfc_id = ab.bfc_id
@@ -5101,18 +5101,18 @@
         select a.bfc_id, a.name, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         union all
         <include refid="getInptCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         )a group by a.bfc_id, a.name
         )c on ab.bfc_id = c.bfc_id
@@ -5120,13 +5120,13 @@
         select a.bfc_id, a.name, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         )a group by a.bfc_id, a.name
         )d on ab.bfc_id = d.bfc_id
@@ -5146,20 +5146,20 @@
         select a.bfc_id, a.name, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         )a group by a.bfc_id, a.name
         )f on ab.bfc_id = f.bfc_id
         left join(
         <include refid="getInptCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by a.bfc_id, b.name
         )g on ab.bfc_id = g.bfc_id
         left join(
@@ -5169,8 +5169,8 @@
         )h on ab.bfc_id = h.bfc_id
         left join(
         <include refid="getInptCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by a.bfc_id, b.name
         )i on ab.bfc_id = i.bfc_id
     </select>
@@ -5211,25 +5211,25 @@
         select a.up_code, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCostBig"></include>
-        where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )))
+        where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by b.up_code
         union all
         <include refid="getOutPtCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )))
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by b.up_code
         union all
         <include refid="getInptCostBig"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and (
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d'))
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s'))
         or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
-        (date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' ))
+        (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' ))
         )
         group by b.up_code
         )a group by a.up_code
@@ -5237,18 +5237,18 @@
         select a.up_code, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCostBig"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         union all
         <include refid="getOutPtCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         union all
         <include refid="getInptCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         )a group by a.up_code
         )a on a.up_code = ab.up_code
@@ -5272,18 +5272,18 @@
         select a.up_code, sum(a.reality_price) reality_price
         from(
         <include refid="getOutRegisterCostBig"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         union all
         <include refid="getOutPtCostBig"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         union all
         <include refid="getInptCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         )a group by a.up_code
         )c on ab.up_code = c.up_code
@@ -5291,13 +5291,13 @@
         select a.up_code, sum(a.reality_price) reality_price
         from (
         <include refid="getOutRegisterCostBig"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         union all
         <include refid="getOutPtCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         )a group by a.up_code
         )d on ab.up_code = d.up_code
@@ -5317,20 +5317,20 @@
         select a.up_code, sum(a.reality_price) reality_price
         from (
         <include refid="getOutRegisterCostBig"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         union all
         <include refid="getOutPtCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         )a group by a.up_code
         )f on ab.up_code = f.up_code
         left join(
         <include refid="getInptCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')
         group by b.up_code
         )g on ab.up_code = g.up_code
         left join(
@@ -5340,8 +5340,8 @@
         )h on ab.up_code = h.up_code
         left join(
         <include refid="getInptCostBig"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d' )
-        and date_format(settle.settle_time, '%Y-%m-%d') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d' )
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )
         group by b.up_code
         )i on ab.up_code = i.up_code
         join base_finance_classify finance on finance.code = ab.up_code and finance.hosp_code = #{hospCode}
@@ -5723,11 +5723,11 @@
             </if>
             /*开始日期*/
             <if test="startTime != null">
-                and date(a.crte_time) &gt;= #{startTime}
+                and a.crte_time &gt;= #{startTime}
             </if>
             /*结束日期*/
             <if test="endTime != null">
-                and date(a.crte_time) &lt;= #{endTime}
+                and a.crte_time &lt;= #{endTime}
             </if>
             <if test="keyword != null and keyword != ''">
                 and (

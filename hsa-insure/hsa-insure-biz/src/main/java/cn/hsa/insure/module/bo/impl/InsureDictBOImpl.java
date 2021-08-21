@@ -256,20 +256,9 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
 
     @Override
     public JSONObject queryInsureDictList2(InsureDictDTO insureDictDTO) {
-        if (StringUtils.isNotEmpty(insureDictDTO.getCode())){
-            insureDictDTO.setCodes(insureDictDTO.getCode().split(","));
-        }
         JSONObject jsonObject = new JSONObject();
-        //查询快捷配置信息
-        Map<String,String> sysParameter = new HashMap<String,String>();
-        sysParameter.put("hospCode",insureDictDTO.getHospCode());//医院编码
-        sysParameter.put("code",insureDictDTO.getCode());//医保机构编码
-        sysParameter.put("isValid", Constants.SF.S);//是否有效
-        jsonObject.put("config",insureDictDAO.querySysParameterByCode(sysParameter));
         //查询码表信息
-        jsonObject.put("insureDict",insureDictDAO.queryInsureDictList(insureDictDTO));
+        jsonObject.put("insureDict",insureDictDAO.queryInsureDictList2(insureDictDTO));
         return jsonObject;
     }
-
-
 }

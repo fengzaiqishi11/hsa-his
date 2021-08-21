@@ -4,7 +4,7 @@
     <!--支付方式统计报表-->
     <select id="queryPayCodeReport" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT t1.settleTime, t2.totalPrice, t2.selfPrice, t2.miPrice, t2.apOffsetPrice, t1.XJprice, t1.POSprice,
-        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice, t2.cardPrice
+        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice
         FROM (
         SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
         IFNULL(SUM(CASE ss.pay_code WHEN '1' THEN ss.price ELSE 0 END ),0) as XJprice,
@@ -15,7 +15,7 @@
         IFNULL(SUM(CASE ss.pay_code WHEN '6' THEN ss.price ELSE 0 END ),0) as ZFBprice
         FROM (
         select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
-        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price, a.card_price
+        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price
         from outpt_settle a
         left join outpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
@@ -26,10 +26,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'MZ' IN
@@ -38,8 +38,8 @@
             </foreach>
         </if>
         UNION ALL
-        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
-        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price, 0 card_price
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
+        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price
         from inpt_settle a
         left join inpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
@@ -50,10 +50,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'ZY' IN
@@ -62,8 +62,8 @@
             </foreach>
         </if>
         UNION ALL
-        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
-        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price, a.card_price
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, a.reality_price,
+        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price
         from outpt_register_settle a
         left join outpt_register_pay b on a.id = b.rs_id and a.hosp_code = b.hosp_code
         where a.hosp_code = #{hospCode}
@@ -74,10 +74,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'GH' IN
@@ -85,14 +85,14 @@
                 #{item}
             </foreach>
         </if>
-        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d %H:%i:%s')
         ) t1 join (
-        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
+        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d %H:%i:%s') settleTime,
         sum(reality_price) totalPrice, sum(mi_price) miPrice, sum(self_price) selfPrice, sum(ap_offset_price)
-        apOffsetPrice, sum(trunc_price) truncPrice, sum(card_price) cardPrice
+        apOffsetPrice, sum(trunc_price) truncPrice
         FROM (
-        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
-        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price, a.card_price
+        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
+        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price
         from outpt_settle a
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">
@@ -102,10 +102,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'MZ' IN
@@ -114,8 +114,8 @@
             </foreach>
         </if>
         UNION ALL
-        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
-        a.mi_price mi_price, (a.self_price-a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price, 0 card_price
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
+        a.mi_price mi_price, (a.self_price-a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price
         from inpt_settle a
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">
@@ -125,10 +125,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'ZY' IN
@@ -137,8 +137,8 @@
             </foreach>
         </if>
         UNION ALL
-        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
-        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price, card_price
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, a.reality_price,
+        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price
         from outpt_register_settle a
         where a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">
@@ -148,10 +148,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'GH' IN
@@ -159,7 +159,7 @@
                 #{item}
             </foreach>
         </if>
-        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d %H:%i:%s')
         )t2 on t1.settleTime = t2.settleTime
 
     </select>
@@ -434,10 +434,10 @@
             and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settleTime,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settleTime,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         ORDER BY settleTime DESC
     </select>
@@ -668,7 +668,7 @@
         (
         SELECT
         'MZ' AS ywlx,
-        DATE_FORMAT( a.settle_time, '%Y-%m-%d' ) AS settleTime,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d %H:%i:%s' ) AS settleTime,
         a.patient_code AS patientCode,
         IFNULL( b.total_price, 0 ) AS totalPrice,
         IFNULL( b.plan_price, 0 ) AS planPrice,
@@ -690,7 +690,7 @@
         UNION ALL
         SELECT
         'ZY' AS ywlx,
-        DATE_FORMAT( a.settle_time, '%Y-%m-%d' ) AS settleTime,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d %H:%i:%s' ) AS settleTime,
         a.patient_code AS patientCode,
         IFNULL( b.total_price, 0 ) AS totalPrice,
         IFNULL( b.plan_price, 0 ) AS planPrice,
@@ -721,10 +721,10 @@
             and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settleTime,'%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settleTime,'%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         GROUP BY ywlx, patientCode
     </select>
@@ -975,10 +975,10 @@
             and t1.patient_code = #{typeCode}
         </if>
         <if test="startDate != null">
-            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d') >= #{startDate}
+            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d %H:%i%s') >= #{startDate}
         </if>
         <if test="endDate != null">
-            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d') &lt;= #{endDate}
+            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d %H:%i%s') &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             AND (
@@ -1308,10 +1308,10 @@
         g.hosp_code = #{hospCode}
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
         )tab where tab.num !=0
@@ -1417,10 +1417,10 @@
         g.hosp_code = #{hospCode}
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
         )tab where tab.num != 0
@@ -1449,10 +1449,10 @@
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
 
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
         </if>
         <!--注射类-->
         <if test='statisWay == "6"'>
@@ -1498,10 +1498,10 @@
         on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
         <if test="startDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d') >= #{startDate}
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') >= #{startDate}
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         <if test="deptId != null and deptId != ''">
             and a.in_dept_id = #{deptId}
@@ -1518,7 +1518,7 @@
         inpt_visit a
         where a.hosp_code = #{hospCode}
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
         ) t2
@@ -1543,12 +1543,12 @@
         in_dept_name as dept_name,
         <![CDATA[
                 IFNULL(sum((case
-                when DATE_FORMAT( in_time, '%Y-%m-%d' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d') and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d' )  then if( DATEDIFF(out_time, #{startDate}) = 0, 1, DATEDIFF(out_time, #{startDate}))
-                when DATE_FORMAT( in_time, '%Y-%m-%d') < DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) and DATE_FORMAT( out_time, '%Y-%m-%d') < DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) then 0
-                when DATE_FORMAT( in_time, '%Y-%m-%d' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d') ) then DATEDIFF(#{endDate}, #{startDate})
-                when DATE_FORMAT( in_time, '%Y-%m-%d' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d' ) and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d' )  then  if(DATEDIFF( out_time, in_time) = 0, 1,DATEDIFF( out_time, in_time))
-                WHEN DATE_FORMAT( in_time, '%Y-%m-%d' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d' )  and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d')) then if(DATEDIFF(#{endDate}, in_time) = 0, 1, DATEDIFF(#{endDate}, in_time))
-                when DATE_FORMAT( in_time, '%Y-%m-%d') >  DATE_FORMAT( #{endDate}, '%Y-%m-%d') then 0
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s') and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  then if( DATEDIFF(out_time, #{startDate}) = 0, 1, DATEDIFF(out_time, #{startDate}))
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s') < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) then 0
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d %H:%i:%s') ) then DATEDIFF(#{endDate}, #{startDate})
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' ) and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  then  if(DATEDIFF( out_time, in_time) = 0, 1,DATEDIFF( out_time, in_time))
+                WHEN DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d %H:%i:%s')) then if(DATEDIFF(#{endDate}, in_time) = 0, 1, DATEDIFF(#{endDate}, in_time))
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s') then 0
                 end)), 0) as szDays
             ]]>
         FROM
@@ -1567,7 +1567,7 @@
         out_dept_name as dept_name,
         hosp_code,
         count(1) AS cyNum,
-        IFNULL(SUM( CASE WHEN DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d')), DATE_FORMAT(in_time,'%Y-%m-%d')) = 0 THEN 1 ELSE DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d')), DATE_FORMAT(in_time,'%Y-%m-%d')) END ), 0) as czDays
+        IFNULL(SUM( CASE WHEN DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')), DATE_FORMAT(in_time,'%Y-%m-%d %H:%i:%s')) = 0 THEN 1 ELSE DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')), DATE_FORMAT(in_time,'%Y-%m-%d %H:%i:%s')) END ), 0) as czDays
         FROM
         inpt_visit
         where hosp_code = #{hospCode}
@@ -1576,7 +1576,7 @@
             and out_dept_id = #{deptId}
         </if>
         <if test="startDate != null and endDate != null">
-            and DATE_FORMAT(out_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d')
+            and DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')
         </if>
         GROUP BY out_dept_id, out_dept_name, hosp_code
         ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_id = t2.dept_id
@@ -1590,7 +1590,7 @@
         inpt_visit a
         where a.hosp_code = #{hospCode}
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d') &lt;= #{endDate}
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
         GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
         ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_id = t3.dept_id
@@ -1653,10 +1653,10 @@
     g.hosp_code = #{hospCode}
     AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
     <if test="startDate != null and startDate != ''">
-      and date(b.crte_time) >= date(#{startDate})
+      and b.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
     </if>
     <if test="endDate != null and endDate != ''">
-      and date(b.crte_time) &lt;= date(#{endDate})
+      and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
     )tab where tab.num != 0 order by tab.crte_time desc
@@ -1715,10 +1715,10 @@
     g.hosp_code = #{hospCode}
     AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
     <if test="startDate != null and startDate != ''">
-      and date(b.crte_time) >= date(#{startDate})
+      and b.crte_time >=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
     </if>
     <if test="endDate != null and endDate != ''">
-      and date(b.crte_time) &lt;= date(#{endDate})
+      and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 

@@ -96,10 +96,16 @@ public class CheckStockBOImpl implements CheckStockBO {
         // 执行周期
         BigDecimal execInterval = MapUtils.get(rateMap, "execInterval");
         // 频率 = 每日次数/执行周期
-        BigDecimal rate = BigDecimalUtils.divide(dailyTimes, execInterval);
+        BigDecimal rate = new BigDecimal(1);
+        if (!BigDecimalUtils.isZero(dailyTimes) && !BigDecimalUtils.isZero(execInterval)){
+            rate = BigDecimalUtils.divide(dailyTimes, execInterval);
+        }
         // 执行天数
-        BigDecimal userDay = new BigDecimal(checkStockDTO.getUseDays());
-        // 通过单位返回结果 ，如果单位不一致，说明是大单位，需要使用频率*总量*天数 获得总数量
+        BigDecimal userDay = new BigDecimal(1);;
+        if (checkStockDTO.getUseDays() != 0 && null != checkStockDTO.getUseDays()){
+            userDay = new BigDecimal(checkStockDTO.getUseDays());
+        }
+        // 计算所需总数量，需要使用频率*总量*天数 获得总数量
         BigDecimal totalNum = BigDecimalUtils.multiplyMany(checkStockDTO.getNum(), rate, userDay)
                 .setScale(2, BigDecimal.ROUND_HALF_UP);
         // 封装返回参数
@@ -111,7 +117,7 @@ public class CheckStockBOImpl implements CheckStockBO {
         checkStockRespDTO.setTotalNumberNoCaculate(totalNumberNoCaculate);
         checkStockRespDTO.setTotalNumberNoCheck(totalNumberNoCheck);
         // 所需数量 - 剩余数量
-        checkStockRespDTO.setResult(totalNum.subtract(result));
+        checkStockRespDTO.setResult(result.subtract(totalNum));
         return checkStockRespDTO;
     }
 
@@ -137,14 +143,9 @@ public class CheckStockBOImpl implements CheckStockBO {
      * @Return void
      */
     private void checkOutParam(CheckStockDTO checkStockDTO) {
-        Optional.ofNullable(checkStockDTO).orElseThrow(() -> new AppException("门诊处方明细不能为空"));
         Optional.ofNullable(checkStockDTO.getHospCode()).orElseThrow(() -> new AppException("医院编码不能为空"));
         Optional.ofNullable(checkStockDTO.getPharId()).orElseThrow(() -> new AppException("发药药房id不能为空"));
         Optional.ofNullable(checkStockDTO.getItemId()).orElseThrow(() -> new AppException("项目id不能为空"));
-        Optional.ofNullable(checkStockDTO.getTotalNumUnitCode()).orElseThrow(() -> new AppException("总数量单位不能为空"));
-        Optional.ofNullable(checkStockDTO.getTotalNum()).orElseThrow(() -> new AppException("总数量不能为空"));
-        Optional.ofNullable(checkStockDTO.getRateId()).orElseThrow(() -> new AppException("频率ID不能为空"));
-        Optional.ofNullable(checkStockDTO.getUseDays()).orElseThrow(() -> new AppException("用药天数不能为空"));
     }
 
     /**

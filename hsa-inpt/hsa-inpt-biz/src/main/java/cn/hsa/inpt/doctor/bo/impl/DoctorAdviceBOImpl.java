@@ -464,23 +464,24 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 String wjsykc = this.getSysParameter(inptAdviceDTO.getHospCode() , "MZYS_CF_WJSFYKC");
                 inptAdviceDTO.setWjsykc(wjsykc);
                 // add by zhangguorui
-//                Map map = new HashMap();
-//                map.put("hospCode", inptAdviceDTO.getHospCode());
-//                CheckStockDTO checkStockDTO = new CheckStockDTO();
-//                BeanUtils.copyProperties(inptAdviceDTO,checkStockDTO);
-//                map.put("checkStockDTO", checkStockDTO);
-//                // 调用住院库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
-//                WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
-//                CheckStockRespDTO checkStockRespDTO = checkResult.getData();
-                //判断库存 || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) > 0
-                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
-                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足,"
-//                            "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
-//                            "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
-//                            "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
-//                            checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
-//                            "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
-//                            checkStockRespDTO.getPrescribeInptNumber()) + "】"
+                Map map = new HashMap();
+                map.put("hospCode", inptAdviceDTO.getHospCode());
+                CheckStockDTO checkStockDTO = new CheckStockDTO();
+                BeanUtils.copyProperties(inptAdviceDTO,checkStockDTO);
+                map.put("checkStockDTO", checkStockDTO);
+                // 调用住院库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
+                WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
+                CheckStockRespDTO checkStockRespDTO = checkResult.getData();
+                //判断库存
+                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))
+                        || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) < 0) {
+                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足," +
+                            "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
+                            "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
+                            "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
+                            checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
+                            "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
+                            checkStockRespDTO.getPrescribeInptNumber()) + "】"
                     );
                 }
             }

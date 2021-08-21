@@ -3,15 +3,9 @@ package cn.hsa.outpt.fees.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureOutptOutFeeDTO;
+import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
-import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
-import cn.hsa.module.insure.module.service.InsureIndividualCostService;
-import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
-import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
+import cn.hsa.module.insure.module.service.*;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
 import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
@@ -22,9 +16,16 @@ import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
+import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
+import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
+import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
+import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.entity.OutptVisitDO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
@@ -38,10 +39,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.outpt.fees.bo.impl
@@ -97,6 +95,12 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private InsureIndividualBasicService insureIndividualBasicService_consumer;
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
+    @Resource
+    private OutptRegisterDAO outptRegisterDAO;
+    @Resource
+    private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
 
 
     /**
@@ -286,8 +290,26 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("visitId",visitId); //就诊id
             map.put("id",visitId); //就诊id
             map.put("oldOutptSettleDTO",oldOutptSettleDTO);
-            SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-            if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
+
+            // 根据医院编码、医保注册编码查询医保配置信息
+            InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+            configDTO.setHospCode(hospCode); //医院编码
+            configDTO.setCode(insureIndividualBasicDTO.getInsureRegCode()); // 医保注册编码
+            configDTO.setIsValid(Constants.SF.S); // 是否有效
+            Map configMap = new LinkedHashMap();
+            configMap.put("hospCode", hospCode);
+            configMap.put("insureConfigurationDTO", configDTO);
+            List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+            if (ListUtils.isEmpty(configurationDTOList)) {
+                throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+            }
+            InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+            // 获取该医保配置是否走统一支付平台，1走，0/null不走
+            String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+            /*SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+            if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台*/
+            if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
                 List<Map<String,Object>> individualCostDTOList  = querySettleCost(map);
                 map.put("insureCostList",individualCostDTOList);
                 map.put("insureSettleId",insureSettleId);
@@ -297,10 +319,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 Map<String,Object> cancelReturnData =  MapUtils.get(resultMap,"output");
                 Map<String,Object> setlInfoMap = MapUtils.get(cancelReturnData,"setlinfo");
                 Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
-                    if(data == true){
-                        MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
-                        insureIndividualCostService_consumer.deleteOutptInsureCost(map);
-                    }
+                if(data){
+                    MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
+                    insureIndividualCostService_consumer.deleteOutptInsureCost(map);
+                }
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"funtionCode"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"msgId"));
@@ -817,20 +839,83 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if(insureIndividualSettleDTO !=null && StringUtils.isNotEmpty(insureIndividualSettleDTO.getInsureSettleId())){
             throw new AppException("改患者已经做了医保结算,不能取消门诊医保登记");
         }
-        map.put("visitId",id);
-        insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
-        insureIndividualVisitService_consumer.deleteInsureVisitById(map);
-        insureIndividualCostService_consumer.deleteOutptInsureCost(map);  // 删除医保费用表数据
-        InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
-        insureIndividualBasicDTO.setHospCode(hospCode);
-        insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());
-        map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
-        insureIndividualBasicService_consumer.deleteInsureBasic(map).getData();
-        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
-        outptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
-        outptVisitDTO.setHospCode(hospCode);
-        outptVisitDTO.setId(id);
-        outptVisitDAO.updateOutptVisit(outptVisitDTO);
+        // 根据医院编码、医保注册编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", hospCode);
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
+            map.put("visitId",id);
+            insureUnifiedPayOutptService_consumer.UP_2202(map).getData();
+            insureIndividualVisitService_consumer.deleteInsureVisitById(map);
+            insureIndividualCostService_consumer.deleteOutptInsureCost(map);  // 删除医保费用表数据
+            InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
+            insureIndividualBasicDTO.setHospCode(hospCode);
+            insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());
+            map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
+            insureIndividualBasicService_consumer.deleteInsureBasic(map).getData();
+            OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
+            outptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
+            outptVisitDTO.setHospCode(hospCode);
+            outptVisitDTO.setId(id);
+            outptVisitDAO.updateOutptVisit(outptVisitDTO);
+        }
+        return true;
+    }
+
+    /**
+     * @Method updateOutptRegister
+     * @Desrciption  医保统一支付平台：门急诊诊疗记录【4301】
+     * @Param id-就诊id
+     *
+     * @Author luoyong
+     * @Date   2021/8/20 8:37
+     * @Return
+     **/
+    @Override
+    public Boolean addOutptVisitRecordUpload(Map<String, Object> map) {
+        String visitId = MapUtils.get(map, "id");
+        String name = MapUtils.get(map, "name");
+        if (StringUtils.isEmpty(visitId)) throw new RuntimeException("未选择需要上传诊疗记录的患者");
+        map.put("visitId", visitId);
+
+        // 根据就诊id查询挂号记录(outpt_register)
+        OutptRegisterDO outptRegisterDO = outptRegisterDAO.getOutptRegisterByVisitId(map);
+        if (outptRegisterDO == null) {
+            throw new RuntimeException("未查询到【" + name + "】相关挂号信息");
+        }
+        // 根据就诊id查询就诊记录(outpt_visit)
+        OutptVisitDO outptVisitDO = outptRegisterDAO.getVisitInfoByVisitId(outptRegisterDO);
+        if (outptVisitDO == null) {
+            throw new RuntimeException("未查询到【" + name + "】相关就诊记录");
+        }
+        // 根据就诊id查询病历信息(outpt_medical_record)
+        List<OutptMedicalRecordDTO> blList = outptVisitDAO.queryMedicalRecordByVisitId(map);
+
+        // 根据就诊id查询诊断信息(outpt_diagnose)
+        List<OutptDiagnoseDTO> zdList = outptVisitDAO.queryDiagnoseByVisitId(map);
+
+        // 根据就诊id查询处方信息(outpt_prescribe_detail_ext)
+        List<OutptPrescribeDetailsExtDTO> cfList = outptVisitDAO.queryPreDetailExtByVisitId(map);
+
+        map.put("outptRegisterDO", outptRegisterDO);
+        map.put("outptVisitDO", outptVisitDO);
+        map.put("blList", blList);
+        map.put("zdList", zdList);
+        map.put("cfList", cfList);
+        // 调用统一支付平台门急诊诊疗记录【4301】接口
+        insureUnifiedPayOutptService_consumer.UP_4301(map).getData();
         return true;
     }
 

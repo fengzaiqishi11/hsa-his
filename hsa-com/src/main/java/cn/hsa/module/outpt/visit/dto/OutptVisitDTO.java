@@ -222,4 +222,9 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
     // 门诊结算一卡通支付金额
     private BigDecimal cardPrice;
+
+    /**
+     * 是否新医保，用于判断业务是否走统一支付平台
+     */
+    private String isUnifiedPay;
 }

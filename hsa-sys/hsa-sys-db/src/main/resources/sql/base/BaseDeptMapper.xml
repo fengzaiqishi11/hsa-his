@@ -12,6 +12,7 @@
         <result property="wardCode" column="ward_code" jdbcType="VARCHAR"/>
         <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="personName" column="person_name" jdbcType="VARCHAR"/>
         <result property="upDeptCode" column="up_dept_code" jdbcType="VARCHAR"/>
         <result property="mgDeptCode" column="mg_dept_code" jdbcType="VARCHAR"/>
         <result property="mgName" column="mgName" jdbcType="VARCHAR"/>
@@ -38,9 +39,10 @@
         bd.type_code,
         bd.nation_code,
         bd.ward_code,
-        bd.CODE,
-        bd.NAME,
+        bd.code,
+        bd.name,
         bd.phone,
+        bd.person_name,
         bd.up_dept_code,
         pDept.name as upName,
         mDept.name as mgName,
@@ -92,6 +94,9 @@
         <if test="isValid != null and isValid != ''">
             and bd.is_valid = #{isValid}
         </if>
+        <if test="isUpload != null and isUpload != ''">
+            and bd.is_upload = #{isUpload}
+        </if>
         <if test="crteTime != null">
             and bd.crte_time = #{crteTime}
         </if>
@@ -120,9 +125,10 @@
         bd.type_code,
         bd.nation_code,
         bd.ward_code,
-        bd.CODE,
-        bd.NAME,
+        bd.code,
+        bd.name,
         bd.phone,
+        bd.person_name,
         bd.up_dept_code,
         pDept.name as upName,
         mDept.name as mgName,
@@ -215,9 +221,10 @@
         bd.type_code,
         bd.nation_code,
         bd.ward_code,
-        bd.CODE,
-        bd.NAME,
+        bd.code,
+        bd.name,
         bd.phone,
+        bd.person_name,
         bd.up_dept_code,
         pDept.name as upName,
         mDept.name as mgName,
@@ -298,10 +305,10 @@
     </select>
     <!--新增所有列-->
     <insert id="insert">
-        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, up_dept_code,
+        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code,
                               mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time,
                               type_identity)
-        values (#{id}, #{hospCode}, #{typeCode}, #{nationCode}, #{code}, #{name}, #{wardCode}, #{phone}, #{upDeptCode},
+        values (#{id}, #{hospCode}, #{typeCode}, #{nationCode}, #{code}, #{name}, #{wardCode}, #{phone}, #{personName}, #{upDeptCode},
                 #{mgDeptCode}, #{intro}, #{place}, #{remark}, #{pym}, #{wbm}, #{isValid}, #{crteId}, #{crteName},
                 #{crteTime}, #{typeIdentity})
     </insert>
@@ -315,6 +322,7 @@
             name         = #{name},
             ward_code    = #{wardCode},
             phone        = #{phone},
+            person_name        = #{personName},
             up_dept_code = #{upDeptCode},
             mg_dept_code = #{mgDeptCode},
             intro        = #{intro},
@@ -339,12 +347,14 @@
         </foreach>
         and hosp_code = #{hospCode}
     </update>
+
+    <!--统一支付平台上传科室信息后更新上传状态-->
     <update id="updateBatchDept">
-        update base_dept set is_valid = #{isValid} where id in
-        <foreach collection="deptIdList" item="item" open="(" separator="," close=")">
-            #{item}
+        <foreach collection="deptDTOList" item="item" separator=";" >
+            update base_dept set is_upload = #{item.isUpload}
+            where id =#{item.id}
+            and hosp_code = #{item.hospCode}
         </foreach>
-        and hosp_code = #{hospCode}
     </update>
 
     <!--根据值域代码编码获取值域代码值-->
@@ -366,6 +376,7 @@
                name,
                ward_code,
                phone,
+               person_name,
                up_dept_code,
                mg_dept_code,
                intro,
@@ -386,7 +397,7 @@
     </select>
     <select id="getDeptTypeCode" resultMap="BaseDeptMap">
         select
-             id, hosp_code, type_code, nation_code, code, name, ward_code, phone, up_dept_code, mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time, type_identity
+             id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code, mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time, type_identity
                from base_dept where hosp_code = #{hospCode}
       <if test="deptTypeCodeList != null and deptTypeCodeList.size() > 0">
         and type_code in
@@ -560,12 +571,12 @@
         </where>
     </select>
     <insert id="insertList" parameterType="java.util.List">
-        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, up_dept_code,
+        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code,
         mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time,
         type_identity) values
         <foreach collection="insertList" item="item" index="index" open="" close="" separator=",">
              (#{item.id}, #{item.hospCode}, #{item.typeCode}, #{item.nationCode}, #{item.code}, #{item.name},
-              #{item.wardCode}, #{item.phone}, #{item.upDeptCode},
+              #{item.wardCode}, #{item.phone}, #{item.personName}, #{item.upDeptCode},
             #{item.mgDeptCode}, #{item.intro}, #{item.place}, #{item.remark}, #{item.pym}, #{item.wbm}, #{item.isValid}, #{item.crteId}, #{item.crteName},
             #{item.crteTime}, #{item.typeIdentity})
         </foreach>
@@ -575,5 +586,46 @@
             id,name as label,code as value
         from base_dept where hosp_code =#{hospCode} and is_valid = '1'
                          and id !=#{id}
+    </select>
+
+    <!--查询未上传的科室列表-->
+    <select id="queryBaseDeptByInsure" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        SELECT
+        a.id,
+        a.code,
+        a.name,
+        a.type_code,
+        a.nation_code,
+        a.intro,
+        a.phone,
+        a.person_name,
+        a.crte_time,
+        IFNULL(c.bed_num, 0) as bed_num,
+        SUM(IF(b.work_type_code like '10%', 1, 0)) as doctor_num,
+        SUM(IF(b.work_type_code like '20%', 1, 0)) as nurse_num,
+        SUM(IF(b.work_type_code like '30%', 1, 0)) as drug_num,
+        SUM(IF(b.work_type_code like '40%', 1, 0)) as medic_num
+        FROM
+        base_dept a
+        left JOIN sys_user b ON a.hosp_code = b.hosp_code and a.code = b.dept_code and b.is_in_job = '1'
+        left join (
+        SELECT hosp_code, dept_code, COUNT(dept_code) as bed_num from base_bed
+        WHERE is_valid = '1' GROUP BY hosp_code, dept_code
+        ) c on a.hosp_code = c.hosp_code and a.code = c.dept_code
+        WHERE a.hosp_code = #{hospCode}
+        <if test="isValid != null and isValid != ''">
+            and a.is_valid = #{isValid}
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            and a.is_upload = #{isUpload}
+        </if>
+        <if test="code != null and code != ''">
+            and a.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and a.name = #{name}
+        </if>
+        GROUP BY a.id, b.dept_code
+        ORDER BY a.code
     </select>
 </mapper>

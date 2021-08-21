@@ -3,6 +3,10 @@ package cn.hsa.module.outpt.visit.dao;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
+import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
+import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.List;
@@ -125,4 +129,13 @@ public interface OutptVisitDAO {
      * @Return
      */
     Boolean updateVisitTime(Map<String, Object> map);
+
+    // 根据就诊id查询病历信息(outpt_medical_record)
+    List<OutptMedicalRecordDTO> queryMedicalRecordByVisitId(Map<String, Object> map);
+
+    // 根据就诊id查询诊断信息(outpt_diagnose)
+    List<OutptDiagnoseDTO> queryDiagnoseByVisitId(Map<String, Object> map);
+
+    // 根据就诊id查询处方信息(outpt_prescribe_detail_ext)
+    List<OutptPrescribeDetailsExtDTO> queryPreDetailExtByVisitId(Map<String, Object> map);
 }

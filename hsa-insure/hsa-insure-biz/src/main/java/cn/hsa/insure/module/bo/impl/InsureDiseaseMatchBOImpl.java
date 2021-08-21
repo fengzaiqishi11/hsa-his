@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.dao.InsureDiseaseMatchDAO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
@@ -258,6 +259,13 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
     public PageDTO queryPageInsureDisease(InsureDiseaseDTO insureDiseaseDTO) {
         PageHelper.startPage(insureDiseaseDTO.getPageNo(),insureDiseaseDTO.getPageSize());
         List<InsureDiseaseDTO> insureDiseaseDTOList= insureDiseaseMatchDAO.queryPageInsureDisease(insureDiseaseDTO);
+        return PageDTO.of(insureDiseaseDTOList);
+    }
+
+    @Override
+    public PageDTO queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseMatchDTO) {
+        PageHelper.startPage(insureDiseaseMatchDTO.getPageNo(),insureDiseaseMatchDTO.getPageSize());
+        List<Map<String,Object>> insureDiseaseDTOList= insureDiseaseMatchDAO.queryUnMacthAllPage(insureDiseaseMatchDTO);
         return PageDTO.of(insureDiseaseDTOList);
     }
 

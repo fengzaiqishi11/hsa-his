@@ -35,28 +35,26 @@
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
     <!--    查询医保病人信息-->
-    <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
-        select iiv.hosp_code,iiv.visit_id,iiv.insure_org_code,iiv.medicine_org_code,
-        iiv.visit_no,iiv.is_hospital,iiv.aac001,iiv.medicine_org_code,iiv.medical_reg_no,iib.aac003,iib.aac004
-        from insure_individual_visit iiv
-        left join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
-        left join inpt_settle on iiv.visit_id = inpt_settle.visit_id and iiv.hosp_code = inpt_settle.hosp_code
-        where iiv.hosp_code=#{hospCode} and inpt_settle.is_settle='1' and inpt_settle.status_code='0'
+    <select id="queryPage" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select a.id,a.name,a.in_no,a.patient_code,a.bed_name,a.in_dept_name,a.zz_doctor_name
+        from inpt_visit a join insure_individual_visit b on a.id = b.visit_id
+        where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
         <if test="keyWord != null and keyWord != ''">
-            and ( iiv.visit_no like concat('%',#{keyWord},'%')
-            or iiv.medical_reg_no like concat('%',#{keyWord},'%')
-            or iib.aac003 like concat('%',#{keyWord},'%')
+            and ( a.name like concat('%',#{keyWord},'%')
+            or a.in_no like concat('%',#{keyWord},'%')
+            or a.bed_name like concat('%',#{keyWord},'%'
+            or a.in_dept_name like concat('%',#{keyWord},'%')
             )
         </if>
         /*开始日期*/
         <if test="startDate != null ">
-            and iiv.crte_time &gt;= #{startDate}
+            and a.in_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null ">
-            and iiv.crte_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            and a.in_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
         </if>
-
+        group by a.id
     </select>
     <select id="queryDoctorAdvice" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" parameterType="java.util.Map">
         select ia.id, ia.hosp_code, ia.visit_id, ia.baby_id, ia.order_no, ia.iat_id,
@@ -74,9 +72,9 @@
                ia.stop_doctor_name, ia.stop_time, ia.stop_check_id, ia.stop_check_name,
                ia.stop_check_time, ia.is_long, ia.is_stop, ia.is_reject, ia.reject_remark, ia.crte_id, ia.crte_name,
                ia.crte_time,
-               iv.in_no as inNo,
-               (select name from base_dept bd where bd.id = ia.dept_id and bd.hosp_code = iv.hosp_code ) as deptName,
-               (select name from base_dept bd where bd.id = ia.exec_dept_id and bd.hosp_code = iv.hosp_code ) as adviceExecDeptName,
+               /*iv.in_no as inNo,*/
+               (select name from base_dept bd where bd.id = ia.dept_id and bd.hosp_code = ia.hosp_code ) as deptName,
+               (select name from base_dept bd where bd.id = ia.exec_dept_id and bd.hosp_code = ia.hosp_code ) as adviceExecDeptName,
                (select name from sys_code_detail where value = ia.prep_code and c_code='JXFL') as prepCode,
                (select name from sys_code_detail where value = ia.usage_code and c_code='YF') as usageCode,
                (select name from sys_code_detail where value = ia.unit_code and c_code='DW') as unitCode,
@@ -88,14 +86,23 @@
                     when ia.item_code ='4' then (select bi.code from base_item bi where ia.item_id = bi.id and bi.hosp_code = ia.hosp_code)
                    end
                    ) as hospDrugOrMaterialItemCode,
-        (case when iel.is_advice_entry is null or iel.is_advice_entry = '' then '未录入' when is_advice_entry ='1' then '已上传' end) isAdviceEntry
-        from inpt_advice ia left join inpt_visit iv on ia.visit_id = iv.id and iv.hosp_code = ia.hosp_code
-        left join insure_entry_log iel on iel.visit_id = ia.visit_id and iel.hosp_code = ia.hosp_code
-        where ia.hosp_code=#{map.hospCode} and ia.visit_id=#{map.visitId} and ia.id in
-        <foreach collection="map.inptCostDTOList" item="item" separator="," open="(" close=")">
-            #{item}
-        </foreach>
+        (case when ia.is_insure_upload is null or ia.is_insure_upload = '' then '未上传' when ia.is_insure_upload ='1' then '已上传' end) isAdviceEntry
+        from inpt_advice ia
+        where ia.hosp_code=#{map.hospCode} and ia.visit_id=#{map.visitId} and is_reject != '1' and is_submit = '1'
+        <if test="map.isInsureUpload == '0'.toString()">
+            and (ia.is_insure_upload is null or ia.is_insure_upload = '' or ia.is_insure_upload = '0')
+        </if>
     </select>
+
+    <update id="updateInsureUploadById"  parameterType="java.util.List">
+        update inpt_advice set is_insure_upload = '1' where id in
+        <foreach item="dto" collection="list" open="(" separator="," close=")">
+            #{dto.id}
+        </foreach>
+    </update>
+
+
+
     <select id="queryInptVisitDisease" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
         select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,
                iv.age, iv.age_unit_code, iv.birthday, iv.nation_code, iv.cert_code, iv.cert_no,
@@ -136,6 +143,9 @@
 
     </select>
     <select id="queryInsurePatientLog" resultType="cn.hsa.module.insure.module.entity.InsureEntryLogDO">
-            select * from insure_entry_log where hosp_code=#{hospCode} and visit_id=#{visitId}
-        </select>
+        select * from insure_entry_log where hosp_code=#{hospCode} and visit_id=#{visitId}
+        <if test="isAdviceEntry != null and isAdviceEntry != ''">
+            and is_advice_entry = #{isAdviceEntry}
+        </if>
+    </select>
 </mapper>

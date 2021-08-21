@@ -579,6 +579,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Date 2021/4/23 12:47
      * @Return
      **/
+    @Override
     public Map<String, Object> queryItemConfirm(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
@@ -591,17 +592,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         Map<String, Object> inputMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
+        // 查询数据参数map
         Map<String, Object> paramMap = new HashMap<>();
-
-        /**
-         * 公共入参
-         */
-        inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_5401);  // 交易编号
-        inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
-        inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
-        inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-        inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-        inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         dataMap.put("exam_org_code", MapUtils.get(map, "examOrgCode"));
@@ -609,27 +601,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("exam_item_code", MapUtils.get(map, "examItemCode"));
         dataMap.put("exam_item_name", MapUtils.get(map, "examItemName"));
         paramMap.put("data", dataMap);
-        inputMap.put("input", paramMap);
-        String json = JSONObject.toJSONString(inputMap);
-        logger.info("项目互认信息查询入参:" + json);
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
-        logger.info("项目互认信息查询回参:" + resultJson);
-        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
-        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "bilgiteminfo");
-        // 模拟数据
-       /* Map map1 = new HashMap();
-        map1.put("psn_no","434324234432");
-        map1.put("rpotc_no","202145678934589");
-        map1.put("rpotc_type_code","123");
-        map1.put("exam_rpotc_name","测试检测报告");
-        map1.put("rpt_date","2021-06-09");
-        map1.put("fixmedins_code","LT0748");
-        map1.put("exam_rslt_poit_flag","1");
-        map1.put("exam_rslt_abn","1");
-        map1.put("examCcls","434324234432");
-        List<Map<String, Object>> resultDataMap = new ArrayList<>();
-        resultDataMap.add(map1);*/
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "5401", paramMap);
+        List<Map<String, Object>> resultDataMap= MapUtils.get(resultMap, "bilgiteminfo");
         map.put("resultDataMap", resultDataMap);
         return map;
     }
@@ -1161,6 +1134,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         insureConfigurationDTO.setOrgCode(orgCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(insureConfigurationDTO ==null){
+            throw new AppException("查询医保机构配置信息为空");
+        }
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
@@ -1180,7 +1156,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
         return resultMap;

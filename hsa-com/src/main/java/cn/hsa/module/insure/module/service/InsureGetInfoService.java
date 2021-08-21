@@ -103,4 +103,26 @@ public interface InsureGetInfoService {
     @PostMapping("/service/insure/insureSettleInfo/queryInsure")
     WrapperResponse<PageDTO> queryInsure(Map map);
 
+    /**
+     * @Method queryPage()
+     * @Desrciption  分页查询医保住院费用传输数据
+     * @Param insureIndividualCostDTO数据传输对象
+     *
+     * @Author fuhui
+     * @Date   2020/11/5 10:58
+     * @Return insureIndividualCostDTO分页数据传输对象
+     **/
+    WrapperResponse<PageDTO> queryPage(Map<String, Object> param);
+
+
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询没有匹配的费用数据集合
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/6/20 9:55
+     * @Return
+     **/
+    WrapperResponse<PageDTO> queryUnMatchPage(Map<String, Object> param);
 }

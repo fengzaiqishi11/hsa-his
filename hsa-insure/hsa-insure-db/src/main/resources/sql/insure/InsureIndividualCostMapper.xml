@@ -325,7 +325,7 @@
         iv.gender_code,iv.bed_name,
         iv.age, iv.age_unit_code,iv.status_code,b.aka130_name as aka130Name,iv.in_disease_name,iv.in_disease_icd10,
         in_dept_name,iv.insure_org_code,iv.zz_doctor_name,iv.crte_time,iv.crte_name,b.insure_reg_code,b.medical_reg_no,
-        b.is_half_settle,
+        b.is_half_settle,b.aac001 as psn_no,
         date_format(
         IFNULL(        DATE_ADD((select iic.fee_end_time from insure_individual_cost iic where iic.visit_id = iv.id
         and iic.hosp_code = iv.hosp_code and iv.id=#{id}
@@ -1191,7 +1191,9 @@
         join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
         WHERE
         b.visit_id = #{id}
-        and iim.insure_reg_code = #{orgCode}
+        <if test="isUnified == '0'.toString()">
+            and iim.insure_reg_code = #{orgCode}
+        </if>
         AND (
         iim.is_trans = '0'
         OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))

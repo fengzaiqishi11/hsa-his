@@ -192,6 +192,28 @@
         order by audit_code,crte_time desc
     </select>
 
+
+    <select id="queryUnMacthAllPage" resultType="java.util.Map" parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        SELECT
+            id,
+            hosp_code hospCode,
+            insure_reg_code insureRegCode,
+            hosp_item_id hospItemId,
+            hosp_item_code hospItemCode,
+            hosp_item_name hospItemName,
+            hosp_item_spec hospItemSpec,
+            hosp_item_price hospItemPrice,
+            hosp_item_unit_code hospItemUnitCode,
+            is_match isMatch,
+            audit_code auditCode
+        FROM
+            insure_item_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND hosp_item_type = #{hospItemType}
+    </select>
+
     <select id="queryInsureMatchItemByItems" parameterType="java.util.Map" resultMap="InsureItemMatchMap">
         select * from insure_item_match
         where hosp_code = #{hospCode}

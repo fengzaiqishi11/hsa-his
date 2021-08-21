@@ -1331,6 +1331,13 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         return insureItemMatchDTOS;
     }
 
+    @Override
+    public PageDTO queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO) {
+        PageHelper.startPage(insureItemMatchDTO.getPageNo(),insureItemMatchDTO.getPageSize());
+        List<Map<String,Object>> insureDiseaseDTOList= insureItemMatchDAO.queryUnMacthAllPage(insureItemMatchDTO);
+        return PageDTO.of(insureDiseaseDTOList);
+    }
+
     /**
      * 封装导入的数据
      * @param num

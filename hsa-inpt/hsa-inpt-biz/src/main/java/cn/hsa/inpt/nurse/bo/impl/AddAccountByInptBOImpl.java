@@ -1011,7 +1011,9 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 dto.setCrteId(userId);
                 dto.setCrteName(userName);
                 dto.setCrteTime(DateUtils.getNow());
-                dto.setCostTime(DateUtils.getNow());
+                if(dto.getCostTime() == null) {
+                    dto.setCostTime(DateUtils.getNow());
+                }
                 /*if (dto.getCrteTime() == null) {
                     dto.setCrteTime(DateUtils.getNow());
                 }*/

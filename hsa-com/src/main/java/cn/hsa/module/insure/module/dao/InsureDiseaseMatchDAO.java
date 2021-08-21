@@ -157,4 +157,11 @@ public interface InsureDiseaseMatchDAO {
      * @Return
      */
     List<InsureDiseaseDTO> queryPageInsureDisease(InsureDiseaseDTO insureDiseaseDTO);
+
+    /**
+     * 查询所有未匹配审核的疾病信息
+     * @param insureDiseaseMatchDTO
+     * @return
+     */
+    List<Map<String, Object>> queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
 }

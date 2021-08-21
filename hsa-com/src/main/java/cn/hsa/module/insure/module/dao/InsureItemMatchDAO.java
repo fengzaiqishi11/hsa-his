@@ -305,4 +305,11 @@ public interface InsureItemMatchDAO {
      * @Return
      **/
     List<BaseMaterialDTO> queryAllMaterialsInfo(Map selectMap);
+
+    /**
+     * 查询所有未匹配的项目
+     * @param insureItemMatchDTO
+     * @return
+     */
+    List<Map<String, Object>> queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO);
 }

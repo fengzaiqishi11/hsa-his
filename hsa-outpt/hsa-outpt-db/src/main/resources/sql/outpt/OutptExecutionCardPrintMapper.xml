@@ -6,12 +6,13 @@
     <select id="queryPage" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
         select * from
         (SELECT
-        a.id,
+        max(a.id) as id,
         d.id as opId,
         b.id as opdId,
         b.group_no as groupNo,
         b.group_seq_no as groupSeqNo,
-        a.visit_id as visitId,
+        b.visit_id as visitId,
+        max(a.crte_time) as registerTime,
         a.crte_time as registerTime,
         c.name,
         c.age,
@@ -69,6 +70,7 @@
         <if test="endTime != null and endTime != ''">
             and a.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
+        group by b.id
         <!--根据处方同顺序排序-->
         order by a.id asc, d.id asc, b.id asc, d.crte_time DESC, a.crte_time DESC, b.group_no asc , b.group_seq_no asc) tab
         <!--order by a.crte_time desc,b.group_no asc ,b.group_seq_no asc)tab-->

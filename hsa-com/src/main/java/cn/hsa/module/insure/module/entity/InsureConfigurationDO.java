@@ -119,4 +119,8 @@ public class InsureConfigurationDO extends PageDO {
      * 就医地医保区划
      */
     private String mdtrtareaAdmvs;
+    /**
+     * 是否走统一支付平台(1是，0/null否)
+     */
+    private String isUnifiedPay;
 }

@@ -86,4 +86,24 @@ public class BaseDeptDTO extends BaseDeptDO implements Serializable {
     private String pharName;
     /** 药房ID **/
     private String pharId;
+    /**
+     * 科室床位数
+     */
+    private String bedNum;
+    /**
+     * 科室医生数
+     */
+    private String doctorNum;
+    /**
+     * 科室护士数
+     */
+    private String nurseNum;
+    /**
+     * 科室药师数
+     */
+    private String drugNum;
+    /**
+     * 科室技师数
+     */
+    private String medicNum;
 }

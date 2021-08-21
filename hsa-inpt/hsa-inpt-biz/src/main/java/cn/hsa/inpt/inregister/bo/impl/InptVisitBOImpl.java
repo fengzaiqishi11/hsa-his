@@ -483,6 +483,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
      **/
     @Override
     public Boolean deleteInsureRegister(InptVisitDTO inptVisitDTO) {
+        String hospCode = inptVisitDTO.getHospCode();
         if (StringUtils.isEmpty(inptVisitDTO.getId())) {
             throw new AppException("未获取到就诊ID");
         }
@@ -492,6 +493,23 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (insureIndividualVisitDTO == null) {
             throw new AppException("取消医保入院登记失败：此病人未进行医保登记");
         }
+
+        // 根据医院编码、医保注册编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", hospCode);
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         InsureInptOutFeeDTO insureInptOutFeeDTO = new InsureInptOutFeeDTO();
         insureInptOutFeeDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
         insureInptOutFeeDTO.setInsureOrgCode(insureIndividualVisitDTO.getInsureOrgCode());
@@ -505,12 +523,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
         insureParam.put("hospCode", insureIndividualVisitDTO.getHospCode());
         insureParam.put("insureInptOutFeeDTO", insureInptOutFeeDTO);
-        // 获取系统参数中配置的是否走统一支付平台
+        /*// 获取系统参数中配置的是否走统一支付平台
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
              Map<String, Object> insureUnifiedPayParam = new HashMap<>();
              insureUnifiedPayParam.put("hospCode",insureIndividualVisitDTO.getHospCode());
@@ -850,14 +869,26 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureParam.put("insureInptRegisterDTO", insureInptRegisterDTO);
 
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String,Object> dataMap = new HashMap<>(2);
 
-        // 获取系统参数中配置的是否走统一支付平台
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(inptVisitDTO.getHospCode());
+        insureConfigurationDTO.setRegCode(inptVisitDTO.getInsureOrgCode());
+        dataMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        dataMap.put("hospCode",inptVisitDTO.getHospCode());
+        insureConfigurationDTO = insureConfigurationService_consumer.queryInsureIndividualConfig(dataMap).getData();
+
+        // 获取页面传递的是否走统一支付平台值，为1走，0/null不走
+        String isUnifiedPay = StringUtils.isEmpty(inptVisitDTO.getIsUnifiedPay()) ? insureConfigurationDTO.getIsUnifiedPay() : inptVisitDTO.getIsUnifiedPay();
+
+       /* // 获取系统参数中配置的是否走统一支付平台
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
 
-        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
 
@@ -910,13 +941,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String medicalegNo = String.valueOf(resultMap.get("aaz217"));
         String omsgid = MapUtils.get(resultMap,"omsgid");
         String oinfno = MapUtils.get(resultMap,"oinfno");
-        Map<String,Object> dataMap = new HashMap<>(2);
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(inptVisitDTO.getHospCode());
-        insureConfigurationDTO.setRegCode(inptVisitDTO.getInsureOrgCode());
-        dataMap.put("insureConfigurationDTO",insureConfigurationDTO);
-        dataMap.put("hospCode",inptVisitDTO.getHospCode());
-        insureConfigurationDTO = insureConfigurationService_consumer.queryInsureIndividualConfig(dataMap).getData();
         // 处理医保回参数据
         try {
             InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
@@ -975,7 +999,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
             insureParam.put("hospCode", insureInptRegisterDTO.getHospCode());
             insureParam.put("insureInptOutFeeDTO", insureInptOutFeeDTO);
-            if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+//            if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+            if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
                 /**统一支付平台调用   开始*/
                 Map<String, Object> insureUnifiedPayParam = new HashMap<>();
                 insureUnifiedPayParam.put("hospCode",insureInptRegisterDTO.getHospCode());
@@ -1475,26 +1500,40 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (outptVisitDTO == null && selectEntiey == null) {
             throw new AppException("修改患者信息失败：门诊/住院均未找到患者就诊信息【就诊id:" + inptVisitDTO.getId() + "】");
         }
-        param.put("code", "UNIFIED_PAY");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();
-        if (data != null && data.getValue().equals("1") &&  !"0".equals(inptVisitDTO.getPatientCode())) {   // 调用统一支付平台
-            Map<String,Object> dataMap = new HashMap<>();
-            dataMap.put("hospCode",inptVisitDTO.getHospCode());
-            dataMap.put("inptVisitDTO",inptVisitDTO);
-            insureIndividualVisitService_consumer.updateInsureInidivdual(dataMap).getData();
-        }
-        else{
-            Map<String,Object> selectMap = new HashMap<>();
-            InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
-            insureIndividualVisitDTO.setVisitId(inptVisitDTO.getId());
-            insureIndividualVisitDTO.setHospCode(inptVisitDTO.getHospCode());
-            selectMap.put("hospCode",inptVisitDTO.getHospCode());
-            selectMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-            List<InsureIndividualVisitDTO> list = insureIndividualVisitService_consumer.findByCondition(selectMap);
-            if (!ListUtils.isEmpty(list)) {
+//        param.put("code", "UNIFIED_PAY");
+//        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();
+        // 获取医保个人信息
+        Map<String,Object> insureVisitParam =new HashMap<String,Object>();
+        insureVisitParam.put("id",inptVisitDTO.getId());
+        insureVisitParam.put("hospCode",inptVisitDTO.getHospCode());
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+
+        if (insureIndividualVisitDTO != null) {
+            // 根据医院编码、医保注册编码查询医保配置信息
+            InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+            configDTO.setHospCode(inptVisitDTO.getHospCode()); //医院编码
+            configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+            configDTO.setIsValid(Constants.SF.S); // 是否有效
+            Map configMap = new LinkedHashMap();
+            configMap.put("hospCode", inptVisitDTO.getHospCode());
+            configMap.put("insureConfigurationDTO", configDTO);
+            List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+            if (ListUtils.isEmpty(configurationDTOList)) {
+                throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+            }
+            InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+            // 获取该医保配置是否走统一支付平台，1走，0/null不走
+            String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+            if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay) && !"0".equals(inptVisitDTO.getPatientCode())) {
+                Map<String,Object> dataMap = new HashMap<>();
+                dataMap.put("hospCode",inptVisitDTO.getHospCode());
+                dataMap.put("inptVisitDTO",inptVisitDTO);
+                insureIndividualVisitService_consumer.updateInsureInidivdual(dataMap).getData();
+            } else {
                 throw new AppException("当前已完成医保登记，请先取消医保登记");
             }
         }
+
         //入院时间不能早于最小费用产生时间
         InptCostDTO minInptCost = inptVisitDAO.getMinTimeCostByVisitId(inptVisitDTO);
         if (minInptCost != null && DateUtils.dateCompare(minInptCost.getCostTime(),inptVisitDTO.getInTime())) {

@@ -224,4 +224,20 @@ public class OutptOutTmakePriceFormController extends BaseController {
         map.put("hospCode",userDTO.getHospCode());
         return outptOutTmakePriceFormService_consumer.updateOutptRegister(map);
     }
+
+    /**
+     * @Method updateOutptRegister
+     * @Desrciption  医保统一支付平台：门急诊诊疗记录【4301】
+     * @Param id-就诊id
+     *
+     * @Author luoyong
+     * @Date   2021/8/20 8:37
+     * @Return
+     **/
+    @PostMapping("/addOutptVisitRecordUpload")
+    public WrapperResponse<Boolean> addOutptVisitRecordUpload(@RequestBody  Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        map.put("hospCode",userDTO.getHospCode());
+        return outptOutTmakePriceFormService_consumer.addOutptVisitRecordUpload(map);
+    }
 }

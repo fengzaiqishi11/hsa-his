@@ -122,16 +122,21 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         }
         insureConfigurationDTO = insureConfigurationDTOList.get(0);
 
-        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        /*Map<String, Object> isInsureUnifiedMap = new HashMap<>();
         isInsureUnifiedMap.put("hospCode", hospCode);
         isInsureUnifiedMap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();*/
         // 满足条件 说明不是走医保统一支付平台
-        if (sysParameterDTO == null || !Constants.SF.S.equals(sysParameterDTO.getValue())) {
+//        if (sysParameterDTO == null || !Constants.SF.S.equals(sysParameterDTO.getValue())) {
+        if (StringUtils.isEmpty(isUnifiedPay) || "0".equals(isUnifiedPay) || !"1".equals(isUnifiedPay)) {
             //根据就诊id删除医保就诊信息
             insureIndividualVisitDAO.deleteByVisitId(visitId);
         }
-        if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+//        if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
             insureIndividualVisitDTO.setVisitId(visitId);
             insureIndividualVisitDTO.setHospCode(hospCode);
@@ -312,7 +317,8 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
          * 通过获取系统参数来判断 是否走医保统一支付平台
          * 如果是走医保统一支付平台，需要判断是否重复登记（根据就诊id，医院编码查询insure_individual_visit表）
          */
-        if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+//        if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             /**
              * 医保登记成功以后，也就是身份验证以后 上传诊断信息
              *

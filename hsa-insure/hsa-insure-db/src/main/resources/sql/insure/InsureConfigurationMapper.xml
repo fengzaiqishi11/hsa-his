@@ -27,6 +27,7 @@
         <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
         <result column="primary_price" property="primaryPrice" jdbcType="VARCHAR" />
+        <result column="is_unified_pay" property="isUnifiedPay" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -53,7 +54,8 @@
         crte_id,
         crte_name,
         crte_time,
-        mdtrtarea_admvs
+        mdtrtarea_admvs,
+        is_unified_pay
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -80,13 +82,14 @@
         ic.crte_id,
         ic.crte_name,
         ic.crte_time,
-        ic.mdtrtarea_admvs
+        ic.mdtrtarea_admvs,
+        ic.is_unified_pay
     </sql>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="insureConfigurationMap">
         select
-        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
         from insure_configuration
         <where>
             <if test="id != null and id != ''">
@@ -195,7 +198,8 @@
           crte_id,
           crte_name,
           crte_time,
-          mdtrtarea_admvs
+          mdtrtarea_admvs,
+          is_unified_pay
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -219,7 +223,8 @@
           #{crteId,jdbcType=VARCHAR},
           #{crteName,jdbcType=VARCHAR},
           #{crteTime,jdbcType=TIMESTAMP},
-          #{mdtrtareaAdmvs,jdbcType=VARCHAR}
+          #{mdtrtareaAdmvs,jdbcType=VARCHAR},
+          #{isUnifiedPay,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -396,7 +401,8 @@
                 crte_id = #{crteId,jdbcType=VARCHAR},
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 crte_time = #{crteTime,jdbcType=TIMESTAMP},
-                mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR}
+                mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR},
+                is_unified_pay = #{isUnifiedPay, jdbcType=VARCHAR}
         where
         id = #{id} and hosp_code = #{hospCode}
     </update>
@@ -472,6 +478,9 @@
             <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
                 mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR}
             </if>
+            <if test="isUnifiedPay != null and isUnifiedPay != ''">
+                is_unified_pay = #{isUnifiedPay, jdbcType=VARCHAR},
+            </if>
         </set>
         where
         id = #{id}
@@ -525,7 +534,7 @@
     <!--查询单个-->
     <select id="getById" parameterType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO" resultMap="insureConfigurationMap">
         select
-        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
         from insure_configuration
         where  hosp_code = #{hospCode}
         <if test="id !=null and id !='' ">
@@ -542,7 +551,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
         select
-        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
         from insure_configuration
         <where>
             <if test="keyword != null and keyword != ''">
@@ -566,7 +575,7 @@
     <select id="queryInsureIndividualConfig"
             resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
         select
-        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs
+        id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
         from insure_configuration
         where  hosp_code = #{hospCode}
         <if test="id !=null and id !='' ">

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -102,6 +103,7 @@ public class BaseDeptDO extends PageDO implements Serializable {
     */
     // 时间戳转换为标准时间格式
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 
     /**
@@ -123,6 +125,9 @@ public class BaseDeptDO extends PageDO implements Serializable {
     private int nursPsncnt; // 护士人数
     private int tecnPsncnt; // 技师人数
     private String isUpload ; // 是否上传
-
+    /**
+     * 科室负责人姓名
+     */
+    private String personName;
 
 }

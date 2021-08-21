@@ -683,4 +683,33 @@
     <update id="updateVisitTime">
         update outpt_visit set visit_time =#{visitTime} where hosp_code =#{hospCode} and id =#{visitId}
     </update>
+
+    <!--根据就诊id查询病历信息-->
+    <select id="queryMedicalRecordByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO">
+        select a.*
+        from outpt_medical_record a
+        where a.hosp_code = #{hospCode}
+        and a.visit_id = #{visitId}
+        order by a.crte_time asc
+    </select>
+
+    <!--根据就诊id查询诊断信息(outpt_diagnose)-->
+    <select id="queryDiagnoseByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
+        select a.*
+        from outpt_diagnose a
+        where a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+        order by crte_time asc
+    </select>
+
+    <!--根据就诊id查询处方信息(outpt_prescribe_detail_ext)-->
+    <select id="queryPreDetailExtByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
+        select a.*
+        from outpt_prescribe_detail_ext a
+        left join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.opd_id = b.id
+        left join outpt_prescribe c on a.hosp_code = c.hosp_code and a.visit_id = b.visit_id and a.op_id = b.id
+        where a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+        order by b.group_no, b.group_seq_no asc
+    </select>
 </mapper>

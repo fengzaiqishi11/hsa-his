@@ -4,17 +4,17 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureItemDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.entity.*;
+import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +22,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +48,9 @@ public class InsureUnifiedMatchController extends BaseController {
 
     @Resource
     private InsureItemMatchService insureItemMatchService_consumer;
+
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
 
     /**
      * @Method insertUnifiedItem
@@ -73,15 +78,33 @@ public class InsureUnifiedMatchController extends BaseController {
     @PostMapping("/insertUnifiedItem")
     public WrapperResponse<Map<String,Object>> insertUnifiedItem(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
         WrapperResponse<Map<String, Object>> result = new WrapperResponse<>();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("crteId",sysUserDTO.getId());
         map.put("crteName",sysUserDTO.getName());
-        Map<String, Object> selectmap = new HashMap<>();
+        /*Map<String, Object> selectmap = new HashMap<>();
         selectmap.put("hospCode", sysUserDTO.getHospCode());
         selectmap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(selectmap).getData();
-        if (sys != null && sys.getValue().equals("1")) {
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(selectmap).getData();*/
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(sysUserDTO.getHospCode()); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", sysUserDTO.getHospCode());
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+//        if (sys != null && sys.getValue().equals("1")) {
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
 
             // 调用统一支付平台
             result = insureUnifiedPayRestService_consumer.insertDownloadItem(map);
@@ -180,11 +203,28 @@ public class InsureUnifiedMatchController extends BaseController {
         insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("insureItemMatchDTO",insureItemMatchDTO);
 
-        Map<String, Object> selectmap = new HashMap<>();
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(sysUserDTO.getHospCode()); //医院编码
+        configDTO.setCode(insureItemMatchDTO.getRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", sysUserDTO.getHospCode());
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        /*Map<String, Object> selectmap = new HashMap<>();
         selectmap.put("hospCode", sysUserDTO.getHospCode());
         selectmap.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(selectmap).getData();
-        if (sys != null && sys.getValue().equals("1")) {
+        if (sys != null && sys.getValue().equals("1")) {*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             // 调用统一支付平台
             result = insureUnifiedPayRestService_consumer.insertUnifiedAutoMatch(map);
         } else {

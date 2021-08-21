@@ -57,6 +57,12 @@
             AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="id != null and id !=''">
+                and a.opd_id != #{id}
+            </if>
+            <if test="opId != null and opId !=''">
+                and a.op_id != #{opId}
+            </if>
             ) d
 
     </select>
@@ -68,9 +74,7 @@
         FROM
             (
             SELECT
-            a.id,
             CASE
-
                 WHEN
                     a.item_code = '1'
                     AND a.num_unit_code = b.split_unit_code THEN
@@ -113,16 +117,16 @@
             CASE
                 WHEN
                     a.item_code = '1'
-                    AND a.unit_code = b.split_unit_code THEN
+                    AND a.total_num_unit_code = b.split_unit_code THEN
                         a.total_num
                         WHEN a.item_code = '1'
-                        AND a.unit_code = b.unit_code THEN
+                        AND a.total_num_unit_code = b.unit_code THEN
                             a.total_num * b.split_ratio
                             WHEN a.item_code = '2'
-                            AND a.unit_code = c.split_unit_code THEN
+                            AND a.total_num_unit_code = c.split_unit_code THEN
                                 a.total_num
                                 WHEN a.item_code = '2'
-                                AND a.unit_code = c.unit_code THEN
+                                AND a.total_num_unit_code = c.unit_code THEN
                                     a.total_num * c.split_ratio ELSE 0
                                 END totalNum
         FROM
@@ -139,6 +143,9 @@
             AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="id != null and id != ''">
+               and a.id != #{id}
+            </if>
             ) d
     </select>
     <!--核收未配药-->
@@ -153,16 +160,16 @@
 
                 WHEN
                     a.item_code = '1'
-                    AND a.unit_code = b.split_unit_code THEN
+                    AND a.total_num_unit_code = b.split_unit_code THEN
                         a.total_num
                         WHEN a.item_code = '1'
-                        AND a.unit_code = b.unit_code THEN
+                        AND a.total_num_unit_code = b.unit_code THEN
                             a.total_num * b.split_ratio
                             WHEN a.item_code = '2'
-                            AND a.unit_code = c.split_unit_code THEN
+                            AND a.total_num_unit_code = c.split_unit_code THEN
                                 a.total_num
                                 WHEN a.item_code = '2'
-                                AND a.unit_code = c.unit_code THEN
+                                AND a.total_num_unit_code = c.unit_code THEN
                                     a.total_num * c.split_ratio ELSE 0
                                 END totalNum
         FROM
@@ -189,5 +196,6 @@
          where
         id = #{rateId} and hosp_code = #{hospCode} and is_valid = '1'
     </select>
+
 
 </mapper>

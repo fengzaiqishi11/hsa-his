@@ -20,9 +20,11 @@ import cn.hsa.module.inpt.fees.entity.InptSettleDO;
 import cn.hsa.module.inpt.fees.entity.InptSettleInvoiceContentDO;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -86,6 +88,8 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
     @Resource
     private InsureIndividualVisitService insureIndividualVisitService;
 
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
 
     /**
      * @Menthod querySettleVisitPage
@@ -352,6 +356,22 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     throw new AppException("医保取消结算失败：未查询到医保就医登记信息");
                 }
 
+                // 根据医院编码、医保注册编码查询医保配置信息
+                InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+                configDTO.setHospCode(hospCode); //医院编码
+                configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+                configDTO.setIsValid(Constants.SF.S); // 是否有效
+                Map configMap = new LinkedHashMap();
+                configMap.put("hospCode", hospCode);
+                configMap.put("insureConfigurationDTO", configDTO);
+                List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+                if (ListUtils.isEmpty(configurationDTOList)) {
+                    throw new RuntimeException("未找到医保机构，请重新获取人员信息。");
+                }
+                InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+                // 获取该医保配置是否走统一支付平台，1走，0/null不走
+                String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
                 // 冲红医保的相关表（insure_individual_settle）
                 insureIndividualVisitDTO.setInptVisitNo(inptVisitDTO.getInNo());
                 // 原记录被冲红和冲红处理
@@ -360,14 +380,15 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     this.insureIndividualSettleChangrRed(selectEntity,insureSettleId);
                 }
 
-                Map<String,Object> isInsureUnifiedMap = new HashMap<>();
+               /* Map<String,Object> isInsureUnifiedMap = new HashMap<>();
                 isInsureUnifiedMap.put("hospCode",hospCode);
                 isInsureUnifiedMap.put("code","UNIFIED_PAY");
-                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();*/
                 /**
                  * 通过获取系统参数来判断 是走医保统一支付平台 还是调用自己的的医保接口
                  */
-                if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+//                if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+                if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
                     Map<String,Object> insureUnifiedMap = new HashMap<>();
                     insureUnifiedMap.put("setl_id",selectEntity.getInsureSettleId()); // 结算ID
                     insureUnifiedMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊ID

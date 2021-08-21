@@ -151,4 +151,18 @@ public class OutptOutTmakePriceFormServiceImpl extends HsafService implements Ou
         return WrapperResponse.success(outptOutTmakePriceFormBO.updateOutptRegister(map));
     }
 
+    /**
+     * @Method updateOutptRegister
+     * @Desrciption  医保统一支付平台：门急诊诊疗记录【4301】
+     * @Param id-就诊id
+     *
+     * @Author luoyong
+     * @Date   2021/8/20 8:37
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Boolean> addOutptVisitRecordUpload(Map<String, Object> map) {
+        return WrapperResponse.success(outptOutTmakePriceFormBO.addOutptVisitRecordUpload(map));
+    }
+
 }

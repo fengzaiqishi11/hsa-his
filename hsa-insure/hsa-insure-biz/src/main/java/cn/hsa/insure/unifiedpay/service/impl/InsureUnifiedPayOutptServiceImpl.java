@@ -172,4 +172,18 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	public WrapperResponse<Map<String, Object>> UP_5302(Map<String, Object> map) {
 		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_5302(map));
 	}
+
+	/**
+	 * @Menthod: UP_4301
+	 * @Desrciption: 医保统一支付平台：门急诊诊疗记录，上传单次病人就诊信息
+	 * @Param:
+	 * @Author: luoyong
+	 * @Email: luoyong@powersi.com.cn
+	 * @Date: 2021-08-17 19:45
+	 * @Return:
+	 **/
+	@Override
+	public WrapperResponse<Map<String, Object>> UP_4301(Map<String, Object> map) {
+		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_4301(map));
+	}
 }

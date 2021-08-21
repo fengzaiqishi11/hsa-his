@@ -5,14 +5,17 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.emd.service.InptElectronicBillService;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.outpt.service.OutptService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +58,9 @@ public class InsureIndividualBasicController extends BaseController {
 
     @Resource
     private InptElectronicBillService inptElectronicBillService_consumer;
+
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
 
     /**
      * @Method queryPage
@@ -159,20 +167,38 @@ public class InsureIndividualBasicController extends BaseController {
         insureIndividualBasicDTO.setPsnCertType(psnCertType);
         insureIndividualBasicDTO.setNationECResult(nationECResult);
         map.put("insureRegCode",regCode);
+        map.put("regCode",regCode);
         map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
 
-        // 查询医院医保配置（直接走医保还是走统一支付平台）
+       /* // 查询医院医保配置（直接走医保还是走统一支付平台）
         Map<String, Object> tempMap = new HashMap<>();
         tempMap.put("hospCode", sysUserDTO.getHospCode());
         tempMap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(tempMap).getData();
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(tempMap).getData();*/
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(sysUserDTO.getHospCode()); //医院编码
+        configDTO.setCode(regCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", MapUtils.get(map,"hospCode"));
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
         if ("qrcode".equals(bka895)){
             if (StringUtils.isEmpty(nationECResult)){
                 throw new AppException("使用电子凭证需要扫码进行身份确认。");
             }
             //电子凭证
             return inptElectronicBillService_consumer.getPatientInfo(map);
-        } else if (sys != null && sys.getValue().equals("1")) {
+//        } else if (sys != null && sys.getValue().equals("1")) {
+        } else if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             //调用统一支付平台平台
             return outptService.getOutptVisitInfo(map);
         }else{

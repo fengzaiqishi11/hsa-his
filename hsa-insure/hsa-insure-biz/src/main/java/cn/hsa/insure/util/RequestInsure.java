@@ -4,6 +4,8 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -44,6 +46,10 @@ public class RequestInsure {
     private static final String consumerTopicKey = "_insure_consumer";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
+
 
     /**
      * @Menthod toLogin
@@ -224,18 +230,35 @@ public class RequestInsure {
         paramObj.put("url",insureConfigurationDO.getUrl());
         paramObj.put("charset","gbk");//编码方式
         paramObj.put("param",HygeiaUtil.map2Xml("utf-8",param));//请求医保参数
-        //解析医保可识别的XML格式编码字符串
-        Map<String,Object> httpParam = new HashMap<String,Object>();
-        httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
-        String activityCode = SnowflakeUtils.getId();//交易号
-        httpParam.put("activityCode",activityCode);
-        httpParam.put("data", paramObj);
-        Map<String,Object> resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
-        Integer code = (Integer) resultObj.get("code");
-        if (code < 0) {
-            throw new AppException((String) resultObj.get("msg"));
+
+        Map<String,Object> resultData = new HashMap<>();
+        // 获取系统参数是直连医保还是走消息队列连接，默认消息队列
+        SysParameterDTO sysParamDTO = this.getSysParamDTO(hospCode, "DIRECT_OR_QUEUE");
+
+        if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
+            // 直连医保
+            logger.debug("*****开始【湖南省医保登录】直连方法*****");
+            logger.debug("【湖南省医保登录】直连入参：" + JSON.toJSONString(paramObj));
+            String doPost = HttpConnectUtil.doPost(paramObj);
+            logger.debug("【湖南省医保登录】直连返参字符串：" + doPost);
+            resultData = HygeiaUtil.xml2map(doPost);
+            logger.debug("【湖南省医保登录】直连返参XML解析后：" + resultData);
+            logger.debug("*****结束【湖南省医保登录】直连方法*****");
+        } else {
+            //解析医保可识别的XML格式编码字符串
+            Map<String,Object> resultObj = new HashMap<>();
+            Map<String,Object> httpParam = new HashMap<String,Object>();
+            httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
+            String activityCode = SnowflakeUtils.getId();//交易号
+            httpParam.put("activityCode",activityCode);
+            httpParam.put("data", paramObj);
+            resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+            Integer code = (Integer) resultObj.get("code");
+            if (code < 0) {
+                throw new AppException((String) resultObj.get("msg"));
+            }
+            resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
         }
-        Map<String,Object> resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
         int errortype = Integer.parseInt((String) resultData.get("errortype"));
         if (errortype != 0){
             throw new AppException((Integer) resultData.get("errormessage"));
@@ -271,17 +294,35 @@ public class RequestInsure {
             paramObj.put("url",insureConfigurationDO.getUrl());
             paramObj.put("charset","gbk");//编码方式
             paramObj.put("param",HygeiaUtil.map2Xml("utf-8",parameters));//请求医保参数
-            Map<String,Object> httpParam = new HashMap<String,Object>();
-            httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
-            String activityCode = SnowflakeUtils.getId();//交易号
-            httpParam.put("activityCode",activityCode);
-            httpParam.put("data", paramObj);
-            Map<String,Object> resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
-            Integer code = (Integer) resultObj.get("code");
-            if (code < 0) {
-                throw new AppException((String) resultObj.get("msg"));
+
+            Map<String,Object> resultData = new HashMap<>();
+            // 获取系统参数是直连医保还是走消息队列连接，默认消息队列
+            SysParameterDTO sysParamDTO = this.getSysParamDTO(hospCode, "DIRECT_OR_QUEUE");
+            if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
+                // 直连医保
+                logger.debug("*****开始【湖南省医保调用】直连方法*****");
+                logger.debug("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
+                String doPost = HttpConnectUtil.doPost(paramObj);
+                logger.debug("【湖南省医保调用】直连返参字符串：" + doPost);
+                logger.debug("开始解析xml");
+                resultData = HygeiaUtil.xml2map(doPost);
+                logger.debug("【湖南省医保调用】直连返参XML解析：" + resultData);
+                logger.debug("*****结束【湖南省医保调用】直连方法*****");
+            } else {
+                // 默认消息队列
+                Map<String,Object> resultObj = new HashMap<>();
+                Map<String,Object> httpParam = new HashMap<String,Object>();
+                httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
+                String activityCode = SnowflakeUtils.getId();//交易号
+                httpParam.put("activityCode",activityCode);
+                httpParam.put("data", paramObj);
+                resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+                Integer code = (Integer) resultObj.get("code");
+                if (code < 0) {
+                    throw new AppException((String) resultObj.get("msg"));
+                }
+                resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
             }
-            Map<String,Object> resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
             int errortype = Integer.parseInt((String) resultData.get("errortype"));
             if (errortype != 0){
                 throw new   AppException("【" + resultData.get("errorno") + "】" +  resultData.get("errormessage"));
@@ -290,6 +331,14 @@ public class RequestInsure {
         } catch (Exception e){
             throw new AppException("调用医保提示【"+e.getMessage()+"】");
         }
+    }
+
+    // 获取系统参数
+    private SysParameterDTO getSysParamDTO(String hospCode, String code) {
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", hospCode);
+        sysMap.put("code", code);
+        return sysParameterService_consumer.getParameterByCode(sysMap).getData();
     }
 
     /**

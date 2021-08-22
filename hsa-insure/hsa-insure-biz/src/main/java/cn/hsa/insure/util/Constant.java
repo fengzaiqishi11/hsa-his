@@ -16,11 +16,11 @@ import java.util.Map;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
 public interface Constant {
-    
+
     /**
      * @Desrciption 湘潭医保功能号
      * @Author Ou·Mr
-     * @Date 2020/11/4 9:08 
+     * @Date 2020/11/4 9:08
      */
     class Xiangtan{
 
@@ -762,6 +762,17 @@ public interface Constant {
         public static class CARD {
             public static final String UP_1602 = "1602"; // 身份证密码校验
             public static final String UP_1603 = "1603"; // 修改身份证密码
+        }
+
+        //库存管理
+        public static class KCGL {
+            public static final String UP_3501 = "3501"; // 商品盘存上传
+            public static final String UP_3502 = "3502"; // 商品库存变更
+            public static final String UP_3503 = "3503"; // 商品采购
+            public static final String UP_3504 = "3504"; // 商品采购退货
+            public static final String UP_3505 = "3505"; // 商品销售
+            public static final String UP_3506 = "3506"; // 商品销售退货
+            public static final String UP_3507 = "3507"; // 商品信息删除
         }
     }
 

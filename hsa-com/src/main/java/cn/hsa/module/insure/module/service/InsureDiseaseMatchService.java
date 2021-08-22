@@ -138,4 +138,6 @@ public interface InsureDiseaseMatchService {
      **/
     @GetMapping("/service/base/baseDisease/queryPageInsureDisease")
     WrapperResponse<PageDTO> queryPageInsureDisease(Map<String, Object> map);
+
+    WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> map);
 }

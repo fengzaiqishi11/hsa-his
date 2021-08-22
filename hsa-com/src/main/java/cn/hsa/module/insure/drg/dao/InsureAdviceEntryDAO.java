@@ -44,7 +44,7 @@ public interface InsureAdviceEntryDAO {
      * @Date: 2020/12/12
      * @Retrun:
      */
-    List<InsureIndividualVisitDTO> queryPage(InsureIndividualVisitDTO insureIndividualVisitDTO);
+    List<InptVisitDTO> queryPage(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     /**
      * @Method: queryPrescribe()
@@ -136,4 +136,6 @@ public interface InsureAdviceEntryDAO {
     List<String> queryAdviceId(@Param("costListMap") List<Map<String, Object>> costListMap);
 
     Boolean deleteLog(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    int updateInsureUploadById(List<InptAdviceDTO> adviceDTOList);
 }

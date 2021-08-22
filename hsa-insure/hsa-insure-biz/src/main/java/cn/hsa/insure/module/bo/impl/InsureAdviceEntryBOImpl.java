@@ -81,8 +81,12 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
     @Override
     public boolean saveAdviceEntry(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         InsureIndividualVisitDTO visitDTO = insureAdviceEntryDAO.queryInsurePatientInfo(insureIndividualVisitDTO);
-        visitDTO.setCrteId(insureIndividualVisitDTO.getCrteId()); // 创建人id
-        visitDTO.setCrteName(insureIndividualVisitDTO.getCrteName()); // 创建人姓名
+        if ( visitDTO == null ) {
+            throw new AppException("该病人没有进行医保登记");
+        }
+        visitDTO.setCrteId(insureIndividualVisitDTO.getCrteId());
+        visitDTO.setCrteName(insureIndividualVisitDTO.getCrteName());
+
         String hospCode = visitDTO.getHospCode();
         String orgCode = visitDTO.getInsureOrgCode();
 
@@ -100,21 +104,13 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         // 获取该医保配置是否走统一支付平台，1走，0/null不走
         String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
 
-        if (visitDTO == null) {
-            throw new AppException("该病人没有进行医保登记");
-        }
-        Integer count = insureAdviceEntryDAO.queryPatientIsSettle(insureIndividualVisitDTO);
-        if(count <0){
-            throw new AppException("该病人还没有做结算操作,不能做医嘱录入操作");
-        }
-        InsureEntryLogDO insureEntryLogDO = insureAdviceEntryDAO.queryInsurePatientLog(insureIndividualVisitDTO);
-        if(insureEntryLogDO !=null){
-            throw new AppException("该病人的医嘱信息已录入到医保前台,请不要重复录入");
-        }
-        /**
-         * doctoradvice医嘱参数
-         */
+        insureIndividualVisitDTO.setIsAdviceEntry("0");
         List<InptAdviceDTO> adviceDTOList = this.queryMatchAdvice(insureIndividualVisitDTO);
+        if (ListUtils.isEmpty(adviceDTOList)) {
+            throw new AppException("没有需要上传的数据!");
+        }
+        insureAdviceEntryDAO.updateInsureUploadById(adviceDTOList);
+
         /**
          * 先操作日志表，后调用医保接口
          */
@@ -134,7 +130,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             paramDataMap.put("data",paramMapList);
             commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.INPT.UP_4402, paramDataMap);
         }
-        else{
+        /*else{
             List<Map<String, Object>> prescribeMapList = new ArrayList<>();
             List<Map<String, Object>> adviceMapList = new ArrayList<>();
             List<Map<String, Object>> diseaseMapList = new ArrayList<>();
@@ -142,9 +138,9 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             Map<String, Object> prescribeParamMap = new HashMap<>(); // 保存处方的信息
             adviceParamMap = new HashMap<>();  // 保存医嘱的信息
             Map<String, Object> diseaseParamMap = new HashMap<>();  // 保存疾病的信息
-            /**
+            *//**
              * 必填参数信息
-             */
+             *//*
             httpResult.put("function_id", Constant.Xiangtan.ADVICE.BIZC320001);    //功能号
             httpResult.put("akb020", visitDTO.getMedicineOrgCode());    //医疗机构编码
             httpResult.put("aaa027", visitDTO.getAaa027());    //分级统筹中心编码
@@ -154,15 +150,15 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             httpResult.put("akc190", visitDTO.getVisitNo());    //住院号
             httpResult.put("audit_flag", "0"); // 校验标识 0：只保存不校验；1：提供医审校验
 
-            /**
+            *//**
              *  传递给call方法调用的参数
-             */
+             *//*
             httpResult.put("hospCode", visitDTO.getHospCode()); // 医院编码
             httpResult.put("medicineOrgCode", visitDTO.getMedicineOrgCode()); // 医疗机构编码
 
-            /**
+            *//**
              * 根据就诊id查询 处方信息
-             */
+             *//*
             List<OutptPrescribeDetailsDTO> prescribeDTOList = insureAdviceEntryDAO.queryPrescribe(insureIndividualVisitDTO);
             if (!ListUtils.isEmpty(prescribeDTOList)) {
                 for (int i = 0; i < prescribeDTOList.size(); i++) {
@@ -264,9 +260,9 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
                 }
             }
             List<InptVisitDTO> diseaseDTOList = insureAdviceEntryDAO.queryInptVisitDisease(insureIndividualVisitDTO);
-            /**
+            *//**
              * 疾病参数
-             */
+             *//*
             if (!ListUtils.isEmpty(diseaseDTOList)) {
                 for (int i = 0; i < diseaseDTOList.size(); i++) {
                     diseaseParamMap.put("bkr112", diseaseDTOList.get(i).getDiseaseId()); // 诊断编号
@@ -296,7 +292,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             httpResult.put("doctoradvice", adviceParamMap);
             httpResult.put("disease", diseaseParamMap);
             transpond.to(visitDTO.getHospCode(), visitDTO.getMedicineOrgCode(), Constant.FUNCTION.BIZC320001, httpResult);
-        }
+        }*/
         return true;
     }
     /**
@@ -317,6 +313,9 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         insureConfigurationDTO.setRegCode(orgCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("未查询到医保机构配置信息【"+ orgCode +"】");
+        }
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
@@ -513,6 +512,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
     @Override
     public PageDTO queryAdvicePage(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         PageHelper.startPage(insureIndividualVisitDTO.getPageNo(),insureIndividualVisitDTO.getPageSize());
+        insureIndividualVisitDTO.setIsAdviceEntry("All");
         List<InptAdviceDTO> adviceDTOList = queryMatchAdvice(insureIndividualVisitDTO);
         return PageDTO.of(adviceDTOList);
     }
@@ -527,18 +527,10 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
      * @Retrun: 医嘱数据传输对象
      */
     private List<InptAdviceDTO> queryMatchAdvice(InsureIndividualVisitDTO insureIndividualVisitDTO) {
-        List<Map<String,Object>> costListMap = insureAdviceEntryDAO.queryCostId(insureIndividualVisitDTO);
-        if(ListUtils.isEmpty(costListMap)){
-            throw new AppException("根据就诊Id,查询医嘱匹配费用明细数据为空");
-        }
-        List<String> inptCostDTOList = insureAdviceEntryDAO.queryAdviceId(costListMap);
-        if(ListUtils.isEmpty(inptCostDTOList)){
-            throw new AppException("根据费用明细Id,查询对应的医嘱id数据为空");
-        }
         Map map =new HashMap<String,Object>();
-        map.put("inptCostDTOList",inptCostDTOList);
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
         map.put("hospCode",insureIndividualVisitDTO.getHospCode());
+        map.put("isInsureUpload",insureIndividualVisitDTO.getIsAdviceEntry());
         List<InptAdviceDTO> adviceDTOList = insureAdviceEntryDAO.queryDoctorAdvice(map);
         return adviceDTOList;
     }
@@ -556,7 +548,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
     @Override
     public PageDTO queryPage(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         PageHelper.startPage(insureIndividualVisitDTO.getPageNo(), insureIndividualVisitDTO.getPageSize());
-        List<InsureIndividualVisitDTO> visitDTOList = insureAdviceEntryDAO.queryPage(insureIndividualVisitDTO);
+        List<InptVisitDTO> visitDTOList = insureAdviceEntryDAO.queryPage(insureIndividualVisitDTO);
         return PageDTO.of(visitDTOList);
     }
 

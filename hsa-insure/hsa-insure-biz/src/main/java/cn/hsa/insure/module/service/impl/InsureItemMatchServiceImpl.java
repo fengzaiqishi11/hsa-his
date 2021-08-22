@@ -303,4 +303,9 @@ public class InsureItemMatchServiceImpl extends HsafService implements InsureIte
     public WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap) {
         return WrapperResponse.success(insureItemMatchBO.queryLimitDrugList(MapUtils.get(paramMap, "insureItemMatchDTO")));
     }
+
+    @Override
+    public WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> selectItemMap) {
+        return WrapperResponse.success(insureItemMatchBO.queryUnMacthAllPage(MapUtils.get(selectItemMap, "insureItemMatchDTO")));
+    }
 }

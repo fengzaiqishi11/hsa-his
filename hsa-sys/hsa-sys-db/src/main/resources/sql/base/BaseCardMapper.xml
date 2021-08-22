@@ -184,7 +184,9 @@
         a.gender_code,
         a.age,
         a.in_profile,a.out_profile,a.cert_no,b.card_type_code,b.card_no,b.status_code as cardStatusCode,b.crte_time as cardTime,
-        c.status_code,c.pay_code,c.end_balance,c.start_balance,c.price,c.crte_time,c.crte_name
+        (case when c.settle_type = '02' or c.settle_type = '04' then '9'
+        else c.status_code end) as statusCode,
+        c.pay_code,c.end_balance,c.start_balance,c.price,c.crte_time,c.crte_name
         from base_profile_file a
         JOIN base_card b
         ON a.hosp_code = b.hosp_code and a.id = b.profile_id

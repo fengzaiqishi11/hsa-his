@@ -55,4 +55,9 @@ public class InsureUnifiedEmrUploadServiceImpl extends HsafService implements In
     public WrapperResponse<Boolean> updateInsureUnifiedPrescrib(Map<String, Object> map) {
         return WrapperResponse.success(insureUnifiedEmrUploadBO.updateInsureUnifiedPrescrib(map));
     }
+
+    @Override
+    public WrapperResponse<Boolean> updateInsureUnifiedEmr(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedEmrUploadBO.updateInsureUnifiedEmr(map));
+    }
 }

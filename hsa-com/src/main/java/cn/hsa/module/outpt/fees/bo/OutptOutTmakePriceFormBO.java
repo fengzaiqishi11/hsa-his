@@ -98,4 +98,15 @@ public interface OutptOutTmakePriceFormBO {
      * @Return
      */
     Boolean updateOutptRegister(Map<String, Object> map);
+
+    /**
+     * @Method updateOutptRegister
+     * @Desrciption  医保统一支付平台：门急诊诊疗记录【4301】
+     * @Param id-就诊id
+     *
+     * @Author luoyong
+     * @Date   2021/8/20 8:37
+     * @Return
+     **/
+    Boolean addOutptVisitRecordUpload(Map<String, Object> map);
 }

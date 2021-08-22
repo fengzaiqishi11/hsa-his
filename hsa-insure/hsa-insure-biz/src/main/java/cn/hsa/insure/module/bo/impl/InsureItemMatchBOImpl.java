@@ -348,12 +348,27 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         String hospCode = insureItemDTO.getHospCode();
         String insureRegCode = insureItemDTO.getInsureRegCode();
         Map<String, Object> map = new HashMap<>();
-        map.put("code", "UNIFIED_PAY");
+//        map.put("code", "UNIFIED_PAY");
         map.put("hospCode", hospCode);  // 医院编码
         map.put("insureRegCode", insureItemDTO.getInsureRegCode());
         map.put("startDate", insureItemDTO.getStartDate());
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        /*SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sys != null && Constants.SF.S.equals(sys.getValue())) {*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             Map<String, Object> data = insureUnifiedPayRestService.UP_1317(map).getData();
         } else {
             Map<String, Object> finMatchData = transpond.to(hospCode, insureRegCode, Constant.ChangSha.RESTS.CS_1300, insureItemDTO);
@@ -930,9 +945,24 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
      */
     @Override
     public Boolean deleteInsureMatch(Map<String, Object> map) {
-        map.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        /* map.put("code", "UNIFIED_PAY");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(MapUtils.get(map, "hospCode")); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+//        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             insureUnifiedPayRestService.UP_3302(map).getData();
         } else {
             if ("isDisease".equals(map.get("downLoadType").toString())) {
@@ -957,7 +987,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     @Override
     public Integer updateIsTrans(InsureItemDTO insureItemDTO) {
         Map<String, Object> map = new HashMap<>();
-        map.put("code", "UNIFIED_PAY");
+//        map.put("code", "UNIFIED_PAY");
         map.put("startDate", insureItemDTO.getStartDate());
         map.put("endDate", insureItemDTO.getEndDate());
         map.put("crteId", insureItemDTO.getCrteId());
@@ -965,9 +995,24 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         map.put("hospItemType", insureItemDTO.getHospItemType());
         map.put("hospCode", insureItemDTO.getHospCode());  // 医院编码
         map.put("insureRegCode", insureItemDTO.getInsureRegCode());
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(insureItemDTO.getHospCode()); //医院编码
+        configDTO.setCode(insureItemDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         Integer size = 0;
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+       /* SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sys != null && Constants.SF.S.equals(sys.getValue())) {*/
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             Map<String, Object> resultMap = insureUnifiedPayRestService.uploadItem(map).getData();
             List<InsureItemMatchDTO> insureItemDTOList = MapUtils.get(resultMap, "insureItemDTOList");
             size = insureItemDTOList.size();
@@ -993,12 +1038,29 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
      */
     @Override
     public Boolean deleteInsureItemMatch(InsureItemMatchDTO insureItemMatchDTO) {
+        String insureRegCode = insureItemMatchDTO.getInsureRegCode();
+        String hospCode = insureItemMatchDTO.getHospCode();
+
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode", insureItemMatchDTO.getHospCode());  // 医院编码
-        map.put("code", "UNIFIED_PAY");
+       /*map.put("code", "UNIFIED_PAY");
 
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+//        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             InsureItemMatchDTO itemMatchDTO = insureItemMatchDAO.selectInsureItemMatch(insureItemMatchDTO);
             if(Constants.SF.S.equals(itemMatchDTO.getAuditCode())){
                 map.put("itemMatchDTO",itemMatchDTO);
@@ -1267,6 +1329,13 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         // 查询已匹配、已传输的限制级用药列表
         List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchDAO.queryPageOrAll(insureItemMatchDTO);
         return insureItemMatchDTOS;
+    }
+
+    @Override
+    public PageDTO queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO) {
+        PageHelper.startPage(insureItemMatchDTO.getPageNo(),insureItemMatchDTO.getPageSize());
+        List<Map<String,Object>> insureDiseaseDTOList= insureItemMatchDAO.queryUnMacthAllPage(insureItemMatchDTO);
+        return PageDTO.of(insureDiseaseDTOList);
     }
 
     /**

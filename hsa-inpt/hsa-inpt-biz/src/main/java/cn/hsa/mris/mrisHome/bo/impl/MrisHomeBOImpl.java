@@ -12,9 +12,11 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureMrisAdvicePatientInfoDTO;
+import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.mris.service.MrisService;
 import cn.hsa.module.mris.mrisHome.bo.MrisHomeBO;
 import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
@@ -67,6 +69,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private InsureUnifiedEmrUploadService insureUnifiedEmrUploadService_consumer;
+
+    @Resource
+    private InsureConfigurationService insureConfigurationService_consumer;
 
 
     /**
@@ -488,6 +493,23 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             throw new AppException("上传失败:未获取医保个人信息");
         }
 
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(MapUtils.get(map,"hospCode")); //医院编码
+        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        Map configMap = new LinkedHashMap();
+        configMap.put("hospCode", MapUtils.get(map,"hospCode"));
+        configMap.put("insureConfigurationDTO", configDTO);
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationService_consumer.findByCondition(configMap);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息。");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+
         // 病案主体信息数据集
         MrisBaseInfoDTO mrisBaseInfoDTO = mrisHomeDAO.getMrisBaseInfo(inptVisitDTO);
         if (mrisBaseInfoDTO == null) {
@@ -499,12 +521,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         MrisCostDO mrisCostDO =  mrisHomeDAO.queryMriCost(map);
         // 病案诊断信息数据集
         List<MrisDiagnoseDO> mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
-        map.put("code","UNIFIED_PAY");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        /*map.put("code","UNIFIED_PAY");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();*/
 
         // 住院病案首页上传 判断走医保统一支付平台，还是走原来的医保配置
 
-        if(sysParameterDTO!=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+//        if(sysParameterDTO!=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+        if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             map.put("mrisOperList",mrisOperList);
             map.put("mrisDiagnoseList",mrisDiagnoseList);
             map.put("mrisBaseInfoDTO",mrisBaseInfoDTO);

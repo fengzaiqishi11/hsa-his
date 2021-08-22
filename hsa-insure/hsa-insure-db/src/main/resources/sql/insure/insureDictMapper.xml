@@ -109,6 +109,28 @@
             AND crte_id = #{crteId}
         </if>
     </select>
+
+    <!-- 查询医保字典表信息 -->
+    <select id="queryInsureDictList2" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO" resultMap="insureDictMap">
+        select
+        *
+        from
+        insure_dict
+        where
+        hosp_code = #{hospCode}
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="medicineOrgCode != null and medicineOrgCode != ''">
+            AND medicine_org_code = #{medicineOrgCode}
+        </if>
+    </select>
+
+
+
     <select id="getDictById" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
         select * from insure_dict where hosp_code=#{hospCode} and id=#{id}
     </select>
@@ -144,6 +166,17 @@
         delete from insure_dict where hosp_code=#{hospCode} and insure_reg_code=#{regCode}
     </delete>
 
+
+
+
+    <select id="queryDictByCode" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        SELECT id, hosp_code, insure_reg_code, code, name, value, remark,
+               crte_id, crte_name, crte_time, ext01, ext02, ext03,
+               medicine_org_code FROM insure_dict where 1=1
+                                       AND hosp_code = #{hospCode}
+                                        and insure_reg_code =#{insureRegCode}
+                                       AND code = #{code}
+    </select>
     <!-- 根据条件code + value -> name -->
     <select id="getInsureDictNameByCode" resultType="java.lang.String" parameterType="java.util.Map">
         SELECT name FROM insure_dict where 1=1

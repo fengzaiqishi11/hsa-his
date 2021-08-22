@@ -37,4 +37,15 @@ public interface  InsureUnifiedEmrUploadService {
      * @Return
      **/
     WrapperResponse<Boolean> updateInsureUnifiedPrescrib(Map<String, Object> map);
+
+    /**
+     * @Method updateInsureUnifiedEmr
+     * @Desrciption  医保统一支付平台：电子病历上传
+     * @Param map
+     *
+     * @Author liuliyun
+     * @Date   2021/8/21 11:03
+     * @Return
+     **/
+    WrapperResponse<Boolean> updateInsureUnifiedEmr(Map<String, Object> map);
 }

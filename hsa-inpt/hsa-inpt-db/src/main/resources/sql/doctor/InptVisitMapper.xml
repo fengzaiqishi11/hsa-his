@@ -251,10 +251,10 @@
 
 		<!-- 入院开始时间 zhongming by 20201219 -->
 		<if test="startTime != null and startTime != ''">
-			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+			and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and status_code = #{statusCode}
@@ -299,10 +299,10 @@
 		</if>
 		<!-- 入院开始时间 zhongming by 20201219 -->
 		<if test="startTime != null and startTime != ''">
-			and pt.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+			and pt.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and pt.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+			and pt.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and pt.status_code = #{statusCode}

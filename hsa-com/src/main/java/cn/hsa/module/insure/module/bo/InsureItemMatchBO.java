@@ -209,4 +209,6 @@ public interface InsureItemMatchBO {
      * @Return:
      */
     List<InsureItemMatchDTO> queryLimitDrugList(InsureItemMatchDTO insureItemMatchDTO);
+
+    PageDTO queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO);
 }

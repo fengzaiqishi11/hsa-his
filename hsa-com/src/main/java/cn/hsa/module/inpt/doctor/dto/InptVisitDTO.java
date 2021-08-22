@@ -379,5 +379,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
      */
     private String isShared;
-
+    /**
+     * 是否新医保，用于判断业务是否走统一支付平台
+     */
+    private String isUnifiedPay;
+    /** 人员编号，insure_individual_visit.aac001 **/
+    private String psnNo;
 }

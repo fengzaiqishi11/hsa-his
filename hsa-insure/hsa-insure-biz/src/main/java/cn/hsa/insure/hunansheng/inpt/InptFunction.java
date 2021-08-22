@@ -1062,6 +1062,8 @@ public class InptFunction {
             costItem.put("stat_type",itemStr);//项目药品类型
             costItem.put("his_item_code",item.get("hospItemCode"));//医院药品项目编码
             costItem.put("his_item_name",item.get("hospItemName"));//医院药品项目名称
+            costItem.put("item_code",item.get("insureItemCode"));//中心药品项目编码
+            costItem.put("item_name",item.get("insureItemName"));//中心药品项目名称
             costItem.put("drug_standard_code",item.get("pqccItemId"));//药品本位码
             costItem.put("model",item.get("prepCode"));//剂型
             costItem.put("factory",null);//厂家

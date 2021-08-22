@@ -668,6 +668,7 @@ public interface Constant {
             public static final String UP_5265 = "5265"; // 结算单下载
             public static final String UP_5269 = "5269"; // 异地门诊结算单下载
             public static final String UP_5270 = "5270"; // 异地住院结算单下载
+            public static final String UP_4301 = "4301"; // 门急诊诊疗记录
         }
 
         public static class INPT {
@@ -679,6 +680,8 @@ public interface Constant {
 
             public static final String UP_4401 = "4401"; // 住院病案首页信息
             public static final String UP_4402 = "4402"; // 住院医嘱记录
+
+            public static final String UP_4601 = "4601"; // 输血信息上传
         }
 
         public static class REGISTER {
@@ -738,6 +741,8 @@ public interface Constant {
             public static final String UP_2563 = "2563"; // 门诊两病备案撤销
 
             public static final String UP_7101 = "7101"; // 电子处方上传
+            public static final String UP_4701 = "4701"; // 电子病历上传
+
         }
 
         public static class DOWNLOAD {

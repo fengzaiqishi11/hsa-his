@@ -58,6 +58,8 @@ public class BaseHomeController extends BaseController {
         map.put("systemCode",  sysUserDTO.getSystemCode());
         //map.put("deptType",  deptType);
         map.put("deptType",  sysUserDTO.getBaseDeptDTO().getTypeCode());
+        //
+        map.put("loginDeptType",  sysUserDTO.getLoginBaseDeptDTO().getTypeCode());
 
         WrapperResponse<Map<String, Object>> mapWrapperResponse = baseHomeService_consumer.queryHomeShowData(map);
 

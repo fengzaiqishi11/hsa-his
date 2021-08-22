@@ -370,4 +370,18 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 		OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
 		return WrapperResponse.success(emrPatientBO.getPatientOutHospVisitId(outptVisitDTO));
 	}
+
+	/**
+	 * @Description: 查询患者住院次数及visitId
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/7/3 15:27
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> uploadEmr(Map map) {
+		InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+		return WrapperResponse.success(emrPatientBO.uploadEmrInfo(inptVisitDTO));
+	}
 }

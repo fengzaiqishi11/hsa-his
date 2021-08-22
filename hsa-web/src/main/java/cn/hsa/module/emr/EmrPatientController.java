@@ -560,4 +560,22 @@ public class EmrPatientController extends BaseController {
 		map.put("outptVisitDTO", outptVisitDTO);
 		return emrPatientService_consumer.getPatientOutHospVisitId(map);
 	}
+
+	/**
+	 * @Description: 上传
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/7/6 15:27
+	 * @Return
+	 */
+	@GetMapping("/uploadEmr")
+	public WrapperResponse<Boolean> uploadEmr(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+		Map map = new HashMap();
+		map.put("hospCode", sysUserDTO.getHospCode());
+		map.put("inptVisitDTO", inptVisitDTO);
+		return emrPatientService_consumer.uploadEmr(map);
+	}
 }

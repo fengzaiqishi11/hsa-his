@@ -741,6 +741,7 @@ public interface Constant {
             public static final String UP_2563 = "2563"; // 门诊两病备案撤销
 
             public static final String UP_7101 = "7101"; // 电子处方上传
+            public static final String UP_4701 = "4701"; // 电子病历上传
 
         }
 

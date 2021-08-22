@@ -239,4 +239,6 @@ public interface InsureItemMatchService {
      */
     @GetMapping("/service/insure/insureItemMatch/queryLimitDrugList")
     WrapperResponse<List<InsureItemMatchDTO>> queryLimitDrugList(Map paramMap);
+
+    WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> selectItemMap);
 }

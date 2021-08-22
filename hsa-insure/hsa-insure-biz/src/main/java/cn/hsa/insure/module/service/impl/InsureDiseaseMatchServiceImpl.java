@@ -174,4 +174,10 @@ public class InsureDiseaseMatchServiceImpl extends HsafService implements Insure
         InsureDiseaseDTO insureDiseaseDTO = MapUtils.get(map,"insureDiseaseDTO");
         return WrapperResponse.success(insureDiseaseMatchBO.queryPageInsureDisease(insureDiseaseDTO));
     }
+
+    @Override
+    public WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> map) {
+        InsureDiseaseMatchDTO insureDiseaseMatchDTO = MapUtils.get(map,"insureDiseaseMatchDTO");
+        return WrapperResponse.success(insureDiseaseMatchBO.queryUnMacthAllPage(insureDiseaseMatchDTO));
+    }
 }

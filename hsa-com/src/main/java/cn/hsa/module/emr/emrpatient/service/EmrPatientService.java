@@ -283,4 +283,15 @@ public interface EmrPatientService {
 	 */
 	@PostMapping("/service/emr/emrPatient/getPatientOutHospVisitId")
 	WrapperResponse<List<OutptVisitDTO>> getPatientOutHospVisitId(Map map);
+
+	/**
+	 * @Description: 上传电子病历
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/8/22 9:27
+	 * @Return
+	 */
+	@PostMapping("/service/emr/emrPatient/uploadEmr")
+	WrapperResponse<Boolean> uploadEmr(Map map);
 }

@@ -166,6 +166,17 @@
         delete from insure_dict where hosp_code=#{hospCode} and insure_reg_code=#{regCode}
     </delete>
 
+
+
+
+    <select id="queryDictByCode" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        SELECT id, hosp_code, insure_reg_code, code, name, value, remark,
+               crte_id, crte_name, crte_time, ext01, ext02, ext03,
+               medicine_org_code FROM insure_dict where 1=1
+                                       AND hosp_code = #{hospCode}
+                                        and insure_reg_code =#{insureRegCode}
+                                       AND code = #{code}
+    </select>
     <!-- 根据条件code + value -> name -->
     <select id="getInsureDictNameByCode" resultType="java.lang.String" parameterType="java.util.Map">
         SELECT name FROM insure_dict where 1=1

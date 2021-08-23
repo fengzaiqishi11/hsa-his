@@ -478,6 +478,63 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
         return true;
     }
 
+    /**
+     * @Menthod: queryAllByVisitId
+     * @Desrciption: 根据就诊id查询出患者在院期间所有护理三测单记录
+     * @Param: visitId
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-22 10:02
+     * @Return:
+     **/
+    @Override
+    public List<InptNurseThirdDTO> queryAllByVisitId(Map<String, Object> map) {
+        String visitId = MapUtils.get(map, "visitId");
+        String hospCode = MapUtils.get(map, "hospCode");
+        if (StringUtils.isEmpty(visitId)) {
+            throw new RuntimeException("未传入需要查询的人员信息");
+        }
+        // 查询护理三测单数据
+        List<InptNurseThirdDTO> inptNurseThirdDTOS = inptNurseThirdDao.queryAllByVisitId(map);
+
+        InptNurseThirdDTO nurseThirdDTO = new InptNurseThirdDTO();
+        nurseThirdDTO.setHospCode(hospCode);
+        nurseThirdDTO.setVisitId(visitId);
+        nurseThirdDTO.setIsRecentOper(Constants.SF.S);
+        // 查询患者手术记录日期list
+        List<String> operDateList = inptNurseThirdDao.getRecordTime(nurseThirdDTO);
+
+        if (!ListUtils.isEmpty(inptNurseThirdDTOS)) {
+            for (InptNurseThirdDTO inptNurseThirdDTO : inptNurseThirdDTOS) {
+                // 计算住院天数
+                Date inTime = inptNurseThirdDTO.getInTimeBatch();
+                Date outTime = inptNurseThirdDTO.getOutTime() == null ? DateUtils.getNow() : inptNurseThirdDTO.getOutTime();
+                int inDays = DateUtils.differentDays(outTime, inTime);
+                if (inDays == 0) {
+                    inDays = 1;
+                }
+                inptNurseThirdDTO.setInDays(inDays);
+
+                // 计算手术天数
+                if (!ListUtils.isEmpty(operDateList)) {
+                    Date operDate = DateUtils.parse(operDateList.get(0), DateUtils.Y_M_D); // 最近手术日期
+                    Date recordDate = inptNurseThirdDTO.getRecordDate(); // 三测单记录日期，yyyy-MM-dd
+                    if (recordDate.before(operDate)) {
+                        // 记录日期早于手术日期
+                        inptNurseThirdDTO.setOperationDays(0);
+                    } else {
+                        int days = DateUtils.differentDays(recordDate, operDate);
+                        if (days == 0) {
+                            days = 1; //记录日期与手术日期当天，设置为1
+                        }
+                        inptNurseThirdDTO.setOperationDays(days);
+                    }
+                }
+            }
+        }
+        return inptNurseThirdDTOS;
+    }
+
     private String[] getDayOps(InptNurseThirdDTO inptNurseThirdDTO,List<InptNurseThirdDTO> inptNurseThirdDTOS,List<String> recordTimeList) {
         String dayOps [] = new String [7] ;
         for (int i = 0; i <7 ; i++) {

@@ -149,4 +149,16 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
 
     // 一卡通当前挂号付款金额
     private BigDecimal cardPrice;
+    /**
+     * 门诊档案号
+     */
+    private String outProfile;
+    /**
+     * 医保个人号
+     */
+    private String aac001;
+    /**
+     * 医保登记号
+     */
+    private String mdtrtCertNo;
 }

@@ -16,11 +16,11 @@ import java.util.Map;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
 public interface Constant {
-    
+
     /**
      * @Desrciption 湘潭医保功能号
      * @Author Ou·Mr
-     * @Date 2020/11/4 9:08 
+     * @Date 2020/11/4 9:08
      */
     class Xiangtan{
 
@@ -669,6 +669,7 @@ public interface Constant {
             public static final String UP_5269 = "5269"; // 异地门诊结算单下载
             public static final String UP_5270 = "5270"; // 异地住院结算单下载
             public static final String UP_4301 = "4301"; // 门急诊诊疗记录
+            public static final String UP_4302 = "4302"; // 急诊留观手术及抢救信息
         }
 
         public static class INPT {
@@ -680,6 +681,9 @@ public interface Constant {
 
             public static final String UP_4401 = "4401"; // 住院病案首页信息
             public static final String UP_4402 = "4402"; // 住院医嘱记录
+
+            public static final String UP_4601 = "4601"; // 输血信息上传
+            public static final String UP_4602 = "4602"; // 护理操作生命体征测量记录
         }
 
         public static class REGISTER {
@@ -739,6 +743,8 @@ public interface Constant {
             public static final String UP_2563 = "2563"; // 门诊两病备案撤销
 
             public static final String UP_7101 = "7101"; // 电子处方上传
+            public static final String UP_4701 = "4701"; // 电子病历上传
+
         }
 
         public static class DOWNLOAD {
@@ -762,6 +768,17 @@ public interface Constant {
         public static class CARD {
             public static final String UP_1602 = "1602"; // 身份证密码校验
             public static final String UP_1603 = "1603"; // 修改身份证密码
+        }
+
+        //库存管理
+        public static class KCGL {
+            public static final String UP_3501 = "3501"; // 商品盘存上传
+            public static final String UP_3502 = "3502"; // 商品库存变更
+            public static final String UP_3503 = "3503"; // 商品采购
+            public static final String UP_3504 = "3504"; // 商品采购退货
+            public static final String UP_3505 = "3505"; // 商品销售
+            public static final String UP_3506 = "3506"; // 商品销售退货
+            public static final String UP_3507 = "3507"; // 商品信息删除
         }
     }
 

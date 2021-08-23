@@ -62,4 +62,9 @@ public class ReportBOImpl extends HsafBO implements ReportBO {
         return PageDTO.of(stroInvoicingDTOS);
 
     }
+
+    @Override
+    public PageDTO queryByStrSQL(Map<String, Object> map) {
+        return PageDTO.of(reportDAO.queryByStrSQL(map));
+    }
 }

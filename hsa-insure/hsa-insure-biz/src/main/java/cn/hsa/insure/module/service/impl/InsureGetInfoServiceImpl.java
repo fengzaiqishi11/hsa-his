@@ -36,6 +36,22 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         return WrapperResponse.success(insureGetInfoBO.insertSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
     }
 
+
+    /**
+     * @Method getSettleInfo
+     * @Desrciption
+     * @Param
+     * [map]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 11:34
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>>
+     **/
+    @Override
+    public WrapperResponse<Map> getSettleInfo(Map map) {
+        return WrapperResponse.success(insureGetInfoBO.getSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+
     /**
      * @Method getInsureCost
      * @Desrciption
@@ -117,6 +133,34 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     @Override
     public WrapperResponse<PageDTO> queryInsure(Map map){
         return WrapperResponse.success(insureGetInfoBO.queryInsure(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    /**
+     * @Method queryPage()
+     * @Desrciption  分页查询医保住院费用传输数据
+     * @Param insureIndividualCostDTO数据传输对象
+     *
+     * @Author fuhui
+     * @Date   2020/11/5 10:58
+     * @Return insureIndividualCostDTO分页数据传输对象
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryPage(Map<String, Object> param) {
+        return WrapperResponse.success(insureGetInfoBO.queryPage(MapUtils.get(param,"insureSettleInfoDTO")));
+    }
+
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询没有匹配的费用数据集合
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/6/20 9:55
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryUnMatchPage(Map<String, Object> param) {
+        return WrapperResponse.success(insureGetInfoBO.queryUnMatchPage(MapUtils.get(param,"insureSettleInfoDTO")));
     }
 
 }

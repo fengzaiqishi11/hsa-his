@@ -38,6 +38,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dclaTime; // 申报时间
 
     private String psnName; // 人员姓名 *
+    private String psnCertType;
 
     private String gend; // 性别 *
 
@@ -127,7 +128,9 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String bldCat; // 输血品种 *
 
-    private String outModeName; // 离院方式 *
+    private String outModeName; // 离院方式名称 *
+
+    private String outModeCode; // 离院方式 *
 
     private String billCode; // 票据代码 *
 
@@ -191,7 +194,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String insureCode; // 医保类型
 
-    private String patientCode; // 住院医疗类型
+    private String patientCode; // 病人类型
 
     private String inDeptId; // 入院科别
 
@@ -269,4 +272,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 //     */
     private String lv3NursecareDays;
 
+    private String iptOptNo;
+    private String isTransmit ;
+    private String isMatch;
+    private String orgCode;
 }

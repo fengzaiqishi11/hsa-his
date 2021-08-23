@@ -11,6 +11,7 @@
             (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
             (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
             (select iib.bka035_name from insure_individual_basic iib where d.mib_id = iib.id) as bka035_name,
+            (select iib.aae140 from insure_individual_basic iib where d.mib_id = iib.id) as hiType,
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'SPGA_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as spgaNurscareDays,
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'lV1_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as lv1NurscareDays,
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'SCD_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as scdNurscareDays,
@@ -47,13 +48,13 @@
             a.settleway,
             a.insure_org_code,
             a.crte_time,
-            d.insuplc_admdvs,
+            d.insuplc_admdvs AS insuplc,
             b.in_time,
             b.out_time,
             f.hi_setl_lv,
             f.crte_time as dclaTime,
-            e.baby_age_month,
             b.address,
+            e.baby_age_month,
             e.work,
             e.work_phone,
             e.work_address,
@@ -91,7 +92,8 @@
         left join insure_setl_info f on a.visit_id=f.visit_id and a.hosp_code=f.hosp_code
         left join inpt_settle g on a.visit_id=g.visit_id and a.hosp_code=g.hosp_code
         left join inpt_settle_invoice h on a.visit_id=h.visit_id and a.hosp_code=h.hosp_code
-        where a.insureSettleId = #{insureSettleId} and a.state = '0'
+        where a.insureSettleId = #{insureSettleId} and a.state = '0' AND A.settle_state = '1' AND G.status_code = '0'
+           AND  A.settle_id = #{settleId}
         order by a.visit_id
     </select>
 
@@ -99,6 +101,11 @@
 
     <select id="getOutSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select
+            ifnull((select settle_no from insure_setl_info where insure_setl_info.settle_id = a.insureSettleId and insure_setl_info.visit_id = a.visit_id limit 1),0) as settleNo,
+            (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
+            (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
+            (select iib.bka035_name from insure_individual_basic iib where d.mib_id = iib.id) as bka035_name,
+            (select iib.aae140 from insure_individual_basic iib where d.mib_id = iib.id) as hiType,
             a.id,
             a.visit_id ,
             a.settle_id,
@@ -117,8 +124,6 @@
             b.gender_code,
             b.birthday,
             d.visit_drpt_id,
-            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as inDeptCode,
-            (select nation_code from base_dept bd where bd.id = d.visit_drpt_id and bd.hosp_code = d.hosp_code) as outDeptCode,
             b.nation_code,
             b.cert_code,
             b.cert_no as certno,
@@ -132,13 +137,49 @@
             a.settleway,
             a.insure_org_code,
             a.crte_time,
-            d.insuplc_admdvs,
+            d.insuplc_admdvs AS insuplc,
             d.visit_time,
-            d.visit_drpt_name
+            d.visit_drpt_name,
+            e.invoice_id as invoiceDetailId,
+            e.invoice_no as invoiceNo,
+            os.settle_time as startTime,
+            os.settle_time as endTime,
+            a.omsgid,
+            f.crte_time as dclaTime,
+            f.hi_setl_lv,
+            g.baby_age_month,
+            g.work,
+            g.work_phone,
+            g.work_address,
+            g.work_post_code,
+            g.baby_birth_weight,
+            g.baby_in_weight,
+            g.in_way,
+            g.turn_dept_ids,
+            g.in_days,
+            g.in_situation_name,
+            g.inpt_before_day,
+            g.inpt_before_hour,
+            g.inpt_before_minute,
+            g.inpt_last_day,
+            g.inpt_last_hour,
+            g.inpt_last_minute,
+            g.out_mode_name,
+            g.is_inpt,
+            g.zg_doctor_name,
+            g.zg_doctor_id,
+            g.zr_nurse_id,
+            g.zr_nurse_name
         from insure_individual_settle a
+        left join outpt_settle os on os.id = a.settle_id and a.hosp_code = os.hosp_code
+        left join outin_invoice_detail e on e.settle_id = a.settle_id and a.hosp_code = e.hosp_code
         left join outpt_visit b on a.visit_id = b.id
         left join insure_individual_visit d on a.visit_id = d.visit_id
-        where a.insureSettleId = #{insureSettleId}
+        left join insure_setl_info f on a.visit_id=f.visit_id and a.hosp_code=f.hosp_code
+        left join mris_base_info g on a.visit_id=g.visit_id and a.hosp_code=g.hosp_code
+        where a.insureSettleId = #{insureSettleId} and  a.state = '0' AND A.settle_state = '1'
+        AND A.settle_id =  #{settleId}
+        and a.hosp_code = #{hospCode}
         order by a.visit_id
     </select>
 
@@ -154,7 +195,8 @@
 
     <select id="queryDiseinfo" resultType="cn.hsa.module.insure.module.dto.DiseInfoDTO">
         select a.disease_id, a.type_code, a.is_main, b.name,b.code,c.oper_disease_icd9, c.oper_disease_name,
-        c.oper_plan_time, c.doctor_id, c.doctor_name, c.rank from (inpt_diagnose a, base_disease b)
+        c.oper_plan_time, c.doctor_id, c.doctor_name, c.rank
+        from (inpt_diagnose a, base_disease b)
         left join oper_info_record c on a.visit_id = c.visit_id and c.hosp_code = a.hosp_code
         where a.visit_id = #{visitId} and a.disease_id = b.id and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
     </select>
@@ -200,29 +242,35 @@
         item_id, item_name, crte_time,
         item_code,price, num, total_num, total_price, doctor_id, doctor_name,
         dept_id, (select name from base_dept a where a.id = dept_id ) as deptName
-        from insure_individual_cost where visit_id = #{id} and id not in (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
+        from insure_individual_cost where visit_id = #{id} and id not in
+        (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
     </select>
 
     <select id="queryVisit" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select * from (
-        select id,1 as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
-        nation_code, cert_no, birthday,  patient_code, crte_time from inpt_visit where
-        patient_code = '0'
-        <if test="name != null and name != ''">
-            and ( name like concat('%',#{name},'%')
-            or in_no like concat('%',#{name},'%'))
-        </if>
-        order by crte_time ) m
-        union all
-        select * from (
-        select id,2 as lx,register_no as visitNo, name, gender_code, age, age_unit_code,
-        nation_code, cert_no, birthday,  patient_code, crte_time from outpt_visit where
-        patient_code = '0'
-        <if test="name != null and name != ''">
-            and ( name like concat('%',#{name},'%')
-            or register_no like concat('%',#{name},'%'))
-        </if>
-        order by crte_time ) n
+        select A.* from (
+            select m.* from (
+            select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
+            nation_code, cert_no,cert_code, birthday,  patient_code, crte_time from inpt_visit where
+            patient_code = '0' and status_code in ('2','5','6')
+            <if test="name != null and name != ''">
+                and ( name like concat('%',#{name},'%')
+                or in_no like concat('%',#{name},'%'))
+            </if>
+            order by crte_time ) m
+            union all
+            select n.* from (
+            select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age, ov.age_unit_code,
+            ov.nation_code, ov.cert_no,cert_code,  ov.birthday,  ov.patient_code, ov.crte_time from outpt_visit ov
+            left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
+            where
+            ov.patient_code = '0' and  os.id is null
+            <if test="name != null and name != ''">
+                and ( ov.name like concat('%',#{name},'%')
+                or ov.register_no like concat('%',#{name},'%'))
+            </if>
+            order by crte_time ) n
+       )A
+       where A.lx = #{lx}
     </select>
 
     <insert id="insertCost" keyProperty="" useGeneratedKeys="true">
@@ -271,9 +319,9 @@
     </select>
 
     <!--新增所有列-->
-    <insert id="insertSettleInfo" keyProperty="" useGeneratedKeys="true">
+    <insert id="insertSettleInfo"  parameterType="java.util.Map">
         insert into insure_setl_info(id, hosp_code, visit_id, settle_id, fixmedins_name, fixmedins_code, hi_setl_lv, hi_no, medcasno, dcla_time, psn_name, gend, brdy, age, ntly, neb_age, naty, patn_cert_type, certno, prfs, curr_addr, emp_name, emp_addr, emp_tel, poscode, coner_name, patn_rlts, coner_addr, coner_tel, hi_type, insulic, sp_psn_type, nwb_adm_type, nwb_bir_wt, nwb_adm_wt, opsp_diag_caty, opsp_mdtrt_date, ipt_med_type, adm_way, trt_type, adm_time, adm_caty, refldept_dept, dscg_time, dscg_caty, act_ipt_days, opt_wm_dise, wm_disw_code, opt_tcm_dise, tcm_dise_code, diag_code_cnt, oprn_oprt_code_cnt, vent_used_durg, pwcry_bfadmcoma_dura, pwcry_afadmcoma_dura, bld_cat, bld_amt, bld_unt, spga_nurscare_days, lv1_nurscare_days, scd_nurscare_days, lv3_nursecare_days, dscg_way, acp_medins_name, acp_optins_code, bill_code, bill_no, biz_sn, days_rinp_flag_31, days_rinp_pup_31, chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay, acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn, crte_id, crte_name, crte_time, settle_no)
-        values (#{id}, #{hospCode}, #{visitId}, #{settleId}, #{fixmedinsName}, #{fixmedinsCode}, #{hiSetlLv}, #{hiNo}, #{medcasno}, #{dclaTime}, #{psnName}, #{gend}, #{brdy}, #{age}, #{ntly}, #{nebAge}, #{naty}, #{patnCertType}, #{certno}, #{prfs}, #{currAddr}, #{empName}, #{empAddr}, #{empTel}, #{poscode}, #{conerName}, #{patnRlts}, #{conerAddr}, #{conerTel}, #{hiType}, #{insulic}, #{spPsnType}, #{nwbAdmType}, #{nwbBirWt}, #{nwbAdmWt}, #{opspDiagCaty}, #{opspMdtrtDate}, #{iptMedType}, #{admWay}, #{trtType}, #{admTime}, #{admCaty}, #{refldeptDept}, #{dscgTime}, #{dscgCaty}, #{actIptDays}, #{optWmDise}, #{wmDiswCode}, #{optTcmDise}, #{tcmDiseCode}, #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDurg}, #{pwcryBfadmcomaDura}, #{pwcryAfadmcomaDura}, #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscareDays}, #{lv1NurscareDays}, #{scdNurscareDays}, #{lv3NursecareDays}, #{dscgWay}, #{acpMedinsName}, #{acpOptinsCode}, #{billCode}, #{billNo}, #{bizSn}, #{daysRinpFlag31}, #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEnDate}, #{psnSelfpay}, #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept}, #{medinsFillPsn}, #{crteId}, #{crteName}, #{crteTime}, #{settleNo})
+        values (#{id}, #{hospCode}, #{visitId}, #{setl_id}, #{fixmedins_name}, #{fixmedins_code}, #{hi_setl_lv}, #{hi_no}, #{medcasno}, #{dcla_time}, #{psn_name}, #{gend}, #{brdy}, #{age}, #{ntly}, #{nebAge}, #{naty}, #{patn_cert_type}, #{certno}, #{prfs}, #{curr_addr}, #{emp_name}, #{emp_addr}, #{emp_tel}, #{poscode}, #{coner_name}, #{patn_rlts}, #{coner_addr}, #{coner_tel}, #{hi_type}, #{insuplc}, #{spPsnType}, #{nwbAdmType}, #{nwb_bir_wt}, #{nwb_adm_w}, #{opsp_diag_caty}, #{opsp_mdtrt_date}, #{ipt_med_type}, #{adm_way}, #{trtType}, #{adm_time}, #{adm_caty}, #{refldept_dept}, #{dscg_time}, #{dscg_caty}, #{act_ipt_days}, #{otp_wm_dise}, #{wm_dise_code}, #{optTcmDise}, #{tcmDiseCode}, #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDurg}, #{pwcry_bfadm_coma_dura}, #{pwcry_afadm_coma_dura}, #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscare_Days}, #{lv1Nurscare_Days}, #{scdNurscare_Days}, #{lv3Nursecare_Days}, #{dscg_way}, #{acpMedinsName}, #{acpOptinsCode}, #{bill_code}, #{bill_no}, #{biz_sn}, #{days_rinp_flag_31}, #{daysRinpPup31}, #{chfpdr_name}, #{chfpdr_code}, #{setl_begn_date}, #{setl_end_date}, #{psnSelfpay}, #{psn_ownpay}, #{acct_pay}, #{psn_cashpay}, #{hi_paymtd}, #{hsorg}, #{hsorg_opter}, #{medins_fill_dept}, #{medins_fill_psn}, #{crteId}, #{crteName}, #{crteTime}, #{settleNo})
     </insert>
 
     <select id="getSetlInfoLocal" resultType="java.lang.String">
@@ -290,4 +338,198 @@
         from insure_individual_cost where visit_id = #{visitId} and hosp_code =#{hospCode}
         and insure_settle_id = #{insureSettleId}
     </select>
+    <select id="queryInptMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        ic.id,ic.hosp_code,ic.visit_id,
+        ic.item_code,
+        ic.item_name,
+        ic.item_id,
+        ic.price,
+        ic.num,ic.exec_time,ic.crte_name,
+        ic.spec,
+        ic.prep_code,
+        ic.dosage,ic.dosage_unit_code,
+        ic.total_num,ic.total_num_unit_code,ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+        (select iv.name from inpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
+        ic.settle_code,
+        ic.status_code,
+        ic.crte_time,
+        iim.deductible,
+        iim.is_trans,
+        iim.insure_item_code,
+        iim.insure_item_name,
+        iim.hosp_item_code,
+        iim.hosp_item_name,
+        (
+        CASE
+        WHEN iic.transmit_code IS NULL
+        OR iic.transmit_code = ''
+        THEN '未传输'
+        WHEN iic.transmit_code = '1'
+        THEN '已传输'
+        WHEN iim.is_trans = '0'
+        THEN '未传输'
+        END
+        ) isTransmit
+        FROM
+        inpt_cost ic
+        JOIN insure_item_match iim ON (ic.`item_id` = iim.`hosp_item_id` AND ic.`item_code` = iim.`hosp_item_type` AND
+        ic.hosp_code = iim.hosp_code)
+        LEFT JOIN insure_individual_cost iic
+        ON ic.id = iic.cost_id
+        AND ic.hosp_code = iic.hosp_code
+        where 1=1 and
+        ic.hosp_code = #{hospCode}
+        and ic.visit_id = #{id}
+        and IFNULL(iim.is_trans,'0') = #{isMatch}
+        and IFNULL(iim.audit_code,'0') =#{isMatch}
+        and IFNULL(iim.is_valid,'0') =#{isMatch}
+        and IFNULL(iim.is_match,'0') =#{isMatch}
+        and ic.settle_code in ('0','1')
+        and iim.insure_reg_code = #{orgCode}
+        <if test="isTransmit != null and isTransmit !=''">
+            and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
+        </if>
+        <if test="isMatch =='1'.toString()">
+            and iim.audit_code='1'
+            and iim.is_valid ='1'
+        </if>
+    </select>
+    <select id="queryOutMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        ic.id,ic.hosp_code,ic.visit_id,
+        ic.item_code,
+        ic.item_name,
+        ic.item_id,
+        ic.price,
+        ic.num,ic.exec_time,ic.crte_name,
+        ic.spec,
+        ic.prep_code,
+        ic.dosage,ic.dosage_unit_code,
+        ic.total_num,ic.total_num_unit_code,ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+        (select iv.name from inpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
+        ic.settle_code,
+        ic.status_code,
+        ic.crte_time,
+        iim.deductible,
+        iim.is_trans,
+        iim.insure_item_code,
+        iim.insure_item_name,
+        iim.hosp_item_code,
+        iim.hosp_item_name,
+        (
+        CASE
+        WHEN iic.transmit_code IS NULL
+        OR iic.transmit_code = ''
+        THEN '未传输'
+        WHEN iic.transmit_code = '1'
+        THEN '已传输'
+        WHEN iim.is_trans = '0'
+        THEN '未传输'
+        END
+        ) isTransmit
+        FROM
+         outpt_cost  ic
+        JOIN insure_item_match iim ON (ic.`item_id` = iim.`hosp_item_id` AND ic.`item_code` = iim.`hosp_item_type` AND
+        ic.hosp_code = iim.hosp_code)
+        LEFT JOIN insure_individual_cost iic
+        ON ic.id = iic.cost_id
+        AND ic.hosp_code = iic.hosp_code
+        where 1=1 and
+        ic.hosp_code = #{hospCode}
+        and ic.visit_id = #{id}
+        and IFNULL(iim.is_trans,'0') = #{isMatch}
+        and IFNULL(iim.audit_code,'0') =#{isMatch}
+        and IFNULL(iim.is_valid,'0') =#{isMatch}
+        and IFNULL(iim.is_match,'0') =#{isMatch}
+        and ic.settle_code in ('0','1')
+        and iim.insure_reg_code = #{orgCode}
+        <if test="isTransmit != null and isTransmit !=''">
+            and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
+        </if>
+        <if test="isMatch =='1'.toString()">
+            and iim.audit_code='1'
+            and iim.is_valid ='1'
+        </if>
+    </select>
+    <select id="queryInptUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+        (case b.item_code
+        when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code
+        =b.hosp_code )
+        when b.item_code='2' then (select bm.code from base_material bm where b.item_id = bm.id and bm.hosp_code =
+        b.hosp_code )
+        when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code =
+        b.hosp_code)
+        else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+        end
+        ) as hospItemCode,
+        iim.hosp_item_id,
+        b.total_price totalPrice,
+        b.reality_price realityPrice
+        FROM
+        inpt_cost b
+        LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+        join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+        WHERE
+        b.visit_id = #{id}
+        AND (
+        iim.is_trans = '0'
+        OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))
+    </select>
+    <select id="queryOutUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+        (case b.item_code
+        when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code
+        =b.hosp_code )
+        when b.item_code='2' then (select bm.code from base_material bm where b.item_id = bm.id and bm.hosp_code =
+        b.hosp_code )
+        when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code =
+        b.hosp_code)
+        else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+        end
+        ) as hospItemCode,
+        iim.hosp_item_id,
+        b.total_price totalPrice,
+        b.reality_price realityPrice
+        FROM
+        out_cost b
+        LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+        join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+        WHERE
+        b.visit_id = #{id}
+        AND (
+        iim.is_trans = '0'
+        OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))
+    </select>
+
+    <select id="getSettleInfo" resultType="java.util.Map">
+        select * from insure_setl_info
+        where
+             settle_id = #{insureSettleId}
+        and  visit_id = #{visitId}
+        and  hosp_code = #{hospCode}
+    </select>
+    <select id="queryID" resultType="java.lang.Integer">
+        select count(1)
+        from insure_setl_info
+        where
+            settle_id = #{insureSettleId}
+          and  visit_id = #{visitId}
+          and  hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteByVisitID" parameterType="java.lang.String">
+        DELETE FROM insure_setl_info
+        WHERE  settle_id = #{insureSettleId}
+        and  visit_id = #{visitId}
+        and  hosp_code = #{hospCode}
+    </delete>
+
+
 </mapper>

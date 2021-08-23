@@ -28,6 +28,17 @@ public interface InsureGetInfoBO {
     Map insertSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
     /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 11:35
+     * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
+     **/
+    Map getSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
      * @Method queryInsureCost
      * @Desrciption
      * @Param
@@ -93,4 +104,27 @@ public interface InsureGetInfoBO {
      **/
     PageDTO queryInsure(InsureSettleInfoDTO insureSettleInfoDTO);
 
+
+    /**
+     * @Method queryPage()
+     * @Desrciption  分页查询医保住院费用传输数据
+     * @Param insureIndividualCostDTO数据传输对象
+     *
+     * @Author fuhui
+     * @Date   2020/11/5 10:58
+     * @Return insureIndividualCostDTO分页数据传输对象
+     **/
+    PageDTO queryPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询没有匹配的费用数据集合
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/6/20 9:55
+     * @Return
+     **/
+    PageDTO queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

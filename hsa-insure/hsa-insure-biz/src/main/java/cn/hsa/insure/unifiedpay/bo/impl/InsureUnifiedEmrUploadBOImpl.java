@@ -3,6 +3,8 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.emr.emrpatientrecord.entity.EmrPatientRecordDO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedEmrUploadBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
@@ -16,11 +18,13 @@ import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO;
 import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
+import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -28,10 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.insure.unifiedpay.bo.impl
@@ -321,15 +322,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
+        //  输入-基本信息（节点标识：baseinfo）
         Map<String,Object> baseinfoMap = queryEmcBaseInfo(map);
+        // 输入-诊断信息（节点标识：diseinfo）
         Map<String,Object> diseaseInfoMap = queryDiseaseInfo(map);
-        Map<String,Object> operationMap = queryOperationInfo(map);
+        // 病案首页流水号
+        MrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"mrisBaseInfoDTO");
+        String mid = mrisBaseInfoDTO.getId();
+        // 输入-手术记录（节点标识：oprninfo）
+        Map<String,Object> operationMap = queryOperationInfo(map,mid);
+        //  输入-重症监护信息（节点标识：icuinfo）
         Map<String,Object> icuinfoMap = queryIcuinInfo(map);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("baseinfo",baseinfoMap);
         paramMap.put("diseinfo",MapUtils.get(diseaseInfoMap,"mapList1"));
         paramMap.put("oprninfo",MapUtils.get(operationMap,"oprationMapList"));
-        paramMap.put("icuinfo",MapUtils.get(operationMap,"icuinfoMapList"));
+        paramMap.put("icuinfo",MapUtils.get(icuinfoMap,"icuinfoMapList"));
         Map<String,Object> resultMap = commonInsureUnified(hospCode,orgCode,Constant.UnifiedPay.INPT.UP_4401,paramMap);
         return true;
     }
@@ -362,10 +370,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         httpParam.put("input",paramMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("调用功能号【"+functionCode+"】的入参为"+json);
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        logger.info("调用功能号【"+functionCode+"】的反参为"+resultJson);
-        Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
-        return resultMap;
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        logger.info("调用功能号【"+functionCode+"】的反参为"+resultStr);
+        logger.info("医保统一支付平台入院办理回参:" + resultStr);
+        if (StringUtils.isEmpty(resultStr)){
+            throw new RuntimeException("调用统一支付平台无响应!");
+        }
+
+        Map<String, Object> m = (Map) JSON.parse(resultStr);
+        String resultCode = MapUtils.get(m,"infcode","");
+        if (StringUtils.isEmpty(resultCode)){
+            throw new RuntimeException("调用统一支付平台无响应!");
+        }
+        if (!"0".equals(resultCode)){
+            throw new RuntimeException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
+        }
+        return m;
     }
 
     /**
@@ -400,7 +420,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Date   2021/4/27 14:31
      * @Return
     **/
-    private Map<String, Object> queryOperationInfo(Map<String, Object> map) {
+    private Map<String, Object> queryOperationInfo(Map<String, Object> map,String mid) {
         InsureIndividualVisitDTO insureIndividualVisitDTO =MapUtils.get(map,"insureIndividualVisitDTO");
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
@@ -410,7 +430,6 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         Map<String,Object> paramMap = null;
         List<MrisOperInfoDO> operInfoDOList = mrisHomeService_consumer.queryAllOperation(map);
         if(!ListUtils.isEmpty(operInfoDOList)){
-            int count =0;
             for(MrisOperInfoDO mrisOperInfoDO : operInfoDOList){
                 paramMap = new HashMap<>();
                 paramMap.put("oprn_oprt_date",mrisOperInfoDO.getOperTime()); // 手术操作日期
@@ -454,6 +473,48 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 paramMap.put("ipt_medcas_hmpg_sn",mrisOperInfoDO.getMbiId()); // 住院病案首页流水号
                 oprationMapList.add(paramMap);
             }
+        }else{
+            paramMap = new HashMap<>();
+            paramMap.put("oprn_oprt_date",""); // 手术操作日期
+            paramMap.put("oprn_oprt_name","无"); // 手术操作名称
+            paramMap.put("oprn_oprt_code","无"); // 手术操作代码
+            paramMap.put("oprn_oprt_sn","无"); // 手术操作序列号
+            paramMap.put("oprn_lv_code","无"); // 手术级别代码
+            paramMap.put("oprn_lv_name","无"); // 手术级别名称
+            paramMap.put("oper_name","无"); // 手术者姓名
+            paramMap.put("asit_1_name","无"); // 助手Ⅰ姓名
+            paramMap.put("asit_name2","无"); // 助手Ⅱ姓名
+            paramMap.put("sinc_heal_lv",""); // 手术切口愈合等级
+            paramMap.put("sinc_heal_lv_code","无"); // 手术切口愈合等级代码
+            paramMap.put("anst_mtd_name","无"); // 麻醉-方法名称
+            paramMap.put("anst_mtd_code","无"); // 麻醉-方法代码
+            paramMap.put("anst_dr_name","无"); // 麻醉医师姓名
+            paramMap.put("oprn_oper_part","无"); //手术操作部位
+            paramMap.put("oprn_oper_part_code","无"); // 手术操作部位代码
+            paramMap.put("oprn_con_time",""); // 手术持续时间
+            paramMap.put("anst_lv_name",""); // 麻醉分级名称
+            paramMap.put("anst_lv_code",""); // 麻醉分级代码
+            paramMap.put("oprn_patn_type",""); // 手术患者类型
+            paramMap.put("oprn_patn_type _code",""); //手术患者类型代码
+            paramMap.put("main_oprn_flag",""); // 主要手术标志
+            paramMap.put("anst_asa_lv_code",""); // 麻醉ASA分级名称
+            paramMap.put("anst_asa_lv_name",""); // 麻醉ASA分级名称
+            paramMap.put("anst_medn_code",""); // 麻醉药物代码
+            paramMap.put("anst_medn_name",""); // 麻醉药物名称
+            paramMap.put("anst_medn_dos",""); // 麻醉药物剂量
+            paramMap.put("unt",""); //计量单位
+            paramMap.put("anst_begntime",""); // 麻醉开始时间
+            paramMap.put("anst_endtime",""); //麻醉结束时间
+            paramMap.put("anst_copn_code",""); // 麻醉合并症代码
+            paramMap.put("anst_copn_name",""); // 麻醉合并症名称
+            paramMap.put("anst_copn_dscr",""); // 麻醉合并症描述
+            paramMap.put("pacu_begntime",""); // 复苏室开始时间
+            paramMap.put("pacu_endtime",""); // 复苏室结束时间
+            paramMap.put("canc_oprn_flag",""); //取消手术标志
+            paramMap.put("vali_flag",Constants.SF.S); // 有效标志
+            paramMap.put("mdtrt_sn",insureIndividualVisitDTO.getMedicalRegNo());  //  就医流水号
+            paramMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+            oprationMapList.add(paramMap);
         }
         map.put("oprationMapList",oprationMapList);
         return map;
@@ -564,6 +625,520 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
         }
         return  map;
+    }
+
+    /**
+     * @Method queryAdminfoInfo
+     * @Desrciption  医保统一支付平台：电子病历上传 入院信息
+     * @Param map
+     *
+     * @Author liuliyun
+     * @Date   2021/8/21 10:59
+     * @Return
+     **/
+    private Map<String, Object> queryAdminfoInfo(Map<String, Object> map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        Map<String, Object> detailMap = null;
+        if(inptVisit!=null){
+            detailMap =new HashMap<>();
+            detailMap.put("mdtrt_sn",medicalRegNo); // 就医流水号
+            detailMap.put("mdtrt_id",inptVisit.getVisitId()); // 就诊ID
+            detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(个人电脑号)
+            detailMap.put("mdtrtsn",inptVisit.getInNo()); // 住院号
+            detailMap.put("name",inptVisit.getName()); // 姓名
+            detailMap.put("gend",inptVisit.getGenderCode()); // 性别
+            detailMap.put("age",inptVisit.getAge()); // 年龄
+            detailMap.put("adm_rec_no",""); // 入院记录流水号
+            detailMap.put("wardarea_name",inptVisit.getInWardId()); // 病区名称
+            detailMap.put("dept_code",inptVisit.getInDeptId()); // 科室编码
+            detailMap.put("dept_name",inptVisit.getInDeptName()); // 科室名称
+            detailMap.put("bedno",inptVisit.getBedName()); // 住院号
+            detailMap.put("adm_time",inptVisit.getInTime()); // 入院时间
+            detailMap.put("illhis_stte_name",inptVisit.getName()); // 病史陈述者姓名
+            detailMap.put("illhis_stte_rltl","-"); // 陈述者与患者关系代码
+            detailMap.put("stte_rele","-"); // 陈述内容是否可靠标识
+            detailMap.put("chfcomp","-"); // 主诉
+            detailMap.put("dise_now","-"); // 现病史
+            detailMap.put("hlcon","-");  // 健康状况
+            detailMap.put("dise_his","-"); // 疾病史
+            detailMap.put("ifet",""); // 患者传染性标志
+            detailMap.put("ifet_his","无"); // 传染病史
+            detailMap.put("prev_vcnt","-");  // 预防接种史
+            detailMap.put("oprn_his","-");  // 手术史
+            detailMap.put("bld_his","-"); // 输血史
+            detailMap.put("algs_his","-"); // 过敏史
+            detailMap.put("psn_his","-"); // 个人史
+            detailMap.put("mrg_his","-"); // 婚育史
+            detailMap.put("mena_his","-"); // 月经史
+            detailMap.put("fmhis","-"); // 家族史
+            detailMap.put("physexm_tprt",0); // 体温体格检查
+            detailMap.put("physexm_pule",0); // 体格检查 -- 脉率（次 /mi数字）
+            detailMap.put("physexm_vent_frqu","-"); // 呼吸频率
+            detailMap.put("physexm_systolic_pre","-"); //体格检查 -- 收缩压 （mmHg）
+            detailMap.put("physexm_dstl_pre","-"); // 体格检查 -- 舒张压 （mmHg）
+            detailMap.put("physexm_height",0); // 体格检查--身高（cm）
+            detailMap.put("physexm_wt",0); // 体格检查--体重（kg）
+            detailMap.put("physexm_ordn_stas","-"); // 体格检查 -- 一般状况 检查结果
+            detailMap.put("physexm_skin_musl","-"); // 体格检查 -- 皮肤和黏膜检查结果
+            detailMap.put("physexm_spef_lymph","-"); // 体格检查 -- 全身浅表淋巴结检查结果
+            detailMap.put("physexm_head","-");  // 体格检查 -- 头部及其器官检查结果
+            detailMap.put("physexm_neck","-"); // 体格检查 -- 颈部检查结果
+            detailMap.put("physexm_chst","-"); // 体格检查 -- 胸部检查结果
+            detailMap.put("physexm_abd","-"); // 体格检查 -- 腹部检查结果
+            detailMap.put("physexm_finger_exam","-"); // 体格检查 -- 肛门指诊检查结果描述
+            detailMap.put("physexm_genital_area","-"); // 体格检查 -- 外生殖器检查结果
+            detailMap.put("physexm_spin","-");   // 体格检查 -- 脊柱检查结果
+            detailMap.put("physexm_all_fors","-"); // 体格检查 -- 四肢检查结果
+            detailMap.put("nersys","-");  // 体格检查 -- 神经系统检查结果
+            detailMap.put("spcy_info","-"); // 专科情况
+            detailMap.put("asst_exam_rslt","-"); // 辅助检查结果
+            detailMap.put("tcm4d_rslt",null); // 中医“四诊”观察结果描述
+            detailMap.put("syddclft",null); // 辨证分型代码
+            detailMap.put("syddclft_name",null); // 辩证分型名称
+            detailMap.put("prnp_trt",null); // 治则治法
+            detailMap.put("rec_doc_code",inptVisit.getOutptDoctorId()); // 接诊医生编号
+            detailMap.put("rec_doc_name",inptVisit.getOutptDoctorName()); // 接诊医生姓名
+            detailMap.put("ipdr_code",inptVisit.getZzDoctorId()); // 住院医师编号
+            detailMap.put("ipdr_name",inptVisit.getZzDoctorName()); // 住院医师姓名
+            detailMap.put("chfdr_code",inptVisit.getZgDoctorId()); // 主任医师编号
+            detailMap.put("chfdr_name",inptVisit.getZzDoctorName()); // 主任医师姓名
+            detailMap.put("chfpdr_code",inptVisit.getJzDoctorId()); // 主诊医师代码
+            detailMap.put("chfpdr_name",inptVisit.getJzDoctorName()); // 主诊医师姓名
+            detailMap.put("main_symp",inptVisit.getDiseaseName()); // 主要症状
+            detailMap.put("adm_rea",inptVisit.getInRemark()); // 入院原因
+            detailMap.put("adm_way",inptVisit.getInModeCode()); // 入院途径
+            detailMap.put("apgr","-"); // 评分值
+            detailMap.put("diet_info","-"); // 饮食情况
+            detailMap.put("growth_deg","-"); // 发育情况
+            detailMap.put("slep_info","-"); // 睡眠状况
+            detailMap.put("sp_info","-"); // 特殊情况
+            detailMap.put("mind_info","-"); // 心理状态
+            detailMap.put("nurt","-"); // 营养状态
+            detailMap.put("self_ablt","-"); // 自理能力
+            detailMap.put("nurscare_obsv_item_name","-"); // 护理观察项目名称
+            detailMap.put("smoke","-"); // 吸烟标志
+            detailMap.put("stop_smok_days",0); // 停止吸烟天数
+            detailMap.put("smok_info","-"); // 吸烟状况
+            detailMap.put("smok_day",0); // 日吸烟量（支）
+            detailMap.put("drnk",""); // 饮酒标志
+            detailMap.put("drnk_frqu",""); // 饮酒频率
+            detailMap.put("drnk_day",0); // 日饮酒量（mL）
+            detailMap.put("eval_time",DateUtils.format(DateUtils.Y_M_DH_M_S)); // 评估日期时间
+            detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
+            detailMap.put("vali_flag",Constants.SF.S); // 有效标志
+        }
+        return detailMap;
+    }
+
+    /**
+     * @Method updateInsureUnifiedEmr
+     * @Desrciption   4701
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 11:18
+     * @return*/
+    public Boolean updateInsureUnifiedEmr(Map<String,Object>map){
+        String hospCode = MapUtils.get(map,"hospCode");
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
+        String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        Map<String,Object>  adminfoInfo = queryAdminfoInfo(map); // 入院信息
+        Map<String,Object>  diseInfoList= queryDiagnoseInfo(map); // 诊断信息
+        Map<String,Object>  coursrinfoList= queryEmrCoursrInfo(map); // 病程记录信息
+        Map<String,Object> operationInfoList = queryEmrOperationInfo(map); // 手术信息
+        Map<String,Object>  rescInfo = queryEmrRescInfo(map); // 抢救信息
+        Map<String,Object>  dieInfo = queryEmrDieInfo(map); // 死亡记录
+        Map<String,Object> dscgoInfo = queryEmrDscgoInfo(map); // 出院小结
+
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("adminfoInfo",adminfoInfo);
+        paramMap.put("diseinfo",diseInfoList.get("diagnoseList"));
+        paramMap.put("coursrinfo",coursrinfoList);
+        paramMap.put("oprninfo",operationInfoList.get("operationInfoList"));
+        paramMap.put("rescInfo",rescInfo);
+        paramMap.put("dieInfo",dieInfo);
+        paramMap.put("dscgoInfo",dscgoInfo);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_4701, paramMap);
+        return true;
+
+    }
+
+    /**
+     * @Method queryDiagnoseInfo
+     * @Desrciption 获取诊断信息
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 14:52
+     * @return*/
+    private Map<String, Object> queryDiagnoseInfo(Map<String, Object> map) {
+        List<InptDiagnoseDTO> diagnoseDTOS = MapUtils.get(map,"diagnoseDTOS");
+        Map<String, Object> diseinfoMap = null;
+        List<Map<String,Object>> diagnoseList = new ArrayList<>();
+        if(!ListUtils.isEmpty(diagnoseDTOS)){
+            for(int i=0;i<diagnoseDTOS.size();i++){
+                InptDiagnoseDTO diagnoseDTO=diagnoseDTOS.get(i);
+                diseinfoMap  = new HashMap<>();
+                diseinfoMap.put("inout_diag_type",diagnoseDTO.getTypeCode());//	出入院诊断类别
+                diseinfoMap.put("maindiag_flag",diagnoseDTO.getIsMain());//	主诊断标志
+                diseinfoMap.put("diag_seq",i+1);//	诊断序列号
+                diseinfoMap.put("diag_time",diagnoseDTO.getCrteTime());//诊断时间
+                diseinfoMap.put("wm_diag_code",diagnoseDTO.getDiseaseCode());//	西医诊断编码
+                diseinfoMap.put("wm_diag_name",diagnoseDTO.getDiseaseName());//	西医诊断名称
+                diseinfoMap.put("tcm_dise_code","无");//	中医病名代码
+                diseinfoMap.put("tcm_dise_name",diagnoseDTO.getDiseaseName());//	中医病名
+                diseinfoMap.put("tcmsymp_code","无");//	中医证候代码
+                diseinfoMap.put("tcmsymp","无");//	中医证候
+                diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+                diagnoseList.add(diseinfoMap);
+            }
+        }else {
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("inout_diag_type","");//	出入院诊断类别
+            diseinfoMap.put("maindiag_flag","");//	主诊断标志
+            diseinfoMap.put("diag_seq",0);//	诊断序列号
+            diseinfoMap.put("diag_time","");//诊断时间
+            diseinfoMap.put("wm_diag_code","");//	西医诊断编码
+            diseinfoMap.put("wm_diag_name","");//	西医诊断名称
+            diseinfoMap.put("tcm_dise_code","");//	中医病名代码
+            diseinfoMap.put("tcm_dise_name","");//	中医病名
+            diseinfoMap.put("tcmsymp_code","");//	中医证候代码
+            diseinfoMap.put("tcmsymp","");//	中医证候
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+            diagnoseList.add(diseinfoMap);
+        }
+        map.put("diagnoseList",diagnoseList);
+        return map;
+    }
+    /**
+     * @Method queryOperationInfo
+     * @Desrciption 获取手术信息
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 15:39
+     * @return*/
+    private Map<String, Object> queryEmrOperationInfo(Map<String, Object> map) {
+        List<OperInfoRecordDO> diagnoseDTOS = MapUtils.get(map,"operInfoRecordInfos");
+        Map<String, Object> diseinfoMap = null;
+        List<Map<String,Object>> operationInfoList = new ArrayList<>();
+        if(!ListUtils.isEmpty(diagnoseDTOS)){
+            for(int i=0;i<diagnoseDTOS.size();i++){
+                OperInfoRecordDO operInfoRecordDO=diagnoseDTOS.get(i);
+                diseinfoMap  = new HashMap<>();
+                diseinfoMap.put("oprn_appy_id","无");//	手术申请单号
+                diseinfoMap.put("oprn_seq","");//	手术序列号
+                diseinfoMap.put("blotype_abo",operInfoRecordDO.getBloodCode());//	血型代码
+                diseinfoMap.put("oprn_time",operInfoRecordDO.getOperPlanTime());//手术日期
+                diseinfoMap.put("oprn_type_code","无"); // 手术分类代码
+                diseinfoMap.put("oprn_type_name","无");//  手术分类名称
+                diseinfoMap.put("bfpn_diag_code",operInfoRecordDO.getInDiseaseIcd10()); //术前诊断代码
+                diseinfoMap.put("bfpn_oprn_diag_name",operInfoRecordDO.getInDiseaseName()); //术前诊断名称
+                diseinfoMap.put("bfpn_inhosp_ifet","无");//	术前是否发生院内感染
+                diseinfoMap.put("afpn_diag_code","无");//	术后诊断代码
+                diseinfoMap.put("afpn_diag_name","无");//	术后诊断名称
+                diseinfoMap.put("sinc_heal_lv",operInfoRecordDO.getHealCode()); //手术切口愈合等级代码
+                diseinfoMap.put("sinc_heal_lv_code","无"); // 手术切口愈合等级
+                diseinfoMap.put("back_oprn","无");//	是否重返手术（明确定义）
+                diseinfoMap.put("selv","无");//	是否择期
+                diseinfoMap.put("prev_abtl_medn","无");//	是否预防使用抗菌药物
+                diseinfoMap.put("abtl_medn_days","无");//	预防使用抗菌药物天数
+                diseinfoMap.put("oprn_oprt_code",operInfoRecordDO.getOperDiseaseIcd9()); //手术操作代码
+                diseinfoMap.put("oprn_oprt_name",operInfoRecordDO.getOperDiseaseIcd9()); //手术操作名称
+                diseinfoMap.put("oprn_lv_code",operInfoRecordDO.getRank()); //手术级别代码
+                diseinfoMap.put("oprn_lv_name",operInfoRecordDO.getRank());//手术级别名称
+                diseinfoMap.put("anst_mtd_code",operInfoRecordDO.getAnaCode());//	麻醉-方法代码
+                diseinfoMap.put("anst_mtd_name",operInfoRecordDO.getAnaCode());//	麻醉-方法名称
+                diseinfoMap.put("anst_lv_code","无");//	麻醉分级代码
+                diseinfoMap.put("anst_lv_name","无");//	麻醉分级名称
+                diseinfoMap.put("exe_anst_dept_code","无");//	麻醉执行科室代码
+                diseinfoMap.put("exe_anst_dept_name","无");//	麻醉执行科室名称
+                diseinfoMap.put("anst_efft","无");// 麻醉效果
+                diseinfoMap.put("oprn_begntime",operInfoRecordDO.getCrteTime());//	手术开始时间
+                diseinfoMap.put("oprn_endtime",operInfoRecordDO.getOperEndTime());//	手术结束时间
+                diseinfoMap.put("oprn_asps",Constants.SF.S);//	麻醉分级名称
+                diseinfoMap.put("oprn_asps_ifet","无");//	无菌手术是否感染
+                diseinfoMap.put("afpn_info","无");//	手术后情况
+                diseinfoMap.put("oprn_merg","无");//	是否手术合并症
+                diseinfoMap.put("oprn_conc","无");//	是否手术并发症
+                diseinfoMap.put("oprn_anst_dept_code",operInfoRecordDO.getOperDeptId());//	手术执行科室代码
+                diseinfoMap.put("oprn_anst_dept_name",operInfoRecordDO.getOperRoomName());//	手术执行科室名称
+                diseinfoMap.put("palg_dise","无");// 病理检查
+                diseinfoMap.put("oth_med_dspo","无"); //其他医学处置
+                diseinfoMap.put("out_std_oprn_time","无"); //是否超出手术时间
+                diseinfoMap.put("oprn_oper_name",operInfoRecordDO.getDoctorName());//	手术者姓名
+                diseinfoMap.put("oprn_asit_name1",operInfoRecordDO.getAssistantName1());//	助手I姓名
+                diseinfoMap.put("oprn_asit_name2",operInfoRecordDO.getAssistantName2());//	助手Ⅱ姓名
+                diseinfoMap.put("anst_dr_name",operInfoRecordDO.getAnaName1());// 麻醉医师姓名
+                diseinfoMap.put("anst_asa_lv_code","无");//麻醉ASA分级代码
+                diseinfoMap.put("anst_asa_lv_name","无");// 麻醉ASA分级名称
+                diseinfoMap.put("anst_medn_code","无");// 麻醉药物代码
+                diseinfoMap.put("anst_medn_name","无"); // 麻醉药物名称
+                diseinfoMap.put("anst_medn_dos","无"); // 麻醉药物剂量
+                diseinfoMap.put("anst_dosunt","无");// 计量单位
+                diseinfoMap.put("anst_begntime",""); // 麻醉开始时间
+                diseinfoMap.put("anst_endtime",""); // 麻醉结束时间
+                diseinfoMap.put("anst_merg_symp_code","无"); // 麻醉合并症代码
+                diseinfoMap.put("anst_merg_symp","无"); // 麻醉合并症名称
+                diseinfoMap.put("anst_merg_symp_dscr","无"); // 麻醉合并症描述
+                diseinfoMap.put("pacu_begntime",""); // 入复苏室时间
+                diseinfoMap.put("pacu_endtime",""); // 出复苏室时间
+                diseinfoMap.put("oprn_selv","无"); // 是否择期手术
+                diseinfoMap.put("canc_oprn","无"); // 是否择取消手术
+                diseinfoMap.put("vali_flag",Constants.SF.S); //有效标志
+                operationInfoList.add(diseinfoMap);
+            }
+        } else {
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("oprn_appy_id","无");//	手术申请单号
+            diseinfoMap.put("oprn_seq","无");//	手术序列号
+            diseinfoMap.put("blotype_abo","无");//	血型代码
+            diseinfoMap.put("oprn_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//手术日期
+            diseinfoMap.put("oprn_type_code","无"); // 手术分类代码
+            diseinfoMap.put("oprn_type_name","无");//  手术分类名称
+            diseinfoMap.put("bfpn_diag_code","无"); //术前诊断代码
+            diseinfoMap.put("bfpn_oprn_diag_name","无"); //术前诊断名称
+            diseinfoMap.put("bfpn_inhosp_ifet","无");//	术前是否发生院内感染
+            diseinfoMap.put("afpn_diag_code","无");//	术后诊断代码
+            diseinfoMap.put("afpn_diag_name","无");//	术后诊断名称
+            diseinfoMap.put("sinc_heal_lv","无"); //手术切口愈合等级代码
+            diseinfoMap.put("sinc_heal_lv_code","无"); // 手术切口愈合等级
+            diseinfoMap.put("back_oprn","无");//	是否重返手术（明确定义）
+            diseinfoMap.put("selv","无");//	是否择期
+            diseinfoMap.put("prev_abtl_medn","无");//	是否预防使用抗菌药物
+            diseinfoMap.put("abtl_medn_days","无");//	预防使用抗菌药物天数
+            diseinfoMap.put("oprn_oprt_code","无"); //手术操作代码
+            diseinfoMap.put("oprn_oprt_name","无"); //手术操作名称
+            diseinfoMap.put("oprn_lv_code","无"); //手术级别代码
+            diseinfoMap.put("oprn_lv_name","无");//手术级别名称
+            diseinfoMap.put("anst_mtd_code","无");//	麻醉-方法代码
+            diseinfoMap.put("anst_mtd_name","无");//	麻醉-方法名称
+            diseinfoMap.put("anst_lv_code","无");//	麻醉分级代码
+            diseinfoMap.put("anst_lv_name","无");//	麻醉分级名称
+            diseinfoMap.put("exe_anst_dept_code","无");//	麻醉执行科室代码
+            diseinfoMap.put("exe_anst_dept_name","无");//	麻醉执行科室名称
+            diseinfoMap.put("anst_efft","无");// 麻醉效果
+            diseinfoMap.put("oprn_begntime",DateUtils.format(DateUtils.Y_M_DH_M_S));//	手术开始时间
+            diseinfoMap.put("oprn_endtime",DateUtils.format(DateUtils.Y_M_DH_M_S));//	手术结束时间
+            diseinfoMap.put("oprn_asps",Constants.SF.S);//	麻醉分级名称
+            diseinfoMap.put("oprn_asps_ifet","无");//	无菌手术是否感染
+            diseinfoMap.put("afpn_info","无");//	手术后情况
+            diseinfoMap.put("oprn_merg","无");//	是否手术合并症
+            diseinfoMap.put("oprn_conc","无");//	是否手术并发症
+            diseinfoMap.put("oprn_anst_dept_code","无");//	手术执行科室代码
+            diseinfoMap.put("oprn_anst_dept_name","无");//	手术执行科室名称
+            diseinfoMap.put("palg_dise","无");// 病理检查
+            diseinfoMap.put("oth_med_dspo","无"); //其他医学处置
+            diseinfoMap.put("out_std_oprn_time",""); //是否超出手术时间
+            diseinfoMap.put("oprn_oper_name","无");//	手术者姓名
+            diseinfoMap.put("oprn_asit_name1","无");//	助手I姓名
+            diseinfoMap.put("oprn_asit_name2","无");//	助手Ⅱ姓名
+            diseinfoMap.put("anst_dr_name","无");// 麻醉医师姓名
+            diseinfoMap.put("anst_asa_lv_code","无");//麻醉ASA分级代码
+            diseinfoMap.put("anst_asa_lv_name","无");// 麻醉ASA分级名称
+            diseinfoMap.put("anst_medn_code","无");// 麻醉药物代码
+            diseinfoMap.put("anst_medn_name","无"); // 麻醉药物名称
+            diseinfoMap.put("anst_medn_dos","无"); // 麻醉药物剂量
+            diseinfoMap.put("anst_dosunt","无");// 计量单位
+            diseinfoMap.put("anst_begntime",""); // 麻醉开始时间
+            diseinfoMap.put("anst_endtime",""); // 麻醉结束时间
+            diseinfoMap.put("anst_merg_symp_code","无"); // 麻醉合并症代码
+            diseinfoMap.put("anst_merg_symp","无"); // 麻醉合并症名称
+            diseinfoMap.put("anst_merg_symp_dscr","无"); // 麻醉合并症描述
+            diseinfoMap.put("pacu_begntime",DateUtils.format(DateUtils.Y_M_DH_M_S)); // 入复苏室时间
+            diseinfoMap.put("pacu_endtime",DateUtils.format(DateUtils.Y_M_DH_M_S)); // 出复苏室时间
+            diseinfoMap.put("oprn_selv","无"); // 是否择期手术
+            diseinfoMap.put("canc_oprn","无"); // 是否择取消手术
+            diseinfoMap.put("vali_flag",Constants.SF.S); //有效标志
+            operationInfoList.add(diseinfoMap);
+        }
+        map.put("operationInfoList",operationInfoList);
+        return map;
+    }
+
+    /**
+     * @Method queryDiagnoseInfo
+     * @Desrciption 获取病程记录
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 14:52
+     * @return*/
+    private Map<String, Object> queryEmrCoursrInfo(Map<String, Object> map) {
+        EmrPatientRecordDO diagnoseDTO = MapUtils.get(map,"courseRecord");
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        Map<String, Object> diseinfoMap = null;
+        List<Map<String,Object>> diagnoseList = new ArrayList<>();
+        if(diagnoseDTO!=null){
+                diseinfoMap  = new HashMap<>();
+                diseinfoMap.put("dept_code",inptVisit.getInDeptId());//	科室代码
+                diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
+                diseinfoMap.put("wardarea_name",inptVisit.getInWardId());//	病区名称
+                diseinfoMap.put("bedno",inptVisit.getBedName());//病床号
+                diseinfoMap.put("rcd_time",diagnoseDTO.getCrteTime());//	记录日期时间
+                diseinfoMap.put("chfcomp","无");//	主诉
+                diseinfoMap.put("cas_ftur","无");//	病例特点
+                diseinfoMap.put("tcm4d_rslt","无");//	中医“四诊”观察结果
+                diseinfoMap.put("dise_evid",inptVisit.getDiseaseIcd10());//	诊断依据
+                diseinfoMap.put("prel_wm_diag_code",inptVisit.getInDiseaseIcd10());//	初步诊断-西医诊断编码
+                diseinfoMap.put("prel_tcm_dise_name",inptVisit.getInDiseaseName());//	初步诊断-西医诊断名称
+                diseinfoMap.put("prel_tcm_diag_code","无");//	初步诊断-中医病名代码
+                diseinfoMap.put("prel_tcm_dise_name","无");//	初步诊断-中医病名
+                diseinfoMap.put("prel_tcmsymp_code","无");//	初步诊断-中医证候代码
+                diseinfoMap.put("prel_tcmsymp","无");//	初步诊断-中医证候
+                diseinfoMap.put("finl_wm_diag_code","无");//	鉴别诊断-西医诊断编码
+                diseinfoMap.put("finl_wm_diag_name","无");//	鉴别诊断-西医诊断名称
+                diseinfoMap.put("finl_tcm_dise_code","无");//	鉴别诊断-中医病名代码
+                diseinfoMap.put("finl_tcm_dise_name","无");//	鉴别诊断-中医病名
+                diseinfoMap.put("finl_tcmsymp_code","无");//	鉴别诊断-中医证候代码
+
+                diseinfoMap.put("finl_tcmsymp","无");//	鉴别诊断-中医证候
+                diseinfoMap.put("dise_plan","无");//	诊疗计划
+                diseinfoMap.put("prnp_trt","无");//	治则治法
+                diseinfoMap.put("ipdr_code",inptVisit.getZzDoctorId());//	住院医师编号
+                diseinfoMap.put("ipdr_name",inptVisit.getZzDoctorName());//	住院医师姓名
+                diseinfoMap.put("prnt_doc_name",inptVisit.getZgDoctorName());//	上级医师姓名
+                diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+                diagnoseList.add(diseinfoMap);
+        }else {
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("dept_code","无");//	科室代码
+            diseinfoMap.put("dept_name","无");//	科室名称
+            diseinfoMap.put("wardarea_name","无");//	病区名称
+            diseinfoMap.put("bedno","无");//病床号
+            diseinfoMap.put("rcd_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	记录日期时间
+            diseinfoMap.put("chfcomp","无");//	主诉
+            diseinfoMap.put("cas_ftur","无");//	病例特点
+            diseinfoMap.put("tcm4d_rslt","无");//	中医“四诊”观察结果
+            diseinfoMap.put("dise_evid","无");//	诊断依据
+            diseinfoMap.put("prel_wm_diag_code","无");//	初步诊断-西医诊断编码
+            diseinfoMap.put("prel_tcm_dise_name","无");//	初步诊断-西医诊断名称
+            diseinfoMap.put("prel_tcm_diag_code","无");//	初步诊断-中医病名代码
+            diseinfoMap.put("prel_tcm_dise_name","无");//	初步诊断-中医病名
+            diseinfoMap.put("prel_tcmsymp_code","无");//	初步诊断-中医证候代码
+            diseinfoMap.put("prel_tcmsymp","无");//	初步诊断-中医证候
+            diseinfoMap.put("finl_wm_diag_code","无");//	鉴别诊断-西医诊断编码
+            diseinfoMap.put("finl_wm_diag_name","无");//	鉴别诊断-西医诊断名称
+            diseinfoMap.put("finl_tcm_dise_code","无");//	鉴别诊断-中医病名代码
+            diseinfoMap.put("finl_tcm_dise_name","无");//	鉴别诊断-中医病名
+            diseinfoMap.put("finl_tcmsymp_code","无");//	鉴别诊断-中医证候代码
+            diseinfoMap.put("finl_tcmsymp","无");//	鉴别诊断-中医证候
+            diseinfoMap.put("dise_plan","无");//	诊疗计划
+            diseinfoMap.put("prnp_trt","无");//	治则治法
+            diseinfoMap.put("ipdr_code","无");//	住院医师编号
+            diseinfoMap.put("ipdr_name","无");//	住院医师姓名
+            diseinfoMap.put("prnt_doc_name","无");//	上级医师姓名
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+        }
+        return diseinfoMap;
+    }
+
+    /**
+     * @Method queryEmrRescInfo
+     * @Desrciption  医保统一支付平台：电子病历上传 病情抢救记录
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:05
+     * @Return
+     **/
+    private Map<String, Object> queryEmrRescInfo(Map<String, Object> map) {
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        Map<String, Object> diseinfoMap = null;
+        if (inptVisit!=null){
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("dept",inptVisit.getInDeptId());//	科室代码
+            diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
+            diseinfoMap.put("wardarea_name",inptVisit.getInWardId());//	病区名称
+            diseinfoMap.put("bedno",inptVisit.getBedName());//病床号
+            diseinfoMap.put("diag_name",inptVisit.getDiseaseIcd10());//	诊断名称
+            diseinfoMap.put("diag_code",inptVisit.getDiseaseCode());//	诊断代码
+            diseinfoMap.put("cond_chg","无");//	病情变化情况
+            diseinfoMap.put("resc_mes","无");//	抢救措施
+            diseinfoMap.put("oprn_oprt_code","无");//	手术操作代码
+            diseinfoMap.put("oprn_oprt_name","无");//	手术操作名称
+            diseinfoMap.put("oprn_oper_part","无");//	手术及操作目标部位名称
+            diseinfoMap.put("itvt_name","无");//	介入物名称
+            diseinfoMap.put("oprt_mtd","无");//	操作方法
+            diseinfoMap.put("oprt_cnt",0);//	操作次数
+            diseinfoMap.put("resc_begntime",DateUtils.format(DateUtils.Y_M_DH_M_S));//	抢救开始日期时间
+            diseinfoMap.put("resc_endtime",DateUtils.format(DateUtils.Y_M_DH_M_S));//	抢救结束日期时间
+            diseinfoMap.put("dise_item_name","无");//	检查/检验项目名称
+            diseinfoMap.put("dise_ccls_qunt",0);// 定量检查结果
+            diseinfoMap.put("dise_ccls","无");//	检查/检验结果
+            diseinfoMap.put("dise_ccls_code","无");//	检查/检验结果代码
+            diseinfoMap.put("mnan","无");//	注意事项
+            diseinfoMap.put("resc_psn_list","无");//	参加抢救人员名单
+            diseinfoMap.put("proftechttl_code","无");//	专业技术职务类别代码
+            diseinfoMap.put("doc_code","无");//	医师编号
+            diseinfoMap.put("dr_name","无");//	医师姓名
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+        }
+        return  diseinfoMap;
+    }
+
+    /**
+     * @Method queryEmrDieInfo
+     * @Desrciption  死亡记录
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:20
+     * @Return
+     **/
+    private Map<String, Object> queryEmrDieInfo(Map<String, Object> map) {
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        Map<String, Object> diseinfoMap = null;
+        if (inptVisit!=null){
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("dept",inptVisit.getInDeptId());//	科室代码
+            diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
+            diseinfoMap.put("wardarea_name",inptVisit.getInWardId());//	病区名称
+            diseinfoMap.put("bedno",inptVisit.getBedName());//病床号
+            diseinfoMap.put("adm_time",inptVisit.getInTime());//	入院时间
+            diseinfoMap.put("adm_dise",inptVisit.getInDiseaseIcd10());//	入院诊断编码
+            diseinfoMap.put("adm_info",inptVisit.getInSituationCode());//	入院情况
+            diseinfoMap.put("trt_proc_dscr","无");//	诊疗过程描述
+            diseinfoMap.put("die_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	死亡时间
+            diseinfoMap.put("die_drt_rea","无");//	直接死亡原因名称
+            diseinfoMap.put("die_drt_rea_code","无");//	直接死亡原因编码
+            diseinfoMap.put("die_dise_name","无");//	死亡诊断名称
+            diseinfoMap.put("die_diag_code","无");//	死亡诊断编码
+            diseinfoMap.put("agre_corp_dset","无");//	家属是否同意尸体解剖标志
+            diseinfoMap.put("ipdr_name","无");//	住院医师姓名
+            diseinfoMap.put("chfpdr_code","无");//	主诊医师代码
+            diseinfoMap.put("chfpdr_name","无");//	主诊医师姓名
+            diseinfoMap.put("chfdr_name","无");//	主任医师姓名
+            diseinfoMap.put("sign_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	签字日期时间
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+        }
+        return  diseinfoMap;
+    }
+
+    /**
+     * @Method queryEmrDscgoInfo
+     * @Desrciption  出院小结
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:35
+     * @Return
+     **/
+    private Map<String, Object> queryEmrDscgoInfo(Map<String, Object> map) {
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        Map<String, Object> diseinfoMap = null;
+        if (inptVisit!=null){
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("dscg_date",inptVisit.getOutTime());//	出院日期
+            diseinfoMap.put("adm_diag_dscr",inptVisit.getInDeptName());//	入院诊断描述
+            diseinfoMap.put("dscg_dise_dscr",inptVisit.getInWardId());//	出院诊断
+            diseinfoMap.put("adm_info",inptVisit.getBedName());//入院情况
+            diseinfoMap.put("trt_proc_rslt_dscr",inptVisit.getInTime());//	诊治经过及结果（含手术日期名称及结果）
+            diseinfoMap.put("dscg_info",inptVisit.getInDiseaseIcd10());//	出院情况（含治疗效果）
+            diseinfoMap.put("dscg_drord",inptVisit.getInSituationCode());//	出院医嘱
+            diseinfoMap.put("caty","无");//	科别
+            diseinfoMap.put("rec_doc","无");// 记录医师
+            diseinfoMap.put("main_drug_name","无");//主要药品名称
+            diseinfoMap.put("oth_imp_info","无");//	其他重要信息
+            diseinfoMap.put("vali_flag",Constants.SF.S);//有效标志
+        }
+        return  diseinfoMap;
     }
 
 }

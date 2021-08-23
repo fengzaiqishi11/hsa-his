@@ -534,4 +534,14 @@ public interface OutinInvoiceDAO {
 	 * @Return
 	 */
 	int selectKYFPs(OutinInvoiceDTO dto);
+
+	/**
+	 * @Description: 获取发票分单后的发票金额
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/8/18 19:36
+	 * @Return
+	 */
+	List<Map<String, Object>> queryOutptsettleInvoiceConent(OutinInvoiceDTO outinInvoiceDTO);
 }

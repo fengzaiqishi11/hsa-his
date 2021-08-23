@@ -79,7 +79,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     @Resource
     private SysParameterService sysParameterService_consumer;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Resource
+    private InsureDictDAO   insureDictDAO;
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * @param map
@@ -1509,7 +1512,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             map.put("itemCode", "103"); // 项目类别标志
         }
         map.put("hospItemId", baseDrugDTO.getId()); // 医院项目id
-        if (StringUtils.isEmpty(baseDrugDTO.getUsualName())) {
+        if(StringUtils.isEmpty(baseDrugDTO.getUsualName())){
             map.put("hospItemName", baseDrugDTO.getGoodName()); // 医院项目名称
         } else {
             map.put("hospItemName", baseDrugDTO.getUsualName()); // 医院项目名称
@@ -2869,6 +2872,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      * @param map
      * @Method insertUnifiedDict
      * @Desrciption 查询下载医保统一支付码表
+     *    1.下载码表前 验证码表是否已经下载
      * @Param
      * @Author fuhui
      * @Date 2021/4/14 23:28
@@ -2882,11 +2886,23 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         String crteName = MapUtils.get(map, "crteName");
         String type = MapUtils.get(map, "type");
         String remark = MapUtils.get(map, "remark");
+        String code = type.toUpperCase();
+        InsureDictDTO insureDictDTO = new InsureDictDTO();
+        insureDictDTO.setHospCode(hospCode);
+        insureDictDTO.setInsureRegCode(insureRegCode);
+        insureDictDTO.setCode(code);
+        List<InsureDictDTO> dictDTOList = insureDictDAO.queryDictByCode(insureDictDTO);
+        if(!ListUtils.isEmpty(dictDTOList)){
+            throw new AppException("改码表类型【"+code+"】已经下载");
+        }
+
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setRegCode(insureRegCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
+
 
         Map httpParam = new HashMap();
         httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_1901);  //交易编号
@@ -2920,8 +2936,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if (ListUtils.isEmpty(resultDataMap)) {
             throw new AppException("下载的码表数据为空");
         }
-
-        InsureDictDTO insureDictDTO = null;
         List<InsureDictDO> insureDictDTOList = new ArrayList<>();
         for (Map<String, Object> item : resultDataMap) {
             insureDictDTO = new InsureDictDTO();

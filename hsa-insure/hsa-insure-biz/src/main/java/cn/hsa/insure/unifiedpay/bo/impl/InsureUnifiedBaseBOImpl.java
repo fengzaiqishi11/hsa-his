@@ -324,7 +324,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(hospCode); //医院编码
-        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
         if (ListUtils.isEmpty(configurationDTOList)) {
@@ -579,6 +579,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Date 2021/4/23 12:47
      * @Return
      **/
+    @Override
     public Map<String, Object> queryItemConfirm(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
@@ -591,17 +592,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         Map<String, Object> inputMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
+        // 查询数据参数map
         Map<String, Object> paramMap = new HashMap<>();
-
-        /**
-         * 公共入参
-         */
-        inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_5401);  // 交易编号
-        inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
-        inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
-        inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-        inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-        inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         dataMap.put("exam_org_code", MapUtils.get(map, "examOrgCode"));
@@ -609,14 +601,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("exam_item_code", MapUtils.get(map, "examItemCode"));
         dataMap.put("exam_item_name", MapUtils.get(map, "examItemName"));
         paramMap.put("data", dataMap);
-        inputMap.put("input", paramMap);
-        String json = JSONObject.toJSONString(inputMap);
-        logger.info("项目互认信息查询入参:" + json);
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
-        Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
-        logger.info("项目互认信息查询回参:" + resultJson);
-        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
-        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "bilgiteminfo");
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "5401", paramMap);
+        List<Map<String, Object>> resultDataMap= MapUtils.get(resultMap, "bilgiteminfo");
         map.put("resultDataMap", resultDataMap);
         return map;
     }
@@ -718,8 +704,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
 
+        // 人员编号
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
-        dataMap.put("rpotc_no", MapUtils.get(map, "rpotcNo"));
+        // 报告单号
+        dataMap.put("rpotc_no", "rpotcNo");
+        // 机构编码
         dataMap.put("fixmedins_code", MapUtils.get(map, "fixmedinsCode"));
 
         paramMap.put("data", dataMap);
@@ -731,6 +720,41 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
         logger.info("报告明细信息查询回参:" + resultJson);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        // Map<String, Object> outptMap = new HashMap<>();
+        // checkreportdetails inspectionreportinformation inspectiondetails
+/*        Map checkreportdetails = new HashMap();
+        checkreportdetails.put("psn_no","123");
+        checkreportdetails.put("rpotc_no","666");
+        checkreportdetails.put("rpt_date","777");
+        checkreportdetails.put("rpotc_type_code","7");
+        checkreportdetails.put("exam_rpotc_name","8");
+        checkreportdetails.put("exam_rslt_poit_flag","9");
+        checkreportdetails.put("exam_rslt_abn","0");
+        checkreportdetails.put("exam_ccls","12");
+        checkreportdetails.put("bilgDrName","23");
+        outptMap.put("checkreportdetails",checkreportdetails);
+
+        Map inspectionreportinformation = new HashMap();
+        inspectionreportinformation.put("psn_no","123");
+        inspectionreportinformation.put("rpotc_no","666");
+        inspectionreportinformation.put("exam_item_code","777");
+        inspectionreportinformation.put("exam_item_name","7");
+        inspectionreportinformation.put("rpt_date","8");
+        inspectionreportinformation.put("rpot_doc","9");
+        outptMap.put("inspectionreportinformation",inspectionreportinformation);
+
+        // inspectiondetails
+        Map inspectiondetails = new HashMap();
+        inspectiondetails.put("rpotc_no","1232");
+        inspectiondetails.put("exam_mtd","1232");
+        inspectiondetails.put("ref_val","1232");
+        inspectiondetails.put("exam_unt","1232");
+        inspectiondetails.put("exam_rslt_val","1232");
+        inspectiondetails.put("exam_rslt_qual","1232");
+        inspectiondetails.put("exam_item_detl_code","1232");
+        inspectiondetails.put("exam_item_detl_name","1232");
+        inspectiondetails.put("exam_rslt_abn","1232");
+        outptMap.put("inspectiondetails",inspectiondetails);*/
         map.put("resultDataMap", outptMap);
         return map;
     }
@@ -1110,6 +1134,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         insureConfigurationDTO.setOrgCode(orgCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(insureConfigurationDTO ==null){
+            throw new AppException("查询医保机构配置信息为空");
+        }
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
@@ -1129,7 +1156,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
         return resultMap;

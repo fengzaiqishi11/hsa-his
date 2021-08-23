@@ -383,4 +383,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 是否新医保，用于判断业务是否走统一支付平台
      */
     private String isUnifiedPay;
+    /** 人员编号，insure_individual_visit.aac001 **/
+    private String psnNo;
 }

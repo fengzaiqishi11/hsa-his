@@ -13,7 +13,6 @@
         b.group_seq_no as groupSeqNo,
         b.visit_id as visitId,
         max(a.crte_time) as registerTime,
-        a.crte_time as registerTime,
         c.name,
         c.age,
         c.gender_code as genderCode,

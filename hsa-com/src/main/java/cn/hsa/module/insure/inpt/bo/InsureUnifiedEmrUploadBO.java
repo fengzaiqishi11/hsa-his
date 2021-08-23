@@ -36,4 +36,15 @@ public interface InsureUnifiedEmrUploadBO {
      * @Return
      */
     Boolean updateInsureUnifiedPrescrib(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method updateInsureUnifiedEmr
+     * @Desrciption 医保统一支付平台：电子病历上传
+     * @Param map
+     * @Author liuliyun
+     * @Date 2021/8/21 11:20
+     * @Return
+     */
+    Boolean updateInsureUnifiedEmr(Map<String, Object> map);
 }

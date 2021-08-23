@@ -379,6 +379,8 @@
     <dubbo:reference id="insureUnifiedPayReversalTradeService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" check="false"/>
     <dubbo:reference id="InsureGetInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureGetInfoService" check="false"/>
     <dubbo:reference id="insureUnifiedRemoteService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" check="false"/>
+    <!--护理生命记录-统一支付平台-->
+    <dubbo:reference id="insureNurseRecordService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" check="false"/>
     <!-- ########################################### 医保接口 end ############################################## -->
 
 
@@ -455,5 +457,9 @@
 
     <!-- 一卡通异动服务 -->
     <dubbo:reference id="baseCardRechargeChangeService_consumer" interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" check="false"/>
+    <!-- 医保库存管理服务 -->
+    <dubbo:reference id="insureStockManagerService_consumer" interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" check="false"/>
+    <!-- 医保输血记录服务 -->
+    <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
 </beans>
 

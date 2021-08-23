@@ -750,6 +750,14 @@
          where b.totalPrice>0
     </select>
 
+    <!-- 根据条件查询门诊发票明细表列表信息 -->
+    <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
+        left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+         where s.hosp_code = #{hospCode} and s.id = #{outptSettleInvoiceId}
+    </select>
+
     <!-- 根据条件查询住院发票明细表列表信息 -->
     <select id="queryOutinItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select b.*, s.crte_name as crteName, s.crte_time as crteTime, s.mi_price as miPrice, s.self_price as selfPrice from (
@@ -1548,6 +1556,7 @@
         '2' AS invoiceType,
         e.type_code AS typeCode,
         f.visit_no AS visitNo,
+        f.gender_code as genderCode,
         '' AS outptSettleInvoiceId
         FROM
         outpt_register_settle b

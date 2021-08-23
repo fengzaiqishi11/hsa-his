@@ -552,7 +552,7 @@
         f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
         b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail
         from outpt_prescribe a
-        join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
+        join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
         join(
             select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a

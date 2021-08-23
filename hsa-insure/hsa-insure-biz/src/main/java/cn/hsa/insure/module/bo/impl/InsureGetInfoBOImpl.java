@@ -118,6 +118,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("psn_name",settleInfoDTO.getName());// 人员姓名
         setlinfo.put("gend",settleInfoDTO.getGenderCode());// 性别
         setlinfo.put("age",settleInfoDTO.getAge()); // 年龄
+        if(settleInfoDTO.getAge()>1){
+            setlinfo.put("sage",""); // 年龄小于一岁
+        }else{
+            setlinfo.put("sage","settleInfoDTO.getAge()");
+        }
         setlinfo.put("brdy",settleInfoDTO.getBirthday()); // 出生日期
         if (StringUtils.isNotEmpty(settleInfoDTO.getNationCode())) {
             setlinfo.put("naty",settleInfoDTO.getNationCode()); // 民族

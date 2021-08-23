@@ -270,4 +270,6 @@ public interface SysUserDAO {
     Boolean insertBatch(List<SysUserDTO> sysUserDTOS);
 
     SysUserDTO querySysUserHaveTeachDoctor(SysUserSystemDTO sysUserSystemDTO);
+
+    List<SysUserDTO> queryVisitDoctorByWorkTypeCode(SysUserDTO sysUserDTO);
 }

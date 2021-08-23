@@ -740,4 +740,17 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         }
         return true;
     }
+    /**
+     * @Method queryVisitDoctorByWorkTypeCode
+     * @Param [sysUserDTO]
+     * @description    根据用户状态、科室类型 职工类型模糊查询
+     * @author zhangguorui
+     * @date 2021/8/23
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>>
+     * @throws
+     */
+    @Override
+    public List<SysUserDTO> queryVisitDoctorByWorkTypeCode(SysUserDTO sysUserDTO) {
+        return sysUserDAO.queryVisitDoctorByWorkTypeCode(sysUserDTO);
+    }
 }

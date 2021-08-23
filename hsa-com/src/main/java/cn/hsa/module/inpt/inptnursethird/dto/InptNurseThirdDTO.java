@@ -154,7 +154,7 @@ public class InptNurseThirdDTO extends InptNurseThirdDO implements Serializable 
     /**
      * 医保登记号
      */
-    private String mdtrtCertNo;
+    private String medicalRegNo;
     /**
      * 入院科室
      */

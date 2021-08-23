@@ -201,7 +201,7 @@ public class InptBoImpl extends HsafBO implements InptBo {
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(hospCode); //医院编码
-        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
         if (ListUtils.isEmpty(configurationDTOList)) {

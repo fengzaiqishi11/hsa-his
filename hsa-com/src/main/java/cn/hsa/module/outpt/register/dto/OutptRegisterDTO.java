@@ -160,5 +160,5 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
     /**
      * 医保登记号
      */
-    private String mdtrtCertNo;
+    private String medicalRegNo;
 }

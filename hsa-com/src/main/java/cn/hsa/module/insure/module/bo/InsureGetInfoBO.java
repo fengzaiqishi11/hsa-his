@@ -104,4 +104,27 @@ public interface InsureGetInfoBO {
      **/
     PageDTO queryInsure(InsureSettleInfoDTO insureSettleInfoDTO);
 
+
+    /**
+     * @Method queryPage()
+     * @Desrciption  分页查询医保住院费用传输数据
+     * @Param insureIndividualCostDTO数据传输对象
+     *
+     * @Author fuhui
+     * @Date   2020/11/5 10:58
+     * @Return insureIndividualCostDTO分页数据传输对象
+     **/
+    PageDTO queryPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询没有匹配的费用数据集合
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/6/20 9:55
+     * @Return
+     **/
+    PageDTO queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

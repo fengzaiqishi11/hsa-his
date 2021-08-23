@@ -3,18 +3,23 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.entity.InsureReadCardDO;
 import cn.hsa.module.insure.inpt.service.InsureReadCardService;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
+import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +41,10 @@ public class InsureGetInfoController extends BaseController {
 
     @Resource
     private InsureReadCardService insureReadCardService_consumer;
+
+
+    @Resource
+    private InsureIndividualCostService insureIndividualCostService_consumer;
 
     /**
      * @Method getSettleInfo
@@ -247,4 +256,48 @@ public class InsureGetInfoController extends BaseController {
         map.put("insureRegCode",insureReadCardDO.getInsureRegCode());
         return insureReadCardService_consumer.updateReadIdCard(map);
     }
+
+
+    /**
+     * @Method queryPage()
+     * @Desrciption  分页查询医保住院费用传输数据
+     * @Param insureIndividualCostDTO数据传输对象
+     *
+     * @Author fuhui
+     * @Date   2020/11/5 10:58
+     * @Return insureIndividualCostDTO分页数据传输对象
+     **/
+    @GetMapping("/queryPage")
+    public WrapperResponse<PageDTO> queryPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());//创建人id
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());//创建人姓名
+        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureGetInfoService_consumer.queryPage(param);
+    }
+
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询没有匹配的费用数据集合
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/6/20 9:55
+     * @Return
+     **/
+    @GetMapping("/queryUnMatchPage")
+    public WrapperResponse<PageDTO> queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());//创建人id
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());//创建人姓名
+        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureGetInfoService_consumer.queryUnMatchPage(param);
+    }
+
 }

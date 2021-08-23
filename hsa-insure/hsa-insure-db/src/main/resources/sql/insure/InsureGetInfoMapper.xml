@@ -242,29 +242,35 @@
         item_id, item_name, crte_time,
         item_code,price, num, total_num, total_price, doctor_id, doctor_name,
         dept_id, (select name from base_dept a where a.id = dept_id ) as deptName
-        from insure_individual_cost where visit_id = #{id} and id not in (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
+        from insure_individual_cost where visit_id = #{id} and id not in
+        (select a.cost_id from insure_upload_cost a where a.visit_id = #{id})
     </select>
 
     <select id="queryVisit" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select * from (
-        select id,1 as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
-        nation_code, cert_no, birthday,  patient_code, crte_time from inpt_visit where
-        patient_code = '0'
-        <if test="name != null and name != ''">
-            and ( name like concat('%',#{name},'%')
-            or in_no like concat('%',#{name},'%'))
-        </if>
-        order by crte_time ) m
-        union all
-        select * from (
-        select id,2 as lx,register_no as visitNo, name, gender_code, age, age_unit_code,
-        nation_code, cert_no, birthday,  patient_code, crte_time from outpt_visit where
-        patient_code = '0'
-        <if test="name != null and name != ''">
-            and ( name like concat('%',#{name},'%')
-            or register_no like concat('%',#{name},'%'))
-        </if>
-        order by crte_time ) n
+        select A.* from (
+            select m.* from (
+            select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
+            nation_code, cert_no,cert_code, birthday,  patient_code, crte_time from inpt_visit where
+            patient_code = '0' and status_code in ('2','5','6')
+            <if test="name != null and name != ''">
+                and ( name like concat('%',#{name},'%')
+                or in_no like concat('%',#{name},'%'))
+            </if>
+            order by crte_time ) m
+            union all
+            select n.* from (
+            select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age, ov.age_unit_code,
+            ov.nation_code, ov.cert_no,cert_code,  ov.birthday,  ov.patient_code, ov.crte_time from outpt_visit ov
+            left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
+            where
+            ov.patient_code = '0' and  os.id is null
+            <if test="name != null and name != ''">
+                and ( ov.name like concat('%',#{name},'%')
+                or ov.register_no like concat('%',#{name},'%'))
+            </if>
+            order by crte_time ) n
+       )A
+       where A.lx = #{lx}
     </select>
 
     <insert id="insertCost" keyProperty="" useGeneratedKeys="true">
@@ -331,6 +337,174 @@
                insure_settle_id, insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt
         from insure_individual_cost where visit_id = #{visitId} and hosp_code =#{hospCode}
         and insure_settle_id = #{insureSettleId}
+    </select>
+    <select id="queryInptMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        ic.id,ic.hosp_code,ic.visit_id,
+        ic.item_code,
+        ic.item_name,
+        ic.item_id,
+        ic.price,
+        ic.num,ic.exec_time,ic.crte_name,
+        ic.spec,
+        ic.prep_code,
+        ic.dosage,ic.dosage_unit_code,
+        ic.total_num,ic.total_num_unit_code,ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+        (select iv.name from inpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
+        ic.settle_code,
+        ic.status_code,
+        ic.crte_time,
+        iim.deductible,
+        iim.is_trans,
+        iim.insure_item_code,
+        iim.insure_item_name,
+        iim.hosp_item_code,
+        iim.hosp_item_name,
+        (
+        CASE
+        WHEN iic.transmit_code IS NULL
+        OR iic.transmit_code = ''
+        THEN '未传输'
+        WHEN iic.transmit_code = '1'
+        THEN '已传输'
+        WHEN iim.is_trans = '0'
+        THEN '未传输'
+        END
+        ) isTransmit
+        FROM
+        inpt_cost ic
+        JOIN insure_item_match iim ON (ic.`item_id` = iim.`hosp_item_id` AND ic.`item_code` = iim.`hosp_item_type` AND
+        ic.hosp_code = iim.hosp_code)
+        LEFT JOIN insure_individual_cost iic
+        ON ic.id = iic.cost_id
+        AND ic.hosp_code = iic.hosp_code
+        where 1=1 and
+        ic.hosp_code = #{hospCode}
+        and ic.visit_id = #{id}
+        and IFNULL(iim.is_trans,'0') = #{isMatch}
+        and IFNULL(iim.audit_code,'0') =#{isMatch}
+        and IFNULL(iim.is_valid,'0') =#{isMatch}
+        and IFNULL(iim.is_match,'0') =#{isMatch}
+        and ic.settle_code in ('0','1')
+        and iim.insure_reg_code = #{orgCode}
+        <if test="isTransmit != null and isTransmit !=''">
+            and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
+        </if>
+        <if test="isMatch =='1'.toString()">
+            and iim.audit_code='1'
+            and iim.is_valid ='1'
+        </if>
+    </select>
+    <select id="queryOutMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        ic.id,ic.hosp_code,ic.visit_id,
+        ic.item_code,
+        ic.item_name,
+        ic.item_id,
+        ic.price,
+        ic.num,ic.exec_time,ic.crte_name,
+        ic.spec,
+        ic.prep_code,
+        ic.dosage,ic.dosage_unit_code,
+        ic.total_num,ic.total_num_unit_code,ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
+        (select iv.name from inpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
+        ic.settle_code,
+        ic.status_code,
+        ic.crte_time,
+        iim.deductible,
+        iim.is_trans,
+        iim.insure_item_code,
+        iim.insure_item_name,
+        iim.hosp_item_code,
+        iim.hosp_item_name,
+        (
+        CASE
+        WHEN iic.transmit_code IS NULL
+        OR iic.transmit_code = ''
+        THEN '未传输'
+        WHEN iic.transmit_code = '1'
+        THEN '已传输'
+        WHEN iim.is_trans = '0'
+        THEN '未传输'
+        END
+        ) isTransmit
+        FROM
+         outpt_cost  ic
+        JOIN insure_item_match iim ON (ic.`item_id` = iim.`hosp_item_id` AND ic.`item_code` = iim.`hosp_item_type` AND
+        ic.hosp_code = iim.hosp_code)
+        LEFT JOIN insure_individual_cost iic
+        ON ic.id = iic.cost_id
+        AND ic.hosp_code = iic.hosp_code
+        where 1=1 and
+        ic.hosp_code = #{hospCode}
+        and ic.visit_id = #{id}
+        and IFNULL(iim.is_trans,'0') = #{isMatch}
+        and IFNULL(iim.audit_code,'0') =#{isMatch}
+        and IFNULL(iim.is_valid,'0') =#{isMatch}
+        and IFNULL(iim.is_match,'0') =#{isMatch}
+        and ic.settle_code in ('0','1')
+        and iim.insure_reg_code = #{orgCode}
+        <if test="isTransmit != null and isTransmit !=''">
+            and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
+        </if>
+        <if test="isMatch =='1'.toString()">
+            and iim.audit_code='1'
+            and iim.is_valid ='1'
+        </if>
+    </select>
+    <select id="queryInptUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+        (case b.item_code
+        when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code
+        =b.hosp_code )
+        when b.item_code='2' then (select bm.code from base_material bm where b.item_id = bm.id and bm.hosp_code =
+        b.hosp_code )
+        when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code =
+        b.hosp_code)
+        else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+        end
+        ) as hospItemCode,
+        iim.hosp_item_id,
+        b.total_price totalPrice,
+        b.reality_price realityPrice
+        FROM
+        inpt_cost b
+        LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+        join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+        WHERE
+        b.visit_id = #{id}
+        AND (
+        iim.is_trans = '0'
+        OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))
+    </select>
+    <select id="queryOutUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
+        (case b.item_code
+        when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code
+        =b.hosp_code )
+        when b.item_code='2' then (select bm.code from base_material bm where b.item_id = bm.id and bm.hosp_code =
+        b.hosp_code )
+        when b.item_code = '4' then (select ba.code from base_advice ba where b.item_id = ba.id and ba.hosp_code =
+        b.hosp_code)
+        else (select bi.code from base_item bi where b.item_id = bi.id and bi.hosp_code = b.hosp_code)
+        end
+        ) as hospItemCode,
+        iim.hosp_item_id,
+        b.total_price totalPrice,
+        b.reality_price realityPrice
+        FROM
+        out_cost b
+        LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
+        join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+        WHERE
+        b.visit_id = #{id}
+        AND (
+        iim.is_trans = '0'
+        OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))
     </select>
 
     <select id="getSettleInfo" resultType="java.util.Map">

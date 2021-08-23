@@ -6,7 +6,10 @@ import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
 import cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
+import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 
@@ -330,4 +333,12 @@ public interface EmrPatientDAO {
 	List<InptVisitDTO> getPatientInHospVisitId(InptVisitDTO inptVisitDTO);
 
 	List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO);
+
+	List<InptDiagnoseDTO> queryEmrPatientDiagnose(Map map);
+
+	List<OperInfoRecordDO> queryEmrOperRecordInfo(Map map);
+
+	EmrPatientRecordDTO queryEmrCourseInfo(Map map);
+
+	InptVisitDTO getEmrInptVisit(EmrPatientDTO emrPatientDTO);
 }

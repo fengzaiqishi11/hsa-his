@@ -4,7 +4,7 @@
     <!--支付方式统计报表-->
     <select id="queryPayCodeReport" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT t1.settleTime, t2.totalPrice, t2.selfPrice, t2.miPrice, t2.apOffsetPrice, t1.XJprice, t1.POSprice,
-        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice
+        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice,t2.cardPrice
         FROM (
         SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
         IFNULL(SUM(CASE ss.pay_code WHEN '1' THEN ss.price ELSE 0 END ),0) as XJprice,
@@ -15,7 +15,7 @@
         IFNULL(SUM(CASE ss.pay_code WHEN '6' THEN ss.price ELSE 0 END ),0) as ZFBprice
         FROM (
         select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
-        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price
+        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price, a.card_price
         from outpt_settle a
         left join outpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
@@ -39,7 +39,7 @@
         </if>
         UNION ALL
         select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
-        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price
+        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price,0 card_price
         from inpt_settle a
         left join inpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
@@ -63,7 +63,7 @@
         </if>
         UNION ALL
         select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, a.reality_price,
-        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price
+        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price, a.card_price
         from outpt_register_settle a
         left join outpt_register_pay b on a.id = b.rs_id and a.hosp_code = b.hosp_code
         where a.hosp_code = #{hospCode}
@@ -89,10 +89,10 @@
         ) t1 join (
         SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d %H:%i:%s') settleTime,
         sum(reality_price) totalPrice, sum(mi_price) miPrice, sum(self_price) selfPrice, sum(ap_offset_price)
-        apOffsetPrice, sum(trunc_price) truncPrice
+        apOffsetPrice, sum(trunc_price) truncPrice, sum(card_price) cardPrice
         FROM (
         select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
-        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price
+        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price, a.card_price
         from outpt_settle a
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">
@@ -115,7 +115,7 @@
         </if>
         UNION ALL
         select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, reality_price,
-        a.mi_price mi_price, (a.self_price-a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price
+        a.mi_price mi_price, (a.self_price-a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price, 0 card_price
         from inpt_settle a
         where a.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">
@@ -138,7 +138,7 @@
         </if>
         UNION ALL
         select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') as settle_time, a.reality_price,
-        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price
+        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price, a.card_price
         from outpt_register_settle a
         where a.hosp_code = #{hospCode}
         <if test="crteId != null and crteId != ''">

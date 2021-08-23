@@ -239,4 +239,13 @@ public interface InsureGetInfoDAO {
 
     Map<String,Object> getSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
+
+
+    List<InptCostDTO> queryInptMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryOutMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryInptUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryOutUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

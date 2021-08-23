@@ -262,4 +262,6 @@ public interface EmrPatientBO {
 	 * @Return
 	 */
 	List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO);
+
+	Boolean uploadEmrInfo(InptVisitDTO inptVisitDTO);
 }

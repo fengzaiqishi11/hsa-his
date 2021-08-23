@@ -38,6 +38,7 @@ public class InsureAdviceEntryController extends BaseController {
     @Resource
     private InsureAdviceEntryService insureAdviceEntryService_consumer;
 
+
     /**
      * @Method: adviceEntry()
      * @Descrition: 录入在院人员医嘱信息

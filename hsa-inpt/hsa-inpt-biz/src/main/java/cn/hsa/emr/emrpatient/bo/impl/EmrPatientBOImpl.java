@@ -19,7 +19,16 @@ import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
 import cn.hsa.module.emr.emrpatienthtml.dao.EmrPatientHtmlDAO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.emr.emrpatientrecord.dao.EmrPatientRecordDAO;
+import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
+import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
+import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
+import cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO;
+import cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO;
+import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -34,6 +43,7 @@ import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.logging.ErrorManager;
 
 /**
  * @Package_name: cn.hsa.emr.emrpatient.bo.impl
@@ -68,6 +78,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 
 	@Resource
 	private SysParameterService sysParameterService_consumer;
+
+	@Resource
+	private  InsureUnifiedEmrUploadService insureUnifiedEmrUploadService_consumer;
 
 	/**
 	 * @Description: 1、新建病人病历，获取能够使用的病历模板;  前提是病人病历没有归档
@@ -1014,6 +1027,29 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 	@Override
 	public List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO) {
 		return emrPatientDAO.getPatientOutHospVisitId(outptVisitDTO);
+	}
+
+	@Override
+	public Boolean uploadEmrInfo(InptVisitDTO inptVisitDTO) {
+		Map map=new HashMap();
+		map.put("hospCode",inptVisitDTO.getHospCode());
+		map.put("visitId",inptVisitDTO.getVisitId());
+		EmrPatientDTO emrPatientDTO =new EmrPatientDTO();
+		emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
+		emrPatientDTO.setVisitId(inptVisitDTO.getVisitId());
+		InptVisitDTO inptVisitMap = emrPatientDAO.getEmrInptVisit(emrPatientDTO);
+		List<InptDiagnoseDTO> diagnoseDTOS =emrPatientDAO.queryEmrPatientDiagnose(map);
+		List<OperInfoRecordDO> operInfoRecordInfos =emrPatientDAO.queryEmrOperRecordInfo(map);
+		EmrPatientRecordDTO courseRecord =emrPatientDAO.queryEmrCourseInfo(map);
+		Map emrInfoMap =new HashMap();
+		emrInfoMap.put("visitId",inptVisitDTO.getVisitId());
+		emrInfoMap.put("hospCode",map.get("hospCode"));
+		emrInfoMap.put("inptVisit", inptVisitMap);
+		emrInfoMap.put("diagnoseDTOS",diagnoseDTOS);
+		emrInfoMap.put("operInfoRecordInfos",operInfoRecordInfos);
+		emrInfoMap.put("courseRecord",courseRecord);
+		insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(emrInfoMap);
+		return true;
 	}
 
 }

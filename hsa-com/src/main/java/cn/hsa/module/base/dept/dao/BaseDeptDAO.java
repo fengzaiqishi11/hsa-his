@@ -277,4 +277,15 @@ public interface BaseDeptDAO {
      * @Return
      */
     boolean updateBatchDept(@Param("deptDTOList") List<BaseDeptDTO> deptDTOList);
+
+    /**
+     * @Menthod: uploadDeptInfo
+     * @Desrciption: 统一支付平台【3401】-科室信息上传
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-13 16:01
+     * @Return: List<BaseDeptDTO>
+     **/
+    List<BaseDeptDTO> queryBaseDeptByInsure(BaseDeptDTO baseDeptDTO);
 }

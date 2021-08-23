@@ -8,6 +8,7 @@ import cn.hsa.insure.xiangtan.outpt.OutptFunction;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureOutptOutFeeDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
@@ -18,6 +19,9 @@ import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.Constants;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -56,6 +60,9 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
     @Resource
     private SysParameterService sysParameterService_consumer;
 
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
+
     @Override
     public Map<String, Object> getInsureOutptOutFeeInfo(Map<String,Object>map) {
         String hospCode = map.get("hospCode").toString();
@@ -76,15 +83,30 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
         String hospCode = (String) param.get("hospCode");
         String regCode = (String) param.get("regCode");
         // return transpond.<Map>to(hospCode,regCode, Constant.FUNCTION.BIZH110001,param);
-		// 获取系统参数中配置的是否走统一支付平台
+
+        // 根据医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode); //医院编码
+        configDTO.setCode(regCode); // 医保注册编码
+        configDTO.setIsValid(Constants.SF.S); // 是否有效
+        List<InsureConfigurationDTO> configurationDTOList = insureConfigurationDAO.findByCondition(configDTO);
+        if (ListUtils.isEmpty(configurationDTOList)) {
+            throw new RuntimeException("未找到医保机构，请先配置医保信息！");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        // 获取该医保配置是否走统一支付平台，1走，0/null不走
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+		/*// 获取系统参数中配置的是否走统一支付平台
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
         map.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
+
         String bka895 = (String) param.get("bka895");
         if ("qrcode".equals(bka895)){//电子凭证
             return transpond.to(hospCode,regCode,Constant.FUNCTION.FC_EMD_11001,param);
-        } else if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+//        } else if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        } else if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             Map<String, Object> resultMap = insureVisitInfoBO.getInsureVisitInfo(param);
             return resultMap;
 

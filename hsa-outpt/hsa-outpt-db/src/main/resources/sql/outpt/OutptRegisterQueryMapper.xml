@@ -54,9 +54,9 @@
         ov.patient_code,ov.doctor_name as outpatientName,
         ocf.name as outptClassifyName,ov.age_unit_code as ageUnitCode
         from outpt_register opr
-        left join outpt_register_settle ors on opr.id=ors.register_id
-        inner join outpt_visit ov on opr.visit_id = ov.id
-        inner join outpt_classify ocf on opr.cf_id=ocf.id
+        left join outpt_register_settle ors on opr.hosp_code = ors.hosp_code and opr.id=ors.register_id
+        inner join outpt_visit ov on opr.hosp_code =  ov.hosp_code and opr.visit_id = ov.id
+        inner join outpt_classify ocf on opr.hosp_code =  ocf.hosp_code and opr.cf_id=ocf.id
        where opr.hosp_code=#{hospCode}
         <if test="keyword != null and keyword != ''">
             and (opr.name like concat('%',#{keyword},'%')
@@ -81,9 +81,9 @@
     <select id="queryOutptRegisterSum" resultType="java.util.LinkedHashMap">
         select sum(ors.reality_price) as 'realityPriceSum'
         from outpt_register opr
-        left join outpt_register_settle ors on opr.id=ors.register_id
-        inner join outpt_visit ov on opr.visit_id = ov.id
-        inner join outpt_classify ocf on opr.cf_id=ocf.id
+        left join outpt_register_settle ors on opr.hosp_code = ors.hosp_code and opr.id=ors.register_id
+        inner join outpt_visit ov on opr.hosp_code =  ov.hosp_code and opr.visit_id = ov.id
+        inner join outpt_classify ocf on opr.hosp_code =  ocf.hosp_code and opr.cf_id=ocf.id
         where opr.hosp_code=#{hospCode}
         <if test="keyword != null and keyword != ''">
             and (opr.name like concat('%',#{keyword},'%')

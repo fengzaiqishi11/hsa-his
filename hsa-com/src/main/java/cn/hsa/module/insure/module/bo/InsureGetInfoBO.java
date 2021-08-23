@@ -28,6 +28,17 @@ public interface InsureGetInfoBO {
     Map insertSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
     /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 11:35
+     * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
+     **/
+    Map getSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
      * @Method queryInsureCost
      * @Desrciption
      * @Param

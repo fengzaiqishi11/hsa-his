@@ -127,7 +127,9 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String bldCat; // 输血品种 *
 
-    private String outModeName; // 离院方式 *
+    private String outModeName; // 离院方式名称 *
+
+    private String outModeCode; // 离院方式 *
 
     private String billCode; // 票据代码 *
 
@@ -191,7 +193,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String insureCode; // 医保类型
 
-    private String patientCode; // 住院医疗类型
+    private String patientCode; // 病人类型
 
     private String inDeptId; // 入院科别
 

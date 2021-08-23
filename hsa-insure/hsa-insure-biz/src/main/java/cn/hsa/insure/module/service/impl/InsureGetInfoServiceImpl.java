@@ -36,6 +36,22 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         return WrapperResponse.success(insureGetInfoBO.insertSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
     }
 
+
+    /**
+     * @Method getSettleInfo
+     * @Desrciption
+     * @Param
+     * [map]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 11:34
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>>
+     **/
+    @Override
+    public WrapperResponse<Map> getSettleInfo(Map map) {
+        return WrapperResponse.success(insureGetInfoBO.getSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+
     /**
      * @Method getInsureCost
      * @Desrciption

@@ -32,6 +32,18 @@ public interface InsureGetInfoService {
     WrapperResponse<Map> insertSettleInfo(Map map);
 
     /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息获取
+     * @Param
+     * [map]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 10:06
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
+     **/
+    @PostMapping("/service/insure/insureSettleInfo/getSettleInfo")
+    WrapperResponse<Map> getSettleInfo(Map map);
+
+    /**
      * @Method getInsureCost
      * @Desrciption
      * @Param

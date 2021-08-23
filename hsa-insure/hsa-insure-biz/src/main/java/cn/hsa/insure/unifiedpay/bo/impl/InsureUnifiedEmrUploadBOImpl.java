@@ -827,7 +827,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 OperInfoRecordDO operInfoRecordDO=diagnoseDTOS.get(i);
                 diseinfoMap  = new HashMap<>();
                 diseinfoMap.put("oprn_appy_id","无");//	手术申请单号
-                diseinfoMap.put("oprn_seq",operInfoRecordDO.getId());//	手术序列号
+                diseinfoMap.put("oprn_seq","");//	手术序列号
                 diseinfoMap.put("blotype_abo",operInfoRecordDO.getBloodCode());//	血型代码
                 diseinfoMap.put("oprn_time",operInfoRecordDO.getOperPlanTime());//手术日期
                 diseinfoMap.put("oprn_type_code","无"); // 手术分类代码

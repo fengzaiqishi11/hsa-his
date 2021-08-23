@@ -110,4 +110,24 @@ public interface OutinDailyBO {
      * @Return 
      **/
     PageDTO queryAdvancePayCd(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 日结缴款 - 一卡通充值、退款明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:43
+     * @Return
+     */
+    PageDTO queryCardConsumePay(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 日结缴款 - 一卡通消费明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:43
+     * @Return
+     */
+    PageDTO queryCardCzOrTkPay(OutinDailyDTO outinDailyDTO);
 }

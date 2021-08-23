@@ -124,4 +124,26 @@ public interface OutinDailyService {
      **/
     @GetMapping("/service/outpt/daily/queryAdvancePayCd")
     WrapperResponse<PageDTO> queryAdvancePayCd(Map map);
+
+    /**
+     * @Description: 日结缴款 - 一卡通充值、退款明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:40
+     * @Return
+     */
+    @GetMapping("/service/outpt/daily/queryCardCzOrTkPay")
+    WrapperResponse<PageDTO> queryCardCzOrTkPay(Map map);
+
+    /**
+     * @Description: 日结缴款 - 一卡通消费明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:41
+     * @Return
+     */
+    @GetMapping("/service/outpt/daily/queryCardConsumePay")
+    WrapperResponse<PageDTO> queryCardConsumePay(Map map);
 }

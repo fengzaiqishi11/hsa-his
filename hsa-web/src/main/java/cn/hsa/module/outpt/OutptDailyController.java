@@ -294,4 +294,53 @@ public class OutptDailyController extends BaseController {
         map.put("outinDailyDTO", outinDailyDTO);
         return outinDaliyService_consumer.queryAdvancePayCd(map);
     }
+
+    /**
+     * @Description: 一卡通充值、退款明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 17:08
+     * @Return
+     */
+    @GetMapping("/queryCardCzOrTkPay")
+    public WrapperResponse<PageDTO> queryCardCzOrTkPay(OutinDailyDTO outinDailyDTO,HttpServletRequest req, HttpServletResponse res) {
+        if (StringUtils.isEmpty(outinDailyDTO.getDailyNo())) {
+            throw new AppException("缴款单号不能为空");
+        }
+        // 缴款类型合法性校验
+        checkTypeCode(outinDailyDTO);
+        SysUserDTO userDTO = getSession(req, res) ;
+        outinDailyDTO.setHospCode(userDTO.getHospCode());
+        outinDailyDTO.setCrteId(userDTO.getId());
+        Map map = new HashMap();
+        map.put("hospCode", userDTO.getHospCode());
+        map.put("outinDailyDTO", outinDailyDTO);
+        return outinDaliyService_consumer.queryCardCzOrTkPay(map);
+    }
+
+    /**
+     * @Description: 一卡通余额消费明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 17:08
+     * @Return
+     */
+    @GetMapping("/queryCardConsumePay")
+    public WrapperResponse<PageDTO> queryCardConsumePay(OutinDailyDTO outinDailyDTO,HttpServletRequest req, HttpServletResponse res) {
+        if (StringUtils.isEmpty(outinDailyDTO.getDailyNo())) {
+            throw new AppException("缴款单号不能为空");
+        }
+        // 缴款类型合法性校验
+        checkTypeCode(outinDailyDTO);
+        SysUserDTO userDTO = getSession(req, res) ;
+        outinDailyDTO.setHospCode(userDTO.getHospCode());
+        outinDailyDTO.setCrteId(userDTO.getId());
+        Map map = new HashMap();
+        map.put("hospCode", userDTO.getHospCode());
+        map.put("outinDailyDTO", outinDailyDTO);
+        return outinDaliyService_consumer.queryCardConsumePay(map);
+    }
+
 }

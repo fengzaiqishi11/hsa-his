@@ -113,4 +113,15 @@ public interface InptNurseThirdDao {
      * @Return: int
      **/
     int updateList(@Param("editList") List<InptNurseThirdDTO> editList);
+
+    /**
+     * @Menthod: queryAllByVisitId
+     * @Desrciption: 根据就诊id查询出患者在院期间所有护理三测单记录
+     * @Param: visitId
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-22 10:02
+     * @Return:
+     **/
+    List<InptNurseThirdDTO> queryAllByVisitId(Map<String, Object> map);
 }

@@ -509,7 +509,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                 // 计算住院天数
                 Date inTime = inptNurseThirdDTO.getInTimeBatch();
                 Date outTime = inptNurseThirdDTO.getOutTime() == null ? DateUtils.getNow() : inptNurseThirdDTO.getOutTime();
-                int inDays = DateUtils.differentDays(outTime, inTime);
+                int inDays = DateUtils.differentDays(inTime, outTime);
                 if (inDays == 0) {
                     inDays = 1;
                 }
@@ -523,7 +523,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                         // 记录日期早于手术日期
                         inptNurseThirdDTO.setOperationDays(0);
                     } else {
-                        int days = DateUtils.differentDays(recordDate, operDate);
+                        int days = DateUtils.differentDays(operDate, recordDate);
                         if (days == 0) {
                             days = 1; //记录日期与手术日期当天，设置为1
                         }

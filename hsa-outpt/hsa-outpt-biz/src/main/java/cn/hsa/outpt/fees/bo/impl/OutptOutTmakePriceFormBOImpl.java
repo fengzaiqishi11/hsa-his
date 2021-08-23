@@ -22,6 +22,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -891,14 +892,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         map.put("visitId", visitId);
 
         // 根据就诊id查询挂号记录(outpt_register)
-        OutptRegisterDO outptRegisterDO = outptRegisterDAO.getOutptRegisterByVisitId(map);
-        if (outptRegisterDO == null) {
-            throw new RuntimeException("未查询到【" + name + "】相关挂号信息");
-        }
-        // 根据就诊id查询就诊记录(outpt_visit)
-        OutptVisitDO outptVisitDO = outptRegisterDAO.getVisitInfoByVisitId(outptRegisterDO);
-        if (outptVisitDO == null) {
-            throw new RuntimeException("未查询到【" + name + "】相关就诊记录");
+        OutptRegisterDTO outptRegisterDTO = outptRegisterDAO.getOutptRegisterByVisitId(map);
+        if (outptRegisterDTO == null) {
+            throw new RuntimeException("未查询到【" + name + "】相关就诊信息");
         }
         // 根据就诊id查询病历信息(outpt_medical_record)
         List<OutptMedicalRecordDTO> blList = outptVisitDAO.queryMedicalRecordByVisitId(map);
@@ -909,8 +905,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 根据就诊id查询处方信息(outpt_prescribe_detail_ext)
         List<OutptPrescribeDetailsExtDTO> cfList = outptVisitDAO.queryPreDetailExtByVisitId(map);
 
-        map.put("outptRegisterDO", outptRegisterDO);
-        map.put("outptVisitDO", outptVisitDO);
+        map.put("outptRegisterDTO", outptRegisterDTO);
         map.put("blList", blList);
         map.put("zdList", zdList);
         map.put("cfList", cfList);

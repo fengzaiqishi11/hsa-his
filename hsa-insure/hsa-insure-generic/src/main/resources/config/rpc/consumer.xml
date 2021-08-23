@@ -25,6 +25,8 @@
     <dubbo:reference id="baseMaterialService_consumer" interface="cn.hsa.module.base.bmm.service.BaseMaterialService" check="false"/>
     <!-- 住院就诊 -->
     <dubbo:reference id="inptVisitService_consumer" interface="cn.hsa.module.inpt.inregister.service.InptVisitService" check="false"/>
+    <!-- 住院三测单 -->
+    <dubbo:reference id="inptNurseThirdService_consumer" interface="cn.hsa.module.inpt.inptnursethird.service.InptNurseThirdService" check="false"/>
     <!-- 住院婴儿 -->
     <dubbo:reference id="inptBabyService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptBabyService" check="false"/>
 

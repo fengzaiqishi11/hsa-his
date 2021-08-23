@@ -187,7 +187,13 @@ public class InptFunction {
             insureMap.put("bka888",map.get("freeze_sta"));
             insureMap.put("bac001",map.get("official_code"));
             insureMap.put("bac001_name",map.get("official_name"));
+
+            // 省异地医保 - 部分市医保接口人员类别使用pers_type_detail作为返参，部分市医保接口用pers_type作为返参
             insureMap.put("bka035",map.get("pers_type_detail"));
+            Object bak035 = map.get("pers_type");
+            if (bak035 != null && StringUtils.isNotEmpty(bak035.toString())) {
+                insureMap.put("bka035",bak035);
+            }
             insureMap.put("bka006",map.get("treatment_type"));
             insureMap.put("shbzkh",map.get("insr_code"));
             insureMap.put("telephone",map.get("telephone"));
@@ -1082,7 +1088,6 @@ public class InptFunction {
             costItem.put("hos_serial",item.get("id"));//医院费用序列号（医院费用的唯一标识）
             costItem.put("remark","");//备注（用法用量等说明）
             costItem.put("make_flag","");//非工伤费用标志（1：工伤住院业务使用，表示录入的费用为非工伤费用，非工伤费用全部现金支付。该标志用于识别工伤住院期间发生非工伤的医疗费）
-            costItem.put("hos_serial",item.get("id"));//医院费用序列号（医院费用的唯一标识）
             if(Constants.ZTBZ.CH.equals(item.get("statusCode"))) {
                 costItem.put("opp_serial_fee", "1"+SnowflakeUtils.getId().substring(12)+(int)(Math.random()*10));//对应费用序列号
             }else{

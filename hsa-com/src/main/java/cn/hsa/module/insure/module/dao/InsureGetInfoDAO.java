@@ -153,6 +153,31 @@ public interface InsureGetInfoDAO {
      **/
     List<InsureUploadCostDTO> queryAll(InsureSettleInfoDTO insureSettleInfoDTO);
 
+
+    /**
+     * @Method queryID
+     * @Desrciption
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 20:27
+     * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+     **/
+     int queryID(InsureSettleInfoDTO insureSettleInfoDTO);
+
+
+
+    /**
+     * @Method deleteByVisitID
+     * @Desrciption
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 20:27
+     * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+     **/
+    int deleteByVisitID(InsureSettleInfoDTO insureSettleInfoDTO);
+
     /**
      * @Method queryVisit
      * @Desrciption
@@ -207,11 +232,15 @@ public interface InsureGetInfoDAO {
      * @Date   2021-04-13 19:10
      * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
      **/
-    int insertSettleInfo(InsureSetlInfoDTO insureSettleInfoDTO);
+    int insertSettleInfo(Map map);
 
     String getSetlInfoLocal(InsureSettleInfoDTO insureSettleInfoDTO);
-    
-    
+
+
+    Map<String,Object> getSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
+
+
+
     List<InptCostDTO> queryInptMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 
     List<InptCostDTO> queryOutMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);

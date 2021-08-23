@@ -686,8 +686,20 @@
 
     <!--根据就诊id查询病历信息-->
     <select id="queryMedicalRecordByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO">
-        select a.*
+        select
+            b.visit_time,
+            a.chief_complaint,
+            a.start_date,
+            a.present_illness,
+            a.past_history,
+            a.allergy_history,
+            a.handle_suggestion,
+            b.dept_id,
+            (select code from base_dept bd where bd.hosp_code = a.hosp_code and bd.id = b.dept_id) as dept_code,
+            b.dept_name,
+            a.visit_id
         from outpt_medical_record a
+        left join outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
         where a.hosp_code = #{hospCode}
         and a.visit_id = #{visitId}
         order by a.crte_time asc
@@ -695,8 +707,20 @@
 
     <!--根据就诊id查询诊断信息(outpt_diagnose)-->
     <select id="queryDiagnoseByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
-        select a.*
+        select
+            a.id,
+            a.hosp_code,
+            a.disease_id,
+            a.visit_id,
+            a.type_code,
+            a.is_main,
+            a.crte_id,
+            a.crte_name,
+            a.crte_time,
+            b.code as disease_code,
+            b.name as disease_name
         from outpt_diagnose a
+        left join base_disease b on a.hosp_code = b.hosp_code and a.disease_id = b.id
         where a.hosp_code = #{hospCode}
           and a.visit_id = #{visitId}
         order by crte_time asc
@@ -704,10 +728,43 @@
 
     <!--根据就诊id查询处方信息(outpt_prescribe_detail_ext)-->
     <select id="queryPreDetailExtByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
-        select a.*
+        select
+            c.order_no,
+            c.crte_time,
+            c.type_code,
+            a.item_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and a.item_code = scd.value and scd.c_code = 'XMLB') as item_code_name,
+            a.item_id,
+            a.item_name,
+            e.type_code as drug_type_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and e.type_code = scd.value and scd.c_code = 'YPFL') as drug_type_name,
+            e.big_type_code as drug_big_type_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and e.big_type_code = scd.value and scd.c_code = 'YPDL') as drug_big_type_name,
+            b.herb_note_code,
+            (select name from sys_code_detail scd where b.hosp_code = scd.hosp_code and b.herb_note_code = scd.value and scd.c_code = 'ZYJZ') as herb_note_name,
+            a.dosage,
+            a.dosage_unit_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and a.dosage = scd.value and scd.c_code = 'JLDW') as dosage_unit_name,
+            a.prep_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and a.prep_code = scd.value and scd.c_code = 'JXFL') as prep_name,
+            a.spec,
+            a.rate_id,
+            (select name from base_rate br where a.hosp_code = br.hosp_code and a.rate_id = br.id) as rate_name,
+            b.is_skin,
+            d.min_plan_exec_date,
+            d.max_plan_exec_date,
+            b.use_days,
+            a.usage_code,
+            (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and a.usage_code = scd.value and scd.c_code = 'YF') as usage_name
         from outpt_prescribe_detail_ext a
         left join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.opd_id = b.id
         left join outpt_prescribe c on a.hosp_code = c.hosp_code and a.visit_id = b.visit_id and a.op_id = b.id
+        left join (
+            SELECT hosp_code, opd_id, MAX(plan_exec_date) as  max_plan_exec_date, MIN(plan_exec_date) as min_plan_exec_date
+            from outpt_prescribe_exec where hosp_code = #{hospCode} and visit_id = #{visitId}
+            GROUP BY hosp_code, opd_id
+        ) d on a.hosp_code = d.hosp_code and a.opd_id = d.opd_id
+        left join base_drug e on a.hosp_code = e.hosp_code and a.item_id = e.id
         where a.hosp_code = #{hospCode}
           and a.visit_id = #{visitId}
         order by b.group_no, b.group_seq_no asc

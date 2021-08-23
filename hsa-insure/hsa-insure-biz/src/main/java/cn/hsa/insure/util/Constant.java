@@ -682,6 +682,7 @@ public interface Constant {
             public static final String UP_4402 = "4402"; // 住院医嘱记录
 
             public static final String UP_4601 = "4601"; // 输血信息上传
+            public static final String UP_4602 = "4602"; // 护理操作生命体征测量记录
         }
 
         public static class REGISTER {

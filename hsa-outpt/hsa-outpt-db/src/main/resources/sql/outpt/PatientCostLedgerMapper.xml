@@ -1381,19 +1381,7 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
-            and t.bizCode IN
-            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="bfcId != null and bfcId != ''">
-            and t.bfc_id = #{bfcId}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and t.item_name  like '%${keyword}%'
-        </if>
-        ORDER BY t.bizCode ,t.visit_id
+        ORDER BY t.bizCode ,t.visit_id,b.crte_time desc
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、开方医生分组合计-->
@@ -1402,17 +1390,8 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
-            and t.bizCode IN
-            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
-                #{item}
-            </foreach>
-        </if>
         <if test="userId != null and userId != ''">
             and t.doctor_id = #{userId}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and t.item_name  like '%${keyword}%'
         </if>
     </select>
 
@@ -1462,18 +1441,10 @@
         <include refid="MzZyItemPatientSql"></include>
         ) e
         where 1=1
-        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
-            and e.bizCode IN
-            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and e.item_name  like '%${keyword}%'
-        </if>
     </select>
 
     <sql id="MzZyItemPatientSql">
+    <if test="queryType == 'all'.toString() or queryType == 'ZY'.toString()">
         SELECT
         'ZY' bizCode,
         '住院' item_type,
@@ -1509,13 +1480,42 @@
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(b.cost_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and b.cost_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(b.cost_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and b.cost_time &lt;= #{endDate}
         </if>
+        <if test="keyword != null and keyword != ''">
+            and b.item_name  like concat( #{keyword },'%')
+        </if>
+        <if test="sumCode != null and sumCode == '3'.toString()">
+            and b.doctor_id = #{userId}
+        </if>
+        <if test="sumCode != null and sumCode == '1'.toString()">
+            <if test="deptId != null and deptId != ''">
+                and b.dept_id = #{deptId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and b.doctor_id = #{userId}
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                and a.patient_code = #{insureCode}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name  like  concat('%',#{ name },'%')
+            </if>
+        </if>
+        <if test="sumCode != null and sumCode = '4'.toString()">
+            <if test="bfcId != null and bfcId != ''">
+                and b.bfc_id = #{bfcId}
+            </if>
+        </if>
+    </if>
+    <if test="queryType == 'all'.toString()">
         UNION ALL
+    </if>
+    <if test="queryType == 'all'.toString() or queryType == 'MZ'.toString()">
         SELECT
         'MZ' as bizCode,
         '门诊' as  item_type,
@@ -1550,11 +1550,19 @@
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and b.crte_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and b.crte_time  &lt;= #{endDate}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and b.item_name  like concat( #{keyword },'%')
+        </if>
+        <if test="sumCode != null and sumCode == '3'.toString()">
+          <if test="userId != null and userId != ''">
+            and b.doctor_id = #{userId}
+          </if>
         </if>
         UNION ALL
         SELECT
@@ -1592,12 +1600,21 @@
         where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and b.crte_time  &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(b.crte_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and b.crte_time &lt;= #{endDate}
         </if>
+        <if test="keyword != null and keyword != ''">
+            and b.item_name  like concat( #{keyword },'%')
+        </if>
+        <if test="sumCode != null and sumCode == '3'.toString()">
+            <if test="userId != null and userId != ''">
+                and b.crte_id = #{userId}
+            </if>
+        </if>
+    </if>
     </sql>
     <!--门诊住院项目使用量统计查询,按业务类型、开方医生、项目、就诊病人分组-->
     <select id="queryHospitalItemReportInfoGroupOne" resultType="java.util.LinkedHashMap">
@@ -1679,27 +1696,6 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
-            and t.bizCode IN
-            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="deptId != null and deptId != ''">
-            and t.dept_id = #{deptId}
-        </if>
-        <if test="userId != null and userId != ''">
-            and t.doctor_id = #{userId}
-        </if>
-        <if test="insureCode != null and insureCode != ''">
-            and t.patient_code = #{insureCode}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and t.item_name  like '%${keyword}%'
-        </if>
-        <if test="name != null and name != ''">
-            and t.name  like '%${name}%'
-        </if>
     </select>
 
     <!--门诊科室/医生收入统计-->

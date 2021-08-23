@@ -293,6 +293,11 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         if(ListUtils.isEmpty(tyepCodeList)){
             throw new RuntimeException("请选择业务类型进行查询!");
         }
+        if(tyepCodeList.size()>1){
+            paraMap.put("queryType", "all");
+        }else{
+            paraMap.put("queryType", tyepCodeList.get(0));
+        }
         paraMap.put("tyepCodeList", tyepCodeList);
         //门诊住院项目使用量统paraMap计查询
         List<LinkedHashMap<String, Object>> datalist = new ArrayList<>();

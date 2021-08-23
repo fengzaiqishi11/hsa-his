@@ -210,4 +210,13 @@ public interface InsureGetInfoDAO {
     int insertSettleInfo(InsureSetlInfoDTO insureSettleInfoDTO);
 
     String getSetlInfoLocal(InsureSettleInfoDTO insureSettleInfoDTO);
+    
+    
+    List<InptCostDTO> queryInptMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryOutMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryInptUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    List<InptCostDTO> queryOutUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

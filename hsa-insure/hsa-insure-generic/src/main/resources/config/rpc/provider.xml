@@ -63,6 +63,8 @@
     <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService" ref="insureUnifiedEmrUploadService_provider"/>
     <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureReadCardService" ref="insureReadCardService_provider"/>
 
+    <dubbo:service interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" ref="insureStockManagerService_provider"/>
+
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" ref="insureInptTransfusionRecordService_provider"/>
 
 </beans>

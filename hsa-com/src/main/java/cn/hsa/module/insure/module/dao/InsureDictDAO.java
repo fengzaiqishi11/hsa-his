@@ -148,4 +148,15 @@ public interface InsureDictDAO {
      * @Return java.util.Map<java.lang.String,java.lang.Object>
      */
     Map<String,Object> querySysParameterByCode(Map<String,String> param);
+
+    /**
+     * @Method queryDictByCode
+     * @Desrciption  根据编码code  医保机构编码查询码表信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/20 10:22
+     * @Return
+    **/
+    List<InsureDictDTO> queryDictByCode(InsureDictDTO insureDictDTO);
 }

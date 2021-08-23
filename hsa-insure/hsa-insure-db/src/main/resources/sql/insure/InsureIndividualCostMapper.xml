@@ -1191,7 +1191,9 @@
         join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
         WHERE
         b.visit_id = #{id}
-        and iim.insure_reg_code = #{orgCode}
+        <if test="isUnified == '0'.toString()">
+            and iim.insure_reg_code = #{orgCode}
+        </if>
         AND (
         iim.is_trans = '0'
         OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))

@@ -493,7 +493,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         String yybm = MapUtils.get(map,"hospCode");//医院编码
         String systemCode = MapUtils.get(map,"systemCode");//登录系统编码
         String dept_id = MapUtils.get(map,"deptId");//登录科室id
-        String deptType = MapUtils.get(map,"deptType");//登录科室性质
+        String deptType = MapUtils.get(map,"loginDeptType");//登录科室性质
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String toDate = format.format(new Date());
 

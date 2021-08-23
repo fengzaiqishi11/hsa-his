@@ -1453,10 +1453,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as in_time,
-        DATE_FORMAT(a.out_time , '%Y-%m-%d %H:%i:%s') as out_time,
-        DATE_FORMAT(b.cost_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        a.in_time as visit_time,
+        a.in_time as in_time,
+        a.out_time as out_time,
+        b.cost_time as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1473,10 +1473,10 @@
         b.reality_price,
         b.total_num AS num
         FROM
-        inpt_cost b left join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        inpt_cost b join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
         left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
-        left join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
-        left join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+        join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
+        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -1524,10 +1524,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        a.visit_time as visit_time,
         null as in_time,
         null as out_time,
-        DATE_FORMAT( b.crte_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        b.crte_time as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1543,10 +1543,10 @@
         d.name as dept_name,
         b.reality_price ,
         if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
-        FROM outpt_cost   b left join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
         left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
-        left join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
-        left join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+        join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
+        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
         WHERE 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -1573,10 +1573,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        a.visit_time as visit_time,
         null as in_time,
         null as out_time,
-        DATE_FORMAT(c.crte_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        c.crte_time as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1593,10 +1593,10 @@
         b.reality_price,
         if (b.reality_price &lt; 0,-b.num,b.num) AS num
         FROM
-        outpt_register_detail b left join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+        outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
         left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
-        left join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
-        left join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+        join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
+        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
         where 1=1
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -1627,10 +1627,10 @@
         t.gender_code,
         t.age,
         t.patient_code,
-        DATE_FORMAT(t.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-        DATE_FORMAT(t.in_time, '%Y-%m-%d %H:%i:%s') as in_time,
-        DATE_FORMAT(t.out_time, '%Y-%m-%d %H:%i:%s') as out_time,
-        DATE_FORMAT(t.settle_time, '%Y-%m-%d %H:%i:%s') as settle_time,
+        t.visit_time as visit_time,
+        t.in_time as in_time,
+        t.out_time as out_time,
+        t.settle_time as settle_time,
         t.item_id,
         t.bfc_name ,
         t.item_code ,

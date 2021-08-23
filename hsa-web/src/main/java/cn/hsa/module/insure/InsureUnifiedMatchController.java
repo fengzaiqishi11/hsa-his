@@ -218,12 +218,6 @@ public class InsureUnifiedMatchController extends BaseController {
         InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
         // 获取该医保配置是否走统一支付平台，1走，0/null不走
         String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
-
-        /*Map<String, Object> selectmap = new HashMap<>();
-        selectmap.put("hospCode", sysUserDTO.getHospCode());
-        selectmap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(selectmap).getData();
-        if (sys != null && sys.getValue().equals("1")) {*/
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             // 调用统一支付平台
             result = insureUnifiedPayRestService_consumer.insertUnifiedAutoMatch(map);

@@ -56,23 +56,17 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     @Resource
     InsureDiseaseDAO insureDiseaseDAO;
     @Resource
-    private InsureDiseaseMatchDAO insureDiseaseMatchDAO;
-
-    @Resource
     BaseDrugService baseDrugService;
-
     @Resource
     BaseItemService baseItemService;
-
     @Resource
     BaseMaterialService baseMaterialService;
-
     @Resource
     BaseDiseaseService baseDiseaseService;
-
     @Resource
     InsureConfigurationDAO insureConfigurationDAO;
-
+    @Resource
+    private InsureDiseaseMatchDAO insureDiseaseMatchDAO;
     @Resource
     private Transpond transpond;
 
@@ -81,6 +75,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 
     @Resource
     private InsureUnifiedPayRestService insureUnifiedPayRestService;
+
 
     /**
      * @Method queryPage
@@ -95,27 +90,27 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         //设置分页信息
         PageHelper.startPage(insureItemMatchDTO.getPageNo(), insureItemMatchDTO.getPageSize());
         List<InsureItemMatchDTO> insureItemMatchDTOS = insureItemMatchDAO.queryPageOrAll(insureItemMatchDTO);
-        for(InsureItemMatchDTO itemMatchDTO : insureItemMatchDTOS){
-            if(Constant.UnifiedPay.LISTTYPE.containsKey(itemMatchDTO.getItemCode())){
-                if(Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(itemMatchDTO.getItemCode())){
+        for (InsureItemMatchDTO itemMatchDTO : insureItemMatchDTOS) {
+            if (Constant.UnifiedPay.LISTTYPE.containsKey(itemMatchDTO.getItemCode())) {
+                if (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("西药");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("中成药");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("中药饮片");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.YYCL.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.YYCL.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("医用材料");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.FWXX.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.FWXX.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("服务项目");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.MZY.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.MZY.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("民族药");
                 }
-                if(Constant.UnifiedPay.DOWNLOADTYPE.ZZJ.equals(itemMatchDTO.getItemCode())){
+                if (Constant.UnifiedPay.DOWNLOADTYPE.ZZJ.equals(itemMatchDTO.getItemCode())) {
                     itemMatchDTO.setItemCode("自制剂");
                 }
             }
@@ -151,8 +146,8 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     public Boolean addItemMatch(InsureItemMatchDTO insureItemMatchDTO) {
         // 查询有效的药品、项目、材料基础表信息
         Map selectMap = new HashMap();
-        selectMap.put("hospCode",insureItemMatchDTO.getHospCode());
-        selectMap.put("isValid",Constants.SF.S);
+        selectMap.put("hospCode", insureItemMatchDTO.getHospCode());
+        selectMap.put("isValid", Constants.SF.S);
         List<BaseDrugDTO> oldDrugs = insureItemMatchDAO.queryAllDrugsInfo(selectMap);
         List<BaseItemDTO> oldItems = insureItemMatchDAO.queryAllItemsInfo(selectMap);
         List<BaseMaterialDTO> oldMaterials = insureItemMatchDAO.queryAllMaterialsInfo(selectMap);
@@ -516,7 +511,6 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
                 if (insureItemDTOList.size() - k * batchCount >= batchCount) {
 
                     insureItemMatchDTOList = insureItemDTOList.subList(k * batchCount, k * batchCount + batchCount);
-                    ;
                 } else {
                     insureItemMatchDTOList = insureItemDTOList.subList(k * batchCount, insureItemDTOList.size() - 1);
                     stat = false;
@@ -707,43 +701,36 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
                 insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
             }
         } else {
-            BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
-            baseDiseaseDTO.setHospCode(map.get("hospCode").toString());
-            baseDiseaseDTO.setIsValid("1");
-            map.put("baseDiseaseDTO", baseDiseaseDTO);
-            WrapperResponse<List<BaseDiseaseDTO>> wrapperResponse = baseDiseaseService.queryAll(map);
-            List<BaseDiseaseDTO> baseDiseaseDTOList = wrapperResponse.getData(); // 医院端疾病
+            InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
+            insureDiseaseMatchDTO.setHospCode(hospCode);
+            insureDiseaseMatchDTO.setInsureRegCode(insureRegCode);
+            insureDiseaseMatchDTO.setIsMatch("0");
+            insureDiseaseMatchDTO.setAuditCode("0");
+            List<Map<String, Object>> list = insureDiseaseMatchDAO.queryUnMacthAllPage(insureDiseaseMatchDTO);
+            if (ListUtils.isEmpty(list)) {
+                throw new AppException("请进行项目生成！");
+            }
+
             InsureDiseaseDTO insureDiseaseDTO = new InsureDiseaseDTO();
             insureDiseaseDTO.setHospCode(map.get("hospCode").toString());
             insureDiseaseDTO.setInsureRegCode(insureRegCode);
             List<InsureDiseaseDTO> insureDiseaseDTOList = insureDiseaseDAO.queryAll(insureDiseaseDTO); // 医保中心端的疾病
-            if (ListUtils.isEmpty(baseDiseaseDTOList) || ListUtils.isEmpty(insureDiseaseDTOList)) {
-                throw new AppException("自动匹配时，医院端或者医保下载回来的疾病数据集为空");
+            if (ListUtils.isEmpty(insureDiseaseDTOList)) {
+                throw new AppException("自动匹配时，医保端疾病数据集为空!");
             }
-            List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = handDiseaseAutoMatch(baseDiseaseDTOList, insureDiseaseDTOList, map);
-            int batchCount = 1000; // 定义分批处理的数据大小
-            if (!ListUtils.isEmpty(insureDiseaseMatchDTOList)) {
-                if (insureDiseaseMatchDTOList.size() >= 1000) {
-                    List<InsureDiseaseMatchDTO> diseaseDTOList = new ArrayList<>();
-                    for (int i = 0; i < insureDiseaseMatchDTOList.size(); i++) {
-                        diseaseDTOList.add(insureDiseaseMatchDTOList.get(i));
-                        if (batchCount == diseaseDTOList.size() || i == insureDiseaseDTOList.size() - 1) {
-                            insureDiseaseMatchDAO.insertMatchDisease(diseaseDTOList);
-                            diseaseDTOList.clear();
-                        }
-                    }
-                } else {
-                    insureDiseaseMatchDAO.insertMatchDisease(insureDiseaseMatchDTOList);
-                }
-            }
+            List<InsureDiseaseMatchDTO> diseaseMatchDTOList = handDiseaseAutoMatch(list, insureDiseaseDTOList);
 
+            while (diseaseMatchDTOList.size() > 1000) {
+                List<InsureDiseaseMatchDTO> updateList = diseaseMatchDTOList.subList(0, 1000);
+                insureDiseaseMatchDAO.updateInsureDiseaseMatchS(updateList);
+                diseaseMatchDTOList.removeAll(diseaseMatchDTOList.subList(0, 1000));
+            }
+            insureDiseaseMatchDAO.updateInsureDiseaseMatchS(diseaseMatchDTOList);
         }
         return true;
     }
 
     private Boolean addDownloadByHNS(InsureItemMatchDTO insureItemMatchDTO) {
-
-
         Map<String, String> map = new HashMap();
         String firstrow = "0";
         String lastrow = "100000";
@@ -1017,7 +1004,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
             List<InsureItemMatchDTO> insureItemDTOList = MapUtils.get(resultMap, "insureItemDTOList");
             size = insureItemDTOList.size();
             if (!ListUtils.isEmpty(insureItemDTOList)) {
-                for(InsureItemMatchDTO itemMatchDTO : insureItemDTOList){
+                for (InsureItemMatchDTO itemMatchDTO : insureItemDTOList) {
                     itemMatchDTO.setIsTrans(Constants.SF.S);
                     itemMatchDTO.setAuditCode(Constants.SF.S);
                 }
@@ -1041,7 +1028,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         String insureRegCode = insureItemMatchDTO.getInsureRegCode();
         String hospCode = insureItemMatchDTO.getHospCode();
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("hospCode", insureItemMatchDTO.getHospCode());  // 医院编码
        /*map.put("code", "UNIFIED_PAY");
 
@@ -1062,9 +1049,9 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 //        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             InsureItemMatchDTO itemMatchDTO = insureItemMatchDAO.selectInsureItemMatch(insureItemMatchDTO);
-            if(Constants.SF.S.equals(itemMatchDTO.getAuditCode())){
-                map.put("itemMatchDTO",itemMatchDTO);
-                map.put("insureRegCode",itemMatchDTO.getInsureRegCode());
+            if (Constants.SF.S.equals(itemMatchDTO.getAuditCode())) {
+                map.put("itemMatchDTO", itemMatchDTO);
+                map.put("insureRegCode", itemMatchDTO.getInsureRegCode());
                 insureUnifiedPayRestService.UP_3302(map);
             }
             return insureItemMatchDAO.deleteUnifiedInsureItemMatch(insureItemMatchDTO);
@@ -1098,11 +1085,11 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
      */
     @Override
     public Integer updateUplaodInsureItem(InsureItemMatchDTO insureItemMatchDTO) {
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("hospCode", insureItemMatchDTO.getHospCode());
         map.put("insureRegCode", insureItemMatchDTO.getInsureRegCode());
         map.put("hospItemType", insureItemMatchDTO.getHospItemType());
-        Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayRestService.UP_3302(map).getData();
+        Map<String, Object> resultMap = insureUnifiedPayRestService.UP_3302(map).getData();
         List<InsureItemMatchDTO> insureItemMatchDTOList = MapUtils.get(resultMap, "insureItemMatchDTOList");
         if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
             insureItemMatchDAO.modifyInsureItem(insureItemMatchDTOList);
@@ -1113,68 +1100,66 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 
     /**
      * @Method updateInsureItemMatchInfo
-     * @Desrciption   导入医保匹配数据
+     * @Desrciption 导入医保匹配数据
      * @Param
-     *
      * @Author 廖继广
-     * @Date   2021/05/20 05:20
+     * @Date 2021/05/20 05:20
      * @Return
      **/
     @Override
     public Boolean updateInsureItemMatchInfo(Map map) {
-        String insureRegCode = MapUtils.get(map,"insureRegCode");
-        String hospCode = MapUtils.get(map,"hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        String hospCode = MapUtils.get(map, "hospCode");
         List<List<String>> resultList = (List<List<String>>) map.get("resultList");
-        List<Map<String,String>> inputList = new ArrayList<>();
+        List<Map<String, String>> inputList = new ArrayList<>();
 
         // 封装数据
         int i = 1;
         int[] numbers = {0, 1, 2, 3};
         for (List<String> item : resultList) {
-            Map<String,String> inputMap = new HashMap<>();
+            Map<String, String> inputMap = new HashMap<>();
             for (int number : numbers) {
                 String key = item.get(number);
                 if (StringUtils.isEmpty(key)) {
-                    throw new AppException("第" + (i+1) + "行的" + (number+1) + "列数据为空");
+                    throw new AppException("第" + (i + 1) + "行的" + (number + 1) + "列数据为空");
                 }
-                this.createMapData(number,key,inputMap);
+                this.createMapData(number, key, inputMap);
             }
-            inputMap.put("insureRegCode",insureRegCode);
-            inputMap.put("hospCode",hospCode);
+            inputMap.put("insureRegCode", insureRegCode);
+            inputMap.put("hospCode", hospCode);
             inputList.add(inputMap);
-            i ++;
+            i++;
         }
 
         // 批量更新
-        if(ListUtils.isEmpty(inputList)) {
-           throw new AppException("系统未获取到数据");
+        if (ListUtils.isEmpty(inputList)) {
+            throw new AppException("系统未获取到数据");
         }
         return insureItemMatchDAO.updateInsureItemMatchInfo(inputList) > 0;
     }
 
     /**
      * @Method insertInsureItemInfos
-     * @Desrciption   批量查询医保项目数据（下载）
+     * @Desrciption 批量查询医保项目数据（下载）
      * @Param
-     *
      * @Author 廖继广
-     * @Date   2021/05/25 05:20
+     * @Date 2021/05/25 05:20
      * @Return
      **/
     @Override
-    public Map<String,Object> insertInsureItemInfos(Map<String, String> map) {
-        Map<String,Object> sysParamMap = new HashMap<>();
+    public Map<String, Object> insertInsureItemInfos(Map<String, String> map) {
+        Map<String, Object> sysParamMap = new HashMap<>();
         String hospCode = map.get("hospCode");
         String insureRegCode = map.get("insureRegCode");
         String crteId = map.get("userId");
         String crteName = map.get("userName");
-        sysParamMap.put("hospCode",hospCode);
-        sysParamMap.put("code",insureRegCode);
+        sysParamMap.put("hospCode", hospCode);
+        sysParamMap.put("code", insureRegCode);
         WrapperResponse<SysParameterDTO> wr = sysParameterService_consumer.getParameterByCode(sysParamMap);
         if (wr == null || wr.getData() == null || wr.getData().getValue() == null) {
-            throw new AppException("请配置系统参数(" + insureRegCode + ")" );
+            throw new AppException("请配置系统参数(" + insureRegCode + ")");
         }
-        JSONObject  JsonObject  =  JSONObject.parseObject(wr.getData().getValue()).getJSONObject("downloadParams");
+        JSONObject JsonObject = JSONObject.parseObject(wr.getData().getValue()).getJSONObject("downloadParams");
         if (JsonObject == null) {
             throw new AppException("系统参数【" + insureRegCode + "】未配置下载参数(downloadParams)");
         }
@@ -1201,26 +1186,26 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         int lastRow = Integer.parseInt(JsonObject.getString("lastRow"));
         String condition = JsonObject.getString("condition");
         String onceFind = JsonObject.getString("onceFind");
-        List<Map<String,Object>> insureResultList = new ArrayList<>();
-        int totalSize = lastRow-firstRow + 1;
+        List<Map<String, Object>> insureResultList = new ArrayList<>();
+        int totalSize = lastRow - firstRow + 1;
         int downCount = 1;
         if (totalSize > size) {
-            downCount = (int) Math.ceil(totalSize/size);
+            downCount = (int) Math.ceil(totalSize / size);
         }
 
         for (int i = 0; i < downCount; i++) {
             try {
-                Map<String,Object> selectMap = new HashMap<>();
-                selectMap.put("size",String.valueOf(size));
-                selectMap.put("firstVersionId",firstVersionId);
-                selectMap.put("lastVersionId",lastVersionId);
-                selectMap.put("type",type);
-                selectMap.put("firstRow",String.valueOf(firstRow + size*i));
-                selectMap.put("lastRow",String.valueOf(firstRow + (i+1)*size - 1));
-                selectMap.put("condition",condition);
-                selectMap.put("hospCode",hospCode);
-                selectMap.put("insureRegCode",insureRegCode);
-                selectMap.put("onceFind",onceFind);
+                Map<String, Object> selectMap = new HashMap<>();
+                selectMap.put("size", String.valueOf(size));
+                selectMap.put("firstVersionId", firstVersionId);
+                selectMap.put("lastVersionId", lastVersionId);
+                selectMap.put("type", type);
+                selectMap.put("firstRow", String.valueOf(firstRow + size * i));
+                selectMap.put("lastRow", String.valueOf(firstRow + (i + 1) * size - 1));
+                selectMap.put("condition", condition);
+                selectMap.put("hospCode", hospCode);
+                selectMap.put("insureRegCode", insureRegCode);
+                selectMap.put("onceFind", onceFind);
                 List<Map<String, Object>> resultInfo = transpond.to(hospCode, insureRegCode, Constant.FUNCTION.BIZC110118, selectMap);
                 if (ListUtils.isEmpty(resultInfo)) {
                     continue;
@@ -1234,56 +1219,57 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         }
 
         if (ListUtils.isEmpty(insureResultList)) {
-            throw new AppException("医保接口获取下载行数为空（"+ firstRow +" - "+ lastRow +")");
+            throw new AppException("医保接口获取下载行数为空（" + firstRow + " - " + lastRow + ")");
         }
-        return this.updateInsureItemInfo(hospCode,insureRegCode,condition,crteId,crteName,insureResultList);
+        return this.updateInsureItemInfo(hospCode, insureRegCode, condition, crteId, crteName, insureResultList);
     }
 
     /**
      * 医保项目数据更新
+     *
      * @param hospCode
      * @param insureRegCode
      * @param condition
      * @param insureResultList
      * @return
      */
-    private Map<String,Object> updateInsureItemInfo(String hospCode, String insureRegCode, String condition, String crteId,String crteName,List<Map<String, Object>> insureResultList) {
-        Map<String,Object> resultMap = new HashMap<>();
+    private Map<String, Object> updateInsureItemInfo(String hospCode, String insureRegCode, String condition, String crteId, String crteName, List<Map<String, Object>> insureResultList) {
+        Map<String, Object> resultMap = new HashMap<>();
         List<InsureItemDTO> firstArrayList = new ArrayList<>();
-        for (Map<String,Object> insureMap : insureResultList) {
+        for (Map<String, Object> insureMap : insureResultList) {
             InsureItemDTO insureItemDTO = new InsureItemDTO();
             insureItemDTO.setId(SnowflakeUtils.getId());
             insureItemDTO.setHospCode(hospCode);
             insureItemDTO.setInsureRegCode(insureRegCode);
-            insureItemDTO.setItemMark(MapUtils.get(insureMap,"stat_type"));
+            insureItemDTO.setItemMark(MapUtils.get(insureMap, "stat_type"));
             insureItemDTO.setDownLoadType(condition);
-            insureItemDTO.setVer(MapUtils.get(insureMap,"version_id"));
-            insureItemDTO.setVerName(MapUtils.get(insureMap,"version_id"));
-            insureItemDTO.setHospItemName(MapUtils.get(insureMap,"hosp_name"));
-            insureItemDTO.setHospItemCode(MapUtils.get(insureMap,"hosp_code"));
-            insureItemDTO.setItemCode(MapUtils.get(insureMap,"item_code"));
-            insureItemDTO.setItemName(MapUtils.get(insureMap,"item_name"));
-            insureItemDTO.setItemType(MapUtils.get(insureMap,"match_type"));
-            insureItemDTO.setItemDosage(MapUtils.get(insureMap,"model"));
-            insureItemDTO.setItemSpec(MapUtils.get(insureMap,"standard"));
-            insureItemDTO.setItemPrice(BigDecimalUtils.convert(MapUtils.get(insureMap,"hosp_price")));
-            insureItemDTO.setItemUnitCode(MapUtils.get(insureMap,"unit"));
-            insureItemDTO.setProd(MapUtils.get(insureMap,"factory"));
-            insureItemDTO.setDeductible(MapUtils.get(insureMap,"self_scale"));
-            insureItemDTO.setDirectory(MapUtils.get(insureMap,"staple_flag"));
+            insureItemDTO.setVer(MapUtils.get(insureMap, "version_id"));
+            insureItemDTO.setVerName(MapUtils.get(insureMap, "version_id"));
+            insureItemDTO.setHospItemName(MapUtils.get(insureMap, "hosp_name"));
+            insureItemDTO.setHospItemCode(MapUtils.get(insureMap, "hosp_code"));
+            insureItemDTO.setItemCode(MapUtils.get(insureMap, "item_code"));
+            insureItemDTO.setItemName(MapUtils.get(insureMap, "item_name"));
+            insureItemDTO.setItemType(MapUtils.get(insureMap, "match_type"));
+            insureItemDTO.setItemDosage(MapUtils.get(insureMap, "model"));
+            insureItemDTO.setItemSpec(MapUtils.get(insureMap, "standard"));
+            insureItemDTO.setItemPrice(BigDecimalUtils.convert(MapUtils.get(insureMap, "hosp_price")));
+            insureItemDTO.setItemUnitCode(MapUtils.get(insureMap, "unit"));
+            insureItemDTO.setProd(MapUtils.get(insureMap, "factory"));
+            insureItemDTO.setDeductible(MapUtils.get(insureMap, "self_scale"));
+            insureItemDTO.setDirectory(MapUtils.get(insureMap, "staple_flag"));
 
             // add 时间数据处理 by liaojiguang on 2021-08-13
-            String auditDate = MapUtils.get(insureMap,"audit_date").toString();
-            String expireDate = MapUtils.get(insureMap,"expire_date").toString();
+            String auditDate = MapUtils.get(insureMap, "audit_date").toString();
+            String expireDate = MapUtils.get(insureMap, "expire_date").toString();
             if (StringUtils.isNotEmpty(auditDate)) {
-                insureItemDTO.setTakeDate(DateUtils.parse(auditDate,DateUtils.Y_M_DH_M_S));
+                insureItemDTO.setTakeDate(DateUtils.parse(auditDate, DateUtils.Y_M_DH_M_S));
             }
             if (StringUtils.isNotEmpty(expireDate)) {
-                insureItemDTO.setLoseDate(DateUtils.parse(expireDate,DateUtils.Y_M_DH_M_S));
+                insureItemDTO.setLoseDate(DateUtils.parse(expireDate, DateUtils.Y_M_DH_M_S));
             }
-            insureItemDTO.setPym(MapUtils.get(insureMap,"code_py"));
-            insureItemDTO.setWbm(MapUtils.get(insureMap,"code_wb"));
-            insureItemDTO.setIsValid(MapUtils.get(insureMap,"audit_flag"));
+            insureItemDTO.setPym(MapUtils.get(insureMap, "code_py"));
+            insureItemDTO.setWbm(MapUtils.get(insureMap, "code_wb"));
+            insureItemDTO.setIsValid(MapUtils.get(insureMap, "audit_flag"));
             insureItemDTO.setCrteId(crteId);
             insureItemDTO.setCrteName(crteName);
             insureItemDTO.setCrteTime(DateUtils.getNow());
@@ -1333,31 +1319,32 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 
     @Override
     public PageDTO queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO) {
-        PageHelper.startPage(insureItemMatchDTO.getPageNo(),insureItemMatchDTO.getPageSize());
-        List<Map<String,Object>> insureDiseaseDTOList= insureItemMatchDAO.queryUnMacthAllPage(insureItemMatchDTO);
+        PageHelper.startPage(insureItemMatchDTO.getPageNo(), insureItemMatchDTO.getPageSize());
+        List<Map<String, Object>> insureDiseaseDTOList = insureItemMatchDAO.queryUnMacthAllPage(insureItemMatchDTO);
         return PageDTO.of(insureDiseaseDTOList);
     }
 
     /**
      * 封装导入的数据
+     *
      * @param num
      * @param key
      * @param inputMap
      * @return
      */
-    private Map<String,String> createMapData(int num,String key,Map<String,String> inputMap) {
+    private Map<String, String> createMapData(int num, String key, Map<String, String> inputMap) {
         switch (num) {
             case 0:
-                inputMap.put("hospItemCode",key);
+                inputMap.put("hospItemCode", key);
                 break;
             case 1:
-                inputMap.put("hospItemName",key);
+                inputMap.put("hospItemName", key);
                 break;
             case 2:
-                inputMap.put("insureItemCode",key);
+                inputMap.put("insureItemCode", key);
                 break;
             case 3:
-                inputMap.put("insureItemName",key);
+                inputMap.put("insureItemName", key);
                 break;
             default:
                 break;
@@ -1451,70 +1438,34 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     }
 
     /**
-     * @param baseDiseaseDTOList
+     * @param uNMacthList
      * @param insureDiseaseDTOList
-     * @param map
-     * @Method handDrugAutoMatch
-     * @Desrciption 处理疾病自动匹配
-     * @Param baseDrugDTOList:医院端的疾病集合
-     * insureItemDTOList：从医保下载回来的疾病集合
-     * map：封装参数信息医院编码，医疗机构编码 创建人，id，时间
-     * @Author fuhui
+     * @param
+     *
+     * @Author 廖继广 update by 2021-08-23
      * @Date 2021/1/27 21:12
      * @Return
      */
-    private List<InsureDiseaseMatchDTO> handDiseaseAutoMatch(List<BaseDiseaseDTO> baseDiseaseDTOList, List<InsureDiseaseDTO> insureDiseaseDTOList, Map map) {
-        String userId = map.get("userId").toString();
-        String userName = map.get("userName").toString();
+    private List<InsureDiseaseMatchDTO> handDiseaseAutoMatch(List<Map<String, Object>> uNMacthList, List<InsureDiseaseDTO> insureDiseaseDTOList) {
         List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = new ArrayList<>();
-        Map<String, InsureDiseaseDTO> collect = insureDiseaseDTOList.stream().collect(Collectors.toMap(InsureDiseaseDTO::getInsureIllnessName, Function.identity(), (k1, k2) -> k1));
-        for (BaseDiseaseDTO baseDiseaseDTO : baseDiseaseDTOList) {
-            if (!collect.isEmpty() && collect.containsKey(baseDiseaseDTO.getName())) {
-                InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
-                insureDiseaseMatchDTO.setId(SnowflakeUtils.getId()); //主键id
-                insureDiseaseMatchDTO.setHospCode(baseDiseaseDTO.getHospCode()); //  医院编码
-                insureDiseaseMatchDTO.setInsureRegCode(collect.get(baseDiseaseDTO.getName()).getInsureRegCode()); // 医保注册编码
-                insureDiseaseMatchDTO.setHospIllnessId(baseDiseaseDTO.getId()); //医院疾病ID
-                insureDiseaseMatchDTO.setHospIllnessCode(baseDiseaseDTO.getCode()); // 医院ICD编码
-                insureDiseaseMatchDTO.setHospIllnessName(baseDiseaseDTO.getName()); // 医院ICD名称
-                insureDiseaseMatchDTO.setInsureIllnessId(collect.get(baseDiseaseDTO.getName()).getInsureIllnessId()); // 医保中心疾病ID
-                insureDiseaseMatchDTO.setInsureIllnessCode(collect.get(baseDiseaseDTO.getName()).getInsureIllnessCode()); // 医保中心ICD编码
-                insureDiseaseMatchDTO.setInsureIllnessName(collect.get(baseDiseaseDTO.getName()).getInsureIllnessName()); // 医保中心ICD名称
-                insureDiseaseMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
-                insureDiseaseMatchDTO.setIsTrans(Constants.SF.S); // 是否传输
-                insureDiseaseMatchDTO.setAuditCode(Constants.SF.S); //审批状态代码
-                insureDiseaseMatchDTO.setRemark(collect.get(baseDiseaseDTO.getName()).getRemark()); // 备注
-                insureDiseaseMatchDTO.setCrteId(userId); // 创建人ID
-                insureDiseaseMatchDTO.setCrteName(userName); // 创建人姓名
-                insureDiseaseMatchDTO.setCrteTime(DateUtils.getNow()); // 创建时间
-                insureDiseaseMatchDTOList.add(insureDiseaseMatchDTO);
-
-            }
-        }
-        InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
-        insureDiseaseMatchDTO.setHospCode(map.get("hospCode").toString());
-        insureDiseaseMatchDTO.setInsureRegCode(map.get("regCode").toString());
-        insureDiseaseMatchDTO.setIsMatch(Constants.SF.S);
-        /**
-         *      1.查询已经匹配的疾病信息
-         *      2.如果匹配疾病为空，则直接跳出不做判断，返回上一步 匹配好的数据
-         *      3.如果不为空，则需要把刚刚自动匹配好的数据和以前匹配的数据做对比，防止重复插入数据
-         */
-        List<InsureDiseaseMatchDTO> diseaseMatchDTOList = insureDiseaseMatchDAO.queryAll(insureDiseaseMatchDTO);
-        if (!ListUtils.isEmpty(diseaseMatchDTOList)) {
-            List<InsureDiseaseMatchDTO> matchDTOList = new ArrayList<>();
-            Map<String, InsureDiseaseMatchDTO> diseaseMatchDTOMap = diseaseMatchDTOList.stream().collect(Collectors.toMap(InsureDiseaseMatchDTO::getHospIllnessId, Function.identity(), (k1, k2) -> k1));
-            if (!ListUtils.isEmpty(insureDiseaseMatchDTOList)) {
-                for (InsureDiseaseMatchDTO diseaseMatchDTO : insureDiseaseMatchDTOList) {
-                    if (!diseaseMatchDTOMap.isEmpty() && !diseaseMatchDTOMap.containsKey(diseaseMatchDTO.getHospIllnessId())) {
-                        matchDTOList.add(diseaseMatchDTO);
-                    }
+        for (Map<String, Object> uNMatchMap : uNMacthList) {
+            for (InsureDiseaseDTO insureDiseaseDTO : insureDiseaseDTOList) {
+                if (uNMatchMap.get("hospItemCode").equals(insureDiseaseDTO.getInsureIllnessCode())
+                        || uNMatchMap.get("hospItemName").equals(insureDiseaseDTO.getInsureIllnessName())) {
+                    InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
+                    insureDiseaseMatchDTO.setId(uNMatchMap.get("id").toString());
+                    insureDiseaseMatchDTO.setInsureRegCode(uNMatchMap.get("insureRegCode").toString());
+                    insureDiseaseMatchDTO.setHospCode(insureDiseaseDTO.getHospCode());
+                    insureDiseaseMatchDTO.setIsMatch("1");
+                    insureDiseaseMatchDTO.setAuditCode("1");
+                    insureDiseaseMatchDTO.setInsureIllnessCode(insureDiseaseDTO.getInsureIllnessCode());
+                    insureDiseaseMatchDTO.setInsureIllnessName(insureDiseaseDTO.getInsureIllnessName());
+                    insureDiseaseMatchDTOList.add(insureDiseaseMatchDTO);
+                    break;
                 }
             }
-            return matchDTOList;
-        } else {
-            return insureDiseaseMatchDTOList;
         }
+        return insureDiseaseMatchDTOList;
     }
 
 
@@ -1732,11 +1683,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 
 
     Boolean handNull(Object object) {
-        if (object == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return object != null;
     }
 
     private Boolean saveBatchList(List dataList, String type) {
@@ -1744,13 +1691,13 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         if (dataSize == 0) {
             return true;
         } else if (dataSize > 0 && dataSize <= 1000) {
-            insertItems(type,dataList);
+            insertItems(type, dataList);
         } else if (dataSize > 1000) {
             List dataTemp = new ArrayList<>();
-            for (int i=0 ;i < dataSize; i++) {
+            for (int i = 0; i < dataSize; i++) {
                 dataTemp.add(dataList.get(i));
-                if (dataTemp.size() == 1000 || (i+1) == dataSize) {
-                    insertItems(type,dataTemp);
+                if (dataTemp.size() == 1000 || (i + 1) == dataSize) {
+                    insertItems(type, dataTemp);
                     dataTemp = new ArrayList();
                 }
             }
@@ -1758,9 +1705,9 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         return true;
     }
 
-    private void insertItems(String type,List dataTemp) {
+    private void insertItems(String type, List dataTemp) {
         switch (type) {
-            case "drug" :
+            case "drug":
                 insureItemMatchDAO.insertHospDrug(dataTemp);
                 break;
             case "item":
@@ -1771,8 +1718,6 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
                 break;
         }
     }
-
-
 
 
 }

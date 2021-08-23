@@ -3,6 +3,7 @@ package cn.hsa.module.inpt.inptnursethird.service;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
+import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,4 +130,15 @@ public interface InptNurseThirdService {
      **/
     @PostMapping("/service/inpt/inptNursethird/saveBatch")
     WrapperResponse<Boolean> saveBatch(Map map);
+
+    /**
+     * @Menthod: queryAllByVisitId
+     * @Desrciption: 根据就诊id查询出患者在院期间所有护理三测单记录
+     * @Param: visitId
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-22 10:02
+     * @Return:
+     **/
+    WrapperResponse<List<InptNurseThirdDTO>> queryAllByVisitId(Map<String, Object> map);
 }

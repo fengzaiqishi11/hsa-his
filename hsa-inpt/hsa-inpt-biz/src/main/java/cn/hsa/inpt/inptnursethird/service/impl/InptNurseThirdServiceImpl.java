@@ -10,6 +10,7 @@ import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import sun.awt.windows.WWindowPeer;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -155,5 +156,19 @@ public class InptNurseThirdServiceImpl implements InptNurseThirdService {
     @Override
     public WrapperResponse<Boolean> saveBatch(Map map) {
         return WrapperResponse.success(inptNurseThirdBO.saveBatch(MapUtils.get(map, "inptNurseThirdDTOS")));
+    }
+
+    /**
+     * @Menthod: queryAllByVisitId
+     * @Desrciption: 根据就诊id查询出患者在院期间所有护理三测单记录
+     * @Param: visitId
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-22 10:02
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<InptNurseThirdDTO>> queryAllByVisitId(Map<String, Object> map) {
+        return WrapperResponse.success(inptNurseThirdBO.queryAllByVisitId(map));
     }
 }

@@ -415,7 +415,7 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(MapUtils.get(map,"hospCode")); //医院编码
-        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setRegCode(insureRegCode); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         Map configMap = new LinkedHashMap();
         configMap.put("hospCode", MapUtils.get(map,"hospCode"));

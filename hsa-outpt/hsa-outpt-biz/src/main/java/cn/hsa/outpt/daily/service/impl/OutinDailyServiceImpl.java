@@ -163,4 +163,30 @@ public class OutinDailyServiceImpl implements OutinDailyService {
     public WrapperResponse<PageDTO> queryAdvancePayCd(Map map) {
         return WrapperResponse.success(outinDailyBO.queryAdvancePayCd(MapUtils.get(map, "outinDailyDTO")));
     }
+
+    /**
+     * @Description: 日结缴款 - 一卡通充值、退款明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:41
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryCardCzOrTkPay(Map map) {
+        return WrapperResponse.success(outinDailyBO.queryCardCzOrTkPay(MapUtils.get(map, "outinDailyDTO")));
+    }
+
+    /**
+     * @Description: 日结缴款 - 一卡通消费明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:41
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryCardConsumePay(Map map) {
+        return WrapperResponse.success(outinDailyBO.queryCardConsumePay(MapUtils.get(map, "outinDailyDTO")));
+    }
 }

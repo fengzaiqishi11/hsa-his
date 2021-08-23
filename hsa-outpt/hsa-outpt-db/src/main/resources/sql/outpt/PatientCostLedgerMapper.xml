@@ -3540,16 +3540,16 @@
         settle.is_settle = '1'
         AND a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -3587,16 +3587,16 @@
         left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -3626,16 +3626,16 @@
         join outpt_visit visit on visit.id = settle.visit_id
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
@@ -3661,16 +3661,16 @@
         join outpt_visit visit on visit.id = a.visit_id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
@@ -3697,16 +3697,16 @@
         join outpt_visit visit on visit.id = settle.visit_id
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
@@ -3730,16 +3730,16 @@
         join outpt_visit visit on visit.id = a.visit_id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and visit.name like concat('%',#{name},'%')
@@ -3776,16 +3776,16 @@
         join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -3813,16 +3813,16 @@
         join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -3849,16 +3849,16 @@
         join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and startTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -5545,11 +5545,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;=DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
 
         union all
@@ -5569,11 +5569,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.settle_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.settle_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         union all
         select
@@ -5591,11 +5591,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and date(a.crte_time) &gt;=date(#{startDate})
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &gt;=DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and date(a.crte_time) &lt;= date(#{endDate})
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         ) t group by t.crteId
     </select>

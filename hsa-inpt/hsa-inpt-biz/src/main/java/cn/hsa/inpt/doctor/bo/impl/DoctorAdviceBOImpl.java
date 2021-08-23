@@ -232,7 +232,8 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         if(!ListUtils.isEmpty(inptAdviceDTOList)){
             InptVisitDTO inptVisitDTO = inptAdviceDAO.checkBalance(inptAdviceDTOList.get(0));
             if(inptVisitDTO != null){
-                throw new AppException("您已欠费，不能在开医嘱,最多欠费："+inptVisitDTO.getQfCose()+"元,您当前余额："+inptVisitDTO.getTotalBalance()+"元");
+                throw new AppException("您已欠费，不能在开医嘱,最多欠费："+inptVisitDTO.getQfCose()+"元,您当前余额："
+                        + inptVisitDTO.getTotalBalance().setScale(2,BigDecimal.ROUND_HALF_UP) +"元");
             }
         }
 
@@ -1133,7 +1134,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             parmInptAdvice.setHospCode(inptAdviceDTO.getHospCode());
             inptVisitDTO = inptAdviceDAO.checkBalance(parmInptAdvice);
             if (inptVisitDTO != null) {
-                throw new AppException("您已欠费，不能在开医嘱,最多欠费：" + inptVisitDTO.getQfCose() + "元,您当前余额：" + inptVisitDTO.getTotalBalance() + "元");
+                throw new AppException("您已欠费，不能在开医嘱,最多欠费：" + inptVisitDTO.getQfCose() + "元,您当前余额：" + inptVisitDTO.getTotalBalance()+ "元");
             }
         } else {
             throw new AppException("保存失败,未获取到医嘱信息!");

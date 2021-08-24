@@ -90,5 +90,6 @@ public class InsureItemDO extends PageDO implements Serializable {
         private int size;
         private int num;
         private int recordCounts;
+        private String keyWord;
 
 }

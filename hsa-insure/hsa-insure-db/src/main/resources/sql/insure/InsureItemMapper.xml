@@ -62,7 +62,7 @@
           and id = #{id}
     </select>
 
-    <select id="getInsureItemById" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+    <select id="getInsureItemById" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
         select id, hosp_code, insure_reg_code, item_mark,
                item_code, item_name, item_type, item_dosage, item_spec,
                item_price, item_unit_code, prod, deductible, check_price, directory,

@@ -994,7 +994,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if (ListUtils.isEmpty(deptDTOList)) {
             throw new RuntimeException("未发现需要上传的科室信息");
         }
-        log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
 
         // 入参封装
         Map<String, Object> inputMap = new HashMap<>();
@@ -1052,7 +1051,17 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             });
             inputMap.put("deptinfo", mapList);
         }
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap);
+
+        // 返参map
+        Map<String, Object> resultMap = new HashMap<>();
+        if (deptDTOList.size() == 1) {
+            log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+            resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap);
+        } else if (deptDTOList.size() > 1) {
+            log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+            resultMap = commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap);
+        }
+
         // 上传完成后，更新本地科室表上传状态
         map.put("deptDTOList", deptDTOList);
         baseDeptService_consumer.updateBatchDept(map).getData();

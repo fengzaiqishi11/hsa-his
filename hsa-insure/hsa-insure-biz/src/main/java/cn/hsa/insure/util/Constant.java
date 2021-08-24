@@ -728,6 +728,7 @@ public interface Constant {
 
 
             public static final String UP_3401 = "3401"; // 科室信息上传
+            public static final String UP_3401A = "3401A"; // 批量科室信息上传
             public static final String UP_3402 = "3402"; // 科室信息变更
             public static final String UP_3403 = "3403"; //科室信息撤销
 

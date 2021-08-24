@@ -43,6 +43,10 @@
     <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
         select * from insure_disease where hosp_code =#{hospCode} and id =#{id}
     </select>
+    <select id="getInsureDiseaseById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name
+        from insure_disease where hosp_code =#{hospCode} and id =#{insureId} and insure_reg_code = #{insureRegCode}
+    </select>
     <select id="selectLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO" parameterType="map">
         select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date,
                lose_date, remark, crte_id, crte_name, crte_time, ver, ver_name, down_load_type,num,size,record_counts from insure_disease

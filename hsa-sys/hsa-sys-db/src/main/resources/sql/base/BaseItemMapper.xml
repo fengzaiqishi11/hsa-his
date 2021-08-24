@@ -561,7 +561,7 @@
 		</if>
 	</select>
     <select id="queryUnifiedPage" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
-		select a.id, a.hosp_code, nation_code, type_code, bfc_code,
+		select a.id, a.hosp_code, a.nation_code, type_code, bfc_code,
 		       code, name, abbr, spec, price, one_price, two_price,
 		       three_price, unit_code, intension, prompt, except, remark,
 		       is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code,

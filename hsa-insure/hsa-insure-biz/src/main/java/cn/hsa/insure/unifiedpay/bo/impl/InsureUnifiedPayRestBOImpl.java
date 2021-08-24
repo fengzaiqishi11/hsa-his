@@ -656,7 +656,16 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      **/
     public Map<String, Object> getMedisnInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        String orgCode = MapUtils.get(map, "orgCode");
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("code","HOSP_INSURE_CODE");
+        String orgCode = "";
+        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+        if(data !=null){
+            orgCode = data.getValue();
+        }else{
+            throw  new AppException("请先配置医疗机构系统参数");
+        }
         String insureServiceType = MapUtils.get(map, "insureServiceType");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);

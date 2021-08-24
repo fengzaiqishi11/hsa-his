@@ -1034,21 +1034,29 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		Map map=new HashMap();
 		map.put("hospCode",inptVisitDTO.getHospCode());
 		map.put("visitId",inptVisitDTO.getVisitId());
+		map.put("deptId",inptVisitDTO.getInDeptId());
 		EmrPatientDTO emrPatientDTO =new EmrPatientDTO();
 		emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
 		emrPatientDTO.setVisitId(inptVisitDTO.getVisitId());
-		InptVisitDTO inptVisitMap = emrPatientDAO.getEmrInptVisit(emrPatientDTO);
-		List<InptDiagnoseDTO> diagnoseDTOS =emrPatientDAO.queryEmrPatientDiagnose(map);
-		List<OperInfoRecordDO> operInfoRecordInfos =emrPatientDAO.queryEmrOperRecordInfo(map);
-		EmrPatientRecordDTO courseRecord =emrPatientDAO.queryEmrCourseInfo(map);
-		Map emrInfoMap =new HashMap();
-		emrInfoMap.put("visitId",inptVisitDTO.getVisitId());
-		emrInfoMap.put("hospCode",map.get("hospCode"));
-		emrInfoMap.put("inptVisit", inptVisitMap);
-		emrInfoMap.put("diagnoseDTOS",diagnoseDTOS);
-		emrInfoMap.put("operInfoRecordInfos",operInfoRecordInfos);
-		emrInfoMap.put("courseRecord",courseRecord);
-		insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(emrInfoMap);
+		List<EmrPatientDTO> emrPatientDTOS=emrPatientDAO.queryEmrPaitentInfo(map);
+		if (emrPatientDTOS!=null&&emrPatientDTOS.size()>0) {
+			InptVisitDTO inptVisitMap = emrPatientDAO.getEmrInptVisit(emrPatientDTO);
+			List<InptDiagnoseDTO> diagnoseDTOS = emrPatientDAO.queryEmrPatientDiagnose(map);
+			List<OperInfoRecordDO> operInfoRecordInfos = emrPatientDAO.queryEmrOperRecordInfo(map);
+			EmrPatientRecordDTO courseRecord = emrPatientDAO.queryEmrCourseInfo(map);
+			EmrPatientRecordDTO outRecord = emrPatientDAO.queryEmrOutInfo(map);
+			Map emrInfoMap = new HashMap();
+			emrInfoMap.put("visitId", inptVisitDTO.getVisitId());
+			emrInfoMap.put("hospCode", map.get("hospCode"));
+			emrInfoMap.put("inptVisit", inptVisitMap);
+			emrInfoMap.put("diagnoseDTOS", diagnoseDTOS);
+			emrInfoMap.put("operInfoRecordInfos", operInfoRecordInfos);
+			emrInfoMap.put("courseRecord", courseRecord);
+			emrInfoMap.put("outRecord", outRecord);
+			insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(emrInfoMap);
+		}else {
+			throw new AppException("该病人还没写电子病历，不能进行上传");
+		}
 		return true;
 	}
 

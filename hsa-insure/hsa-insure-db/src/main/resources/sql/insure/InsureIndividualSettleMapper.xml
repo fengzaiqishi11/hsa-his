@@ -1091,6 +1091,11 @@
     </select>
     <select id="queryInptSettle" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
         select * from inpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
+                                    and status_code ='0'
+    </select>
+    <select id="queryOutptSettle" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select * from outpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
+        and status_code ='0'
     </select>
 
 </mapper>

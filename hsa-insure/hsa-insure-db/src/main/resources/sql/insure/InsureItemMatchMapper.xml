@@ -402,7 +402,7 @@
         insure_item_unit_code, insure_item_prep_code, insure_item_price,
         deductible, standard_code, check_price, manufacturer, audit_code,
         is_match, is_trans, is_valid, take_date,
-        lose_date, pym, wbm, crte_id, crte_name, crte_time,tcmdrug_used_way) values
+        lose_date, pym, wbm, crte_id, crte_name, crte_time,tcmdrug_used_way,nation_code) values
         <foreach collection="insureItemMatchDTOList" item="item" index="index" separator=",">
             (#{item.id},#{item.hospCode}, #{item.insureRegCode}, #{item.itemCode}, #{item.molssItemId},
             #{item.pqccItemId}, #{item.hospItemId}, #{item.hospItemName}, #{item.hospItemCode}, #{item.hospItemType},
@@ -412,7 +412,7 @@
             #{item.standardCode}, #{item.checkPrice}, #{item.manufacturer}, #{item.auditCode}, #{item.isMatch},
             #{item.isTrans}, #{item.isValid},
             #{item.takeDate}, #{item.loseDate}, #{item.pym}, #{item.wbm}, #{item.crteId}, #{item.crteName},
-            #{item.crteTime},#{item.tcmdrugUsedWay}
+            #{item.crteTime},#{item.tcmdrugUsedWay},#{item.nationCode}
             )
         </foreach>
     </insert>
@@ -741,9 +741,6 @@
     <update id="updateInsureItemMatch">
             update insure_item_match
             <set>
-                <if test="hospCode != null and hospCode != ''">
-                    hosp_code = #{hospCode},
-                </if>
                 <if test="insureRegCode != null and insureRegCode != ''">
                     insure_reg_code = #{insureRegCode},
                 </if>
@@ -855,8 +852,11 @@
                 <if test="tcmdrugUsedWay != null and tcmdrugUsedWay != ''">
                     tcmdrug_used_way = #{tcmdrugUsedWay},
                 </if>
+                <if test="nationCode != null and nationCode != ''">
+                    nation_code = #{nationCode},
+                </if>
             </set>
-            where id = #{id}
+            where id = #{id} and hosp_code = #{hospCode}
         </update>
     <delete id="deleteHospItem">
         delete

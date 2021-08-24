@@ -3049,15 +3049,24 @@
         SELECT
         <if test="type != null and type !=''">
             CONCAT(
-            ov.NAME,'/',
-            (CASE ov.gender_code WHEN '0' THEN '未知的性别'
-            WHEN '1' THEN '男' WHEN '2' THEN '女'
-            WHEN '9' THEN '未说明的性别' ELSE '' END ),
-            '/',IFNULL( ov.age, '-' ),
-            (CASE ov.age_unit_code
-            WHEN '1' THEN '岁' WHEN '2' THEN '月'
-            WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
-            ) keyword,
+            ov.NAME,
+            '/',
+            IFNULL((SELECT
+            s.name
+            FROM
+            sys_code_detail s
+            WHERE s.c_code = 'XB'
+            AND s.hosp_code = #{hospCode}
+            AND s.value = ov.gender_code),'-'),
+            '/',
+            IFNULL(ov.age,'-'),
+            IFNULL((SELECT
+            s.name
+            FROM
+            sys_code_detail s
+            WHERE s.c_code = 'NLDW'
+            AND s.hosp_code = #{hospCode}
+            AND s.value = ov.age_unit_code),'')) keyword,
         </if>
         ov.id,
         ov.hosp_code,

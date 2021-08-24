@@ -49,6 +49,6 @@ public interface InsureInptTransfusionRecordService {
      */
     WrapperResponse<List<InsureInptTransfusionRecordDTO>> queryInsureInptTransfusionRecords(Map<String,Object> param);
     /** 传输信息到统一支付平台 **/
-    WrapperResponse<Boolean> transferInsureInptTranfusionRecords(Map<String,Object> param);
+    WrapperResponse<Boolean> updateTransferInsureInptTranfusionRecords(Map<String,Object> param);
 
 }

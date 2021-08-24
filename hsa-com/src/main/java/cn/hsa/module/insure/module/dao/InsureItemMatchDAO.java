@@ -312,4 +312,8 @@ public interface InsureItemMatchDAO {
      * @return
      */
     List<Map<String, Object>> queryUnMacthAllPage(InsureItemMatchDTO insureItemMatchDTO);
+
+    List<InsureItemMatchDTO> queryUnMacthAllDtoPage(InsureItemMatchDTO insureItemMatchDTO);
+
+    int deleteInsureItemInfos(InsureItemMatchDTO insureItemMatchDTO);
 }

@@ -506,9 +506,14 @@
             a.card_price as cardPrice,
             CONCAT(
             b.name,'/',
-            IFNULL((select name from sys_code_detail where hosp_code = a.hosp_code and hosp_code = #{hospCode} and c_code = 'XB' and value = b.gender_code),'-'),'/',
-            IFNULL(b.age,'-'),
-            IFNULL((select name from sys_code_detail where hosp_code = a.hosp_code and hosp_code = #{hospCode} and c_code = 'NLDW' and value = b.age_unit_code),'')
+                (CASE b.gender_code WHEN '0' THEN '未知的性别'
+                WHEN '1' THEN '男' WHEN '2' THEN '女'
+                WHEN '9' THEN '未说明的性别' ELSE '' END ),
+                '/',IFNULL( b.age, '-' ),
+                (CASE b.age_unit_code
+                WHEN '1' THEN '岁' WHEN '2' THEN '月'
+                WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+                )
             ) AS personInfo,
             (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
             (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,

@@ -91,7 +91,7 @@ public class InsureUnifiedMatchController extends BaseController {
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(sysUserDTO.getHospCode()); //医院编码
-        configDTO.setCode(insureRegCode); // 医保注册编码
+        configDTO.setRegCode(insureRegCode); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         Map configMap = new LinkedHashMap();
         configMap.put("hospCode", sysUserDTO.getHospCode());
@@ -206,7 +206,7 @@ public class InsureUnifiedMatchController extends BaseController {
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(sysUserDTO.getHospCode()); //医院编码
-        configDTO.setCode(insureItemMatchDTO.getRegCode()); // 医保注册编码
+        configDTO.setRegCode(insureItemMatchDTO.getRegCode()); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         Map configMap = new LinkedHashMap();
         configMap.put("hospCode", sysUserDTO.getHospCode());
@@ -218,12 +218,6 @@ public class InsureUnifiedMatchController extends BaseController {
         InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
         // 获取该医保配置是否走统一支付平台，1走，0/null不走
         String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
-
-        /*Map<String, Object> selectmap = new HashMap<>();
-        selectmap.put("hospCode", sysUserDTO.getHospCode());
-        selectmap.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(selectmap).getData();
-        if (sys != null && sys.getValue().equals("1")) {*/
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             // 调用统一支付平台
             result = insureUnifiedPayRestService_consumer.insertUnifiedAutoMatch(map);

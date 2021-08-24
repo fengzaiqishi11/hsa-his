@@ -406,7 +406,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         paramMap.put("insutype", insureIndividualVisitDTO.getAae140()); // 险种类型
         paramMap.put("tel", insureInptRecordDTO.getTel()); // 联系电话
         paramMap.put("addr", insureInptRecordDTO.getAddr()); // 联系地址
-        paramMap.put("insu_optins", insureInptRecordDTO.getInsuOptins()); // 参保机构医保区划
+        paramMap.put("insu_optins", insureConfigurationDTO.getMdtrtareaAdmvs()); // 参保机构医保区划
         paramMap.put("diag_code", insureIndividualVisitDTO.getVisitIcdCode()); // 诊断代码
         paramMap.put("diag_name", insureIndividualVisitDTO.getVisitIcdName()); // 诊断名称
         paramMap.put("dise_cond_dscr", insureInptRecordDTO.getDiseCondDscr()); // 疾病病情描述

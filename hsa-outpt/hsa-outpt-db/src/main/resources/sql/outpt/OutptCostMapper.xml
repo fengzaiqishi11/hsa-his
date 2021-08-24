@@ -1204,109 +1204,100 @@
         SELECT
         <if test="type != null and type !=''">
             CONCAT(
-            NAME,
-            '/',
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'XB'
-            AND hosp_code = #{hospCode}
-            AND s.value = gender_code),'-'),
-            '/',
-            IFNULL(age,'-'),
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'NLDW'
-            AND hosp_code = #{hospCode}
-            AND s.value = age_unit_code),'')) keyword,
+            v.NAME,'/',
+            (CASE v.gender_code WHEN '0' THEN '未知的性别'
+            WHEN '1' THEN '男' WHEN '2' THEN '女'
+            WHEN '9' THEN '未说明的性别' ELSE '' END ),
+            '/',IFNULL( v.age, '-' ),
+            (CASE v.age_unit_code
+            WHEN '1' THEN '岁' WHEN '2' THEN '月'
+            WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+            ) keyword,
         </if>
-        id,
-        hosp_code,
-        profile_id,
-        out_profile,
-        register_id,
-        register_no,
-        name,
-        gender_code,
-        age,
-        age_unit_code,
-        birthday,
-        marry_code,
-        nation_code,
-        cert_code,
-        cert_no,
-        phone,
-        visit_no,
-        visit_code,
-        patient_code,
-        preferential_type_id,
-        insure_code,
-        insure_org_code,
-        insure_no,
-        insure_biz_code,
-        insure_treat_code,
-        insure_patient_id,
-        insure_remark,
-        doctor_id,
-        doctor_name,
-        dept_id,
-        dept_name,
-        visit_time,
-        remark,
-        pym,
-        wbm,
-        is_visit,
-        is_phys,
-        is_first_visit,
-        in_dept_id,
-        in_disease_id,
-        in_remark,
-        crte_id,
-        crte_name,
-        crte_time,
-        (select medical_reg_no from insure_individual_visit iiv where iiv.visit_id = outpt_visit.id and iiv.hosp_code = outpt_visit.hosp_code ) as medicalRegNo,
-        (select is_ecqr from insure_individual_visit iiv where iiv.visit_id = outpt_visit.id and iiv.hosp_code = outpt_visit.hosp_code ) as isEcqr
+        v.id,
+        v.hosp_code,
+        v.profile_id,
+        v.out_profile,
+        v.register_id,
+        v.register_no,
+        v.name,
+        v.gender_code,
+        v.age,
+        v.age_unit_code,
+        v.birthday,
+        v.marry_code,
+        v.nation_code,
+        v.cert_code,
+        v.cert_no,
+        v.phone,
+        v.visit_no,
+        v.visit_code,
+        v.patient_code,
+        v.preferential_type_id,
+        v.insure_code,
+        v.insure_org_code,
+        v.insure_no,
+        v.insure_biz_code,
+        v.insure_treat_code,
+        v.insure_patient_id,
+        v.insure_remark,
+        v.doctor_id,
+        v.doctor_name,
+        v.dept_id,
+        v.dept_name,
+        v.visit_time,
+        v.remark,
+        v.pym,
+        v.wbm,
+        v.is_visit,
+        v.is_phys,
+        v.is_first_visit,
+        v.in_dept_id,
+        v.in_disease_id,
+        v.in_remark,
+        v.crte_id,
+        v.crte_name,
+        v.crte_time,
+        iiv.medical_reg_no as medicalRegNo,
+        iiv.is_ecqr as isEcqr
         FROM
-        outpt_visit
+        outpt_visit v left join insure_individual_visit iiv on iiv.hosp_code = v.hosp_code and iiv.visit_id = v.id
         WHERE
-        hosp_code = #{hospCode}
-        AND is_visit = '1'
+        v.hosp_code = #{hospCode}
+        AND v.is_visit = '1'
         <if test="startDate != null">
-            AND DATE_FORMAT(visit_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            AND DATE_FORMAT(v.visit_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(visit_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
         </if>
         <if test="registerNo != null and registerNo != ''">
-            AND register_no LIKE CONCAT('%',#{registerNo},'%')
+            AND v.register_no LIKE CONCAT('%',#{registerNo},'%')
         </if>
         <if test="name != null and name != ''">
-            AND name LIKE CONCAT('%',#{name},'%')
+            AND v.name LIKE CONCAT('%',#{name},'%')
         </if>
         <if test="certNo != null and certNo != ''">
-            AND cert_no LIKE CONCAT('%',#{certNo},'%')
+            AND v.cert_no LIKE CONCAT('%',#{certNo},'%')
         </if>
         <if test="phone != null and phone != ''">
-            AND phone LIKE CONCAT('%',#{phone},'%')
+            AND v.phone LIKE CONCAT('%',#{phone},'%')
         </if>
         <if test="genderCode != null and genderCode != ''">
-            AND gender_code = #{genderCode}
+            AND v.gender_code = #{genderCode}
         </if>
         <if test="isPhys != null and isPhys != ''">
-            AND is_phys =#{isPhys}
+            AND v.is_phys =#{isPhys}
         </if>
         <if test="keyword != null and keyword != ''">
             AND(
-            name LIKE CONCAT('%',#{keyword},'%')
+            v.name LIKE CONCAT('%',#{keyword},'%')
             or
-            cert_no LIKE CONCAT('%',#{keyword},'%')
+            v.cert_no LIKE CONCAT('%',#{keyword},'%')
             or
-            phone LIKE CONCAT('%',#{keyword},'%')
+            v.phone LIKE CONCAT('%',#{keyword},'%')
             or
-            register_no LIKE CONCAT('%',#{keyword},'%')
+            v.register_no LIKE CONCAT('%',#{keyword},'%')
             )
         </if>
         <if test='type == "0"'>
@@ -1319,7 +1310,7 @@
                 where
                 hosp_code = #{hospCode}
                 and source_code = '1'
-                and visit_id = outpt_visit.id
+                and visit_id = v.id
                 and status_code = '0'
                 and settle_code in ('0','1')
             )
@@ -1330,7 +1321,7 @@
                 outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
                 where
                 pp.hosp_code = #{hospCode}
-                and pp.visit_id = outpt_visit.id
+                and pp.visit_id = v.id
                 and pp.is_settle = '0'
                 and pp.is_cancel = '0'
                 and pp.is_submit = '1'
@@ -1348,7 +1339,7 @@
             where
             hosp_code = #{hospCode}
             and source_code = '1'
-            and visit_id = outpt_visit.id
+            and visit_id = v.id
             and status_code = '0'
             and settle_code in ('0','1')
             )
@@ -1359,7 +1350,7 @@
             outpt_prescribe
             where
             hosp_code = #{hospCode}
-            and visit_id = outpt_visit.id
+            and visit_id = v.id
             and is_settle = '0'
             and is_cancel = '0'
             and is_submit = '1'
@@ -1418,7 +1409,7 @@
             )
             )
         </if>
-        order by crte_time desc
+        order by v.crte_time desc
     </select>
 
     <!-- 查询处方信息 -->

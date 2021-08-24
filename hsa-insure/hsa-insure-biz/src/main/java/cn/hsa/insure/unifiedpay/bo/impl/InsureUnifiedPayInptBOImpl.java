@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
+import cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedPayInptBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
@@ -1755,6 +1756,110 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
         }
         return null;
+    }
+
+    /**
+     * @Menthod: UP_4602
+     * @Desrciption: 统一支付平台-护理操作生命体征测量记录【4602】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-21 16:22
+     * @Return:
+     **/
+    @Override
+    public Map<String, Object> UP4602(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        List<InptNurseThirdDTO> smtzList = MapUtils.get(map, "smtzList");
+
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode);
+        configDTO.setRegCode(insureRegCode);
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null) throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
+
+        // 封装护理生命特征记录
+        List<Map<String, Object>> data = this.handeleSmtzData(smtzList);
+
+        Map inputMap = new HashMap();
+        inputMap.put("data", data); // 护理生命特征记录list
+
+        // 调用统一支付平台接口
+        Map httpMap = new HashMap();
+        httpMap.put("infno", Constant.UnifiedPay.INPT.UP_4602); // 交易编号
+        httpMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode())); // 发送方报文
+        httpMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); // 参保地医保区划
+        httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
+        httpMap.put("medins_code", insureConfigurationDTO.getOrgCode()); // 定点医药机构编号
+        httpMap.put("insur_code", insureConfigurationDTO.getRegCode()); // 医保中心编码
+        httpMap.put("input", inputMap); // 交易输入
+        String dataJson = JSONObject.toJSONString(httpMap);
+        logger.debug("统一支付平台-护理操作生命体征测量记录【4602】入参：" + dataJson);
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
+        logger.debug("统一支付平台-护理操作生命体征测量记录【4602】返参：" + resultStr);
+
+        // 解析返参
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("无法访问统一支付平台");
+        }
+        Map<String, Object> resultMap = JSONObject.parseObject(resultStr, Map.class);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            String msg = MapUtils.get(resultMap, "msg");
+            throw new AppException(msg);
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            String err_msg = MapUtils.get(resultMap, "err_msg");
+            throw new AppException(err_msg);
+        }
+        return resultMap;
+    }
+
+    // 封装护理生命特征记录
+    private List<Map<String, Object>> handeleSmtzData(List<InptNurseThirdDTO> smtzList) {
+        List<Map<String, Object>> data = new ArrayList<>();
+        if (!ListUtils.isEmpty(smtzList)) {
+            smtzList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("mdtrt_sn", dto.getVisitId()); // 就医流水号
+                if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
+                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
+                        map.put("mdtrt_id", dto.getMedicalRegNo()); // 就诊ID
+                        map.put("psn_no", dto.getAac001()); // 人员编号
+                    } else {
+                        throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
+                    }
+                }
+                map.put("dept_code", dto.getInDeptCode()); // 科室代码
+                map.put("dept_name", dto.getInDeptName()); // 科室名称
+                map.put("wardarea_name", dto.getInWardName()); // 病区名称
+                map.put("bedno", dto.getBedName()); // 病床号
+                map.put("diag_code", dto.getInDiseaseCode()); // 诊断代码
+                map.put("adm_time", dto.getInTime()); // 入院时间
+                map.put("act_ipt_days", dto.getInDays()); // 实际住院天数
+                map.put("afpn_days", dto.getOperationDays()); // 手术后天数
+                map.put("rcd_time", dto.getRecordTime()); // 记录日期时间
+                map.put("vent_frqu", dto.getBreath()); // 呼吸频率（次/min）
+                map.put("use_vent_flag", dto.getIsVentilator()); // 使用呼吸机标志
+                map.put("pule", dto.getPulse()); // 脉率（次/min）
+                map.put("pat_heart_rate", dto.getHeartRate()); // 起搏器心率（次/min）
+                map.put("tprt", dto.getTemperature()); // 体温（℃）
+                String amBp = dto.getAmBp();
+                String[] split = amBp.split("/");
+                map.put("systolic_pre", StringUtils.isNotEmpty(split[0]) ? split[0] : ""); // 收缩压（mmHg）
+                map.put("dstl_pre", StringUtils.isNotEmpty(split[1]) ? split[1] : ""); // 舒张压（mmHg）
+                map.put("wt", dto.getWeight()); // 体重（kg）
+                map.put("abde", dto.getHeight()); // 腹围（cm）
+                map.put("nurscare_obsv_item_name", ""); // 护理观察项目名称
+                map.put("nurscare_obsv_rslt", ""); // 护理观察结果
+                map.put("nurs_name", dto.getCrteName()); // 护士姓名
+                map.put("sign_time", dto.getCrteTime()); // 签字时间
+                map.put("vali_flag", Constants.SF.S); // 有效标志
+                data.add(map);
+            });
+        }
+        return data;
     }
 
 }

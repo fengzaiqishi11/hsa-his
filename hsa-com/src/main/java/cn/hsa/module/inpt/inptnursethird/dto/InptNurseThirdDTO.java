@@ -147,4 +147,47 @@ public class InptNurseThirdDTO extends InptNurseThirdDO implements Serializable 
      * 是否查询婴儿标志(SF: 1是，0否)
      */
     private String isQueryBaby;
+    /**
+     * 医保个人电脑号
+     */
+    private String aac001;
+    /**
+     * 医保登记号
+     */
+    private String medicalRegNo;
+    /**
+     * 入院科室
+     */
+    private String inDeptId;
+    private String inDeptCode;
+    private String inDeptName;
+    /**
+     * 入院病区
+     */
+    private String inWardId;
+    private String inWardName;
+    /**
+     * 入院诊断
+     */
+    private String inDiseaseId;
+    private String inDiseaseCode;
+    private String inDiseaseName;
+    /**
+     * 护理记录日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date recordDate;
+    /**
+     * 住院天数
+     */
+    private Integer inDays;
+    /**
+     * 是否取最近手术日期(0否，1是)
+     */
+    private String isRecentOper;
+    /**
+     * 病人类型
+     */
+    private String patientCode;
 }

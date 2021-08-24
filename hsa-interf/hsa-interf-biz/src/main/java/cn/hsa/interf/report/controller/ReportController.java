@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/interf/report")
 @Slf4j
-public class TestController {
+public class ReportController {
 
     @Resource
     private ReportService reportService;
@@ -71,7 +71,7 @@ public class TestController {
         StringBuffer stringBuffer = new StringBuffer();
         try{
             InputStream inputStream =  getClass().getClassLoader().getResourceAsStream("testData.json");
-             reader = new BufferedReader(new InputStreamReader(inputStream));
+            reader = new BufferedReader(new InputStreamReader(inputStream));
             while((line = reader.readLine())!= null){
                 stringBuffer.append(line);
             }

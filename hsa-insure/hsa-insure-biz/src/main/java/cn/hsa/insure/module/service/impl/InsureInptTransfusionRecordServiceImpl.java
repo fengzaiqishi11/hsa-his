@@ -88,8 +88,8 @@ public class InsureInptTransfusionRecordServiceImpl implements InsureInptTransfu
      * @param param ids 主键id，可以传多个以逗号隔开
      **/
     @Override
-    public WrapperResponse<Boolean> transferInsureInptTranfusionRecords(Map<String, Object> param) {
-        return WrapperResponse.success(insureInptTransfusionRecordBO.transferInsureInptTranfusionRecords(param));
+    public WrapperResponse<Boolean> updateTransferInsureInptTranfusionRecords(Map<String, Object> param) {
+        return WrapperResponse.success(insureInptTransfusionRecordBO.updateTransferInsureInptTranfusionRecords(param));
     }
 
 }

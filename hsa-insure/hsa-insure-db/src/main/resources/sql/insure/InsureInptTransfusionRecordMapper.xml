@@ -38,6 +38,11 @@
 
     <update id="updateInsureTransfusionRecordTransferred">
         UPDATE `insure_inpt_transfusion_record` set is_transmission = #{isTransmission},transmission_time= #{transmissionTime},
-        transmission_times = (transmission_times + 1) where id = #{id} and hosp_code = {hospCode}
+        transmission_times = (ifnull(transmission_times,0) + 1) where
+        id in
+         <foreach collection="idList" open="(" separator="," item="item" close=")">
+             #{item}
+         </foreach>
+         and hosp_code = #{hospCode}
     </update>
 </mapper>

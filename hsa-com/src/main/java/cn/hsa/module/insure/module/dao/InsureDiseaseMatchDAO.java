@@ -164,4 +164,6 @@ public interface InsureDiseaseMatchDAO {
      * @return
      */
     List<Map<String, Object>> queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
+
+    int deleteInsureDiseaseInfos(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
 }

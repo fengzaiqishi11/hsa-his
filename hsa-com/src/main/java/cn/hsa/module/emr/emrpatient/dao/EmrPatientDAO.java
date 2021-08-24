@@ -341,4 +341,8 @@ public interface EmrPatientDAO {
 	EmrPatientRecordDTO queryEmrCourseInfo(Map map);
 
 	InptVisitDTO getEmrInptVisit(EmrPatientDTO emrPatientDTO);
+
+	EmrPatientRecordDTO queryEmrOutInfo(Map map);
+
+	List<EmrPatientDTO> queryEmrPaitentInfo(Map map);
 }

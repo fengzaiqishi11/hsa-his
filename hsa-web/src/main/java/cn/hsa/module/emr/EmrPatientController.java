@@ -572,6 +572,9 @@ public class EmrPatientController extends BaseController {
 	@GetMapping("/uploadEmr")
 	public WrapperResponse<Boolean> uploadEmr(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
 		SysUserDTO sysUserDTO = getSession(req, res);
+		if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+			inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+		}
 		inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());

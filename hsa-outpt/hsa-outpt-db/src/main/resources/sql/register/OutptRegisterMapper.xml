@@ -1133,7 +1133,31 @@
     </select>
 
     <!--根据就诊id查询挂号记录(outpt_register)-->
-    <select id="getOutptRegisterByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.entity.OutptRegisterDO">
-
+    <select id="getOutptRegisterByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        SELECT
+            a.id,
+            a.visit_id,
+            a.name,
+            a.register_no,
+            a.source_bz_code,
+            a.visit_code,
+            a.source_tj_code,
+            a.is_cancel,
+            a.is_first_visit,
+            c.is_visit,
+            a.register_time,
+            c.out_profile,
+            d.aac001,
+            d.medical_reg_no,
+            c.patient_code,
+            SUM(b.reality_price) as reality_price
+        FROM
+            outpt_register a
+        LEFT JOIN outpt_register_detail b on a.hosp_code = b.hosp_code and a.id = b.register_id
+        join outpt_visit c on a.hosp_code = c.hosp_code and a.id = c.register_id and a.visit_id = c.id
+        left join insure_individual_visit d on a.hosp_code = b.hosp_code and a.visit_id = d.visit_id
+        where a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+        GROUP BY a.id
     </select>
 </mapper>

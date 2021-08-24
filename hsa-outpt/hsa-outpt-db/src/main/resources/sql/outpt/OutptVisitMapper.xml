@@ -769,4 +769,32 @@
           and a.visit_id = #{visitId}
         order by b.group_no, b.group_seq_no asc
     </select>
+
+    <!--根据就诊id查询手术信息(oper_info_record)-->
+    <select id="queryOperInfoRecordByVistiId" parameterType="java.util.Map" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+            a.visit_id,
+            c.aac001,
+            c.medical_reg_no,
+            b.name,
+            b.out_profile,
+            b.patient_code,
+            a.id,
+            a.oper_disease_id,
+            (select code from base_disease bd where bd.hosp_code = b.hosp_code and bd.id = a.oper_disease_id) as oper_disease_code,
+            a.oper_disease_name,
+            a.content,
+            a.oper_end_time
+        from  oper_info_record a
+        left join outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
+        left join insure_individual_visit c on b.hosp_code = c.hosp_code and b.id = c.visit_id
+        where a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+        <!--手术及抢救信息上传，默认查询大人的，婴儿的排除-->
+        <if test="babyId == null or babyId == ''">
+          <![CDATA[
+            and (a.baby_id is null or LENGTH(TRIM(a.baby_id)) < 1)
+          ]]>
+        </if>
+    </select>
 </mapper>

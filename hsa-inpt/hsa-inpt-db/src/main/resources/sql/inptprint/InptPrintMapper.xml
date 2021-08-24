@@ -177,16 +177,16 @@
                 AND status_code = #{statusCode}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-                and DATE_FORMAT(cost_time,'%Y-%m-%d %H%i%s') &gt;= #{costStartTime} and DATE_FORMAT(cost_time,'%Y-%m-%d %H%i%s') &lt;= #{costStopTime}
+                and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
             </if>
             <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
                 <![CDATA[
-                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H%i%s') <= #{costStopTime}
+                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
                 ]]>
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
                 <![CDATA[
-                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H%i%s') >= #{costStartTime}
+                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
                 ]]>
             </if>
         <if test='queryBaby =="N"'>

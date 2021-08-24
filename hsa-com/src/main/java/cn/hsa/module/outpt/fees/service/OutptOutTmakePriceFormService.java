@@ -112,4 +112,15 @@ public interface OutptOutTmakePriceFormService {
      * @Return
      **/
     WrapperResponse<Boolean> addOutptVisitRecordUpload(Map<String, Object> map);
+
+    /**
+     * @Menthod: addOperAndRescue
+     * @Desrciption: 统一支付平台-急诊留观手术及抢救信息【4302】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-23 13:50
+     * @Return:
+     **/
+    WrapperResponse<Boolean> addOperAndRescue(Map<String, Object> map);
 }

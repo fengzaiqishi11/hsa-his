@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.visit.dao;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
@@ -138,4 +139,7 @@ public interface OutptVisitDAO {
 
     // 根据就诊id查询处方信息(outpt_prescribe_detail_ext)
     List<OutptPrescribeDetailsExtDTO> queryPreDetailExtByVisitId(Map<String, Object> map);
+
+    // 根据就诊id查询手术信息
+    List<OperInfoRecordDTO> queryOperInfoRecordByVistiId(Map<String, Object> map);
 }

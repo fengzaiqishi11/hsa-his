@@ -1824,9 +1824,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 Map<String, Object> map = new HashMap<>();
                 map.put("mdtrt_sn", dto.getVisitId()); // 就医流水号
                 if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
-                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMdtrtCertNo())) {
-                        map.put("mdtrt_id", dto.getAac001()); // 就诊ID
-                        map.put("psn_no", dto.getMdtrtCertNo()); // 人员编号
+                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
+                        map.put("mdtrt_id", dto.getMedicalRegNo()); // 就诊ID
+                        map.put("psn_no", dto.getAac001()); // 人员编号
                     } else {
                         throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
                     }

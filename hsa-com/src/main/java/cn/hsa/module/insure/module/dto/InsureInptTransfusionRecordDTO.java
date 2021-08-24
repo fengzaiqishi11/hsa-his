@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *  医保输血信息传输实体对象
@@ -23,4 +24,6 @@ public class InsureInptTransfusionRecordDTO extends InsureInptTransfusionRecordD
     private String startTime;
     /** 查询结束时间 **/
     private String endTime;
+    /** idList,已经上传的数据ID **/
+    private List<String> idList;
 }

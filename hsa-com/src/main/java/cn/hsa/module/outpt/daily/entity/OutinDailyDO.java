@@ -130,4 +130,13 @@ public class OutinDailyDO extends PageDO implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 
+    // 一卡通支付金额
+    private BigDecimal cardTotalPrice;
+
+    // 一卡通充值总金额
+    private BigDecimal yktczTotalPrice;
+
+    // 一卡通退款总金额
+    private BigDecimal ykttkTotalPrice;
+
 }

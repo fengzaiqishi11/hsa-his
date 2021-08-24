@@ -1836,7 +1836,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 map.put("wardarea_name", dto.getInWardName()); // 病区名称
                 map.put("bedno", dto.getBedName()); // 病床号
                 map.put("diag_code", dto.getInDiseaseCode()); // 诊断代码
-                map.put("adm_time", dto.getInTime()); // 入院时间
+                map.put("adm_time", dto.getInTimeBatch()); // 入院时间
                 map.put("act_ipt_days", dto.getInDays()); // 实际住院天数
                 map.put("afpn_days", dto.getOperationDays()); // 手术后天数
                 map.put("rcd_time", dto.getRecordTime()); // 记录日期时间

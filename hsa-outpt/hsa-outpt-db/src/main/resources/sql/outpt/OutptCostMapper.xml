@@ -3060,22 +3060,11 @@
             CONCAT(
             ov.NAME,
             '/',
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'XB'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.gender_code),'-'),
+            (case when ov.gender_code = '0' then '未知'  when ov.gender_code = '1' then '男'  when ov.gender_code = '2' then '女' when ov.gender_code = '9' then '未说明' end),
             '/',
             IFNULL(ov.age,'-'),
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'NLDW'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.age_unit_code),'')) keyword,
+            (case when ov.age_unit_code = '1' then '岁'  when ov.age_unit_code = '2' then '月'  when ov.age_unit_code = '3' then '周' when ov.age_unit_code = '4' then '天' end)
+            ) keyword,
         </if>
         ov.id,
         ov.hosp_code,
@@ -3135,10 +3124,10 @@
         AND os.is_settle = '1'
         AND os.status_code = '0'
         <if test="startDate != null">
-            AND DATE_FORMAT(os.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            AND os.settle_time &gt;= DATE_ADD(#{startDate},INTERVAL 0 DAY)
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(os.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            and os.settle_time &lt;= DATE_ADD(#{endDate},INTERVAL 1 DAY)
         </if>
         <if test="keyword != null and keyword != ''">
             AND(

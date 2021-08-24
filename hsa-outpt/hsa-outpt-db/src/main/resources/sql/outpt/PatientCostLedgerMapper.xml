@@ -1381,7 +1381,7 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        ORDER BY t.bizCode ,t.visit_id,b.crte_time desc
+        ORDER BY t.bizCode ,t.visit_id
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、开方医生分组合计-->
@@ -1453,10 +1453,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as visit_time,
-        DATE_FORMAT(a.in_time , '%Y-%m-%d %H:%i:%s') as in_time,
-        DATE_FORMAT(a.out_time , '%Y-%m-%d %H:%i:%s') as out_time,
-        DATE_FORMAT(b.cost_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        a.in_time  as visit_time,
+        a.in_time  as in_time,
+        a.out_time as out_time,
+        b.cost_time  as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1524,10 +1524,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        a.visit_time  as visit_time,
         null as in_time,
         null as out_time,
-        DATE_FORMAT( b.crte_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        b.crte_time  as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1573,10 +1573,10 @@
         a.gender_code,
         a.age,
         a.patient_code,
-        DATE_FORMAT(a.visit_time , '%Y-%m-%d %H:%i:%s') as visit_time,
+        a.visit_time  as visit_time,
         null as in_time,
         null as out_time,
-        DATE_FORMAT(c.crte_time , '%Y-%m-%d %H:%i:%s') as settle_time,
+        c.crte_time  as settle_time,
         b.item_id,
         b.bfc_id ,
         e.name as bfc_name,
@@ -1648,27 +1648,6 @@
             <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
-            and t.bizCode IN
-            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="deptId != null and deptId != ''">
-            and t.dept_id = #{deptId}
-        </if>
-        <if test="userId != null and userId != ''">
-            and t.doctor_id = #{userId}
-        </if>
-        <if test="insureCode != null and insureCode != ''">
-            and t.patient_code = #{insureCode}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and t.item_name  like '%${keyword}%'
-        </if>
-        <if test="name != null and name != ''">
-            and t.name  like '%${name}%'
-        </if>
         group by t.item_id,
         t.bfc_name,
         t.item_code,

@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author luonianxin
@@ -67,7 +64,7 @@ public class InsureInptTransfusionRecordBOImpl  implements InsureInptTransfusion
     }
 
     @Override
-    public Boolean transferInsureInptTranfusionRecords(Map params) {
+    public Boolean updateTransferInsureInptTranfusionRecords(Map params) {
 
         String strIds = MapUtils.get(params,"ids");
         String hospCode = MapUtils.get(params,"hospCode");
@@ -76,8 +73,14 @@ public class InsureInptTransfusionRecordBOImpl  implements InsureInptTransfusion
         List<Map> dataMapList = insureInptTransfusionRecordDAO.queryInsureInptTransfusionRecordsMap(hospCode,idList);
         Map inputMap = new HashMap(4);
         inputMap.put("data",dataMapList);
-        commonInsureUnified(hospCode,orgCode, Constant.UnifiedPay.INPT.UP_4601,inputMap);
 
+        commonInsureUnified(hospCode,orgCode, Constant.UnifiedPay.INPT.UP_4601,inputMap);
+        InsureInptTransfusionRecordDTO paramDTO = new InsureInptTransfusionRecordDTO();
+        paramDTO.setIdList(idList);
+        paramDTO.setIsTransmission(Constants.SF.S);
+        paramDTO.setTransmissionTime(new Date());
+        paramDTO.setHospCode(hospCode);
+        insureInptTransfusionRecordDAO.updateInsureTransfusionRecordTransferred(paramDTO);
         return true;
     }
 
@@ -102,7 +105,7 @@ public class InsureInptTransfusionRecordBOImpl  implements InsureInptTransfusion
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
         httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-        httpParam.put("input", paramMap.get("data"));
+        httpParam.put("input", paramMap);
         String json = JSONObject.toJSONString(httpParam);
         log.info("调用功能号【" + functionCode + "】的入参为" + json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);

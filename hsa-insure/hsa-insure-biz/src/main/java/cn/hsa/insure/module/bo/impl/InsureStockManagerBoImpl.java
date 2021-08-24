@@ -188,28 +188,15 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureGoodInfoDelete(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
-        List<InsureGoodInfoDelete> listInsureGoodInfoDelete = MapUtils.getEmptyErr(map, "listInsureGoodInfoDelete", "未获取到需要上传的数据！");
-        if(!ListUtils.isEmpty(listInsureGoodInfoDelete)){
-            listInsureGoodInfoDelete = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodInfoDelete),InsureGoodInfoDelete.class);
-        }
-        List<Map<String, Object>> listMap = new ArrayList<>();
-        Map<String, Object> dataMap = null;
-        for (InsureGoodInfoDelete insureGoodInfoDelete : listInsureGoodInfoDelete) {
-            dataMap = new HashMap<String, Object>();
-            dataMap.put("fixmedinsBchno",insureGoodInfoDelete.getFixmedinsBchno())	;//定点医药机构批次流水号	字符型	30	　	Y　
-            dataMap.put("invDataType",insureGoodInfoDelete.getInvDataType())	;//	进销存数据类型	字符型	30	Y	Y	1-盘存信息；2-库存变更信息；3-采购信息；4-销售信息
-            listMap.add(dataMap);
-        }
+        String fixmedins_bchno = MapUtils.getEmptyErr(map, "fixmedins_bchno", "批次流水号不能为空！");
+        String inv_data_type = MapUtils.getEmptyErr(map, "inv_data_type", "进销存数据类型不能为空！");
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("fixmedins_bchno",fixmedins_bchno);
+        dataMap.put("inv_data_type",inv_data_type);
+
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("data", listMap); //	交易输入
+        paramMap.put("data", dataMap); //	交易输入
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3507, paramMap);
-
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
-
-        //上传成功数据
-        List<InsureInventoryStockUpdate> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
-        //上传成功数据
-        List<InsureInventoryStockUpdate> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
         return true;
     }
 

@@ -19,6 +19,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -290,22 +291,30 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          * 如果是中途结算 1.则出院时间取结算表里面的结束日期
          *              2.天数需要根据医保结算表的结束时间和开始时间计算
          */
-        InptSettleDTO inptSettleDTO = insureIndividualSettleDAO.queryInptSettle(map);
-        if(inptSettleDTO == null){
-            throw new AppException("根据就诊Id,结算id查询患者结算信息为空");
-        }
-        Date startTime = inptSettleDTO.getStartTime();
-        Date endTime = inptSettleDTO.getEndTime();
-        int daysBetween = daysBetween(startTime, endTime);
-        if ("1".equals(insureIndividualVisitDTO.getIsHalfSettle())) {
-            daysBetween = daysBetween +1;
-            insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
+
+        if("1".equals(MapUtils.get(map,"isHospital"))){
+            InptSettleDTO inptSettleDTO = insureIndividualSettleDAO.queryInptSettle(map);
+            if(inptSettleDTO == null){
+                throw new AppException("根据就诊Id,结算id查询患者结算信息为空");
+            }
+            insureIndividualVisitDTO.setSettleTime(inptSettleDTO.getSettleTime()); // 结算时间
+            insureIndividualVisitDTO.setInTime(inptSettleDTO.getStartTime()); // 入院时间
+            insureIndividualVisitDTO.setOutTime(inptSettleDTO.getEndTime());// 出院时间
+            Date startTime = inptSettleDTO.getStartTime();
+            Date endTime = inptSettleDTO.getEndTime();
+            int daysBetween = daysBetween(startTime, endTime);
+            if ("1".equals(insureIndividualVisitDTO.getIsHalfSettle())) {
+                daysBetween = daysBetween +1;
+                insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
+            }else{
+                insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
+            }
         }else{
-            insureIndividualVisitDTO.setHospitalDay(daysBetween); // 住院天数
+            OutptSettleDTO outptSettleDTO =  insureIndividualSettleDAO.queryOutptSettle(map);
+            insureIndividualVisitDTO.setSettleTime(outptSettleDTO.getSettleTime()); // 结算时间
+            insureIndividualVisitDTO.setInTime(outptSettleDTO.getCrteTime()); // 入院时间
+            insureIndividualVisitDTO.setOutTime(outptSettleDTO.getCrteTime());// 出院时间
         }
-        insureIndividualVisitDTO.setSettleTime(inptSettleDTO.getSettleTime()); // 结算时间
-        insureIndividualVisitDTO.setInTime(inptSettleDTO.getStartTime()); // 入院时间
-        insureIndividualVisitDTO.setOutTime(inptSettleDTO.getEndTime());// 出院时间
         String medicineOrgCode = insureIndividualVisitDTO.getMedicineOrgCode();
         InsureConfigurationDTO configurationDTO = new InsureConfigurationDTO();
         configurationDTO.setHospCode(hospCode);  // 医院编码

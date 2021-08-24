@@ -1583,37 +1583,44 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         inptVisitDTO.setId(MapUtils.get(map,"id"));
         inptVisitDTO.setInsureRegCode(insureConfigurationDTO.getRegCode());
         map.put("inptVisitDTO",inptVisitDTO);
-        List<InptDiagnoseDTO> dataList = doctorAdviceService_consumer.queryInptDiagnose(map).getData();
-        if(ListUtils.isEmpty(dataList)){
+        List<InptDiagnoseDTO> inptDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(map).getData();
+        if(ListUtils.isEmpty(inptDiagnoseDTOList)){
             throw new AppException("转院信息变更的诊断不能为空");
         }
         //住院变更诊断信息参数diseinfoMap
         Map<String, Object> diseinfoMap = null;
-        Integer count = 0;
-        List<Map<String,Object>> mapListl = new ArrayList<>();
-        for(InptDiagnoseDTO inptDiagnoseDTO : dataList){
-            diseinfoMap  = new HashMap<>();
-            diseinfoMap.put("mdtrt_id",medicalRegNo);//	就诊ID
-            diseinfoMap.put("psn_no",psnNo);//	人员编号
-            diseinfoMap.put("diag_type",inptDiagnoseDTO.getTypeCode());//	诊断类别
-            diseinfoMap.put("maindiag_flag",inptDiagnoseDTO.getIsMain());//	主诊断标志
-            diseinfoMap.put("diag_srt_no",count++);//	诊断排序号
-            diseinfoMap.put("diag_code",inptDiagnoseDTO.getInsureInllnessCode());//	诊断代码
-            diseinfoMap.put("diag_name",inptDiagnoseDTO.getInsureInllnessName());//	诊断名称
-            diseinfoMap.put("adm_cond",null);//	入院病情
-            diseinfoMap.put("diag_dept",inptDiagnoseDTO.getInDeptName());//	诊断科室
-            diseinfoMap.put("dise_dor_no",inptDiagnoseDTO.getZzDoctorId());//	诊断医生编码
-            diseinfoMap.put("dise_dor_name",inptDiagnoseDTO.getZzDoctorName());//	诊断医生姓名
-            diseinfoMap.put("diag_time",DateUtils.format(inptDiagnoseDTO.getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
-            diseinfoMap.put("medins_diag_code",orgCode);//	医疗机构诊断编码
-            mapListl.add(diseinfoMap);
+        //入院诊断信息参数diseinfoList
+        List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
+        for(int i=0;i<inptDiagnoseDTOList.size();i++){
+            diseinfoMap = new HashMap<>();
+            diseinfoMap.put("psn_no", psnNo);//	人员编号
+            if("101".equals(inptDiagnoseDTOList.get(i).getTypeCode()) ||
+                    "102".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
+                    "201".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
+                    "202".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
+                    "203".equals(inptDiagnoseDTOList.get(i).getTypeCode())){
+                diseinfoMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());//	诊断类别
+                diseinfoMap.put("diag_type", "1");//	诊断类别
+                diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
+                diseinfoMap.put("diag_srt_no", i);//	诊断排序号
+                diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
+                diseinfoMap.put("diag_name", inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+                diseinfoMap.put("adm_cond", null);//	入院病情
+                diseinfoMap.put("diag_dept", inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
+                diseinfoMap.put("dise_dor_no",  inptDiagnoseDTOList.get(i).getZzDoctorId());//	诊断医生编码
+                diseinfoMap.put("dise_dor_name",  inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
+                diseinfoMap.put("diag_time",  DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+                diseinfoMap.put("medins_diag_code",orgCode);//	医疗机构诊断编码
+                diseinfoList.add(diseinfoMap);
+            }
+
         }
 
         //input信息参数inputMap
         Map<String, Object> inputMap = new HashMap<String, Object>();
         inputMap.put("adminfo", adminfoMap);
         inputMap.put("agnterinfo", agnterinfoMap);
-        inputMap.put("diseinfo", mapListl);
+        inputMap.put("diseinfo", diseinfoList);
         httpParam.put("input",inputMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("住院信息变更入参:" + json);

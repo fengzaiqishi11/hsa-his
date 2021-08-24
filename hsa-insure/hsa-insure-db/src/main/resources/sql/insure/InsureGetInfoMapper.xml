@@ -249,9 +249,9 @@
     <select id="queryVisit" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
         select A.* from (
             select m.* from (
-            select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,
+            select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
             nation_code, cert_no,cert_code, birthday,  patient_code, crte_time from inpt_visit where
-            patient_code = '0' and status_code in ('2','5','6')
+            patient_code = '0' and status_code in ('2','5','6') and hosp_code =#{hospCode}
             <if test="name != null and name != ''">
                 and ( name like concat('%',#{name},'%')
                 or in_no like concat('%',#{name},'%'))
@@ -259,18 +259,18 @@
             order by crte_time ) m
             union all
             select n.* from (
-            select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age, ov.age_unit_code,
+            select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age, ov.age_unit_code,ov.hosp_code,
             ov.nation_code, ov.cert_no,cert_code,  ov.birthday,  ov.patient_code, ov.crte_time from outpt_visit ov
             left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
             where
-            ov.patient_code = '0' and  os.id is null
+            ov.patient_code = '0' and  os.id is null and ov.hosp_code =#{hospCode}
             <if test="name != null and name != ''">
                 and ( ov.name like concat('%',#{name},'%')
                 or ov.register_no like concat('%',#{name},'%'))
             </if>
             order by crte_time ) n
        )A
-       where A.lx = #{lx}
+       where A.lx = #{lx} and A.hosp_code = #{hospCode}
     </select>
 
     <insert id="insertCost" keyProperty="" useGeneratedKeys="true">
@@ -403,13 +403,13 @@
         ic.item_name,
         ic.item_id,
         ic.price,
-        ic.num,ic.exec_time,ic.crte_name,
+        ic.num,ic.crte_name,
         ic.spec,
         ic.prep_code,
         ic.dosage,ic.dosage_unit_code,
-        ic.total_num,ic.total_num_unit_code,ic.total_price,
-        ic.preferential_price,ic.reality_price,ic.back_num, ic.back_code,ic.doctor_id, ic.doctor_name,
-        (select iv.name from inpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
+        ic.total_num,ic.total_price,
+        ic.preferential_price,ic.reality_price,ic.back_num,ic.doctor_id, ic.doctor_name,
+        (select iv.name from outpt_visit iv where iv.id = ic.visit_id and iv.hosp_code = ic.hosp_code and iv.id = #{id}) as name,
         ic.settle_code,
         ic.status_code,
         ic.crte_time,
@@ -497,9 +497,9 @@
         b.total_price totalPrice,
         b.reality_price realityPrice
         FROM
-        out_cost b
+        outpt_cost b
         LEFT JOIN insure_item_match iim ON b.item_id = iim.hosp_item_id
-        join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
+        join outpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
         WHERE
         b.visit_id = #{id}
         AND (

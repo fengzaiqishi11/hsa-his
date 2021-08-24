@@ -28,6 +28,7 @@ public class OutptRegisterSettleDto extends OutptRegisterSettleDO {
     private BigDecimal wxZf;
     private BigDecimal zfbZf;
     private BigDecimal xjZf;
+    private BigDecimal zzZf;
 
     private String currNo;
     private String prefix;

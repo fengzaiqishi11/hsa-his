@@ -16,6 +16,8 @@
         <result property="yjjsTotalPrice" column="yjjs_total_price" jdbcType="NUMERIC"/>
         <result property="yjcdTotalPrice" column="yjcd_total_price" jdbcType="NUMERIC"/>
         <result property="backTotalPrice" column="back_total_price" jdbcType="NUMERIC"/>
+        <result property="yktczTotalPrice" column="yktcz_total_price" jdbcType="NUMERIC"/>
+        <result property="ykttkTotalPrice" column="ykttk_total_price" jdbcType="NUMERIC"/>
         <result property="preferentialTotalPrice" column="preferential_total_price" jdbcType="NUMERIC"/>
         <result property="roundTotalPrice" column="round_total_price" jdbcType="NUMERIC"/>
         <result property="realityTotalPrice" column="reality_total_price" jdbcType="NUMERIC"/>
@@ -53,16 +55,18 @@
             daily_no,
             start_time,
             end_time,
-            sum( total_price+yjss_total_price ) AS total_price,
+            sum(total_price) + sum(yjss_total_price) + ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) AS total_price,
             sum( insure_total_price ) AS insure_total_price,
             sum( yjss_total_price ) AS yjss_total_price,
             sum( yjtk_total_price ) AS yjtk_total_price,
             sum( yjjs_total_price ) AS yjjs_total_price,
             sum( yjcd_total_price ) AS yjcd_total_price,
             sum( back_total_price ) AS back_total_price,
+            sum( yktcz_total_price ) AS yktcz_total_price,
+            sum( ykttk_total_price ) AS ykttk_total_price,
             sum( preferential_total_price ) AS preferential_total_price,
             sum( round_total_price ) AS round_total_price,
-            sum( reality_total_price+yjss_total_price ) AS reality_total_price,
+            sum( reality_total_price) + sum(yjss_total_price) +ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) AS reality_total_price,
             min(is_ok) as is_ok,
             min(ok_name) as ok_name,
             min(ok_time) as ok_time,
@@ -657,20 +661,20 @@
     </select>
 
     <select id="queryBaseCardCZAndTK" resultType="java.util.Map">
-        select f.name, f.gender_code, f.age, f.age_unit_code, bc.card_no, c.status_code, c.price, c.pay_code, bc.status_code as cardStatusCode, c.crte_name, c.crte_time
+        select f.name, f.gender_code, f.age, f.age_unit_code, bc.card_no, c.status_code, c.price, c.pay_code, bc.status_code as cardStatusCode, c.crte_name, DATE_FORMAT(c.crte_time, '%Y-%m-%d %H:%i:%s') as crte_time
         from
         base_card_recharge_change c left join base_card bc on c.card_id = bc.id
         left join base_profile_file f on f.id = bc.profile_id
         left join outin_daily d on c.hosp_code = d.hosp_code and c.daily_settle_id = d.id
-        where d.hosp_code = #{hospCode} and d.daily_no = #{dailyNo} and c.status_code in ('6', '7')
+        where d.hosp_code = #{hospCode} and d.daily_no = #{dailyNo} and c.status_code in ('6', '7') order by c.crte_time desc
     </select>
 
     <select id="queryCardConsumePay" resultType="java.util.Map">
-        select f.name, f.gender_code, f.age, f.age_unit_code, bc.card_no, c.settle_type as status_code, c.price, c.pay_code, bc.status_code as cardStatusCode, c.crte_name, c.crte_time
+        select f.name, f.gender_code, f.age, f.age_unit_code, bc.card_no, c.settle_type as status_code, c.price, c.pay_code, bc.status_code as cardStatusCode, c.crte_name, DATE_FORMAT(c.crte_time, '%Y-%m-%d %H:%i:%s') as crte_time
         from
         base_card_recharge_change c left join base_card bc on c.card_id = bc.id
         left join base_profile_file f on f.id = bc.profile_id
         left join outin_daily d on c.hosp_code = d.hosp_code and c.daily_settle_id = d.id
-        where d.hosp_code = #{hospCode} and d.daily_no = #{dailyNo} and c.status_code = '8'
+        where d.hosp_code = #{hospCode} and d.daily_no = #{dailyNo} and c.status_code = '8' order by c.crte_time desc
     </select>
 </mapper>

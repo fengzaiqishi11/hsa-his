@@ -268,97 +268,7 @@
      -->
     <select id="queryDocterAdvice" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select A.* from (
-      (select distinct i.id, i.hosp_code, i.visit_id,
-      i.group_no,i.group_seq_no, i.type_code,
-      i.end_exec_num, i.item_code,
-      i.item_name, i.content, i.spec, i.prep_code,i.dosage, i.dosage_unit_code,
-      i.usage_code, i.speed_code, i.num, i.unit_code, i.price,
-      i.technology_no,i.long_start_time,i.is_check, i.check_name,i.check_time,i.is_stop_check,
-      i.stop_doctor_name, i.stop_time, i.stop_check_name,
-      i.stop_check_time, i.is_long, i.is_stop,i.crte_id, i.crte_name,i.crte_time,
-      if(i.is_long='0','长嘱','临时') as adviceType,
-      br.name as rateName,br.daily_times,
-      iv.gender_code,iv.age_unit_code,
-      iv.name,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
-      bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
-      ba.container_code as containerCode ,
-      ba.specimen_code as specimenCode,
-      MIN(iae.is_print) as isPrint,
-      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
-      MIN(iae.plan_exec_time) as execPlaneTime1,
-      MIN(iae.id) as inptAdviceExecId,
-      (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
-        CONCAT(
-        iv.NAME,'/',
-        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
-        WHEN '1' THEN '男' WHEN '2' THEN '女'
-        WHEN '9' THEN '未说明的性别' ELSE '' END ),
-        '/',IFNULL( iv.age, '-' ),
-        (CASE iv.age_unit_code
-        WHEN '1' THEN '岁' WHEN '2' THEN '月'
-        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
-        ) AS patientInfo
-        from inpt_advice i inner join inpt_visit iv on i.hosp_code = iv.hosp_code and i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
-      and iv.hosp_code = i.hosp_code and iv.status_code = '2'
-      <if test="keyword !=null and keyword != ''">
-        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
-        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
-      </if>
-      left join base_rate br on i.rate_id= br.id and i.hosp_code= br.hosp_code
-      left join base_advice ba on i.item_id = ba.id and i.hosp_code = ba.hosp_code
-      join inpt_advice_exec iae on iae.hosp_code = i.hosp_code and iae.advice_id =i.id and iae.visit_id = i.visit_id
-      <if test="queryDate !=null and queryDate != ''">
-          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
-          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
-      </if>
-      where i.hosp_code=#{hospCode}
-      and i.use_code in ('2','3') and i.is_check='1'
-      <!--数据共享标志为1，需根据单据类型判断打印状态-->
-      <if test="isShared != null and isShared == '1'.toString()">
-          <!--护理单据对应、未打印的-->
-          <if test="printFlag != null and printFlag == '0'.toString()">
-              and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
-          </if>
-          <!--护理单据对应、已打印的-->
-          <if test="printFlag != null and printFlag == '1'.toString()">
-              and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
-          </if>
-      </if>
-      <!--数据共享标志为0，直接根据打印标志拍段打印状态-->
-      <if test="isShared != null and isShared == '0'.toString()">
-        and iae.is_print = #{printFlag}
-      </if>
-      <if test="isStop !=null and isStop != ''">
-        and i.is_stop = #{isStop}
-      </if>
-      <if test="ids !=null and ids.size()>0">
-        and i.visit_id in
-        <foreach collection="ids" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="usageCodeList !=null and usageCodeList.size()>0">
-          and i.usage_code in
-          <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
-            #{item}
-          </foreach>
-      </if>
-      <if test="adviceType !=null and adviceType !=''">
-        and i.is_long=#{adviceType}
-      </if>
-      <if test="typeCodeList !=null and typeCodeList.size()>0">
-        and i.type_code in
-        <foreach collection="typeCodeList" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="printType =='11'.toString()">
-        and ba.biz_code is not null and ba.biz_code != '' and i.is_stop = '0'
-      </if>
-        group by i.id
-      )
-      union all
-      (select distinct ia.id, ia.hosp_code, ia.visit_id,
+      (select ia.id, ia.hosp_code, ia.visit_id,
       ia.group_no,ia.group_seq_no, ia.type_code,
       ia.end_exec_num, ia.item_code,
       ia.item_name, ia.content, ia.spec, ia.prep_code,ia.dosage, ia.dosage_unit_code,
@@ -388,7 +298,7 @@
         WHEN '1' THEN '岁' WHEN '2' THEN '月'
         WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
         ) AS patientInfo
-        from inpt_advice ia inner join inpt_visit iv on i.hosp_code = iv.hosp_code and i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+    from inpt_advice ia inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
       <if test="keyword !=null and keyword != ''">
         and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
@@ -403,7 +313,7 @@
       </if>
       left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
       where ia.hosp_code=#{hospCode}
-      and (( ia.item_code = '1' and piwr.status_code >'0' and ia.use_code ='1') or (ia.item_code != '1'))
+      and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code = '3' and ia.use_code ='1') or (ia.item_code != '1'))
       and ia.is_check='1'
       <!--数据共享标志为1，需根据单据类型判断打印状态-->
       <if test="isShared != null and isShared == '1'.toString()">
@@ -447,14 +357,12 @@
       <if test="adviceType !=null and adviceType !=''">
         and ia.is_long=#{adviceType}
       </if>
-        GROUP BY ia.id
-          )
+      <if test="typeCode !=null and typeCode !=''">
+          and ia.type_code=#{typeCode}
+      </if>
+        GROUP BY ia.id)
     ) A  where 1=1
-
-    <if test="typeCode !=null and typeCode !=''">
-        and A.type_code=#{typeCode}
-    </if>
-    order by A.bedSeqNo,A.execPlaneTime1 asc, A.group_no asc, A.group_seq_no asc
+    order by A.bedSeqNo, A.execPlaneTime1 asc, A.group_no asc, A.group_seq_no asc
     </select>
 
     <select id="queryExcuteByIds" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceExecDTO">

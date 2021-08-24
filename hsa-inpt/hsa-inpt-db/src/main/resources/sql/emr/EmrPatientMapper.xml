@@ -475,12 +475,37 @@
         select * from emr_patient_record a
         left join emr_classify_template b on a.classify_template_id =b.id and a.hosp_code = b.hosp_code
         LEFT JOIN emr_classify c on b.classify_code = c.`code` and b.hosp_code =c.hosp_code
-        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and c.name like '首次病程记录%' limit 1
+        where a.hosp_code = #{hospCode}
+        and a.visit_id = #{visitId}
+        and c.name like '首次病程记录%'
+        and b.dept_id =#{deptId}
+        and c.dept_id =#{deptId}
+        and c.is_valid ='1'
+        limit 1
     </select>
 
     <!-- 根据就诊ID查询住院病人基本信息 -->
     <select id="getEmrInptVisit" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
         select v.* from inpt_visit v where v.id = #{visitId} and v.hosp_code = #{hospCode}
+    </select>
+
+    <!--出院记录-->
+    <select id="queryEmrOutInfo" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO">
+        select  * from emr_patient_record a
+        left join emr_classify_template b on a.classify_template_id =b.id and a.hosp_code = b.hosp_code
+        LEFT JOIN emr_classify c on b.classify_code = c.`code` and b.hosp_code =c.hosp_code
+        where  a.hosp_code = #{hospCode}
+        and a.visit_id = #{visitId}
+        and c.name like '出院记录%'
+        and b.dept_id =#{deptId}
+        and c.dept_id =#{deptId}
+        and c.is_valid ='1'
+        limit 1
+    </select>
+
+    <!--查询病人是否已写病历-->
+    <select id="queryEmrPaitentInfo" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+        select * from emr_patient where visit_id = #{visitId} and hosp_code = #{hospCode} and dept_id =#{deptId}
     </select>
 
 </mapper>

@@ -883,7 +883,7 @@
         left join base_dept b on a.in_dept_id = b.id
         left join sys_user user_1 on (b.code = user_1.dept_code and user_1.work_type_code = '101')
         left join sys_user user_2 on (b.code = user_1.dept_code and user_1.work_type_code = '102')
-        where a.hosp_code = #{hospCode} and a.id = #{visitId}
+        where a.hosp_code = #{hospCode} and a.id = #{visitId} limit 1
     </select>
 
     <!--HIS数据抽取 获取入院次数-->

@@ -88,7 +88,7 @@
                    ) as hospDrugOrMaterialItemCode,
         (case when ia.is_insure_upload is null or ia.is_insure_upload = '' then '未上传' when ia.is_insure_upload ='1' then '已上传' end) isAdviceEntry
         from inpt_advice ia
-        where ia.hosp_code=#{map.hospCode} and ia.visit_id=#{map.visitId} and is_reject != '1' and is_submit = '1'
+        where ia.hosp_code=#{map.hospCode} and ia.visit_id=#{map.visitId} and ia.is_reject != '1' and ia.is_submit = '1'
         <if test="map.isInsureUpload == '0'.toString()">
             and (ia.is_insure_upload is null or ia.is_insure_upload = '' or ia.is_insure_upload = '0')
         </if>

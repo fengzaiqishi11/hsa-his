@@ -60,6 +60,6 @@ public class InsureInptTransfusionRecordController extends BaseController {
     public WrapperResponse<Boolean> transferInsureInptTranfusionRecords(@RequestParam Map<String,Object> params ,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO userDTO = getSession(req,res);
         params.put("hospCode",userDTO.getHospCode());
-        return insureInptTransfusionRecordService_consumer.transferInsureInptTranfusionRecords(params);
+        return insureInptTransfusionRecordService_consumer.updateTransferInsureInptTranfusionRecords(params);
     }
 }

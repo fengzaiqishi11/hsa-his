@@ -37,7 +37,38 @@
           AND insure_reg_code = #{insureRegCode}
           AND is_match = #{isMatch}
           AND audit_code = #{auditCode}
+        <if test="keyword !=null and keyword != ''">
+            and (hosp_illness_code like '%${keyword}%'
+            or hosp_illness_name like '%${keyword}%'
+        </if>
     </select>
+
+    <select id="queryUnMacthAllDTOPage" resultMap="InsureDiseaseMatchMap">
+        SELECT
+            id,
+            hosp_code hospCode,
+            insure_reg_code insureRegCode,
+            hosp_illness_id hospItemId,
+            hosp_illness_code hospItemCode,
+            hosp_illness_name hospItemName,
+            is_match isMatch,
+            audit_code auditCode
+        FROM
+            insure_disease_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND audit_code = #{auditCode}
+    </select>
+    <delete id="deleteInsureDiseaseInfos" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        DELETE FROM
+              insure_disease_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND audit_code = #{auditCode}
+
+    </delete>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryPageOrAll" resultMap="InsureDiseaseMatchMap">

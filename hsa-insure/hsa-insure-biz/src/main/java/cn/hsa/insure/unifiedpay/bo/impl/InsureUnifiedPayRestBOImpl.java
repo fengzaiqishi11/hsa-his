@@ -17,6 +17,7 @@ import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.*;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
+import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayRestBO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,42 +49,33 @@ import java.util.stream.Collectors;
 public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedPayRestBO {
 
     @Resource
-    private InsureConfigurationDAO insureConfigurationDAO;
-
-    @Resource
-    private InsureIndividualVisitDAO insureIndividualVisitDAO;
-
-    @Resource
     InsureItemMatchDAO insureItemMatchDAO;
-
     @Resource
     InsureItemDAO insureItemDAO;
-
     @Resource
     BaseDrugService baseDrugService;
     @Resource
     BaseMaterialService baseMaterialService;
-
     @Resource
     BaseItemService baseItemService;
-
     @Resource
     BaseDiseaseService baseDiseaseService;
-
     @Resource
     InsureDiseaseDAO insureDiseaseDAO;
-
     @Resource
     InsureDiseaseMatchDAO insureDiseaseMatchDAO;
-
     @Resource
-    InsureDiseaseMatchService insureDiseaseMatchService;
-
+    InsureDiseaseMatchService insureDiseaseMatchService_consumer;
+    @Resource
+    InsureItemMatchService insureItemMatchService_consumer;
     @Resource
     InsureIndividualSettleDAO insureIndividualSettleDAO;
-
     @Resource
     InsureDirectoryDownLoadDAO insureDirectoryDownLoadDAO;
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
+    @Resource
+    private InsureIndividualVisitDAO insureIndividualVisitDAO;
     @Resource
     private SysParameterService sysParameterService_consumer;
 
@@ -968,163 +959,116 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      */
     @Override
     public PageDTO queryHospItemPage(Map<String, Object> map) {
-        String itemCode = map.get("itemCode").toString();
-        String hospCode = map.get("hospCode").toString();
+        PageDTO pageDTO = null;
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        String itemCode = MapUtils.get(map, "itemCode");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String keyWord = MapUtils.get(map, "keyword");
         Integer pageSize = Integer.valueOf(map.get("pageSize").toString());
         Integer pageNo = Integer.valueOf(map.get("pageNo").toString());
-        PageDTO data;
-        if (StringUtils.isEmpty(itemCode)) {    // 默认查询药品
-            itemCode = "1";
-        }
-        if (Constants.XMLB.YP.equals(itemCode)) {
-            BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
-            baseDrugDTO.setHospCode(hospCode);
-            baseDrugDTO.setKeyword(map.get("keyword").toString());
-            baseDrugDTO.setIsValid("1");
-            baseDrugDTO.setPageNo(pageNo);
-            baseDrugDTO.setPageSize(pageSize);
-            map.put("baseDrugDTO", baseDrugDTO);
-            WrapperResponse<PageDTO> pageDTOWrapperResponse = baseDrugService.queryUnifiedPage(map);
-            data = pageDTOWrapperResponse.getData();
-        } else if (Constants.XMLB.XM.equals(itemCode)) {
-            BaseItemDTO baseItemDTO = new BaseItemDTO();
-            baseItemDTO.setHospCode(hospCode);
-            baseItemDTO.setKeyword(map.get("keyword").toString());
-            baseItemDTO.setIsValid("1");
-            baseItemDTO.setPageNo(pageNo);
-            baseItemDTO.setPageSize(pageSize);
-            map.put("baseItemDTO", baseItemDTO);
-            WrapperResponse<PageDTO> pageDTOWrapperResponse = baseItemService.queryUnifiedPage(map);
-            data = pageDTOWrapperResponse.getData();
-        } else if (Constants.XMLB.CL.equals(itemCode)) {
-            BaseMaterialDTO baseMaterialDTO = new BaseMaterialDTO();
-            baseMaterialDTO.setHospCode(hospCode);
-            baseMaterialDTO.setKeyword(map.get("keyword").toString());
-            baseMaterialDTO.setIsValid("1");
-            baseMaterialDTO.setPageSize(pageSize);
-            baseMaterialDTO.setPageNo(pageNo);
-            map.put("baseMaterialDTO", baseMaterialDTO);
-            WrapperResponse<PageDTO> pageDTOWrapperResponse = baseMaterialService.queryUnifiedPage(map);
-            data = pageDTOWrapperResponse.getData();
+
+        // 项目匹配数据
+        if (Constants.XMLB.YP.equals(itemCode) || Constants.XMLB.XM.equals(itemCode) || Constants.XMLB.CL.equals(itemCode)) {
+            Map<String, Object> selectItemMap = new HashMap<>();
+            InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
+            selectItemMap.put("hospCode", hospCode);
+            selectItemMap.put("insureRegCode", insureRegCode);
+            insureItemMatchDTO.setHospCode(hospCode);
+            insureItemMatchDTO.setInsureRegCode(insureRegCode);
+            insureItemMatchDTO.setIsMatch("0");
+            insureItemMatchDTO.setPageNo(pageNo);
+            insureItemMatchDTO.setPageSize(pageSize);
+            insureItemMatchDTO.setHospItemType(itemCode);
+            insureItemMatchDTO.setKeyword(keyWord);
+            selectItemMap.put("insureItemMatchDTO", insureItemMatchDTO);
+            WrapperResponse<PageDTO> wr = insureItemMatchService_consumer.queryUnMacthAllPage(selectItemMap);
+            pageDTO = wr.getData();
         } else {
-            BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
-            baseDiseaseDTO.setHospCode(hospCode);
-            baseDiseaseDTO.setKeyword(map.get("keyword").toString());
-            baseDiseaseDTO.setIsValid("1");
-            baseDiseaseDTO.setPageNo(pageNo);
-            baseDiseaseDTO.setPageSize(pageSize);
-            map.put("baseDiseaseDTO", baseDiseaseDTO);
-            WrapperResponse<PageDTO> pageDTOWrapperResponse = baseDiseaseService.queryPage(map);
-            data = pageDTOWrapperResponse.getData();
+            Map<String, Object> selectDiseaseMap = new HashMap<>();
+            InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
+            insureDiseaseMatchDTO.setHospCode(hospCode);
+            insureDiseaseMatchDTO.setInsureRegCode(insureRegCode);
+            insureDiseaseMatchDTO.setIsMatch("0");
+            insureDiseaseMatchDTO.setAuditCode("0");
+            insureDiseaseMatchDTO.setPageNo(pageNo);
+            insureDiseaseMatchDTO.setPageSize(pageSize);
+            insureDiseaseMatchDTO.setKeyword(keyWord);
+            selectDiseaseMap.put("hospCode", hospCode);
+            selectDiseaseMap.put("insureDiseaseMatchDTO", insureDiseaseMatchDTO);
+            WrapperResponse<PageDTO> wr = insureDiseaseMatchService_consumer.queryUnMacthAllPage(selectDiseaseMap);
+            pageDTO = wr.getData();
         }
-        if (data != null) {
-            return data;
-        } else {
-            return null;
-        }
+        return pageDTO;
     }
 
     /**
      * @param itemMatchDTO
      * @Method insertUnifiedAutoMatch
-     * @Desrciption 医保统一支付平台：自动匹配医保项目信息和医院his的项目信息
+     * @Desrciption 项目疾病匹配
      * @Param
-     * @Author fuhui
-     * @Date 2021/4/10 1:45
+     * @Author liaojiguang update
+     * @Date 2021-08-23
      * @Return
      */
     @Override
     public Integer insertUnifiedAutoMatch(InsureItemMatchDTO itemMatchDTO) {
-        String itemCode = itemMatchDTO.getMatchCode();   // 匹配项目
-        String insureRegCode = itemMatchDTO.getRegCode(); // 医疗机构编码
-        String hospCode = itemMatchDTO.getHospCode(); // 医院编码
-        InsureItemDTO insureItemDTO = new InsureItemDTO();
-        insureItemDTO.setHospCode(hospCode);
-        insureItemDTO.setInsureRegCode(insureRegCode);
-        Integer integer = null;
-        Map map = new HashMap();
-        map.put("hospCode", hospCode);
-        map.put("regCode", insureRegCode);
-        map.put("itemMatchDTO", itemMatchDTO);
-        if (Constants.XMLB.YP.equals(itemCode)) {
-            BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
-            baseDrugDTO.setDownLoadFlag("1");
-            baseDrugDTO.setHospCode(hospCode);
-            baseDrugDTO.setIsValid("1");
-            if(Constant.UnifiedPay.MATCHCODE.GJBM.equals(itemMatchDTO.getMatchType())){
-                baseDrugDTO.setIsNationCode(true);
-            }
-            map.put("baseDrugDTO", baseDrugDTO);
-            WrapperResponse<List<BaseDrugDTO>> listWrapperResponse = baseDrugService.queryAll(map);
-            List<BaseDrugDTO> baseDrugDTOList = listWrapperResponse.getData();  // 医院端药品
-            List<String> stringList = new ArrayList<String>() {{
-                add("1301");
-                add("1302");
-                add("1303");
-                add("1304");
-            }};
-            insureItemDTO.setHandItemList(stringList);
-            List<InsureItemDTO> insureItemDTOList = insureItemDAO.queryInsureItemAll(insureItemDTO);
-            if (ListUtils.isEmpty(baseDrugDTOList) || ListUtils.isEmpty(insureItemDTOList)) {
-                throw new AppException("自动匹配时，医院端或者医保下载回来的药品数据集为空");
-            }
-            List<InsureItemMatchDTO> insureItemMatchDTOList = handDrugAutoMatch(baseDrugDTOList, insureItemDTOList, map);
-            if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
-                integer = insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
+        String itemCode = itemMatchDTO.getMatchCode();
+        String insureRegCode = itemMatchDTO.getRegCode();
+        String hospCode = itemMatchDTO.getHospCode();
+        Integer integer = 0;
+        if (Constants.XMLB.YP.equals(itemCode) || Constants.XMLB.CL.equals(itemCode) || Constants.XMLB.XM.equals(itemCode)) {
+            InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
+            insureItemMatchDTO.setHospCode(hospCode);
+            insureItemMatchDTO.setInsureRegCode(insureRegCode);
+            insureItemMatchDTO.setIsMatch("0");
+            insureItemMatchDTO.setHospItemType(itemCode);
+            List<InsureItemMatchDTO> list = insureItemMatchDAO.queryUnMacthAllDtoPage(insureItemMatchDTO);
+            if (ListUtils.isEmpty(list)) {
+                throw new AppException("请先进行项目生成！");
             }
 
-        }
-        else if (Constants.XMLB.CL.equals(itemCode)) {
-            BaseMaterialDTO baseMaterialDTO = new BaseMaterialDTO();
-            baseMaterialDTO.setHospCode(hospCode);
-            baseMaterialDTO.setIsValid("1");
-            if(Constant.UnifiedPay.MATCHCODE.GJBM.equals(itemMatchDTO.getMatchType())){
-                baseMaterialDTO.setIsNationCode(true);
-            }
-            baseMaterialDTO.setDownLoadFlag("1");
-            map.put("baseMaterialDTO", baseMaterialDTO);
-            WrapperResponse<List<BaseMaterialDTO>> listWrapperResponse2 = baseMaterialService.queryAll(map);
-            List<BaseMaterialDTO> baseMaterialDTOList = listWrapperResponse2.getData(); // 医院端材料
-            insureItemDTO.setDownLoadType("1306");
-            List<InsureItemDTO> insureItemDTOList = insureItemDAO.queryInsureItemAll(insureItemDTO);
-            List<InsureItemMatchDTO> insureItemMatchDTOList = handMaterialAutoMatch(baseMaterialDTOList, insureItemDTOList, map);
-            if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
-                integer = insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
+            InsureItemDTO insureItemDTO = new InsureItemDTO();
+            insureItemDTO.setHospCode(hospCode);
+            insureItemDTO.setInsureRegCode(insureRegCode);
+            List<InsureItemDTO> insureDiseaseDTOList = insureItemDAO.queryPageUnifiedItem(insureItemDTO);
+            if (ListUtils.isEmpty(insureDiseaseDTOList)) {
+                throw new AppException("医保端项目数据集为空!");
             }
 
-        }
-        else if (Constants.XMLB.XM.equals(itemCode)) {
-            BaseItemDTO baseItemDTO = new BaseItemDTO();
-            baseItemDTO.setHospCode(hospCode);
-            baseItemDTO.setIsValid("1");
-            baseItemDTO.setDownLoadFlag("1");
-            if(Constant.UnifiedPay.MATCHCODE.GJBM.equals(itemMatchDTO.getMatchType())){
-                baseItemDTO.setIsNationCode(true);
-            }
-            map.put("baseItemDTO", baseItemDTO);
-            WrapperResponse<List<BaseItemDTO>> listWrapperResponse1 = baseItemService.queryAll(map);
-            List<BaseItemDTO> baseItemDTOList = listWrapperResponse1.getData(); // 医院端项目
-            insureItemDTO.setDownLoadType("1305");
-            insureItemDTO.setIsValid(Constants.SF.S);
-            List<InsureItemDTO> insureItemDTOList = insureItemDAO.queryInsureItemAll(insureItemDTO);
-            List<InsureItemMatchDTO> insureItemMatchDTOList = handItemAutoMatch(baseItemDTOList, insureItemDTOList, map);
-            if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
-                integer = insureItemMatchDAO.insertMatchItem(insureItemMatchDTOList);
+            List<InsureItemMatchDTO> itemMatchDTOList = handItemAutoMatch(list, insureDiseaseDTOList,itemMatchDTO);
+            insureItemMatchDAO.deleteInsureItemInfos(insureItemMatchDTO);
+            insureItemMatchDAO.insertMatchItem(itemMatchDTOList);
+            for (InsureItemMatchDTO dto : itemMatchDTOList) {
+                if ("1".equals(dto.getIsMatch())) {
+                    integer ++;
+                }
             }
         } else {
-            BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
-            baseDiseaseDTO.setHospCode(map.get("hospCode").toString());
-            baseDiseaseDTO.setIsValid("1");
-            map.put("baseDiseaseDTO", baseDiseaseDTO);
-            WrapperResponse<List<BaseDiseaseDTO>> wrapperResponse = baseDiseaseService.queryAll(map);
-            List<BaseDiseaseDTO> baseDiseaseDTOList = wrapperResponse.getData(); // 医院端疾病
+            InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
+            insureDiseaseMatchDTO.setHospCode(hospCode);
+            insureDiseaseMatchDTO.setInsureRegCode(insureRegCode);
+            insureDiseaseMatchDTO.setIsMatch("0");
+            insureDiseaseMatchDTO.setAuditCode("0");
+            List<InsureDiseaseMatchDTO> list = insureDiseaseMatchDAO.queryPageOrAll(insureDiseaseMatchDTO);
+            if (ListUtils.isEmpty(list)) {
+                throw new AppException("请先进行疾病生成！");
+            }
+
             InsureDiseaseDTO insureDiseaseDTO = new InsureDiseaseDTO();
-            insureDiseaseDTO.setHospCode(map.get("hospCode").toString());
+            insureDiseaseDTO.setHospCode(hospCode);
             insureDiseaseDTO.setInsureRegCode(insureRegCode);
-            List<InsureDiseaseDTO> insureDiseaseDTOList = insureDiseaseDAO.queryAll(insureDiseaseDTO); // 医保中心端的疾病
-            List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = handDiseaseAutoMatch(baseDiseaseDTOList, insureDiseaseDTOList, map);
-            if (!ListUtils.isEmpty(insureDiseaseMatchDTOList)) {
-                integer = insureDiseaseMatchDAO.insertMatchDisease(insureDiseaseMatchDTOList);
+            List<InsureDiseaseDTO> insureDiseaseDTOList = insureDiseaseDAO.queryAll(insureDiseaseDTO);
+            if (ListUtils.isEmpty(insureDiseaseDTOList)) {
+                throw new AppException("医保端疾病数据集为空!");
+            }
+            List<InsureDiseaseMatchDTO> diseaseMatchDTOList = handDiseaseAutoMatch(list, insureDiseaseDTOList,itemMatchDTO);
+            insureDiseaseMatchDAO.deleteInsureDiseaseInfos(insureDiseaseMatchDTO);
+            insureDiseaseMatchDAO.insertMatchDisease(diseaseMatchDTOList);
+
+            for (InsureDiseaseMatchDTO dto : diseaseMatchDTOList) {
+                if ("1".equals(dto.getAuditCode())) {
+                    integer ++;
+                }
             }
         }
         return integer;
@@ -1160,7 +1104,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     /**
      * @param baseDiseaseDTOList
      * @param insureDiseaseDTOList
-     * @param map
      * @Method handDiseaseAutoMatch
      * @Desrciption 处理疾病自动匹配
      * @Param baseDrugDTOList:医院端的疾病集合
@@ -1170,154 +1113,47 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      * @Date 2021/1/27 21:12
      * @Return
      */
-    private List<InsureDiseaseMatchDTO> handDiseaseAutoMatch(List<BaseDiseaseDTO> baseDiseaseDTOList, List<InsureDiseaseDTO> insureDiseaseDTOList, Map map) {
-        InsureItemMatchDTO itemMatchDTO = MapUtils.get(map, "itemMatchDTO");
-        String userId = itemMatchDTO.getCrteId();
-        String userName = itemMatchDTO.getCrteName();
+    private List<InsureDiseaseMatchDTO> handDiseaseAutoMatch(List<InsureDiseaseMatchDTO> diseaseDTOList, List<InsureDiseaseDTO> insureDiseaseDTOList, InsureItemMatchDTO itemMatchDTO) {
         String matchType = itemMatchDTO.getMatchType();
-        Map<String, InsureDiseaseDTO> collect = null;
-        List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = new ArrayList<>();
+        Map<String, InsureDiseaseDTO> collect;
         if (Constant.UnifiedPay.MATCHCODE.MC.equals(matchType)) {
             collect = insureDiseaseDTOList.stream().collect(Collectors.toMap(InsureDiseaseDTO::getInsureIllnessName, Function.identity(), (k1, k2) -> k1));
-            for (BaseDiseaseDTO baseDiseaseDTO : baseDiseaseDTOList) {
-                if (!collect.isEmpty() && collect.containsKey(baseDiseaseDTO.getName())) {
-                    InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
+            for (InsureDiseaseMatchDTO insureDiseaseMatchDTO : diseaseDTOList) {
+                if (!collect.isEmpty() && collect.containsKey(insureDiseaseMatchDTO.getHospIllnessName())) {
+                    InsureDiseaseDTO insureDiseaseDTO = collect.get(insureDiseaseMatchDTO.getHospIllnessName());
                     insureDiseaseMatchDTO.setId(SnowflakeUtils.getId()); //主键id
-                    insureDiseaseMatchDTO.setHospCode(baseDiseaseDTO.getHospCode()); //  医院编码
-                    insureDiseaseMatchDTO.setInsureRegCode(collect.get(baseDiseaseDTO.getName()).getInsureRegCode()); // 医保注册编码
-                    insureDiseaseMatchDTO.setHospIllnessId(baseDiseaseDTO.getId()); //医院疾病ID
-                    insureDiseaseMatchDTO.setHospIllnessCode(baseDiseaseDTO.getCode()); // 医院ICD编码
-                    insureDiseaseMatchDTO.setHospIllnessName(baseDiseaseDTO.getName()); // 医院ICD名称
-                    insureDiseaseMatchDTO.setInsureIllnessId(collect.get(baseDiseaseDTO.getName()).getInsureIllnessId()); // 医保中心疾病ID
-                    insureDiseaseMatchDTO.setInsureIllnessCode(collect.get(baseDiseaseDTO.getName()).getInsureIllnessCode()); // 医保中心ICD编码
-                    insureDiseaseMatchDTO.setInsureIllnessName(collect.get(baseDiseaseDTO.getName()).getInsureIllnessName()); // 医保中心ICD名称
+                    insureDiseaseMatchDTO.setHospCode(insureDiseaseDTO.getHospCode()); //  医院编码
+                    insureDiseaseMatchDTO.setInsureRegCode(insureDiseaseDTO.getInsureRegCode()); // 医保注册编码
+                    insureDiseaseMatchDTO.setInsureIllnessId(insureDiseaseDTO.getInsureIllnessId()); // 医保中心疾病ID
+                    insureDiseaseMatchDTO.setInsureIllnessCode(insureDiseaseDTO.getInsureIllnessCode()); // 医保中心ICD编码
+                    insureDiseaseMatchDTO.setInsureIllnessName(insureDiseaseDTO.getInsureIllnessName()); // 医保中心ICD名称
                     insureDiseaseMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
                     insureDiseaseMatchDTO.setIsTrans(Constants.SF.S); // 是否传输
                     insureDiseaseMatchDTO.setAuditCode(Constants.SF.S); //审批状态代码
-                    insureDiseaseMatchDTO.setRemark(collect.get(baseDiseaseDTO.getName()).getRemark()); // 备注
-                    insureDiseaseMatchDTO.setCrteId(userId); // 创建人ID
-                    insureDiseaseMatchDTO.setCrteName(userName); // 创建人姓名
-                    insureDiseaseMatchDTO.setCrteTime(DateUtils.getNow()); // 创建时间
-                    insureDiseaseMatchDTO.setTypeCode(collect.get(baseDiseaseDTO.getName()).getDownLoadType());
-                    insureDiseaseMatchDTOList.add(insureDiseaseMatchDTO);
-
+                    insureDiseaseMatchDTO.setRemark(insureDiseaseDTO.getRemark()); // 备注
+                    insureDiseaseMatchDTO.setTypeCode(insureDiseaseDTO.getDownLoadType());
                 }
             }
-        }
-        else {
-            collect = insureDiseaseDTOList.stream().collect(Collectors.toMap(InsureDiseaseDTO::getInsureIllnessCode, Function.identity(), (k1, k2) -> k1));
-            for (BaseDiseaseDTO baseDiseaseDTO : baseDiseaseDTOList) {
-                if (!collect.isEmpty() && collect.containsKey(baseDiseaseDTO.getNationCode()) && !StringUtils.isEmpty(baseDiseaseDTO.getNationCode())) {
-                    InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
-                    insureDiseaseMatchDTO.setId(SnowflakeUtils.getId()); //主键id
-                    insureDiseaseMatchDTO.setHospCode(baseDiseaseDTO.getHospCode()); //  医院编码
-                    insureDiseaseMatchDTO.setInsureRegCode(collect.get(baseDiseaseDTO.getNationCode()).getInsureRegCode()); // 医保注册编码
-                    insureDiseaseMatchDTO.setHospIllnessId(baseDiseaseDTO.getId()); //医院疾病ID
-                    insureDiseaseMatchDTO.setHospIllnessCode(baseDiseaseDTO.getCode()); // 医院ICD编码
-                    insureDiseaseMatchDTO.setHospIllnessName(baseDiseaseDTO.getName()); // 医院ICD名称
-                    insureDiseaseMatchDTO.setInsureIllnessId(collect.get(baseDiseaseDTO.getNationCode()).getInsureIllnessId()); // 医保中心疾病ID
-                    insureDiseaseMatchDTO.setInsureIllnessCode(collect.get(baseDiseaseDTO.getNationCode()).getInsureIllnessCode()); // 医保中心ICD编码
-                    insureDiseaseMatchDTO.setInsureIllnessName(collect.get(baseDiseaseDTO.getNationCode()).getInsureIllnessName()); // 医保中心ICD名称
-                    insureDiseaseMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
-                    insureDiseaseMatchDTO.setIsTrans(Constants.SF.S); // 是否传输
-                    insureDiseaseMatchDTO.setAuditCode(Constants.SF.S); //审批状态代码
-                    insureDiseaseMatchDTO.setRemark(collect.get(baseDiseaseDTO.getNationCode()).getRemark()); // 备注
-                    insureDiseaseMatchDTO.setCrteId(userId); // 创建人ID
-                    insureDiseaseMatchDTO.setCrteName(userName); // 创建人姓名
-                    insureDiseaseMatchDTO.setCrteTime(DateUtils.getNow()); // 创建时间
-                    insureDiseaseMatchDTO.setDownLoadType(collect.get(baseDiseaseDTO.getNationCode()).getDownLoadType());
-                    insureDiseaseMatchDTOList.add(insureDiseaseMatchDTO);
-
-                }
-            }
-        }
-        InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
-        insureDiseaseMatchDTO.setHospCode(map.get("hospCode").toString());
-        insureDiseaseMatchDTO.setInsureRegCode(map.get("regCode").toString());
-        insureDiseaseMatchDTO.setIsMatch(Constants.SF.S);
-        /**
-         *      1.查询已经匹配的疾病信息
-         *      2.如果匹配疾病为空，则直接跳出不做判断，返回上一步 匹配好的数据
-         *      3.如果不为空，则需要把刚刚自动匹配好的数据和以前匹配的数据做对比，防止重复插入数据
-         */
-        List<InsureDiseaseMatchDTO> diseaseMatchDTOList = insureDiseaseMatchDAO.queryAll(insureDiseaseMatchDTO);
-        if (!ListUtils.isEmpty(diseaseMatchDTOList)) {
-            List<InsureDiseaseMatchDTO> matchDTOList = new ArrayList<>();
-            Map<String, InsureDiseaseMatchDTO> diseaseMatchDTOMap = diseaseMatchDTOList.stream().collect(Collectors.toMap(InsureDiseaseMatchDTO::getHospIllnessId, Function.identity(), (k1, k2) -> k1));
-            if (!ListUtils.isEmpty(insureDiseaseMatchDTOList)) {
-                for (InsureDiseaseMatchDTO diseaseMatchDTO : insureDiseaseMatchDTOList) {
-                    if (!diseaseMatchDTOMap.isEmpty() && !diseaseMatchDTOMap.containsKey(diseaseMatchDTO.getHospIllnessId())) {
-                        matchDTOList.add(diseaseMatchDTO);
-                    }
-                }
-            }
-            return matchDTOList;
         } else {
-            return insureDiseaseMatchDTOList;
-        }
-    }
-
-    /**
-     * @Method matchAutoStardCode
-     * @Desrciption  自动匹配：根据药品本位码，两个集合组成一个新的集合
-     *
-     * @Param
-     *
-     * @Author fuhui
-     * @Date   2021/7/19 8:52
-     * @Return
-     **/
-    private void matchAutoStardCode(List<BaseDrugDTO> baseDrugDTOList, List<InsureItemDTO> insureItemDTOList, List<InsureItemMatchDTO> insureItemMatchDTOList, String userId, String userName) {
-        insureItemDTOList = insureItemDTOList.stream().filter(insureItemDTO -> !"".equals(insureItemDTO.getDrugadmStrdcode())).collect(Collectors.toList());
-        Map<String, InsureItemDTO> collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getDrugadmStrdcode, Function.identity(), (v1, v2) -> v1));
-        InsureItemMatchDTO insureItemMatchDTO;
-        for (BaseDrugDTO baseDrugDTO : baseDrugDTOList) {
-            if (!collect.isEmpty() && collect.containsKey(baseDrugDTO.getInsureCode()) && !StringUtils.isEmpty(baseDrugDTO.getInsureCode())) {
-                insureItemMatchDTO = new InsureItemMatchDTO();
-                insureItemMatchDTO.setId(SnowflakeUtils.getId());
-                insureItemMatchDTO.setHospCode(baseDrugDTO.getHospCode()); //
-                insureItemMatchDTO.setInsureRegCode(collect.get(baseDrugDTO.getInsureCode()).getInsureRegCode());
-                insureItemMatchDTO.setItemCode(collect.get(baseDrugDTO.getInsureCode()).getItemMark()); // 项目类别标志
-                insureItemMatchDTO.setMolssItemId(null); // 人社部药品id
-                insureItemMatchDTO.setPqccItemId(null); // 卫计委药品id
-                if (StringUtils.isEmpty(baseDrugDTO.getGoodName())) {
-                    insureItemMatchDTO.setHospItemName(baseDrugDTO.getUsualName()); //医院项目名称
-                } else {
-                    insureItemMatchDTO.setHospItemName(baseDrugDTO.getGoodName()); //医院项目名称
+            collect = insureDiseaseDTOList.stream().collect(Collectors.toMap(InsureDiseaseDTO::getInsureIllnessCode, Function.identity(), (k1, k2) -> k1));
+            for (InsureDiseaseMatchDTO insureDiseaseMatchDTO : diseaseDTOList) {
+                if (!collect.isEmpty() && collect.containsKey(insureDiseaseMatchDTO.getHospIllnessCode())) {
+                    InsureDiseaseDTO insureDiseaseDTO = collect.get(insureDiseaseMatchDTO.getHospIllnessCode());
+                    insureDiseaseMatchDTO.setId(SnowflakeUtils.getId()); //主键id
+                    insureDiseaseMatchDTO.setHospCode(insureDiseaseDTO.getHospCode()); //  医院编码
+                    insureDiseaseMatchDTO.setInsureRegCode(insureDiseaseDTO.getInsureRegCode()); // 医保注册编码
+                    insureDiseaseMatchDTO.setInsureIllnessId(insureDiseaseDTO.getInsureIllnessId()); // 医保中心疾病ID
+                    insureDiseaseMatchDTO.setInsureIllnessCode(insureDiseaseDTO.getInsureIllnessCode()); // 医保中心ICD编码
+                    insureDiseaseMatchDTO.setInsureIllnessName(insureDiseaseDTO.getInsureIllnessName()); // 医保中心ICD名称
+                    insureDiseaseMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
+                    insureDiseaseMatchDTO.setIsTrans(Constants.SF.S); // 是否传输
+                    insureDiseaseMatchDTO.setAuditCode(Constants.SF.S); //审批状态代码
+                    insureDiseaseMatchDTO.setRemark(insureDiseaseDTO.getRemark()); // 备注
+                    insureDiseaseMatchDTO.setTypeCode(insureDiseaseDTO.getDownLoadType());
                 }
-                insureItemMatchDTO.setHospItemId(baseDrugDTO.getId()); // 医院项目id
-                insureItemMatchDTO.setHospItemCode(baseDrugDTO.getCode()); // 医院项目编码
-                insureItemMatchDTO.setHospItemType(Constants.XMLB.YP); // 医院项目类别
-                insureItemMatchDTO.setHospItemSpec(baseDrugDTO.getSpec()); //  医院项目规格
-                insureItemMatchDTO.setHospItemUnitCode(baseDrugDTO.getUnitCode()); // 医院项目单位
-                insureItemMatchDTO.setHospItemPrepCode(baseDrugDTO.getPrepCode()); //医院项目剂型
-                insureItemMatchDTO.setHospItemPrice(baseDrugDTO.getPrice()); //医院项目价格
-                insureItemMatchDTO.setLmtUserFlag(collect.get(baseDrugDTO.getInsureCode()).getLmtUsedFlag()); // 目录限制使用标志
-                insureItemMatchDTO.setInsureItemName(collect.get(baseDrugDTO.getInsureCode()).getItemName()); // 医保中心项目名称
-                insureItemMatchDTO.setInsureItemCode(collect.get(baseDrugDTO.getInsureCode()).getItemCode()); // 医保中心项目编码
-                insureItemMatchDTO.setInsureItemType(collect.get(baseDrugDTO.getInsureCode()).getItemType()); // 医保中心项目类别
-                insureItemMatchDTO.setInsureItemSpec(collect.get(baseDrugDTO.getInsureCode()).getItemSpec()); // 医保中心项目规格
-                insureItemMatchDTO.setInsureItemUnitCode(collect.get(baseDrugDTO.getInsureCode()).getItemUnitCode()); //医保中心项目单位
-                insureItemMatchDTO.setInsureItemPrepCode(collect.get(baseDrugDTO.getInsureCode()).getItemDosage()); //医保中心项目剂型
-                insureItemMatchDTO.setInsureItemPrice(null); // 医保中心项目价格
-                insureItemMatchDTO.setDeductible(collect.get(baseDrugDTO.getInsureCode()).getDeductible()); // 自费比例
-                insureItemMatchDTO.setStandardCode(baseDrugDTO.getInsureCode()); // 本位码
-                insureItemMatchDTO.setCheckPrice(collect.get(baseDrugDTO.getNationCode()).getCheckPrice()); // 限价
-                insureItemMatchDTO.setManufacturer(baseDrugDTO.getProdName()); // 生产厂家
-                insureItemMatchDTO.setAuditCode(Constants.SF.F); // 审核状态代码
-                insureItemMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
-                insureItemMatchDTO.setIsTrans(Constants.SF.F); // 是否传输
-                insureItemMatchDTO.setIsValid(baseDrugDTO.getIsValid()); // 是否有效
-                insureItemMatchDTO.setTakeDate(collect.get(baseDrugDTO.getInsureCode()).getTakeDate()); // 生效日期
-                insureItemMatchDTO.setLoseDate(collect.get(baseDrugDTO.getInsureCode()).getLoseDate()); // 失效日期
-                insureItemMatchDTO.setPym(baseDrugDTO.getUsualPym()); // 拼音码
-                insureItemMatchDTO.setWbm(baseDrugDTO.getUsualWbm()); // 五笔码
-                insureItemMatchDTO.setCrteId(userId); // 创建人ID
-                insureItemMatchDTO.setCrteTime(DateUtils.getNow()); // 创建人姓名
-                insureItemMatchDTO.setCrteName(userName); // 创建时间
-                insureItemMatchDTOList.add(insureItemMatchDTO);
             }
         }
+        return diseaseDTOList;
     }
 
     /**
@@ -1438,7 +1274,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
         if (!ListUtils.isEmpty(matchDTOList)) {
             List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(),(k1, k2) -> k1));
+            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(), (k1, k2) -> k1));
             if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
                 for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
                     if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {
@@ -1462,127 +1298,59 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      * @Date 2021/1/27 21:12
      * @Return
      **/
-    private List<InsureItemMatchDTO> handItemAutoMatch(List<BaseItemDTO> baseItemDTOList, List<InsureItemDTO> insureItemDTOList, Map map) {
-        InsureItemMatchDTO itemMatchDTO = MapUtils.get(map, "itemMatchDTO");
-        String userId = itemMatchDTO.getCrteId();
-        String userName = itemMatchDTO.getCrteName();
+    private List<InsureItemMatchDTO> handItemAutoMatch(List<InsureItemMatchDTO> insureItemMatchList, List<InsureItemDTO> insureItemDTOList,InsureItemMatchDTO itemMatchDTO) {
         String matchType = itemMatchDTO.getMatchType();
-        List<InsureItemMatchDTO> insureItemMatchDTOList = new ArrayList<>();
         Map<String, InsureItemDTO> collect = null;
         if (Constant.UnifiedPay.MATCHCODE.MC.equals(matchType)) {
             collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemName, Function.identity(), (k1, k2) -> k1));
-            InsureItemMatchDTO insureItemMatchDTO = null;
-            for (BaseItemDTO baseItemDTO : baseItemDTOList) {
-                if (!collect.isEmpty() && collect.containsKey(baseItemDTO.getName())) {
-                    insureItemMatchDTO = new InsureItemMatchDTO();
-                    insureItemMatchDTO.setId(SnowflakeUtils.getId());
-                    insureItemMatchDTO.setHospCode(baseItemDTO.getHospCode()); //
-                    insureItemMatchDTO.setInsureRegCode(collect.get(baseItemDTO.getName()).getInsureRegCode());
-                    insureItemMatchDTO.setItemCode(collect.get(baseItemDTO.getName()).getItemMark()); // 项目类别标志
-                    insureItemMatchDTO.setMolssItemId(null); // 人社部药品id
-                    insureItemMatchDTO.setPqccItemId(null); // 卫计委药品id
-                    insureItemMatchDTO.setHospItemName(baseItemDTO.getName()); //医院项目名称
-                    insureItemMatchDTO.setHospItemId(baseItemDTO.getId()); // 医院项目id
-                    insureItemMatchDTO.setHospItemCode(baseItemDTO.getCode()); // 医院项目编码
-                    insureItemMatchDTO.setHospItemType(Constants.XMLB.XM); // 医院项目类别
-                    insureItemMatchDTO.setHospItemSpec(baseItemDTO.getSpec()); //  医院项目规格
-                    insureItemMatchDTO.setHospItemUnitCode(baseItemDTO.getUnitCode()); // 医院项目单位
-                    insureItemMatchDTO.setHospItemPrepCode(null); //医院项目剂型
-                    insureItemMatchDTO.setHospItemPrice(baseItemDTO.getPrice()); //医院项目价格
-                    insureItemMatchDTO.setInsureItemName(collect.get(baseItemDTO.getName()).getItemName()); // 医保中心项目名称
-                    insureItemMatchDTO.setInsureItemCode(collect.get(baseItemDTO.getName()).getItemCode()); // 医保中心项目编码
-                    insureItemMatchDTO.setInsureItemType(collect.get(baseItemDTO.getName()).getItemType()); // 医保中心项目类别
-                    insureItemMatchDTO.setInsureItemSpec(collect.get(baseItemDTO.getName()).getItemSpec()); // 医保中心项目规格
-                    insureItemMatchDTO.setInsureItemUnitCode(collect.get(baseItemDTO.getName()).getItemUnitCode()); //医保中心项目单位
-                    insureItemMatchDTO.setInsureItemPrepCode(collect.get(baseItemDTO.getName()).getItemDosage()); //医保中心项目剂型
-                    insureItemMatchDTO.setInsureItemPrice(null); // 医保中心项目价格
-                    insureItemMatchDTO.setDeductible(collect.get(baseItemDTO.getName()).getDeductible()); // 自费比例
-                    insureItemMatchDTO.setStandardCode(null); // 本位码
-                    insureItemMatchDTO.setCheckPrice(collect.get(baseItemDTO.getName()).getCheckPrice()); // 限价
-                    insureItemMatchDTO.setManufacturer(null); // 生产厂家
-                    insureItemMatchDTO.setAuditCode(Constants.SF.F); // 审核状态代码
+            for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchList) {
+                if (!collect.isEmpty() && collect.containsKey(insureItemMatchDTO.getHospItemName())) {
+                    InsureItemDTO itemDto = collect.get(insureItemMatchDTO.getHospItemName());
+                    insureItemMatchDTO.setItemCode(itemDto.getItemMark()); // 项目类别标志
+                    insureItemMatchDTO.setInsureItemName(itemDto.getItemName()); // 医保中心项目名称
+                    insureItemMatchDTO.setInsureItemCode(itemDto.getItemCode()); // 医保中心项目编码
+                    insureItemMatchDTO.setInsureItemType(itemDto.getItemType()); // 医保中心项目类别
+                    insureItemMatchDTO.setInsureItemSpec(itemDto.getItemSpec()); // 医保中心项目规格
+                    insureItemMatchDTO.setInsureItemUnitCode(itemDto.getItemUnitCode()); //医保中心项目单位
+                    insureItemMatchDTO.setInsureItemPrepCode(itemDto.getItemDosage()); //医保中心项目剂型
+                    insureItemMatchDTO.setDeductible(itemDto.getDeductible()); // 自费比例
+                    insureItemMatchDTO.setCheckPrice(itemDto.getCheckPrice()); // 限价
                     insureItemMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
                     insureItemMatchDTO.setIsTrans(Constants.SF.F); // 是否传输
-                    insureItemMatchDTO.setIsValid(baseItemDTO.getIsValid()); // 是否有效
-                    insureItemMatchDTO.setTakeDate(collect.get(baseItemDTO.getName()).getTakeDate()); // 生效日期
-                    insureItemMatchDTO.setLoseDate(collect.get(baseItemDTO.getName()).getLoseDate()); // 失效日期
-                    insureItemMatchDTO.setPym(baseItemDTO.getNamePym()); // 拼音码
-                    insureItemMatchDTO.setWbm(baseItemDTO.getNameWbm()); // 五笔码
-                    insureItemMatchDTO.setCrteId(userId); // 创建人ID
-                    insureItemMatchDTO.setCrteTime(DateUtils.getNow()); // 创建人姓名
-                    insureItemMatchDTO.setCrteName(userName); // 创建时间
-                    insureItemMatchDTOList.add(insureItemMatchDTO);
+                    insureItemMatchDTO.setIsValid(itemDto.getIsValid()); // 是否有效
+                    insureItemMatchDTO.setTakeDate(itemDto.getTakeDate()); // 生效日期
+                    insureItemMatchDTO.setLoseDate(itemDto.getLoseDate()); // 失效日期
                 }
             }
-        }
-        else {
-            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (k1, k2) -> k1));
-            InsureItemMatchDTO insureItemMatchDTO = null;
-            for (BaseItemDTO baseItemDTO : baseItemDTOList) {
-                if (!collect.isEmpty() && collect.containsKey(baseItemDTO.getNationCode()) && !StringUtils.isEmpty(baseItemDTO.getNationCode())) {
-                    insureItemMatchDTO = new InsureItemMatchDTO();
-                    insureItemMatchDTO.setId(SnowflakeUtils.getId());
-                    insureItemMatchDTO.setHospCode(baseItemDTO.getHospCode()); //
-                    insureItemMatchDTO.setInsureRegCode(collect.get(baseItemDTO.getNationCode()).getInsureRegCode());
-                    insureItemMatchDTO.setItemCode(collect.get(baseItemDTO.getNationCode()).getItemMark()); // 项目类别标志
-                    insureItemMatchDTO.setMolssItemId(null); // 人社部药品id
-                    insureItemMatchDTO.setPqccItemId(null); // 卫计委药品id
-                    insureItemMatchDTO.setHospItemName(baseItemDTO.getName()); //医院项目名称
-                    insureItemMatchDTO.setHospItemId(baseItemDTO.getId()); // 医院项目id
-                    insureItemMatchDTO.setHospItemCode(baseItemDTO.getCode()); // 医院项目编码
-                    insureItemMatchDTO.setHospItemType(Constants.XMLB.XM); // 医院项目类别
-                    insureItemMatchDTO.setHospItemSpec(baseItemDTO.getSpec()); //  医院项目规格
-                    insureItemMatchDTO.setHospItemUnitCode(baseItemDTO.getUnitCode()); // 医院项目单位
-                    insureItemMatchDTO.setHospItemPrepCode(null); //医院项目剂型
-                    insureItemMatchDTO.setHospItemPrice(baseItemDTO.getPrice()); //医院项目价格
-                    insureItemMatchDTO.setInsureItemName(collect.get(baseItemDTO.getNationCode()).getItemName()); // 医保中心项目名称
-                    insureItemMatchDTO.setInsureItemCode(collect.get(baseItemDTO.getNationCode()).getItemCode()); // 医保中心项目编码
-                    insureItemMatchDTO.setInsureItemType(collect.get(baseItemDTO.getNationCode()).getItemType()); // 医保中心项目类别
-                    insureItemMatchDTO.setInsureItemSpec(collect.get(baseItemDTO.getNationCode()).getItemSpec()); // 医保中心项目规格
-                    insureItemMatchDTO.setInsureItemUnitCode(collect.get(baseItemDTO.getNationCode()).getItemUnitCode()); //医保中心项目单位
-                    insureItemMatchDTO.setInsureItemPrepCode(collect.get(baseItemDTO.getNationCode()).getItemDosage()); //医保中心项目剂型
-                    insureItemMatchDTO.setInsureItemPrice(null); // 医保中心项目价格
-                    insureItemMatchDTO.setDeductible(collect.get(baseItemDTO.getNationCode()).getDeductible()); // 自费比例
-                    insureItemMatchDTO.setStandardCode(null); // 本位码
-                    insureItemMatchDTO.setCheckPrice(collect.get(baseItemDTO.getNationCode()).getCheckPrice()); // 限价
-                    insureItemMatchDTO.setManufacturer(null); // 生产厂家
-                    insureItemMatchDTO.setAuditCode(Constants.SF.F); // 审核状态代码
-                    insureItemMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
-                    insureItemMatchDTO.setIsTrans(Constants.SF.F); // 是否传输
-                    insureItemMatchDTO.setIsValid(baseItemDTO.getIsValid()); // 是否有效
-                    insureItemMatchDTO.setTakeDate(collect.get(baseItemDTO.getNationCode()).getTakeDate()); // 生效日期
-                    insureItemMatchDTO.setLoseDate(collect.get(baseItemDTO.getNationCode()).getLoseDate()); // 失效日期
-                    insureItemMatchDTO.setPym(baseItemDTO.getNamePym()); // 拼音码
-                    insureItemMatchDTO.setWbm(baseItemDTO.getNameWbm()); // 五笔码
-                    insureItemMatchDTO.setCrteId(userId); // 创建人ID
-                    insureItemMatchDTO.setCrteTime(DateUtils.getNow()); // 创建人姓名
-                    insureItemMatchDTO.setCrteName(userName); // 创建时间
-                    insureItemMatchDTOList.add(insureItemMatchDTO);
-                }
-            }
-        }
-        itemMatchDTO.setIsMatch(Constants.SF.S);
-        itemMatchDTO.setHospItemType(Constants.XMLB.XM);
-        /**
-         *      1.查询已经匹配的药品信息
-         *      2.如果匹配药品为空，则直接跳出不做判断，返回上一步 匹配好的数据
-         *      3.如果不为空，则需要把刚刚自动匹配好的数据和以前匹配的数据做对比，防止重复插入数据
-         */
-        List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
-        if (!ListUtils.isEmpty(matchDTOList)) {
-            List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(), (k1, k2) -> k1));
-            if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
-                for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
-                    if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {
-                        dtoList.add(matchDTO);
-                    }
-                }
-            }
-            return dtoList;
         } else {
-            return insureItemMatchDTOList;
+            collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (k1, k2) -> k1));
+            for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchList) {
+                if (insureItemMatchDTO.getNationCode() == null) {
+                    continue;
+                }
+                if (!collect.isEmpty() && collect.containsKey(insureItemMatchDTO.getNationCode())) {
+                    InsureItemDTO itemDto = collect.get(insureItemMatchDTO.getNationCode());
+                    if (itemDto == null) {
+                        continue;
+                    }
+                    insureItemMatchDTO.setItemCode(itemDto.getItemMark()); // 项目类别标志
+                    insureItemMatchDTO.setInsureItemName(itemDto.getItemName()); // 医保中心项目名称
+                    insureItemMatchDTO.setInsureItemCode(itemDto.getItemCode()); // 医保中心项目编码
+                    insureItemMatchDTO.setInsureItemType(itemDto.getItemType()); // 医保中心项目类别
+                    insureItemMatchDTO.setInsureItemSpec(itemDto.getItemSpec()); // 医保中心项目规格
+                    insureItemMatchDTO.setInsureItemUnitCode(itemDto.getItemUnitCode()); //医保中心项目单位
+                    insureItemMatchDTO.setInsureItemPrepCode(itemDto.getItemDosage()); //医保中心项目剂型
+                    insureItemMatchDTO.setDeductible(itemDto.getDeductible()); // 自费比例
+                    insureItemMatchDTO.setCheckPrice(itemDto.getCheckPrice()); // 限价
+                    insureItemMatchDTO.setIsMatch(Constants.SF.S); // 是否匹配
+                    insureItemMatchDTO.setIsTrans(Constants.SF.F); // 是否传输
+                    insureItemMatchDTO.setIsValid(itemDto.getIsValid()); // 是否有效
+                    insureItemMatchDTO.setTakeDate(itemDto.getTakeDate()); // 生效日期
+                    insureItemMatchDTO.setLoseDate(itemDto.getLoseDate()); // 失效日期
+                }
+            }
         }
+        return insureItemMatchList;
     }
 
     /**
@@ -1651,8 +1419,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureItemMatchDTOList.add(insureItemMatchDTO);
                 }
             }
-        }
-        else if(Constant.UnifiedPay.MATCHCODE.GJBM.equals(matchType)) {
+        } else if (Constant.UnifiedPay.MATCHCODE.GJBM.equals(matchType)) {
             collect = insureItemDTOList.stream().collect(Collectors.toMap(InsureItemDTO::getItemCode, Function.identity(), (v1, v2) -> v1));
             for (BaseDrugDTO baseDrugDTO : baseDrugDTOList) {
                 if (!collect.isEmpty() && collect.containsKey(baseDrugDTO.getNationCode()) && !StringUtils.isEmpty(baseDrugDTO.getNationCode())) {
@@ -1701,9 +1468,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureItemMatchDTOList.add(insureItemMatchDTO);
                 }
             }
-        }
-        else{
-           matchAutoStardCode(baseDrugDTOList, insureItemDTOList,insureItemMatchDTOList,userId,userName);
+        } else {
+            //matchAutoStardCode(baseDrugDTOList, insureItemDTOList, insureItemMatchDTOList, userId, userName);
         }
         itemMatchDTO.setIsMatch(Constants.SF.S);
         itemMatchDTO.setHospItemType(Constants.XMLB.YP);
@@ -1715,7 +1481,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemMatchDTO> matchDTOList = insureItemMatchDAO.queryPageOrAll(itemMatchDTO);
         if (!ListUtils.isEmpty(matchDTOList)) {
             List<InsureItemMatchDTO> dtoList = new ArrayList<>();
-            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(),(k1, k2) -> k1));
+            Map<String, InsureItemMatchDTO> drugMatchDTOMap = matchDTOList.stream().collect(Collectors.toMap(InsureItemMatchDTO::getHospItemCode, Function.identity(), (k1, k2) -> k1));
             if (!ListUtils.isEmpty(insureItemMatchDTOList)) {
                 for (InsureItemMatchDTO matchDTO : insureItemMatchDTOList) {
                     if (!drugMatchDTOMap.isEmpty() && !drugMatchDTOMap.containsKey(matchDTO.getHospItemCode())) {
@@ -1757,7 +1523,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("hospItemId", baseDrugDTO.getId()); // 医院项目id
         if(StringUtils.isEmpty(baseDrugDTO.getUsualName())){
             map.put("hospItemName", baseDrugDTO.getGoodName()); // 医院项目名称
-        }else{
+        } else {
             map.put("hospItemName", baseDrugDTO.getUsualName()); // 医院项目名称
         }
         map.put("hospItemCode", baseDrugDTO.getCode()); // 医院项目编码
@@ -1862,26 +1628,25 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         Map httpParam = new HashMap();
         if (Constant.UnifiedPay.JBLIST.containsKey(itemType)) {
             InsureDiseaseDTO insureDiseaseDTO = insureDiseaseDAO.selectLatestVer(map);
-            if(insureDiseaseDTO !=null && (insureDiseaseDTO.getRecordCounts() < insureDiseaseDTO.getNum() * insureDiseaseDTO.getSize() ) ){
+            if (insureDiseaseDTO != null && (insureDiseaseDTO.getRecordCounts() < insureDiseaseDTO.getNum() * insureDiseaseDTO.getSize())) {
                 throw new AppException("已经是最新数据了");
             }
-            if(insureDiseaseDTO !=null){
+            if (insureDiseaseDTO != null) {
                 num = insureDiseaseDTO.getNum();
                 dataMap.put("page_num", ++num);
-            }else {
+            } else {
                 dataMap.put("page_num", num);
             }
             dataMap.put("page_size", size);
-        }
-        else {
+        } else {
             InsureItemDTO insureItemDTO = insureItemDAO.selectLatestVer(map);
-            if(insureItemDTO !=null && (insureItemDTO.getRecordCounts() < insureItemDTO.getNum() * insureItemDTO.getSize() ) ){
+            if (insureItemDTO != null && (insureItemDTO.getRecordCounts() < insureItemDTO.getNum() * insureItemDTO.getSize())) {
                 throw new AppException("已经是最新数据了");
             }
-            if(insureItemDTO !=null){
+            if (insureItemDTO != null) {
                 num = insureItemDTO.getNum();
                 dataMap.put("page_num", ++num);
-            }else {
+            } else {
                 dataMap.put("page_num", num);
             }
             dataMap.put("page_size", size);
@@ -1954,8 +1719,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
         List<Map<String, Object>> dataResultMap = (List<Map<String, Object>>) outptMap.get("data");
-        if(ListUtils.isEmpty(dataResultMap)){
-            throw new AppException("调用"+ itemType +"功能号下载接口反参为空");
+        if (ListUtils.isEmpty(dataResultMap)) {
+            throw new AppException("调用" + itemType + "功能号下载接口反参为空");
         }
         int recordCounts = MapUtils.get(outptMap, "recordCounts");
         map.put("size", size);
@@ -2126,7 +1891,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureDiseaseDTO> insureDiseaseDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
@@ -2152,9 +1917,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 insureDiseaseDTO.setCrteTime(DateUtils.getNow()); //创建时间
                 insureDiseaseDTO.setDownLoadType(listType);
                 insureDiseaseDTO.setVer(MapUtils.get(item, "ver"));
-                if(num > (recordCounts / size)){
+                if (num > (recordCounts / size)) {
                     insureDiseaseDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
+                } else {
                     insureDiseaseDTO.setVerName(ver); // 版本号
                 }
                 insureDiseaseDTOList.add(insureDiseaseDTO);
@@ -2287,7 +2052,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
         int recordCounts = MapUtils.get(map, "recordCounts");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
             for (Map<String, Object> item : dataResultMap) {
@@ -2312,9 +2077,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 insureDiseaseDTO.setCrteTime(DateUtils.getNow()); //创建时间
                 insureDiseaseDTO.setDownLoadType(listType);
                 insureDiseaseDTO.setVer(MapUtils.get(item, "ver"));
-                if(num > (recordCounts / size)){
+                if (num > (recordCounts / size)) {
                     insureDiseaseDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
+                } else {
                     insureDiseaseDTO.setVerName(ver); // 版本号
                 }
                 insureDiseaseDTOList.add(insureDiseaseDTO);
@@ -2342,7 +2107,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureDiseaseDTO> insureDiseaseDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
@@ -2369,9 +2134,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 insureDiseaseDTO.setCrteTime(DateUtils.getNow()); //创建时间
                 insureDiseaseDTO.setDownLoadType(listType);
                 insureDiseaseDTO.setVer(MapUtils.get(item, "ver"));
-                if(num > (recordCounts / size)){
+                if (num > (recordCounts / size)) {
                     insureDiseaseDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
+                } else {
                     insureDiseaseDTO.setVerName(ver); // 版本号
                 }
                 insureDiseaseDTOList.add(insureDiseaseDTO);
@@ -2409,7 +2174,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureDiseaseDTO> insureDiseaseDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
@@ -2435,9 +2200,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 insureDiseaseDTO.setCrteTime(DateUtils.getNow()); //创建时间
                 insureDiseaseDTO.setDownLoadType(listType);
                 insureDiseaseDTO.setVer(MapUtils.get(item, "ver"));
-                if(num > (recordCounts / size)){
+                if (num > (recordCounts / size)) {
                     insureDiseaseDTO.setVerName(MapUtils.get(item, "ver_name"));
-                }else{
+                } else {
                     insureDiseaseDTO.setVerName(ver); // 版本号
                 }
                 insureDiseaseDTOList.add(insureDiseaseDTO);
@@ -2466,7 +2231,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
         int recordCounts = MapUtils.get(map, "recordCounts");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
             for (Map<String, Object> item : dataResultMap) {
@@ -2520,7 +2285,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
         int recordCounts = MapUtils.get(map, "recordCounts");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         InsureDiseaseDTO insureDiseaseDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
             for (Map<String, Object> item : dataResultMap) {
@@ -2573,7 +2338,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemDTO> insureItemDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         logger.info("材料下载数据量:" + dataResultMap.size());
         InsureItemDTO itemDTO = null;
@@ -2666,7 +2431,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
         int recordCounts = MapUtils.get(map, "recordCounts");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         InsureItemDTO itemDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
             for (Map<String, Object> item : dataResultMap) {
@@ -2749,7 +2514,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemDTO> insureItemDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         InsureItemDTO itemDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
@@ -2834,7 +2599,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<InsureItemDTO> insureItemDTOList = new ArrayList<>();
         int size = MapUtils.get(map, "size");
         int num = MapUtils.get(map, "num");
-        String ver = MapUtils.get(map,"ver");
+        String ver = MapUtils.get(map, "ver");
         int recordCounts = MapUtils.get(map, "recordCounts");
         InsureItemDTO itemDTO = null;
         if (!ListUtils.isEmpty(dataResultMap)) {
@@ -2944,10 +2709,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             //医保中心项目编码
             itemDTO.setItemCode(MapUtils.get(item, "med_list_codg"));
             // 医保中心项目名称
-            if(StringUtils.isEmpty(MapUtils.get(item, "drug_prodname")) || "无".equals(MapUtils.get(item, "drug_prodname"))||
-                    "null".equals(MapUtils.get(item, "drug_prodname"))){
+            if (StringUtils.isEmpty(MapUtils.get(item, "drug_prodname")) || "无".equals(MapUtils.get(item, "drug_prodname")) ||
+                    "null".equals(MapUtils.get(item, "drug_prodname"))) {
                 itemDTO.setItemName(MapUtils.get(item, "drug_genname"));
-            }else{
+            } else {
                 itemDTO.setItemName(MapUtils.get(item, "drug_prodname"));
             }
             // 医保中心项目规格
@@ -3511,8 +3276,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         for (InsureItemMatchDTO hospItem : resultList) {
             for (InsureItemDTO insureItem : insureItemDTOList) {
                 if (hospItem.getHospItemCode().equals(insureItem.getHospItemCode())
-                    && hospItem.getHospItemName().equals(insureItem.getHospItemName()))
-                {
+                        && hospItem.getHospItemName().equals(insureItem.getHospItemName())) {
                     hospItem.setInsureItemCode(insureItem.getItemCode());
                     hospItem.setInsureItemName(insureItem.getItemName());
                     hospItem.setMatchType(insureItem.getItemType());
@@ -3547,15 +3311,15 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      */
     @Override
     public Boolean insertUnifiedItem(InsureItemDTO insureItemDTO) {
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         String hospCode = insureItemDTO.getHospCode();
-        map.put("hospCode",hospCode);
-        map.put("code","HOSP_INSURE_CODE");
+        map.put("hospCode", hospCode);
+        map.put("code", "HOSP_INSURE_CODE");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
-        String orgCode ="";
-        if(sysParameterDTO ==null){
-           throw  new AppException("请先配置系统参数:" +"HOSP_INSURE_CODE"+"值为医院的医疗机构编码");
-        }else{
+        String orgCode = "";
+        if (sysParameterDTO == null) {
+            throw new AppException("请先配置系统参数:" + "HOSP_INSURE_CODE" + "值为医院的医疗机构编码");
+        } else {
             orgCode = sysParameterDTO.getValue(); // 获取医疗机构编码
         }
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();

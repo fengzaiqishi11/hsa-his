@@ -97,4 +97,15 @@ public interface InsureItemDAO {
      * @Return
      */
     Boolean deleteInsureItemByRegCode(InsureItemDTO insureItemDTO);
+
+    /**
+     * @param insureItemMatchDTO
+     * @Method getInsureItemById
+     * @Desrciption 根据ID获取项目匹配信息
+     * @Param
+     * @Author LiaoJiGuang
+     * @Date 2021/7/9 10:56
+     * @Return
+     */
+    InsureItemDTO getInsureItemById(InsureItemMatchDTO insureItemMatchDTO);
 }

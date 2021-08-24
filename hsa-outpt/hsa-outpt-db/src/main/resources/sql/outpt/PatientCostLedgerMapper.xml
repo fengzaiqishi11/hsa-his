@@ -1381,7 +1381,7 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
-        ORDER BY t.bizCode ,t.visit_id,b.crte_time desc
+        ORDER BY t.bizCode ,t.visit_id
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、开方医生分组合计-->

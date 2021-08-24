@@ -30,7 +30,7 @@ public interface InsureInptTransfusionRecordBO {
      */
     Boolean updateInsureTransfusionRecordTransferred(InsureInptTransfusionRecordDTO insureInptTransfusionRecordDTO);
 
-    Boolean transferInsureInptTranfusionRecords(Map params);
+    Boolean updateTransferInsureInptTranfusionRecords(Map params);
 
     /**
      *  查询病人输血信息列表

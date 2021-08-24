@@ -381,12 +381,16 @@
         max(ma.bar_code ) bar_code,
         max(ba.technology_code) technology_code
         from 	medic_apply ma
-
-        join outpt_prescribe_detail opd on ma.opd_id = opd.id and ma.hosp_code = opd.hosp_code
-        join base_advice ba on opd.item_id = ba.id and opd.hosp_code = ba.hosp_code
-        join  outpt_visit ov on ma.visit_id = ov.id and ma.hosp_code = ov.hosp_code
-        join  outpt_prescribe op on opd.op_id = op.id and op.hosp_code = opd.hosp_code
-
+        JOIN outpt_prescribe_detail opd ON
+        Convert(ma.opd_id USING utf8) COLLATE utf8_unicode_ci = opd.id
+        AND
+        Convert(ma.hosp_code USING utf8) COLLATE utf8_unicode_ci= opd.hosp_code
+        JOIN base_advice ba ON opd.item_id = ba.id
+        AND opd.hosp_code = ba.hosp_code
+        JOIN outpt_visit ov ON ma.visit_id = ov.id
+        AND ma.hosp_code = ov.hosp_code
+        JOIN outpt_prescribe op ON opd.op_id = op.id
+        AND op.hosp_code = opd.hosp_code
         where op.is_settle ='1' and ma.hosp_code = #{hospCode}
 
         <if test="name != null and name != '' ">
@@ -399,10 +403,10 @@
             and ov.visit_no like concat('%',#{visitNo},'%')
         </if>
         <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
         </if>
         <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
         </if>
         <if test="queryType != null and queryType == 'zy'.toString()">
             and 1=2
@@ -458,10 +462,10 @@
             and iv.in_no like concat('%',#{visitNo},'%')
         </if>
         <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
         </if>
         <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
         </if>
         <if test="queryType != null and queryType == 'mz'.toString()">
             and 1=2

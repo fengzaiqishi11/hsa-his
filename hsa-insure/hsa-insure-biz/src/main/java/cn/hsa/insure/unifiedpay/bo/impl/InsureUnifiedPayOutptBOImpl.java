@@ -13,6 +13,7 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayOutptBO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
@@ -1297,6 +1298,116 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         return resultMap;
     }
 
+    /**
+     * @Menthod: UP_4302
+     * @Desrciption: 医保统一支付平台：急诊留观手术及抢救信息
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-17 19:45
+     * @Return:
+     **/
+    @Override
+    public Map<String, Object> UP4302(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (StringUtils.isEmpty(insureRegCode)) {
+            throw new RuntimeException("未传入医保机构编码");
+        }
+        List<OperInfoRecordDTO> ssList = MapUtils.get(map, "ssList");
+        List<OutptDiagnoseDTO> qjList = MapUtils.get(map, "qjList");
+        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode);
+        configDTO.setRegCode(insureRegCode);
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null) throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
+
+        // 封装手术信息
+        List<Map<String, Object>> oprninfo = this.handleSsData(ssList);
+        // 封装抢救信息 todo his没有相关数据，暂时写死
+        List<Map<String, Object>> rescinfo = this.handleQjData(qjList);
+
+        Map inputMap = new HashMap();
+        inputMap.put("oprninfo", oprninfo); // 手术信息list
+        inputMap.put("rescinfo", rescinfo); // 抢救信息list
+
+        // 调用统一支付平台接口
+        Map httpMap = new HashMap();
+        httpMap.put("infno", Constant.UnifiedPay.OUTPT.UP_4302); // 交易编号
+        httpMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode())); // 发送方报文
+        httpMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); // 参保地医保区划
+        httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
+        httpMap.put("medins_code", insureConfigurationDTO.getOrgCode()); // 定点医药机构编号
+        httpMap.put("insur_code", insureConfigurationDTO.getRegCode()); // 医保中心编码
+        httpMap.put("input", inputMap); // 交易输入
+        String dataJson = JSONObject.toJSONString(httpMap);
+        logger.debug("统一支付平台-急诊留观手术及抢救信息【4302】入参：" + dataJson);
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
+        logger.debug("统一支付平台-急诊留观手术及抢救信息【4302】返参：" + resultStr);
+
+        // 解析返参
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("无法访问统一支付平台");
+        }
+        Map<String, Object> resultMap = JSONObject.parseObject(resultStr, Map.class);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            String msg = MapUtils.get(resultMap, "msg");
+            throw new AppException(msg);
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            String err_msg = MapUtils.get(resultMap, "err_msg");
+            throw new AppException(err_msg);
+        }
+        return resultMap;
+    }
+
+    // 封装抢救信息
+    private List<Map<String, Object>> handleQjData(List<OutptDiagnoseDTO> qjList) {
+        List<Map<String, Object>> rescinfo = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("resc_begntime", DateUtils.getNow()); //抢救开始时间
+        map.put("resc_endtime", DateUtils.getNow()); //抢救结束时间
+        map.put("er_resc_rec", " "); //急诊抢救记录
+        map.put("resc_psn_list", "管理员,医生1"); //参加抢救人员名单
+        map.put("vali_flag", Constants.SF.S); //有效标志
+        rescinfo.add(map);
+        return rescinfo;
+    }
+
+    // 封装手术信息
+    private List<Map<String, Object>> handleSsData(List<OperInfoRecordDTO> ssList) {
+        List<Map<String, Object>> oprninfo = new ArrayList<>();
+        if (!ListUtils.isEmpty(ssList)) {
+            ssList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("mdtrt_sn", dto.getVisitId()); //就医流水号
+                if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
+                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
+                        map.put("mdtrt_id", dto.getMedicalRegNo()); //就诊ID，医保登记号
+                        map.put("psn_no", dto.getAac001()); //人员编号，个人电脑号
+                    } else {
+                        throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
+                    }
+                }
+                map.put("medrcdno", dto.getOutProfile()); //病历号
+                map.put("oprn_oprt_sn", dto.getId()); //手术操作序号
+                map.put("oprn_oprt_code", dto.getOperDiseaseCode()); //手术操作代码
+                map.put("oprn_oprt_name", dto.getOperDiseaseName()); //手术操作名称
+                map.put("oprn_oprt_tagt_part_name", " "); //手术操作目标部位名称
+                map.put("itvt_name", " "); //介入物名称
+                map.put("oprn_oprt_mtd_dscr", dto.getContent()); //手术及操作方法描述
+                map.put("oprn_oprt_cnt", 1); //手术及操作次数
+                map.put("oprn_oprt_time", dto.getOperEndTime()); //手术及操作时间
+                map.put("vali_flag", Constants.SF.S); //有效标志
+                oprninfo.add(map);
+            });
+        }
+        return oprninfo;
+    }
+
     // 封装处方信息
     private List<Map<String, Object>> handleCfData(List<OutptPrescribeDetailsExtDTO> cfList) {
         List<Map<String, Object>> rxinfo = new ArrayList<>();
@@ -1394,8 +1505,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         Map<String, Object> rgstinfo = new HashMap();
         rgstinfo.put("mdtrt_sn", outptRegisterDTO.getVisitId()); // 就医流水号
         if (!Constants.BRLX.PTBR.equals(outptRegisterDTO.getPatientCode())) {
-            if (StringUtils.isNotEmpty(outptRegisterDTO.getAac001()) && StringUtils.isNotEmpty(outptRegisterDTO.getMdtrtCertNo())) {
-                rgstinfo.put("mdtrt_id", outptRegisterDTO.getMdtrtCertNo()); // 就诊ID，医保登记号
+            if (StringUtils.isNotEmpty(outptRegisterDTO.getAac001()) && StringUtils.isNotEmpty(outptRegisterDTO.getMedicalRegNo())) {
+                rgstinfo.put("mdtrt_id", outptRegisterDTO.getMedicalRegNo()); // 就诊ID，医保登记号
                 rgstinfo.put("psn_no", outptRegisterDTO.getAac001()); // 人员编号
             } else {
                 throw new RuntimeException("【" + outptRegisterDTO.getName() + "】为医保病人，请先进行医保登记");

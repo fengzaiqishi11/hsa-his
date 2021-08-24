@@ -109,4 +109,7 @@ public class InsureItemMatchDO extends PageDO implements Serializable {
         // 中药使用方式（1复方 2单方），涉及是否报销
         private String tcmdrugUsedWay;
 
+        // 国家编码
+        private String nationCode;
+
 }

@@ -690,7 +690,7 @@
         select
             a.visit_id,
             c.aac001,
-            c.mdtrt_cert_no,
+            c.medical_reg_no,
             b.patient_code,
             b.in_dept_id,
             b.name,

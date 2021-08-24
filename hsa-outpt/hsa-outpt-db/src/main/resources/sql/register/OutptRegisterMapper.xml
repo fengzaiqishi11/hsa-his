@@ -1148,7 +1148,7 @@
             a.register_time,
             c.out_profile,
             d.aac001,
-            d.mdtrt_cert_no,
+            d.medical_reg_no,
             c.patient_code,
             SUM(b.reality_price) as reality_price
         FROM

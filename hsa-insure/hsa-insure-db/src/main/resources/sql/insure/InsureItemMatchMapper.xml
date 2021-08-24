@@ -41,6 +41,7 @@
         <result property="lmtUserFlag" column="lmt_user_flag" jdbcType="VARCHAR"/>
         <result property="limUserExplain" column="lim_user_explain" jdbcType="VARCHAR"/>
         <result property="tcmdrugUsedWay" column="tcmdrug_used_way" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
     </resultMap>
     <!--通过实体作为筛选条件查询-->
     <select id="queryPageOrAll" resultMap="InsureItemMatchMap"
@@ -51,12 +52,16 @@
         insure_item_name, insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
         insure_item_prep_code, insure_item_price, deductible, standard_code, check_price, manufacturer, audit_code,
         is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name, crte_time,lmt_user_flag,
-               lim_user_explain,tcmdrug_used_way
+               lim_user_explain,tcmdrug_used_way,nation_code
         from insure_item_match
         <where>
             <if test="id != null and id != ''">
                 and id = #{id}
             </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{id}
+            </if>
+
             <if test="hospCode != null and hospCode != ''">
                 and hosp_code = #{hospCode}
             </if>
@@ -165,7 +170,8 @@
                 or pym like '%${keyword}%'
                 or wbm like '%${keyword}%'
                 or insure_item_name like '%${keyword}%'
-                or insure_item_code like '%${keyword}%')
+                or insure_item_code like '%${keyword}%'
+                or nation_code like '%${keyword}%')
             </if>
             <if test="downloadType == '01'.toString() and downloadType !=null">
                 and hosp_item_type = '1'
@@ -205,14 +211,46 @@
             hosp_item_price hospItemPrice,
             hosp_item_unit_code hospItemUnitCode,
             is_match isMatch,
-            audit_code auditCode
+            audit_code auditCode,
+            nation_code nationCode
         FROM
             insure_item_match
         WHERE hosp_code = #{hospCode}
           AND insure_reg_code = #{insureRegCode}
           AND is_match = #{isMatch}
           AND hosp_item_type = #{hospItemType}
+        <if test="keyword !=null and keyword != ''">
+            and (hosp_item_name like '%${keyword}%'
+            or hosp_item_code like '%${keyword}%'
+            or pym like '%${keyword}%'
+            or wbm like '%${keyword}%'
+            or nation_code like '%${keyword}%')
+        </if>
     </select>
+
+    <select id="queryUnMacthAllDtoPage" resultMap="InsureItemMatchMap" parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select
+            id, hosp_code, insure_reg_code, item_code, pqcc_item_id, hosp_item_id, hosp_item_name,
+            hosp_item_code, hosp_item_type, hosp_item_spec, hosp_item_unit_code, hosp_item_prep_code, hosp_item_price,
+            insure_item_name, insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
+            insure_item_prep_code, insure_item_price, deductible, standard_code, check_price, manufacturer, audit_code,
+            is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name, crte_time,lmt_user_flag,
+            lim_user_explain,tcmdrug_used_way,nation_code
+        from insure_item_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND hosp_item_type = #{hospItemType}
+    </select>
+
+    <delete id="deleteInsureItemInfos" parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        delete from insure_item_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND hosp_item_type = #{hospItemType}
+    </delete>
+
 
     <select id="queryInsureMatchItemByItems" parameterType="java.util.Map" resultMap="InsureItemMatchMap">
         select * from insure_item_match
@@ -234,7 +272,7 @@
         hosp_item_unit_code, hosp_item_prep_code,
         hosp_item_price, standard_code, audit_code, is_match,
         is_trans, is_valid, pym, wbm, crte_id,
-        crte_name, crte_time)
+        crte_name, crte_time,nation_code)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (
@@ -260,7 +298,8 @@
             #{item.goodWbm},
             #{item.crteId},
             #{item.crteName},
-            now()
+            now(),
+            #{item.nationCode}
             )
         </foreach>
     </insert>
@@ -272,7 +311,7 @@
         hosp_item_id, hosp_item_name, hosp_item_code,
         hosp_item_type, hosp_item_spec, hosp_item_unit_code,
         hosp_item_price, audit_code,is_match, is_trans, is_valid,
-        pym, wbm, crte_id, crte_name, crte_time)
+        pym, wbm, crte_id, crte_name, crte_time,nation_code)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (
@@ -295,7 +334,8 @@
             #{item.nameWbm},
             #{item.crteId},
             #{item.crteName},
-            now()
+            now(),
+            #{item.nationCode}
             )
         </foreach>
     </insert>
@@ -307,7 +347,7 @@
         hosp_item_id, hosp_item_name, hosp_item_code,
         hosp_item_type, hosp_item_spec, hosp_item_unit_code,
         hosp_item_price, audit_code,is_match, is_trans, is_valid,
-        pym, wbm, crte_id, crte_name, crte_time)
+        pym, wbm, crte_id, crte_name, crte_time,nation_code)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (
@@ -330,7 +370,8 @@
             #{item.wbm},
             #{item.crteId},
             #{item.crteName},
-            now()
+            now(),
+            #{item.nationCode}
             )
         </foreach>
     </insert>

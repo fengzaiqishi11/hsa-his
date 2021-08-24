@@ -751,8 +751,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
      */
     @Override
     public Boolean insertUnifiedHandMatch(InsureItemMatchDTO insureItemMatchDTO) {
-        String itemCode = insureItemMatchDTO.getItemCode();
-        if (Constants.XMLB.YP.equals(itemCode) || Constants.XMLB.CL.equals(itemCode) || Constants.XMLB.XM.equals(itemCode)) {
+        String hospItemType = insureItemMatchDTO.getHospItemType();
+        if (Constants.XMLB.YP.equals(hospItemType) || Constants.XMLB.CL.equals(hospItemType) || Constants.XMLB.XM.equals(hospItemType)) {
             insureItemMatchDTO.setId(insureItemMatchDTO.getInsureId());
             InsureItemDTO insureItemDTO = insureItemDAO.getInsureItemById(insureItemMatchDTO);
             if (insureItemDTO == null) {
@@ -778,10 +778,16 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         } else {
             insureItemMatchDTO.setId(insureItemMatchDTO.getInsureId());
             InsureDiseaseDTO insureDiseaseDTO = insureDiseaseDAO.getInsureDiseaseById(insureItemMatchDTO);
+            if (insureDiseaseDTO == null) {
+                throw new AppException("未查询到医保疾病信息！");
+            }
+
             InsureDiseaseMatchDTO insureDiseaseMatchDTO = new InsureDiseaseMatchDTO();
             insureDiseaseMatchDTO.setId(insureItemMatchDTO.getHospId());
+            insureDiseaseMatchDTO.setHospCode(insureItemMatchDTO.getHospCode());
             insureDiseaseMatchDTO.setIsMatch(Constants.SF.S);
             insureDiseaseMatchDTO.setIsTrans(Constants.SF.S);
+            insureDiseaseMatchDTO.setAuditCode(Constants.SF.S);
             insureDiseaseMatchDTO.setInsureIllnessName(insureDiseaseDTO.getInsureIllnessName());
             insureDiseaseMatchDTO.setInsureIllnessCode(insureDiseaseDTO.getInsureIllnessCode());
             insureDiseaseMatchDAO.updateDisease(insureDiseaseMatchDTO);
@@ -789,14 +795,14 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         return true;
     }
 
-    /**
+   /* *//**
      * @Method insertHandlerItem
      * @Desrciption 医保统一支付：材料类型的手动匹配
      * @Param
      * @Author fuhui
      * @Date 2021/4/10 2:18
      * @Return
-     **/
+     **//*
     private void insertHandlerMaterial(InsureItemDTO itemDTO, BaseMaterialDTO baseMaterialDTO, InsureItemMatchDTO itemMatchDTO) {
         List<InsureItemMatchDTO> list = insureItemMatchDAO.selectById(itemMatchDTO);
         if (!ListUtils.isEmpty(list)) {
@@ -836,14 +842,14 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         insureItemMatchDAO.insertHandMatch(map);
     }
 
-    /**
+    *//**
      * @Method insertHandlerItem
      * @Desrciption 医保统一支付：项目类型的手动匹配
      * @Param
      * @Author fuhui
      * @Date 2021/4/10 2:18
      * @Return
-     **/
+     **//*
     private void insertHandlerItem(InsureItemDTO itemDTO, BaseItemDTO baseItemDTO, InsureItemMatchDTO itemMatchDTO) {
         List<InsureItemMatchDTO> list = insureItemMatchDAO.selectById(itemMatchDTO);
         if (!ListUtils.isEmpty(list)) {
@@ -879,7 +885,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("crteId", itemMatchDTO.getCrteId());
         map.put("crteTime", DateUtils.getNow());
         insureItemMatchDAO.insertHandMatch(map);
-    }
+    }*/
 
     /**
      * @param insureItemDTO

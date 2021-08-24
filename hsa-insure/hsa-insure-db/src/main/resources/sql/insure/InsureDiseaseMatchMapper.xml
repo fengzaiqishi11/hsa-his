@@ -39,7 +39,7 @@
           AND audit_code = #{auditCode}
         <if test="keyword !=null and keyword != ''">
             and (hosp_illness_code like '%${keyword}%'
-            or hosp_illness_name like '%${keyword}%'
+            or hosp_illness_name like '%${keyword}%')
         </if>
     </select>
 

@@ -240,4 +240,21 @@ public class OutptOutTmakePriceFormController extends BaseController {
         map.put("hospCode",userDTO.getHospCode());
         return outptOutTmakePriceFormService_consumer.addOutptVisitRecordUpload(map);
     }
+
+
+    /**
+     * @Menthod: addOperAndRescue
+     * @Desrciption: 统一支付平台-急诊留观手术及抢救信息【4302】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-23 13:50
+     * @Return:
+     **/
+    @PostMapping("/addOperAndRescue")
+    public WrapperResponse<Boolean> addOperAndRescue(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return outptOutTmakePriceFormService_consumer.addOperAndRescue(map);
+    }
 }

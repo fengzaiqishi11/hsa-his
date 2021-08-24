@@ -78,4 +78,28 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
 
     /** 取消手术申请标识 1:表示取消手术申请 **/
     private String operApplyStatusChange;
+    /**
+     * 医保个人电脑号
+     */
+    private String aac001;
+    /**
+     * 医保登记号
+     */
+    private String medicalRegNo;
+    /**
+     * 门诊病历号
+     */
+    private String outProfile;
+    /**
+     * 病人类型
+     */
+    private String patientCode;
+    /**
+     * 手术疾病编码
+     */
+    private String operDiseaseCode;
+    /**
+     * 患者姓名
+     */
+    private String name;
 }

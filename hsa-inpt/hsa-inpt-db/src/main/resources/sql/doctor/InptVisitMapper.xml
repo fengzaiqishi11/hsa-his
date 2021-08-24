@@ -254,7 +254,7 @@
 			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+			and in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and status_code = #{statusCode}
@@ -302,7 +302,7 @@
 			and pt.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and pt.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+			and pt.in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and pt.status_code = #{statusCode}

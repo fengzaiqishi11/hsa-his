@@ -438,6 +438,27 @@ public class SysUserController extends BaseController {
         return listWrapperResponse;
     }
 
+    /**
+     * @Method queryVisitDoctorByWorkTypeCode
+     * @Param [sysUserDTO]
+     * @description    根据用户状态、科室类型 职工类型模糊查询
+     * @author zhangguorui
+     * @date 2021/8/23
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.sys.user.dto.SysUserDTO>>
+     * @throws
+     */
+    @GetMapping("/queryVisitDoctorByWorkTypeCode")
+    public WrapperResponse<List<SysUserDTO>> queryVisitDoctorByWorkTypeCode(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res)
+    {
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+        //封装参数
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("sysUserDTO",sysUserDTO);
+        WrapperResponse<List<SysUserDTO>> listWrapperResponse = sysUserService_consumer.queryVisitDoctorByWorkTypeCode(map);
+        return listWrapperResponse;
+    }
     @PostMapping("/upLoad")
     public WrapperResponse<Boolean> upLoad(@RequestParam MultipartFile file, HttpServletRequest req, HttpServletResponse res) {
 

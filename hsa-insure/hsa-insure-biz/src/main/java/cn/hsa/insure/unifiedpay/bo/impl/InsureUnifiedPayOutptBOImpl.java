@@ -13,11 +13,12 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayOutptBO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
-import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.entity.OutptVisitDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -1240,8 +1241,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         String hospCode = MapUtils.get(map, "hospCode");
         String insureRegCode = MapUtils.get(map, "insureRegCode");
         if (StringUtils.isEmpty(insureRegCode)) throw new RuntimeException("未传入医保机构编码");
-        OutptRegisterDO outptRegisterDO = MapUtils.get(map, "outptRegisterDO");
-        OutptVisitDO outptVisitDO = MapUtils.get(map, "outptVisitDO");
+        OutptRegisterDTO outptRegisterDTO = MapUtils.get(map, "outptRegisterDTO");
         List<OutptMedicalRecordDTO> blList = MapUtils.get(map, "blList");
         List<OutptDiagnoseDTO> zdList = MapUtils.get(map, "zdList");
         List<OutptPrescribeDetailsExtDTO> cfList = MapUtils.get(map, "cfList");
@@ -1253,13 +1253,13 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
         if (insureConfigurationDTO == null) throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
 
-        // 封装挂号信息 todo
-        Map<String, Object> rgstinfo = this.handleRegisterData(outptRegisterDO, outptVisitDO);
-        // 封装病历信息 todo
+        // 封装挂号信息
+        Map<String, Object> rgstinfo = this.handleRegisterData(outptRegisterDTO);
+        // 封装病历信息
         List<Map<String, Object>> caseinfo = this.handleBlData(blList);
-        // 封装诊断信息 todo
+        // 封装诊断信息
         List<Map<String, Object>> diseinfo = this.handleZdData(zdList);
-        // 封装处方信息 todo
+        // 封装处方信息
         List<Map<String, Object>> rxinfo = this.handleCfData(cfList);
 
         Map inputMap = new HashMap();
@@ -1298,44 +1298,156 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         return resultMap;
     }
 
+    /**
+     * @Menthod: UP_4302
+     * @Desrciption: 医保统一支付平台：急诊留观手术及抢救信息
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-17 19:45
+     * @Return:
+     **/
+    @Override
+    public Map<String, Object> UP4302(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (StringUtils.isEmpty(insureRegCode)) {
+            throw new RuntimeException("未传入医保机构编码");
+        }
+        List<OperInfoRecordDTO> ssList = MapUtils.get(map, "ssList");
+        List<OutptDiagnoseDTO> qjList = MapUtils.get(map, "qjList");
+        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode);
+        configDTO.setRegCode(insureRegCode);
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null) throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
+
+        // 封装手术信息
+        List<Map<String, Object>> oprninfo = this.handleSsData(ssList);
+        // 封装抢救信息 todo his没有相关数据，暂时写死
+        List<Map<String, Object>> rescinfo = this.handleQjData(qjList);
+
+        Map inputMap = new HashMap();
+        inputMap.put("oprninfo", oprninfo); // 手术信息list
+        inputMap.put("rescinfo", rescinfo); // 抢救信息list
+
+        // 调用统一支付平台接口
+        Map httpMap = new HashMap();
+        httpMap.put("infno", Constant.UnifiedPay.OUTPT.UP_4302); // 交易编号
+        httpMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode())); // 发送方报文
+        httpMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); // 参保地医保区划
+        httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
+        httpMap.put("medins_code", insureConfigurationDTO.getOrgCode()); // 定点医药机构编号
+        httpMap.put("insur_code", insureConfigurationDTO.getRegCode()); // 医保中心编码
+        httpMap.put("input", inputMap); // 交易输入
+        String dataJson = JSONObject.toJSONString(httpMap);
+        logger.debug("统一支付平台-急诊留观手术及抢救信息【4302】入参：" + dataJson);
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
+        logger.debug("统一支付平台-急诊留观手术及抢救信息【4302】返参：" + resultStr);
+
+        // 解析返参
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("无法访问统一支付平台");
+        }
+        Map<String, Object> resultMap = JSONObject.parseObject(resultStr, Map.class);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            String msg = MapUtils.get(resultMap, "msg");
+            throw new AppException(msg);
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            String err_msg = MapUtils.get(resultMap, "err_msg");
+            throw new AppException(err_msg);
+        }
+        return resultMap;
+    }
+
+    // 封装抢救信息
+    private List<Map<String, Object>> handleQjData(List<OutptDiagnoseDTO> qjList) {
+        List<Map<String, Object>> rescinfo = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("resc_begntime", DateUtils.getNow()); //抢救开始时间
+        map.put("resc_endtime", DateUtils.getNow()); //抢救结束时间
+        map.put("er_resc_rec", " "); //急诊抢救记录
+        map.put("resc_psn_list", "管理员,医生1"); //参加抢救人员名单
+        map.put("vali_flag", Constants.SF.S); //有效标志
+        rescinfo.add(map);
+        return rescinfo;
+    }
+
+    // 封装手术信息
+    private List<Map<String, Object>> handleSsData(List<OperInfoRecordDTO> ssList) {
+        List<Map<String, Object>> oprninfo = new ArrayList<>();
+        if (!ListUtils.isEmpty(ssList)) {
+            ssList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("mdtrt_sn", dto.getVisitId()); //就医流水号
+                if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
+                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
+                        map.put("mdtrt_id", dto.getMedicalRegNo()); //就诊ID，医保登记号
+                        map.put("psn_no", dto.getAac001()); //人员编号，个人电脑号
+                    } else {
+                        throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
+                    }
+                }
+                map.put("medrcdno", dto.getOutProfile()); //病历号
+                map.put("oprn_oprt_sn", dto.getId()); //手术操作序号
+                map.put("oprn_oprt_code", dto.getOperDiseaseCode()); //手术操作代码
+                map.put("oprn_oprt_name", dto.getOperDiseaseName()); //手术操作名称
+                map.put("oprn_oprt_tagt_part_name", " "); //手术操作目标部位名称
+                map.put("itvt_name", " "); //介入物名称
+                map.put("oprn_oprt_mtd_dscr", dto.getContent()); //手术及操作方法描述
+                map.put("oprn_oprt_cnt", 1); //手术及操作次数
+                map.put("oprn_oprt_time", dto.getOperEndTime()); //手术及操作时间
+                map.put("vali_flag", Constants.SF.S); //有效标志
+                oprninfo.add(map);
+            });
+        }
+        return oprninfo;
+    }
+
     // 封装处方信息
     private List<Map<String, Object>> handleCfData(List<OutptPrescribeDetailsExtDTO> cfList) {
         List<Map<String, Object>> rxinfo = new ArrayList<>();
         if (!ListUtils.isEmpty(cfList)) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("rxno", null); //处方号
-            map.put("rx_prsc_time", null); //处方开方时间
-            map.put("rx_type_code", null); //处方类别代码
-            map.put("rx_item_type_code", null); //处方项目分类代码
-            map.put("rx_item_type_name", null); //处方项目分类名称
-            map.put("rx_detl_id", null); //处方明细代码
-            map.put("rx_detl_name", null); //处方明细名称
-            map.put("tcmdrug_type_name", null); //中药类别名称
-            map.put("tcmdrug_type_code", null); //中药类别代码
-            map.put("tcmherb_foote", null); //草药脚注
-            map.put("medn_type_code", null); //药物类型代码
-            map.put("medn_type_name", null); //药物类型
-            map.put("drug_dosform", null); //药品剂型
-            map.put("drug_dosform_name", null); //药品剂型名称
-            map.put("drug_spec", null); //药品规格
-            map.put("drug_used_frqu", null); //药物使用-频率
-            map.put("drug_used_idose", null); //药物使用-总剂量
-            map.put("drug_used_sdose", null); //药物使用-次剂量
-            map.put("drug_used_dosunt", null); //药物使用-剂量单位
-            map.put("drug_used_way_code", null); //药物使用-途径代码
-            map.put("drug_medc_way", null); //药物使用-途径
-            map.put("skintst_dicm", null); //皮试判别
-            map.put("medc_begntime", null); //用药开始时间
-            map.put("medc_endtime", null); //用药停止日期时间
-            map.put("medc_days", null); //用药天数
-            map.put("main_medc_flag", null); //主要用药标志
-            map.put("urgt_flag", null); //加急标志
-            map.put("unif_purc_drug", null); //统一采购药品
-            map.put("drug_purc_code", null); //药品采购代码
-            map.put("drug_mgt_plaf_code", null); //药品管理平台代码
-            map.put("bas_medn_flag", null); //基本药物标志
-            map.put("vali_flag", null); //有效标志
-            rxinfo.add(map);
+            cfList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("rxno", dto.getOrderNo()); //处方号
+                map.put("rx_prsc_time", dto.getCrteTime()); //处方开方时间
+                map.put("rx_type_code", dto.getTypeCode()); //处方类别代码
+                map.put("rx_item_type_code", dto.getItemCode()); //处方项目分类代码
+                map.put("rx_item_type_name", dto.getItemCodeName()); //处方项目分类名称
+                map.put("rx_detl_id", dto.getItemId()); //处方明细代码
+                map.put("rx_detl_name", dto.getItemName()); //处方明细名称
+                map.put("tcmdrug_type_name", null); //中药类别名称
+                map.put("tcmdrug_type_code", null); //中药类别代码
+                map.put("tcmherb_foote", dto.getHerbNoteName()); //草药脚注
+                map.put("medn_type_code", dto.getDrugTypeCode()); //药物类型代码
+                map.put("medn_type_name", dto.getDrugTypeName()); //药物类型
+                map.put("drug_dosform", dto.getPrepCode()); //药品剂型
+                map.put("drug_dosform_name", dto.getPrepName()); //药品剂型名称
+                map.put("drug_spec", dto.getSpec()); //药品规格
+                map.put("drug_used_frqu", dto.getRateName()); //药物使用-频率
+                map.put("drug_used_idose", dto.getDosage()); //药物使用-总剂量
+                map.put("drug_used_sdose", dto.getDosage()); //药物使用-次剂量
+                map.put("drug_used_dosunt", dto.getDosageUnitName()); //药物使用-剂量单位
+                map.put("drug_used_way_code", dto.getUsageCode()); //药物使用-途径代码，即用药方式
+                map.put("drug_medc_way",  dto.getUsageCode()); //药物使用-途径，即用药方式
+                map.put("skintst_dicm", dto.getIsSkin()); //皮试判别
+                map.put("medc_begntime", dto.getMinPlanExecDate()); //用药开始时间
+                map.put("medc_endtime", dto.getMaxPlanExecDate()); //用药停止日期时间
+                map.put("medc_days", dto.getUseDays()); //用药天数
+                map.put("main_medc_flag", dto.getUsageName()); //主要用药标志
+                map.put("urgt_flag", null); //加急标志
+                map.put("unif_purc_drug", null); //统一采购药品
+                map.put("drug_purc_code", null); //药品采购代码
+                map.put("drug_mgt_plaf_code", null); //药品管理平台代码
+                map.put("bas_medn_flag", null); //基本药物标志
+                map.put("vali_flag", Constants.SF.S); //有效标志
+                rxinfo.add(map);
+            });
         }
         return rxinfo;
     }
@@ -1344,17 +1456,19 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     private List<Map<String, Object>> handleZdData(List<OutptDiagnoseDTO> zdList) {
         List<Map<String, Object>> diseinfo = new ArrayList<>();
         if (!ListUtils.isEmpty(zdList)) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("tcm_diag_flag", null); //中医诊断标志
-            map.put("maindiag_flag", null); //主诊断标志
-            map.put("diag_code", null); //诊断代码
-            map.put("diag_name", null); //诊断名称
-            map.put("tcm_dise_code", null); //中医病名代码
-            map.put("tcm_dise_name", null); //中医病名名称
-            map.put("tcmsymp_code", null); //中医证候代码
-            map.put("tcmsymp", null); //中医证候
-            map.put("vali_flag", null); //有效标志
-            diseinfo.add(map);
+            zdList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("tcm_diag_flag", null); //中医诊断标志
+                map.put("maindiag_flag", dto.getIsMain()); //主诊断标志
+                map.put("diag_code", dto.getDiseaseCode()); //诊断代码
+                map.put("diag_name", dto.getDiseaseName()); //诊断名称
+                map.put("tcm_dise_code", null); //中医病名代码
+                map.put("tcm_dise_name", null); //中医病名名称
+                map.put("tcmsymp_code", null); //中医证候代码
+                map.put("tcmsymp", null); //中医证候
+                map.put("vali_flag", Constants.SF.S); //有效标志
+                diseinfo.add(map);
+            });
         }
         return diseinfo;
     }
@@ -1363,43 +1477,51 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     private List<Map<String, Object>> handleBlData(List<OutptMedicalRecordDTO> blList) {
         List<Map<String, Object>> caseinfo = new ArrayList<>();
         if (!ListUtils.isEmpty(blList)) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("mdtrt_date", null); // 就诊日期
-            map.put("chfcomp", null); // 主诉
-            map.put("attk_date_time", null); // 发病日期时间
-            map.put("mdtrt_rea", null); // 就诊原因
-            map.put("illhis", null); // 病史
-            map.put("algs", null); // 过敏史
-            map.put("aise_code", null); // 过敏源代码
-            map.put("phex", null); // 查体
-            map.put("disa_info_code", null); // 残疾情况代码
-            map.put("symp_name", null); // 症状名称
-            map.put("symp_code", null); // 症状代码
-            map.put("dspo_opnn", null); // 处置意见
-            map.put("dept_code", null); // 科室代码
-            map.put("dept_name", null); // 科室名称
-            map.put("vali_flag", null); // 有效标志
-            caseinfo.add(map);
+            blList.forEach(dto -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("mdtrt_date", dto.getVisitTime()); // 就诊日期
+                map.put("chfcomp", dto.getChiefComplaint()); // 主诉
+                map.put("attk_date_time", dto.getStartDate()); // 发病日期时间
+                map.put("mdtrt_rea", null); // 就诊原因
+                map.put("illhis", dto.getPresentIllness()); // 病史
+                map.put("algs", dto.getAllergyHistory()); // 过敏史
+                map.put("aise_code", null); // 过敏源代码
+                map.put("phex", null); // 查体
+                map.put("disa_info_code", null); // 残疾情况代码
+                map.put("symp_name", null); // 症状名称
+                map.put("symp_code", null); // 症状代码
+                map.put("dspo_opnn", dto.getHandleSuggestion()); // 处置意见
+                map.put("dept_code", dto.getDeptCode()); // 科室代码
+                map.put("dept_name", dto.getDeptName()); // 科室名称
+                map.put("vali_flag", Constants.SF.S); // 有效标志
+                caseinfo.add(map);
+            });
         }
         return caseinfo;
     }
 
     // 封装挂号信息
-    private Map<String, Object> handleRegisterData(OutptRegisterDO outptRegisterDO, OutptVisitDO outptVisitDO) {
+    private Map<String, Object> handleRegisterData(OutptRegisterDTO outptRegisterDTO) {
         Map<String, Object> rgstinfo = new HashMap();
-        rgstinfo.put("mdtrt_sn", null); // 就医流水号
-        rgstinfo.put("mdtrt_id", null); // 就诊ID
-        rgstinfo.put("psn_no", null); // 人员编号
-        rgstinfo.put("rgst_type_code", null); // 挂号类别代码
-        rgstinfo.put("rgst_way_code", null); // 挂号方式代码
-        rgstinfo.put("rgst_serv_fee", null); // 挂号费
-        rgstinfo.put("ordr_way_code", null); // 预约途径代码
-        rgstinfo.put("retnr_flag", null); // 退号标志
-        rgstinfo.put("fstdiag_flag", null); // 初诊标志
-        rgstinfo.put("mdtrt_flag", null); // 就诊标志
-        rgstinfo.put("rgst_retnr_time", null); // 挂号/退号时间
+        rgstinfo.put("mdtrt_sn", outptRegisterDTO.getVisitId()); // 就医流水号
+        if (!Constants.BRLX.PTBR.equals(outptRegisterDTO.getPatientCode())) {
+            if (StringUtils.isNotEmpty(outptRegisterDTO.getAac001()) && StringUtils.isNotEmpty(outptRegisterDTO.getMedicalRegNo())) {
+                rgstinfo.put("mdtrt_id", outptRegisterDTO.getMedicalRegNo()); // 就诊ID，医保登记号
+                rgstinfo.put("psn_no", outptRegisterDTO.getAac001()); // 人员编号
+            } else {
+                throw new RuntimeException("【" + outptRegisterDTO.getName() + "】为医保病人，请先进行医保登记");
+            }
+        }
+        rgstinfo.put("rgst_type_code", outptRegisterDTO.getVisitCode()); // 挂号类别代码
+        rgstinfo.put("rgst_way_code", outptRegisterDTO.getSourceBzCode()); // 挂号方式代码
+        rgstinfo.put("rgst_serv_fee", outptRegisterDTO.getRealityPrice()); // 挂号费
+        rgstinfo.put("ordr_way_code", outptRegisterDTO.getSourceTjCode()); // 预约途径代码
+        rgstinfo.put("retnr_flag", outptRegisterDTO.getIsCancel()); // 退号标志
+        rgstinfo.put("fstdiag_flag", outptRegisterDTO.getIsFirstVisit()); // 初诊标志
+        rgstinfo.put("mdtrt_flag", outptRegisterDTO.getIsVisit()); // 就诊标志
+        rgstinfo.put("rgst_retnr_time", outptRegisterDTO.getRegisterTime()); // 挂号/退号时间
         rgstinfo.put("medfee_paymtd_code", null); // 医疗费用支付方式代码
-        rgstinfo.put("vali_flag", null); // 有效标志
+        rgstinfo.put("vali_flag", Constants.SF.S); // 有效标志
         return rgstinfo;
     }
 

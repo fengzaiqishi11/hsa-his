@@ -4,10 +4,12 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.inpt.advancepay.entity.InptAdvancePayDO;
+import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.outpt.daily.bo.OutinDailyBO;
 import cn.hsa.module.outpt.daily.dao.OutinDailyDAO;
 import cn.hsa.module.outpt.daily.dto.*;
 import cn.hsa.module.outpt.daily.entity.OutinDailyAdvancePayDO;
+import cn.hsa.module.outpt.daily.entity.OutinDailyCardPayDO;
 import cn.hsa.module.outpt.daily.entity.OutinDailyDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -159,6 +161,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         List<OutinDailyInsureDTO> odinList = new ArrayList<>();
         // 预交金支付方式表
         List<OutinDailyAdvancePayDO> odapList = new ArrayList<>();
+        // 一卡通充值退费记录
+        List<OutinDailyCardPayDO> odcpList = new ArrayList<>();
 
         // 门诊缴款
         if (Constants.JKLX.MZGH.equals(outinDailyDTO.getTypeCode()) || Constants.JKLX.MZSF.equals(outinDailyDTO.getTypeCode())) {
@@ -171,7 +175,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             }
             // 2、生成门诊收费日结缴款
             if ("0".equals(value) || Constants.JKLX.MZSF.equals(outinDailyDTO.getTypeCode())) {
-                handleDailyOutpt(outinDailyDTO, Constants.JKLX.MZSF, odList, odiList, odpList, odfList, odinList);
+                handleDailyOutpt(outinDailyDTO, Constants.JKLX.MZSF, odList, odiList, odpList, odfList, odinList, odcpList);
             }
         }
         // 住院缴款
@@ -203,6 +207,10 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         // 日结预交金支付方式
         if (!ListUtils.isEmpty(odapList)) {
             outinDailyDAO.insertOutinDailyAdvancePayList(odapList);
+        }
+        // 一卡通支付方式
+        if (!ListUtils.isEmpty(odcpList)) {
+            outinDailyDAO.insertOutinDailyCardPayList(odcpList);
         }
         return true;
     }
@@ -247,6 +255,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setPreferentialTotalPrice(MapUtils.get(allMap, "preferential_price"));
         // 实缴总金额 = 汇总【门诊挂号结算表（正常）.实收总金额】
         outinDailyDTO.setRealityTotalPrice(MapUtils.get(allMap, "reality_price"));
+        // 一卡通支付总金额 = 汇总【门诊挂号结算表（正常）.一卡通支付总金额】
+        outinDailyDTO.setCardTotalPrice(MapUtils.get(allMap, "card_price"));
         // 挂号结算记录
         Map<String, Map<String, Object>> orsMap = outinDailyDAO.queryOutptRegisterSettle(dto);
         if (MapUtils.isEmpty(orsMap)) {
@@ -335,11 +345,42 @@ public class OutinDailyBOImpl implements OutinDailyBO {
      * @Date 2020/9/24 20:49
      * @Return
      **/
-    private void handleDailyOutpt(OutinDailyDTO dto, String typeCode, List<OutinDailyDTO> odList, List<OutinDailyInvoiceDTO> odiList, List<OutinDailyPayDTO> odpList, List<OutinDailyFinclassifyDTO> odfList, List<OutinDailyInsureDTO> odinList) {
+    private void handleDailyOutpt(OutinDailyDTO dto, String typeCode, List<OutinDailyDTO> odList, List<OutinDailyInvoiceDTO> odiList, List<OutinDailyPayDTO> odpList, List<OutinDailyFinclassifyDTO> odfList, List<OutinDailyInsureDTO> odinList, List<OutinDailyCardPayDO> odcpList) {
         // *******************************门诊日结 - 日结主表*******************************
         OutinDailyDTO outinDailyDTO = buildOutinDailyDTO(dto, typeCode);
         odList.add(outinDailyDTO);
 
+        // 一卡通充值
+        List<BaseCardRechargeChangeDTO> cardCZList = outinDailyDAO.queryBaseCardCZ(dto);
+        // 一卡通充值
+        if (!ListUtils.isEmpty(cardCZList)) {
+            // 充值金额
+            Map<String, List<BaseCardRechargeChangeDTO>> iapPriceMap = cardCZList.stream().collect(Collectors.groupingBy(e -> e.getStatusCode(), LinkedHashMap::new, Collectors.toList()));
+
+            // 充值
+            List<BaseCardRechargeChangeDTO> czList = iapPriceMap.get("6");
+            if (!ListUtils.isEmpty(czList)) {
+                // 一卡通充值
+                outinDailyDTO.setYktczTotalPrice(czList.stream().map(e -> e.getPrice()).reduce(BigDecimal.ZERO, BigDecimal::add).abs());
+            }
+            // 退款
+            List<BaseCardRechargeChangeDTO> chList = iapPriceMap.get("7");
+            if (!ListUtils.isEmpty(chList)) {
+                // 一卡通退款
+                outinDailyDTO.setYkttkTotalPrice(chList.stream().map(e -> e.getPrice()).reduce(BigDecimal.ZERO, BigDecimal::add).abs());
+            }
+
+            // 一卡通充值方式
+            Map<String, List<BaseCardRechargeChangeDTO>> iapPayMap = cardCZList.stream().collect(Collectors.groupingBy(e -> e.getPayCode(), LinkedHashMap::new, Collectors.toList()));
+            for (Map.Entry<String, List<BaseCardRechargeChangeDTO>> map : iapPayMap.entrySet()) {
+                OutinDailyCardPayDO odcp = buildOutinDailyCardPayDTO(outinDailyDTO, typeCode);
+                // 支付方式
+                odcp.setPayCode(map.getKey());
+                // 预交金支付金额
+                odcp.setTotalPrice(map.getValue().stream().map(e -> e.getPrice()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                odcpList.add(odcp);
+            }
+        }
 
         // 门诊结算记录
         Map<String, Map<String, Object>>  mzMap = outinDailyDAO.queryOutptSettleAll(dto);
@@ -356,6 +397,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setRoundTotalPrice(MapUtils.get(mzMap, "trunc_price"));
         // 实缴总金额 = 汇总【门诊结算表（正常）.实收金额】
         outinDailyDTO.setRealityTotalPrice(MapUtils.get(mzMap, "actual_price"));
+        // 一卡通支付总金额 = 汇总【门诊结算表（正常）.一卡通支付总金额】
+        outinDailyDTO.setCardTotalPrice(MapUtils.get(mzMap, "card_price"));
 
         // 门诊结算记录
         Map<String, Map<String, Object>>  osMap = outinDailyDAO.queryOutptSettle(dto);
@@ -436,6 +479,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         }
         // 回写门诊结算表日结缴款ID
         outinDailyDAO.updateDailyIdByOutptSettle(outinDailyDTO);
+        // 回写一卡通异动表日结缴款ID
+        outinDailyDAO.updateDailyIdToBaseCardRechangeChargeDO(outinDailyDTO);
     }
 
     /**
@@ -653,6 +698,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setRoundTotalPrice(new BigDecimal(0));
         // 实缴总金额
         outinDailyDTO.setRealityTotalPrice(new BigDecimal(0));
+        // 一卡通支付总金额
+        outinDailyDTO.setCardTotalPrice(new BigDecimal(0));
         // 是否确认缴款
         outinDailyDTO.setIsOk(Constants.SF.F);
         // 创建人/缴款人ID
@@ -823,6 +870,36 @@ public class OutinDailyBOImpl implements OutinDailyBO {
     }
 
     /**
+     * @Method 构建日结缴款-预交金支付方式表
+     * @Description
+     *
+     * @Param
+     *
+     * @Author zhongming
+     * @Date 2020/9/24 21:02
+     * @Return
+     **/
+    private OutinDailyCardPayDO buildOutinDailyCardPayDTO(OutinDailyDTO dto, String typeCode) {
+        // 日结缴款支付方式表
+        OutinDailyCardPayDO outinDailyCardPayDO = new OutinDailyCardPayDO();
+        // 主键
+        outinDailyCardPayDO.setId(SnowflakeUtils.getId());
+        // 医院编码
+        outinDailyCardPayDO.setHospCode(dto.getHospCode());
+        // 日结ID
+        outinDailyCardPayDO.setDailyId(dto.getId());
+        // 日结单号
+        outinDailyCardPayDO.setDailyNo(dto.getDailyNo());
+        // 缴款类型代码：0、门诊挂号，1、门诊收费，2、住院
+        outinDailyCardPayDO.setTypeCode(typeCode);
+        // 支付方式代码（ZFFS）
+        outinDailyCardPayDO.setPayCode(Constants.ZFFS.XJ);
+        // 支付总金额
+        outinDailyCardPayDO.setTotalPrice(new BigDecimal(0));
+        return outinDailyCardPayDO;
+    }
+
+    /**
      * @Method 确认缴款
      * @Description 
      * 
@@ -928,6 +1005,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             OutinDailyDO odMzSF = null;
             List<Map<String, Object>> MZ_GH03_LIST = null;
             List<Map<String, Object>> MZ_SF03_LIST = null;
+            List<Map<String, Object>> MZ_YKT_LIST = null;
             // 日结发票
             List<Map<String, Object>> MZ_05 = outinDailyDAO.queryOutinDailyInvoiceByDailyNo(dto);
             Map<String, List<Map<String, Object>>> MZ_05_MAP_LIST = MZ_05.stream().collect(Collectors.groupingBy(e -> MapUtils.get(e, "type_code"), LinkedHashMap::new, Collectors.toList()));
@@ -939,8 +1017,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 List<Map<String, Object>> RT_0201 = outinDailyDAO.queryDailyByDailyNo(dto);
                 RT_0201 = RT_0201.stream().filter(map ->
                         ("A".equals(MapUtils.get(map, "code")) || "B".equals(MapUtils.get(map, "code")) ||
-                         "J".equals(MapUtils.get(map, "code")) || "I".equals(MapUtils.get(map, "code")) ||
-                         !BigDecimalUtils.isZero(MapUtils.get(map, "total_price")))
+                                "J".equals(MapUtils.get(map, "code")) || "I".equals(MapUtils.get(map, "code")) ||
+                                !BigDecimalUtils.isZero(MapUtils.get(map, "total_price")))
                 ).collect(Collectors.toList());
                 resultMap.put("RT_0201", RT_0201);
 
@@ -957,7 +1035,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0202.put("RT_020204", odMzGh != null ? odMzGh.getRealityTotalPrice() : "0.00");
                 resultMap.put("RT_0202", RT_0202);
 
-                // 门诊挂号 - 费用构成
+                // 门诊挂号 - 费用构成  TODO 添加一卡通
                 MZ_GH03_LIST = outinDailyDAO.queryOutinDailyPay(dto);
                 StringBuffer RT_0203 = new StringBuffer();
                 MZ_GH03_LIST.forEach(m -> {
@@ -966,20 +1044,25 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                     }
                     RT_0203.append(m.get("name")).append("：").append(m.get("total_price")).append("元");
                 });
+
+                // 2021年8月23日13:59:04 查询结算表一卡通支付金额
+                Map<String, Object> cardTotalPriceMap = outinDailyDAO.getOutptRegisterSettleCardTotalPrice(dto);
+                RT_0203.append("，一卡通：" + (cardTotalPriceMap != null ? MapUtils.get(cardTotalPriceMap, "cardTotalPrice") : "0.00") + "元");
+
                 resultMap.put("RT_0203", RT_0203);
 
                 // 挂号发票
                 List<Map<String, Object>> MZ_05_MZGH = MZ_05_MAP_LIST.get(Constants.JKLX.MZGH);
                 if (ListUtils.isEmpty(MZ_05_MZGH)) {
-                    resultMap.put("RT_030204", "门诊挂号发票：(    -    )0张");
+                    resultMap.put("RT_040204", "门诊挂号发票：(    -    )0张");
                 } else {
-                    StringBuffer RT_030204 = new StringBuffer("门诊挂号发票：");
+                    StringBuffer RT_040204 = new StringBuffer("门诊挂号发票：");
                     MZ_05_MZGH.forEach(m -> {
-                        RT_030204.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
-                        RT_030204.append("，");
+                        RT_040204.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
+                        RT_040204.append("，");
                     });
-                    RT_030204.deleteCharAt(RT_030204.length() - 1);
-                    resultMap.put("RT_030204", RT_030204);
+                    RT_040204.deleteCharAt(RT_040204.length() - 1);
+                    resultMap.put("RT_040204", RT_040204);
                 }
             }
             // 门诊收费收入
@@ -1003,27 +1086,58 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0102.put("RT_010204", odMzSF != null ? odMzSF.getRealityTotalPrice() : "0.00");
                 resultMap.put("RT_0102", RT_0102);
 
+                // *******************************门诊日结 - 一卡通收入*******************************
+                // 一卡通合计
+                BigDecimal yktcz = odMzSF != null ? odMzSF.getYktczTotalPrice() != null ? odMzSF.getYktczTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
+                BigDecimal ykttk = odMzSF != null ? odMzSF.getYkttkTotalPrice() != null ? odMzSF.getYkttkTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
+                List<Map<String, Object>> RT_0301 = new ArrayList<>();
+                Map<String, Object> tempMap = new HashMap<>();
+                tempMap.put("code", "B");
+                tempMap.put("total_price", yktcz);
+                tempMap.put("name", "充值合计");
+                RT_0301.add(tempMap);
+                Map<String, Object> tempMap1 = new HashMap<>();
+                tempMap1.put("code", "C");
+                tempMap1.put("total_price", ykttk);
+                tempMap1.put("name", "退款合计");
+                RT_0301.add(tempMap1);
+                Map<String, Object> tempMap2 = new HashMap<>();
+                tempMap2.put("code", "D");
+                tempMap2.put("total_price", BigDecimalUtils.subtract(yktcz, ykttk));
+                tempMap2.put("name", "实收合计");
+                RT_0301.add(tempMap2);
+                resultMap.put("RT_0301", RT_0301);
+
+                // 一卡通收入 -->> 支付方式组成
+                String RT_0302 = outinDailyDAO.queryOutinDailyCardPay(dto);
+                resultMap.put("RT_0302", RT_0302);
+                // *******************************门诊日结 - 一卡通收入*******************************
+
                 // 门诊收费 - 费用构成
                 MZ_SF03_LIST = outinDailyDAO.queryOutinDailyPay(dto);
                 StringBuffer RT_0103 = new StringBuffer();
                 MZ_SF03_LIST.forEach(m -> {
                     RT_0103.append(m.get("name")).append("：").append(m.get("total_price")).append("元，");
                 });
-                RT_0103.append("医保：" + (odMzSF != null ? odMzSF.getInsureTotalPrice() : "0.00") + "元");
+                RT_0103.append("医保：" + (odMzSF != null ? odMzSF.getInsureTotalPrice() : "0.00") + "元，");
+                // 2021年8月23日13:59:04 查询结算表一卡通支付金额
+                Map<String, Object> cardTotalPriceMap = outinDailyDAO.getOutptSettleCardTotalPrice(dto);
+                RT_0103.append("一卡通：" + (cardTotalPriceMap != null ? MapUtils.get(cardTotalPriceMap, "cardTotalPrice") : "0.00") + "元");
+
                 resultMap.put("RT_0103", RT_0103);
 
                 // 门诊发票
                 List<Map<String, Object>> MZ_05_MZSF = MZ_05_MAP_LIST.get(Constants.JKLX.MZSF);
                 if (ListUtils.isEmpty(MZ_05_MZSF)) {
-                    resultMap.put("RT_030205", "门诊收费发票：(    -    )0张");
+                    resultMap.put("RT_040205", "门诊收费发票：(    -    )0张");
                 } else {
-                    StringBuffer RT_030205 = new StringBuffer("门诊收费发票：");
+                    StringBuffer RT_040205 = new StringBuffer("门诊收费发票：");
                     MZ_05_MZSF.forEach(m -> {
-                        RT_030205.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
-                        RT_030205.append("，");
+                        RT_040205.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
+                        RT_040205.append("，");
                     });
-                    RT_030205.deleteCharAt(RT_030205.length() - 1);
-                    resultMap.put("RT_030205", RT_030205);
+                    RT_040205.deleteCharAt(RT_040205.length() - 1);
+                    resultMap.put("RT_040205", RT_040205);
                 }
             }
             // 结算情况
@@ -1033,37 +1147,45 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             BigDecimal mzSfSS = odMzSF != null ? odMzSF.getRealityTotalPrice() : new BigDecimal(0);
             // 医保金额
             BigDecimal mzYb = odMzSF != null ? odMzSF.getInsureTotalPrice() : new BigDecimal(0);
+            // 一卡通实收
+            BigDecimal yktczTotalPrice = odMzSF != null ? odMzSF.getYktczTotalPrice() != null ? odMzSF.getYktczTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
+            BigDecimal ykttkTotalPrice = odMzSF != null ? odMzSF.getYkttkTotalPrice() != null ? odMzSF.getYkttkTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
+            BigDecimal mzYKTSS = BigDecimalUtils.subtract(yktczTotalPrice, ykttkTotalPrice);
             // 实缴金额
-            BigDecimal RT_030201 = mzGhSS.add(mzSfSS).subtract(mzYb);
-            StringBuffer RT_0301 = new StringBuffer();
+            BigDecimal RT_040201 = mzGhSS.add(mzSfSS).add(mzYKTSS).subtract(mzYb);
+            StringBuffer RT_0401 = new StringBuffer();
             // 门诊、挂号合并
             if ("0".equals(value)) {
-                RT_0301.append("门诊挂号实收：").append(mzGhSS).append("元");
-                RT_0301.append(" + ");
-                RT_0301.append("门诊收费实收：").append(mzSfSS).append("元");
-                RT_0301.append(" - ");
-                RT_0301.append("医保金额：").append(mzYb).append("元");
+                RT_0401.append("门诊挂号实收：").append(mzGhSS).append("元");
+                RT_0401.append(" + ");
+                RT_0401.append("门诊收费实收：").append(mzSfSS).append("元");
+                RT_0401.append(" + ");
+                RT_0401.append("门诊一卡通实收：").append(mzYKTSS).append("元");
+                RT_0401.append(" - ");
+                RT_0401.append("医保金额：").append(mzYb).append("元");
             }
             // 门诊、挂号分开
             else {
                 // 挂号
                 if (Constants.JKLX.MZGH.equals(dto.getTypeCode())) {
-                    RT_0301.append("门诊挂号实收：").append(mzGhSS).append("元");
+                    RT_0401.append("门诊挂号实收：").append(mzGhSS).append("元");
                 }
                 // 门诊
                 else {
-                    RT_0301.append("门诊收费实收：").append(mzSfSS).append("元");
-                    RT_0301.append(" - ");
-                    RT_0301.append("医保金额：").append(mzYb).append("元");
+                    RT_0401.append("门诊收费实收：").append(mzSfSS).append("元");
+                    RT_0401.append(" + ");
+                    RT_0401.append("门诊一卡通实收：").append(mzYKTSS).append("元");
+                    RT_0401.append(" - ");
+                    RT_0401.append("医保金额：").append(mzYb).append("元");
                 }
             }
-            RT_0301.append(" = ");
-            RT_0301.append("实缴金额：").append(RT_030201).append("元");
-            resultMap.put("RT_0301", RT_0301);
+            RT_0401.append(" = ");
+            RT_0401.append("实缴金额：").append(RT_040201).append("元");
+            resultMap.put("RT_0401", RT_0401);
 
             // 金额小写转大写
-            resultMap.put("RT_030201", MoneyUtils.convert(RT_030201.doubleValue()));
-            resultMap.put("RT_030202", RT_030201);
+            resultMap.put("RT_040201", MoneyUtils.convert(RT_040201.doubleValue()));
+            resultMap.put("RT_040202", RT_040201);
 
             // 支付方式
             List<Map<String, Object>> MZ_01_LIST = new ArrayList<>();
@@ -1072,6 +1194,11 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             }
             if (!ListUtils.isEmpty(MZ_SF03_LIST)) {
                 MZ_01_LIST.addAll(MZ_SF03_LIST);
+            }
+            // 查询一卡通充值退费支付方式
+            MZ_YKT_LIST = outinDailyDAO.queryOutinDailyCardPays(dto);
+            if (!ListUtils.isEmpty(MZ_YKT_LIST)) {
+                MZ_01_LIST.addAll(MZ_YKT_LIST);
             }
             if (!ListUtils.isEmpty(MZ_01_LIST)) {
                 Map<String, List<Map<String, Object>>> mapList = MZ_01_LIST.stream().collect(Collectors.groupingBy(e -> MapUtils.get(e, "name"), LinkedHashMap::new, Collectors.toList()));
@@ -1084,14 +1211,14 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                         put("total_price", totalPrice);
                     }});
                 });
-                StringBuffer RT_030203 = new StringBuffer();
+                StringBuffer RT_040203 = new StringBuffer();
                 MZ_01_LIST.forEach(m -> {
-                    if (RT_030203.length() != 0) {
-                        RT_030203.append("，");
+                    if (RT_040203.length() != 0) {
+                        RT_040203.append("，");
                     }
-                    RT_030203.append(m.get("name")).append("：").append(m.get("total_price")).append("元");
+                    RT_040203.append(m.get("name")).append("：").append(m.get("total_price")).append("元");
                 });
-                resultMap.put("RT_030203", RT_030203);
+                resultMap.put("RT_040203", RT_040203);
             }
         }
         // 住院缴款
@@ -1145,9 +1272,9 @@ public class OutinDailyBOImpl implements OutinDailyBO {
 
             // *******************************住院日结 - 预交金结算*******************************
             // 预交金结算 -->> 预交金结算、预交金冲抵、 预交金补退
-            resultMap.put("RT_0301", TMP_0102.getYjjsTotalPrice());
-            resultMap.put("RT_0302", TMP_0102.getYjcdTotalPrice());
-            resultMap.put("RT_0303", TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()));
+            resultMap.put("RT_0401", TMP_0102.getYjjsTotalPrice());
+            resultMap.put("RT_0402", TMP_0102.getYjcdTotalPrice());
+            resultMap.put("RT_0403", TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()));
 
             // *******************************住院日结 - 结算详情*******************************
             // 实缴金额
@@ -1262,6 +1389,26 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         PageHelper.startPage(outinDailyDTO.getPageNo(), outinDailyDTO.getPageSize());
         // 查询所有
         List<Map<String, Object>> apcdList = outinDailyDAO.queryAdvancePayCd(outinDailyDTO);
+        // 返回分页结果
+        return PageDTO.of(apcdList);
+    }
+
+    @Override
+    public PageDTO queryCardConsumePay(OutinDailyDTO outinDailyDTO) {
+        // 设置分页信息
+        PageHelper.startPage(outinDailyDTO.getPageNo(), outinDailyDTO.getPageSize());
+        // 查询所有
+        List<Map<String, Object>> apcdList = outinDailyDAO.queryCardConsumePay(outinDailyDTO);
+        // 返回分页结果
+        return PageDTO.of(apcdList);
+    }
+
+    @Override
+    public PageDTO queryCardCzOrTkPay(OutinDailyDTO outinDailyDTO) {
+        // 设置分页信息
+        PageHelper.startPage(outinDailyDTO.getPageNo(), outinDailyDTO.getPageSize());
+        // 查询所有
+        List<Map<String, Object>> apcdList = outinDailyDAO.queryBaseCardCZAndTK(outinDailyDTO);
         // 返回分页结果
         return PageDTO.of(apcdList);
     }

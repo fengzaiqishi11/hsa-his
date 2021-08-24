@@ -14,4 +14,5 @@ public interface ReportService {
      * @return  cn.hsa.hsaf.core.framework.web public class WrapperResponse 统一结果返回实体
      */
     WrapperResponse<PageDTO> queryStroInvoicingLedger(Map<String,Object> map);
+    WrapperResponse<PageDTO> queryByStrSQL(Map<String,Object> map);
 }

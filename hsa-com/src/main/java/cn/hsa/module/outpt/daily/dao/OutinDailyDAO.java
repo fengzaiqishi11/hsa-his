@@ -1,12 +1,15 @@
 package cn.hsa.module.outpt.daily.dao;
 
 import cn.hsa.module.inpt.advancepay.entity.InptAdvancePayDO;
+import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.outpt.daily.dto.*;
 import cn.hsa.module.outpt.daily.entity.OutinDailyAdvancePayDO;
+import cn.hsa.module.outpt.daily.entity.OutinDailyCardPayDO;
 import cn.hsa.module.outpt.daily.entity.OutinDailyDO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -457,6 +460,16 @@ public interface OutinDailyDAO {
     String queryOutinDailyAdvancePay(OutinDailyDTO dto);
 
     /**
+     * @Description: 一卡通充值、退款 - 支付方式
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 10:57
+     * @Return
+     */
+    String queryOutinDailyCardPay(OutinDailyDTO dto);
+
+    /**
      * @Method 日结缴款 - 结算列表
      * @Description
      *
@@ -503,4 +516,84 @@ public interface OutinDailyDAO {
      * @Return 
      **/
     int updateDailyIdIsNull(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 一卡通充值
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/19 15:40
+     * @Return
+     */
+    List<BaseCardRechargeChangeDTO> queryBaseCardCZ(OutinDailyDTO dto);
+
+    /**
+     * @Description: 更新一卡通异动表缴款ID
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/19 17:48
+     * @Return
+     */
+    void updateDailyIdToBaseCardRechangeChargeDO(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 日结缴款  一卡通充值、退款支付表
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/19 17:47
+     * @Return
+     */
+    void insertOutinDailyCardPayList(List<OutinDailyCardPayDO> odcpList);
+
+    /**
+     * @Description: 根据缴款id查询门诊划价收费结算表一卡通支付总金额
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 14:01
+     * @Return
+     */
+    Map<String, Object> getOutptSettleCardTotalPrice(OutinDailyDTO dto);
+
+    /**
+     * @Description: 根据缴款id查询门诊挂号结算表一卡通支付总金额
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 14:28
+     * @Return
+     */
+    Map<String, Object> getOutptRegisterSettleCardTotalPrice(OutinDailyDTO dto);
+
+    /**
+     * @Description: 查询缴款表一卡通支付记录 queryOutinDailyCardPayPay
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:07
+     * @Return
+     */
+    List<Map<String, Object>> queryOutinDailyCardPays(OutinDailyDTO dto);
+
+    /**
+     * @Description: 一卡通充值，退款
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 16:47
+     * @Return
+     */
+    List<Map<String, Object>> queryBaseCardCZAndTK(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 一卡通消费、退费明细
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/23 17:24
+     * @Return
+     */
+    List<Map<String, Object>> queryCardConsumePay(OutinDailyDTO outinDailyDTO);
 }

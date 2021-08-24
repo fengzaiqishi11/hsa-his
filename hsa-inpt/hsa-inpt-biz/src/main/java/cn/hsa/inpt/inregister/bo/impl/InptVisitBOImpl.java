@@ -497,7 +497,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // 根据医院编码、医保注册编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(hospCode); //医院编码
-        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         Map configMap = new LinkedHashMap();
         configMap.put("hospCode", hospCode);
@@ -1512,7 +1512,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             // 根据医院编码、医保注册编码查询医保配置信息
             InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
             configDTO.setHospCode(inptVisitDTO.getHospCode()); //医院编码
-            configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+            configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
             configDTO.setIsValid(Constants.SF.S); // 是否有效
             Map configMap = new LinkedHashMap();
             configMap.put("hospCode", inptVisitDTO.getHospCode());

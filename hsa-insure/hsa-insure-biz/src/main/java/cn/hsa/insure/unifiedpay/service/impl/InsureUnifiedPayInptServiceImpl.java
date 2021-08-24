@@ -166,4 +166,17 @@ public class InsureUnifiedPayInptServiceImpl extends HsafService implements Insu
     }
 
 
+    /**
+     * @Menthod: UP_4602
+     * @Desrciption: 统一支付平台-护理操作生命体征测量记录【4602】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-21 16:22
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> UP_4602(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedPayInptBO.UP4602(map));
+    }
 }

@@ -62,10 +62,34 @@ public class InsureGetInfoController extends BaseController {
         insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
         insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
         insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        insureSettleInfoDTO.setHosrgOpter(sysUserDTO.getName());
+        insureSettleInfoDTO.setMedinsFillDept(sysUserDTO.getBaseDeptDTO().getName());
+        insureSettleInfoDTO.setMedinsFillPsn(sysUserDTO.getName());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("insureSettleInfoDTO",insureSettleInfoDTO);
         return insureGetInfoService_consumer.insertSettleInfo(map);
+    }
+    /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2021-08-19 22:49
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/getSettleInfo")
+    public WrapperResponse<Map> getSettleInfo(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureGetInfoService_consumer.getSettleInfo(map);
     }
 
     /**

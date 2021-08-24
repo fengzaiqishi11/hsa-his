@@ -102,4 +102,15 @@ public interface InsureUnifiedPayInptBO {
     Map<String,String> UP_2303(Map<String, Object> unifiedMap);
 
     Map<String,String> UP_2304(Map<String, Object> settleMap);
+
+    /**
+     * @Menthod: UP_4602
+     * @Desrciption: 统一支付平台-护理操作生命体征测量记录【4602】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-21 16:22
+     * @Return:
+     **/
+    Map<String, Object> UP4602(Map<String, Object> map);
 }

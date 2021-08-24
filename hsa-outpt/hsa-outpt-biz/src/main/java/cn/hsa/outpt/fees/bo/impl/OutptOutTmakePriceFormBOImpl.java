@@ -8,6 +8,7 @@ import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.service.*;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.outpt.fees.bo.OutptOutTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dao.*;
@@ -22,6 +23,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -294,7 +296,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // 根据医院编码、医保注册编码查询医保配置信息
             InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
             configDTO.setHospCode(hospCode); //医院编码
-            configDTO.setCode(insureIndividualBasicDTO.getInsureRegCode()); // 医保注册编码
+            configDTO.setRegCode(insureIndividualBasicDTO.getInsureRegCode()); // 医保注册编码
             configDTO.setIsValid(Constants.SF.S); // 是否有效
             Map configMap = new LinkedHashMap();
             configMap.put("hospCode", hospCode);
@@ -842,7 +844,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 根据医院编码、医保注册编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
         configDTO.setHospCode(hospCode); //医院编码
-        configDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
+        configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保注册编码
         configDTO.setIsValid(Constants.SF.S); // 是否有效
         Map configMap = new LinkedHashMap();
         configMap.put("hospCode", hospCode);
@@ -891,14 +893,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         map.put("visitId", visitId);
 
         // 根据就诊id查询挂号记录(outpt_register)
-        OutptRegisterDO outptRegisterDO = outptRegisterDAO.getOutptRegisterByVisitId(map);
-        if (outptRegisterDO == null) {
-            throw new RuntimeException("未查询到【" + name + "】相关挂号信息");
-        }
-        // 根据就诊id查询就诊记录(outpt_visit)
-        OutptVisitDO outptVisitDO = outptRegisterDAO.getVisitInfoByVisitId(outptRegisterDO);
-        if (outptVisitDO == null) {
-            throw new RuntimeException("未查询到【" + name + "】相关就诊记录");
+        OutptRegisterDTO outptRegisterDTO = outptRegisterDAO.getOutptRegisterByVisitId(map);
+        if (outptRegisterDTO == null) {
+            throw new RuntimeException("未查询到【" + name + "】相关就诊信息");
         }
         // 根据就诊id查询病历信息(outpt_medical_record)
         List<OutptMedicalRecordDTO> blList = outptVisitDAO.queryMedicalRecordByVisitId(map);
@@ -909,13 +906,52 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 根据就诊id查询处方信息(outpt_prescribe_detail_ext)
         List<OutptPrescribeDetailsExtDTO> cfList = outptVisitDAO.queryPreDetailExtByVisitId(map);
 
-        map.put("outptRegisterDO", outptRegisterDO);
-        map.put("outptVisitDO", outptVisitDO);
+        map.put("outptRegisterDTO", outptRegisterDTO);
         map.put("blList", blList);
         map.put("zdList", zdList);
         map.put("cfList", cfList);
         // 调用统一支付平台门急诊诊疗记录【4301】接口
         insureUnifiedPayOutptService_consumer.UP_4301(map).getData();
+        return true;
+    }
+
+    /**
+     * @Menthod: addOperAndRescue
+     * @Desrciption: 统一支付平台-急诊留观手术及抢救信息【4302】
+     * @Param: visitId-就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-23 13:50
+     * @Return:
+     **/
+    @Override
+    public Boolean addOperAndRescue(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String visitId = MapUtils.get(map, "visitId");
+        String name = MapUtils.get(map, "name");
+        if (StringUtils.isEmpty(visitId)) {
+            throw new RuntimeException("未选择需要上传手术及抢救信息的患者");
+        }
+
+        Map visitMap = new HashMap();
+        visitMap.put("hospCode", hospCode);
+        visitMap.put("id", visitId);
+        // 查询就诊记录
+        OutptVisitDTO outptVisitDTO = outptVisitDAO.queryByVisitID(visitMap);
+        if (outptVisitDTO == null) {
+            throw new RuntimeException("未查询到【" + name + "】相关就诊信息，请核对！");
+        }
+
+        // 根据就诊id查询手术信息
+        List<OperInfoRecordDTO> ssList = outptVisitDAO.queryOperInfoRecordByVistiId(map);
+        // 根据就诊id查询抢救信息
+        List qjList = new ArrayList();
+
+        map.put("outptVisitDTO", outptVisitDTO);
+        map.put("ssList", ssList);
+        map.put("qjList", qjList);
+        // 调用 统一支付平台-急诊留观手术及抢救信息【4302】接口
+        insureUnifiedPayOutptService_consumer.UP4302(map);
         return true;
     }
 

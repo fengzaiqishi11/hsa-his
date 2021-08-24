@@ -66,4 +66,5 @@ public interface ReportDAO {
      * @Return java.util.List<java.util.Map>
      **/
     List<Map> queryPharInvoicingLedgerBuy(Map<String,Object> map);
+    List<Map> queryByStrSQL(Map<String,Object> map);
 }

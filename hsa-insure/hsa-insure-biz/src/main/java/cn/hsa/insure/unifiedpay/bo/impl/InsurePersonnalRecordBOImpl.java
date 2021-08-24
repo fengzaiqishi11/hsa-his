@@ -146,15 +146,15 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         map.put("insureRegCode", configurationDTO.getOrgCode());
         Map<String, Object> data = insureUnifiedPayOutptService.UP_5301(map).getData();
         List<Map<String, Object>> mapList = MapUtils.get(data, "mapList");
-        if (!ListUtils.isEmpty(mapList)) {
-            StringBuilder stringBuilder = null;
-            String str = "";
-            for (Map<String, Object> item : mapList) {
-                stringBuilder = new StringBuilder();
-                str += stringBuilder.append(item.get("opsp_dise_name")).toString();
-            }
-            throw new AppException("该人员备案的【" + str + "】疾病已经在医保中心审核,医院无法撤销");
-        }
+//        if (!ListUtils.isEmpty(mapList)) {
+//            StringBuilder stringBuilder = null;
+//            String str = "";
+//            for (Map<String, Object> item : mapList) {
+//                stringBuilder = new StringBuilder();
+//                str += stringBuilder.append(item.get("opsp_dise_name")).toString();
+//            }
+//            throw new AppException("该人员备案的【" + str + "】疾病已经在医保中心审核,医院无法撤销");
+//        }
 
         Map<String, Object> httpParam = new HashMap<String, Object>(6);
         httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_2504);  //交易编号

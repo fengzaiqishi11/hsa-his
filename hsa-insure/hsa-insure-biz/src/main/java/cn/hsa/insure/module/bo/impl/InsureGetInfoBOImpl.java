@@ -368,7 +368,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
             mapList = handlerInptCostFee(insureSettleInfoDTO);
 
-        } else if (insureSettleInfoDTO.getLx().equals("2")) {
+        } else if (insureSettleInfoDTO.getLx().equals("0")) {
             mapList = handlerOutptCostFee(insureSettleInfoDTO);
         }
         // 3.组装医保接口参数
@@ -391,7 +391,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 feedetail.put("psn_cert_type",insureSettleInfoDTO.getCertCode()); // 人员证件类型
                 feedetail.put("certno",insureSettleInfoDTO.getCertNo()); // 证件号码
                 feedetail.put("psn_name",insureSettleInfoDTO.getName()); // 人员姓名
-                feedetail.put("fee_ocur_time", DateUtils.format((Date) item.get("costTime"),DateUtils.Y_M_DH_M_S)); // 费用发生时间
+                if (insureSettleInfoDTO.getLx().equals("1")) {
+
+                    feedetail.put("fee_ocur_time", DateUtils.format((Date) item.get("costTime"),DateUtils.Y_M_DH_M_S)); // 费用发生时间
+
+                } else if (insureSettleInfoDTO.getLx().equals("0")) {
+                    feedetail.put("fee_ocur_time", DateUtils.format((Date) item.get("crteTime"),DateUtils.Y_M_DH_M_S)); // 费用发生时间
+
+                }
                 BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);
                 BigDecimal price = BigDecimalUtils.scale((BigDecimal) item.get("price"), 4);
                 feedetail.put("cnt",cnt); // 数量
@@ -530,7 +537,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     **/
     private List<Map<String, Object>> handlerOutptCostFee(InsureSettleInfoDTO insureSettleInfoDTO) {
 
-        String insureRegCode = insureSettleInfoDTO.getInsureRegCode();
+        String insureRegCode = insureSettleInfoDTO.getOrgCode();
         //判断是否有传输费用信息
         Map<String,String> insureCostParam = new HashMap<String,String>();
         insureCostParam.put("hospCode",insureSettleInfoDTO.getHospCode());//医院编码
@@ -800,11 +807,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
 
         List<InptCostDTO> costDTOList =null;
-        if (insureSettleInfoDTO.getLx().equals("1")) {
+        if ("1".equals(insureSettleInfoDTO.getLx())) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
             costDTOList = insureGetInfoDAO.queryInptMatchPage(insureSettleInfoDTO);
         }
-        if (insureSettleInfoDTO.getLx().equals("2")) {
+        if ( "0".equals(insureSettleInfoDTO.getLx())) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
             costDTOList = insureGetInfoDAO.queryOutMatchPage(insureSettleInfoDTO);
         }
@@ -824,11 +831,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public PageDTO queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO) {
         List<InptCostDTO> costDTOList =null;
-        if (insureSettleInfoDTO.getLx().equals("1")) {
+        if ( "1".equals(insureSettleInfoDTO.getLx())) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
             costDTOList = insureGetInfoDAO.queryInptUnMatchPage(insureSettleInfoDTO);
         }
-        if (insureSettleInfoDTO.getLx().equals("2")) {
+        if ( "0".equals(insureSettleInfoDTO.getLx())) {
             PageHelper.startPage(insureSettleInfoDTO.getPageNo(),insureSettleInfoDTO.getPageSize());
             costDTOList = insureGetInfoDAO.queryOutUnMatchPage(insureSettleInfoDTO);
         }

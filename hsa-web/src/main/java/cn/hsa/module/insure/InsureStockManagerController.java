@@ -49,6 +49,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureGoodBuy(@RequestBody  Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureGoodBuy(map);
     }
 
@@ -82,6 +83,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureGoodBuyBack(@RequestBody  Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureGoodBuyBack(map);
     }
 
@@ -114,6 +116,7 @@ public class InsureStockManagerController extends BaseController {
     @PostMapping("/uploadInsureGoodInfoDelete")
     public WrapperResponse<Boolean> uploadInsureGoodInfoDelete(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("certId", sysUserDTO.getId());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureStockManagerService_consumer.uploadInsureGoodInfoDelete(map);
     }
@@ -148,6 +151,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureGoodSell(@RequestBody  Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureGoodSell(map);
     }
 
@@ -181,6 +185,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureGoodSellBack(@RequestBody   Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureGoodSellBack(map);
     }
 
@@ -214,6 +219,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureInventoryCheck(@RequestBody  Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureInventoryCheck(map);
     }
 
@@ -247,6 +253,7 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<Boolean> uploadInsureInventoryStock(@RequestBody  Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureInventoryStock(map);
     }
 

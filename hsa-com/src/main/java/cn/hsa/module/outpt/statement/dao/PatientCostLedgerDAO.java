@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 
@@ -773,4 +774,25 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
    **/
   List<InptVisitDTO> queryInPatientDaily(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getMedicalCostMzTitle
+   * @Desrciption  查询门诊计费类别
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/08/24 17:05
+   * @Return OutptCostDTO
+   **/
+  List<OutptCostDTO> getMedicalCostMzTitle(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod queryMedicalCostDetailMz
+   * @Desrciption
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/08/24 17:08
+   * @Return List<Map>
+   **/
+  List<Map> queryMedicalCostDetailMz(OutptVisitDTO outptVisitDTO);
+
 }

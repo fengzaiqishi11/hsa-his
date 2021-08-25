@@ -13,6 +13,7 @@ import cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCost
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.bo.PatientCostLedgerBO;
 import cn.hsa.module.outpt.statement.dao.PatientCostLedgerDAO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.util.*;
@@ -2846,5 +2847,77 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
         return PageDTO.of(patientCostLedgerDAO.queryInPatientDaily(inptVisitDTO));
     }
+
+    /**
+     * @Menthod queryMedicalCostMz
+     * @Desrciption 查询门诊医疗汇总报表
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/08/24 17:11
+     * @Return PageDTO
+     **/
+    @Override
+    public PageDTO queryMedicalCostMz(OutptVisitDTO visitDTO) {
+        List<OutptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getMedicalCostMzTitle(visitDTO);
+        PageHelper.startPage(visitDTO.getPageNo(), visitDTO.getPageSize());
+        //动态拼接sql
+        StringBuffer sqlStr = new StringBuffer();
+        if(ListUtils.isEmpty(inptCostDTOSAll)){
+            return PageDTO.of(new ArrayList());
+        }
+        for (OutptCostDTO outptCostDTO : inptCostDTOSAll) {
+            sqlStr.append("sum((case when a.bfc_id = '");
+            sqlStr.append(outptCostDTO.getBfcId());
+            sqlStr.append("' then a.total_price else 0 end)) '");
+            sqlStr.append(outptCostDTO.getBfcId());
+            sqlStr.append("', ");
+        }
+        visitDTO.setSql(sqlStr.toString());
+       // if ("1".equals(inptVisitDTO.getSummMethod())) {
+            //查询病人所有的费用信息明细
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.queryMedicalCostDetailMz(visitDTO);
+            return PageDTO.of(inptVisitDTOS);
+//       // } else {
+//            List<Map> deptCost = patientCostLedgerDAO.queryPatirntCostDeptLedger(inptVisitDTO);
+//            return PageDTO.of(deptCost);
+//        }
+
+    }
+
+
+    /**
+     * @Menthod queryMedicalCostMz
+     * @Desrciption 查询门诊医疗汇总报表表头
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/08/24 20:24
+     * @Return map
+     **/
+    @Override
+    public Map queryMedicalCostTitle(OutptVisitDTO outptVisitDTO) {
+        Map resultMap = new HashMap();
+        List<Map> listTableConfig = new ArrayList<>();
+        List<OutptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getMedicalCostMzTitle(outptVisitDTO);
+        Map<String, List<OutptCostDTO>> collect2 = inptCostDTOSAll.stream().collect(Collectors.groupingBy(OutptCostDTO::getBfcName));
+        Map map = new HashMap();
+        map.put("label","费用构成");
+        List<Map> childList = new ArrayList<>();
+        int num = 0;
+        for (String key : collect2.keySet()) {
+            Map childMap = new HashMap();
+            childMap.put("label",key);
+            childMap.put("prop",collect2.get(key).get(0).getBfcId());
+            childMap.put("type","money");
+            childMap.put("toFixed", 2);
+            childMap.put("showSummary", true);
+            childMap.put("minWidth","100");
+            childList.add(childMap);
+        }
+        map.put("children",childList);
+        resultMap.put("listTableConfig",listTableConfig);
+        listTableConfig.add(map);
+        return resultMap;
+    }
+
 
 }

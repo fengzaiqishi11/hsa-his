@@ -8,6 +8,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.bo.PatientCostLedgerBO;
 import cn.hsa.module.outpt.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.util.MapUtils;
@@ -462,4 +463,31 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     return WrapperResponse.success(patientCostLedgerBO.queryInPatientDaily(inptVisitDTO));
   }
 
+  /**
+   * @Menthod queryMedicalCostMz
+   * @Desrciption 门诊医疗汇总报表
+   * @Param [map]
+   * @Author liuliyun
+   * @Date   2021/08/21 16：21
+   * @Return PageDTO
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryMedicalCostMz(Map map) {
+    OutptVisitDTO outptVisitDTO =MapUtils.get(map,"outptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.queryMedicalCostMz(outptVisitDTO));
+  }
+
+  /**
+   * @Menthod queryMedicalCostTitle
+   * @Desrciption 门诊医疗汇总报表
+   * @Param [map]
+   * @Author liuliyun
+   * @Date   2021/08/24 20:21
+   * @Return Map
+   **/
+  @Override
+  public WrapperResponse<Map> queryMedicalCostTitle(Map map) {
+    OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.queryMedicalCostTitle(outptVisitDTO));
+  }
 }

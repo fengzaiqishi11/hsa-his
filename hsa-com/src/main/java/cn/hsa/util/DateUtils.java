@@ -32,6 +32,7 @@ public class DateUtils {
     public static final String YMD = "yyyyMMdd";
     public static final String YM = "yyyyMM";
     public static final String H_M_S = "HH:mm:ss";
+    public static final String H_M = "HH:mm";
     public static final SimpleDateFormat SDF_Y_M_DH_M_S = new SimpleDateFormat(Y_M_DH_M_S);
     public static final SimpleDateFormat SDF_Y_M_DH_M = new SimpleDateFormat(Y_M_DH_M);
     public static final SimpleDateFormat SDF_Y_M_DH = new SimpleDateFormat(Y_M_DH);

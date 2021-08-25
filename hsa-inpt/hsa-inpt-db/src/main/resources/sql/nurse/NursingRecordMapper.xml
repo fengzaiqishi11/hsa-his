@@ -333,6 +333,7 @@
         from base_nurse_order
         where hosp_code = #{hospCode}
           and id = #{bnoId}
+          and is_valid = '1'
     </select>
 
     <!--查询出护理单据类型下所有需要汇总的表头-->

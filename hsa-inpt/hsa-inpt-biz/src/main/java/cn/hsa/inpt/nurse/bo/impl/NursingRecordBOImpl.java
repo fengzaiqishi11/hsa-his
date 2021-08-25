@@ -427,11 +427,16 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         //查询出护理单据下所有的表头
         List<BaseNurseTbHeadDTO> allTbHeadList = nursingRecordDAO.findAllNurseTBhead(inptNurseRecordDTO);
         String dateItemCode = null;
+        String timeItemCode = null;
         String signatureItemCode = null;
         for (BaseNurseTbHeadDTO baseNurseTbHeadDTO : allTbHeadList) {
             //如果表头格式为日期格式，拼接小结时间为开始+结束时间
             if ("DATE".equals(baseNurseTbHeadDTO.getDateTypeCode())) {
                 dateItemCode = baseNurseTbHeadDTO.getItemCode(); //item001
+            }
+            //如果表头格式为日期格式，拼接小结时间为开始+结束时间
+            if ("TIME".equals(baseNurseTbHeadDTO.getDateTypeCode())) {
+                timeItemCode = baseNurseTbHeadDTO.getItemCode(); //item001
             }
             //如果表头资源值为下拉自定义SQL，设置小结记录签名人为当前登陆人
             if ("2".equals(baseNurseTbHeadDTO.getSourceCode())) {
@@ -445,6 +450,14 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         Date sTime = DateUtils.parse(startTime, DateUtils.Y_M_DH_M_S);
         Date eTime = DateUtils.parse(endTime, DateUtils.Y_M_DH_M_S);
         int hours = (int) ((eTime.getTime() - sTime.getTime()) / (1000 * 60 * 60));
+        String infoDate = "";
+        String infoTime = "";
+
+        // 根据就诊id，护理单据规则查询
+        Integer max = nursingRecordDAO.getMaxGroupNo(inptNurseRecordDTO);
+        if (max == 0) {
+            max = 1;
+        }
 
         //生成日间小结护理记录dto, 进行赋值
         InptNurseRecordDTO info = new InptNurseRecordDTO();
@@ -460,6 +473,9 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         info.setDaySumId(userId); //日间小结人ID
         info.setDaySumName(userName); //日间小结姓名
         info.setDaySumTime(DateUtils.getNow()); //日间小结时间
+        info.setGroupNo(max + 1); // 设置组号
+        info.setGroupSeqNo(1); // 组内序号默认为1
+        info.setIsEnd(Constants.SF.S); // 是否末行，是
         info.setCrteId(userId); //创建人id
         info.setCrteName(userName); //创建人名称
         info.setCrteTime(DateUtils.getNow()); //创建人时间
@@ -489,21 +505,43 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
                     }
                 }
             }
+
+            // 获取当前汇总项目的汇总名称 量(300)->名称(输液)
+            String num = itemCode.split("item")[1];
+            Integer nameNum = Integer.parseInt(num) - 1;
+            String nameItemCode = "";
+            if (nameNum < 10) {
+                nameItemCode = "item00" + String.valueOf(nameNum);
+            } else {
+                nameItemCode = "item0" + String.valueOf(nameNum);
+            }
+
             //将汇总项目值合并到日间小结记录info中
             String[] infoNames = getAttributeNames(info);
             for (String infoName : infoNames) {
+                // 设置汇总项值，以及汇总项目名称
                 if (infoName.equals(itemCode)) {
+                    setAttributeValue(info, nameItemCode, hours + "h小结");
                     setAttributeValue(info, infoName, Integer.toString(sum));
                 }
+                // 设置日期，为日间小结的截止日期的日期
                 if (infoName.equals(dateItemCode) && StringUtils.isNotEmpty(dateItemCode)) {
-                    String value = startTime + "/" + endTime;
-                    setAttributeValue(info, infoName, value);
+                   infoDate = DateUtils.format(eTime, DateUtils.Y_M_D);
+                    setAttributeValue(info, infoName, infoDate);
                 }
+                // 设置时间
+                if (infoName.equals(timeItemCode) && StringUtils.isNotEmpty(timeItemCode)) {
+                   infoTime = DateUtils.format(eTime, DateUtils.H_M);
+                    setAttributeValue(info, infoName, infoTime);
+                }
+                // 设置签名
                 if (infoName.equals(signatureItemCode) && StringUtils.isNotEmpty(signatureItemCode)) {
                     setAttributeValue(info, infoName, userId);
                 }
             }
         }
+        // 设置排序字段
+        info.setItem039( infoDate+ " " + infoTime);
 
         //插入日间小结护理记录到库中
         try {

@@ -233,4 +233,6 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String settleStartTime;
     //结算时间
     private String settleEndTime;
+
+    private String isSettle;
 }

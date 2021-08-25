@@ -5932,6 +5932,9 @@
         <if test="keyword != null and keyword != ''">
             and a.name like concat('%', #{keyword}, '%')
         </if>
+        <if test="isSettle != null and isSettle != ''">
+            and c.is_settle =#{isSettle}
+        </if>
         order by c.settle_time desc
     </select>
 

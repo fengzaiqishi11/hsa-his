@@ -10,6 +10,7 @@ import cn.hsa.module.insure.stock.bo.InsureStockManagerBO;
 import cn.hsa.module.insure.stock.dao.InsureStockManagerDAO;
 import cn.hsa.module.insure.stock.entity.*;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -59,6 +61,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureGoodBuy(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureGoodBuy> listInsureGoodBuy = MapUtils.getEmptyErr(map, "listInsureGoodBuy", "未获取到需要上传的数据！");
         if(!ListUtils.isEmpty(listInsureGoodBuy)){
             listInsureGoodBuy = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodBuy),InsureGoodBuy.class);
@@ -98,9 +101,31 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
 
         //上传成功数据
-        List<InsureInventoryStockUpdate> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传成功数据
-        List<InsureInventoryStockUpdate> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+
+        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureGoodBuy.class);
+
+        //获取list对象 list属性 并进行去重
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (String fixmedinsBchno:fixmedinsBchnoList){
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("3");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }
+
+        if (!ListUtils.isEmpty(listData)){
+            insureStockManagerDAO.insertStockUploadBatch(listData);
+        }
+
         return true;
     }
 
@@ -162,6 +187,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3504, dataMap);
 
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+
         return true;
     }
 
@@ -175,7 +201,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     @Override
     public List<InsureGoodInfoDelete> queryInsureGoodInfoDeletePage(InsureGoodInfoDelete insureGoodInfoDelete) {
         PageHelper.startPage(insureGoodInfoDelete.getPageNo(), insureGoodInfoDelete.getPageSize());
-        return insureStockManagerDAO.queryInsureGoodInfoDeletePage(insureGoodInfoDelete);
+        return insureStockManagerDAO.queryInsureUploadDataPage(insureGoodInfoDelete);
     }
 
     /**
@@ -188,15 +214,20 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureGoodInfoDelete(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
-        String fixmedins_bchno = MapUtils.getEmptyErr(map, "fixmedins_bchno", "批次流水号不能为空！");
-        String inv_data_type = MapUtils.getEmptyErr(map, "inv_data_type", "进销存数据类型不能为空！");
+        String fixmedinsBchno = MapUtils.getEmptyErr(map, "fixmedinsBchno", "批次流水号不能为空！");
+        String invDataType = MapUtils.getEmptyErr(map, "invDataType", "进销存数据类型不能为空！");
+        String id = MapUtils.getEmptyErr(map, "id", "记录ID不存在！");
+
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("fixmedins_bchno",fixmedins_bchno);
-        dataMap.put("inv_data_type",inv_data_type);
+        dataMap.put("fixmedins_bchno",fixmedinsBchno);
+        dataMap.put("inv_data_type",invDataType);
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("data", dataMap); //	交易输入
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3507, paramMap);
+
+        insureStockManagerDAO.deleteStockUpload(map);
+
         return true;
     }
 
@@ -223,6 +254,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureGoodSell(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureGoodSell> listInsureGoodSell = MapUtils.getEmptyErr(map, "listInsureGoodSell", "未获取到需要上传的数据！");
         if(!ListUtils.isEmpty(listInsureGoodSell)){
             listInsureGoodSell = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodSell),InsureGoodSell.class);
@@ -279,9 +311,30 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
 
         //上传成功数据
-        List<InsureInventoryStockUpdate> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传成功数据
-        List<InsureInventoryStockUpdate> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+
+        List<InsureGoodSell> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureGoodSell.class);
+
+        //获取list对象 list属性 并进行去重
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSell::getFixmedinsBchno).distinct().collect(Collectors.toList());
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (String fixmedinsBchno:fixmedinsBchnoList){
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("3");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }
+
+        if (!ListUtils.isEmpty(listData)){
+            insureStockManagerDAO.insertStockUploadBatch(listData);
+        }
         return true;
     }
 
@@ -308,6 +361,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureGoodSellBack(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureGoodSellBack> listInsureGoodSellBack = MapUtils.getEmptyErr(map, "listInsureGoodSellBack", "未获取到需要上传的数据！");
         if(!ListUtils.isEmpty(listInsureGoodSellBack)){
             listInsureGoodSellBack = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodSellBack),InsureGoodSellBack.class);
@@ -348,9 +402,30 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
 
         //上传成功数据
-        List<InsureInventoryStockUpdate> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传成功数据
-        List<InsureInventoryStockUpdate> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+
+        List<InsureGoodSellBack> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureGoodSellBack.class);
+
+        //获取list对象 list属性 并进行去重
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSellBack::getFixmedinsBchno).distinct().collect(Collectors.toList());
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (String fixmedinsBchno:fixmedinsBchnoList){
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("1");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }
+
+        if (!ListUtils.isEmpty(listData)){
+            insureStockManagerDAO.insertStockUploadBatch(listData);
+        }
         return true;
     }
 
@@ -377,6 +452,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureInventoryCheck(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureInventoryCheck> listInsureInventoryCheck = MapUtils.getEmptyErr(map, "listInsureInventoryCheck", "未获取到需要上传的数据！");
         if(!ListUtils.isEmpty(listInsureInventoryCheck)){
             listInsureInventoryCheck = JSONObject.parseArray(JSONObject.toJSONString(listInsureInventoryCheck),InsureInventoryCheck.class);
@@ -405,10 +481,30 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
 
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
-        List<InsureInventoryCheck> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传成功数据
-        List<InsureInventoryCheck> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
 
+        List<InsureInventoryCheck> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureInventoryCheck.class);
+
+        //获取list对象 list属性 并进行去重
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (String fixmedinsBchno:fixmedinsBchnoList){
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("1");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }
+
+        if (!ListUtils.isEmpty(listData)){
+            insureStockManagerDAO.insertStockUploadBatch(listData);
+        }
         return true;
     }
 
@@ -435,6 +531,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureInventoryStock(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureInventoryStockUpdate> listInsureInventoryStockUpdate = MapUtils.getEmptyErr(map, "listInsureInventoryStockUpdate", "未获取到需要上传的数据！");
         if(!ListUtils.isEmpty(listInsureInventoryStockUpdate)){
             listInsureInventoryStockUpdate = JSONObject.parseArray(JSONObject.toJSONString(listInsureInventoryStockUpdate),InsureInventoryStockUpdate.class);
@@ -469,9 +566,30 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
 
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
-        List<InsureInventoryStockUpdate> sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传成功数据
-        List<InsureInventoryStockUpdate> failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
+
+        List<InsureInventoryStockUpdate> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureInventoryStockUpdate.class);
+
+        //获取list对象 list属性 并进行去重
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryStockUpdate::getFixmedinsBchno).distinct().collect(Collectors.toList());
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (String fixmedinsBchno:fixmedinsBchnoList){
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("2");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }
+
+        if (!ListUtils.isEmpty(listData)){
+            insureStockManagerDAO.insertStockUploadBatch(listData);
+        }
         return true;
     }
 

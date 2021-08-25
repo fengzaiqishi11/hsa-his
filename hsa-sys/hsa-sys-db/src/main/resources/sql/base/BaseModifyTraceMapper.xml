@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    修改痕迹
+-->
+<mapper namespace="cn.hsa.module.base.modify.dao.BaseModifyTraceDAO">
+
+    <resultMap type="cn.hsa.module.base.modify.dto.BaseModifyTraceDTO" id="BaseModifyTraceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="tableName" column="table_name" jdbcType="VARCHAR"/>
+        <result property="updtConent" column="updt_conent" jdbcType="VARCHAR"/>
+        <result property="updtId" column="updt_id" jdbcType="VARCHAR"/>
+        <result property="updtName" column="updt_name" jdbcType="VARCHAR"/>
+        <result property="updtTime" column="updt_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询具体修改痕迹-->
+    <select id="getById" resultMap="BaseModifyTraceMap">
+        select a.id, a.hosp_code, a.table_name, a.updt_conent, a.updt_id, a.updt_name,a.updt_time
+        from base_modify_trace
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseModifyTraceMap">
+        select a.id, a.hosp_code, a.table_name, a.updt_conent, a.updt_id, a.updt_name,a.updt_time
+        from base_modify_trace a
+        where a.hosp_code = #{hospCode}
+        <where>
+            <if test="tableName != null and tableName != ''">
+                and a.table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+
+    <!--新增修改痕迹-->
+    <insert id="insert" parameterType="cn.hsa.module.base.modify.dto.BaseModifyTraceDTO">
+        insert into base_modify_trace(
+            id, hosp_code, table_name, updt_conent, updt_id, updt_name, updt_time
+        )
+        values (
+            #{id}, #{hospCode}, #{tableName}, #{updtConent}, #{updtId}, #{updtName}, now()
+        )
+    </insert>
+
+    <!--获取基础数据中具体修改内容-->
+    <select id="getTableConent" parameterType="cn.hsa.module.base.modify.dto.BaseModifyTraceDTO" resultType="java.util.Map" >
+        select *
+        from #{tableName}
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+</mapper>

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncmenu.dao.SyncMenuDAO">
+
+    <resultMap type="cn.hsa.module.sync.syncmenu.dto.SyncMenuDTO" id="SyncMenuDTOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="sysCode" column="sys_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="upCode" column="up_code" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="icon" column="icon" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="sysName" column="sysName" jdbcType="VARCHAR"/>
+        <result property="upName" column="upName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.sync.syncmenu.dto.SyncMenuButtonDTO" id="SyncMenuButtonDTOMap">
+      <result property="id" column="id" jdbcType="VARCHAR"/>
+      <result property="menuCode" column="menu_code" jdbcType="VARCHAR"/>
+      <result property="code" column="code" jdbcType="VARCHAR"/>
+      <result property="name" column="name" jdbcType="VARCHAR"/>
+      <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+      <result property="icon" column="icon" jdbcType="VARCHAR"/>
+      <result property="remark" column="remark" jdbcType="VARCHAR"/>
+      <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+      <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+      <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+      <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+      <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+  <!--查询单个菜单信息-->
+  <select id="getMenuById" resultMap="SyncMenuDTOMap">
+        select
+          id, sys_code, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time
+        from sync_menu
+        where  id = #{id}
+    </select>
+
+  <!--通过实体作为筛选条件查询菜单信息-->
+  <select id="queryMenu" resultMap="SyncMenuDTOMap">
+    select
+    id, sys_code, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time,
+    (select sync_system.name from sync_system where sys_code = sync_system.code ) as sysName,
+    (select b.name from sync_menu a left join sync_menu b on b.code = a.up_code where a.code = #{code}) as upName
+    from sync_menu
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="sysCode != null and sysCode != ''">
+        and sys_code = #{sysCode}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="name != null and name != ''">
+        and name = #{name}
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        and type_code = #{typeCode}
+      </if>
+      <if test="upCode != null and upCode != ''">
+        and up_code = #{upCode}
+      </if>
+      <if test="url != null and url != ''">
+        and url = #{url}
+      </if>
+      <if test="icon != null and icon != ''">
+        and icon = #{icon}
+      </if>
+      <if test="seqNo != null">
+        and seq_no = #{seqNo}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="isValid != null and isValid != ''">
+        and is_valid = #{isValid}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and crte_time = #{crteTime}
+      </if>
+    </where>
+    order by seq_no
+  </select>
+
+  <!--新增菜单-->
+  <insert id="insertMenu">
+        insert into sync_menu(id, sys_code, code, name, type_code, up_code, url, icon, seq_no, remark, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{sysCode}, #{code}, #{name}, #{typeCode},
+        <if test="upCode != null and upCode != ''">
+          #{upCode},
+        </if>
+        <if test="upCode == null or upCode == ''">
+          '-1',
+        </if>
+        #{url}, #{icon}, #{seqNo}, #{remark}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+  <!--通过主键修改菜单-->
+  <update id="updateMenu">
+    update sync_menu
+    <set>
+      <if test="id != null and id != ''">
+        id = #{id},
+      </if>
+      <if test="sysCode != null and sysCode != ''">
+        sys_code = #{sysCode},
+      </if>
+      <if test="code != null and code != ''">
+        code = #{code},
+      </if>
+      <if test="name != null and name != ''">
+        name = #{name},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code = #{typeCode},
+      </if>
+      <if test="upCode != null and upCode != ''">
+        up_code = #{upCode},
+      </if>
+      <if test="url != null and url != ''">
+        url = #{url},
+      </if>
+      <if test="icon != null and icon != ''">
+        icon = #{icon},
+      </if>
+      <if test="seqNo != null">
+        seq_no = #{seqNo},
+      </if>
+      <if test="remark != null and remark != ''">
+        remark = #{remark},
+      </if>
+      <if test="isValid != null and isValid != ''">
+        is_valid = #{isValid},
+      </if>
+    </set>
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="isValid != null and isValid != ''">
+        and is_valid = #{isValid}
+      </if>
+    </where>
+  </update>
+
+  <!--通过主键删除菜单-->
+  <update id="deleteMenu">
+        update sync_menu set is_valid = '0' where code = #{code}
+    </update>
+
+  <!--查询单个菜单按钮-->
+  <select id="getMenuButton" resultMap="SyncMenuButtonDTOMap">
+        select
+          id, menu_code, code, name, type_code, icon, remark, seq_no, is_valid, crte_id, crte_name, crte_time
+        from sync_menu_button
+        where id = #{id}
+  </select>
+
+  <!--按条件菜单按钮-->
+  <select id="queryMenuButton" resultMap="SyncMenuButtonDTOMap">
+    select
+    id, menu_code, code, name, type_code, icon, remark, seq_no, is_valid, crte_id, crte_name, crte_time,
+    (select sync_menu.name from sync_menu where sync_menu.code = menu_code) as upName
+    from sync_menu_button
+    where
+     is_valid = '1'
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="menuCode != null and menuCode != ''">
+        and menu_code = #{menuCode}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="name != null and name != ''">
+        and name = #{name}
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        and type_code = #{typeCode}
+      </if>
+      <if test="icon != null and icon != ''">
+        and icon = #{icon}
+      </if>
+      <if test="seqNo != null">
+        and seq_no = #{seqNo}
+      </if>
+      <if test="usCode != null and usCode != ''">
+        and code in (select sys_role_menu_button.button_code from sys_role_menu_button where sys_role_menu_button.role_code in
+        (select sys_user_role.role_code from sys_user_role where sys_user_role.us_code = #{usCode}) )
+      </if>
+    order by seq_no
+  </select>
+
+  <!--新增菜单按钮-->
+  <insert id="insertMenuButton">
+          insert into sync_menu_button(id, menu_code, code, name, type_code, icon, remark, seq_no, is_valid, crte_id, crte_name, crte_time)
+          values (#{id}, #{menuCode}, #{code}, #{name}, #{typeCode}, #{icon}, #{remark}, #{seqNo}, '1', #{crteId}, #{crteName}, #{crteTime})
+  </insert>
+
+  <!--菜单树提供给动态菜单-->
+  <select id="getOnlyMenuTree" resultType="cn.hsa.base.TreeMenuNode">
+    select '1' as isMenuOrBtn,`code` id,name label,up_code as parentId,url from sync_menu
+    <where>
+      and is_valid = '1'
+      <if test="usCode != null and usCode != ''">
+        and code in (select sys_role_menu_button.menu_code from sys_role_menu_button where sys_role_menu_button.role_code in
+        (select sys_user_role.role_code from sys_user_role where sys_user_role.us_code = #{usCode}) )
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and name like concat('%',#{keyword},'%')
+      </if>
+    </where>
+    order by seq_no
+  </select>
+
+  <!--通过主键修改菜单按钮-->
+  <update id="updateMenuButton">
+    update sync_menu_button
+    <set>
+      <if test="id != null and id != ''">
+        id = #{id},
+      </if>
+      <if test="menuCode != null and menuCode != ''">
+        menu_code = #{menuCode},
+      </if>
+      <if test="code != null and code != ''">
+        code = #{code},
+      </if>
+      <if test="name != null and name != ''">
+        name = #{name},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code = #{typeCode},
+      </if>
+      <if test="icon != null and icon != ''">
+        icon = #{icon},
+      </if>
+      <if test="remark != null and remark != ''">
+        remark = #{remark},
+      </if>
+      <if test="seqNo != null">
+        seq_no = #{seqNo},
+      </if>
+      <if test="isValid != null and isValid != ''">
+        is_valid = #{isValid},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <!--通过主键修改按钮有效状态-->
+  <update id="deleteMenuButton">
+        update sync_menu_button set is_valid = '0' where code = #{code}
+    </update>
+
+  <select id="queryIsExitCode" resultType="java.lang.Integer">
+    select count(code) from sync_menu_button
+    where
+    code = #{code} and #{sysCode} =
+    (select sync_menu.sys_code from sync_menu where sync_menu.code = #{menuCode})
+    <if test="id != null and id != ''">
+      and id != #{id}
+    </if>
+  </select>
+
+  <!--获取菜单树-->
+  <select id="getMenuTree" resultType="cn.hsa.base.TreeMenuNode">
+    (
+    select '1' as isMenuOrBtn,`code` id,name label,up_code as parentId,url from sync_menu
+    <where>and is_valid = '1'
+      <if test = "sysCode != null and sysCode != ''" >
+        and sys_code = #{sysCode}
+      </if>
+    </where>
+     order by seq_no limit 1000000
+     )
+    union all
+    (
+    select '2' as isMenuOrBtn,`code` id,name label,menu_code as parentId,'' as url from sync_menu_button where is_valid = '1' and menu_code
+    in (SELECT sync_menu.CODE from sync_menu
+    <where>
+        and is_valid = '1'
+      <if test = "sysCode != null and sysCode != ''" >
+        and sys_code = #{sysCode}
+      </if>
+    </where>)
+     order by seq_no limit 1000000
+     )
+  </select>
+
+  <!-- 查询菜单序号自动填充前端-->
+  <select id="queryMenuSeqNo" resultType="java.lang.Integer">
+      select max(seq_no) from sync_menu where is_valid = '1' and (up_code = #{upCode} or up_code = '-1' )
+  </select>
+
+  <!-- 查询按钮序号自动填充前端-->
+  <select id="queryBtnSeqNo" resultType="java.lang.Integer">
+      select max(seq_no) from sync_menu_button where  is_valid = '1'
+      and menu_code = #{upCode}
+    </select>
+
+  <!--查询子系统填充下拉框-->
+  <select id="querySystem" resultType="cn.hsa.module.sys.system.dto.SysSystemDTO" parameterType="cn.hsa.module.sys.system.dto.SysSystemDTO">
+      select * from sync_system where is_valid='1'
+  </select>
+
+  <!--根据用户系统id查询用户系统关系代码-->
+  <select id="getUsById" parameterType="cn.hsa.module.sys.user.dto.SysUserSystemDTO" resultType="cn.hsa.module.sys.user.dto.SysUserSystemDTO">
+      select us_code,user_code,system_code from sys_user_system where id =#{id}
+  </select>
+
+</mapper>

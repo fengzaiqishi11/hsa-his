@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.stroinvoicing.dao.StroInvoicingDAO">
+
+    <resultMap type="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO" id="StroInvoicingMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="outinCode" column="outin_code" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="OTHER"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+        <result property="sellPrice" column="sell_price" jdbcType="OTHER"/>
+        <result property="buyPrice" column="buy_price" jdbcType="OTHER"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="OTHER"/>
+        <result property="splitPrice" column="split_price" jdbcType="OTHER"/>
+        <result property="splitNum" column="split_num" jdbcType="OTHER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="batchSurplusNum" column="batch_surplus_num" jdbcType="OTHER"/>
+        <result property="upSurplusNum" column="up_surplus_num" jdbcType="OTHER"/>
+        <result property="surplusNum" column="surplus_num" jdbcType="OTHER"/>
+        <result property="splitSurplusNum" column="splitSurplusNum" jdbcType="OTHER"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="OTHER"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="OTHER"/>
+        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="OTHER"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="OTHER"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="bizName" column="bizName" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="invoicingTargetId" column="invoicing_target_id" jdbcType="VARCHAR"/>
+        <result property="invoicingTargetName" column="invoicing_target_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="StroInvoicingMap">
+        select
+        a.id, a.hosp_code, a.outin_code, a.order_no, a.biz_id, a.item_code, a.item_id, a.item_name, ifnull(a.num,0) num, a.unit_code, a.curr_unit_code,
+        ifnull(a.sell_price,0) sell_price, ifnull(a.buy_price,0) buy_price, a.split_ratio, ifnull(a.split_price,0) split_price,
+        ifnull(a.split_num,0) split_num, a.split_unit_code, a.batch_no, ifnull(a.batch_surplus_num,0) batch_surplus_num,
+        ifnull(a.up_surplus_num,0) up_surplus_num, ifnull(a.surplus_num,0) surplus_num, ifnull(a.up_buy_price_all,0) up_buy_price_all,
+         ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.up_sell_price_all,0) up_sell_price_all, ifnull(a.sell_price_all,0) sell_price_all,
+        DATE_FORMAT(a.expiry_date,'%Y-%m-%d') expiry_date, a.crte_id, a.crte_name, a.crte_time, b.name bizName,a.invoicing_target_id,
+        a.invoicing_target_name,round(ifnull((a.surplus_num*a.split_ratio),0),0) splitSurplusNum,
+        (case a.item_code when '1' then c.spec when '2' then d.spec end ) spec,
+        (case a.item_code when '1' then c.code when '2' then d.code end ) code,
+        ifnull(a.new_price,0) new_price,
+        ifnull(a.new_split_price,0) new_split_price
+        from stro_invoicing a left join base_dept b on a.biz_id=b.id and a.hosp_code=b.hosp_code
+        left join base_drug c on a.item_code='1' and c.id=a.item_id and c.hosp_code=a.hosp_code
+        left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="keyword != null and keyword != ''">
+                and (a.item_name like concat('%',#{keyword},'%') or c.good_pym like concat('%',#{keyword},'%')
+              or c.good_wbm like concat('%',#{keyword},'%')
+              or c.usual_pym like concat('%',#{keyword},'%')
+              or c.usual_wbm like concat('%',#{keyword},'%')
+              or d.pym like concat('%',#{keyword},'%') or d.wbm like concat('%',#{keyword},'%') )
+            </if>
+            /*新增项目编码查询条件*/
+            <if test="code != null and code != ''">
+                and c.code=#{code}
+            </if>
+            <if test="starttime != null and starttime != ''">
+                and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;=#{starttime}
+            </if>
+            <if test="endtime != null and endtime != ''">
+                and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;=#{endtime}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id=#{bizId}
+            </if>
+            <if test="outinCode != null and outinCode != ''">
+                and a.outin_code=#{outinCode}
+            </if>
+            <if test="spec!=null and spec!=''">
+                and (c.spec like concat('%',#{spec},'%') or d.spec like concat('%',#{spec},'%'))
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+    <select id="queryAllrk" resultMap="StroInvoicingMap">
+        select
+        id, hosp_code, outin_code, order_no, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code,
+        sell_price, buy_price, split_ratio, split_price, split_num, split_unit_code, batch_no, batch_surplus_num,
+        up_surplus_num, surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all, expiry_date,
+        crte_id, crte_name, crte_time,invoicing_target_id,invoicing_target_name
+        from stro_invoicing
+        <where>
+                and hosp_code = #{hospCode}
+            <if test="item_name != null and item_name != ''">
+                and item_name like concat('%',#{itemName},'%')
+            </if>
+            <if test="starttime != null and starttime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{starttime}
+            </if>
+            <if test="endtime != null and endtime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{endtime}
+            </if>
+                and outin_code in (1,4)
+        </where>
+        order by crte_time desc
+    </select>
+
+
+    <select id="queryAllck" resultMap="StroInvoicingMap">
+        select
+        id, hosp_code, outin_code, order_no, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code, sell_price,
+        buy_price, split_ratio, split_price, split_num, split_unit_code, batch_no, batch_surplus_num, up_surplus_num, surplus_num,
+        up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all, expiry_date, crte_id, crte_name, crte_time,
+        invoicing_target_id,invoicing_target_name
+        from stro_invoicing
+        <where>
+                and hosp_code = #{hospCode}
+            <if test="item_name != null and item_name != ''">
+                and item_name like concat('%',#{itemName},'%')
+            </if>
+            <if test="starttime != null and starttime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{starttime}
+            </if>
+            <if test="endtime != null and endtime != ''">
+                and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{endtime}
+            </if>
+            and outin_code in (2,3,9,10)
+        </where>
+        order by crte_time desc
+    </select>
+    <!-- 新增台账信息-->
+    <insert id="insertInvoicing" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into stro_invoicing(
+            id, hosp_code, outin_code, order_no, biz_id, item_code, item_id, item_name,
+            num, surplus_num, unit_code, sell_price, buy_price, split_ratio, split_num,
+            split_price, split_unit_code, batch_no, batch_surplus_num,
+            expiry_date, crte_id, crte_name, crte_time, curr_unit_code, up_surplus_num,
+            up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all,crte_time_stamp,
+            invoicing_target_id,invoicing_target_name,new_price,new_split_price
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.outinCode},
+            #{item.orderNo},
+            #{item.bizId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.num},
+            #{item.surplusNum},
+            #{item.unitCode},
+            #{item.sellPrice},
+            #{item.buyPrice},
+            #{item.splitRatio},
+            #{item.splitNum},
+            #{item.splitPrice},
+            #{item.splitUnitCode},
+            #{item.batchNo},
+            #{item.batchSurplusNum},
+            #{item.expiryDate},
+            #{item.crteId},
+            #{item.crteName},
+            now(),
+            #{item.currUnitCode},
+            #{item.upSurplusNum},
+            #{item.upBuyPriceAll},
+            #{item.buyPriceAll},
+            #{item.upSellPriceAll},
+            #{item.sellPriceAll},
+            #{item.crteTimeStamp},
+            #{item.invoicingTargetId},
+            #{item.invoicingTargetName},
+            #{item.newPrice},
+            #{item.newSplitPrice}
+            )
+        </foreach>
+    </insert>
+</mapper>

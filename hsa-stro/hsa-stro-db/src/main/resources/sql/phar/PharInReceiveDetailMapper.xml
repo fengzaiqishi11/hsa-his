@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharinbackdrug.dao.PharInReceiveDetailDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO" id="PharInReceiveDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="wrId" column="wr_id" jdbcType="VARCHAR"/>
+        <result property="receiveId" column="receive_id" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="NUMERIC"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getPharInReceiveDetailById" resultMap="PharInReceiveDetailMap">
+        select
+          id, hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code
+        from phar_in_receive_detail
+        where hosp_code = #{hospCode}
+         and id = #{id}
+    </select>
+
+    <!--根据待领id批量查询-->
+    <select id="queryPharInReceiveDetails" resultMap="PharInReceiveDetailMap">
+        select
+          id, hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code
+        from phar_in_receive_detail
+        where (hosp_code,wr_id) in
+         <foreach collection="list" item="dto" open="(" close=")" separator=",">
+             (#{dto.hospCode},#{dto.oldWrId})
+         </foreach>
+        and num > 0
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPharInReceiveDetailPage" resultMap="PharInReceiveDetailMap">
+        select
+          a.*, b.bed_name as bedName, b.name as name
+        from phar_in_receive_detail a
+        left join inpt_visit b on a.visit_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+        and a.id = #{id}
+        </if>
+        <if test="receiveId != null and receiveId != ''">
+        and a.receive_id = #{receiveId}
+        </if>
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertPharInReceiveDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_receive_detail(hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code)
+        values (#{hospCode}, #{wrId}, #{receiveId}, #{adviceId}, #{groupNo}, #{visitId}, #{babyId}, #{itemCode}, #{itemId}, #{itemName}, #{price}, #{num}, #{spec}, #{unitCode}, #{totalPrice}, #{dosage}, #{dosageUnitCode}, #{splitRatio}, #{splitUnitCode}, #{splitNum}, #{splitPrice}, #{chineseDrugNum}, #{usageCode})
+    </insert>
+
+    <!--批量新增-->
+    <insert id="insertPharInReceiveDetails" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_receive_detail(id,hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code,curr_unit_code)
+        values
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id}, #{dto.hospCode}, #{dto.wrId}, #{dto.receiveId}, #{dto.adviceId}, #{dto.groupNo}, #{dto.visitId}, #{dto.babyId}, #{dto.itemCode}, #{dto.itemId},
+            #{dto.itemName}, #{dto.price}, #{dto.num}, #{dto.spec}, #{dto.unitCode}, #{dto.totalPrice}, #{dto.dosage}, #{dto.dosageUnitCode}, #{dto.splitRatio}, #{dto.splitUnitCode}, #{dto.splitNum}, #{dto.splitPrice}, #{dto.chineseDrugNum}, #{dto.usageCode}, #{dto.currUnitCode})
+        </foreach>
+    </insert>
+
+    <!--单个修改-->
+    <update id="updatePharInReceiveDetail">
+        update phar_in_receive_detail
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="wrId != null and wrId != ''">
+                wr_id = #{wrId},
+            </if>
+            <if test="receiveId != null and receiveId != ''">
+                receive_id = #{receiveId},
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                advice_id = #{adviceId},
+            </if>
+            <if test="groupNo != null and groupNo != ''">
+                group_no = #{groupNo},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="splitRatio != null">
+                split_ratio = #{splitRatio},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code = #{splitUnitCode},
+            </if>
+            <if test="splitNum != null">
+                split_num = #{splitNum},
+            </if>
+            <if test="splitPrice != null">
+                split_price = #{splitPrice},
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num = #{chineseDrugNum},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+
+</mapper>

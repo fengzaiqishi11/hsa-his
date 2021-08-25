@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.pym.dao.PymDao">
+
+    <!--用户-->
+    <select id="querySysUserAll" resultType="cn.hsa.module.sys.user.dto.SysUserDTO" parameterType="java.util.Map">
+        select *
+        from sys_user a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--用户更新-->
+    <update id="updateSysUserAll" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update sys_user set
+            pym = #{item.pym},
+            wbm = #{item.wbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--药品-->
+    <select id="queryBaseDrugAll" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="java.util.Map">
+        select *
+        from base_drug a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--药品更新-->
+    <update id="updateBaseDrupg" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update base_drug set
+            usual_pym = #{item.usualPym},
+            usual_wbm = #{item.usualWbm},
+            good_pym = #{item.goodPym},
+            good_wbm = #{item.goodWbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--材料-->
+    <select id="queryBaseMaterialAll" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO" parameterType="java.util.Map">
+        select *
+        from base_material a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--材料更新-->
+    <update id="updateBaseMaterial" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update base_material set
+            pym = #{item.pym},
+            wbm = #{item.wbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--医嘱目录-->
+    <select id="queryBaseAdviceAll" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO" parameterType="java.util.Map">
+        select *
+        from base_advice a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--医嘱目录更新-->
+    <update id="updateBaseAdvice" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update base_advice set
+            pym = #{item.pym},
+            wbm = #{item.wbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--项目-->
+    <select id="queryBaseItem" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO" parameterType="java.util.Map">
+        select *
+        from base_item a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--项目更新-->
+    <update id="updateBaseItem" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update base_item set
+            name_pym = #{item.namePym},
+            name_wbm = #{item.nameWbm},
+            abbr_pym = #{item.abbrPym},
+            abbr_wbm = #{item.abbrWbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--疾病目录-->
+    <select id="queryDisease" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO" parameterType="java.util.Map">
+        select *
+        from base_disease a
+        where hosp_code = #{hospCode}
+    </select>
+    <!--疾病目录-->
+    <update id="updateDisease" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update base_disease set
+            pym = #{item.pym},
+            wbm = #{item.wbm}
+            where id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+</mapper>

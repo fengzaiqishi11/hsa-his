@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharinbackdrug.dao.PharInWaitReceiveDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO" id="PharInWaitReceiveMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="NUMERIC"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="assignUserId" column="assign_user_id" jdbcType="VARCHAR"/>
+        <result property="assignUserName" column="assign_user_name" jdbcType="VARCHAR"/>
+        <result property="assignTime" column="assign_time" jdbcType="TIMESTAMP"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distUserName" column="dist_user_name" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="isEmergency" column="is_emergency" jdbcType="VARCHAR"/>
+        <result property="isBack" column="is_back" jdbcType="VARCHAR"/>
+        <result property="costId" column="cost_id" jdbcType="VARCHAR"/>
+        <result property="oldWrId" column="old_wr_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="oldStatusCode" column="oldStatusCode" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="costTime" column="costTime" jdbcType="VARCHAR"/>
+        <result property="showNum" column="showNum" jdbcType="NUMERIC"/>
+        <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="adviceDosage" column="adviceDosage" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getPharInWaitReceiveById" resultMap="PharInWaitReceiveMap">
+        select
+          id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time
+        from phar_in_wait_receive
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--批量查询-->
+    <select id="queryPharInWaitReceives" resultMap="PharInWaitReceiveMap">
+        select
+          id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time
+        from phar_in_wait_receive
+        where hosp_code = #{hospCode}
+        and item_id = #{itemId}
+    </select>
+
+    <!--通过实体作为筛选条件分页查询  jiahong.yang -->
+    <select id="queryPharInWaitReceivePage" resultMap="PharInWaitReceiveMap">
+    select
+    id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, unit_code, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id,curr_unit_code,
+    (select crte_time from inpt_cost where inpt_cost.id = cost_id) as costTime,
+    case curr_unit_code = unit_code when true then num else split_num end as num,
+    case curr_unit_code = unit_code when true then price else split_price end as price
+    from phar_in_wait_receive
+    where
+      hosp_code = #{hospCode}
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="adviceId != null and adviceId != ''">
+        and advice_id = #{adviceId}
+      </if>
+      <if test="groupNo != null and groupNo != ''">
+        and group_no = #{groupNo}
+      </if>
+      <if test="visitId != null and visitId != ''">
+        and visit_id = #{visitId}
+      </if>
+      <if test="babyId != null and babyId != ''">
+        and baby_id = #{babyId}
+      </if>
+      <if test="itemCode != null and itemCode != ''">
+        and item_code = #{itemCode}
+      </if>
+      <if test="itemId != null and itemId != ''">
+        and item_id = #{itemId}
+      </if>
+      <if test="itemName != null and itemName != ''">
+        and item_name = #{itemName}
+      </if>
+      <if test="spec != null and spec != ''">
+        and spec = #{spec}
+      </if>
+      <if test="dosage != null">
+        and dosage = #{dosage}
+      </if>
+      <if test="dosageUnitCode != null and dosageUnitCode != ''">
+        and dosage_unit_code = #{dosageUnitCode}
+      </if>
+      <if test="num != null">
+        and num = #{num}
+      </if>
+      <if test="unitCode != null and unitCode != ''">
+        and unit_code = #{unitCode}
+      </if>
+      <if test="price != null">
+        and price = #{price}
+      </if>
+      <if test="splitRatio != null">
+        and split_ratio = #{splitRatio}
+      </if>
+      <if test="splitUnitCode != null and splitUnitCode != ''">
+        and split_unit_code = #{splitUnitCode}
+      </if>
+      <if test="splitNum != null">
+        and split_num = #{splitNum}
+      </if>
+      <if test="splitPrice != null">
+        and split_price = #{splitPrice}
+      </if>
+      <if test="totalPrice != null">
+        and total_price = #{totalPrice}
+      </if>
+      <if test="chineseDrugNum != null">
+        and chinese_drug_num = #{chineseDrugNum}
+      </if>
+      <if test="statusCode != null and statusCode != ''">
+        and status_code = #{statusCode}
+      </if>
+      <if test="pharId != null and pharId != ''">
+        and phar_id = #{pharId}
+      </if>
+      <if test="assignUserId != null and assignUserId != ''">
+        and assign_user_id = #{assignUserId}
+      </if>
+      <if test="assignUserName != null and assignUserName != ''">
+        and assign_user_name = #{assignUserName}
+      </if>
+      <if test="assignTime != null">
+        and assign_time = #{assignTime}
+      </if>
+      <if test="distUserId != null and distUserId != ''">
+        and dist_user_id = #{distUserId}
+      </if>
+      <if test="distUserName != null and distUserName != ''">
+        and dist_user_name = #{distUserName}
+      </if>
+      <if test="distTime != null">
+        and dist_time = #{distTime}
+      </if>
+      <if test="usageCode != null and usageCode != ''">
+        and usage_code = #{usageCode}
+      </if>
+      <if test="useCode != null and useCode != ''">
+        and use_code = #{useCode}
+      </if>
+      <if test="deptId != null and deptId != ''">
+        and dept_id = #{deptId}
+      </if>
+      <if test="isEmergency != null and isEmergency != ''">
+        and is_emergency = #{isEmergency}
+      </if>
+      <if test="isBack != null and isBack != ''">
+        and is_back = #{isBack}
+      </if>
+      <if test="costId != null and costId != ''">
+        and cost_id = #{costId}
+      </if>
+      <if test="oldWrId != null and oldWrId != ''">
+        and old_wr_id = #{oldWrId}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and crte_time = #{crteTime}
+      </if>
+      order by crte_time desc
+  </select>
+
+    <!--根据条件查询出待领信息集合-->
+    <select id="queryPharInWaitReceive" resultMap="PharInWaitReceiveMap">
+        select
+        id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code,
+        num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code,
+        phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code,
+         dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code
+        from phar_in_wait_receive
+        where hosp_code = #{hospCode}
+        <if test="costIds != null and costIds.size() >0">
+            and cost_id in
+            <foreach collection="costIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+            and num > 0
+        </if>
+        <if test="ids != null and ids.size() >0">
+          and id in
+          <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+          </foreach>
+        </if>
+
+    </select>
+
+    <!--根据条件查询出待领信息集合-->
+    <select id="queryPharInWaitReceivess" resultMap="PharInWaitReceiveMap">
+        select
+        b.id, b.hosp_code, b.advice_id, b.group_no, b.visit_id, b.baby_id, b.item_code, b.item_id, b.item_name, b.spec, b.dosage, b.dosage_unit_code, b.num,
+        b.unit_code,
+        b.price, b.split_ratio, b.split_unit_code, b.split_num, b.split_price, b.total_price, b.chinese_drug_num, b.status_code, b.phar_id,
+        b.assign_user_id, b.assign_user_name, b.assign_time, b.dist_user_id, b.dist_user_name,
+        b.dist_time, b.usage_code, b.use_code, b.dept_id, b.is_emergency, b.is_back, a.cost_id, b.old_wr_id, b.crte_id, b.crte_name, b.crte_time
+        from phar_in_wait_receive a join phar_in_wait_receive b on a.hosp_code=b.hosp_code and a.old_wr_id=b.id
+        where a.hosp_code = #{hospCode}
+        <if test="costIds != null and costIds.size() >0">
+            and a.cost_id in
+            <foreach collection="costIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <!--根据条件查询出待领信息集合-->
+    <select id="queryPharInWaitReceiveToIsBack" resultMap="PharInWaitReceiveMap">
+        select
+        id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time
+        from phar_in_wait_receive
+        where hosp_code = #{hospCode} and is_back ='1'
+        <if test="costIds != null and costIds.size() >0">
+            and cost_id in
+            <foreach collection="costIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+    </select>
+
+    <!--单个新增-->
+    <insert id="insertPharInWaitReceive" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_wait_receive(hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time)
+        values (#{hospCode}, #{adviceId}, #{groupNo}, #{visitId}, #{babyId}, #{itemCode}, #{itemId}, #{itemName}, #{spec}, #{dosage}, #{dosageUnitCode}, #{num}, #{unitCode}, #{price}, #{splitRatio}, #{splitUnitCode}, #{splitNum}, #{splitPrice}, #{totalPrice}, #{chineseDrugNum}, #{statusCode}, #{pharId}, #{assignUserId}, #{assignUserName}, #{assignTime}, #{distUserId}, #{distUserName}, #{distTime}, #{usageCode}, #{useCode}, #{deptId}, #{isEmergency}, #{isBack}, #{costId}, #{oldWrId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--批量新增-->
+    <insert id="insertPharInWaitReceiveBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_wait_receive(id,hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name,
+        spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code,
+        split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name,
+        assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency,
+         is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code)
+        values
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id},#{dto.hospCode}, #{dto.adviceId}, #{dto.groupNo}, #{dto.visitId}, #{dto.babyId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName},
+            #{dto.spec}, #{dto.dosage}, #{dto.dosageUnitCode}, #{dto.num}, #{dto.unitCode}, #{dto.price}, #{dto.splitRatio}, #{dto.splitUnitCode},
+            #{dto.splitNum}, #{dto.splitPrice}, #{dto.totalPrice}, #{dto.chineseDrugNum}, #{dto.statusCode}, #{dto.pharId}, #{dto.assignUserId}, #{dto.assignUserName},
+            #{dto.assignTime}, #{dto.distUserId}, #{dto.distUserName}, #{dto.distTime}, #{dto.usageCode}, #{dto.useCode}, #{dto.deptId}, #{dto.isEmergency},
+            #{dto.isBack}, #{dto.costId}, #{dto.oldWrId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.currUnitCode})
+        </foreach>
+    </insert>
+
+    <!--单个修改-->
+    <update id="updatePharInWaitReceive">
+        update phar_in_wait_receive
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                advice_id = #{adviceId},
+            </if>
+            <if test="groupNo != null and groupNo != ''">
+                group_no = #{groupNo},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="splitRatio != null">
+                split_ratio = #{splitRatio},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code = #{splitUnitCode},
+            </if>
+            <if test="splitNum != null">
+                split_num = #{splitNum},
+            </if>
+            <if test="splitPrice != null">
+                split_price = #{splitPrice},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num = #{chineseDrugNum},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id = #{assignUserId},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name = #{assignUserName},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id = #{distUserId},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name = #{distUserName},
+            </if>
+            <if test="distTime != null">
+                dist_time = #{distTime},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="isEmergency != null and isEmergency != ''">
+                is_emergency = #{isEmergency},
+            </if>
+            <if test="isBack != null and isBack != ''">
+                is_back = #{isBack},
+            </if>
+            <if test="costId != null and costId != ''">
+                cost_id = #{costId},
+            </if>
+            <if test="oldWrId != null and oldWrId != ''">
+                old_wr_id = #{oldWrId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deletePharInWaitReceive">
+        delete from phar_in_wait_receive where hosp_code = #{hospCode}
+        and hosp_code = #{hospCode}
+        and id = #{id}
+    </delete>
+
+    <!--通过主键批量删除-->
+    <delete id="deletePharInWaitReceiveBatch">
+        delete from phar_in_wait_receive
+        where (hosp_code,id) in
+        <foreach collection="list" item="dto" open="(" close=")" separator=",">
+            (#{dto.hospCode},#{dto.id})
+        </foreach>
+    </delete>
+
+    <!--按申请科室分组查询出待退药的信息-->
+    <select id="queryWaitReceiveGroupByDeptId" resultMap="PharInWaitReceiveMap">
+        SELECT tab.dept_id,tab.deptName,ifnull(sum(tab.num),0) num
+        FROM
+        (
+            SELECT e.dept_id,sum(e.num) num,
+            (select t.name from base_dept t where t.hosp_code = e.hosp_code and t.id = e.dept_id) deptName
+            FROM phar_in_wait_receive e
+            join inpt_cost c on e.cost_id = c.id and e.hosp_code=c.hosp_code
+            WHERE e.hosp_code = #{hospCode}
+            AND e.is_back = '1'
+            AND e.status_code='3'
+            AND e.phar_id = #{crteId}
+            <if test="backCode!=null and backCode!=''">
+                and c.back_code=#{backCode}
+                <if test="backCode==1 or backCode=='1'">
+                    AND c.is_ok='0'
+                </if>
+            </if>
+            <if test="startDate != null and startDate !=''">
+                AND e.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate !=''">
+                AND e.crte_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                and e.dept_id=#{deptId}
+            </if>
+            GROUP BY e.dept_id,e.item_id
+        )tab
+        GROUP BY tab.dept_id
+    </select>
+
+    <!--按项目id分组查询出科室待退药的信息-->
+    <select id="queryWaitReceiveGroupByItemIdPage" resultMap="PharInWaitReceiveMap">
+        SELECT
+        e.item_id,
+        max(e.item_name) item_name,
+        max(e.spec) spec,
+        max(e.dosage) dosage,
+        max(e.price) price,
+        max(e.split_price) split_price,
+        max(e.curr_unit_code) curr_unit_code,
+        max(e.unit_code) unit_code,
+        max(e.split_unit_code) split_unit_code,
+        sum( e.num ) num,
+        sum(e.split_num) split_num,
+        abs(sum(e.split_num)) as showSplitNum,
+        abs(sum(e.total_price)) total_price,
+        abs(sum( e.num )) showNum,
+        max(e.crte_name) crte_name,
+        case when max(e.item_code)='1' then bd.code when max(e.item_code)='2' then bm.code end drugCode
+        FROM phar_in_wait_receive e
+        join inpt_cost c on e.cost_id = c.id and e.hosp_code=c.hosp_code
+        left join base_drug bd on bd.id = e.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = e.item_id and bm.hosp_code = #{hospCode}
+        WHERE e.hosp_code = #{hospCode}
+        AND e.is_back = '1'
+        AND e.status_code='3'
+        AND e.phar_id = #{crteId}
+        <if test="backCode!=null and backCode!=''">
+          and c.back_code=#{backCode}
+          <if test="backCode==1 or backCode=='1'">
+            AND c.is_ok='0'
+          </if>
+        </if>
+        <if test="startDate != null and startDate !=''">
+          AND e.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate !=''">
+          AND e.crte_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
+        </if>
+        AND e.dept_id = #{deptId}
+        GROUP BY e.item_id,e.curr_unit_code
+    </select>
+
+    <!--查询出申请科室的退药明细-->
+    <select id="queryWaitReceiveByDeptIdPage" resultMap="PharInWaitReceiveMap">
+        SELECT
+        e.id,
+        e.crte_time,
+        e.crte_name,
+        (select t.name from inpt_visit t where t.hosp_code = e.hosp_code and t.id = e.visit_id) visitName,
+        e.item_name,
+        e.spec,
+        e.price,
+        e.split_price,
+        e.curr_unit_code curr_unit_code,
+        e.unit_code unit_code,
+        e.split_unit_code split_unit_code,
+        e.num,
+        e.split_num,
+        abs(e.total_price) total_price,
+        abs(e.split_num) as showSplitNum,
+        abs(e.num) showNum,
+        v.in_no,
+        v.name,
+        v.bed_name,
+        case when e.item_code='1' then bd.code when e.item_code='2' then bm.code end drugCode
+        FROM phar_in_wait_receive e
+        join inpt_cost c on e.cost_id = c.id and e.hosp_code=c.hosp_code
+        left join base_drug bd on bd.id = e.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = e.item_id and bm.hosp_code = #{hospCode}
+        left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
+        WHERE e.hosp_code = #{hospCode}
+        AND e.is_back = '1'
+        AND e.status_code='3'
+        AND e.phar_id = #{crteId}
+        <if test="backCode!=null and backCode!=''">
+          and c.back_code=#{backCode}
+          <if test="backCode==1 or backCode=='1'">
+            AND c.is_ok='0'
+          </if>
+        </if>
+        <if test="startDate != null and startDate !=''">
+          AND e.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate !=''">
+          AND e.crte_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
+        </if>
+        AND e.dept_id = #{deptId}
+        order by e.crte_time desc
+    </select>
+
+    <!--根据待领id集合批量出查询出退药信息-->
+    <select id="queryWaitReceiveByIds" resultMap="PharInWaitReceiveMap">
+        select
+          id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,
+          (select status_code from phar_in_wait_receive ie where ie.hosp_code = e.hosp_code and ie.id = e.old_wr_id) oldStatusCode,curr_unit_code
+        from phar_in_wait_receive e
+        where hosp_code = #{hospCode} and status_code='3'
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        <if test="deptId != null and deptId !=''">
+            AND dept_id = #{deptId}
+            AND is_back = '1'
+        </if>
+
+    </select>
+
+    <!--根据项目id集合批量出查询出退药信息-->
+    <select id="queryWaitReceiveByItemIds" resultMap="PharInWaitReceiveMap">
+        select
+        e.id, e.hosp_code, e.advice_id, e.group_no, e.visit_id, e.baby_id, e.item_code, e.item_id, e.item_name, e.spec, e.dosage, e.dosage_unit_code
+        , e.num, e.unit_code, e.price, e.split_ratio, e.split_unit_code, e.split_num, e.split_price, e.total_price, e.chinese_drug_num, e.status_code
+        , e.phar_id, e.assign_user_id, e.assign_user_name, e.assign_time, e.dist_user_id, e.dist_user_name, e.dist_time, e.usage_code, e.use_code
+        , e.dept_id, e.is_emergency, e.is_back, e.cost_id, e.old_wr_id, e.crte_id, e.crte_name, e.crte_time,
+        (select status_code from phar_in_wait_receive ie where ie.hosp_code = e.hosp_code and ie.id = e.old_wr_id) oldStatusCode,curr_unit_code
+        from phar_in_wait_receive e join inpt_cost f on e.hosp_code=f.hosp_code and e.cost_id=f.id
+        where e.hosp_code = #{hospCode} and e.status_code='3' and e.is_back='1' and f.back_code='1' and f.is_ok='0'
+        and e.item_id in
+        <foreach collection="itemIds" item="itemId" open="(" close=")" separator=",">
+            #{itemId}
+        </foreach>
+        <if test="deptId != null and deptId !=''">
+            AND e.dept_id = #{deptId}
+        </if>
+    </select>
+
+    <!--批量修改发药状态-->
+    <update id="updatePharInWaitReceiveBatch">
+        update phar_in_wait_receive
+        set status_code = #{statusCode}
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--批量修改发药状态-->
+    <update id="updateInWaitStatusByWrIds">
+      update phar_in_wait_receive
+      set status_code = #{statusCode}
+      where hosp_code = #{hospCode}
+      and old_wr_id in
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+      and old_wr_id is not null and num &lt;= 0
+    </update>
+
+    <select id="getWaitReceiveByCost" resultMap="PharInWaitReceiveMap">
+        select
+        id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,
+        (select status_code from phar_in_wait_receive ie where ie.hosp_code = e.hosp_code and ie.id = e.old_wr_id) oldStatusCode
+        from phar_in_wait_receive e
+        where hosp_code = #{hospCode}
+        and item_code = #{itemCode}
+        and item_id = #{itemId}
+        and advice_id = #{adviceId}
+        and visit_id = #{visitId}
+    </select>
+
+    <!--根据条件查询出待领信息集合-->
+    <select id="queryPharInWaitReceiveApply" resultMap="PharInWaitReceiveMap">
+        select
+        a.*,
+        b.ph_code as phCode,
+        b.is_lvp as isLvp,
+        b.prep_code as prepCode,
+        b.big_type_code as bigTypeCode,
+        c.bed_name as bedName,
+        c.name as name,
+        d.name as pahrName,
+        e.dosage as adviceDosage,
+        e.usage_code as usageCode,
+        e.crte_name as tellName,
+        e.exec_name as execName,
+        e.dosage as adviceDosage,
+        (select f.name from base_rate f where f.id = e.rate_id) as rateName
+        from phar_in_wait_receive a
+        left join base_drug b on a.item_id = b.id
+        left join inpt_visit c on a.visit_id = c.id
+        left join base_dept d on a.phar_id = d.id
+        left join inpt_advice e on a.advice_id = e.id
+        where a.hosp_code = #{hospCode} and c.status_code in ('2','3','4')
+        <if test="deptId != null and deptId !=''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="isBack != null and isBack !=''">
+            and a.is_back = #{isBack}
+        </if>
+        <if test="isEmergency != null and isEmergency !=''">
+          and a.is_emergency = #{isEmergency}
+        </if>
+
+    </select>
+
+    <!--批量修改发药状态-->
+    <update id="updateCostIdBatch">
+        <foreach collection="list" item="dto" separator=";">
+            update phar_in_wait_receive
+            set cost_id = #{dto.id}
+            where hosp_code = #{dto.hospCode}
+            and cost_id = #{dto.oldCostId}
+        </foreach>
+    </update>
+
+    <update id="updateUrgentMedicine">
+      update phar_in_wait_receive
+      set is_emergency = '1'
+      where hosp_code = #{hospCode}
+      and id in
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    </update>
+
+    <!--未退药信息查询 -->
+    <select id="queryBackDrugPage" resultMap="PharInWaitReceiveMap">
+        SELECT
+        e.id,
+        e.crte_time,
+        t.name as visitName,
+        e.visit_id,
+        t.in_no,
+        t.bed_name,
+        e.item_name,
+        e.spec,
+        e.price,
+        e.split_price,
+        e.curr_unit_code curr_unit_code,
+        e.unit_code unit_code,
+        e.split_unit_code split_unit_code,
+        e.num,
+        e.split_num,
+        abs(e.num) showNum,
+        e.dist_time
+        FROM phar_in_wait_receive e
+        join inpt_visit t on  t.hosp_code = e.hosp_code and t.id = e.visit_id
+        join inpt_cost c on e.cost_id = c.id and e.hosp_code=c.hosp_code
+        WHERE e.hosp_code = #{hospCode}
+        AND e.is_back = '1'
+        AND e.status_code='3'
+        AND c.back_code='1'
+        <if test="visitName != null and visitName !=''">
+            and (t.name like concat('%',#{visitName},'%') or t.bed_name like concat('%',#{visitName},'%'))
+        </if>
+        <if test="inNo != null and inNo !=''">
+            and t.in_no like concat('%',#{inNo},'%')
+        </if>
+        <if test="startDate != null and startDate !=''">
+            AND e.dist_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate !=''">
+            AND e.dist_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
+        </if>
+        order by e.crte_time desc
+    </select>
+
+</mapper>

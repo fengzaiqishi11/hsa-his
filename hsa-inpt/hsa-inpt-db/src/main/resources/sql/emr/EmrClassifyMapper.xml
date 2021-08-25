@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrclassify.dao.EmrClassifyDAO">
+	
+	<resultMap type="cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO" id="EmrClassifyMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="code" column="code" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="upCode" column="up_code" jdbcType="VARCHAR"/>
+		<result property="pagePrintCode" column="page_print_code" jdbcType="VARCHAR"/>
+		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+		<result property="docCode" column="doc_code" jdbcType="VARCHAR"/>
+		<result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+		<result property="pym" column="pym" jdbcType="VARCHAR"/>
+		<result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+		<result property="isDelNullline" column="is_del_nullline" jdbcType="VARCHAR"/>
+		<result property="isCommon" column="is_common" jdbcType="VARCHAR"/>
+		<result property="isEnd" column="is_end" jdbcType="VARCHAR"/>
+		<result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+		<result property="isUnique" column="is_unique" jdbcType="VARCHAR"/>
+		<result property="isPagePrint" column="is_page_print" jdbcType="VARCHAR"/>
+		<result property="isAudit" column="is_audit" jdbcType="VARCHAR"/>
+		<result property="isHosp" column="is_hosp" jdbcType="VARCHAR"/>
+		<result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="recordTimeCode" column="record_time_code" jdbcType="VARCHAR"/>
+		<result property="validTime" column="valid_time" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<!--查询全员分类单个-->
+	<select id="getByIdOrCode" resultMap="EmrClassifyMap">
+        select
+          id, hosp_code, code, name, up_code, page_print_code, type_code, seq, doc_code, gender_code, pym, wbm, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time, record_time_code,
+		  (select count(id) from emr_classify where up_code = a.code  and dept_id is null and hosp_code = #{hospCode}) as son,
+		  (select count(id) from emr_classify_template where classify_code = #{code} and dept_id is null and hosp_code = #{hospCode}) as tempHtml,
+		  valid_time
+        from emr_classify as a
+        where (id = #{id} or code = #{code}) and dept_id is null and hosp_code = #{hospCode}
+    </select>
+	
+	<!--通过实体作为筛选条件查询-->
+	<select id="queryPageOrAll" resultMap="EmrClassifyMap">
+		select
+		id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm,seq,
+		is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id,
+		crte_name, crte_time
+		from emr_classify
+		<where>
+			hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and id = #{id}
+			</if>
+			<if test="code != null and code != ''">
+				and code = #{code}
+			</if>
+			<if test="name != null and name != ''">
+				and name = #{name}
+			</if>
+			<if test="upCode != null and upCode != ''">
+				and up_code = #{upCode}
+			</if>
+			<if test="pagePrintCode != null and pagePrintCode != ''">
+				and page_print_code = #{pagePrintCode}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and type_code = #{typeCode}
+			</if>
+			<if test="docCode != null and docCode != ''">
+				and doc_code = #{docCode}
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				and gender_code = #{genderCode}
+			</if>
+			<if test="pym != null and pym != ''">
+				and pym = #{pym}
+			</if>
+			<if test="wbm != null and wbm != ''">
+				and wbm = #{wbm}
+			</if>
+			<if test="seq != null and seq != ''">
+				and seq = #{seq}
+			</if>
+			<if test="isDelNullline != null and isDelNullline != ''">
+				and is_del_nullline = #{isDelNullline}
+			</if>
+			<if test="isCommon != null and isCommon != ''">
+				and is_common = #{isCommon}
+			</if>
+			<if test="isEnd != null and isEnd != ''">
+				and is_end = #{isEnd}
+			</if>
+			<if test="isValid != null and isValid != ''">
+				and is_valid = #{isValid}
+			</if>
+			<if test="isUnique != null and isUnique != ''">
+				and is_unique = #{isUnique}
+			</if>
+			<if test="isPagePrint != null and isPagePrint != ''">
+				and is_page_print = #{isPagePrint}
+			</if>
+			<if test="isAudit != null and isAudit != ''">
+				and is_audit = #{isAudit}
+			</if>
+			<if test="isHosp != null and isHosp != ''">
+				and is_hosp = #{isHosp}
+			</if>
+			<if test="deptId != null and deptId != ''">
+				and dept_id = #{deptId}
+			</if>
+			<if test="deptId == null">
+				and dept_id is null
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and crte_time = #{crteTime}
+			</if>
+			<if test="codes != null and codes.size() > 0">
+				and code in
+				<foreach collection="codes" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!--新增所有列-->
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into emr_classify(id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm, seq, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time, record_time_code,valid_time)
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{upCode}, #{pagePrintCode}, #{typeCode}, #{docCode}, #{genderCode}, #{pym}, #{wbm}, #{seq}, #{isDelNullline}, #{isCommon}, #{isEnd}, #{isValid}, #{isUnique}, #{isPagePrint}, #{isAudit}, #{isHosp}, #{deptId}, #{crteId}, #{crteName}, #{crteTime}, #{recordTimeCode},#{validTime})
+    </insert>
+	
+	<select id="getMaxCode" resultMap="EmrClassifyMap">
+        select
+          id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm, seq, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time
+        from emr_classify
+        where up_code = #{upCode} and hosp_code = #{hospCode} and dept_id is null
+        order by seq DESC limit 1
+    </select>
+	
+	<!--通过主键修改数据(无判空条件))-->
+	<update id="updateEmrClassify">
+		update emr_classify
+		<set>
+			hosp_code = #{hospCode},
+			code = #{code},
+			name = #{name},
+			up_code = #{upCode},
+			page_print_code = #{pagePrintCode},
+			type_code = #{typeCode},
+			doc_code = #{docCode},
+			gender_code = #{genderCode},
+			pym = #{pym},
+			wbm = #{wbm},
+			seq = #{seq},
+			is_del_nullline = #{isDelNullline},
+			is_common = #{isCommon},
+			is_end = #{isEnd},
+			is_valid = #{isValid},
+			is_unique = #{isUnique},
+			is_page_print = #{isPagePrint},
+			is_audit = #{isAudit},
+			is_hosp = #{isHosp},
+			dept_id = #{deptId},
+			crte_id = #{crteId},
+			crte_name = #{crteName},
+			crte_time = #{crteTime},
+			record_time_code = #{recordTimeCode}
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+	
+	<!--通过主键修改数据(有判空条件))-->
+	<update id="updateEmrClassifyS">
+		update emr_classify
+		<set>
+			<if test="hospCode != null and hospCode != ''">
+				hosp_code = #{hospCode},
+			</if>
+			<if test="code != null and code != ''">
+				code = #{code},
+			</if>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="upCode != null and upCode != ''">
+				up_code = #{upCode},
+			</if>
+			<if test="pagePrintCode != null and pagePrintCode != ''">
+				page_print_code = #{pagePrintCode},
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				type_code = #{typeCode},
+			</if>
+			<if test="docCode != null and docCode != ''">
+				doc_code = #{docCode},
+			</if>
+				gender_code = #{genderCode},
+			<if test="pym != null and pym != ''">
+				pym = #{pym},
+			</if>
+			<if test="wbm != null and wbm != ''">
+				wbm = #{wbm},
+			</if>
+			<if test="seq != null and seq != ''">
+				seq = #{seq},
+			</if>
+			<if test="isDelNullline != null and isDelNullline != ''">
+				is_del_nullline = #{isDelNullline},
+			</if>
+			<if test="isCommon != null and isCommon != ''">
+				is_common = #{isCommon},
+			</if>
+			<if test="isEnd != null and isEnd != ''">
+				is_end = #{isEnd},
+			</if>
+			<if test="isValid != null and isValid != ''">
+				is_valid = #{isValid},
+			</if>
+			<if test="isUnique != null and isUnique != ''">
+				is_unique = #{isUnique},
+			</if>
+			<if test="isPagePrint != null and isPagePrint != ''">
+				is_page_print = #{isPagePrint},
+			</if>
+			<if test="isAudit != null and isAudit != ''">
+				is_audit = #{isAudit},
+			</if>
+			<if test="isHosp != null and isHosp != ''">
+				is_hosp = #{isHosp},
+			</if>
+			<if test="deptId != null and deptId != ''">
+				dept_id = #{deptId},
+			</if>
+			<if test="crteId != null and crteId != ''">
+				crte_id = #{crteId},
+			</if>
+			<if test="crteName != null and crteName != ''">
+				crte_name = #{crteName},
+			</if>
+			<if test="crteTime != null">
+				crte_time = #{crteTime},
+			</if>
+			<if test="recordTimeCode != null and recordTimeCode != ''">
+				record_time_code = #{recordTimeCode},
+			</if>
+				valid_time = #{validTime},
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+	<!--查询分类 -->
+	<select id="getEmrClassifyTree" resultType="cn.hsa.base.TreeMenuNode">
+		select a.code as id,a.name as label,a.up_code as parentId
+		,if(a.is_end >0,true,false) as isEnd, a.valid_time
+		from emr_classify as a
+		left join emr_classify_template as b
+		on a.hosp_code = b.hosp_code  and a.code = b.classify_code
+		and IFNULL(a.dept_id,'') = IFNULL(b.dept_id,'')
+		where a.hosp_code = #{hospCode}
+		<if test="deptId != null and deptId != ''">
+			and a.dept_id = #{deptId}
+		</if>
+		<if test="deptId == null or deptId ==''.toString() ">
+			and a.dept_id is null
+		</if>
+		order by a.seq asc
+	</select>
+	
+	<select id="getValidEmrClassifyTree" resultType="cn.hsa.base.TreeMenuNode">
+		select a.code as id,a.name as label,a.up_code as parentId
+		,if(a.is_end >0,true,false) as isEnd,b.id as templateId,
+		a.valid_time as validTime
+		from emr_classify as a
+		left join emr_classify_template as b
+		on a.hosp_code = b.hosp_code  and a.code = b.classify_code
+		and IFNULL(a.dept_id,'') = IFNULL(b.dept_id,'')
+		where a.hosp_code = #{hospCode} and a.is_valid  = '1'
+		<if test="deptId != null and deptId != ''">
+			and a.dept_id = #{deptId}
+		</if>
+		<if test="deptId == null or deptId == ''.toString()">
+			and a.dept_id is null
+		</if>
+		<if test="ksDeptId != null and ksDeptId != ''">
+			and a.type_code = (select type_code from base_dept where id = #{ksDeptId} and hosp_code = #{hospCode})
+		</if>
+		order by a.seq asc
+	</select>
+	
+	<select id="queryByUpCode" resultMap="EmrClassifyMap">
+		select
+		id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time
+		from emr_classify
+		where hosp_code=#{hospCode}
+		<if test="upCode != null and upCode != '' and upCode != '-1'">
+			and  up_code = #{upCode}
+		</if>
+	</select>
+	
+	<!--通过父级批量修改数据-->
+	<update id="updateList">
+		update emr_classify set is_valid = #{isValid} where hosp_code = #{hospCode}
+		<if test="codes != null and codes.size()>0">
+			and code in
+			<foreach collection="codes" item="code" separator="," open="(" close=")">
+				#{code}
+			</foreach>
+		</if>
+	</update>
+
+	<!-- 根据病历文档编码查询病历关联的元素，找出元素类型为时间的元素 -->
+	<select id="getEmrClassifyRecordCode" parameterType="cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO" resultType="cn.hsa.module.emr.emrelement.dto.EmrElementDTO">
+		select e.code, e.name from emr_element e join emr_classify_element t on e.code = t.element_code
+			where t.classinfo_code = #{code} and t.hosp_code = #{hospCode} and e.hosp_code = #{hospCode} and t.dept_id is null and e.type_code = '5' and e.is_require = '1'
+	</select>
+
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.drg.dao.InsureDrgDAO">
+
+
+    <select id="queryInsureIndividualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select medicine_org_code,medical_reg_no,aac001,hosp_code from insure_individual_visit
+        where hosp_code=#{hospCode} and visit_no=#{visitNo}
+    </select>
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select iiv.id,iiv.visit_no,iiv.medicine_org_code,iiv.is_hospital,iiv.medical_reg_no,
+        (select iib.aac003 from insure_individual_basic iib where iiv.mib_id= iib.id and iiv.hosp_code=iib.hosp_code) as aac003
+        from insure_individual_visit iiv where iiv.hosp_code=#{hospCode}
+    </select>
+</mapper>

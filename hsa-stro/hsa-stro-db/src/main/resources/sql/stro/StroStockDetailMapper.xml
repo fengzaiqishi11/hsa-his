@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.stock.dao.StroStockDetailDao">
+
+    <resultMap type="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" id="StroStockDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="buyPrice" column="buy_price" jdbcType="OTHER"/>
+        <result property="sellPrice" column="sell_price" jdbcType="OTHER"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="OTHER"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="OTHER"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+        <result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+        <result property="splitPrice" column="split_price" jdbcType="OTHER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="OTHER"/>
+        <result property="dosage" column="dosage" jdbcType="VARCHAR"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="locationNo" column="locationNo" jdbcType="VARCHAR"/>
+        <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="locationNo" column="locationNo" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个库存明细-->
+    <select id="getStroStockDetailById" resultMap="StroStockDetailMap">
+        select id, hosp_code, biz_id,  item_code, item_id, item_name,
+        num, buy_price_all , sell_price_all , split_num , split_price , unit_code ,
+        batch_no , expiry_date , split_unit_code ,split_ratio ,buy_price ,sell_price
+        from stro_stock_detail
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+    <!--根据参数获取库存明细数据-->
+    <select id="queryByItemIdAndNo" resultMap="StroStockDetailMap">
+        select
+          id, hosp_code, biz_id,  item_code, item_id, item_name,
+        num, buy_price_all , sell_price_all , split_num , split_price , unit_code ,
+        batch_no , expiry_date , split_unit_code ,split_ratio ,buy_price ,sell_price
+        from stro_stock_detail
+        where item_id = #{itemId} and hosp_code= #{hospCode} and item_code=#{itemCode} and biz_id=#{bizId} and batch_no=#{batchNo}
+        limit 1
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllDrug" resultMap="StroStockDetailMap">
+        select A.* from (
+          select
+          min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+          as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
+          sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+          as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+          min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+          '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
+          max(b.prod_code) prod_code,
+          (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model
+          from stro_stock_detail a
+          JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+          <if test="keyword != null and keyword != ''">
+            and (b.good_name like concat('%',#{keyword},'%')
+            or b.usual_name like concat('%',#{keyword},'%')
+            or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%'))
+          </if>
+          left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and c.item_code=a.item_code
+          <where>
+            and a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+              and a.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+              and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+              and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+              and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+              and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+              and a.unit_code = #{unitCode}
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+              and a.batch_no = #{batchNo}
+            </if>
+            <if test="expiryDate != null">
+              and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+              and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+              and a.split_num > 0
+            </if>
+            <if test="types != null and types.size()>0">
+              and b.big_type_code in
+              <foreach collection="types" item="type" open="(" separator="," close=")">
+                #{type}
+              </foreach>
+            </if>
+          </where>
+          group by a.item_id,a.hosp_code,a.biz_id,a.item_code,a.batch_no
+        )A
+        order by A.locationNo is null,A.locationNo,A.code
+    </select>
+
+    <select id="queryAllDrugCancleNo" resultMap="StroStockDetailMap">
+        select A.* from (
+          select
+          min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+          as unit_code, sum(a.num) as num, b.avg_buy_price as buy_price, min(a.sell_price) as sell_price,
+          sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all, min(a.expiry_date)
+          as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+          min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+          '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,
+          (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code, "" as model
+          from stro_stock_detail a
+          JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+          <if test="keyword != null and keyword != ''">
+            and (b.good_name like concat('%',#{keyword},'%')
+            or b.usual_name like concat('%',#{keyword},'%')
+            or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%'))
+          </if>
+          left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and c.item_code=a.item_code
+          <where>
+            and a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+              and a.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+              and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+              and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+              and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+              and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+              and a.unit_code = #{unitCode}
+            </if>
+            <if test="expiryDate != null">
+              and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+              and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+              and a.num > 0
+            </if>
+            <if test="types != null and types.size()>0">
+              and b.big_type_code in
+              <foreach collection="types" item="type" open="(" separator="," close=")">
+                #{type}
+              </foreach>
+            </if>
+          </where>
+          group by a.item_id,a.hosp_code,a.biz_id,a.item_code
+            ) A
+          order by A.locationNo is null,A.locationNo,A.code
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllMaterial" resultMap="StroStockDetailMap">
+      select A.* from (
+        select
+        min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+        as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+        min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+        '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
+        max(b.prod_code) prod_code,
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,b.model as model
+        from stro_stock_detail a
+        JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="keyword != null and keyword != ''">
+          and (b.name like concat('%',#{keyword},'%') or b.pym like concat('%',#{keyword},'%') or b.wbm like concat('%',#{keyword},'%'))
+        </if>
+        left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and c.item_code=a.item_code
+        <where>
+          <if test="id != null and id != ''">
+            and a.id = #{id}
+          </if>
+          and a.hosp_code = #{hospCode}
+          <if test="bizId != null and bizId != ''">
+            and a.biz_id = #{bizId}
+          </if>
+          <if test="itemCode != null and itemCode != ''">
+            and a.item_code = #{itemCode}
+          </if>
+          <if test="itemId != null and itemId != ''">
+            and a.item_id = #{itemId}
+          </if>
+          <if test="itemName != null and itemName != ''">
+            and a.item_name = #{itemName}
+          </if>
+          <if test="unitCode != null and unitCode != ''">
+            and a.unit_code = #{unitCode}
+          </if>
+          <if test="batchNo != null and batchNo != ''">
+            and a.batch_no = #{batchNo}
+          </if>
+          <if test="expiryDate != null">
+            and a.expiry_date = #{expiryDate}
+          </if>
+          <if test="splitUnitCode != null and splitUnitCode != ''">
+            and a.split_unit_code = #{splitUnitCode}
+          </if>
+          <if test="isMun">
+            and a.split_num > 0
+          </if>
+        </where>
+        group by a.item_id,a.hosp_code,a.biz_id,a.hosp_code,a.item_code,a.batch_no
+      ) A order by A.locationNo is null,A.locationNo,A.code
+    </select>
+
+    <select id="queryAllMaterialCancleNo" resultMap="StroStockDetailMap">
+        select A.* from (
+            select
+            min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+            as unit_code, sum(a.num) as num, b.avg_buy_price as buy_price,min(a.sell_price) as sell_price,
+            sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all, min(a.expiry_date)
+            as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+            min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+            '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,
+            (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,b.model as model
+            from stro_stock_detail a
+            JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+            <if test="keyword != null and keyword != ''">
+              and (b.name like concat('%',#{keyword},'%') or b.pym like concat('%',#{keyword},'%') or b.wbm like concat('%',#{keyword},'%'))
+            </if>
+            left join stro_stock c on c.item_id = a.id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and c.item_code=a.item_code
+            <where>
+              <if test="id != null and id != ''">
+                and a.id = #{id}
+              </if>
+              and a.hosp_code = #{hospCode}
+              <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+              </if>
+              <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+              </if>
+              <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+              </if>
+              <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+              </if>
+              <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+              </if>
+              <if test="expiryDate != null">
+                and a.expiry_date = #{expiryDate}
+              </if>
+              <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+              </if>
+              <if test="isMun">
+                and a.num > 0
+              </if>
+            </where>
+            group by a.item_id,a.hosp_code,a.biz_id,a.hosp_code,a.item_code
+        ) A
+        order by A.locationNo is null,A.locationNo,A.code
+    </select>
+
+    <select id="queryAll" resultMap="StroStockDetailMap">
+        select f.* from (
+        select
+        min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+        as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+        min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+        '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
+        max(b.prod_code) prod_code,
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model
+        from stro_stock_detail a
+        JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="keyword != null and keyword != ''">
+          and (b.good_name like concat('%',#{keyword},'%')
+          or b.usual_name like concat('%',#{keyword},'%')
+          or b.good_pym like concat('%',#{keyword},'%')
+          or b.good_wbm like concat('%',#{keyword},'%')
+          or b.usual_pym like concat('%',#{keyword},'%')
+          or b.usual_wbm like concat('%',#{keyword},'%'))
+        </if>
+        left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and
+        c.item_code=a.item_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                and a.batch_no = #{batchNo}
+            </if>
+            <if test="expiryDate != null">
+                and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+                and a.split_num > 0
+            </if>
+            <if test="types != null and types.size()>0">
+                and b.big_type_code in
+                <foreach collection="types" item="type" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+        group by a.item_id,a.hosp_code,a.biz_id,a.item_code,a.batch_no
+        union all
+        select
+        min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+        as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+        min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+        '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
+        max(b.prod_code) prod_code,
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) prodName,min(b.code) as code,b.model as model
+        from stro_stock_detail a
+        JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="keyword != null and keyword != ''">
+          and (b.name like concat('%',#{keyword},'%') or b.pym like concat('%',#{keyword},'%') or b.wbm like concat('%',#{keyword},'%'))
+        </if>
+        left join stro_stock c on c.item_id = a.id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and
+        c.item_code=a.item_code
+        <where>
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            and a.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                and a.batch_no = #{batchNo}
+            </if>
+            <if test="expiryDate != null">
+                and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+                and a.split_num > 0
+            </if>
+            <if test="!isMun">
+                and a.num >= 0
+            </if>
+        </where>
+        group by a.item_id,a.hosp_code,a.biz_id,a.hosp_code,a.item_code,a.batch_no
+        ) f order by f.locationNo is null,f.locationNo,f.code
+    </select>
+
+    <select id="queryAllCancleNo" resultMap="StroStockDetailMap">
+        select f.* from (
+        select
+        min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+        as unit_code, sum(a.num) as num, b.avg_buy_price as buy_price, min(a.sell_price) as sell_price,
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all, min(a.expiry_date)
+        as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+        min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+        '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model
+        from stro_stock_detail a
+        JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="keyword != null and keyword != ''">
+            and (b.good_name like concat('%',#{keyword},'%')
+            or b.usual_name like concat('%',#{keyword},'%')
+            or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%'))
+        </if>
+        left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and
+        c.item_code=a.item_code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="expiryDate != null">
+                and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+                and a.num > 0
+            </if>
+            <if test="types != null and types.size()>0">
+                and b.big_type_code in
+                <foreach collection="types" item="type" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+        group by a.item_id,a.hosp_code,a.biz_id,a.item_code
+        union all
+        select
+        min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
+        as unit_code, sum(a.num) as num, b.avg_buy_price as buy_price,min(a.sell_price) as sell_price,
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all, min(a.expiry_date)
+        as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
+        min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
+        '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) prodName,min(b.code) as code,b.model as model
+        from stro_stock_detail a
+        JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="keyword != null and keyword != ''">
+            and (b.name like concat('%',#{keyword},'%') or b.pym like concat('%',#{keyword},'%') or b.wbm like concat('%',#{keyword},'%'))
+        </if>
+        left join stro_stock c on c.item_id = a.item_id and a.hosp_code=c.hosp_code and c.biz_id=a.biz_id and
+        c.item_code=a.item_code
+        <where>
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            and a.hosp_code = #{hospCode}
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="expiryDate != null">
+                and a.expiry_date = #{expiryDate}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and a.split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="isMun">
+                and a.num > 0
+            </if>
+            <if test="!isMun">
+                and a.num >= 0
+            </if>
+        </where>
+        group by a.item_id,a.hosp_code,a.biz_id,a.item_code
+        ) f order by f.locationNo is null,f.locationNo,f.code
+    </select>
+
+    <select id="queryAllStroStock" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        select id, hosp_code, biz_id, item_code, item_id, item_name,
+               unit_code, num, buy_price, sell_price, buy_price_all,
+               sell_price_all, batch_no,
+               expiry_date, split_ratio, split_num, split_price, split_unit_code from stro_stock_detail
+        where hosp_code = #{hospCode}
+    </select>
+</mapper>

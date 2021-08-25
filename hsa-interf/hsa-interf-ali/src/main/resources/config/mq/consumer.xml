@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 业务处理对象定义，也可以@service注解定义 -->
+    <!--<bean id="mqTestHandler" class="cn.hsa.example.mq.service.impl.MqStrConsumerServiceImpl"></bean>-->
+
+    <bean id="mqConsumer" class="cn.hsa.hsaf.mq.MQConsumerByOns" init-method="start"
+          destroy-method="shutdown">
+        <property name="properties"> <!--消费者配置信息-->
+            <props>
+                <prop key="GROUP_ID">${mq.ali.GROUP_ID}</prop>
+                <prop key="AccessKey">${mq.ali.AccessKey}</prop>
+                <prop key="SecretKey">${mq.ali.SecretKey}</prop>
+                <prop key="NAMESRV_ADDR">${mq.ali.NAMESRV_ADDR}</prop>
+                <prop key="ConsumeThreadNums">${mq.ali.ConsumeThreadNums}</prop><!--消费者并发线程数-->
+            </props>
+        </property>
+
+        <!--消费者容器主题对应业务处理对象配置信息-->
+        <property name="listTopic2Handler">
+            <list>
+                <bean class="cn.hsa.hsaf.mq.MQConsumerInfo">
+                    <property name="topic" value="MQ-NHSA-CZHY-DEMO-STR"></property>
+                    <property name="tag" value=""></property>
+                    <property name="businessService" ref="mqStrConsumerService"></property>
+                </bean>
+                <bean class="cn.hsa.hsaf.mq.MQConsumerInfo">
+                    <property name="topic" value="MQ-NHSA-CZHY-DEMO-DTO"></property>
+                    <property name="tag" value=""></property>
+                    <property name="businessService" ref="mqDtoConsumerService"></property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+
+</beans>

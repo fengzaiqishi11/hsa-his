@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+
+
+                        http://www.springframework.org/schema/aop
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+    <!-- 必须加proxy-target-class="true"，否则报404，详见：https://blog.csdn.net/lmy86263/article/details/50789842 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+    <bean id="paramValidator" class="cn.hsa.hsaf.core.framework.validation.ParamValidatorAOP"/>
+    <aop:config>
+        <aop:aspect ref="paramValidator">
+            <!-- 切面为service下的所有方法 -->
+            <aop:pointcut id="performance" expression="execution(public * cn.hsa..*ServiceImpl.*(..))"/>
+            <aop:before method="doBefore" pointcut-ref="performance"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

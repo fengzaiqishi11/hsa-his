@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.oper.operRoom.dao.OperRoomDAO">
+
+    <resultMap type="cn.hsa.module.oper.operRoom.entity.OperRoomDO" id="OperRoomMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="isUse" column="is_use" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--新增所有列-->
+    <insert id="insertOperRoom" keyProperty="id" useGeneratedKeys="true">
+        insert into  oper_room(id, hosp_code, code, name, address, is_use, is_valid, crte_id,crte_name)
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{address}, "0", "1", #{crteId}, #{crteName})
+    </insert>
+
+
+    <!--通过主键修改数据-->
+    <update id="updateOperRoom">
+        update  oper_room
+        <set>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="isUse != null and isUse != ''">
+                is_use = #{isUse},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+        </set>
+        where
+        hosp_code = #{hospCode}
+        and
+        id = #{id}
+    </update>
+
+    <update id="updateOperRoomStatus">
+         update  oper_room
+         set is_use = #{isUse}
+         where  hosp_code = #{hospCode}
+         <if test="code != null and code != '' ">
+             and  code = #{code}
+         </if>
+        <if test="name != null and name != '' ">
+            and  name = #{name}
+        </if>
+
+    </update>
+
+    <update id="deleteOperRooms">
+      update oper_room
+        set is_valid = #{isValid}
+        <where>
+            hosp_code=#{hospCode}
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+
+    <select id="queryOperRooms" resultType="cn.hsa.module.oper.operRoom.dto.OperRoomDTO">
+        select
+        id, hosp_code, code, name, address, is_use, is_valid, crte_id, crte_name, crte_time
+        from oper_room
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test ="keyword != null and keyword != '' " >
+                and  (name like CONCAT('%',#{keyword},'%') or code like CONCAT('%',#{keyword},'%') )
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="address != null and address != ''">
+                and address = #{address}
+            </if>
+            <if test="isUse != null and isUse != ''">
+                and is_use = #{isUse}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+
+</mapper>

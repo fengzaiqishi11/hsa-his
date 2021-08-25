@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.hospital.dao.CenterHospitalDAO">
+
+    <resultMap type="cn.hsa.module.center.hospital.dto.CenterHospitalDTO" id="CenterHospitalMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="proCode" column="pro_code" jdbcType="VARCHAR"/>
+        <result property="cityCode" column="city_code" jdbcType="VARCHAR"/>
+        <result property="areaCode" column="area_code" jdbcType="VARCHAR"/>
+        <result property="buliImagePath" column="buli_image_path" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="fax" column="fax" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="postCode" column="post_code" jdbcType="VARCHAR"/>
+        <result property="hospImagePath" column="hosp_image_path" jdbcType="VARCHAR"/>
+        <result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+        <result property="website" column="website" jdbcType="VARCHAR"/>
+        <result property="legalName" column="legal_name" jdbcType="VARCHAR"/>
+        <result property="legalPhone" column="legal_phone" jdbcType="VARCHAR"/>
+        <result property="adminName" column="admin_name" jdbcType="VARCHAR"/>
+        <result property="adminPhone" column="admin_phone" jdbcType="VARCHAR"/>
+        <result property="levelCode" column="level_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="longLat" column="long_lat" jdbcType="VARCHAR"/>
+        <result property="startDate" column="start_date" jdbcType="DATE"/>
+        <result property="endDate" column="end_date" jdbcType="DATE"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="DATE"/>
+        <result property="diseaseCode" column="disease_code" jdbcType="VARCHAR"/>
+        <result property="operCode" column="oper_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getByHospCode" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
+        select
+          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time
+        from center_hospital
+        where code = #{code}
+    </select>
+    <!--查询单个-->
+    <select id="getById" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
+        select
+          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time
+        from center_hospital
+        where  id = #{id}
+    </select>
+    <!--通过主键修改数据-->
+    <update id="update" >
+        update center_hospital
+        <set>
+                code = #{code},
+                name = #{name},
+                pro_code = #{proCode},
+                city_code = #{cityCode},
+                area_code = #{areaCode},
+                disease_code = #{diseaseCode},
+                oper_code = #{operCode},
+                buli_image_path = #{buliImagePath},
+                address = #{address},
+                phone = #{phone},
+                fax = #{fax},
+                email = #{email},
+                post_code = #{postCode},
+                hosp_image_path = #{hospImagePath},
+                introduce = #{introduce},
+                website = #{website},
+                legal_name = #{legalName},
+                legal_phone = #{legalPhone},
+                admin_name = #{adminName},
+                admin_phone = #{adminPhone},
+                level_code = #{levelCode},
+                pym = #{pym},
+                wbm = #{wbm},
+                long_lat = #{longLat},
+                start_date = #{startDate},
+                end_date = #{endDate}
+        </set>
+        where id = #{id}
+    </update>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
+        select
+        id, code, name, pro_code, city_code, disease_code, oper_code, area_code, buli_image_path, address, phone, fax, email, post_code,
+        hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date,
+        end_date, is_valid, crte_id, crte_name, crte_time
+        from center_hospital
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+        </where>
+    </select>
+    <!--分页查询-->
+    <select id="queryPage" resultMap="CenterHospitalMap">
+    select
+    id, code, name, pro_code, city_code, area_code, disease_code, oper_code, buli_image_path, address, phone, fax, email, post_code,
+    hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date,
+    end_date, is_valid, crte_id, crte_name, crte_time
+    from center_hospital
+        <where>
+            <if test="keyword != null and keyword != ''">
+                ( name like concat('%',#{keyword},'%')
+                or code like concat('%',#{keyword},'%')
+                or pym like concat('%',#{keyword},'%')
+                or wbm like concat('%',#{keyword},'%'))
+            </if>
+            <if test="start_time != null and start_time != '' and end_time != null and end_time != ''">
+               and  NOT ((end_date &lt;= #{start_time}) OR (#{end_time} &lt;start_date))
+            </if>
+                and is_valid = '1'
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="" useGeneratedKeys="true">
+        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code)
+        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode})
+    </insert>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        delete from center_hospital
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+    <!--    判断编码是否存在-->
+    <select id="queryCodeIsExist" resultType="java.lang.Integer">
+        select count(code) from center_hospital
+        where
+        code = #{code}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+</mapper>

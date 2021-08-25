@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 消费者：消费接口 -->
+    <!-- 基础信息子系统 -> 财务分类消费者 -->
+    <dubbo:reference id="baseFinanceClassifyService_consumer" interface="cn.hsa.module.base.bfc.service.BaseFinanceClassifyService" check="false"/>
+    <!-- 基础信息子系统 -> 疾病管理消费者 -->
+    <dubbo:reference id="baseDiseaseService_consumer" interface="cn.hsa.module.base.bd.service.BaseDiseaseService" check="false"/>
+    <!-- 基础信息子系统 -> 供应商信息维护消费者-->
+    <dubbo:reference id="baseSupplierService_consumer" interface="cn.hsa.module.base.bspl.service.BaseSupplierService" check="false"/>
+    <!-- 基础信息子系统 -> 材料信息消费者 -->
+    <dubbo:reference id="baseMaterialService_consumer" interface="cn.hsa.module.base.bmm.service.BaseMaterialService" check="false"/>
+    <!-- 基础信息子系统 -> 床位分类消费者 -->
+    <dubbo:reference id="baseBedApi_consumer" interface="cn.hsa.module.base.bb.service.BaseBedService" check="false"/>
+    <!-- 基础信息子系统 -> 辅助计费消费者 -->
+    <dubbo:reference id="baseAssistCalcApi_consumer" interface="cn.hsa.module.base.bac.service.BaseAssistCalcService" check="false"/>
+    <!-- 基础信息子系统 -> 辅助计费消费者 -->
+    <dubbo:reference id="baseAssistCalcDetailApi_consumer" interface="cn.hsa.module.base.bacd.api.BaseAssistCalcDetailApi" check="false"/>
+    <!-- 基础信息子系统 -> 优惠配置信息维护消费者 -->
+    <dubbo:reference id="basePreferentialService_consumer" interface="cn.hsa.module.base.bpft.service.BasePreferentialService" check="false"/>
+    <!-- 基础信息子系统 -> 单据生成规则消费者 -->
+    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>
+    <!-- 基础信息子系统 -> 项目信息消费者 -->
+    <dubbo:reference id="baseItemService_consumer" interface="cn.hsa.module.base.bi.service.BaseItemService" check="false"/>
+    <!-- 基础信息子系统 -> 医嘱频率消费者 -->
+    <dubbo:reference id="baseRateService_consumer" interface="cn.hsa.module.base.rate.service.BaseRateService" check="false"/>
+    <!-- 基础信息子系统 -> 特殊药品计费消费者 -->
+    <dubbo:reference id="baseSpecialCalcService_consumer" interface="cn.hsa.module.base.bspc.service.BaseSpecialCalcService" check="false"/>
+
+    <!--    <dubbo:reference id="baseAssistCalcDetailApi_consumer" interface="cn.hsa.module.base.bacd.service.BaseAssistCalcDetailApi" check="false"/>-->
+    <!-- 基础信息子系统 -> 辅助计费消费者 -->
+    <dubbo:reference id="baseDailyfirstCalcApi_consumer" interface="cn.hsa.module.base.bdc.service.BaseDailyfirstCalcService" check="false"/>
+    <!-- 基础信息子系统 -> 科室信息维护消费者 -->
+    <dubbo:reference id="baseDeptService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService" check="false"/>
+
+    <!-- 基础信息子系统 -> 医嘱消费者 -->
+    <dubbo:reference id="baseAdviceService_customer" interface="cn.hsa.module.base.ba.service.BaseAdviceService" check="false"/>
+
+    <!-- 基础信息子系统 -> 项目信息消费者 -->
+    <dubbo:reference id="baseDrugService_consumer" interface="cn.hsa.module.base.drug.service.BaseDrugService" check="false"/>
+    <!-- 基础信息子系统 -> 生产企业信息消费者 -->
+    <dubbo:reference id="baseProductService_consumer" interface="cn.hsa.module.base.bp.service.BaseProductService" check="false"/>
+
+    <!-- 基础信息子系统 -> 生产企业信息消费者 -->
+    <dubbo:reference id="inventoryApi_consumer" interface="cn.hsa.module.stro.inventory.service.InventoryService" check="false"/>
+
+    <!-- 基础信息子系统 -> 发药窗口消费者 -->
+    <dubbo:reference id="baseWindowService_consumer" interface="cn.hsa.module.base.bw.service.BaseWindowService" check="false"/>
+
+    <!-- 基础信息子系统 -> 修改痕跡 -->
+    <dubbo:reference id="baseModifyTraceService_customer" interface="cn.hsa.module.base.modify.service.BaseModifyTraceService" check="false"/>
+
+    <!-- 基础信息子系统 -> 病案费用归类 -->
+    <dubbo:reference id="baseMrisClassifyService_customer" interface="cn.hsa.module.base.bmc.service.BaseMrisClassifyService" check="false"/>
+
+    <!-- 基础信息子系统 -> 领药单据类型 -->
+    <dubbo:reference id="baseOrderReceiveService_customer" interface="cn.hsa.module.base.baseorderreceive.service.BaseOrderReceiveService" check="false"/>
+    <!-- 基础信息子系统 -> 护理单据类型 -->
+    <dubbo:reference id="baseNurseOrderService_consumer" interface="cn.hsa.module.base.nurse.service.BaseNurseOrderService" check="false"/>
+    <!-- 基础信息子系统 -> 护理单据表头格式 -->
+    <dubbo:reference id="baseNurseTbHeadService_consumer" interface="cn.hsa.module.base.nurse.service.BaseNurseTbHeadService" check="false"/>
+    <!-- 基础信息子系统 -> 门诊执行科室维护 -->
+    <dubbo:reference id="baseOutptExecService_consumer" interface="cn.hsa.module.base.baseoutptexec.service.BaseOutptExecService" check="false"/>
+    <!-- 基础信息子系统 -> 本地档案服务 -->
+    <dubbo:reference id="baseProfileFileService_consumer" interface="cn.hsa.module.base.profileFile.service.BaseProfileFileService" check="false"/>
+    <!-- 基础信息子系统 -> 一卡通管理 -->
+    <dubbo:reference id="baseCardService_consumer" interface="cn.hsa.module.base.card.service.BaseCardService" check="false"/>
+    <!-- 首页数据查询 -->
+    <dubbo:reference id="baseHomeService_consumer" interface="cn.hsa.module.base.home.service.BaseHomeService" check="false"/>
+
+    <!-- ########################################### 药库服务consumer start ########################################### -->
+    <!-- 采购计划 -->
+    <dubbo:reference id="stroPurchaseService_consumer" interface="cn.hsa.module.stro.purchase.service.StroPurchaseService" check="false"/>
+
+    <!-- 入库 -->
+    <dubbo:reference id="stroInService_consumer" interface="cn.hsa.module.stro.stroin.service.StroInService" check="false"/>
+
+    <!--进销存查询-->
+    <dubbo:reference id="stroInvoicingApi_consumer" interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingService" check="false"/>
+
+    <!-- cx -->
+    <dubbo:reference id="cxStroStockApi_consumer" interface="cn.hsa.module.stro.stock.service.StroStockService" check="false"/>
+
+    <!-- 出库 -->
+    <dubbo:reference id="stroOutApi_consumer" interface="cn.hsa.module.stro.stroout.service.StroOutService" check="false"/>
+
+    <!-- 退库确认 -->
+    <dubbo:reference id="backStroConfirmService_consumer" interface="cn.hsa.module.stro.backstroconfirm.service.BackStroConfirmService" check="false"/>
+    <!-- 调价 -->
+    <dubbo:reference id="stroAdjustService_consumer" interface="cn.hsa.module.stro.adjust.service.StroAdjustService" check="false"/>
+    <!-- 报损 -->
+    <dubbo:reference id="stroIncdecService_consumer" interface="cn.hsa.module.stro.incdec.service.StroIncdecService" check="false"/>
+
+
+    <!-- ########################################### 药库服务consumer end ########################################### -->
+    <!-- 药房入库查询与确认 -->
+    <dubbo:reference id="stockInQueryService_consumer" interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" check="false"/>
+    <!--药房领药申请-->
+    <dubbo:reference id="pharApplyService_consumer" interface="cn.hsa.module.phar.pharapply.service.PharApplyService" check="false"/>
+
+    <!-- ########################################### 药房服务consumer start ########################################### -->
+
+    <!--门诊退药 -->
+    <dubbo:reference id="outBackDrugService_consumer" interface="cn.hsa.module.phar.pharoutbackdrug.service.OutBackDrugService" check="false"/>
+
+    <!--住院退药 -->
+    <dubbo:reference id="inBackDrugService_consumer" interface="cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService" check="false"/>
+    <!--住院待领 -->
+    <dubbo:reference id="pharInWaitReceiveService_consumer" interface="cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService" check="false"/>
+
+    <!--门诊发药 -->
+    <dubbo:reference id="outDistributeDrugService_consumer" interface="cn.hsa.module.phar.pharoutdistributedrug.service.OutDistributeDrugService" check="false"/>
+    <!--住院发药 -->
+    <dubbo:reference id="inDistributeDrugService_consumer" interface="cn.hsa.module.phar.pharindistributedrug.service.InDistributeDrugService" check="false"/>
+
+    <!-- ########################################### 药房服务consumer end ########################################### -->
+
+
+    <!-- ########################################### 系统管理服务consumer start ########################################### -->
+    <!-- 系统管理子系统 -> 参数管理 -->
+    <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
+
+    <!--系统菜单管理 -->
+    <dubbo:reference id="sysMenuService_consumer" interface="cn.hsa.module.sys.menu.service.SysMenuService" check="false"/>
+
+    <!--系统用户管理 -->
+    <dubbo:reference id="sysUserService_consumer" interface="cn.hsa.module.sys.user.service.SysUserService" check="false"/>
+
+    <!-- 系统管理子系统 -> 值域代码消费者 -->
+    <dubbo:reference id="sysCodeService_consumer" interface="cn.hsa.module.sys.code.service.SysCodeService" check="false"/>
+
+    <!-- 系统管理子系统 -> 子系统消费者 -->
+    <dubbo:reference id="sySystemService_consumer" interface="cn.hsa.module.sys.system.service.SysSystemService" check="false"/>
+
+    <!-- 系统管理子系统 -> 角色消费者 -->
+    <dubbo:reference id="sysRoleService_consumer" interface="cn.hsa.module.sys.role.service.SysRoleService" check="false"/>
+
+    <!-- 系统管理子系统 -> 日志消费者 -->
+    <dubbo:reference id="sysLogService_consumer" interface="cn.hsa.module.sys.log.service.SysLogService" check="false"/>
+
+    <!-- 系统管理子系统 -> 操作日志服务 -->
+    <dubbo:reference id="hisLogInfoCzService_consumer" interface="cn.hsa.module.sys.log.service.HisLogInfoCzService" check="false"/>
+
+    <!-- 系统管理子系统 -> 异常日志服务 -->
+    <dubbo:reference id="hisLogInfoYcService_consumer" interface="cn.hsa.module.sys.log.service.HisLogInfoYcService" check="false"/>
+
+    <!-- ########################################### 系统管理服务consumer end ########################################### -->
+
+
+
+    <!-- ########################################### 信息中心服务consumer start ########################################### -->
+
+    <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
+    <dubbo:reference id="centerSyncService_consumer" interface="cn.hsa.module.center.sync.sevice.CenterSyncService" check="false"/>
+    <!-- 信息中心服务 -> 医院管理 -->
+    <dubbo:reference id="sysHospitalService_consumer" interface="cn.hsa.module.center.syshospital.service.SysHospitalService" check="false"/>
+
+    <!-- 系统管理子系统 -> 参数管理 -->
+    <dubbo:reference id="centerParameterService_consumer" interface="cn.hsa.module.center.parameter.service.CenterParameterService" check="false"/>
+    <!-- 系统管理子系统 -> 医院信息维护 -->
+    <dubbo:reference id="centerHospitalService_consumer" interface="cn.hsa.module.center.hospital.service.CenterHospitalService" check="false"/>
+
+    <!--中心平台子系统 -> 角色权限管理-->
+    <dubbo:reference id="centerRoleService_consumer" interface="cn.hsa.module.center.role.service.CenterRoleService" check="false"/>
+    <!--中心平台子系统 -> 个人档案维护-->
+    <dubbo:reference id="centerProfileFileService_consumer" interface="cn.hsa.module.center.profilefile.service.CenterProfileFileService" check="false"/>
+    <!--中心平台 >>  -->
+    <dubbo:reference id="OutptProfileFileService_consumer" interface="cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService" check="false"/>
+
+    <!--中心平台 >>  -->
+    <dubbo:reference id="nationStandardMaterialService_consumer" interface="cn.hsa.module.center.nationstandardmaterial.service.NationStandardMaterialService" check="false"/>
+    <!--中心平台 >>  -->
+    <dubbo:reference id="nationStandardItemService_consumer" interface="cn.hsa.module.center.nationstandardItem.service.NationStandardItemService" check="false"/>
+    <!-- 信息中心子系统 -> 国家药品(中药)生产者 -->
+    <dubbo:reference interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugZYService" id="nationStandardDrugZYService_consumer" check="false"/>
+
+
+
+    <!-- ########################################### 信息中心服务consumer end ########################################### -->
+
+    <!-- ########################################### 挂号子系统 consumer start ########################################### -->
+
+    <!--挂号子系统 -> 挂号类别设置-->
+    <dubbo:reference id="outptClassifyService_consumer" interface="cn.hsa.module.outpt.outptclassify.service.OutptClassifyService" check="false"/>
+    <!--挂号子系统 -> 班次信息维护设置-->
+    <dubbo:reference id="outptClassesService_consumer" interface="cn.hsa.module.outpt.classes.service.OutptClassesService" check="false"/>
+
+    <!--挂号子系统 -> 门诊挂号查询-->
+    <dubbo:reference id="outptRegisterQueryService_consumer" interface="cn.hsa.module.outpt.outptquery.service.OutptRegisterQueryService" check="false"/>
+
+    <!--挂号子系统 -> 门诊挂号-->
+    <dubbo:reference id="outptRegisterService_consumer" interface="cn.hsa.module.outpt.register.service.OutptRegisterService" check="false"/>
+    <!--挂号子系统 -> 坐诊对列-->
+    <dubbo:reference id="outptClassesQueueService_consumer" interface="cn.hsa.module.outpt.queue.service.OutptClassesQueueService" check="false" retries = "0" timeout="1200000"/>
+    <!--挂号子系统 -> 医生队列-->
+    <dubbo:reference id="outptDoctorQueueService_consumer" interface="cn.hsa.module.outpt.queue.service.OutptDoctorQueueService" check="false" retries = "0"/>
+
+    <!--挂号子系统 -> 挂号类别排班设置-->
+    <dubbo:reference id="outptClassifyClassesService_customer" interface="cn.hsa.module.outpt.outptclassifyclasses.service.OutptClassifyClassesService" check="false"/>
+
+    <!--挂号子系统 -> 个人档案维护-->
+    <dubbo:reference id="outptProfileFileService_consumer" interface="cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService" check="false"/>
+
+    <!--挂号子系统 -> 门诊就诊维护-->
+    <dubbo:reference id="outptVisitService_consumer" interface="cn.hsa.module.outpt.visit.service.OutptVisitService" check="false"/>
+
+    <dubbo:reference id="lisService_consumer" interface="cn.hsa.module.outpt.lis.service.LisService" check="false"/>
+
+    <dubbo:reference id="pacsService_consumer" interface="cn.hsa.module.outpt.lis.service.PacsService" check="false"/>
+
+    <!-- ########################################### 挂号子系统 consumer end ########################################### -->
+
+    <!-- ########################################### 门诊护士子系统consumer start ########################################### -->
+
+    <!--门诊护士子系统 -> 门诊输液登记-->
+    <dubbo:reference id="outptInfusionRegisterService_consumer" interface="cn.hsa.module.outpt.infusionRegister.service.OutptInfusionRegisterService" check="false"/>
+    <!--门诊护士子系统 -> 门诊输液执行-->
+    <dubbo:reference id="outptInfusionExecService_consumer" interface="cn.hsa.module.outpt.infusionExec.service.OutptInfusionExecService" check="false"/>
+    <!--门诊护士子系统 -> 门诊输液执行-->
+    <dubbo:reference id="outptExecutionCardPrintService_consumer" interface="cn.hsa.module.outpt.executioncardprint.service.OutptExecutionCardPrintService" check="false"/>
+    <!--门诊护士子系统 -> 皮试处理-->
+    <dubbo:reference id="outptSkinService_consumer" interface="cn.hsa.module.outpt.skin.service.OutptSkinService" check="false"/>
+    <!--门诊护士子系统 -> 门诊采血-->
+    <dubbo:reference id="outptCollBloodService_consumer" interface="cn.hsa.module.outpt.collblood.service.OutptCollBloodService" check="false"/>
+
+    <!-- ########################################### 门诊护士子系统 consumer end ########################################### -->
+
+
+    <!-- ########################################### 门诊医生站子系统consumer start ########################################### -->
+
+
+    <!--门诊医生站子系统 -> 处方模板-->
+    <dubbo:reference id="outptPrescribeTempService_consumer" interface="cn.hsa.module.outpt.prescribe.service.OutptPrescribeTempService" check="false"/>
+
+    <!--门诊医生站子系统 -> 处方管理-->
+    <dubbo:reference id="outptDoctorPrescribeService_consumer" interface="cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService" check="false"/>
+
+    <!--门诊医生站子系统 -> 门诊电子病历模板-->
+    <dubbo:reference id="outptMedicalTemplateService_consumer" interface="cn.hsa.module.outpt.outptmedicaltemplate.service.OutptMedicalTemplateService" check="false"/>
+
+    <!-- ########################################### 门诊医生站子系统 consumer end ########################################### -->
+
+    <!-- ########################################### 门诊收费子系统 consumer start ########################################### -->
+
+    <!--门诊收费子系统 -> 发票管理-->
+    <dubbo:reference id="outinInvoiceService_consumer" interface="cn.hsa.module.outpt.outinInvoice.service.OutinInvoiceService" check="false"/>
+    <!--门诊收费子系统 -> 划价收费-->
+    <dubbo:reference id="outptTmakePriceFormService_consumer" interface="cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService" check="false"/>
+
+    <!--门诊收费子系统 -> 门诊退费-->
+    <dubbo:reference id="outptOutTmakePriceFormService_consumer" interface="cn.hsa.module.outpt.fees.service.OutptOutTmakePriceFormService" check="false"/>
+
+    <!-- ########################################### 门诊收费子系统 consumer end ########################################### -->
+
+
+    <!-- ########################################### 住院子系统consumer start ########################################### -->
+
+    <!--医嘱-->
+    <dubbo:reference id="doctorAdviceService_consumer" interface="cn.hsa.module.inpt.doctor.service.DoctorAdviceService" check="false"/>
+    <!--医嘱执行-->
+    <dubbo:reference id="doctorAdviceExecuteService_consumer" interface="cn.hsa.module.inpt.nurse.service.DoctorAdviceExecuteService" check="false"/>
+    <!--补记账管理-->
+    <dubbo:reference id="addAccountByInptService_consumer" interface="cn.hsa.module.inpt.nurse.service.AddAccountByInptService" check="false"/>
+    <!--住院退费-->
+    <dubbo:reference id="backCostByInputService_consumer" interface="cn.hsa.module.inpt.nurse.service.BackCostByInputService" check="false"/>
+    <!--住院退费确认-->
+    <dubbo:reference id="backCostSureWithInptService_consumer" interface="cn.hsa.module.inpt.nurse.service.BackCostSureByInptService" check="false"/>
+    <!--住院费用 -->
+    <dubbo:reference id="inptCostService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptCostService" check="false"/>
+    <!--出院召回 -->
+    <dubbo:reference id="leaveHospitalRecallService_consumer" interface="cn.hsa.module.inpt.nurse.service.LeaveHospitalRecallService" check="false"/>
+    <!--    三测单-->
+    <dubbo:reference id="inptNurseThirdService_consumer" interface="cn.hsa.module.inpt.inptnursethird.service.InptNurseThirdService" check="false"/>
+    <!--    护理模板-->
+    <dubbo:reference id="inptNurseTemplateService_consumer" interface="cn.hsa.module.inpt.careTemplate.service.InptNurseTemplateService" check="false"/>
+    <!--    既往诊疗史-->
+    <dubbo:reference id="inptPastTreatService_consumer" interface="cn.hsa.module.inpt.pasttreat.service.InptPastTreatService" check="false"/>
+
+    <!--入出院管理-->
+    <dubbo:reference id="inptVisitService_consumer" interface="cn.hsa.module.inpt.inregister.service.InptVisitService" check="false" />
+
+    <!--预交金管理-->
+    <dubbo:reference id="inptAdvancePayService_consumer" interface="cn.hsa.module.inpt.advancepay.service.InptAdvancePayService" check="false" />
+    <!--    护理执行卡打印-->
+    <dubbo:reference id="nurseExcuteCardService_consumer" interface="cn.hsa.module.inpt.nurseexcutecard.service.NurseExcuteCardService" check="false"/>
+    <!--住院医嘱费用核对-->
+    <dubbo:reference id="inptAdviceFeeCheckService_consumer" interface="cn.hsa.module.inpt.nurse.service.InptAdviceFeeCheckService" check="false"/>
+    <!--    科室床位列表-->
+    <dubbo:reference id="bedListService_consumer" interface="cn.hsa.module.inpt.bedlist.service.BedListService" check="false"/>
+    <!--综合查询-->
+    <dubbo:reference id="compositeQueryService_consumer" interface="cn.hsa.module.inpt.compositequery.service.CompositeQueryService" check="false"/>
+
+    <!--护理记录单-->
+    <dubbo:reference id="nursingRecordService_consumer" interface="cn.hsa.module.inpt.nurse.service.NursingRecordService" check="false"/>
+    <!--医嘱核收-->
+    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false"/>
+    <!-- 住院结算 -->
+    <dubbo:reference id="inptSettlementService_consumer" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
+    <!-- 取消住院结算 -->
+    <dubbo:reference id="inptCancelSettlementService_consumer" interface="cn.hsa.module.inpt.fees.service.InptCancelSettlementService" check="false"/>
+    <!--    病人综合查询-->
+    <dubbo:reference id="comprehensiveQueryService_consumer" interface="cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService" check="false"/>
+    <!--    医嘱模板-->
+    <dubbo:reference id="inptAdviceTempService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptAdviceTempService" check="false"/>
+    <!--    住院打印-->
+    <dubbo:reference id="inptPrintService_consumer" interface="cn.hsa.module.inpt.inptprint.service.InptPrintService" check="false"/>
+    <dubbo:reference id="criticalValuesService_consumer" interface="cn.hsa.module.inpt.criticalvalues.service.CriticalValuesService" check="false"/>
+    <!-- 消息模板记录 -->
+    <dubbo:reference id="msgTempRecordService_consumer" interface="cn.hsa.module.inpt.msg.service.MsgTempRecordService" check="false"/>
+    <!--  新生婴儿-->
+    <dubbo:reference id="inptBabyService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptBabyService" check="false"/>
+    <!--  保证金管理-->
+    <dubbo:reference id="inptGuarantee_consumer" interface="cn.hsa.module.inpt.inptguarantee.service.InptGuaranteeService" check="false"/>
+    <!-- ########################################### 住院子系统 consumer end ########################################### -->
+
+    <!-- ########################################### 电子病历子系统consumer start ########################################### -->
+
+    <!-- 电子病历子系统 -> 电子病历打印设置 -->
+    <dubbo:reference id="emrPrintSettingService_consumer" interface="cn.hsa.module.emr.emrprintsetting.service.EmrPrintSettingService" check="false"/>
+    <!-- 电子病历子系统 -> 电子病历元素管理 -->
+    <dubbo:reference id="emrElementServcie_consumer" interface="cn.hsa.module.emr.emrelement.service.EmrElementServcie" check="false"/>
+    <!-- 电子病历子系统 -> 电子病历分类管理 -->
+    <dubbo:reference id="emrClassifyServcie_consumer" interface="cn.hsa.module.emr.emrclassify.service.EmrClassifyServcie" check="false"/>
+    <!-- 电子病历子系统 -> 电子病历文档分类元素管理 -->
+    <dubbo:reference id="emrClassifyElementServcie_consumer" interface="cn.hsa.module.emr.emrclassifyelement.service.EmrClassifyElementService" check="false"/>
+    <!-- 电子病历子系统 -> 电子病历文档分类元素管理 -->
+    <dubbo:reference id="emrClassifyTemplateServcie_consumer" interface="cn.hsa.module.emr.emrclassifytemplate.service.EmrClassifyTemplateService" check="false"/>
+    <!-- 电子病历子系统   电子病历书写与查看 -->
+    <dubbo:reference id="emrPatientService_consumer" interface="cn.hsa.module.emr.emrpatient.service.EmrPatientService" check="false"/>
+    <!-- 电子病历子系统   电子病历归档与解除归档 -->
+    <dubbo:reference id="emrArchiveLoggingService_consumer" interface="cn.hsa.module.emr.emrarchivelogging.service.EmrArchiveLoggingService" check="false"/>
+    <!-- 电子病历子系统   电子病历单项模板维护 -->
+    <dubbo:reference id="emrElementTemplateService_consumer" interface="cn.hsa.module.emr.emrelementtemplate.service.EmrElementTemplateService" check="false"/>
+    <!-- 电子病历子系统   电子病历个人病历模板维护 -->
+    <dubbo:reference id="emrDocTemplateService_consumer" interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" check="false"/>
+    <!-- ########################################### 电子病历子系统consumer end ############################################## -->
+
+    <!-- ########################################### 手麻系统 start ########################################### -->
+    <!--手术信息-->
+    <dubbo:reference id="operInfoRecordService_consumer" interface="cn.hsa.module.oper.operInforecord.service.OperInfoRecordService" check="false"/>
+    <!--手术室信息-->
+    <dubbo:reference id="operRoomService_consumer" interface="cn.hsa.module.oper.operRoom.service.OperRoomService" check="false"/>
+
+    <!--手术室模板-->
+    <dubbo:reference id="operAccountTempService_consumer" interface="cn.hsa.module.oper.operInforecord.service.OperAccountTempService" check="false"/>
+    <!--麻醉记录单-->
+    <dubbo:reference id="perAnesthesiaRecordService_consumer" interface="cn.hsa.module.oper.operrecord.service.OperAnesthesiaRecordService" check="false"/>
+    <!--手术病人信息-->
+    <dubbo:reference id="operPatientRecordService_consumer" interface="cn.hsa.module.oper.operpatientrecord.service.OperPatientRecordService" check="false"/>
+    <!-- ########################################### 手麻系统 end ############################################## -->
+
+    <!-- ########################################### 医保接口 start ########################################### -->
+    <!--个人信息-->
+    <dubbo:reference id="insureIndividualBasicService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" check="false"/>
+
+    <!--机构信息-->
+    <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
+    <!--事前事中分析服务-->
+    <dubbo:reference id="insureUnifiedPayMatterService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayMatterService" check="false"/>
+
+    <!--医保方法配置信息-->
+    <dubbo:reference id="insureFunctionService_consumer" interface="cn.hsa.module.insure.module.service.InsureFunctionService" check="false"/>
+    <!--医保方法配置信息-->
+    <dubbo:reference id="insureIndividualSettleService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualSettleService" check="false"/>
+    <!--项目匹配-->
+    <dubbo:reference id="insureItemMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureItemMatchService" check="false"/>
+    <dubbo:reference id="insureDiseaseMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" check="false"/>
+
+    <dubbo:reference id="insureDictService_consumer" interface="cn.hsa.module.insure.module.service.InsureDictService" check="false"/>
+    <dubbo:reference id="insureIndividualCostService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
+    <!--人员备案-医保统一支付平台-->
+    <dubbo:reference id="insurePersonnalRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsurePersonnalRecordService" check="false"/>
+
+    <!--冲正交易-医保统一支付平台-->
+    <dubbo:reference id="insureUnifiedPayReversalTradeService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" check="false"/>
+    <dubbo:reference id="InsureGetInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureGetInfoService" check="false"/>
+    <dubbo:reference id="insureUnifiedRemoteService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" check="false"/>
+    <!--护理生命记录-统一支付平台-->
+    <dubbo:reference id="insureNurseRecordService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" check="false"/>
+    <!-- ########################################### 医保接口 end ############################################## -->
+
+
+    <!-- ########################################### 病案管理子系统consumer start ########################################### -->
+    <!-- 病案管理子系统 -> 病案首页 -->
+    <dubbo:reference id="mrisHomeServcie_consumer" interface="cn.hsa.module.mris.mrisHome.service.MrisHomeService" check="false"/>
+    <!-- ########################################### 病案管理子系统consumer end ########################################### -->
+
+    <!--门诊日结缴款-->
+    <dubbo:reference id="outinDaliyService_consumer" interface="cn.hsa.module.outpt.daily.service.OutinDailyService" check="false"/>
+    <!--科室领药申请-->
+    <dubbo:reference id="drawMedicineService_consumer" interface="cn.hsa.module.inpt.drawMedicine.service.DrawMedicineService" check="false"/>
+    <!--床位长期费用-->
+    <dubbo:reference id="bedLongCostService_consumer" interface="cn.hsa.module.inpt.longcost.service.BedLongCostService" check="false"/>
+
+    <!-- ################################################ 报表consumer start ################################################ -->
+
+    <!--病人费用台账-->
+    <dubbo:reference id="patientCostLedgerService_consumer" interface="cn.hsa.module.outpt.statement.service.PatientCostLedgerService" check="false"/>
+
+    <!--统计报表(支付方式、医保结算)-->
+    <dubbo:reference id="statisticalReportService_consumer" interface="cn.hsa.module.outpt.report.service.StatisticalReportService" check="false"/>
+
+    <!-- ################################################ 报表consumer end ################################################ -->
+
+    <!-- ################################################ 医保 consumer start ################################################ -->
+    <!-- 门诊医保 service -->
+    <dubbo:reference id="outptService_consumer" interface="cn.hsa.module.insure.outpt.service.OutptService" check="false"/>
+    <dubbo:reference id="dzpzOutptService_consumer" interface="cn.hsa.module.insure.outpt.service.DzpzOutptService" check="false"/>
+    <dubbo:reference id="insureDrgService_consumer" interface="cn.hsa.module.insure.drg.service.InsureDrgService" check="false"/>
+    <dubbo:reference id="insureAdviceEntryService_consumer" interface="cn.hsa.module.insure.drg.service.InsureAdviceEntryService" check="false"/>
+    <dubbo:reference id="inptService_consumer" interface="cn.hsa.module.insure.inpt.service.InptService" check="false"/>
+    <dubbo:reference id="insureReadCardService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureReadCardService" check="false"/>
+
+    <!-- ################################################ 医保 consumer end ################################################ -->
+
+
+    <!-- ################################################ 数据上报 start ################################################ -->
+    <dubbo:reference id="healthReportService_consumer" interface="cn.hsa.module.upload.healthreport.service.HealthReportService" check="false"/>
+    <!-- ################################################ 数据上报 end ################################################ -->
+
+    <!-- ################################################ 医审接口 start ################################################ -->
+    <dubbo:reference id="medicalCheckService_consumer" interface="cn.hsa.module.inpt.medicalcheck.service.MedicalCheckService" check="false"/>
+    <!-- ################################################ 医审接口 end   ################################################ -->
+
+    <!-- ################################################ 国家项目消费者 start ################################################ -->
+    <dubbo:reference id="nationStandardDrugService_consumer" interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService" check="false"/>
+    <!-- ################################################ 国家 end   ################################################ -->
+    <dubbo:reference id="medicalDataService_consumer" interface="cn.hsa.module.medic.data.service.MedicalDataService" check="false"/>
+    <!--住院电子凭证-->
+    <dubbo:reference id="inptElectronicBillService_consumer" interface="cn.hsa.module.insure.emd.service.InptElectronicBillService" check="false"/>
+    <dubbo:reference id="outptRefundApplyService_consumer" interface="cn.hsa.module.outpt.outptrefundapply.service.OutptRefundApplyService" check="false"/>
+    <dubbo:reference id="medicalTechnologyService_consumer" interface="cn.hsa.module.inpt.medicaltechnology.service.MedicalTechnologyService" check="false"/>
+    <dubbo:reference id="insureUnifiedPayRestService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService" check="false"  retries = "0" timeout="1200000"/>
+    <dubbo:reference id="insureUnifiedPayInptService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" check="false"/>
+    <!--诊断模板-->
+    <dubbo:reference id="baseDiagnosisTemplateService_customer" interface="cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService" check="false"/>
+
+    <dubbo:reference id="insureUnifiedBaseService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" check="false"/>
+
+
+    <dubbo:reference id="insureUnifiedEmrUploadService_comsumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService" check="false"/>
+    <!--挂号子系统 -> 门诊传染病-->
+    <dubbo:reference id="outptInfectiousExecService_consumer" interface="cn.hsa.module.outpt.infectious.service.OutptInfectiousDiseaExecService" check="false"/>
+
+
+    <dubbo:reference id="inspectionReportServiceconsumer" interface="cn.hsa.module.inpt.inspectionreport.service.InspectionReportService" check="false"/>
+    <dubbo:reference id="baseClinicService_consumer" interface="cn.hsa.module.base.clinic.service.BaseClinicService" check="false"/>
+    <!-- 分诊队列服务 -->
+    <dubbo:reference id="outptTriageVisitService_consumer" interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" check="false"/>
+    <!--库存校验-->
+    <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
+
+
+    <!-- 一卡通异动服务 -->
+    <dubbo:reference id="baseCardRechargeChangeService_consumer" interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" check="false"/>
+    <!-- 医保库存管理服务 -->
+    <dubbo:reference id="insureStockManagerService_consumer" interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" check="false"/>
+    <!-- 医保输血记录服务 -->
+    <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
+</beans>
+

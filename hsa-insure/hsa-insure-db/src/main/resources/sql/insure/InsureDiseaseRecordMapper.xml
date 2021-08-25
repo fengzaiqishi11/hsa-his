@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDiseaseRecordDAO">
+
+
+    <insert id="insertRecordDisease" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO">
+        insert into insure_record(id, hosp_code, visit_id, psn_no, insutype,
+                                  opsp_dise_code, opsp_dise_name,
+                                  tel, addr, insu_optins, ide_fixmedins_no,
+                                  ide_fixmedins_name, hosp_ide_date, diag_dr_codg, diag_dr_name,
+                                  begndate, enddate, trt_dcla_detl_sn, memo, crte_id, crte_name, crte_time, reg_code)
+        values (#{id}, #{hospCode}, #{visitId}, #{psnNo}, #{insutype}, #{opspDiseCode},
+                #{opspDiseName}, #{tel}, #{addr}, #{insuOptins}, #{ideFixmedinsNo}, #{ideFixmedinsName},
+                #{hospIdeDate}, #{diagDrCodg}, #{diagDrName}, #{begndate}, #{enddate}, #{trtDclaDetlSn}, #{memo},
+                #{crteId}, #{crteName}, #{crteTime}, #{regCode})
+    </insert>
+    <insert id="insertInsureFixPersonnalRecord"
+            parameterType="cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO">
+        insert into insure_fix_record (id, hosp_code, psn_no, tel, addr,
+                                       biz_appy_type, begndate, enddate, agnter_name,
+                                       agnter_cert_type, agnter_certno, agnter_tel,
+                                       agnter_addr, agnter_rlts, fix_srt_no,
+                                       fixmedins_code, fixmedins_name, memo, visit_id,
+                                       insure_reg_code, trt_dcla_detl_sn,
+                                       crte_time, crte_name, cret_id, name,biz_appy_type_name,
+                                       agnter_cert_type_name,agnter_rlts_name
+                                       )
+        values (#{id}, #{hospCode}, #{psnNo}, #{tel}, #{addr}, #{bizAppyType}, #{begndate}, #{enddate},
+                #{agnterName}, #{agnterCertType}, #{agnterCertno}, #{agnterTel}, #{agnterAddr}, #{agnterRlts},
+                #{fixSrtNo}, #{fixmedinsCode}, #{fixmedinsName}, #{memo},
+                #{visitId}, #{insureRegCode}, #{trtDclaDetlSn}, #{crteTime}, #{crteName}, #{crteId}, #{name},#{bizAppyTypeName},
+                #{agnterCertTypeName},#{agnterRltsName})
+    </insert>
+    <insert id="insertInptRecord" parameterType="cn.hsa.module.insure.module.entity.InsureInptRecordDO">
+        insert into insure_inpt_record(id, hosp_code, visit_id, psn_no, insutype, tel, addr,
+                                       insu_optins, diag_name, dise_cond_dscr, reflin_medins_no,
+                                       reflin_medins_name, mdtrtarea_admdvs, hosp_agre_refl_flag,
+                                       refl_type, refl_date, refl_rea, refl_opnn, begndate, enddate, trt_dcla_detl_sn,
+                                       crte_id, crte_name, crte_time,insure_reg_code,refl_type_name)
+        values (#{id}, #{hospCode}, #{visitId}, #{psnNo}, #{insutype}, #{tel}, #{addr}, #{insuOptins}, #{diagName},
+                #{diseCondDscr},
+                #{reflinMedinsNo}, #{reflinMedinsName}, #{mdtrtareaAdmdvs}, #{hospAgreReflFlag}, #{reflType},
+                #{reflDate}, #{reflRea}, #{reflOpnn},
+                #{begndate}, #{enddate}, #{trtDclaDetlSn}, #{crteId}, #{crteName}, #{crteTime},#{insureRegCode},#{reflTypeName})
+    </insert>
+    <delete id="deleteRecordDisease">
+        delete
+        from insure_record
+        where hosp_code = #{hospCode}
+          and trt_dcla_detl_sn = #{trtDclaDetlSn}
+    </delete>
+    <delete id="deleteInsureFixPersonnalRecord">
+        delete
+        from insure_fix_record
+        where hosp_code = #{hospCode}
+          and psn_no = #{psnNo}
+    </delete>
+    <delete id="deleteInsureInptRecord">
+        delete
+        from insure_inpt_record
+        where hosp_code = #{hospCode}
+          and trt_dcla_detl_sn = #{trtDclaDetlSn}
+    </delete>
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO">
+        select ov.name,ov.visit_id,ov.dept_name,ov.register_no,ov.cert_no, ir.id, ir.hosp_code, ir.visit_id, ir.psn_no,
+        ( case ir.insutype when '310' then '职工基本医疗保险' when '320' then '公务员医疗补助' when '330' then '大额医疗费用补助'
+        when '340' then '离休人员医疗保障' when '390' then '城乡居民基本医疗保险' when '392' then '城乡居民大病医疗保险'
+        when '510' then '生育保险' end) as insutype,
+        ir.opsp_dise_code, ir.opsp_dise_name, ir.tel, ir.addr, ir.insu_optins,
+        ir.ide_fixmedins_no, ir.ide_fixmedins_name,
+        ir.hosp_ide_date, ir.diag_dr_codg, ir.diag_dr_name,ir. begndate,
+        ir.enddate, ir.trt_dcla_detl_sn, ir.memo
+        from outpt_register ov
+        left join insure_record ir on ov.visit_id = ir.visit_id and ov.hosp_code = ir.hosp_code
+        where ov.hosp_code =#{hospCode}
+        <if test="keyword !=null and keyword != ''">
+            and (ov.name like '%${keyword}%'
+            or ov.register_no like '%${keyword}%'
+            or ir.opsp_dise_code like '%${keyword}%'
+            or ir.ide_fixmedins_name like '%${keyword}%')
+        </if>
+        /*开始日期*/
+        <if test="startDate != null ">
+            and date(ov.register_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null ">
+            and date(ov.register_time) &lt;= date(#{endDate})
+        </if>
+        order by ir.crte_time desc
+
+    </select>
+    <select id="queryPageInsureFixRecord"
+            resultType="cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO">
+        select * from insure_fix_record where hosp_code =#{hospCode}
+        <if test="keyword !=null and keyword != ''">
+            and (name like '%${keyword}%')
+        </if>
+        <!--        /*开始日期*/-->
+        <!--        <if test="startDate != null ">-->
+        <!--            and date(ifr.begndate) &gt;= date(#{startDate})-->
+        <!--        </if>-->
+        <!--        /*结束日期*/-->
+        <!--        <if test="endDate != null ">-->
+        <!--            and date(ifr.enddate) &lt;= date(#{endDate})-->
+        <!--        </if>-->
+        order by crte_time desc
+    </select>
+    <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO">
+        select id,
+               hosp_code,
+               visit_id,
+               psn_no,
+               insutype,
+               opsp_dise_code,
+               opsp_dise_name,
+               tel,
+               addr,
+               insu_optins,
+               ide_fixmedins_no,
+               ide_fixmedins_name,
+               hosp_ide_date,
+               diag_dr_codg,
+               diag_dr_name,
+               begndate,
+               enddate,
+               trt_dcla_detl_sn,
+               memo,
+               crte_id,
+               crte_name,
+               crte_time,
+               reg_code
+        from insure_record
+        where hosp_code = #{hospCode}
+          and trt_dcla_detl_sn = #{trtDclaDetlSn}
+    </select>
+    <select id="getFixRecordById" resultType="cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO">
+        select id,
+               hosp_code,
+               psn_no,
+               tel,
+               addr,
+               biz_appy_type,
+               begndate,
+               enddate,
+               agnter_name,
+               agnter_cert_type,
+               agnter_certno,
+               agnter_tel,
+               agnter_addr,
+               agnter_rlts,
+               fix_srt_no,
+               fixmedins_code,
+               fixmedins_name,
+               memo,
+               visit_id,
+               insure_reg_code,
+               trt_dcla_detl_sn,
+               cret_id,
+               crte_name,
+               crte_time
+        from insure_fix_record
+        where hosp_code = #{hospCode}
+          and trt_dcla_detl_sn = #{trtDclaDetlSn}
+    </select>
+    <select id="getInptRecordById" resultType="cn.hsa.module.insure.module.dto.InsureInptRecordDTO">
+        select iir.*,iiv.crte_time as regsiterTime
+        from insure_inpt_record iir
+        join insure_individual_visit iiv on iir.visit_id =  iiv.visit_id and iir.hosp_code = iiv.hosp_code
+        where iir.hosp_code = #{hospCode}
+          and iir.trt_dcla_detl_sn = #{trtDclaDetlSn}
+    </select>
+    <select id="queryPageInptRecord" resultType="cn.hsa.module.insure.module.dto.InsureInptRecordDTO">
+        select iv.name,iv.phone,iv.address,iiv.medical_reg_no,iiv.medicine_org_code as
+        medicineOrgCode,iiv.bka006,iiv.visit_icd_code,iiv.visit_icd_name,
+        iiv.visit_berth as visitBerth, iiv.visit_icd_code as visitIcdCode,iiv.visit_drpt_name as
+        visitDrptName,iiv.visit_icd_name as visitIcdName,
+        iiv.aac001,iiv.aka130_name as aka130Name,iv.phone as tel,iv.address as address,iiv.insure_reg_code,iiv.visit_id
+        as visitId,iib.aae140 as aae140,
+        iir.*
+        from insure_individual_visit iiv
+        join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
+        join  insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
+        left join insure_inpt_record iir on iir.hosp_code = iiv.hosp_code and iir.visit_id = iiv.visit_id
+        and iiv.hosp_code = #{hospCode} and iiv.is_hospital ='1'
+        <if test="keyword !=null and keyword != ''">
+            and (iv.name like '%${keyword}%')
+        </if>
+        order by iir.crte_time desc
+    </select>
+    <select id="queryInptRecordNo" resultType="cn.hsa.module.insure.module.dto.InsureInptRecordDTO">
+        select fix_srt_no
+        from insure_fix_record
+        where hosp_code = #{hospCode}
+          and psn_no = #{psnNo}
+        order by crte_time desc
+        limit 1
+    </select>
+
+    <select id="queryPageOutptTwoDiseRecord"
+            resultType="cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO">
+        select ov.name,ov.visit_id,ov.dept_name,ov.register_no,ov.cert_no, ir.id, ir.hosp_code, ir.visit_id, ir.psn_no,
+        ir.reg_code, ir.hosp_opnn, ir.appyer_tel, ir.appyer_addr,
+        ir.opsp_dise_code, ir.opsp_dise_name, ir.begndate,
+        ir.enddate, ir.trtDclaDetlSn, ir.memo
+        from outpt_register ov
+        left join insure_outpt_twodise ir on ov.visit_id = ir.visit_id and ov.hosp_code = ir.hosp_code
+        where ov.hosp_code =#{hospCode}
+        <if test="keyword !=null and keyword != ''">
+            and (ov.name like '%${keyword}%'
+            or ov.register_no like '%${keyword}%'
+            or ir.opsp_dise_code like '%${keyword}%')
+        </if>
+        /*开始日期*/
+        <if test="startDate != null ">
+            and date(ov.register_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null ">
+            and date(ov.register_time) &lt;= date(#{endDate})
+        </if>
+        order by ir.crte_time desc
+
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertOuptTowDiseRecord" keyProperty="" useGeneratedKeys="true">
+        insert into insure_outpt_twodise(id, visit_id, reg_code, trtDclaDetlSn, hosp_code, psn_no, opsp_dise_code, opsp_dise_name, hosp_opnn, hosp_appy_time, begndate, enddate, opter_name, memo, appy_rea, symp_dscr, appyer, appyer_tel, appyer_addr, crte_id, crte_name, crte_time)
+        values (#{id}, #{visitId}, #{regCode}, #{trtDclaDetlSn}, #{hospCode}, #{psnNo}, #{opspDiseCode}, #{opspDiseName}, #{hospOpnn}, #{hospAppyTime}, #{begndate}, #{enddate}, #{opterName}, #{memo}, #{appyRea}, #{sympDscr}, #{appyer}, #{appyerTel}, #{appyerAddr}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <delete id="deleteOuptTwoDiseRecord">
+        delete
+        from insure_outpt_twodise
+        where hosp_code = #{hospCode}
+          and trtDclaDetlSn = #{trtDclaDetlSn}
+    </delete>
+
+    <select id="getByIdTwoDise" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO">
+        select id, hosp_code, reg_code, psn_no, trtDclaDetlSn from insure_outpt_twodise
+        where hosp_code = #{hospCode} and trtDclaDetlSn = #{trtDclaDetlSn}
+    </select>
+</mapper>

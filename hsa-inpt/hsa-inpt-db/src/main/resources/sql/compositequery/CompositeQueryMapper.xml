@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.compositequery.dao.CompositeQueryDAO">
+    <!--查询所有住院病人-->
+    <select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+        id,
+        bed_id,
+        bed_name,
+        name,
+        gender_code,
+        age,
+        age_unit_code,
+        status_code,
+        in_no,
+        in_dept_id,
+        (select code from base_dept as b where b.hosp_code = hosp_code and b.id = in_dept_id ) as deptCode,
+        in_dept_name,
+        in_time,
+        in_disease_id,
+        in_disease_name,
+        out_time,
+        total_advance,
+        total_cost,
+        total_balance,
+        zz_doctor_name,
+        outpt_visit_no,
+        in_disease_icd10,
+        in_ward_id,
+        Illness_code,
+        outpt_visit_no
+        FROM
+        inpt_visit
+        WHERE hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (name like CONCAT('%',#{keyword},'%') or bed_name like CONCAT('%',#{keyword},'%') or in_no = #{keyword})
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and status_code = #{statusCode}
+        </if>
+        order by in_time desc
+    </select>
+
+    <!--查询患者基本信息-->
+    <select id="queryInptVisit" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select * from inpt_visit where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--患者预交金查询-->
+    <select id="queryAdvance" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">
+        SELECT
+            a.ap_order_no AS apOrderNo,
+            b.name,
+            b.in_no AS inNo,
+            b.in_dept_name AS inDeptName,
+            ( SELECT bw.name FROM base_dept bw WHERE bw.id = b.in_ward_id ) AS wardName,
+            a.is_settle AS isSettle,
+            a.status_code AS statusCode,
+            a.crte_time AS crteTime,
+            a.price,
+            a.pay_code AS payCode,
+            a.cheque_no AS chequeNo,
+            a.crte_name AS crteName
+        FROM inpt_advance_pay a
+                 LEFT JOIN inpt_visit b ON a.visit_id = b.id
+        WHERE
+            a.hosp_code = #{hospCode}
+          AND a.visit_id = #{id}
+        order by a.crte_time
+    </select>
+
+    <!--查询患者诊断信息-->
+    <select id="queryDisease" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">
+        SELECT
+            id,
+            type_code as typeCode,
+            crte_time as crteTime,
+            (SELECT name FROM base_disease bd where bd.id = disease_id) as diseaseName,
+            is_main as isMain,
+            crte_name as crteName
+        FROM
+            inpt_diagnose
+        where hosp_code = #{hospCode}
+          and visit_id = #{id}
+    </select>
+
+    <!--条件查询住院病人-->
+    <select id="queryVisitsByCondition" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+        id,
+        bed_id,
+        bed_name,
+        name,
+        gender_code,
+        age,
+        age_unit_code,
+        status_code,
+        in_no,
+        in_dept_name,
+        in_time,
+        in_disease_name,
+        in_profile,
+        out_time,
+        total_advance,
+        total_cost,
+        total_balance,
+        zz_doctor_name
+        FROM
+        inpt_visit
+        WHERE hosp_code = #{hospCode}
+        <if test="name != null and name != ''">
+            and (name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="bedName != null and bedName != ''">
+            and (bed_name like CONCAT('%',#{bedName},'%')
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and (in_no like CONCAT('%',#{inNo},'%')
+        </if>
+        <if test="bedId != null and bedId != ''">
+            and (bed_id like CONCAT('%',#{bedId},'%')
+        </if>
+        <if test="inProfile != null and inProfile != ''">
+            and (in_profile like CONCAT('%',#{inProfile},'%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by in_time desc
+    </select>
+</mapper>

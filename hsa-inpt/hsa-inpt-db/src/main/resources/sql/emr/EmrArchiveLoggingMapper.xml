@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrarchivelogging.dao.EmrArchiveLoggingDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO" id="EmrArchiveLoggingMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="archiveState" column="archive_state" jdbcType="VARCHAR"/>
+        <result property="archiveTime" column="archive_time" jdbcType="TIMESTAMP"/>
+        <result property="archiveUserId" column="archive_user_id" jdbcType="VARCHAR"/>
+        <result property="archiveName" column="archive_name" jdbcType="VARCHAR"/>
+        <result property="archiveOption" column="archive_option" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getEmrArchiveLoggingDO" resultMap="EmrArchiveLoggingMap">
+        select
+          id, visit_id, hosp_code, archive_state, archive_time, archive_user_id, archive_name, archive_option
+        from emr_archive_logging
+        where visit_id = #{visitId}
+    </select>
+
+    <!--批量新增所有列-->
+    <insert id="insertEmrArchiveLoggingDO" parameterType="java.util.List" >
+        insert into emr_archive_logging(id, visit_id, hosp_code, archive_state, archive_time, archive_user_id, archive_name, archive_option)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.visitId}, #{item.hospCode}, #{item.archiveState}, #{item.archiveTime}, #{item.archiveUserId}, #{item.archiveName}, #{item.archiveOption})
+        </foreach>
+
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateEmrArchiveLoggingDO" parameterType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        update emr_archive_logging
+        <trim prefix="set" suffixOverrides=",">
+            <if test="archiveState != null and archiveState != ''">
+                archive_state = #{archiveState},
+            </if>
+            <if test="archiveTime != null">
+                archive_time = #{archiveTime},
+            </if>
+            <if test="archiveUserId != null and archiveUserId != ''">
+                archive_user_id = #{archiveUserId},
+            </if>
+            <if test="archiveName != null and archiveName != ''">
+                archive_name = #{archiveName},
+            </if>
+            <if test="archiveOption != null and archiveOption != ''">
+                archive_option = #{archiveOption},
+            </if>
+        </trim>
+        where visit_id in (${stringVisitIds})
+    </update>
+
+    <!-- 查询住院病人信息，关联归档状况 查询未归档的病历-->
+    <select id="getZYEmrFilePatients" parameterType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name, e.archive_name, e.archive_option,
+        if(e.archive_state is null, "0", e.archive_state) as archive_state, e.archive_time, v.zg_doctor_name as doctorName,v.zg_doctor_id as doctorId
+        from inpt_visit v left join emr_archive_logging e on v.id = e.visit_id
+        where v.hosp_code = #{hospCode}
+        <if test="endTime != null and endTime != ''">
+            and v.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="patientName != null and patientName != ''">
+            and (v.name like concat('%', #{patientName,jdbcType=VARCHAR}, '%')
+            or v.bed_name like concat('%', #{patientName,jdbcType=VARCHAR}, '%')
+            or v.in_no like concat('%', #{patientName,jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="archiveState != null and archiveState != ''">
+            and (e.archive_state is null or e.archive_state = #{archiveState})
+        </if>
+        <if test="outEndDate != null and outEndDate != ''">
+            and v.out_time &lt;= DATE_ADD(STR_TO_DATE(#{outEndDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="outStartDate != null and outStartDate != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{outStartDate},'%Y-%m-%d')
+        </if>
+        order by v.in_time desc
+    </select>
+
+
+    <!-- 查询住院病人信息，关联归档状况 查询未归档的病历-->
+    <select id="getZYEmrFilePatientsGd" parameterType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name as bedName, e.archive_name, e.archive_option,
+        if(e.archive_state is null, "0", e.archive_state) as archive_state, e.archive_time, v.zg_doctor_name as doctorName,v.zg_doctor_id as doctorId
+        from inpt_visit v join emr_archive_logging e on v.id = e.visit_id
+        where v.hosp_code = #{hospCode}
+        <if test="ryDate != null and cyDate != null">
+            and DATE_FORMAT(v.in_time,'%Y-%m-%d') between #{ryDate} and #{cyDate}
+        </if>
+        <if test="ryDate == null and cyDate != null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') <= #{cyDate}
+            ]]>
+        </if>
+        <if test="ryDate != null and cyDate == null">
+            <![CDATA[
+                and DATE_FORMAT(v.in_time, '%Y-%m-%d') >= #{ryDate}
+            ]]>
+        </if>
+        <if test="patientName != null and patientName != ''">
+            and (v.name like concat('%', #{patientName,jdbcType=VARCHAR}, '%')
+            or v.bed_name like concat('%', #{patientName,jdbcType=VARCHAR}, '%')
+            or v.in_no like concat('%', #{patientName,jdbcType=VARCHAR}, '%') )
+        </if>
+        <if test="archiveState != null and archiveState != ''">
+            and e.archive_state = #{archiveState}
+        </if>
+        <if test="outEndDate != null and outEndDate != ''">
+            and v.out_time &lt;= DATE_ADD(STR_TO_DATE(#{outEndDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <if test="outStartDate != null and outStartDate != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{outStartDate},'%Y-%m-%d')
+        </if>
+        order by v.in_time desc
+    </select>
+
+    <!-- 查询不能归档的住院病人名字，只显示病人拥有的病历需要送审，但是审核状态不是通过的 -->
+    <select id="getPatientIsArchive" parameterType="java.lang.String" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.name as patientName from emr_patient p join emr_classify_template t on p.classify_template_id = t.id
+        join emr_classify c on t.classify_code = c.code
+        join inpt_visit v on v.id = p.visit_id
+
+        where p.visit_id in ( ${visitIds} ) and c.dept_id = t.dept_id
+        and c.hosp_code = t.hosp_code and c.is_audit = '1' and p.audit_code &lt;&gt; '2'
+    </select>
+
+    <!-- 根据就诊id集合，查询当前结合中已经归档的病人 -->
+    <select id="getIsArchives" parameterType="java.lang.String" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.name as patientName from emr_archive_logging e join inpt_visit v on e.visit_id = v.id
+	    where e.visit_id in (${visitIds}) and e.archive_state = '1'
+    </select>
+
+    <!-- 删除当前归档数据的历史记录 -->
+    <delete id="deleteArchives" parameterType="java.lang.String">
+        delete from emr_archive_logging where visit_id in (${visitIds})
+    </delete>
+
+    <select id="getArchiveLoggingsByVisitIds" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO" parameterType="java.lang.String">
+        select v.id as visit_id, v.name as patientName, a.archive_state from emr_archive_logging a right join inpt_visit v on a.visit_id = v.id where v.id in (${visitIds})
+    </select>
+    <!-- 查询出院7天-->
+    <select id="getZYEmrFilePatientsNoArchived" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name as bedName, e.archive_name, e.archive_option,
+        e.archive_state, e.archive_time
+        from inpt_visit v left join emr_archive_logging e on v.id = e.visit_id
+        where v.hosp_code = #{hospCode}
+        and v.status_code ='7' and DATEDIFF(NOW(),v.out_time)>7 and (e.archive_state ='0' or e.archive_state is null)
+    </select>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.criticalvalues.dao.CriticalValuesDAO">
+
+    <select id="queryPage" resultType="cn.hsa.module.inpt.criticalvalues.dto.CriticalValuesDTO">
+        select id, hosp_code, visit_id, item_id, item_name, jyckz, jyjgz,
+               jyjgdw, jyzt, wjzzt, jyff, wjsm, wjsj, is_wjcl, wjclrid,
+               (IF(wjclrid = wjclrid is not null, '已处理', '未处理')) as  status_code,
+               wjclrxm, wjclrsj, wjclbz, crte_id, crte_name, crte_time,critical_item_name,critical_item_id,
+               (select iv.name from inpt_visit iv where iv.hosp_code = inpt_critical_values.hosp_code and iv.id = inpt_critical_values.visit_id  )name
+        from inpt_critical_values
+            where  hosp_code=#{hospCode} and visit_id =#{visitId} and item_id =#{itemId} and wjzzt in ('1','2')
+    </select>
+
+    <select id="queryAll" resultType="cn.hsa.module.inpt.criticalvalues.dto.CriticalValuesDTO">
+        select item_name,critical_item_name from inpt_critical_values
+        where  hosp_code=#{hospCode} and visit_id =#{visitId} and wjzzt='1'
+    </select>
+
+        <update id="updateCriticalValue"  parameterType="java.util.List">
+            <foreach collection="criticalValuesDTOList" item="item" index="index" open="" close="" separator=";">
+                update inpt_critical_values
+                <set>
+                    wjclbz=#{item.wjclbz},
+                    is_wjcl =#{item.isWjcl},
+                    wjclrid=#{item.wjclrid},
+                    wjclrxm=#{item.wjclrxm},
+                    wjclrsj=#{item.wjclrsj},
+                    wjzzt = #{item.wjzzt},
+                    wjclbz=#{item.wjclbz}
+                </set>
+                where visit_id = #{item.visitId} and hosp_code =#{item.hospCode} and item_id =#{item.itemId}
+                    and critical_item_id=#{item.criticalItemId }
+            </foreach>
+    </update>
+    <update id="updateInptVisitValueCode" parameterType="cn.hsa.module.inpt.criticalvalues.dto.CriticalValuesDTO">
+        update inpt_visit set critical_value_code ='2' where hosp_code =#{hospCode} and id = #{visitId}
+    </update>
+
+    <select id="queryItemByVisitId" resultType="cn.hsa.module.inpt.criticalvalues.dto.CriticalValueItemDTO" parameterType="cn.hsa.module.inpt.criticalvalues.dto.CriticalValueItemDTO">
+        select ia.visit_id ,ia.hosp_code,ia.item_name as checkItem, ia.item_id,ia.crte_name as doctorName
+        from inpt_advice ia
+        where type_code ='3'
+        and ia.hosp_code=#{hospCode} and ia.visit_id =#{visitId}
+    </select>
+</mapper>

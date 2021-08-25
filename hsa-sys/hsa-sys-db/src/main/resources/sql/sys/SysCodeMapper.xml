@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.code.dao.SysCodeDao">
+
+    <resultMap id="codeResultMap" type="cn.hsa.module.sys.code.dto.SysCodeDTO">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isTree" column="is_tree" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="showDefault" column="show_default" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="detailResultMap" type="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="c_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="upValue" column="up_value" jdbcType="VARCHAR"/>
+        <result property="isEnd" column="is_end" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="codeMaps" type="cn.hsa.module.sys.code.dto.SysCodeDTO">
+        <result property="cCode" column="cCode" jdbcType="INTEGER"/>
+        <collection property="sysCodeSelectDTOList" ofType="cn.hsa.module.sys.code.dto.SysCodeSelectDTO" javaType="java.util.List">
+            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="value" column="value" jdbcType="VARCHAR"/>
+            <result property="label" column="label" jdbcType="VARCHAR"/>
+            <result property="cName" column="cName" jdbcType="INTEGER"/>
+            <result property="cCode" column="cCode" jdbcType="VARCHAR"/>
+            <result property="showDefault" column="showDefault" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getByCode" parameterType="java.lang.String" resultMap="codeMaps">
+        select
+        b.name cName,b.code cCode,a.id id,a.name label,a.value value,b.show_default showDefault
+        from sys_code b join sys_code_detail a  on b.code=a.c_code and a.hosp_code=b.hosp_code and a.is_valid='1'
+        where b.is_valid='1' and b.hosp_code=#{hospCode}
+        <if test="codes!=null and codes.size()>0">
+            and b.code in
+            <foreach collection="codes" index="index" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        order by a.c_code,CAST(a.seq_no AS SIGNED)
+    </select>
+
+    <!--根据医保值域代码编码获取值域代码值-->
+    <select id="getInsureDictByCode" parameterType="java.lang.String" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select name,code,id,name label,value value
+        from insure_dict
+        where hosp_code=#{hospCode}
+        <if test="codes!=null and codes.size()>0">
+            and code in
+            <foreach collection="codes" index="index" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码-->
+    <select id="queryCodePage" resultMap="codeResultMap" parameterType="cn.hsa.module.sys.code.dto.SysCodeDTO">
+        select * from sys_code
+        <where>
+            1=1 and is_valid='1' and hosp_code=#{hospCode}
+            <if test="keyword!=null and keyword!=''">
+                and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%'))
+                or (pym like CONCAT('%',#{keyword},'%')) or (wbm like CONCAT('%',#{keyword},'%')))
+            </if>
+			<if test="ids != null and ids.size() > 0">
+				and id in
+				<foreach collection="ids" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码值-->
+    <select id="queryCodeDetailPage" resultMap="detailResultMap" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
+        select a.id,a.c_code,a.name,a.VALUE,a.seq_no,a.pym,a.wbm,a.up_value,a.is_end,a.is_valid,a.remark,a.is_end isEnd,
+        a.crte_id,a.crte_name,a.crte_time,(select name from sys_code_detail where c_code=a.c_code and value=a.up_value and hosp_code=a.hosp_code) upValueName
+        from sys_code_detail a
+        where
+        1=1 and a.is_valid='1' and a.hosp_code=#{hospCode}
+        <if test="keyword!=null and keyword!=''">
+          and ((a.value like CONCAT('%',#{keyword},'%')) or (a.name like CONCAT('%',#{keyword},'%'))
+          or (a.pym like CONCAT('%',#{keyword},'%')) or (a.wbm like CONCAT('%',#{keyword},'%')))
+        </if>
+        <if test="code!=null and code!=''">
+          and a.c_code=#{code}
+        </if>
+        <if test="isEnd!=null and isEnd!=''">
+            and ((a.is_end is null) or (a.is_end is not null and a.is_end != '1'))
+        </if>
+        <if test="value!=null and value!=''">
+            and a.value=#{value}
+        </if>
+        <if test="valueList != null and valueList.size() > 0">
+          and a.value in
+          <foreach collection="valueList" item="item" separator="," open="(" close=")">
+            #{item}
+          </foreach>
+        </if>
+		<if test="ids != null and ids.size() > 0">
+			and a.id in
+			<foreach collection="ids" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+        order by CAST(a.seq_no AS SIGNED)
+    </select>
+
+    <!--根据主键获取值域代码对象-->
+    <select id="getCodeById" resultMap="codeResultMap">
+        select * from sys_code where is_valid='1' and id=#{id} and hosp_code=#{hospCode}
+    </select>
+
+    <!--根据主键获取值域代码值对象-->
+    <select id="getCodeDetailById" resultMap="detailResultMap">
+        select * from sys_code_detail where is_valid='1' and id=#{id} and hosp_code=#{hospCode}
+    </select>
+
+    <select id="getMaxSeqno" resultType="java.lang.Integer">
+      select ifnull(max(seq_no),0) from sys_code_detail where hosp_code=#{hospCode} and c_code=#{code} and is_valid = '1'
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeCount" resultType="java.lang.Integer">
+        select count(1) as num from sys_code where code=#{code} and id!=#{id} and hosp_code=#{hospCode}
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeDetailCount" resultType="java.lang.Integer">
+        select count(1) as num from sys_code_detail where c_code=#{code} and is_valid='1' and id!=#{id} and hosp_code=#{hospCode} and value=#{value}
+    </select>
+
+    <!--新增值域代码-->
+    <insert id="insertCode" keyProperty="id" useGeneratedKeys="true">
+        insert into sys_code(id,hosp_code,code,name,pym,wbm,is_tree,is_valid,crte_id,crte_name,crte_time,show_default)
+        values (#{id},#{hospCode},#{code},#{name},#{pym},#{wbm},#{isTree},'1',#{crteId},#{crteName},#{crteTime},#{showDefault})
+    </insert>
+
+    <!--新增值域代码-->
+    <insert id="insertCodeDetail">
+        insert into sys_code_detail(id,hosp_code,c_code,name,value,remark,seq_no,pym,wbm,up_value,is_end,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{hospCode},#{code},#{name},#{value},#{remark},#{seqNo},#{pym},#{wbm},#{upValue},#{isEnd},'1',#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--更新值域代码-->
+    <update id="updateCode" keyProperty="id" useGeneratedKeys="true">
+        update sys_code
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            <if test="isTree!=null and isTree!=''">
+                is_tree=#{isTree},
+            </if>
+            <if test="showDefault!=null and showDefault!=''">
+                show_default=#{showDefault},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <!--更新值域代码值-->
+    <update id="updateCodeDetail" keyProperty="id" useGeneratedKeys="true">
+        update sys_code_detail
+        <set>
+            name=#{name},value=#{value},remark=#{remark},is_end=#{isEnd},up_value=#{upValue},
+            <if test="pym!=null and pym!=''">
+                pym=#{pym},
+            </if>
+            <if test="seqNo!=null and seqNo!=''">
+                seq_no=#{seqNo},
+            </if>
+            <if test="seqNo==null or seqNo==''">
+                seq_no='0',
+            </if>
+            <if test="wbm!=null and wbm!=''">
+                wbm=#{wbm},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <update id = "updateCodeDetailByCode" >
+      update sys_code_detail
+      set c_code = #{code}
+      where c_code= #{oldCode} and hosp_code = #{hospCode}
+    </update>
+
+    <!--删除值域代码-->
+    <update id="deleteCodes" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.code.dto.SysCodeDTO">
+        update sys_code
+        set is_valid = 0 where 1=1 and is_valid = 1 and hosp_code=#{hospCode}
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--删除值域代码值-->
+    <update id="deleteCodeDetails" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
+        update sys_code_detail
+        set is_valid = 0 where 1=1 and is_valid = 1 and hosp_code=#{hospCode}
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getCodeTree" parameterType="java.lang.String" resultType="cn.hsa.base.TreeMenuNode">
+        select "-2" id, a.name label, "-1" parentId
+        from sys_code a
+        where a.is_valid='1' and a.hosp_code = #{hospCode} and a.code=#{code}
+        union all
+        select a.id, a.label, a.parentId from (
+            select b.value id, b.name label, ifnull(( CASE b.up_value WHEN '' THEN '-2' ELSE b.up_value END ),'-2') parentId
+            from sys_code a
+            join sys_code_detail b on a.code = b.c_code
+            where b.is_valid='1' and a.hosp_code = #{hospCode} and a.code=#{code}
+            order by b.seq_no
+        )a
+
+    </select>
+<!--    查询国家编码-->
+    <select id="queryNationCode" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO" resultType="cn.hsa.base.TreeMenuNode">
+        select value as id , name label, up_value as parentId from sys_code_detail where c_code='KB' and is_valid='1' and hosp_code=#{hospCode}
+        <if test="nationCode !=null and nationCode != '' ">
+            and value = #{nationCode}
+        </if>
+    </select>
+    
+    <select id="queryFathersCode" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO" resultType="cn.hsa.base.TreeMenuNode">
+        select value as id ,value, name label, up_value as parentId from sys_code_detail
+        where c_code=#{code} and is_valid='1' and hosp_code=#{hospCode}
+    </select>
+
+    <!--根据值域代码值查询出单个具体的值域代码值对象-->
+    <select id="getCodeDetailByValue" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO" resultMap="detailResultMap">
+        select id, hosp_code, c_code, name, value, remark, seq_no, pym, wbm, up_value, is_end, is_valid, crte_id, crte_name, crte_time
+        from sys_code_detail
+        where hosp_code = #{hospCode}
+        <if test="code != null and code != ''">
+            and c_code = #{code}
+        </if>
+        <if test="value != null and value != ''">
+            and value = #{value}
+        </if>
+    </select>
+</mapper>

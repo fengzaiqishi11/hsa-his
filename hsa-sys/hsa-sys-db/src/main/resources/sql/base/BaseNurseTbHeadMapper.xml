@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.nurse.dao.BaseNurseTbHeadDAO">
+    <!--分页查询所有护理单据表头-->
+    <select id="queryPage" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code,
+        date_type_code, data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid,
+        crte_id, crte_name, crte_time
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode} and is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%', #{keyword}, '%') or code like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="bnoCode != null and bnoCode != ''">
+            and bno_code = #{bnoCode}
+        </if>
+        order by seq_no
+    </select>
+
+    <!--根据护理单据code查询出所有的动态表头列-->
+    <select id="queryTbHeadByCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select id,
+               hosp_code,
+               bno_code,
+               seq_no,
+               up_code,
+               code,
+               name,
+               item_code,
+               min_num,
+               max_num,
+               gender_code,
+               date_type_code,
+               data_width,
+               data_length,
+               source_code,
+               source_value,
+               default_value,
+               is_up,
+               is_sum,
+               is_valid,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and is_valid = #{isValid}
+          and bno_code = #{code}
+        order by seq_no
+    </select>
+
+    <!--根据表头编码code查询出是否存在-->
+    <select id="getByCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO" resultType="int">
+        select count(1)
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+        and code = #{code}
+        and is_valid = '1'
+        and bno_code = #{bnoCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--新增-->
+    <insert id="insert" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        insert into base_nurse_tbhead(id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num,
+                                      gender_code, date_type_code, data_width, data_length, source_code, source_value,
+                                      default_value, is_up, is_sum, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{bnoCode}, #{seqNo}, #{upCode}, #{code}, #{name}, #{itemCode}, #{minNum},
+                #{maxNum},
+                #{genderCode}, #{dateTypeCode}, #{dataWidth}, #{dataLength}, #{sourceCode}, #{sourceValue},
+                #{defaultValue}, #{isUp}, #{isSum}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--修改-->
+    <update id="update" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        update base_nurse_tbhead
+        <set>
+            <if test="seqNo != null and seqNo != ''">
+                seq_no = #{seqNo},
+            </if>
+            <if test="upCode != null and upCode != ''">
+                up_code = #{upCode},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="itemCode != null">
+                item_code = #{itemCode},
+            </if>
+            min_num = #{minNum},
+            max_num = #{maxNum},
+            gender_code = #{genderCode},
+            <if test="dateTypeCode != null">
+                date_type_code = #{dateTypeCode},
+            </if>
+            data_width = #{dataWidth},
+            data_length = #{dataLength},
+            <if test="sourceCode != null">
+                source_code = #{sourceCode},
+            </if>
+            source_value = #{sourceValue},
+            default_value = #{defaultValue},
+            <if test="isUp != null and isUp != ''">
+                is_up = #{isUp},
+            </if>
+            <if test="isSum != null and isSum != ''">
+                is_sum = #{isSum},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--根据主键获取唯一护理单据表头格式-->
+    <select id="getById" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select *
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </select>
+
+    <!--根据code查询出是否包含子节点-->
+    <select id="querySonTbHead" parameterType="java.util.Map"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select
+        id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code, date_type_code,
+        data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, crte_id, crte_name,
+        crte_time
+        from base_nurse_tbhead
+        where
+        hosp_code = #{hospCode}
+        and bno_code = #{bnoCode}
+        and is_valid = '1'
+        and up_code in
+        <foreach collection="codeList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--删除节点-->
+    <update id="deleteTbHead" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update base_nurse_tbhead
+            set is_valid = '0'
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+        </foreach>
+    </update>
+
+    <!--查询护士签名列表-->
+    <select id="queryNurseName" parameterType="java.util.Map" resultType="java.util.Map">
+        select tab.*
+        from (${sql}) tab
+    </select>
+
+    <!--根据护理单据查询出当前单据下最大序列号-->
+    <select id="querySeqNo" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO" resultType="int">
+        select MAX(seq_no)
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and is_valid = '1'
+          and bno_code = #{bnoCode}
+    </select>
+
+    <!--根据护理单据查询出所有表头List，供选择上级标题使用-->
+    <select id="queryTbHeadByBnoCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select id,
+               hosp_code,
+               bno_code,
+               seq_no,
+               up_code,
+               code,
+               name,
+               item_code,
+               min_num,
+               max_num,
+               gender_code,
+               date_type_code,
+               data_width,
+               data_length,
+               source_code,
+               source_value,
+               default_value,
+               is_up,
+               is_sum,
+               is_valid,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_tbhead
+        where hosp_code = #{hospCode}
+          and is_valid = '1'
+          and bno_code = #{code}
+        order by seq_no
+    </select>
+
+    <!--查询出该护理单据下已经使用了的项目编码-->
+    <select id="queryItemCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="java.lang.String">
+        SELECT item_code
+        FROM base_nurse_tbhead
+        WHERE hosp_code = #{hospCode}
+          AND bno_code = #{code}
+          AND item_code IS NOT NULL
+          AND is_valid = '1'
+        ORDER BY seq_no
+    </select>
+
+    <!--根据项目编码itemCode查询出是否存在-->
+    <select id="getByItemCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(item_code)
+        FROM
+        base_nurse_tbhead
+        WHERE
+        hosp_code = #{hospCode}
+        AND bno_code = #{bnoCode}
+        AND is_valid = '1'
+        and item_code = #{itemCode}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+</mapper>

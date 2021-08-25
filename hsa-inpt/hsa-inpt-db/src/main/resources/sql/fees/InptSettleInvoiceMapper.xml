@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.inpt.fees.dao.InptSettleInvoiceDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="inptSettleInvoiceDtoMap" type="cn.hsa.module.inpt.fees.dto.InptSettleInvoiceDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="invoice_id" property="invoiceId" jdbcType="VARCHAR" />
+        <result column="invoice_detail_id" property="invoiceDetailId" jdbcType="VARCHAR" />
+        <result column="invoice_no" property="invoiceNo" jdbcType="VARCHAR" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="print_id" property="printId" jdbcType="VARCHAR" />
+        <result column="print_name" property="printName" jdbcType="VARCHAR" />
+        <result column="print_time" property="printTime" jdbcType="TIMESTAMP" />
+        <result column="print_num" property="printNum" jdbcType="INTEGER" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="red_id" property="redId" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code, 
+        settle_id, 
+        visit_id, 
+        invoice_id, 
+        invoice_detail_id, 
+        invoice_no, 
+        total_price,
+        print_id, 
+        print_name, 
+        print_time, 
+        print_num, 
+        status_code, 
+        red_id
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        isi.id, 
+        isi.hosp_code, 
+        isi.settle_id, 
+        isi.visit_id, 
+        isi.invoice_id, 
+        isi.invoice_detail_id, 
+        isi.invoice_no, 
+        isi.total_price,
+        isi.print_id, 
+        isi.print_name, 
+        isi.print_time, 
+        isi.print_num, 
+        isi.status_code, 
+        isi.red_id
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        inpt_settle_invoice
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" >
+        insert into
+        inpt_settle_invoice
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          invoice_id,
+          invoice_detail_id,
+          invoice_no,
+          total_price,
+          print_id,
+          print_name,
+          print_time,
+          print_num,
+          status_code,
+          red_id
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{settleId,jdbcType=VARCHAR}, 
+          #{visitId,jdbcType=VARCHAR}, 
+          #{invoiceId,jdbcType=VARCHAR}, 
+          #{invoiceDetailId,jdbcType=VARCHAR}, 
+          #{invoiceNo,jdbcType=VARCHAR}, 
+          #{totalPrice,jdbcType=DECIMAL}, 
+          #{printId,jdbcType=VARCHAR}, 
+          #{printName,jdbcType=VARCHAR}, 
+          #{printTime,jdbcType=TIMESTAMP}, 
+          #{printNum,jdbcType=INTEGER}, 
+          #{statusCode,jdbcType=VARCHAR}, 
+          #{redId,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" >
+        insert into
+        inpt_settle_invoice
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                    settle_id, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id, 
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                    invoice_id, 
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                    invoice_detail_id, 
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                    invoice_no, 
+                </if>
+                <if test="totalPrice != null">
+                    total_price, 
+                </if>
+                <if test="printId != null and printId != ''">
+                    print_id, 
+                </if>
+                <if test="printName != null and printName != ''">
+                    print_name, 
+                </if>
+                <if test="printTime != null">
+                    print_time, 
+                </if>
+                <if test="printNum != null">
+                    print_num, 
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                    status_code, 
+                </if>
+                <if test="redId != null and redId != ''">
+                    red_id
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                        #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                        #{invoiceId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                        #{invoiceDetailId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                        #{invoiceNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="totalPrice != null">
+                        #{totalPrice,jdbcType=DECIMAL}, 
+                </if>
+                <if test="printId != null and printId != ''">
+                        #{printId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="printName != null and printName != ''">
+                        #{printName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="printTime != null">
+                        #{printTime,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="printNum != null">
+                        #{printNum,jdbcType=INTEGER}, 
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                        #{statusCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="redId != null and redId != ''">
+                        #{redId,jdbcType=VARCHAR}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" >
+        update
+        inpt_settle_invoice
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                invoice_id = #{invoiceId,jdbcType=VARCHAR}, 
+                invoice_detail_id = #{invoiceDetailId,jdbcType=VARCHAR}, 
+                invoice_no = #{invoiceNo,jdbcType=VARCHAR}, 
+                total_price = #{totalPrice,jdbcType=DECIMAL}, 
+                print_id = #{printId,jdbcType=VARCHAR}, 
+                print_name = #{printName,jdbcType=VARCHAR}, 
+                print_time = #{printTime,jdbcType=TIMESTAMP}, 
+                print_num = #{printNum,jdbcType=INTEGER}, 
+                status_code = #{statusCode,jdbcType=VARCHAR}, 
+                red_id = #{redId,jdbcType=VARCHAR}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" >
+        update
+        inpt_settle_invoice
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                invoice_id = #{invoiceId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                invoice_detail_id = #{invoiceDetailId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                invoice_no = #{invoiceNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL}, 
+                </if>
+                <if test="printId != null and printId != ''">
+                print_id = #{printId,jdbcType=VARCHAR}, 
+                </if>
+                <if test="printName != null and printName != ''">
+                print_name = #{printName,jdbcType=VARCHAR}, 
+                </if>
+                <if test="printTime != null">
+                print_time = #{printTime,jdbcType=TIMESTAMP}, 
+                </if>
+                <if test="printNum != null">
+                print_num = #{printNum,jdbcType=INTEGER}, 
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="redId != null and redId != ''">
+                red_id = #{redId,jdbcType=VARCHAR}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM inpt_settle_invoice WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM inpt_settle_invoice WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="inptSettleInvoiceDtoMap" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM inpt_settle_invoice isi 
+        where
+        isi.hosp_code = #{hospCode}
+        <if test="settleId != null and settleId != ''">
+            AND isi.settle_id = #{settleId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            AND isi.visit_id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND isi.status_code = #{statusCode}
+        </if>
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into
+        inpt_settle_invoice
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          invoice_id,
+          invoice_detail_id,
+          invoice_no,
+          total_price,
+          print_id,
+          print_name,
+          print_time,
+          print_num,
+          status_code,
+          red_id
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.invoiceId,jdbcType=VARCHAR},
+            #{item.invoiceDetailId,jdbcType=VARCHAR},
+            #{item.invoiceNo,jdbcType=VARCHAR},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.printId,jdbcType=VARCHAR},
+            #{item.printName,jdbcType=VARCHAR},
+            #{item.printTime,jdbcType=TIMESTAMP},
+            #{item.printNum,jdbcType=INTEGER},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.redId,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update
+            inpt_settle_invoice
+            <set >
+                <if test="item.settleId != null and item.settleId != ''">
+                    settle_id = #{item.settleId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.visitId != null and item.visitId != ''">
+                    visit_id = #{item.visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.invoiceId != null and item.invoiceId != ''">
+                    invoice_id = #{item.invoiceId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.invoiceDetailId != null and item.invoiceDetailId != ''">
+                    invoice_detail_id = #{item.invoiceDetailId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.invoiceNo != null and item.invoiceNo != ''">
+                    invoice_no = #{item.invoiceNo,jdbcType=VARCHAR},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.printId != null and item.printId != ''">
+                    print_id = #{item.printId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.printName != null and item.printName != ''">
+                    print_name = #{item.printName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.printTime != null">
+                    print_time = #{item.printTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="item.printNum != null">
+                    print_num = #{item.printNum,jdbcType=INTEGER},
+                </if>
+                <if test="item.statusCode != null and item.statusCode != ''">
+                    status_code = #{item.statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.redId != null and item.redId != ''">
+                    red_id = #{item.redId,jdbcType=VARCHAR}
+                </if>
+            </set>
+            where
+            id = #{item.id}
+        </foreach>
+    </update>
+
+</mapper>

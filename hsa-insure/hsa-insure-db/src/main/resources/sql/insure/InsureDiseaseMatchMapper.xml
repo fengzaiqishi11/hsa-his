@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDiseaseMatchDAO">
+
+    <resultMap type="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO" id="InsureDiseaseMatchMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="insureRegCode" column="insure_reg_code" jdbcType="VARCHAR"/>
+        <result property="hospIllnessId" column="hosp_illness_id" jdbcType="VARCHAR"/>
+        <result property="hospIllnessCode" column="hosp_illness_code" jdbcType="VARCHAR"/>
+        <result property="hospIllnessName" column="hosp_illness_name" jdbcType="VARCHAR"/>
+        <result property="insureIllnessId" column="insure_illness_id" jdbcType="VARCHAR"/>
+        <result property="insureIllnessCode" column="insure_illness_code" jdbcType="VARCHAR"/>
+        <result property="insureIllnessName" column="insure_illness_name" jdbcType="VARCHAR"/>
+        <result property="isMatch" column="is_match" jdbcType="VARCHAR"/>
+        <result property="isTrans" column="is_trans" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="queryUnMacthAllPage" resultType="java.util.Map">
+        SELECT
+            id,
+            hosp_code hospCode,
+            insure_reg_code insureRegCode,
+            hosp_illness_id hospItemId,
+            hosp_illness_code hospItemCode,
+            hosp_illness_name hospItemName,
+            is_match isMatch,
+            audit_code auditCode
+        FROM
+            insure_disease_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND audit_code = #{auditCode}
+        <if test="keyword !=null and keyword != ''">
+            and (hosp_illness_code like '%${keyword}%'
+            or hosp_illness_name like '%${keyword}%')
+        </if>
+    </select>
+
+    <select id="queryUnMacthAllDTOPage" resultMap="InsureDiseaseMatchMap">
+        SELECT
+            id,
+            hosp_code hospCode,
+            insure_reg_code insureRegCode,
+            hosp_illness_id hospItemId,
+            hosp_illness_code hospItemCode,
+            hosp_illness_name hospItemName,
+            is_match isMatch,
+            audit_code auditCode
+        FROM
+            insure_disease_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND audit_code = #{auditCode}
+    </select>
+    <delete id="deleteInsureDiseaseInfos" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        DELETE FROM
+              insure_disease_match
+        WHERE hosp_code = #{hospCode}
+          AND insure_reg_code = #{insureRegCode}
+          AND is_match = #{isMatch}
+          AND audit_code = #{auditCode}
+
+    </delete>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageOrAll" resultMap="InsureDiseaseMatchMap">
+        select
+        id, hosp_code, insure_reg_code, hosp_illness_id, hosp_illness_code, hosp_illness_name, insure_illness_id,
+        insure_illness_code, insure_illness_name, is_match, is_trans, audit_code, remark, crte_id, crte_name, crte_time,
+        treatment_code,oper_num,unoper_num
+        from insure_disease_match
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                and insure_reg_code = #{insureRegCode}
+            </if>
+            <if test="hospIllnessId != null and hospIllnessId != ''">
+                and hosp_illness_id = #{hospIllnessId}
+            </if>
+            <if test="hospIllnessCode != null and hospIllnessCode != ''">
+                and hosp_illness_code = #{hospIllnessCode}
+            </if>
+            <if test="hospIllnessName != null and hospIllnessName != ''">
+                and hosp_illness_name = #{hospIllnessName}
+            </if>
+            <if test="insureIllnessId != null and insureIllnessId != ''">
+                and insure_illness_id = #{insureIllnessId}
+            </if>
+            <if test="insureIllnessCode != null and insureIllnessCode != ''">
+                and insure_illness_code = #{insureIllnessCode}
+            </if>
+            <if test="insureIllnessName != null and insureIllnessName != ''">
+                and insure_illness_name = #{insureIllnessName}
+            </if>
+            <if test="isMatch != null and isMatch != ''">
+                and is_match = #{isMatch}
+            </if>
+            <if test="isTrans != null and isTrans != ''">
+                and is_trans = #{isTrans}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="typeCode !=null and typeCode !=''">
+                and type_code =#{typeCode}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (hosp_illness_code like '%${keyword}%'
+                or hosp_illness_name like '%${keyword}%'
+                or insure_illness_code like '%${keyword}%'
+                or insure_illness_name like '%${keyword}%')
+            </if>
+        </where>
+        order by audit_code desc
+    </select>
+
+    <select id="queryAll" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO"
+            resultMap="InsureDiseaseMatchMap">
+        SELECT
+        id,
+        hosp_code,
+        insure_reg_code,
+        hosp_illness_id,
+        hosp_illness_code,
+        hosp_illness_name,
+        insure_illness_id,
+        insure_illness_code,
+        insure_illness_name,
+        is_match,
+        is_trans,
+        audit_code,
+        remark,
+        crte_id,
+        crte_name,
+        crte_time
+        FROM
+        insure_disease_match
+        where
+        hosp_code = #{hospCode}
+        <if test="insureRegCode !=null and insureRegCode !='' ">
+            AND insure_reg_code = #{insureRegCode,jdbcType =VARCHAR}
+        </if>
+        <if test="hospIllnessId !=null and hospIllnessId !='' ">
+            AND hosp_illness_id = #{hospIllnessId,jdbcType =VARCHAR}
+        </if>
+        <if test="hospIllnessCode !=null and hospIllnessCode !='' ">
+            AND hosp_illness_code = #{hospIllnessCode,jdbcType =VARCHAR}
+        </if>
+        <if test="isMatch != null and isMatch !='' ">
+            AND is_match = #{isMatch,jdbcType =VARCHAR}
+        </if>
+        <if test="auditCode != null and auditCode !='' ">
+            AND audit_code = #{auditCode,jdbcType =VARCHAR}
+        </if>
+        <if test="insureIllnessCode != null and insureIllnessCode !='' ">
+            AND insure_illness_code = #{insureIllnessCode,jdbcType =VARCHAR}
+        </if>
+    </select>
+    <select id="queryDiseaseIsMatch" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        SELECT id,
+               hosp_code,
+               insure_reg_code,
+               hosp_illness_id,
+               hosp_illness_code,
+               hosp_illness_name,
+               insure_illness_id,
+               insure_illness_code,
+               insure_illness_name,
+               is_match,
+               is_trans,
+               audit_code
+        FROM insure_disease_match
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+          and hosp_illness_id = #{hospIllnessId}
+          and insure_illness_code = #{insureIllnessCode}
+    </select>
+
+    <!--同步新增医院匹配项目数据-->
+    <insert id="insertHospDisease" keyProperty="id" useGeneratedKeys="true">
+        insert into insure_disease_match(
+        id, hosp_code, insure_reg_code, hosp_illness_id,
+        hosp_illness_code, hosp_illness_name, is_match,
+        is_trans, audit_code, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.insureId},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.id},
+            #{item.code},
+            #{item.name},
+            '0',
+            '0',
+            '0',
+            #{item.crteId},
+            #{item.crteName},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <!--同步修改医院匹配药品数据-->
+    <update id="updateHospDisease">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_disease_match
+            <set>
+                <if test="item.code != null and item.code != ''">
+                    hosp_illness_code = #{item.code},
+                </if>
+                <if test="item.name != null and item.name != ''">
+                    hosp_illness_name = #{item.name},
+                </if>
+            </set>
+            where hosp_illness_id = #{item.id} and hosp_code= #{item.hospCode}
+        </foreach>
+    </update>
+
+    <delete id="deleteHospDisease">
+        delete
+        from insure_disease_match
+        where hosp_code = #{hospCode}
+          and insure_reg_code = #{insureRegCode}
+    </delete>
+    <delete id="deleteInsureDisease">
+        delete
+        from insure_disease_match
+        where hosp_code = #{hospCode}
+          and id = #{id} and insure_reg_code =#{insureRegCode}
+    </delete>
+
+    <update id="updateInsureDiseaseMatchS">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update insure_disease_match
+            <set>
+                <if test="item.insureRegCode != null and item.insureRegCode != ''">
+                    insure_reg_code = #{item.insureRegCode},
+                </if>
+                <if test="item.hospIllnessId != null and item.hospIllnessId != ''">
+                    hosp_illness_id = #{item.hospIllnessId},
+                </if>
+                <if test="item.hospIllnessCode != null and item.hospIllnessCode != ''">
+                    hosp_illness_code = #{item.hospIllnessCode},
+                </if>
+                <if test="item.hospIllnessName != null and item.hospIllnessName != ''">
+                    hosp_illness_name = #{item.hospIllnessName},
+                </if>
+                <if test="item.insureIllnessId != null and item.insureIllnessId != ''">
+                    insure_illness_id = #{item.insureIllnessId},
+                </if>
+                <if test="item.insureIllnessCode != null and item.insureIllnessCode != ''">
+                    insure_illness_code = #{item.insureIllnessCode},
+                </if>
+                <if test="item.insureIllnessName != null and item.insureIllnessName != ''">
+                    insure_illness_name = #{item.insureIllnessName},
+                </if>
+                <if test="item.isMatch != null and item.isMatch != ''">
+                    is_match = #{item.isMatch},
+                </if>
+                <if test="item.isTrans != null and item.isTrans != ''">
+                    is_trans = #{item.isTrans},
+                </if>
+                <if test="item.auditCode != null and item.auditCode != ''">
+                    audit_code = #{item.auditCode},
+                </if>
+                <if test="item.remark != null and item.remark != ''">
+                    remark = #{item.remark},
+                </if>
+            </set>
+            where id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+    <insert id="insertDiseaseMatchDAO" parameterType="map">
+        insert into insure_disease_match(id, hosp_code, insure_reg_code, hosp_illness_id,
+                                         hosp_illness_code, hosp_illness_name, insure_illness_id,
+                                         insure_illness_code, insure_illness_name,
+                                         is_match, is_trans, audit_code, remark, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{insureRegCode}, #{hospIllnessId},
+                #{hospIllnessCode}, #{hospIllnessName}, #{insureIllnessId},
+                #{insureIllnessCode}, #{insureIllnessName}, #{isMatch}, #{isTrans},
+                #{auditCode}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+    <insert id="insertMatchDisease" parameterType="java.util.List">
+        insert into insure_disease_match(id,hosp_code, insure_reg_code, hosp_illness_id,
+        hosp_illness_code, hosp_illness_name, insure_illness_id,
+        insure_illness_code, insure_illness_name,
+        is_match, is_trans, audit_code, remark, crte_id, crte_name, crte_time,type_code)
+        values
+        <foreach collection="insureDiseaseMatchDTOList" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.insureRegCode}, #{item.hospIllnessId},
+            #{item.hospIllnessCode}, #{item.hospIllnessName}, #{item.insureIllnessId},
+            #{item.insureIllnessCode}, #{item.insureIllnessName}, #{item.isMatch}, #{item.isTrans},
+            #{item.auditCode}, #{item.remark}, #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.downLoadType})
+        </foreach>
+    </insert>
+    <insert id="insertDiseaseMatch">
+        insert into insure_disease_match(id, hosp_code, insure_reg_code, hosp_illness_id,
+                                         hosp_illness_code, hosp_illness_name, insure_illness_id,
+                                         insure_illness_code, insure_illness_name,
+                                         is_match, is_trans, audit_code, remark, crte_id, crte_name, crte_time,type_code)
+        values (#{id}, #{hospCode}, #{insureRegCode}, #{hospIllnessId},
+                #{hospIllnessCode}, #{hospIllnessName}, #{insureIllnessId},
+                #{insureIllnessCode}, #{insureIllnessName}, #{isMatch}, #{isTrans},
+                #{auditCode}, #{remark}, #{crteId}, #{crteName}, #{crteTime},#{typeCode})
+    </insert>
+    <update id="deleteInsureMatch" parameterType="map">
+        delete
+        from insure_disease_match
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+
+    <select id="getInsureDiseaseById" parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select
+        from insure_disease
+        where hosp_code = #{hospCode}
+          and id = #{id}
+          and insure_reg_code = #{insureRegCode}
+    </select>
+
+    <update id="updateDisease">
+        update insure_disease_match
+        <set>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                insure_reg_code = #{insureRegCode},
+            </if>
+            <if test="hospIllnessId != null and hospIllnessId != ''">
+                hosp_illness_id = #{hospIllnessId},
+            </if>
+            <if test="hospIllnessCode != null and hospIllnessCode != ''">
+                hosp_illness_code = #{hospIllnessCode},
+            </if>
+            <if test="hospIllnessName != null and hospIllnessName != ''">
+                hosp_illness_name = #{hospIllnessName},
+            </if>
+            <if test="insureIllnessId != null and insureIllnessId != ''">
+                insure_illness_id = #{insureIllnessId},
+            </if>
+            <if test="insureIllnessCode != null and insureIllnessCode != ''">
+                insure_illness_code = #{insureIllnessCode},
+            </if>
+            <if test="insureIllnessName != null and insureIllnessName != ''">
+                insure_illness_name = #{insureIllnessName},
+            </if>
+            <if test="isMatch != null and isMatch != ''">
+                is_match = #{isMatch},
+            </if>
+            <if test="isTrans != null and isTrans != ''">
+                is_trans = #{isTrans},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code=#{hospCode}
+    </update>
+
+    <select id="queryInptDiseaseInfoByVisitId" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            a.id AS id,
+            a.disease_id AS diseaseId,
+            a.is_main AS isMain,
+            b.insure_reg_code AS insureRegCode,
+            b.hosp_illness_code AS hospIllnessCode,
+            b.hosp_illness_name AS hospIllnessName,
+            b.insure_illness_code AS insureIllnessCode,
+            b.insure_illness_name AS insureIllnessName,
+            b.is_match AS isMatch,
+            b.audit_code AS auditCode
+        FROM
+            inpt_diagnose a
+                LEFT JOIN insure_disease_match b ON a.disease_id = b.hosp_illness_id
+                AND a.hosp_code = b.hosp_code
+            where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and b.insure_reg_code = #{insureRegCode}
+    </select>
+    <select id="selectById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        select * from insure_disease_match where hosp_code =#{hospCode} and insure_reg_code =#{insureRegCode} and hosp_illness_id =#{hospIllnessId}
+    </select>
+    <select id="queryPageInsureDisease" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code,
+               insure_illness_name, icd10, pym, wbm, take_date, lose_date,
+               remark, crte_id, crte_name, crte_time, ver, ver_name, down_load_type
+        from insure_disease
+        where  hosp_code =#{hospCode}
+        <if test="typeList != null and typeList.size() > 0">
+            and down_load_type in
+            <foreach collection="typeList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            or insure_illness_name like concat('%',#{keyword},'%')
+            or insure_illness_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+</mapper>

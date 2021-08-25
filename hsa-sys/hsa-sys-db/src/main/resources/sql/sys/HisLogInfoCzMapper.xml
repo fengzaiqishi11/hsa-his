@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.log.dao.HisLogInfoCzDao">
+
+    <insert id="saveLogCz" parameterType="cn.hsa.module.sys.log.dto.HisLogInfoCzDTO" >
+        insert into sys_log_info_cz(id ,czlx,czms,czff,qqcs,fhcs,qqlj,czrid,czr,czip,xzsj,hosp_code,trace_id)
+        values(#{id} ,#{czlx},#{czms},#{czff},#{qqcs}, #{fhcs},#{qqlj},#{czrid},#{czr},#{czip},#{xzsj},#{hospCode},#{traceId})
+    </insert>
+</mapper>

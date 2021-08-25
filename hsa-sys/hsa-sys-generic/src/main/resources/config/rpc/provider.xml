@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 生产者：暴露接口 -->
+
+    <!-- 基础信息子系统 -> 值域代码生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.code.service.SysCodeService" ref="sysCodeService_provider"/>
+
+    <!-- 基础信息子系统 -> 参数管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.parameter.service.SysParameterService" ref="sysParameterService_provider"/>
+
+    <!-- 系统管理子系统 -> 系统菜单生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.menu.service.SysMenuService" ref="sysMenuService_provider"/>
+
+    <!-- 系统管理子系统 -> 系统用户管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.user.service.SysUserService" ref="sysUserService_provider"/>
+
+    <!-- 系统管理子系统 -> 子系统生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.system.service.SysSystemService" ref="sysSystemService_provider"/>
+
+    <!-- 系统管理子系统 -> 角色生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.role.service.SysRoleService" ref="sysRoleService_provider"/>
+
+    <!-- 系统管理子系统 -> 日志生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.log.service.SysLogService" ref="sysLogService_provider"/>
+
+    <!-- 系统管理子系统 -> 正常日志生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.log.service.HisLogInfoCzService" ref="hisLogInfoCzService_provider"/>
+
+    <!-- 系统管理子系统 -> 异常日志生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.log.service.HisLogInfoYcService" ref="hisLogInfoYcService_provider"/>
+
+
+    <!-- 生产者：暴露接口 -->
+    <!-- 基础信息子系统 -> 财务分类消费者 -->
+    <dubbo:service interface="cn.hsa.module.base.bfc.service.BaseFinanceClassifyService" ref="baseFinanceClassifyService_provider"/>
+    <!-- 基础信息子系统 -> 科室信息维护生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.dept.service.BaseDeptService" ref="baseDeptService_provider"/>
+    <!-- 基础信息子系统 -> 供应商信息维护生产者-->
+    <dubbo:service interface="cn.hsa.module.base.bspl.service.BaseSupplierService" ref="baseSupplierService_provider"/>
+
+    <!-- 基础信息子系统 -> 材料信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bmm.service.BaseMaterialService" ref="baseMaterialService_provider"/>
+
+    <!-- 基础信息子系统 -> 床位信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bb.service.BaseBedService" ref="baseBedService_provider"/>
+    <!-- 首日计费子系统 -> 床位信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bdc.service.BaseDailyfirstCalcService" ref="baseDailyfirstCalcService_provider"/>
+    <!-- 基础信息子系统 -> 辅助计费信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bac.service.BaseAssistCalcService" ref="baseAssistCalcService_provider"/>
+
+    <!-- 基础信息子系统 -> 疾病信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bd.service.BaseDiseaseService" ref="baseDiseaseService_provider"/>
+
+    <!-- 基础信息子系统 -> 优惠配置信息维护生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bpft.service.BasePreferentialService" ref="basePreferentialService_provider"/>
+
+    <!-- 基础信息子系统 -> 单据生成规则生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" ref="baseOrderRuleService_provider"/>
+
+    <!-- 基础信息子系统 -> 项目信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bi.service.BaseItemService" ref="baseItemService_provider"/>
+    <!-- 基础信息子系统 -> 医嘱频率管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.rate.service.BaseRateService" ref="baseRateService_provider"/>
+    <!-- 基础信息子系统 -> 特殊药品计费生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bspc.service.BaseSpecialCalcService" ref="baseSpecialCalcService_provider"/>
+    <!-- 基础信息子系统 -> 医嘱信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.ba.service.BaseAdviceService" ref="baseAdviceService_provider"/>
+    <!-- 基础信息子系统 -> 药品信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.drug.service.BaseDrugService" ref="baseDrugService_provider"/>
+    <!-- 基础信息子系统 -> 生产企业信息管理生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bp.service.BaseProductService" ref="baseProductService_provider"/>
+    <!-- 基础信息子系统 -> 发药窗口生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.bw.service.BaseWindowService" ref="baseWindowService_provider"/>
+    <!-- 基础信息子系统 -> 病案费用归类 -->
+    <dubbo:service interface="cn.hsa.module.base.bmc.service.BaseMrisClassifyService" ref="baseMrisClassifyService_provider"/>
+    <!-- 基础信息子系统 -> 领药单据类型 -->
+    <dubbo:service interface="cn.hsa.module.base.baseorderreceive.service.BaseOrderReceiveService" ref="baseOrderReceiveService_provider"/>
+    <!-- 基础信息子系统 -> 护理单据类型 -->
+    <dubbo:service interface="cn.hsa.module.base.nurse.service.BaseNurseOrderService" ref="baseNurseOrderService_provider"/>
+    <!-- 基础信息子系统 -> 护理单据表头格式 -->
+    <dubbo:service interface="cn.hsa.module.base.nurse.service.BaseNurseTbHeadService" ref="baseNurseTbHeadService_provider"/>
+    <!-- 基础信息子系统 -> 本地档案服务 -->
+    <dubbo:service interface="cn.hsa.module.base.profileFile.service.BaseProfileFileService" ref="baseProfileFileService_provider"/>
+    <!-- 基础信息子系统 -> 一卡通管理 -->
+    <dubbo:service interface="cn.hsa.module.base.card.service.BaseCardService" ref="baseCardService_provider"/>
+
+
+    <!-- 基础信息子系统 -> 修改痕跡生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.modify.service.BaseModifyTraceService" ref="baseModifyTraceService_provider"/>
+
+    <!-- 基础信息子系统 -> 门诊执行科室配置信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.baseoutptexec.service.BaseOutptExecService" ref="baseOutptExecService_provider"/>
+
+    <!-- 首页数据查询 -->
+    <dubbo:service interface="cn.hsa.module.base.home.service.BaseHomeService" ref="baseHomeService_provider"/>
+
+    <!--诊断模板-->
+    <dubbo:service interface="cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService" ref="baseDiagnosisTemplateService_provider"/>
+  <!--诊室信息-->
+    <dubbo:service interface="cn.hsa.module.base.clinic.service.BaseClinicService" ref="baseClinicService_provider"/>
+
+</beans>

@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.ba.dao.BaseAdviceDetailDAO">
+
+    <resultMap type="cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO" id="BaseAdviceDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="adviceCode" column="advice_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+        <result property="isAloneCost" column="is_alone_cost" jdbcType="VARCHAR"/>
+        <result property="isFristCost" column="is_frist_cost" jdbcType="VARCHAR"/>
+        <result property="isAppointRate" column="is_appoint_rate" jdbcType="VARCHAR"/>
+        <result property="rateCode" column="rate_code" jdbcType="VARCHAR"/>
+        <result property="insureListCode" column="insure_list_code" jdbcType="VARCHAR"/>
+        <result property="itemTypeCode" column="itemTypeCode" jdbcType="VARCHAR"/>
+        <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
+        <result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="inDeptName" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="itemCode" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
+        <result property="bfcName" column="bfcName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
+    <select id="queryItemAndMaterialPage" resultMap="BaseAdviceDetailMap">
+        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.code as itemCode,a.use_code,
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName
+        FROM
+        (   select id,`name`,type_code as itemTypeCode,price,unit_code,spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
+        '3' as type_code,
+        (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
+        (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName
+        from base_item m
+        where is_valid = '1' and hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%'))
+        </if>
+        UNION ALL
+        select id,`name`,type_code as itemTypeCode,split_price as price,split_unit_code as unit_code,spec,'','',hosp_code,code,use_code,
+        '2' as type_code,
+        (select d.id from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcId,
+        (select d.name from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcName
+        from base_material l
+        where is_valid = '1' and hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and  (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+        </if>
+        )  a
+        left join base_dept b on a.in_dept_code = b.`code` and a.hosp_code = b.hosp_code
+        left join base_dept c on a.out_dept_code = c.`code` and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 查询出医院的项目和有库存的材料信息（typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码） -->
+    <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
+        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode,a.code as itemCode,a.use_code,
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName
+        FROM
+        ( select id,`name`,type_code as itemTypeCode,price,unit_code,unit_code as splitUnitCode, spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
+        '3' as type_code,
+        (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
+        (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName
+        from base_item m
+        where is_valid = '1' and hosp_code = #{hospCode} and is_supp_curtain = '1' and is_in = '1'
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%'))
+        </if>
+        UNION ALL
+        select l.id,l.`name`,l.type_code as itemTypeCode,l.price,l.unit_code,l.split_unit_code as splitUnitCode,l.spec,'','',l.hosp_code,l.code,l.use_code,
+        '2' as type_code,
+        (select d.id from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcId,
+        (select d.name from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcName
+        from base_material l,
+        stro_stock k
+        WHERE
+        l.hosp_code = k.hosp_code
+        AND l.id = k.item_id
+        -- AND k.num > 0
+        AND l.is_valid = '1'
+        AND l.hosp_code = #{hospCode}
+        and l.is_supp_curtain = '1'
+        <if test="keyword != null and keyword != ''">
+            and  (l.name like concat('%',#{keyword},'%') or l.pym like concat('%',#{keyword},'%') or l.wbm like concat('%',#{keyword},'%'))
+        </if>
+        )  a
+        left join base_dept b on a.in_dept_code = b.`code` and a.hosp_code = b.hosp_code
+        left join base_dept c on a.out_dept_code = c.`code` and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode}
+    </select>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseAdviceDetailMap">
+         select
+          id, hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from base_advice_detail
+        where id = #{id} and hosp_code=#{hospCode}
+    </select>
+
+    <!--查询所有数据-->
+    <select id="queryAll" resultMap="BaseAdviceDetailMap">
+        select
+        id, hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from base_advice_detail
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="adviceCode != null and adviceCode != ''">
+            and advice_code = #{adviceCode}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and type_code = #{typeCode}
+        </if>
+        <if test="itemCode != null and itemCode != ''">
+            and item_code = #{itemCode}
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and item_name = #{itemName}
+        </if>
+        <if test="num != null">
+            and num = #{num}
+        </if>
+        <if test="unitCode != null and unitCode != ''">
+            and unit_code = #{unitCode}
+        </if>
+        <if test="price != null">
+            and price = #{price}
+        </if>
+        <if test="spec != null and spec != ''">
+            and spec = #{spec}
+        </if>
+        <if test="useCode != null and useCode != ''">
+            and use_code = #{useCode}
+        </if>
+        <if test="totalPrice != null">
+            and total_price = #{totalPrice}
+        </if>
+        <if test="isAloneCost != null and isAloneCost != ''">
+            and is_alone_cost = #{isAloneCost}
+        </if>
+        <if test="isFristCost != null and isFristCost != ''">
+            and is_frist_cost = #{isFristCost}
+        </if>
+        <if test="isAppointRate != null and isAppointRate != ''">
+            and is_appoint_rate = #{isAppointRate}
+        </if>
+        <if test="rateCode != null and rateCode != ''">
+            and rate_code = #{rateCode}
+        </if>
+        <if test="insureListCode != null and insureListCode != ''">
+            and insure_list_code = #{insureListCode}
+        </if>
+        <if test="ids !=null">
+            and id in
+            <foreach collection="ids" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!--通过医嘱编码查询项目信息数据-->
+    <select id="queryItemByAdviceCode" resultMap="BaseAdviceDetailMap">
+         select
+          b.id, b.hosp_code, b.advice_code, b.type_code, b.item_code, b.item_name, b.num, b.unit_code, b.price, b.spec, b.use_code,
+           b.total_price, b.is_alone_cost, b.is_frist_cost, b.is_appoint_rate, b.rate_code, b.insure_list_code,a.itemName,a.itemTypeCode,a.typeCode,
+          a.out_dept_code,a.in_dept_code,a.inDeptName,a.outDeptName,a.id as itemId,(select name from base_rate where base_rate.hosp_code = #{hospCode} and b.rate_code = base_rate.code)as rateName
+					from base_advice_detail b
+					left join
+					(select id,`name` as itemName,code,itemTypeCode,out_dept_code,in_dept_code,hosp_code,inDeptName,outDeptName,typeCode
+					from
+                        (select id,`name`,code,type_code as itemTypeCode,out_dept_code,in_dept_code,
+                            hosp_code,(select name from base_dept where code = out_dept_code)as outDeptName,
+                            (select name from base_dept where code = in_dept_code)as inDeptName,'3' as typeCode
+					    from base_item where  is_valid = '1' and hosp_code = #{hospCode}
+					    union all
+					    select id,`name`,code,type_code as itemTypeCode,'','',hosp_code,'','','2' as typeCode
+					    from base_material where is_valid = '1' and hosp_code = #{hospCode}
+					    )mAndi
+					) a
+					on b.item_code = a.code and b.hosp_code = a.hosp_code and a.typeCode =b.type_code
+					where b.hosp_code = #{hospCode} and b.advice_code = #{code}
+    </select>
+
+    <!--通过医嘱编码查询医嘱详细数据-->
+    <select id="queryDetailByAdviceCode" resultMap="BaseAdviceDetailMap">
+        SELECT a.* FROM base_advice_detail a,base_advice b WHERE a.hosp_code =  #{hospCode} and b.hosp_code =  #{hospCode} AND b.id = #{id} and a.advice_code = b.code
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseAdviceDetailMap">
+        select
+        id, hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price,
+        is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from base_advice_detail
+        <where>
+            and hosp_code = #{hospCode}
+
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="adviceCode != null and adviceCode != ''">
+                and advice_code = #{adviceCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and item_code = #{itemCode}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and item_name = #{itemName}
+            </if>
+            <if test="num != null">
+                and num = #{num}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and use_code = #{useCode}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="isAloneCost != null and isAloneCost != ''">
+                and is_alone_cost = #{isAloneCost}
+            </if>
+            <if test="isFristCost != null and isFristCost != ''">
+                and is_frist_cost = #{isFristCost}
+            </if>
+            <if test="isAppointRate != null and isAppointRate != ''">
+                and is_appoint_rate = #{isAppointRate}
+            </if>
+            <if test="rateCode != null and rateCode != ''">
+                and rate_code = #{rateCode}
+            </if>
+            <if test="insureListCode != null and insureListCode != ''">
+                and insure_list_code = #{insureListCode}
+            </if>
+            <if test="ids !=null">
+                and id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryBaseAdviceByItemCode" resultMap="BaseAdviceDetailMap">
+        select
+            id, hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price,
+            is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from base_advice_detail
+        where hosp_code = #{hospCode}
+        and item_code = #{itemCode}
+    </select>
+
+    <!--查询和项目和材料和药品三合一-->
+    <select id="queryItemAndMaterialAndDrugPage" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO">
+        SELECT
+	a.id AS itemId,
+	a.`name` AS itemName,
+	a.itemTypeCode,
+	a.type_code,
+	a.price,
+	a.unit_code,
+	a.CODE AS itemCode,
+	a.use_code,
+	a.spec,
+	a.out_dept_code,
+	a.in_dept_code,
+	a.hosp_code,
+	b.NAME AS inDeptName,
+	c.NAME AS outDeptName,
+	bfcId,
+	bfcName,
+	bigTypeCode,
+    dosage, dosageUnitCode, prepCode, pharId, inUnitCode, type
+FROM
+	(
+	SELECT
+		id,
+		`name`,
+		type_code AS itemTypeCode,
+		price,
+		unit_code,
+		spec,
+		out_dept_code,
+		in_dept_code,
+		hosp_code,
+		CODE,
+		'' AS use_code,
+		'3' AS type_code,
+		( SELECT d.id FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+		( SELECT d.NAME FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+        null as bigTypeCode,
+        null as dosage, null dosageUnitCode, null prepCode, null pharId, unit_code inUnitCode, '9' type
+	FROM
+		base_item m
+	WHERE
+		is_valid = '1'
+		AND hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%')
+                or abbr_pym like concat('%',#{keyword},'%') or abbr_wbm like concat('%',#{keyword},'%'))
+        </if>
+		UNION ALL
+
+	SELECT
+        l.id,
+        l.`name`,
+        l.type_code AS itemTypeCode,
+        l.split_price price,
+        l.split_unit_code unit_code,
+        l.spec,
+		'',
+		'',
+        l.hosp_code,
+        l.CODE,
+        l.use_code,
+		'2' AS type_code,
+		( SELECT d.id FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+		( SELECT d.NAME FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+        null as bigTypeCode,
+        null as dosage, null dosageUnitCode, null prepCode, b.clf pharId, l.split_unit_code inUnitCode, '2' type
+	FROM
+		base_material l
+        left join(
+            select max(if(b.type_code = '1',c.id,'')) xyf, max(if(b.type_code = '2',c.id,'')) zcf,max(if(b.type_code = '3',c.id,'')) cyf,
+            max(if(b.type_code = '4',c.id,'')) clf, max(b.drugstore_code) drugstore_code
+            from base_dept a
+            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+        )b on 1 = 1
+	WHERE
+        l.is_valid = '1'
+		AND l.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and  (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+        </if>
+		UNION ALL
+
+        SELECT
+        a.id,
+        a.good_name AS `name`,
+        a.type_code AS itemTypeCode,
+        CASE WHEN a.in_unit_code = a.unit_code THEN a.price
+        WHEN a.in_unit_code = a.split_unit_code THEN
+        a.split_price
+        END price,
+        a.split_unit_code unit_code,
+        a.spec,
+        '',
+        '',
+        a.hosp_code,
+        a.`CODE`,
+        a.durg_code,
+        '1' AS type_code,
+        ( SELECT d.id FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+        ( SELECT d.NAME FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+        a.big_type_code AS bigTypeCode,
+        a.dosage,
+        a.dosage_unit_code dosageUnitCode,
+        a.prep_code prepCode,
+        CASE
+        WHEN a.big_type_code = '2' THEN b.cyf
+        WHEN a.big_type_code = '1' THEN b.zcf
+        WHEN a.big_type_code = '0' THEN b.xyf
+        END pharId,
+        a.in_unit_code inUnitCode,
+        CASE WHEN a.big_type_code = '2' THEN
+        '3' ELSE '1'
+        END type
+        FROM
+        base_drug a
+        LEFT JOIN (
+        SELECT
+        max(
+        IF
+        ( b.type_code = '1', c.id, '0' )) xyf,
+        max(
+        IF
+        ( b.type_code = '2', c.id, '0' )) zcf,
+        max(
+        IF
+        ( b.type_code = '3', c.id, '0' )) cyf,
+        max(
+        IF
+        ( b.type_code = '4', c.id, '0' )) clf,
+        max( b.drugstore_code ) drugstore_code
+        FROM
+        base_dept a
+        JOIN base_dept_drugstore b ON a.CODE = b.dept_code
+        AND a.hosp_code = b.hosp_code
+        JOIN base_dept c ON b.drugstore_code = c.CODE
+        AND c.hosp_code = b.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND a.id = #{loginDeptId}
+        AND a.is_valid = '1'
+        ) b ON 1 = 1
+        JOIN stro_stock stock ON (
+        CASE
+
+        WHEN a.big_type_code = '2' THEN
+        b.cyf
+        WHEN a.big_type_code = '1' THEN
+        b.zcf
+        WHEN a.big_type_code = '0' THEN
+        b.xyf
+        END
+        ) = stock.biz_id
+        AND a.id = stock.item_id
+        AND a.hosp_code = stock.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND a.is_valid = '1'
+        AND ( stock.num - ifnull( stock.stock_occupy, 0 )/ stock.split_ratio ) > 0
+        <if test="keyword != null and keyword != ''">
+            and (usual_name like concat('%',#{keyword},'%') or usual_pym like concat('%',#{keyword},'%') or usual_wbm like concat('%',#{keyword},'%')
+                or good_name like concat('%',#{keyword},'%') or good_pym like concat('%',#{keyword},'%') or good_wbm like concat('%',#{keyword},'%'))
+        </if>
+	) a
+	LEFT JOIN base_dept b ON a.in_dept_code = b.`code`
+	AND a.hosp_code = b.hosp_code
+	LEFT JOIN base_dept c ON a.out_dept_code = c.`code`
+	AND a.hosp_code = c.hosp_code
+WHERE
+	a.hosp_code = #{hospCode}
+
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_advice_detail(id,hosp_code, advice_code, type_code, item_code, item_name, num, unit_code, price,
+        spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.adviceCode}, #{item.typeCode}, #{item.itemCode}, #{item.itemName}, #{item.num}, #{item.unitCode}, #{item.price}, #{item.spec}, #{item.useCode},
+            #{item.totalPrice}, #{item.isAloneCost}, #{item.isFristCost}, #{item.isAppointRate}, #{item.rateCode}, #{item.insureListCode})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="java.util.List">
+        <foreach collection="list"  item="item" separator=";">
+            update base_advice_detail
+            <set>
+                hosp_code = #{item.hospCode},
+                advice_code = #{item.adviceCode},
+                type_code = #{item.typeCode},
+                item_code = #{item.itemCode},
+                item_name = #{item.itemName},
+                num = #{item.num},
+                unit_code = #{item.unitCode},
+                price = #{item.price},
+                spec = #{item.spec},
+                use_code = #{item.useCode},
+                total_price = #{item.totalPrice},
+                is_alone_cost = #{item.isAloneCost},
+                is_frist_cost = #{item.isFristCost},
+                is_appoint_rate = #{item.isAppointRate},
+                rate_code = #{item.rateCode},
+                insure_list_code = #{item.insureListCode},
+            </set>
+            where id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        delete from base_advice_detail
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </delete>
+
+
+</mapper>

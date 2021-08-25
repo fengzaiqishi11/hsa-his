@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.profileFile.dao.BaseProfileFileDAO">
+
+    <resultMap type="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO" id="baseProfileFileMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+        <result property="outProfile" column="out_profile" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationalityCation" column="nationality_cation" jdbcType="VARCHAR"/>
+        <result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+        <result property="educationCode" column="education_code" jdbcType="VARCHAR"/>
+        <result property="occupationCode" column="occupation_code" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="oftenCode" column="often_code" jdbcType="VARCHAR"/>
+        <result property="nowProv" column="now_prov" jdbcType="VARCHAR"/>
+        <result property="nowCity" column="now_city" jdbcType="VARCHAR"/>
+        <result property="nowArea" column="now_area" jdbcType="VARCHAR"/>
+        <result property="nowAddress" column="now_address" jdbcType="VARCHAR"/>
+        <result property="nowPostCode" column="now_post_code" jdbcType="VARCHAR"/>
+        <result property="nativeProv" column="native_prov" jdbcType="VARCHAR"/>
+        <result property="nativeCity" column="native_city" jdbcType="VARCHAR"/>
+        <result property="nativeArea" column="native_area" jdbcType="VARCHAR"/>
+        <result property="nativeAddress" column="native_address" jdbcType="VARCHAR"/>
+        <result property="nativePostCode" column="native_post_code" jdbcType="VARCHAR"/>
+        <result property="contactName" column="contact_name" jdbcType="VARCHAR"/>
+        <result property="contactRelaCode" column="contact_rela_code" jdbcType="VARCHAR"/>
+        <result property="contactPhone" column="contact_phone" jdbcType="VARCHAR"/>
+        <result property="contactPostCode" column="contact_post_code" jdbcType="VARCHAR"/>
+        <result property="contactAddress" column="contact_address" jdbcType="VARCHAR"/>
+        <result property="takeName" column="take_name" jdbcType="VARCHAR"/>
+        <result property="takeRelaCode" column="take_rela_code" jdbcType="VARCHAR"/>
+        <result property="takeCertNo" column="take_cert_no" jdbcType="VARCHAR"/>
+        <result property="takePhone" column="take_phone" jdbcType="VARCHAR"/>
+        <result property="work" column="work" jdbcType="VARCHAR"/>
+        <result property="workPhone" column="work_phone" jdbcType="VARCHAR"/>
+        <result property="workPostCode" column="work_post_code" jdbcType="VARCHAR"/>
+        <result property="workAddress" column="work_address" jdbcType="VARCHAR"/>
+        <result property="bloodCode" column="blood_code" jdbcType="VARCHAR"/>
+        <result property="familyDisease" column="family_disease" jdbcType="VARCHAR"/>
+        <result property="exposeDisease" column="expose_disease" jdbcType="VARCHAR"/>
+        <result property="heredityDisease" column="heredity_disease" jdbcType="VARCHAR"/>
+        <result property="allergyDisease" column="allergy_disease" jdbcType="VARCHAR"/>
+        <result property="pastDisease" column="past_disease" jdbcType="VARCHAR"/>
+        <result property="pastOper" column="past_oper" jdbcType="VARCHAR"/>
+        <result property="pastTrauma" column="past_trauma" jdbcType="VARCHAR"/>
+        <result property="pastBlood" column="past_blood" jdbcType="VARCHAR"/>
+        <result property="pastRemark" column="past_remark" jdbcType="VARCHAR"/>
+        <result property="allergyRemark" column="allergy_remark" jdbcType="VARCHAR"/>
+        <result property="sourceTjCode" column="source_tj_code" jdbcType="VARCHAR"/>
+        <result property="sourceTjRemark" column="source_tj_remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="totalOut" column="total_out" jdbcType="INTEGER"/>
+        <result property="totalIn" column="total_in" jdbcType="INTEGER"/>
+        <result property="outptLastVisitTime" column="outpt_last_visit_time" jdbcType="TIMESTAMP"/>
+        <result property="inptLastVisitTime" column="inpt_last_visit_time" jdbcType="TIMESTAMP"/>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--    判断身份证是否已经存在-->
+    <select id="isCertNoExist" resultMap="baseProfileFileMap">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from base_profile_file
+        where cert_no = #{certNo}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
+        order by crte_time desc limit 1
+    </select>
+
+    <select id="isCertNoExistS" resultMap="baseProfileFileMap">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from base_profile_file
+        where cert_no = #{certNo}
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
+        order by crte_time desc limit 1
+    </select>
+
+    <insert id="insert" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+        insert into base_profile_file(id, hosp_code, in_profile, out_profile, name, gender_code, age,
+               age_unit_code,birthday, nation_code, nationality_cation, native_place,
+               education_code, occupation_code, marry_code, cert_code, cert_no,
+               phone, email, often_code, now_prov, now_city, now_area, now_address,
+               now_post_code, native_prov, native_city, native_area, native_address,
+               native_post_code, contact_name, contact_rela_code, contact_phone,
+               contact_post_code, contact_address, take_name, take_rela_code,
+               take_cert_no, take_phone, work, work_phone, work_post_code,
+               work_address, blood_code, family_disease, expose_disease,
+               heredity_disease, allergy_disease, past_disease, past_oper,
+               past_trauma, past_blood, past_remark, allergy_remark,
+               source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+               outpt_last_visit_time, inpt_last_visit_time, patient_code, preferential_type_id, remark, is_valid,
+               crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{inProfile}, #{outProfile}, #{name}, #{genderCode}, #{age},#{ageUnitCode} ,#{birthday}, #{nationCode},
+                #{nationalityCation}, #{nativePlace}, #{educationCode}, #{occupationCode}, #{marryCode}, #{certCode},
+                #{certNo}, #{phone}, #{email}, #{oftenCode}, #{nowProv}, #{nowCity}, #{nowArea}, #{nowAddress}, #{nowPostCode},
+                #{nativeProv}, #{nativeCity}, #{nativeArea}, #{nativeAddress}, #{nativePostCode}, #{contactName}, #{contactRelaCode},
+                #{contactPhone}, #{contactPostCode}, #{contactAddress}, #{takeName}, #{takeRelaCode}, #{takeCertNo},
+                #{takePhone}, #{work}, #{workPhone}, #{workPostCode}, #{workAddress}, #{bloodCode}, #{familyDisease},
+                #{exposeDisease}, #{heredityDisease}, #{allergyDisease}, #{pastDisease}, #{pastOper}, #{pastTrauma},
+                #{pastBlood}, #{pastRemark}, #{allergyRemark}, #{sourceTjCode}, #{sourceTjRemark}, #{pym}, #{wbm},
+                #{totalOut}, #{totalIn}, #{outptLastVisitTime}, #{inptLastVisitTime}, #{patientCode}, #{preferentialTypeId}, #{remark}, #{isValid}, #{crteId},
+                #{crteName}, #{crteTime})
+    </insert>
+
+    <select id="queryById" resultMap="baseProfileFileMap" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from  base_profile_file
+        <!--where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}-->
+        where hosp_code = #{hospCode} and is_valid = '1' and id = #{id}
+    </select>
+
+    <update id="update" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+        update base_profile_file
+        <set>
+            <if test="inProfile != null and inProfile != ''">
+                in_profile = #{inProfile},
+            </if>
+            <if test="outProfile != null and outProfile != ''">
+                out_profile = #{outProfile},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="ageUnitCode != null">
+                age_unit_code = #{ageUnitCode},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                nation_code = #{nationCode},
+            </if>
+            <if test="nationalityCation != null and nationalityCation != ''">
+                nationality_cation = #{nationalityCation},
+            </if>
+            <if test="nativePlace != null and nativePlace != ''">
+                native_place = #{nativePlace},
+            </if>
+            <if test="educationCode != null and educationCode != ''">
+                education_code = #{educationCode},
+            </if>
+            <if test="occupationCode != null and occupationCode != ''">
+                occupation_code = #{occupationCode},
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                marry_code = #{marryCode},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code = #{certCode},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no = #{certNo},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="oftenCode != null and oftenCode != ''">
+                often_code = #{oftenCode},
+            </if>
+            <if test="nowProv != null and nowProv != ''">
+                now_prov = #{nowProv},
+            </if>
+            <if test="nowCity != null and nowCity != ''">
+                now_city = #{nowCity},
+            </if>
+            <if test="nowArea != null and nowArea != ''">
+                now_area = #{nowArea},
+            </if>
+            <if test="nowAddress != null and nowAddress != ''">
+                now_address = #{nowAddress},
+            </if>
+            <if test="nowPostCode != null and nowPostCode != ''">
+                now_post_code = #{nowPostCode},
+            </if>
+            <if test="nativeProv != null and nativeProv != ''">
+                native_prov = #{nativeProv},
+            </if>
+            <if test="nativeCity != null and nativeCity != ''">
+                native_city = #{nativeCity},
+            </if>
+            <if test="nativeArea != null and nativeArea != ''">
+                native_area = #{nativeArea},
+            </if>
+            <if test="nativeAddress != null and nativeAddress != ''">
+                native_address = #{nativeAddress},
+            </if>
+            <if test="nativePostCode != null and nativePostCode != ''">
+                native_post_code = #{nativePostCode},
+            </if>
+            <if test="contactName != null and contactName != ''">
+                contact_name = #{contactName},
+            </if>
+            <if test="contactRelaCode != null and contactRelaCode != ''">
+                contact_rela_code = #{contactRelaCode},
+            </if>
+            <if test="contactPhone != null and contactPhone != ''">
+                contact_phone = #{contactPhone},
+            </if>
+            <if test="contactPostCode != null and contactPostCode != ''">
+                contact_post_code = #{contactPostCode},
+            </if>
+            <if test="contactAddress != null and contactAddress != ''">
+                contact_address = #{contactAddress},
+            </if>
+            <if test="takeName != null and takeName != ''">
+                take_name = #{takeName},
+            </if>
+            <if test="takeRelaCode != null and takeRelaCode != ''">
+                take_rela_code = #{takeRelaCode},
+            </if>
+            <if test="takeCertNo != null and takeCertNo != ''">
+                take_cert_no = #{takeCertNo},
+            </if>
+            <if test="takePhone != null and takePhone != ''">
+                take_phone = #{takePhone},
+            </if>
+            <if test="work != null and work != ''">
+                work = #{work},
+            </if>
+            <if test="workPhone != null and workPhone != ''">
+                work_phone = #{workPhone},
+            </if>
+            <if test="workPostCode != null and workPostCode != ''">
+                work_post_code = #{workPostCode},
+            </if>
+            <if test="workAddress != null and workAddress != ''">
+                work_address = #{workAddress},
+            </if>
+            <if test="bloodCode != null and bloodCode != ''">
+                blood_code = #{bloodCode},
+            </if>
+            <if test="familyDisease != null and familyDisease != ''">
+                family_disease = #{familyDisease},
+            </if>
+            <if test="exposeDisease != null and exposeDisease != ''">
+                expose_disease = #{exposeDisease},
+            </if>
+            <if test="heredityDisease != null and heredityDisease != ''">
+                heredity_disease = #{heredityDisease},
+            </if>
+            <if test="allergyDisease != null and allergyDisease != ''">
+                allergy_disease = #{allergyDisease},
+            </if>
+            <if test="pastDisease != null and pastDisease != ''">
+                past_disease = #{pastDisease},
+            </if>
+            <if test="pastOper != null and pastOper != ''">
+                past_oper = #{pastOper},
+            </if>
+            <if test="pastTrauma != null and pastTrauma != ''">
+                past_trauma = #{pastTrauma},
+            </if>
+            <if test="pastBlood != null and pastBlood != ''">
+                past_blood = #{pastBlood},
+            </if>
+            <if test="pastRemark != null and pastRemark != ''">
+                past_remark = #{pastRemark},
+            </if>
+            <if test="allergyRemark != null and allergyRemark != ''">
+                allergy_remark = #{allergyRemark},
+            </if>
+            <if test="sourceTjCode != null and sourceTjCode != ''">
+                source_tj_code = #{sourceTjCode},
+            </if>
+            <if test="sourceTjRemark != null and sourceTjRemark != ''">
+                source_tj_remark = #{sourceTjRemark},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm},
+            </if>
+            <if test="totalOut != null">
+                total_out = #{totalOut},
+            </if>
+            <if test="totalIn != null">
+                total_in = #{totalIn},
+            </if>
+            <if test="outptLastVisitTime != null">
+                outpt_last_visit_time = #{outptLastVisitTime},
+            </if>
+            <if test="inptLastVisitTime != null">
+                inpt_last_visit_time = #{inptLastVisitTime},
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                patient_code = #{patientCode},
+            </if>
+            <if test="preferentialTypeId != null and preferentialTypeId != ''">
+                preferential_type_id = #{preferentialTypeId},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        <!--where hosp_code = #{hospCode} and cert_no = #{certNo}-->
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <select id="queryPage" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO" resultMap="baseProfileFileMap">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age,age_unit_code, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,
+            (select name from base_preferential_type bpt where bpt.hosp_code = a.hosp_code and bpt.id = a.preferential_type_id) as preferential_type_name
+        from  base_profile_file a
+        where hosp_code = #{hospCode}
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%', #{keyword}, '%') or cert_no like concat('%', #{keyword}, '%') or phone like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and a.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        order by a.crte_time desc
+    </select>
+
+    <select id="getById" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO" resultMap="baseProfileFileMap">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from  base_profile_file
+        where hosp_code = #{hospCode}
+        and id = #{id}
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
+    </select>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getAddressTree" resultType="cn.hsa.base.TreeMenuNode">
+        select value as id,value, name as label, ifnull(up_value, "-1") as parentId
+        from sys_code_detail
+        where c_code = 'XZQH' and is_valid = '1'
+    </select>
+</mapper>

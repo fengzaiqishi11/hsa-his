@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.inventory.dao.StroInventoryDetailDao">
+
+    <resultMap type="cn.hsa.module.stro.inventory.dto.StroInventoryDetailDTO" id="StroInventoryDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="inventoryId" column="inventory_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+        <result property="resultCode" column="result_code" jdbcType="VARCHAR"/>
+        <result property="beforeNum" column="before_num" jdbcType="OTHER"/>
+        <result property="beforeSplitNum" column="before_split_num" jdbcType="OTHER"/>
+        <result property="finalNum" column="final_num" jdbcType="OTHER"/>
+        <result property="incdecNum" column="incdec_num" jdbcType="OTHER"/>
+        <result property="finalSplitNum" column="final_split_num" jdbcType="OTHER"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="buyPrice" column="buy_price" jdbcType="OTHER"/>
+        <result property="sellPrice" column="sell_price" jdbcType="OTHER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitBuyPrice" column="split_buy_price" jdbcType="OTHER"/>
+        <result property="splitSellPrice" column="split_sell_price" jdbcType="OTHER"/>
+        <result property="incdecBuyPrice" column="incdec_buy_price" jdbcType="OTHER"/>
+        <result property="incdecSellPrice" column="incdec_sell_price" jdbcType="OTHER"/>
+        <result property="orderno" column="order_no" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="splitRatio" jdbcType="VARCHAR"/>
+        <result property="locationNo" column="location_no" jdbcType="VARCHAR"/>
+        <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="invoicingTargetId" column="invoicingTargetId" jdbcType="VARCHAR"/>
+        <result property="invoicingTargetName" column="invoicingTargetName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StroInventoryDetailMap">
+        select
+          id, hosp_code, inventory_id, item_code, item_id, item_name, batch_no, expiry_date, result_code, before_num, before_split_num, final_num, incdec_num, final_split_num, unit_code, buy_price, sell_price, split_unit_code, split_buy_price, split_sell_price, incdec_buy_price, incdec_sell_price
+        from stro_inventory_detail
+        where id = #{id} and hosp_code= #{hospCode}
+        order by crte_time desc
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="StroInventoryDetailMap">
+      select x.*,ifnull((select name from base_product bp where x.prod_code = bp.code and bp.hosp_code= #{hospCode}),'')as prodName  from
+         (  select
+            a.id, a.hosp_code, a.inventory_id, a.item_code, a.item_id, a.item_name, a.batch_no, a.expiry_date, a.result_code, ifnull(a.before_num,0) before_num,
+            ifnull(a.before_split_num,0) before_split_num, ifnull(a.final_num,0) final_num, ifnull(a.incdec_num,0) incdec_num, ifnull(a.final_split_num,0) final_split_num,
+            a.unit_code, ifnull(a.buy_price,0) buy_price,
+            (ifnull(a.buy_price,0) * ifnull(a.final_num,0)) afterBuyPriceAll,
+            (ifnull(a.buy_price,0) * ifnull(a.before_num,0)) beforBuyPriceAll,
+            ifnull(a.sell_price,0) sell_price, a.split_unit_code, ifnull(a.split_buy_price,0) split_buy_price,
+            ifnull(a.split_sell_price,0) split_sell_price, ifnull(a.incdec_buy_price,0) incdec_buy_price, ifnull(a.incdec_sell_price,0) incdec_sell_price,a.location_no,
+            case when a.item_code='1' then bd.prod_code when a.item_code='2' then bm.prod_code end prod_code,
+            case when a.item_code='1' then bd.split_ratio when a.item_code='2' then bm.split_ratio end splitRatio,
+            case when a.item_code='1' then bd.spec when a.item_code='2' then bm.spec end spec,
+            case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+            case when a.item_code='2' then bm.model end model
+            from stro_inventory_detail a
+            left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+            left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+            <where>
+                    and a.hosp_code = #{hospCode}
+                <if test="inventoryId != null and inventoryId != ''">
+                    and a.inventory_id = #{inventoryId}
+                </if>
+            </where>
+        )x order by x.location_no is null,x.location_no,x.code
+    </select>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from stro_inventory_detail where inventory_id = #{id} and hosp_code= #{hospCode}
+    </delete>
+
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertList"  parameterType="list">
+        insert into stro_inventory_detail
+        (id,hosp_code, inventory_id, item_code, item_id, item_name, batch_no, expiry_date, result_code, before_num,
+        before_split_num, final_num, incdec_num, final_split_num, unit_code, buy_price, sell_price, split_unit_code,
+        split_buy_price, split_sell_price, incdec_buy_price, incdec_sell_price,location_no)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.inventoryId}, #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.batchNo},
+            #{item.expiryDate}, #{item.resultCode}, #{item.beforeNum}, #{item.beforeSplitNum}, #{item.finalNum}, #{item.incdecNum},
+            #{item.finalSplitNum}, #{item.unitCode}, #{item.buyPrice}, #{item.sellPrice}, #{item.splitUnitCode}, #{item.splitBuyPrice},
+            #{item.splitSellPrice}, #{item.incdecBuyPrice}, #{item.incdecSellPrice}, #{item.locationNo})
+        </foreach>
+    </insert>
+
+
+    <!--批量查询-->
+    <select id="queryAllid" resultMap="StroInventoryDetailMap">
+        select
+         a.id, a.hosp_code, a.inventory_id, a.item_code, a.item_id, a.item_name, a.batch_no, a.expiry_date,
+         a.result_code, a.before_num, a.before_split_num, a.final_num, a.incdec_num, a.final_split_num,
+         a.unit_code, a.buy_price, a.sell_price, a.split_unit_code, a.split_buy_price, a.split_sell_price,
+         a.incdec_buy_price, a.incdec_sell_price,
+        (ifnull(a.buy_price,0) * ifnull(a.final_num,0)) afterBuyPriceAll,
+        (ifnull(a.buy_price,0) * ifnull(a.before_num,0)) beforBuyPriceAll,
+        b.order_no as order_no,
+        (
+        case  item_code when '1' then
+        (select split_ratio from base_drug where id=a.item_id and hosp_code=a.hosp_code
+        )  when '2' then
+        (select split_ratio from base_material where id=a.item_id and hosp_code=a.hosp_code
+        ) end
+        ) splitRatio,
+        b.biz_id as invoicingTargetId,
+        (select dp.name from base_dept dp where dp.id = b.biz_id and dp.hosp_code = b.hosp_code) as invoicingTargetName
+        from stro_inventory_detail a
+        LEFT JOIN stro_inventory b on a.inventory_id = b.id and a.hosp_code=b.hosp_code
+        where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and a.inventory_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--盘点单打印接口-->
+    <select id="printInventory" resultType="cn.hsa.module.stro.inventory.dto.InventoryDTO">
+        select a.order_no as orderNo,DATE_FORMAT(a.crte_time,'%Y年%m月%d日') incentoryTime,
+        (select name from base_dept where id=a.biz_id and hosp_code=a.hosp_code) bizName
+        ,
+        (select ifnull(sum(final_num),0) from stro_inventory_detail where inventory_id=a.id and hosp_code=a.hosp_code) finalNum
+        ,ifnull(a.before_price,0) beforePrice,ifnull(a.after_price,0) afterPrice,
+        CONCAT(convert((1-ifnull(a.after_price,0)/ifnull(a.before_price,0))*100,decimal(10,2))*(case when a.incdec_price>0 then 1 else -1 end)
+        ,'%') rate,
+        (select ifnull(sum(incdec_num),0) from stro_inventory_detail where inventory_id=a.id and hosp_code=a.hosp_code) incdecNum,
+        ifnull(a.incdec_price,0) incdecPrice,a.remark
+        from
+        stro_inventory a
+        where a.hosp_code=#{hospCode}
+        and a.id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

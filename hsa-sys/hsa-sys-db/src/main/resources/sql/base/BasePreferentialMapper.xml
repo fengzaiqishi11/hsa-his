@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bpft.dao.BasePreferentialDAO">
+
+    <resultMap type="cn.hsa.module.base.bpft.dto.BasePreferentialDTO" id="BasePreferentialMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bizCode" column="biz_code" jdbcType="VARCHAR"/>
+        <result property="pfTypeCode" column="pf_type_code" jdbcType="VARCHAR"/>
+        <result property="outCode" column="out_code" jdbcType="VARCHAR"/>
+        <result property="outScale" column="out_scale" jdbcType="DECIMAL"/>
+        <result property="inCode" column="in_code" jdbcType="VARCHAR"/>
+        <result property="inScale" column="in_scale" jdbcType="DECIMAL"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO" id="BasePreferentialTypeMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="getById" resultMap="BasePreferentialMap">
+        select
+          id, hosp_code, type_code, biz_code, pf_type_code, out_code, out_scale, in_code, in_scale, is_valid, crte_id, crte_name, crte_time
+        from base_preferential
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BasePreferentialMap">
+        select
+          id, hosp_code, type_code, biz_code, pf_type_code, out_code, out_scale, in_code, in_scale, is_valid, crte_id, crte_name, crte_time,
+         (
+         case
+         base_preferential.type_code
+         when '2' then
+         (SELECT  base_drug.good_name FROM base_drug WHERE base_drug.code = base_preferential.biz_code and base_drug.hosp_code = #{hospCode})
+         when '3' then
+         (SELECT  base_item.name FROM base_item WHERE base_item.code = base_preferential.biz_code and base_item.hosp_code = #{hospCode})
+         when '1' then
+         ( SELECT base_finance_classify.name FROM base_finance_classify WHERE base_finance_classify.code = base_preferential.biz_code and base_finance_classify.hosp_code = #{hospCode})
+          END
+        ) AS projectName,
+        (
+        case
+        base_preferential.type_code
+        when '2' then
+        (SELECT  base_drug.id FROM base_drug WHERE base_drug.code = base_preferential.biz_code and base_drug.hosp_code = #{hospCode})
+        when '3' then
+        (SELECT  base_item.id FROM base_item WHERE base_item.code = base_preferential.biz_code and base_item.hosp_code = #{hospCode})
+        when '1' then
+        ( SELECT base_finance_classify.id FROM base_finance_classify WHERE base_finance_classify.code = base_preferential.biz_code and base_finance_classify.hosp_code = #{hospCode})
+        END
+        ) AS itemId
+      from base_preferential
+        where
+            hosp_code = #{hospCode}
+            <if test="pfTypeCodeId != null">
+                and pf_type_code = (select code from base_preferential_type where hosp_code = #{hospCode} and id=#{pfTypeCodeId})
+            </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="bizCode != null and bizCode != ''">
+                and biz_code = #{bizCode}
+            </if>
+            <if test="pfTypeCode != null and pfTypeCode != ''">
+                and pf_type_code = #{pfTypeCode}
+            </if>
+            <if test="outCode != null and outCode != ''">
+                and out_code = #{outCode}
+            </if>
+            <if test="outScale != null">
+                and out_scale = #{outScale}
+            </if>
+            <if test="inCode != null and inCode != ''">
+                and in_code = #{inCode}
+            </if>
+            <if test="inScale != null">
+                and in_scale = #{inScale}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and biz_code in
+                  (
+                  select base_drug.code from base_drug where base_drug.good_name like concat('%',#{keyword},'%') and base_drug.hosp_code = #{hospCode}
+                  union all
+                  select base_item.code from base_item where base_item.name like concat('%',#{keyword},'%') and base_item.hosp_code = #{hospCode}
+                  union all
+                  select base_finance_classify.code from base_finance_classify where base_finance_classify.name like concat('%',#{keyword},'%') and base_finance_classify.hosp_code = #{hospCode}
+                  )
+            </if>
+            order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPreferentials" resultType="cn.hsa.module.base.bpft.dto.BasePreferentialDTO">
+        select
+        a.id id, a.hosp_code hospCode, a.type_code typeCode, a.biz_code bizCode, a.pf_type_code pfTypeCode, a.out_code outCode,
+         a.out_scale outScale, a.in_code inCode, a.in_scale inScale,
+        (case a.type_code when '2' then c.id when '3' then d.id when '1' then e.id end) itemId,
+        (case a.type_code when '2' then '1' when '3' then '3' end) itemCode,
+        (case a.type_code when '2' then c.good_name when '3' then d.name when '1' then e.name end) itemName
+        from base_preferential a join base_preferential_type b on a.pf_type_code=b.code
+        left join base_drug c on a.biz_code=c.code and c.hosp_code = a.hosp_code
+        left join base_item d on a.biz_code=d.code and d.hosp_code = a.hosp_code
+        left join base_finance_classify e on a.biz_code=e.code and e.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode} and b.is_valid='1'
+        <if test="id != null">
+            and b.id = #{id}
+        </if>
+        order by a.type_code desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_preferential(id,hosp_code, type_code, biz_code, pf_type_code, out_code, out_scale, in_code, in_scale, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{typeCode}, #{bizCode}, #{pfTypeCode}, #{outCode}, #{outScale}, #{inCode}, #{inScale}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_preferential
+        <set>
+            <if test="typeCode != null">
+                type_code = #{typeCode},
+            </if>
+            <if test="bizCode != null">
+                biz_code = #{bizCode},
+            </if>
+            <if test="pfTypeCode != null">
+                pf_type_code = #{pfTypeCode},
+            </if>
+            <if test="outCode != null">
+                out_code = #{outCode},
+            </if>
+            <if test="outScale != null">
+                out_scale = #{outScale},
+            </if>
+            <if test="inCode != null">
+                in_code = #{inCode},
+            </if>
+            <if test="inScale != null">
+                in_scale = #{inScale},
+            </if>
+            <if test="isValid != null">
+                 is_valid = #{isValid},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--批量修改优惠配置信息-->
+    <update id="updateAll" parameterType="java.util.List">
+      update base_preferential set
+      <foreach item="item" collection="list" separator="," open="" close="" index="index">
+        pf_type_code = CASE
+        WHEN #{item.id} and #{item.hospCode} THEN #{item.pfTypeCode}
+        END
+      </foreach>
+      where id in
+      <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+        #{item.id}
+      </foreach>
+      and hosp_code in
+      <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+        #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        update base_preferential set is_valid = '0'
+        where
+        hosp_code = #{hospCode}
+        <if test="ids != null and ids.size()>0">
+          and id in
+         <foreach collection="ids" item="id" separator="," open="(" close=")">
+           #{id}
+         </foreach>
+        </if>
+    </delete>
+
+    <!--通过实体作为筛选条件查询优惠类型-->
+    <select id="queryBsplTypePage" resultMap="BasePreferentialTypeMap">
+      select
+      id, hosp_code, code, name, is_valid, crte_id, crte_name, crte_time
+      from base_preferential_type
+       where
+        hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and id = #{id}
+        </if>
+
+        <if test="code != null and code != ''">
+          and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+          and name = #{name}
+        </if>
+        <if test="isValid != null and isValid != ''">
+          and is_valid = #{isValid}
+        </if>
+        <if test="crteId != null and crteId != ''">
+          and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+          and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+          and crte_time = #{crteTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+          and (name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+        </if>
+        order by crte_time desc
+    </select>
+    
+    <!--通过实体作为筛选条件查询优惠类型-->
+    <select id="queryBsplTypeAll" resultMap="BasePreferentialTypeMap">
+        select
+        id, hosp_code, code, name, is_valid, crte_id, crte_name, crte_time
+        from base_preferential_type
+        where
+        hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+        </if>
+        order by code ASC
+    </select>
+
+    <!--新增优惠类型-->
+    <insert id="insertBsplType">
+          insert into base_preferential_type(id,hosp_code, code, name, is_valid, crte_id, crte_name, crte_time)
+          values (#{id},#{hospCode}, #{code}, #{name}, '1', #{crteId}, #{crteName}, #{crteTime})
+      </insert>
+
+    <!--通过主键修改优惠类型-->
+    <update id="updateBsplType">
+      update base_preferential_type
+      <set>
+        <if test="code != null">
+          code = #{code},
+        </if>
+        <if test="name != null and name != ''">
+          name = #{name},
+        </if>
+      </set>
+      where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除优惠类型-->
+    <update id="updateBsplTypeStatus">
+      update base_preferential_type set is_valid = #{isValid}
+      where
+      hosp_code = #{hospCode}
+      <if test="ids != null and ids.size()>0">
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </update>
+
+    <!--判断编码是否存在-->
+    <select id="queryCodeIsExist" resultType="java.lang.Integer">
+      select count(code) from base_preferential_type
+      where
+      code = #{code} and hosp_code = #{hospCode}
+      <if test="id != null and id != ''">
+        and id != #{id}
+      </if>
+    </select>
+
+    <!--优惠类型名称是否重复-->
+    <select id="queryNameIsExist" resultType="java.lang.Integer">
+      select count(code) from base_preferential_type
+      where
+      name = #{name} and hosp_code = #{hospCode} and is_valid = '1'
+      <if test="id != null and id != ''">
+        and id != #{id}
+      </if>
+    </select>
+
+</mapper>

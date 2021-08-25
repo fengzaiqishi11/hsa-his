@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.his</groupId>
+    <artifactId>hsa-his</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+    <name>hsa-his</name>
+
+    <modules>
+        <!-- 公共模块 -->
+        <module>hsa-com</module>
+        <!-- 统一认证模块 -->
+        <module>hsa-web</module>
+        <!-- 药房药库子系统 -->
+        <module>hsa-stro</module>
+         <!-- 系统管理子系统 -->
+        <module>hsa-sys</module>
+         <!-- 中心平台子系统 -->
+        <module>hsa-center</module>
+        <!-- 门诊医护子系统 -->
+        <module>hsa-outpt</module>
+        <!-- 住院医护子系统 -->
+        <module>hsa-inpt</module>
+        <!--医保管理子系统-->
+        <module>hsa-insure</module>
+                        <module>hsa-interf</module>
+<!--         定时任务子系统-->
+<!--                        <module>hsa-cron</module>-->
+<!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
+<!--                        <module>hsa-cron/xxl-job-executor</module>-->
+    </modules>
+
+    <!--spring boot默认推荐的组件及版本-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.9.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!--定义所有子工程公共组件版本,可覆盖springboot parent中推荐版本-->
+    <properties>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+
+        <!--常用工具类-->
+        <lombok.version>1.18.8</lombok.version>
+        <fastjson.version>1.2.60</fastjson.version>
+        <guava.version>20.0</guava.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <commons-io.version>2.4</commons-io.version>
+        <commons-collections4.version>4.0</commons-collections4.version>
+        <commons-fileupload.version>1.3.3</commons-fileupload.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-codec.version>1.11</commons-codec.version>
+        <httpclient.version>4.5.9</httpclient.version>
+
+        <junit.version>4.12</junit.version>
+
+        <!--Rest接口文档-->
+        <springfox-swagger.version>2.9.2</springfox-swagger.version>
+
+        <spring-boot.version>2.0.9.RELEASE</spring-boot.version>
+        <springframework.version>5.0.13.RELEASE</springframework.version>
+
+        <druid.version>1.1.19</druid.version>
+
+        <!--旧版本：mybatis和druid适配，保证使用cursor的功能可用-->
+        <!--
+        <mybatis.version>3.4.6</mybatis.version>
+        <mybatis-spring.version>1.3.3</mybatis-spring.version>
+        -->
+
+        <!--推荐使用新版本MyBatis，不支持cursor场景-->
+        <mybatis.version>3.5.3</mybatis.version>
+        <mybatis-spring.version>2.0.3</mybatis-spring.version>
+
+        <persistence-api.version>1.0.2</persistence-api.version>
+        <pagehelper.version>5.1.10</pagehelper.version>
+
+        <xxl-job-core.version>2.0.1</xxl-job-core.version>
+        <workflow-sdk.version>1.0.6</workflow-sdk.version>
+
+        <hsaf-core.version>1.1.4</hsaf-core.version>
+
+        <hsaf-idgenerator.version>1.0.3</hsaf-idgenerator.version>
+        <hsaf-auth-security.version>1.1.5</hsaf-auth-security.version>
+        <hsaf-cache-redis.version>1.0.0</hsaf-cache-redis.version>
+
+        <hsaf-ali-mq.version>1.0.0</hsaf-ali-mq.version>
+        <hsaf-ali-rpc.version>1.1.1</hsaf-ali-rpc.version>
+        <hsaf-ali-fsstore.version>1.0.1</hsaf-ali-fsstore.version>
+        <hsaf-ali-gateway.version>1.2.3</hsaf-ali-gateway.version>
+
+        <hsaf-tencent-mq.version>1.0.0</hsaf-tencent-mq.version>
+        <hsaf-tencent-fsstore.version>1.0.1</hsaf-tencent-fsstore.version>
+        <hsaf-tencent-gateway.version>1.2.2</hsaf-tencent-gateway.version>
+        <hsaf-tencent-rpc.version>1.1.1</hsaf-tencent-rpc.version>
+
+        <hsaf-generic-rpc.version>1.1.1</hsaf-generic-rpc.version>
+        <hsaf-generic-mq.version>1.0.0</hsaf-generic-mq.version>
+        <hsaf-generic-fsstore.version>1.0.1</hsaf-generic-fsstore.version>
+        <hsaf-generic-gateway.version>1.2.2</hsaf-generic-gateway.version>
+                <dockerUrl>https://8.136.115.215:2375</dockerUrl>
+                <dockerUrlZs>D:\work\文档资料——和宇\云his\服务器\tls-client-certs</dockerUrlZs>
+<!--                        <dockerUrl>http://8.136.110.29:2375</dockerUrl>-->
+<!--                        <dockerUrlZs></dockerUrlZs>-->
+        <!--                        <dockerUrl>http://172.18.100.104:2375</dockerUrl>-->
+        <!--        <dockerUrl>172.18.100.105</dockerUrl>-->
+        <!--            <dockerUrl>8.136.110.29</dockerUrl>-->
+<!--        <dockerUrl>https://8.135.102.205:2375</dockerUrl>-->
+<!--        <dockerUrlZs>D:\work\文档资料——和宇\云his\服务器\docker证书</dockerUrlZs>-->
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${springframework.version}</version>
+            </dependency>
+
+            <!--核心包-->
+            <dependency>
+                <groupId>cn.hsa.hsaf.core</groupId>
+                <artifactId>hsaf-core</artifactId>
+                <version>${hsaf-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.auth.security</groupId>
+                <artifactId>hsaf-auth-security</artifactId>
+                <version>${hsaf-auth-security.version}</version>
+            </dependency>
+
+            <!--适配包-->
+            <!--分布式服务-->
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-ali-rpc</artifactId>
+                <version>${hsaf-ali-rpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-generic-rpc</artifactId>
+                <version>${hsaf-generic-rpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-tencent-rpc</artifactId>
+                <version>${hsaf-tencent-rpc.version}</version>
+            </dependency>
+
+            <!--分布式缓存-->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>2.0.14.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-cache-redis</artifactId>
+                <version>${hsaf-cache-redis.version}</version>
+            </dependency>
+
+            <!--分布式消息队列-->
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-ali-mq</artifactId>
+                <version>${hsaf-ali-mq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-generic-mq</artifactId>
+                <version>${hsaf-generic-mq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-tencent-mq</artifactId>
+                <version>${hsaf-tencent-mq.version}</version>
+            </dependency>
+
+            <!--分布式非结构化存储-->
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-ali-fsstore</artifactId>
+                <version>${hsaf-ali-fsstore.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-generic-fsstore</artifactId>
+                <version>${hsaf-generic-fsstore.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-tencent-fsstore</artifactId>
+                <version>${hsaf-tencent-fsstore.version}</version>
+            </dependency>
+
+            <!--网关-->
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-ali-gateway</artifactId>
+                <version>${hsaf-ali-gateway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-tencent-gateway</artifactId>
+                <version>${hsaf-tencent-gateway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hsa.hsaf.adapt</groupId>
+                <artifactId>hsaf-generic-gateway</artifactId>
+                <version>${hsaf-generic-gateway.version}</version>
+            </dependency>
+
+            <!--MVC支持-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!--数据库访问-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>${persistence-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+
+            <!--定时任务-->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job-core.version}</version>
+            </dependency>
+
+            <!--工作流-->
+            <dependency>
+                <!--
+                <groupId>cn.hsa.hsaf.workflow</groupId>
+                <artifactId>workflow-sdk</artifactId>
+                <version>${workflow-sdk.version}</version>
+                -->
+                <groupId>cn.hsa.cep.wfc</groupId>
+                <artifactId>hsa-cep-wfc-sdk</artifactId>
+                <version>${workflow-sdk.version}</version>
+            </dependency>
+
+            <!--工具类-->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!--Rest接口文档-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox-swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox-swagger.version}</version>
+            </dependency>
+
+            <!--注解依赖-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-openfeign-core</artifactId>
+                <version>2.0.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>1.5.21</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-context</artifactId>
+                <version>2.0.4.RELEASE</version>
+            </dependency>
+
+            <!--测试相关-->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

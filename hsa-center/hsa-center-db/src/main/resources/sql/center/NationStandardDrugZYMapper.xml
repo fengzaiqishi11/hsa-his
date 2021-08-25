@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugZYDAO">
+
+    <resultMap type="cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO" id="NationStandardDrugZYMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="decoctionName" column="decoction_name" jdbcType="VARCHAR"/>
+        <result property="registerName" column="register_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="functionType" column="function_type" jdbcType="VARCHAR"/>
+        <result property="goodName" column="good_name" jdbcType="VARCHAR"/>
+        <result property="drugsSourceSubject" column="drugs_source_subject" jdbcType="VARCHAR"/>
+        <result property="drugsSourceRace" column="drugs_source_race" jdbcType="VARCHAR"/>
+        <result property="pharmacyPosition" column="pharmacy_position" jdbcType="VARCHAR"/>
+        <result property="processingMethod" column="processing_method" jdbcType="VARCHAR"/>
+        <result property="sexualTaste" column="sexual_taste" jdbcType="VARCHAR"/>
+        <result property="functionIndications" column="function_indications" jdbcType="VARCHAR"/>
+        <result property="usageDosage" column="usage_dosage" jdbcType="VARCHAR"/>
+        <result property="insurancePolicy" column="insurance_policy" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="saveNationStandardDrugZYBatch">
+        insert into nation_standard_drug_zy
+        ( `id`,
+          `code` ,
+          `Decoction_name` ,
+          `good_name` ,
+          `function_type` ,
+          `drugs_source_subject` ,
+          `drugs_source_race` ,
+          `pharmacy_position`,
+          `Processing_method` ,
+          `Sexual_taste` ,
+          `Function_indications` ,
+          `usage_dosage` ,
+          `insurance_policy` ,
+          `is_valid` ,
+          `crte_id` ,
+          `crte_name`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.code },
+                #{item.decoctionName},
+                #{item.goodName },
+                #{item.functionType },
+                #{item.drugsSourceSubject},
+                #{item.drugsSourceRace },
+                #{item.pharmacyPosition},
+                #{item.processingMethod },
+                #{item.sexualTaste },
+                #{item.functionIndications },
+                #{item.usageDosage},
+                #{item.insurancePolicy},
+                #{item.isValid},
+                #{item.crteId},
+                #{item.crteName}
+            )
+        </foreach>
+    </insert>
+
+    <!--查询单个-->
+    <select id="getZYById" resultMap="NationStandardDrugZYMap">
+        select
+            `id`,
+            `code` ,
+            `Decoction_name` as decoction_name,
+            `good_name` ,
+            `function_type` ,
+            `drugs_source_subject` ,
+            `drugs_source_race` ,
+            `pharmacy_position`,
+            `Processing_method` as processing_method ,
+            `Sexual_taste` as  sexual_tasteas ,
+            `Function_indications` as function_indications ,
+            `usage_dosage` ,
+            `insurance_policy` ,
+            `is_valid` ,
+            `crte_id` ,
+            `crte_name` from nation_standard_drug_zy
+        where id = #{id}
+    </select>
+
+
+
+    <select id="queryNationStandardDrugZYPage" resultMap="NationStandardDrugZYMap">
+      select   `id`,
+        `code` ,
+        `Decoction_name` as register_name,
+        `good_name` ,
+        `function_type` ,
+        `drugs_source_subject` ,
+        `drugs_source_race` ,
+        `pharmacy_position`,
+        `Processing_method` as processing_method ,
+        `Sexual_taste` as  sexual_taste ,
+        `Function_indications` as function_indications ,
+        `usage_dosage` ,
+        `insurance_policy` ,
+        `is_valid` ,
+        `crte_id` ,
+        `crte_name`,
+        `crte_time` from nation_standard_drug_zy where 1=1
+
+        <if test="keyword != null and keyword != ''">
+            and (good_name like concat('%',#{keyword},'%') or decoction_name like concat('%',#{keyword},'%')  or wbm like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%'))
+        </if>
+        <if test="provinceCode != null and provinceCode !=''">
+            AND  (province_code = #{provinceCode} or province_code is null)
+        </if>
+    </select>
+
+</mapper>

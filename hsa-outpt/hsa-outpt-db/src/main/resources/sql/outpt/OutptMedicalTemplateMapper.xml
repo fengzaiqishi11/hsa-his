@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.outptmedicaltemplate.dao.OutptMedicalTemplateDAO">
+
+    <resultMap type="cn.hsa.module.outpt.outptmedicaltemplate.dto.OutptMedicalTemplateDTO" id="OutptMedicalTemplateMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="chiefComplaint" column="chief_complaint" jdbcType="VARCHAR"/>
+        <result property="presentIllness" column="present_illness" jdbcType="VARCHAR"/>
+        <result property="pastHistory" column="past_history" jdbcType="VARCHAR"/>
+        <result property="oneselfHistory" column="oneself_history" jdbcType="VARCHAR"/>
+        <result property="familyHistory" column="family_history" jdbcType="VARCHAR"/>
+        <result property="allergyHistory" column="allergy_history" jdbcType="VARCHAR"/>
+        <result property="vaccinationHistory" column="vaccination_history" jdbcType="VARCHAR"/>
+        <result property="auxiliaryInspect" column="auxiliary_inspect" jdbcType="VARCHAR"/>
+        <result property="diseaseAnalysis" column="disease_analysis" jdbcType="VARCHAR"/>
+        <result property="handleSuggestion" column="handle_suggestion" jdbcType="VARCHAR"/>
+        <result property="temperature" column="temperature" jdbcType="VARCHAR"/>
+        <result property="minBloodPressure" column="min_blood_pressure" jdbcType="VARCHAR"/>
+        <result property="maxBloodPressure" column="max_blood_pressure" jdbcType="VARCHAR"/>
+        <result property="breath" column="breath" jdbcType="VARCHAR"/>
+        <result property="height" column="height" jdbcType="VARCHAR"/>
+        <result property="bloodSugar" column="blood_sugar" jdbcType="VARCHAR"/>
+        <result property="pulse" column="pulse" jdbcType="VARCHAR"/>
+        <result property="weight" column="weight" jdbcType="VARCHAR"/>
+        <result property="bmi" column="bmi" jdbcType="VARCHAR"/>
+        <result property="entrust" column="entrust" jdbcType="VARCHAR"/>
+        <result property="remarke" column="remarke" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="OutptMedicalTemplateMap">
+        select
+          id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke
+        from outpt_medical_template
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryMedicalTemplatePage" resultMap="OutptMedicalTemplateMap">
+        select
+          a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.is_valid, a.pym, a.wbm,
+          a.audit_code, a.audit_id, a.audit_name, a.audit_time,a.chief_complaint, a.present_illness, a.past_history,
+          a.oneself_history, a.family_history, a.allergy_history, a.vaccination_history, a.auxiliary_inspect, a.disease_analysis,
+          a.handle_suggestion, a.temperature, a.min_blood_pressure, a.max_blood_pressure, a.breath, a.height, a.blood_sugar, a.pulse,
+          a.weight, a.bmi, a.entrust, a.crte_id, a.crte_name, a.crte_time,a.disease_id,c.name diseaseName,remarke
+        from outpt_medical_template a
+        left join base_disease c on a.disease_id = c.id and c.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and a.name = #{name}
+            </if>
+            <!-- 个人模板 -->
+            <if test="typeCode == '2'.toString() ">
+              and a.type_code ='2'  and ifnull( doctor_id, '0' ) = #{doctorId}
+            </if>
+            <!-- 科室模板 -->
+            <if test="typeCode == '1'.toString() ">
+              and a.type_code ='1' and ifnull( dept_id, '0' ) = #{deptId}
+            </if>
+            <!-- 科室模板 -->
+            <if test="typeCode == '0'.toString() ">
+              and a.type_code ='0'
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="pym != null and pym != ''">
+                and a.pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and a.wbm = #{wbm}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and a.audit_code = #{auditCode}
+            </if>
+            <if test="auditId != null and auditId != ''">
+                and a.audit_id = #{auditId}
+            </if>
+            <if test="auditName != null and auditName != ''">
+                and a.audit_name = #{auditName}
+            </if>
+            <if test="auditTime != null">
+                and a.audit_time = #{auditTime}
+            </if>
+            <if test="chiefComplaint != null and chiefComplaint != ''">
+                and a.chief_complaint = #{chiefComplaint}
+            </if>
+            <if test="presentIllness != null and presentIllness != ''">
+                and a.present_illness = #{presentIllness}
+            </if>
+            <if test="pastHistory != null and pastHistory != ''">
+                and a.past_history = #{pastHistory}
+            </if>
+            <if test="oneselfHistory != null and oneselfHistory != ''">
+                and a.oneself_history = #{oneselfHistory}
+            </if>
+            <if test="familyHistory != null and familyHistory != ''">
+                and a.family_history = #{familyHistory}
+            </if>
+            <if test="allergyHistory != null and allergyHistory != ''">
+                and a.allergy_history = #{allergyHistory}
+            </if>
+            <if test="vaccinationHistory != null and vaccinationHistory != ''">
+                and a.vaccination_history = #{vaccinationHistory}
+            </if>
+            <if test="auxiliaryInspect != null and auxiliaryInspect != ''">
+                and a.auxiliary_inspect = #{auxiliaryInspect}
+            </if>
+            <if test="diseaseAnalysis != null and diseaseAnalysis != ''">
+                and a.disease_analysis = #{diseaseAnalysis}
+            </if>
+            <if test="handleSuggestion != null and handleSuggestion != ''">
+                and a.handle_suggestion = #{handleSuggestion}
+            </if>
+            <if test="temperature != null and temperature != ''">
+                and a.temperature = #{temperature}
+            </if>
+            <if test="minBloodPressure != null and minBloodPressure != ''">
+                and a.min_blood_pressure = #{minBloodPressure}
+            </if>
+            <if test="maxBloodPressure != null and maxBloodPressure != ''">
+                and a.max_blood_pressure = #{maxBloodPressure}
+            </if>
+            <if test="breath != null and breath != ''">
+                and a.breath = #{breath}
+            </if>
+            <if test="height != null and height != ''">
+                and a.height = #{height}
+            </if>
+            <if test="bloodSugar != null and bloodSugar != ''">
+                and a.blood_sugar = #{bloodSugar}
+            </if>
+            <if test="pulse != null and pulse != ''">
+                and a.pulse = #{pulse}
+            </if>
+            <if test="weight != null and weight != ''">
+                and a.weight = #{weight}
+            </if>
+            <if test="bmi != null and bmi != ''">
+                and a.bmi = #{bmi}
+            </if>
+            <if test="entrust != null and entrust != ''">
+                and a.entrust = #{entrust}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+              and (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
+            </if>
+            order by a.crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into outpt_medical_template(id,hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke)
+        values (#{id},#{hospCode}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isValid}, #{pym}, #{wbm}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory}, #{allergyHistory}, #{vaccinationHistory}, #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure}, #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust}, #{crteId}, #{crteName}, #{crteTime},#{diseaseId},#{remarke})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update outpt_medical_template
+        set dept_id = #{deptId},
+            dept_name = #{deptName},
+            doctor_id = #{doctorId},
+            doctor_name = #{doctorName},
+            hosp_code = #{hospCode},
+            name = #{name},
+            type_code = #{typeCode},
+            pym = #{pym},
+            wbm = #{wbm},
+            chief_complaint = #{chiefComplaint},
+            present_illness = #{presentIllness},
+            past_history = #{pastHistory},
+            oneself_history = #{oneselfHistory},
+            family_history = #{familyHistory},
+            allergy_history = #{allergyHistory},
+            vaccination_history = #{vaccinationHistory},
+            auxiliary_inspect = #{auxiliaryInspect},
+            disease_analysis = #{diseaseAnalysis},
+            handle_suggestion = #{handleSuggestion},
+            temperature = #{temperature},
+            min_blood_pressure = #{minBloodPressure},
+            max_blood_pressure = #{maxBloodPressure},
+            breath = #{breath},
+            height = #{height},
+            blood_sugar = #{bloodSugar},
+            pulse = #{pulse},
+            weight = #{weight},
+            bmi = #{bmi},
+            entrust = #{entrust},
+            disease_id = #{diseaseId},
+            remarke = #{remarke}
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from outpt_medical_template where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+      update outpt_medical_template set is_valid = #{isValid}
+      where
+      hosp_code = #{hospCode}
+      <if test="ids != null and ids.size()>0">
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </update>
+
+</mapper>

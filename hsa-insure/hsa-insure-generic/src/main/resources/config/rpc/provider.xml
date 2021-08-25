@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--个人信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" ref="insureIndividualBasicService_provider"/>
+    <!--医保个人结算查询-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureIndividualSettleService" ref="insureIndividualSettleService_provider"/>
+    <!--机构信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureConfigurationService" ref="insureConfigurationService_provider"/>
+    <!--医保方法配置信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureFunctionService" ref="insureFunctionService_provider"/>
+    <!--住院-->
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InptService" ref="inptService_provider"/>
+    <!--门诊-->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.OutptService" ref="outptService_provider"/>
+    <!--病案首页-->
+    <dubbo:service interface="cn.hsa.module.insure.mris.service.MrisService" ref="mrisService_provider"/>
+    <!--费用信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" ref="insureIndividualCostService_provider"/>
+    <!--项目匹配-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureItemMatchService" ref="insureItemMatchService_provider"/>
+    <!--疾病匹配-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" ref="insureDiseaseMatchService_provider"/>
+    <!--电子凭证service-->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.DzpzOutptService" ref="DzpzOutptService_provider"/>
+    <!--医保字典-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDictService" ref="insureDictService_provider"/>
+    <!--医保个人就诊信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureIndividualVisitService" ref="insureIndividualVisitService_provider"/>
+    <!--医保个人信息-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" ref="insureIndividualBasicService_provider"/>
+    <!--DRG分组调用-->
+    <dubbo:service interface="cn.hsa.module.insure.drg.service.InsureDrgService" ref="insureDrg_provider"/>
+    <!--医嘱录入上传-->
+    <dubbo:service interface="cn.hsa.module.insure.drg.service.InsureAdviceEntryService" ref="insureAdviceEntryService_provider"/>
+    <!--住院统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" ref="insureUnifiedPayInptService_provider"/>
+    <!--门诊统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService" ref="insureUnifiedPayRestService_provider"/>
+    <!-- 门诊统一支付平台 -->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService" ref="insureUnifiedPayOutptService_provider"/>
+    <!--事前事中分析服务-->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayMatterService" ref="insureUnifiedPayMatterService_provider"/>
+    <!--门诊电子凭证-->
+    <dubbo:service interface="cn.hsa.module.insure.emd.service.OutptElectronicBillService" ref="outptElectronicBillService_provider"/>
+    <!--住院电子凭证-->
+    <dubbo:service interface="cn.hsa.module.insure.emd.service.InptElectronicBillService" ref="inptElectronicBillService_provider"/>
+    <!--人员备案-医保统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsurePersonnalRecordService" ref="insurePersonnalRecordService_provider"/>
+    <!--冲正交易-医保统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" ref="insureUnifiedPayReversalTradeService_provider"/>
+    <!--冲正交易-医保统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" ref="insureUnifiedRemoteService_provider"/>
+    <!--信息采集上传-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureGetInfoService" ref="insureGetInfoService_provider"/>
+    <!--农合医保患者信息下发-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureNHPatientService" ref="insureNHPatientService_provider"/>
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" ref="insureUnifiedBaseService_provider"/>
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService" ref="insureUnifiedEmrUploadService_provider"/>
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureReadCardService" ref="insureReadCardService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" ref="insureStockManagerService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" ref="insureInptTransfusionRecordService_provider"/>
+    <!--护理生命记录-统一支付平台-->
+    <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" ref="insureNurseRecordService_provider"/>
+
+</beans>

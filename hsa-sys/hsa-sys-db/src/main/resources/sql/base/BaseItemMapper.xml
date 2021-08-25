@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bi.dao.BaseItemDAO">
+	<resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+		<result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+		<result property="code" column="code" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="abbr" column="abbr" jdbcType="VARCHAR"/>
+		<result property="spec" column="spec" jdbcType="VARCHAR"/>
+		<result property="price" column="price" jdbcType="NUMERIC"/>
+		<result property="onePrice" column="one_price" jdbcType="NUMERIC"/>
+		<result property="twoPrice" column="two_price" jdbcType="NUMERIC"/>
+		<result property="threePrice" column="three_price" jdbcType="NUMERIC"/>
+		<result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+		<result property="intension" column="intension" jdbcType="VARCHAR"/>
+		<result property="prompt" column="prompt" jdbcType="VARCHAR"/>
+		<result property="except" column="except" jdbcType="VARCHAR"/>
+		<result property="remark" column="remark" jdbcType="VARCHAR"/>
+		<result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+		<result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+		<result property="isCg" column="is_cg" jdbcType="VARCHAR"/>
+		<result property="isMs" column="is_ms" jdbcType="VARCHAR"/>
+		<result property="isSuppCurtain" column="is_supp_curtain" jdbcType="VARCHAR"/>
+		<result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+		<result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+		<result property="namePym" column="name_pym" jdbcType="VARCHAR"/>
+		<result property="nameWbm" column="name_wbm" jdbcType="VARCHAR"/>
+		<result property="abbrPym" column="abbr_pym" jdbcType="VARCHAR"/>
+		<result property="abbrWbm" column="abbr_wbm" jdbcType="VARCHAR"/>
+		<result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+		<result property="inDeptName" column="inDeptName" jdbcType="VARCHAR"/>
+		<result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
+		<result property="itemName" column="itemName" jdbcType="VARCHAR"/>
+		<result property="otherName" column="other_name" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!--查询单个-->
+	<select id="getById" resultMap="BaseItemMap">
+		select
+		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
+		a.two_price,
+		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+		a.is_supp_curtain,
+		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
+		a.crte_name, a.crte_time,a.other_name,
+		(select count(0) from base_advice_detail d where d.type_code = '3' and d.item_code = a.code) as adviceFlag,
+		b.name as outDeptName,
+		c.name as inDeptName
+		from base_item a
+		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+		LEFT JOIN base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+		</where>
+
+	</select>
+
+	<!--查询医院下的所有项目-->
+	<select id="queryAll" resultMap="BaseItemMap">
+		select
+		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
+		a.two_price,
+		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+		a.is_supp_curtain,a.other_name,
+		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
+		a.crte_name, a.crte_time,
+		b.name as outDeptName,
+		c.name as inDeptName
+		from base_item a
+		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+		LEFT JOIN base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+		left join insure_item_match  iim on iim.hosp_item_id = a.id and iim.hosp_code = a.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="isValid != null and isValid != ''">
+				and a.is_valid = #{isValid}
+			</if>
+			<if test="downLoadFlag == '1'.toString() ">
+				and	iim.hosp_item_id is null
+			</if>
+			<if test="isValid == null or isValid == ''">
+				and a.is_valid = '1'
+			</if>
+			<if test="isNationCode == true">
+				and a.nation_code is not null and LENGTH(trim(a.nation_code))>0
+			</if>
+			<if test="id != null">
+				and a.id = #{id}
+			</if>
+			<if test="ids != null and ids.size() > 0">
+				and a.id in
+				<foreach collection="ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="codes != null">
+				and a.code in
+				<foreach collection="codes" item="code" open="(" separator="," close=")">
+					#{code}
+				</foreach>
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and a.type_code = #{typeCode}
+			</if>
+			<if test="bfcCode != null and bfcCode != ''">
+				and a.bfc_code = #{bfcCode}
+			</if>
+			<if test="abbr != null and abbr != ''">
+				and a.abbr = #{abbr}
+			</if>
+			<if test="spec != null and spec != ''">
+				and a.spec = #{spec}
+			</if>
+			<if test="price != null">
+				and a.price = #{price}
+			</if>
+			<if test="onePrice != null">
+				and a.one_price = #{onePrice}
+			</if>
+			<if test="twoPrice != null">
+				and a.two_price = #{twoPrice}
+			</if>
+			<if test="threePrice != null">
+				and a.three_price = #{threePrice}
+			</if>
+			<if test="unitCode != null and unitCode != ''">
+				and a.unit_code = #{unitCode}
+			</if>
+			<if test="intension != null and intension != ''">
+				and a.intension = #{intension}
+			</if>
+			<if test="prompt != null and prompt != ''">
+				and a.prompt = #{prompt}
+			</if>
+			<if test="except != null and except != ''">
+				and a.except = #{except}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="isOut != null and isOut != ''">
+				and a.is_out = #{isOut}
+			</if>
+			<if test="isIn != null and isIn != ''">
+				and a.is_in = #{isIn}
+			</if>
+			<if test="isCg != null and isCg != ''">
+				and a.is_cg = #{isCg}
+			</if>
+			<if test="isMs != null and isMs != ''">
+				and a.is_ms = #{isMs}
+			</if>
+			<if test="isSuppCurtain != null and isSuppCurtain != ''">
+				and a.is_supp_curtain = #{isSuppCurtain}
+			</if>
+			<if test="outDeptCode != null and outDeptCode != ''">
+				and a.out_dept_code = #{outDeptCode}
+			</if>
+			<if test="inDeptCode != null and inDeptCode != ''">
+				and a.in_dept_code = #{inDeptCode}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			<if test="keyword !=null and keyword != ''">
+				and (a.code like concat('%',#{keyword},'%')
+				or a.name like concat('%',#{keyword},'%')
+				or a.name_pym like concat('%',#{keyword},'%')
+				or a.name_wbm like concat('%',#{keyword},'%'))
+			</if>
+		</where>
+		order by a.code asc
+	</select>
+
+	<!--通过实体作为筛选条件查询-->
+	<select id="queryPage" resultMap="BaseItemMap">
+		select
+		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
+		a.two_price,a.name as itemName,
+		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+		a.is_supp_curtain,a.other_name,
+		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
+		a.crte_name, a.crte_time,
+		b.name as outDeptName,
+		c.name as inDeptName
+		from base_item a
+		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+		LEFT JOIN base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null">
+				and a.id = #{id}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and a.type_code = #{typeCode}
+			</if>
+			<if test="bfcCode != null and bfcCode != ''">
+				and a.bfc_code = #{bfcCode}
+			</if>
+			<if test="abbr != null and abbr != ''">
+				and a.abbr = #{abbr}
+			</if>
+			<if test="spec != null and spec != ''">
+				and a.spec = #{spec}
+			</if>
+			<if test="price != null">
+				and a.price = #{price}
+			</if>
+			<if test="onePrice != null">
+				and a.one_price = #{onePrice}
+			</if>
+			<if test="twoPrice != null">
+				and a.two_price = #{twoPrice}
+			</if>
+			<if test="threePrice != null">
+				and a.three_price = #{threePrice}
+			</if>
+			<if test="unitCode != null and unitCode != ''">
+				and a.unit_code = #{unitCode}
+			</if>
+			<if test="intension != null and intension != ''">
+				and a.intension = #{intension}
+			</if>
+			<if test="prompt != null and prompt != ''">
+				and a.prompt = #{prompt}
+			</if>
+			<if test="except != null and except != ''">
+				and a.except = #{except}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="isOut != null and isOut != ''">
+				and a.is_out = #{isOut}
+			</if>
+			<if test="isIn != null and isIn != ''">
+				and a.is_in = #{isIn}
+			</if>
+			<if test="isCg != null and isCg != ''">
+				and a.is_cg = #{isCg}
+			</if>
+			<if test="isMs != null and isMs != ''">
+				and a.is_ms = #{isMs}
+			</if>
+			<if test="isSuppCurtain != null and isSuppCurtain != ''">
+				and a.is_supp_curtain = #{isSuppCurtain}
+			</if>
+			<if test="outDeptCode != null and outDeptCode != ''">
+				and a.out_dept_code = #{outDeptCode}
+			</if>
+			<if test="inDeptCode != null and inDeptCode != ''">
+				and a.in_dept_code = #{inDeptCode}
+			</if>
+			<if test="abbrPym != null and abbrPym != ''">
+				and a.abbr_pym = #{abbrPym}
+			</if>
+			<if test="abbrWbm != null and abbrWbm != ''">
+				and a.abbr_wbm = #{abbrWbm}
+			</if>
+			<if test="isValid != null and isValid != ''">
+				and a.is_valid = #{isValid}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			<if test="keyword !=null and keyword != ''">
+				and (a.code like concat('%',#{keyword},'%')
+				or a.name like concat('%',#{keyword},'%')
+				or a.name_pym like concat('%',#{keyword},'%')
+				or a.name_wbm like concat('%',#{keyword},'%'))
+			</if>
+			<if test="ids != null and ids.size() > 0">
+				and a.type_code in
+				<foreach collection="ids" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by a.code asc
+	</select>
+
+	<!--新增所有列-->
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_item(id, hosp_code, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name)
+        values (#{id}, #{hospCode}, #{nationCode}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm},'1', #{crteId}, #{crteName}, #{crteTime},#{otherName})
+    </insert>
+	<insert id="insertBatch">
+        insert into base_item
+        (id, hosp_code, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name)
+        values
+		<foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.nationCode}, #{item.typeCode}, #{item.bfcCode}, #{item.code}, #{item.name}, #{item.abbr}, #{item.spec}, #{item.price}, #{item.onePrice}, #{item.twoPrice}, #{item.threePrice}, #{item.unitCode}, #{item.intension}, #{item.prompt}, #{item.except}, #{item.remark}, #{item.isOut}, #{item.isIn}, #{item.isCg}, #{item.isMs}, #{item.isSuppCurtain}, #{item.outDeptCode}, #{item.inDeptCode}, #{item.namePym}, #{item.nameWbm}, #{item.abbrPym}, #{item.abbrWbm},'1', #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.otherName})
+		</foreach>
+	</insert>
+	<insert id="insertInsureMatch" parameterType="list">
+		insert into insure_item_match
+		(id, hosp_code, insure_reg_code, item_code, molss_item_id,
+		pqcc_item_id, hosp_item_id, hosp_item_name, hosp_item_code,
+		hosp_item_type, hosp_item_spec, hosp_item_unit_code, hosp_item_prep_code, hosp_item_price,
+		insure_item_name, insure_item_code, insure_item_type, insure_item_spec,
+		insure_item_unit_code, insure_item_prep_code, insure_item_price,
+		deductible, standard_code, check_price, manufacturer, audit_code,
+		is_match, is_trans, is_valid, take_date,
+		lose_date, pym, wbm, crte_id, crte_name, crte_time) values
+		<foreach collection="baseItemDTOList" item="item" index="index" separator=",">
+			(#{item.id},#{item.hospCode}, #{item.insureRegCode}, #{item.itemCode}, null,
+			null, #{item.hospItemId}, #{item.name}, #{item.code}, #{item.hospItemType},
+			#{item.spec}, null, null, #{item.price},
+			#{item.insureItemName}, #{item.insureItemCode}, #{item.insureItemType}, #{item.insureItemSpec},
+			#{item.insureItemUnitCode}, #{item.insureItemPrepCode}, #{item.insureItemPrice}, #{item.deductible},
+			#{item.standardCode}, #{item.checkPrice}, #{item.manufacturer}, #{item.auditCode}, #{item.isMatch},
+			#{item.isTrans}, #{item.isValid},
+			#{item.takeDate}, #{item.loseDate}, #{item.pym}, #{item.wbm}, #{item.crteId}, #{item.crteName},
+			#{item.crteTime}
+			)
+		</foreach>
+	</insert>
+
+    <!--通过主键修改数据-->
+
+	<!--通过主键修改数据-->
+	<update id="update">
+		update base_item
+		<set>
+			nation_code = #{nationCode},
+			type_code = #{typeCode},
+			bfc_code = #{bfcCode},
+			code = #{code},
+			name = #{name},
+			abbr = #{abbr},
+			spec = #{spec},
+			price = #{price},
+			one_price = #{onePrice},
+			two_price = #{twoPrice},
+			three_price = #{threePrice},
+			unit_code = #{unitCode},
+			intension = #{intension},
+			prompt = #{prompt},
+			except = #{except},
+			remark = #{remark},
+			is_out = #{isOut},
+			is_in = #{isIn},
+			is_cg = #{isCg},
+			is_ms = #{isMs},
+			is_supp_curtain = #{isSuppCurtain},
+			out_dept_code = #{outDeptCode},
+			in_dept_code = #{inDeptCode},
+			name_pym = #{namePym},
+			name_wbm = #{nameWbm},
+			abbr_pym = #{abbrPym},
+			abbr_wbm = #{abbrWbm},
+			other_name=#{otherName}
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--批量和单个修改有效状态-->
+	<update id="updateStatus" parameterType="java.util.List">
+		update base_item
+		set is_valid = #{isValid} where hosp_code = #{hospCode} and
+		<if test="ids != null and ids.size()>0">
+			id in
+			<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</update>
+
+	<!--判断项目编码是否已经存在-->
+	<select id="isCodeExist" resultType="java.lang.Integer">
+		select count(id)
+		from base_item
+		where hosp_code = #{hospCode}
+		<if test="code != null and code != ''">
+			and code = #{code}
+		</if>
+		<if test="nationCode != null and nationCode != ''">
+			and nation_code = #{nationCode}
+		</if>
+		<if test="id != null and id != ''">
+			and id != #{id}
+		</if>
+	</select>
+
+	<!--查询单个-->
+	<select id="getByCode" resultMap="BaseItemMap">
+		select
+		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
+		a.two_price,
+		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+		a.is_supp_curtain,
+		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
+		a.crte_name, a.crte_time,a.other_name,
+		(select count(0) from base_advice_detail d where d.type_code = '3' and d.item_code = a.code) as adviceFlag,
+		b.name as outDeptName,
+		c.name as inDeptName,
+		(select id from base_finance_classify where code=a.bfc_code and hosp_code=a.hosp_code) bfcId
+		from base_item a
+		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+		LEFT JOIN base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="code != null and code != ''">
+				and a.code = #{code}
+			</if>
+		</where>
+
+	</select>
+
+	<!--查询医院下的所有项目-->
+	<select id="queryAllBfcId" resultMap="BaseItemMap">
+		select
+		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
+		a.two_price,
+		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
+		a.is_supp_curtain,a.other_name,
+		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
+		a.crte_name, a.crte_time,
+		b.id as bfcId
+		from base_item a
+		LEFT JOIN base_finance_classify b on a.bfc_code = b.code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null">
+				and a.id = #{id}
+			</if>
+			<if test="ids != null and ids.size() > 0">
+				and a.id in
+				<foreach collection="ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="codes != null">
+				and a.code in
+				<foreach collection="codes" item="code" open="(" separator="," close=")">
+					#{code}
+				</foreach>
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				and a.type_code = #{typeCode}
+			</if>
+			<if test="bfcCode != null and bfcCode != ''">
+				and a.bfc_code = #{bfcCode}
+			</if>
+			<if test="abbr != null and abbr != ''">
+				and a.abbr = #{abbr}
+			</if>
+			<if test="spec != null and spec != ''">
+				and a.spec = #{spec}
+			</if>
+			<if test="price != null">
+				and a.price = #{price}
+			</if>
+			<if test="onePrice != null">
+				and a.one_price = #{onePrice}
+			</if>
+			<if test="twoPrice != null">
+				and a.two_price = #{twoPrice}
+			</if>
+			<if test="threePrice != null">
+				and a.three_price = #{threePrice}
+			</if>
+			<if test="unitCode != null and unitCode != ''">
+				and a.unit_code = #{unitCode}
+			</if>
+			<if test="intension != null and intension != ''">
+				and a.intension = #{intension}
+			</if>
+			<if test="prompt != null and prompt != ''">
+				and a.prompt = #{prompt}
+			</if>
+			<if test="except != null and except != ''">
+				and a.except = #{except}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="isOut != null and isOut != ''">
+				and a.is_out = #{isOut}
+			</if>
+			<if test="isIn != null and isIn != ''">
+				and a.is_in = #{isIn}
+			</if>
+			<if test="isCg != null and isCg != ''">
+				and a.is_cg = #{isCg}
+			</if>
+			<if test="isMs != null and isMs != ''">
+				and a.is_ms = #{isMs}
+			</if>
+			<if test="isSuppCurtain != null and isSuppCurtain != ''">
+				and a.is_supp_curtain = #{isSuppCurtain}
+			</if>
+			<if test="outDeptCode != null and outDeptCode != ''">
+				and a.out_dept_code = #{outDeptCode}
+			</if>
+			<if test="inDeptCode != null and inDeptCode != ''">
+				and a.in_dept_code = #{inDeptCode}
+			</if>
+			<if test="isValid != null and isValid != ''">
+				and a.is_valid = #{isValid}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+		</where>
+		order by a.crte_time desc
+	</select>
+	<select id="queryIds" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+		select
+		id, hosp_code, nation_code, type_code, bfc_code, code,
+		name, abbr, spec, price, one_price, two_price, three_price,
+		unit_code, intension, prompt,except, remark, is_out, is_in,
+		is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code,
+		name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id,
+		crte_name, crte_time,other_name
+		from base_item
+		where hosp_code = #{hospCode} and
+		<if test="ids != null and ids.size()>0">
+			id in
+			<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+    <select id="queryUnifiedPage" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+		select a.id, a.hosp_code, a.nation_code, type_code, bfc_code,
+		       code, name, abbr, spec, price, one_price, two_price,
+		       three_price, unit_code, intension, prompt, except, remark,
+		       is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code,
+		       in_dept_code, name_pym,a.other_name,
+		       name_wbm, abbr_pym, abbr_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time from base_item a left join
+		           insure_item_match  b on a.id = b.hosp_item_id where b.hosp_item_id is null
+			and a.hosp_code =#{hospCode} and a.is_valid ='1'
+		<if test="keyword !=null and keyword != ''">
+			and (a.code like concat('%',#{keyword},'%')
+			or a.name like concat('%',#{keyword},'%')
+			or a.name_pym like concat('%',#{keyword},'%')
+			or a.name_wbm like concat('%',#{keyword},'%'))
+		</if>
+		order by a.crte_time
+	</select>
+
+    <update id="updateNationCodeById">
+        update base_item set nation_code = #{nationCode}  where id = #{id} and hosp_code = #{hospCode}
+    </update>
+</mapper>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharinbackdrug.dao.PharInDistributeDetailDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeDetailDTO" id="PharInDistributeDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="distributeId" column="distribute_id" jdbcType="VARCHAR"/>
+        <result property="irId" column="ir_id" jdbcType="VARCHAR"/>
+        <result property="irdId" column="ird_id" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="chineseDrugNum" column="chinese_drug_num" jdbcType="NUMERIC"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="stockDetailId" column="stock_detail_id" jdbcType="VARCHAR"/>
+        <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="upBatchSurplusNum" column="up_batch_surplus_num" jdbcType="NUMERIC"/>
+        <result property="batchSurplusNum" column="batch_surplus_num" jdbcType="NUMERIC"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="NUMERIC"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="NUMERIC"/>
+        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="NUMERIC"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getPharInDistributeDetailById" resultMap="PharInDistributeDetailMap">
+        select
+          id, hosp_code, distribute_id, ir_id, ird_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage, dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code, stock_detail_id, batch_no, up_batch_surplus_num, batch_surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all
+        from phar_in_distribute_detail
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--批量查询-->
+    <select id="queryPharInDistributeDetails" resultMap="PharInDistributeDetailMap">
+        select a.*
+        from phar_in_distribute_detail a
+        join phar_in_receive_detail b on a.hosp_code=b.hosp_code and a.ir_id=b.receive_id and a.ird_id=b.id
+        join phar_in_wait_receive c on a.hosp_code=c.hosp_code and c.old_wr_id=b.wr_id
+        where c.hosp_code = #{hospCode} and c.id = #{id}
+        and a.num > 0
+        order by a.stock_detail_id desc
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPharInDistributeDetailPage" resultMap="PharInDistributeDetailMap">
+        select
+          id, hosp_code, distribute_id, ir_id, ird_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage, dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code, stock_detail_id, batch_no, up_batch_surplus_num, batch_surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all
+        from phar_in_distribute_detail
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertPharInDistributeDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_distribute_detail(hosp_code, distribute_id, ir_id, ird_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage, dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code, stock_detail_id, batch_no, up_batch_surplus_num, batch_surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all)
+        values (#{hospCode}, #{distributeId}, #{irId}, #{irdId}, #{adviceId}, #{groupNo}, #{visitId}, #{babyId}, #{itemCode}, #{itemId}, #{itemName}, #{num}, #{price}, #{unitCode}, #{spec}, #{dosage}, #{dosageUnitCode}, #{totalPrice}, #{splitRatio}, #{splitUnitCode}, #{splitNum}, #{splitPrice}, #{chineseDrugNum}, #{usageCode}, #{stockDetailId}, #{batchNo}, #{upBatchSurplusNum}, #{batchSurplusNum}, #{upBuyPriceAll}, #{buyPriceAll}, #{upSellPriceAll}, #{sellPriceAll})
+    </insert>
+
+
+    <!--批量新增-->
+    <insert id="insertPharInDistributeDetails" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_distribute_detail(id, hosp_code, distribute_id, ir_id, ird_id, advice_id,
+        group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec,
+        dosage, dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price,
+        chinese_drug_num, usage_code, stock_detail_id, batch_no, up_batch_surplus_num, batch_surplus_num,
+        up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all,curr_unit_code,distribute_all_detail_id,old_dist_id)
+        values
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id}, #{dto.hospCode}, #{dto.distributeId}, #{dto.irId}, #{dto.irdId}, #{dto.adviceId},
+            #{dto.groupNo}, #{dto.visitId}, #{dto.babyId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName},
+            #{dto.num}, #{dto.price}, #{dto.unitCode}, #{dto.spec}, #{dto.dosage}, #{dto.dosageUnitCode},
+            #{dto.totalPrice},#{dto.splitRatio}, #{dto.splitUnitCode}, #{dto.splitNum}, #{dto.splitPrice},
+            #{dto.chineseDrugNum}, #{dto.usageCode}, #{dto.stockDetailId}, #{dto.batchNo},
+            #{dto.upBatchSurplusNum}, #{dto.batchSurplusNum}, #{dto.upBuyPriceAll}, #{dto.buyPriceAll},
+            #{dto.upSellPriceAll}, #{dto.sellPriceAll},#{dto.currUnitCode},#{dto.distributeAllDetailId},#{dto.oldDistId})
+        </foreach>
+    </insert>
+
+    <insert id="insertPharInDistribute">
+      insert into phar_in_distribute(id,hosp_code,phar_id,window_id,order_no,order_type_code,total_price,assign_user_id,
+          assign_user_name,assign_time,dist_user_id,dist_user_name,dist_time,dept_id,status_code,crte_id,crte_name,crte_time)
+          values(#{id},#{hospCode},#{pharId},#{windowId},#{orderNo},#{orderTypeCode},#{totalPrice},#{assignUserId}
+          ,#{assignUserName},#{assignTime},#{distUserId},#{distUserName},#{distTime},#{deptId},#{statusCode},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--单个修改-->
+    <update id="updatePharInDistributeDetail">
+        update phar_in_distribute_detail
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="distributeId != null and distributeId != ''">
+                distribute_id = #{distributeId},
+            </if>
+            <if test="irId != null and irId != ''">
+                ir_id = #{irId},
+            </if>
+            <if test="irdId != null and irdId != ''">
+                ird_id = #{irdId},
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                advice_id = #{adviceId},
+            </if>
+            <if test="groupNo != null and groupNo != ''">
+                group_no = #{groupNo},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="splitRatio != null">
+                split_ratio = #{splitRatio},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code = #{splitUnitCode},
+            </if>
+            <if test="splitNum != null">
+                split_num = #{splitNum},
+            </if>
+            <if test="splitPrice != null">
+                split_price = #{splitPrice},
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num = #{chineseDrugNum},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="stockDetailId != null and stockDetailId != ''">
+                stock_detail_id = #{stockDetailId},
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                batch_no = #{batchNo},
+            </if>
+            <if test="upBatchSurplusNum != null">
+                up_batch_surplus_num = #{upBatchSurplusNum},
+            </if>
+            <if test="batchSurplusNum != null">
+                batch_surplus_num = #{batchSurplusNum},
+            </if>
+            <if test="upBuyPriceAll != null">
+                up_buy_price_all = #{upBuyPriceAll},
+            </if>
+            <if test="buyPriceAll != null">
+                buy_price_all = #{buyPriceAll},
+            </if>
+            <if test="upSellPriceAll != null">
+                up_sell_price_all = #{upSellPriceAll},
+            </if>
+            <if test="sellPriceAll != null">
+                sell_price_all = #{sellPriceAll},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--获得库存明细数据-->
+    <select id="queryStroStockDetailDTOs" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        SELECT
+        l.hosp_code,
+        e.phar_id as biz_id,
+        e.order_no,
+        l.item_code,
+        l.item_id,
+        l.item_name,
+        abs(l.num) num,
+        l.unit_code,
+        case when l.item_code = '1' then bd.last_buy_price when l.item_code ='2' then bm.last_buy_price end buy_price,
+        l.price AS sell_price,
+        case when l.item_code = '1' then abs( bd.last_buy_price * l.num ) when l.item_code ='2' then ( bm.last_buy_price * l.num ) end buy_price_all,
+        abs( l.price * l.num ) AS sell_price_all,
+        l.split_ratio,
+        l.split_num,
+        l.split_price,
+        l.split_unit_code,
+        l.batch_no,
+        s.expiry_date,
+        s.id,
+        e.phar_id as invoicingTargetId,
+        s.sell_price as new_price,
+        s.split_price as new_split_price,
+        (select dp.name from base_dept dp where dp.id = e.phar_id and dp.hosp_code = e.hosp_code) as invoicingTargetName
+        FROM
+        phar_in_distribute_detail l
+        join phar_in_distribute e on e.id = l.distribute_id and  e.hosp_code = l.hosp_code
+        join stro_stock_detail s on l.hosp_code = s.hosp_code and l.stock_detail_id = s.id
+        left join base_drug bd on bd.id = l.item_id and bd.hosp_code = l.hosp_code
+        left join base_material bm on bm.id = l.item_id and bm.hosp_code = l.hosp_code
+        where
+        (l.hosp_code,l.id) in
+		    <foreach collection="list" item="dto" open="(" close=")" separator=",">
+            (#{dto.hospCode},#{dto.id})
+        </foreach>
+    </select>
+
+    <select id="queryPharInDistributeDetailById" resultType="java.math.BigDecimal">
+       select ifnull(abs(sum(split_num)),0) from phar_in_distribute_detail where old_dist_id = #{id} and hosp_code = #{hospCode} and num &lt; 0
+    </select>
+
+    <!--批量查询-->
+    <select id="queryPharInDistributeAllDetailDTO" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeAllDetailDTO">
+      select a.*
+      from phar_in_distribute_all_detail a
+      join phar_in_receive_detail b on a.hosp_code=b.hosp_code and a.ir_id=b.receive_id and a.ird_id=b.id
+      join phar_in_wait_receive c on a.hosp_code=c.hosp_code and c.old_wr_id=b.wr_id
+      where c.hosp_code = #{hospCode} and c.id = #{id}
+      and a.num > 0
+    </select>
+
+
+
+</mapper>

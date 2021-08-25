@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.OutptPayDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptPayDtoMap" type="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="INTEGER" />
+        <result column="visit_id" property="visitId" jdbcType="INTEGER" />
+        <result column="pay_code" property="payCode" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="service_price" property="servicePrice" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id, 
+        hosp_code, 
+        settle_id, 
+        visit_id, 
+        pay_code, 
+        price, 
+        order_no, 
+        service_price
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        op.id, 
+        op.hosp_code, 
+        op.settle_id, 
+        op.visit_id, 
+        op.pay_code, 
+        op.price, 
+        op.order_no, 
+        op.service_price
+            
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptPayDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_pay
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.fees.entity.OutptPayDO" >
+        insert into
+        outpt_pay
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          pay_code,
+          price,
+          order_no,
+          service_price
+        ) values (
+          #{id,jdbcType=VARCHAR}, 
+          #{hospCode,jdbcType=VARCHAR}, 
+          #{settleId,jdbcType=INTEGER}, 
+          #{visitId,jdbcType=INTEGER}, 
+          #{payCode,jdbcType=VARCHAR}, 
+          #{price,jdbcType=DECIMAL}, 
+          #{orderNo,jdbcType=VARCHAR}, 
+          #{servicePrice,jdbcType=DECIMAL}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptPayDO" >
+        insert into
+        outpt_pay
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code, 
+                </if>
+                <if test="settleId != null">
+                    settle_id, 
+                </if>
+                <if test="visitId != null">
+                    visit_id, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                    pay_code, 
+                </if>
+                <if test="price != null">
+                    price, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                    order_no, 
+                </if>
+                <if test="servicePrice != null">
+                    service_price
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR}, 
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null">
+                        #{settleId,jdbcType=INTEGER}, 
+                </if>
+                <if test="visitId != null">
+                        #{visitId,jdbcType=INTEGER}, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                        #{payCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="price != null">
+                        #{price,jdbcType=DECIMAL}, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                        #{orderNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="servicePrice != null">
+                        #{servicePrice,jdbcType=DECIMAL}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.fees.entity.OutptPayDO" >
+        update
+        outpt_pay
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                settle_id = #{settleId,jdbcType=INTEGER}, 
+                visit_id = #{visitId,jdbcType=INTEGER}, 
+                pay_code = #{payCode,jdbcType=VARCHAR}, 
+                price = #{price,jdbcType=DECIMAL}, 
+                order_no = #{orderNo,jdbcType=VARCHAR}, 
+                service_price = #{servicePrice,jdbcType=DECIMAL}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptPayDO" >
+        update
+        outpt_pay
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="settleId != null">
+                settle_id = #{settleId,jdbcType=INTEGER}, 
+                </if>
+                <if test="visitId != null">
+                visit_id = #{visitId,jdbcType=INTEGER}, 
+                </if>
+                <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode,jdbcType=VARCHAR}, 
+                </if>
+                <if test="price != null">
+                price = #{price,jdbcType=DECIMAL}, 
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo,jdbcType=VARCHAR}, 
+                </if>
+                <if test="servicePrice != null">
+                service_price = #{servicePrice,jdbcType=DECIMAL}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM outpt_pay WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM outpt_pay WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="outptPayDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_pay op 
+        <where>
+            <if test="hospCode != null and hospCode != ''">
+                AND op.hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+            </if>
+            <if test="settleId != null">
+                AND op.settle_id = #{settleId}
+            </if>
+            <if test="visitId != null">
+                AND op.visit_id = #{visitId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertOutptPays" parameterType="list">
+        INSERT INTO outpt_pay (
+        id, hosp_code, settle_id, visit_id, pay_code, price, order_no, service_price
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.settleId},
+            #{item.visitId},
+            #{item.payCode},
+            #{item.price},
+            #{item.orderNo},
+            #{item.servicePrice}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findOutptPayByParams" resultMap="outptPayDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM outpt_pay
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id} and price &gt;= 0
+    </select>
+
+    <insert id="batchInsertOutptPay" parameterType="java.util.List">
+        INSERT INTO outpt_pay (
+        id, hosp_code, settle_id, visit_id, pay_code, price, order_no, service_price
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.settleId},
+            #{item.visitId},
+            #{item.payCode},
+            #{item.price},
+            #{item.orderNo},
+            #{item.servicePrice}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryMedicalApplyList" resultType="java.util.Map">
+        select a.hosp_code, a.apply_no, a.type_code, a.visit_id as pid, a.in_no, a.opd_id,a.id,
+        c.item_id,
+        b.age_unit_code as ageunit,
+        '门诊' as patType,
+        '无' as bednum,
+        (select ba.code from base_advice ba where ba.id = c.item_id and ba.hosp_code = a.hosp_code) as sfcode,
+        c.item_name as sfname, c.total_price as sfmoney, '1' as sfcount,
+        a.is_inpt, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name,
+        (select bd.code from base_dept bd where bd.id = a.dept_id and bd.hosp_code = a.hosp_code) as department,
+		(select ba.code from sys_user ba where ba.id = a.doctor_id and ba.hosp_code = a.hosp_code) as doctor,
+        a.crte_time as sftime, a.medic_type as pattype, b.name,
+        if(b.gender_code = '1', '男', '女') as sex, ifnull(b.age,18) as age,
+        a.bar_code as barcode
+        from medic_apply a
+        left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        left join outpt_prescribe_detail c on a.opd_id = c.id and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode} and a.visit_id = #{id}
+    </select>
+
+    <select id="queryInptMedicalApplyList">
+        select a.hosp_code, a.apply_no, a.type_code, a.visit_id as pid, a.in_no, a.opd_id,a.id,
+        c.item_id,
+        b.age_unit_code as ageunit,
+        '住院' as patType,
+        b.bed_name as bednum,
+        (select ba.code from base_advice ba where ba.id = c.item_id and ba.hosp_code = a.hosp_code) as sfcode,
+        c.item_name as sfname, c.total_price as sfmoney, '1' as sfcount,
+        a.is_inpt, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name,
+        (select bd.code from base_dept bd where bd.id = a.dept_id and bd.hosp_code = a.hosp_code) as department,
+		(select ba.code from sys_user ba where ba.id = a.doctor_id and ba.hosp_code = a.hosp_code) as doctor,
+        a.crte_time as sftime, a.medic_type as pattype, b.name, if(b.gender_code = '1', '男', '女') as sex, ifnull(b.age,18) as age,
+        a.bar_code as barcode
+        from medic_apply a
+        left join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        left join inpt_advice_detail c on a.opd_id = c.id and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode} and a.visit_id = #{id}
+    </select>
+</mapper>

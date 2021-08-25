@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bspc.dao.BaseSpecialCalcDAO">
+
+    <resultMap type="cn.hsa.module.base.bspc.dto.BaseSpecialCalcDTO" id="BaseSpecialCalcMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="drugCode" column="drug_code" jdbcType="VARCHAR"/>
+        <result property="truncCode" column="trunc_code" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="drugName" column="drugName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseSpecialCalcMap">
+        select
+          id, hosp_code, dept_code, drug_code, trunc_code, is_valid, crte_id, crte_name, crte_time
+        from base_special_calc
+        where id = #{id} and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseSpecialCalcMap">
+        select
+          id, hosp_code, dept_code, drug_code, trunc_code, is_valid, crte_id, crte_name, crte_time,
+          (select base_dept.name from base_dept where base_dept.`code` =  dept_code and base_dept.hosp_code = #{hospCode}) as deptName,
+          (select base_drug.good_name from base_drug where base_drug.`code` = drug_code and base_drug.hosp_code = #{hospCode}) as drugName,
+          (select base_drug.spec from base_drug where base_drug.`code` = drug_code and base_drug.hosp_code = #{hospCode}) as spec
+        from base_special_calc
+        where hosp_code = #{hospCode}
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="drugCode != null and drugCode != ''">
+                and drug_code = #{drugCode}
+            </if>
+            <if test="truncCode != null and truncCode != ''">
+                and trunc_code = #{truncCode}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and drug_code in (select base_drug.code from base_drug where base_drug.good_name like concat('%',#{keyword},'%') and base_drug.hosp_code = #{hospCode})
+            </if>
+            <if test="ids != null and ids.size() > 0">
+              and dept_code in
+              <foreach collection="ids" item="item" separator="," open="(" close=")">
+                #{item}
+              </foreach>
+            </if>
+            order by crte_time desc
+    </select>
+
+    <select id="querySpecialCalcs" resultMap="BaseSpecialCalcMap">
+        select
+        a.id, a.hosp_code, a.dept_code, a.drug_code, a.trunc_code, a.is_valid, a.crte_id, a.crte_name, a.crte_time
+        from base_special_calc a left join base_dept b on a.hosp_code=b.hosp_code and a.dept_code=b.code
+        left join base_drug c on a.drug_code=c.code and c.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and b.id = #{deptId}
+        </if>
+        <if test="deptId == null or deptId == ''">
+            and (b.id = '' or b.id is null)
+        </if>
+        <if test="drugId != null and drugId != ''">
+            and c.id = #{drugId}
+        </if>
+        order by a.crte_time desc
+    </select>
+
+    <!--批量增加特殊药品计费-->
+    <insert id="insert" parameterType="java.util.List">
+        insert into base_special_calc(id,hosp_code, dept_code, drug_code, trunc_code, is_valid, crte_id, crte_name, crte_time)
+        VALUES
+      <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id},#{item.hospCode},#{item.deptCode},#{item.drugCode},#{item.truncCode},#{item.isValid},#{item.crteId},#{item.crteName} ,#{item.crteTime})
+      </foreach>
+
+    </insert>
+
+    <!--批量修改特殊药品计费-->
+    <update id="update" parameterType="java.util.List">
+      <foreach collection="list" item="item" separator=";">
+        update base_special_calc
+        <set>
+          <if test="item.deptCode != null">
+            dept_code=#{item.deptCode},
+          </if>
+          <if test="item.drugCode != null">
+            drug_code=#{item.drugCode},
+          </if>
+          <if test="item.truncCode != null">
+            trunc_code=#{item.truncCode},
+          </if>
+        </set>
+        where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete" parameterType="java.util.Map">
+        update base_special_calc set is_valid = 0
+        where hosp_code = #{hospCode}
+        <if test="ids != null and ids.size() > 0">
+          and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </delete>
+
+    <!--获取科室树结构-->
+    <select id="getDeptTree" resultType="cn.hsa.base.TreeMenuNode" parameterType="java.util.Map">
+       select
+         code as id,
+         id as deptId,
+         name label,
+         if(up_dept_code = '' or up_dept_code is null ,'-1',up_dept_code) as parentId
+         from base_dept
+       where hosp_code = #{hospCode} and is_valid = '1'
+          <if test="deptTypeCodes != null and deptTypeCodes.size() > 0">
+            and type_code in
+            <foreach collection="deptTypeCodes" item="item" separator="," open="(" close=")">
+              #{item}
+            </foreach>
+          </if>
+    </select>
+
+</mapper>

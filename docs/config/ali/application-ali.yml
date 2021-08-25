@@ -1,0 +1,144 @@
+logging:
+  file:
+    path: /home/admin/taobao-tomcat-production-7.0.59.3/logs/
+  level:
+    root: warn
+    cn.hsa: debug
+
+swagger:
+  enabled: true
+
+cache:
+  cluster0:
+    cacheName: hsaf-redis
+    password: Admin123
+    nodes: r-ag393eabe69eb434.redis.rds.ops.hsip.gov.cn:6379
+
+mybatis:
+  database:
+    provider:
+      type: mysql
+    pageHelper:
+      dialect: mysql
+db:
+  druid:
+    url: jdbc:mysql://rm-ag365857024l39gdm.mysql.rds.ops.hsip.gov.cn:3306/hsa_template_db_dev?connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: hsa_template_dev
+    password: hsa_template_dev123
+    validationQuery: SELECT 'x'
+
+fsstore:
+  url: http://hsa-template-oss-dev.oss-cn-beijing-ybcloud-d01-a.ops.hsip.gov.cn/
+  bucket: hsa-template-oss-dev
+oss:
+  endpoint: http://oss-cn-beijing-ybcloud-d01-a.ops.hsip.gov.cn
+  accessKeyId: BX4uzUTor88oWtsA
+  secretAccessKey: 9qnGyDdvvuoasJcpSLg4YhiHuEwfxE
+
+gateway:
+  csb:
+    csburl: http://39.106.64.95:8086/CSB
+    accessKey: 3ac22a8c0644460b86eebe0b8bf162b8
+    securityKey: ic1m+47vSRKddKdXjSgUn/ZF/7A=
+    connectionMax: 200
+    connectionTimeout: 2000
+    connectionSoTimeout: 2000
+    connectionCrTimeout: 2000
+    skipConnectionPool: false
+    connectionAsync: false
+  tencent:
+    gatewayUrl: http://demo.rio.tencent.com/ebus
+    paasid: testapp1_passid
+    token: DC8d9v0U3XgnuNR73XgRPtGcDz3badZs
+    socketTimeout: 2000
+    connectTimeout: 2000
+    soTimeout: 2000
+    connectionRequestTimeout: 2000
+    maxConnTotal: 10
+    maxConnPerRoute: 3
+  generic:
+    gatewayUrl: http://127.0.0.1:8000
+    apikey: test123
+    socketTimeout: 2000
+    connectTimeout: 2000
+    soTimeout: 2000
+    connectionRequestTimeout: 2000
+    maxConnTotal: 10
+    maxConnPerRoute: 3
+
+idgenerator:
+  common:
+    step: 10
+  redis:
+    clusterNodes: r-ag38aa7f45ad9c14.redis.rds.ops.hsip.gov.cn:6379
+    password: Admin123
+
+xxl:
+  job:
+    enabled: true
+    admin:
+      addresses: http://10.12.65.20:8080/xxl-job-admin
+    accessToken:
+    executor:
+      appname: xxl-job-executor-sample
+      ip:
+      port: 9998
+      logpath: /home/admin/taobao-tomcat-production-7.0.59.3/logs/xxl-job/jobhandler
+      logretentiondays: -1
+
+mq:
+  topic:
+    string: MQ-NHSA-CZHY-DEMO-STR
+    dto: MQ-NHSA-CZHY-DEMO-DTO
+  ali:
+    GROUP_ID: GID-NHSA-CZHY-TCP
+    AccessKey: d7JXUcy9ecsNoDK5
+    SecretKey: 6JIl20nY7fz0O4aIBAR5uD8ueoBgUI
+    NAMESRV_ADDR: http://MQ_INST_1587868884041871_Bbigm9Zs.cn-beijing-ybcloud-d01.mq.namesrv.cloud.hsip.gov.cn:9876
+    ConsumeThreadNums: 100
+
+server:
+  servlet:
+    session:
+      cookie:
+        path: /
+
+session:
+  redis:
+    host: r-ag3f61a45f2cb2c4.redis.rds.ops.hsip.gov.cn
+    port: 6379
+    password: Admin123
+    database: 0
+    timeout: 30000
+    pool:
+      maxIdle: 5
+      maxTotal: 10
+      maxWaitMillis: 5000
+      testOnBorrow: false
+      testOnReturn: false
+security:
+  type: hsa-mock
+  oauth2:
+    client:
+      access-token-uri: http://127.0.0.1:7001/uaa/oauth/token
+      user-authorization-uri: http://127.0.0.1:7001/uaa/oauth/authorize
+      client-id: acme1
+      client-secret: acmesecret1
+      client-authentication-scheme: header
+      permits: /test
+    resource:
+      jwt:
+        key-value: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnGp/Q5lh0P8nPL21oMMrt2RrkT9AW5jgYwLfSUnJVc9G6uR3cXRRDCjHqWU5WYwivcF180A6CWp/ireQFFBNowgc5XaA0kPpzEtgsA5YsNX7iSnUibB004iBTfU9hZ2Rbsc8cWqynT0RyN4TP1RYVSeVKvMQk4GT1r7JCEC+TNu1ELmbNwMQyzKjsfBXyIOCFU/E94ktvsTZUHF4Oq44DBylCDsS1k7/sfZC2G5EU7Oz0mhG8+Uz6MSEQHtoIi6mc8u64Rwi3Z3tscuWG2ShtsUFuNSAFNkY7LkLn+/hxLCu2bNISMaESa8dG22CIMuIeRLVcAmEWEWH5EEforTg+QIDAQAB
+
+upengine:
+  sdk:
+    urlPrefix: http://10.12.65.21:8080/up-runtime-server/service/rest/
+    clientType: ten
+    tenantCode: C2D1T1
+    accessUser: AUC2D1T1
+    checkCode: C2D1T1123456
+    area: .*
+    connectTimeout: 1000
+    readTimeout: 30000
+    charset: UTF-8

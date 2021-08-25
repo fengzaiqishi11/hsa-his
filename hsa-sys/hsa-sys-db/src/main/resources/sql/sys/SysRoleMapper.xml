@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.role.dao.SysRoleDao">
+
+    <!--获取子系统所有数据-->
+    <select id="queryRoles" resultType="cn.hsa.module.sys.role.entity.SysRoleDo">
+        select * from sys_role where is_valid='1' and hosp_code=#{hospCode}
+        order by CAST(seq_no AS SIGNED)
+    </select>
+
+    <!--根据编码获取数量-->
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(1) as num from sys_role where code=#{code} and is_valid='1' and id!=#{id} and hosp_code=#{hospCode}
+    </select>
+
+    <!--新增-->
+    <insert id="insertRole" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.role.entity.SysRoleDo">
+        insert into sys_role(id,hosp_code,code,name,remark,seq_no,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{hospCode},#{code},#{name},#{remark},#{seqNo},'1',#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--修改-->
+    <update id="updateRole" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.role.entity.SysRoleDo">
+        update sys_role
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark=#{remark},
+            </if>
+            <if test="seqNo!=null and seqNo!=''">
+                seq_no=#{seqNo},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id} and hosp_code=#{hospCode}
+    </update>
+
+    <!--删除-->
+    <update id="deleteRoles" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.role.entity.SysRoleDo">
+        update sys_role
+        set is_valid = 0 where 1=1 and is_valid = 1
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="hospCode!=null and hospCode!=''">
+            and hosp_code=#{hospCode}
+        </if>
+    </update>
+
+    <!--保存角色菜单按钮-->
+    <delete id="deleteRoleButtonByCode">
+        delete from sys_role_menu_button where role_code=#{roleCode} and hosp_code=#{hospCode}
+    </delete>
+
+    <!--新增角色菜单权限-->
+    <insert id="insertRoleButtons">
+        insert into sys_role_menu_button(id,hosp_code,role_code,menu_code,button_code,crte_id,crte_name,crte_time)
+        values
+        <foreach collection="buttons" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.hospCode}, #{item.roleCode}, #{item.menuCode}, #{item.buttonCode}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--获取树形数据-->
+    <select id="getMenuTree" resultType="cn.hsa.base.TreeMenuNode">
+        select a.* from (
+        select distinct '1' as isMenuOrBtn,a.code code,a.name label,a.up_code as parentCode,a.code id,
+        (case when b.menu_code is null then 'false' else 'true' end) isAble
+        from sys_menu a
+        left join sys_role_menu_button b on a.code = b.menu_code and b.hosp_code = a.hosp_code
+        <if test="code!=null and code!=''">
+            and b.role_code = #{code}
+        </if>
+        where a.is_valid = '1' and a.hosp_code = #{hospCode}
+        <if test="sysCode!=null and sysCode!=''">
+            and a.sys_code = #{sysCode}
+        </if>
+        union all
+        select distinct '2' as isMenuOrBtn,c.code code,c.name label,c.menu_code as parentCode,c.id id,
+        (case when b.button_code is null then 'false'  else 'true' end) isAble
+        from sys_menu_button c
+        left join sys_role_menu_button b on b.button_code=c.code and b.hosp_code=c.hosp_code and b.menu_code = c.menu_code
+        <if test="code!=null and code!=''">
+            and b.role_code=#{code}
+        </if>
+        where c.is_valid='1' and c.hosp_code = #{hospCode}
+        ) a order by a.id
+    </select>
+</mapper>

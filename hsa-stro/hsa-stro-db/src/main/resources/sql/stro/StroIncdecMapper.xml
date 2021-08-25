@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.incdec.dao.StroIncdecDao">
+
+    <resultMap type="cn.hsa.module.stro.incdec.dto.StroIncdecDTO" id="StroIncdecMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="beforePrice" column="before_price" jdbcType="NUMERIC"/>
+        <result property="afterPrice" column="after_price" jdbcType="NUMERIC"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="bizName" column="bizName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getStroIncdecDTOById" resultMap="StroIncdecMap">
+        select
+          c.id, c.hosp_code, c.biz_id, c.order_no, c.before_price, c.after_price, c.price, c.remark, c.audit_id, c.audit_name, c.audit_code, c.audit_time, c.crte_id, c.crte_name, c.crte_time,
+          (select name from base_dept t where t.hosp_code = c.hosp_code and t.id = c.biz_id) bizName
+        from stro_incdec c
+        where  c.hosp_code = #{hospCode}
+        and c.id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryStroIncdecDTOPage" resultMap="StroIncdecMap">
+        select
+        c.id, c.hosp_code, c.biz_id, c.order_no, c.before_price, c.after_price, c.price, c.remark, c.audit_id, c.audit_name, c.audit_code, c.audit_time, c.crte_id, c.crte_name, c.crte_time,
+        (select name from base_dept t where t.hosp_code = c.hosp_code and t.id = c.biz_id) bizName
+        from stro_incdec c
+        where c.hosp_code = #{hospCode}
+        <if test="bizId != null and bizId != ''">
+            and c.biz_id = #{bizId}
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            and c.order_no like concat("%",#{orderNo},"%")
+        </if>
+        <if test="auditCode != null and auditCode != ''">
+            and c.audit_code = #{auditCode}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(c.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(c.crte_time) &lt;= date(#{endDate})
+        </if>
+        order by c.audit_code,c.crte_time
+    </select>
+
+    <!--根据条件查询-->
+    <select id="queryStroIncdecDTOs" resultMap="StroIncdecMap">
+        select
+        c.id, c.hosp_code, c.biz_id, c.order_no, c.before_price, c.after_price, c.price, c.remark, c.audit_id, c.audit_name, c.audit_code, c.audit_time, c.crte_id, c.crte_name, c.crte_time,
+        (select name from base_dept t where t.hosp_code = c.hosp_code and t.id = c.biz_id) bizName
+        from stro_incdec c
+        where c.hosp_code = #{hospCode}
+        and c.id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        order by c.audit_code,c.crte_time
+    </select>
+
+    <!--单个新增-->
+    <insert id="insertStroIncdecDTO" keyProperty="" useGeneratedKeys="true">
+        insert into stro_incdec(id, hosp_code, biz_id, order_no, before_price, after_price, price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{price}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--单个修改-->
+    <update id="updateStroIncdecDTO">
+        update stro_incdec
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="bizId != null and bizId != ''">
+                biz_id = #{bizId},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="beforePrice != null">
+                before_price = #{beforePrice},
+            </if>
+            <if test="afterPrice != null">
+                after_price = #{afterPrice},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--批量修改-->
+    <update id="updateStroIncdecDTOByIds">
+        update stro_incdec
+        set audit_id = #{auditId},
+        audit_name = #{auditName},
+        audit_code = #{auditCode},
+        audit_time = #{auditTime}
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

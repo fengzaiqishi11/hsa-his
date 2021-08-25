@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.baseoutptexec.dao.BaseOutptExecDAO">
+
+    <resultMap type="cn.hsa.module.base.baseoutptexec.dto.BaseOutptExecDTO" id="BaseOutptExecMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="usageCodes" column="usage_codes" jdbcType="VARCHAR"/>
+        <result property="deptIds" column="dept_ids" jdbcType="VARCHAR"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseOutptExecMap">
+        select
+          id, hosp_code, usage_codes, dept_ids, exec_dept_id, is_valid, crte_id, crte_name, crte_time
+        from base_outpt_exec
+        where id = #{id} and hosp_code =#{hospCode}
+        <if test="deptIds != null and deptIds != ''">
+          and find_in_set(#{deptId},a.dept_ids)
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageorAll" resultMap="BaseOutptExecMap">
+        select
+          id, hosp_code, usage_codes, dept_ids, exec_dept_id, is_valid, crte_id, crte_name, crte_time,
+          (select name from base_dept where base_dept.id = exec_dept_id and hosp_Code = #{hospCode}) as execDeptName
+        from base_outpt_exec
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="usageCodes != null and usageCodes != ''">
+                and usage_codes = #{usageCodes}
+            </if>
+            <if test="deptIds != null and deptIds != ''">
+                and dept_ids = #{deptIds}
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                and exec_dept_id = #{execDeptId}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+              and (id like concat('%',#{keyword},'%') or exec_dept_id in (select id from base_dept where `name` like concat('%',#{keyword},'%') ))
+            </if>
+            order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_outpt_exec(id,hosp_code, usage_codes, dept_ids, exec_dept_id, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{usageCodes}, #{deptIds}, #{execDeptId}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_outpt_exec
+        <set>
+            <if test="usageCodes != null">
+                usage_codes = #{usageCodes},
+            </if>
+            <if test="deptIds != null">
+                dept_ids = #{deptIds},
+            </if>
+            <if test="execDeptId != null">
+                exec_dept_id = #{execDeptId},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+      update base_outpt_exec set is_valid = #{isValid}
+      where
+      hosp_code = #{hospCode}
+      <if test="ids != null and ids.size()>0">
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </update>
+
+    <!--查询执行科室-->
+    <select id="getExecDept" resultMap="BaseOutptExecMap">
+        select
+          a.id, a.hosp_code, a.usage_codes, a.dept_ids, a.exec_dept_id, a.is_valid, a.crte_id, a.crte_name, a.crte_time
+        from base_outpt_exec a
+        where find_in_set(#{usageCodes} , a.usage_codes) and FIND_IN_SET(#{deptIds} ,a.dept_ids) and a.hosp_code = #{hospCode}
+        and a.is_valid='1'
+    </select>
+    
+    <!--是否存在同一个科室同一个用法重复的数据-->
+    <select id="getExecDeptS" resultMap="BaseOutptExecMap">
+        select
+          a.id, a.hosp_code, a.usage_codes, a.dept_ids, a.exec_dept_id, a.is_valid, a.crte_id, a.crte_name, a.crte_time
+        from base_outpt_exec a
+        where find_in_set(#{usageCodes} , a.usage_codes) and FIND_IN_SET(#{deptIds} ,a.dept_ids)
+        and a.is_valid='1' and a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and a.id != #{id}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,1101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO">
+
+    <resultMap id="insureIndividualSettleMap"
+               type="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="isHospital" column="is_hospital" jdbcType="VARCHAR"/>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"/>
+        <result property="dischargeDnCode" column="discharge_dn_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="insureRegCode" column="insure_reg_code" jdbcType="VARCHAR"/>
+        <result property="medicineOrgCode" column="medicine_org_code" jdbcType="VARCHAR"/>
+        <result property="dischargeDnName" column="discharge_dn_name" jdbcType="VARCHAR"/>
+        <result property="dischargedDate" column="discharged_date" jdbcType="TIMESTAMP"/>
+        <result property="dischargedCase" column="discharged_case" jdbcType="VARCHAR"/>
+        <result property="settleway" column="settleway" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="planPrice" column="plan_price" jdbcType="NUMERIC"/>
+        <result property="seriousPrice" column="serious_price" jdbcType="NUMERIC"/>
+        <result property="civilPrice" column="civil_price" jdbcType="NUMERIC"/>
+        <result property="retirePrice" column="retire_price" jdbcType="NUMERIC"/>
+        <result property="personalPrice" column="personal_price" jdbcType="NUMERIC"/>
+        <result property="personPrice" column="person_price" jdbcType="NUMERIC"/>
+        <result property="hospPrice" column="hosp_price" jdbcType="NUMERIC"/>
+        <result property="beforeSettle" column="before_settle" jdbcType="NUMERIC"/>
+        <result property="lastSettle" column="last_settle" jdbcType="NUMERIC"/>
+        <result property="restsPrice" column="rests_price" jdbcType="NUMERIC"/>
+        <result property="assignPrice" column="assign_price" jdbcType="NUMERIC"/>
+        <result property="startingPrice" column="starting_price" jdbcType="NUMERIC"/>
+        <result property="topPrice" column="top_price" jdbcType="NUMERIC"/>
+        <result property="planAccountPrice" column="plan_account_price" jdbcType="NUMERIC"/>
+        <result property="portionPrice" column="portion_price" jdbcType="NUMERIC"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="settleState" column="settleState" jdbcType="VARCHAR"/>
+        <result property="costbatch" column="costbatch" jdbcType="VARCHAR"/>
+        <result property="aka130" column="aka130" jdbcType="VARCHAR"/>
+        <result property="injuryBorthSn" column="injury_borth_sn" jdbcType="VARCHAR"/>
+        <result property="isAccount" column="is_account" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="aac003" column="aac003" jdbcType="VARCHAR"/>
+        <result property="aac002" column="aac002" jdbcType="VARCHAR"/>
+        <result property="aac004" column="aac004" jdbcType="VARCHAR"/>
+        <result property="aae005" column="aae005" jdbcType="VARCHAR"/>
+        <result property="bka006" column="bka006" jdbcType="VARCHAR"/>
+        <result property="bka006Name" column="bka006_name" jdbcType="VARCHAR"/>
+        <result property="visitIcdCode" column="visitIcdCode" jdbcType="VARCHAR"/>
+        <result property="aac001" column="aac001" jdbcType="VARCHAR"/>
+        <result property="visitIcdName" column="visitIcdName" jdbcType="VARCHAR"/>
+        <result property="aka130Name" column="aka130Name" jdbcType="VARCHAR"/>
+        <result property="patientCode" column="patientCode" jdbcType="VARCHAR"/>
+        <result property="visitDrptName" column="visitDrptName" jdbcType="VARCHAR"/>
+        <result property="insureSettleId" column="insureSettleId" jdbcType="VARCHAR"/>
+        <result property="akc252" column="akc252" jdbcType="NUMERIC"/>
+        <result property="isZC" column="isZC" jdbcType="VARCHAR"/>
+        <result property="isUpload" column="isUpload" jdbcType="VARCHAR"/>
+        <result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="bka035" column="bka035" jdbcType="VARCHAR"/>
+        <result property="bka035Name" column="bka035_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        iis.id,
+        iis.hosp_code,
+        iis.visit_id,
+        iis.settle_id,
+        iis.is_hospital,
+        iis.visit_no,
+        iis.discharge_dn_code,
+        iis.insure_org_code,
+        iis.insure_reg_code,
+        iis.medicine_org_code,
+        iis.discharge_dn_name,
+        iis.discharged_date,
+        iis.discharged_case,
+        iis.settleway,
+        iis.total_price,
+        iis.insure_price,
+        iis.plan_price,
+        iis.serious_price,
+        iis.civil_price,
+        iis.retire_price,
+        iis.personal_price,
+        iis.person_price,
+        iis.hosp_price,
+        iis.before_settle,
+        iis.last_settle,
+        iis.rests_price,
+        iis.assign_price,
+        iis.starting_price,
+        iis.top_price,
+        iis.plan_account_price,
+        iis.portion_price,
+        iis.state,
+        iis.settle_state,
+        iis.costbatch,
+        iis.aka130,
+        iis.bka006,
+        iis.injury_borth_sn,
+        iis.is_account,
+        iis.remark,
+        iis.crte_id,
+        iis.crte_name,
+        iis.crte_time,
+        iis.insureSettleId,
+        iis.medicalRegNo,
+        iis.ext03,
+        iis.ext04,
+        iis.ext05,
+        iis.ext06,
+        iis.ext07,
+        iis.ext08,
+        iis.ext09,
+        iis.ext10
+    </sql>
+
+    <!--通过实体作为筛选条件 分页查询个人医保结算信息-->
+    <select id="queryPage" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO"
+            resultMap="insureIndividualSettleMap">
+        select * from(
+        select
+        iic.id, iic.hosp_code, iic.visit_id, iic.settle_id, iic.is_hospital, iic.visit_no, iic.discharge_dn_code,
+        iic.insure_org_code,iic.insure_reg_code,
+        iic.medicine_org_code,iic.discharge_dn_name, discharged_date, iic.discharged_case,
+        (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
+        iic.total_price, iic.plan_price,
+        iic.serious_price, iic.civil_price, iic.retire_price, iic.personal_price, iic.person_price, iic.hosp_price,
+        iic.before_settle, iic.last_settle,
+        iic.rests_price, iic.assign_price, iic.starting_price, iic.top_price, iic.plan_account_price, iic.portion_price,
+        iic.state,
+        (IF(iic.settle_state = '0', '试算', '结算')) as settleState,
+        iic.costbatch, iic.aka130,iic.injury_borth_sn, iic.is_account, iic.remark, iic.crte_id,iic.insureSettleId,
+        iic.crte_name, iic.crte_time,iiv.visit_drpt_name as visitDrptName,
+        iiv.aka130_name as aka130Name,iiv.aac001,iiv.bka006,
+        CASE iiv.bka006_name WHEN 'null' THEN '-' WHEN '' THEN '-' ELSE iiv.bka006_name END bka006_name,
+        iiv.visit_icd_code as visitIcdCode,iiv.visit_icd_name as visitIcdName,
+        iib.aac003,iib.aac002,
+        CASE iib.aac004 WHEN '男' THEN 2 WHEN '女' THEN 1 ELSE iib.aac004 END aac004,iib.aae005,
+        (
+        case iic.is_hospital
+        when '1'
+        then (select patient_code from inpt_visit iv where iv.hosp_code = iic.hosp_code and iv.id = iic.visit_id)
+        when '0'
+        then (select patient_code from outpt_visit ov where ov.hosp_code = iic.hosp_code and ov.id = iic.visit_id)
+        end
+        ) as patientCode,
+        if(isnull((select settle_id from insure_setl_info isi where iic.settle_id = isi.settle_id
+        and iic.visit_id = isi.visit_id limit 1)),0,1) as isUpload,
+        iv.in_time,
+        iv.out_time,
+        iib.bka035,
+        iib.bka035_name
+        from insure_individual_settle iic
+        left join insure_individual_visit iiv on iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
+        join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
+        left join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
+        where iic.hosp_code = #{hospCode} and iic.insureSettleId is not null
+        <if test="keyWord != null and keyWord != ''">
+            and ( iiv.visit_no like concat('%',#{keyWord},'%')
+            or iib.aac003 like concat('%',#{keyWord},'%')
+            or iib.aac002 like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <if test="isZC != null and isZC != ''">
+            and iic.state = '0' and iib.aac003 is not null
+        </if>
+        <!--业务类型选择-->
+        <if test="isHospital != null and isHospital != ''">
+            and  iic.is_hospital =#{isHospital}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(iic.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(iic.crte_time) &lt;= date(#{endDate})
+        </if>
+        order by iic.crte_time
+        )a where 1=1
+        <if test="isUpload != null and isUpload != ''">
+            and a.isUpload = #{isUpload}
+        </if>
+        order by a.crte_time
+    </select>
+
+    <select id="getById" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO"
+            resultMap="insureIndividualSettleMap">
+        select iic.id,iic.hosp_code,iic.visit_id,
+        iic.settle_id,iic.is_hospital,iic.visit_no,iic.discharge_dn_code, iic.insure_org_code,iic.insure_reg_code,
+        iic.medicine_org_code,iic.discharge_dn_name,iic.discharged_date,
+        iic.discharged_case,iic.assign_price,iic.top_price,
+        (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
+        iic.total_price,iic.plan_price, iic.serious_price, iic.civil_price,
+        iic.retire_price,iic.personal_price,iic.person_price, iic.hosp_price,iic.before_settle,iic.last_settle,
+        iic.rests_price,
+        iic.assign_price, iic.starting_price,iic.top_price, iic.plan_account_price,
+        iic.portion_price,
+        (case iic.state when '1' then '正常' when '2' then '冲红' else '被冲红' end) as state,
+        (IF(iic.settle_state = '1', '结算', '试算')) as settleState,
+        iic.costbatch, iic.aka130, iic.injury_borth_sn, iic.is_account, iic.remark,
+        iic.crte_id, iic.crte_name,iic.crte_time, iiv.aka130_name as aka130Name, iiv.aac001, iiv.bka006, iiv.bka006_name
+        as bka006Name,
+        iiv.visit_icd_code as visitIcdCode, iiv.visit_icd_name as visitIcdName, iib.aac003,iib.aac002,
+        (select name from sys_code_detail where value = iib.aac004 and c_code = 'XB') as aac004,
+        iib.aae005,iib.akc252,
+        (
+        case iic.is_hospital
+        when '1'
+        then (select patient_code from inpt_visit
+        iv where iv.hosp_code = iic.hosp_code and iv.id = iic.visit_id)
+        when '0'
+        then (select patient_code from outpt_visit ov where ov.hosp_code = iic.hosp_code and ov.id = iic.visit_id)
+        end
+        ) as patientCode
+        from insure_individual_settle iic
+        left join insure_individual_visit iiv on iic.visit_id = iiv.visit_id and
+        iic.hosp_code = iiv.hosp_code
+        left join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
+        where iic.hosp_code = #{hospCode}
+        and iic.id = #{id}
+        <if test="state !=null and state != ''">
+            and iic.state = #{state}
+        </if>
+    </select>
+
+
+    <insert id="insert" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
+        insert into insure_individual_settle
+        (id,
+         hosp_code,
+         visit_id,
+         settle_id,
+         is_hospital,
+         visit_no,
+         discharge_dn_code,
+         insure_org_code,
+         insure_reg_code,
+         medicine_org_code,
+         discharge_dn_name,
+         discharged_date,
+         discharged_case,
+         settleway,
+         total_price,
+         insure_price,
+         plan_price,
+         serious_price,
+         civil_price,
+         retire_price,
+         personal_price,
+         person_price,
+         hosp_price,
+         before_settle,
+         last_settle,
+         rests_price,
+         assign_price,
+         starting_price,
+         top_price,
+         plan_account_price,
+         portion_price,
+         state,
+         settle_state,
+         costbatch,
+         aka130,
+         bka006,
+         injury_borth_sn,
+         is_account,
+         remark,
+         crte_id,
+         crte_name,
+         crte_time,
+         insureSettleId,
+         medicalRegNo,
+         ext03,
+         ext04,
+         ext05,
+         ext06,
+         ext07,
+         ext08,
+         ext09,
+         ext10)
+        values (#{id,jdbcType=VARCHAR},
+                #{hospCode,jdbcType=VARCHAR},
+                #{visitId,jdbcType=VARCHAR},
+                #{settleId,jdbcType=VARCHAR},
+                #{isHospital,jdbcType=VARCHAR},
+                #{visitNo,jdbcType=VARCHAR},
+                #{dischargeDnCode,jdbcType=VARCHAR},
+                #{insureOrgCode,jdbcType=VARCHAR},
+                #{insureRegCode,jdbcType=VARCHAR},
+                #{medicineOrgCode,jdbcType=VARCHAR},
+                #{dischargeDnName,jdbcType=VARCHAR},
+                #{dischargedDate,jdbcType=TIMESTAMP},
+                #{dischargedCase,jdbcType=VARCHAR},
+                #{settleway,jdbcType=VARCHAR},
+                #{totalPrice,jdbcType=DECIMAL},
+                #{insurePrice,jdbcType=DECIMAL},
+                #{planPrice,jdbcType=DECIMAL},
+                #{seriousPrice,jdbcType=DECIMAL},
+                #{civilPrice,jdbcType=DECIMAL},
+                #{retirePrice,jdbcType=DECIMAL},
+                #{personalPrice,jdbcType=DECIMAL},
+                #{personPrice,jdbcType=DECIMAL},
+                #{hospPrice,jdbcType=DECIMAL},
+                #{beforeSettle,jdbcType=DECIMAL},
+                #{lastSettle,jdbcType=DECIMAL},
+                #{restsPrice,jdbcType=DECIMAL},
+                #{assignPrice,jdbcType=DECIMAL},
+                #{startingPrice,jdbcType=DECIMAL},
+                #{topPrice,jdbcType=DECIMAL},
+                #{planAccountPrice,jdbcType=DECIMAL},
+                #{portionPrice,jdbcType=DECIMAL},
+                #{state,jdbcType=VARCHAR},
+                #{settleState,jdbcType=VARCHAR},
+                #{costbatch,jdbcType=VARCHAR},
+                #{aka130,jdbcType=VARCHAR},
+                #{bka006,jdbcType=VARCHAR},
+                #{injuryBorthSn,jdbcType=VARCHAR},
+                #{isAccount,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR},
+                #{crteId,jdbcType=VARCHAR},
+                #{crteName,jdbcType=VARCHAR},
+                now(),
+                #{insureSettleId,jdbcType=VARCHAR},
+                #{medicalRegNo,jdbcType=VARCHAR},
+                #{ext03,jdbcType=VARCHAR},
+                #{ext04,jdbcType=VARCHAR},
+                #{ext05,jdbcType=VARCHAR},
+                #{ext06,jdbcType=VARCHAR},
+                #{ext07,jdbcType=VARCHAR},
+                #{ext08,jdbcType=VARCHAR},
+                #{ext09,jdbcType=VARCHAR},
+                #{ext10,jdbcType=VARCHAR})
+    </insert>
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
+        insert into
+        insure_individual_settle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id,
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                is_hospital,
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no,
+            </if>
+            <if test="dischargeDnCode != null and dischargeDnCode != ''">
+                discharge_dn_code,
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code,
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                insure_reg_code,
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                medicine_org_code,
+            </if>
+            <if test="dischargeDnName != null and dischargeDnName != ''">
+                discharge_dn_name,
+            </if>
+            <if test="dischargedDate != null">
+                discharged_date,
+            </if>
+            <if test="dischargedCase != null and dischargedCase != ''">
+                discharged_case,
+            </if>
+            <if test="settleway != null and settleway != ''">
+                settleway,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="insurePrice != null">
+                insure_price,
+            </if>
+            <if test="planPrice != null">
+                plan_price,
+            </if>
+            <if test="seriousPrice != null">
+                serious_price,
+            </if>
+            <if test="civilPrice != null">
+                civil_price,
+            </if>
+            <if test="retirePrice != null">
+                retire_price,
+            </if>
+            <if test="personalPrice != null">
+                personal_price,
+            </if>
+            <if test="personPrice != null">
+                person_price,
+            </if>
+            <if test="hospPrice != null">
+                hosp_price,
+            </if>
+            <if test="beforeSettle != null">
+                before_settle,
+            </if>
+            <if test="lastSettle != null">
+                last_settle,
+            </if>
+            <if test="restsPrice != null">
+                rests_price,
+            </if>
+            <if test="assignPrice != null">
+                assign_price,
+            </if>
+            <if test="startingPrice != null">
+                starting_price,
+            </if>
+            <if test="topPrice != null">
+                top_price,
+            </if>
+            <if test="planAccountPrice != null">
+                plan_account_price,
+            </if>
+            <if test="portionPrice != null">
+                portion_price,
+            </if>
+            <if test="state != null and state != ''">
+                state,
+            </if>
+            <if test="settleState != null and settleState != ''">
+                settle_state,
+            </if>
+            <if test="costbatch != null and costbatch != ''">
+                costbatch,
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130,
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006,
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn,
+            </if>
+            <if test="isAccount != null and isAccount != ''">
+                is_account,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time,
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insureSettleId,
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                medicalRegNo,
+            </if>
+            <if test="ext03 != null and ext03 != ''">
+                ext03,
+            </if>
+            <if test="ext04 != null and ext04 != ''">
+                ext04,
+            </if>
+            <if test="ext05 != null and ext05 != ''">
+                ext05,
+            </if>
+            <if test="ext06 != null and ext06 != ''">
+                ext06,
+            </if>
+            <if test="ext07 != null and ext07 != ''">
+                ext07,
+            </if>
+            <if test="ext08 != null and ext08 != ''">
+                ext08,
+            </if>
+            <if test="ext09 != null and ext09 != ''">
+                ext09,
+            </if>
+            <if test="ext10 != null and ext10 != ''">
+                ext10
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                #{isHospital,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargeDnCode != null and dischargeDnCode != ''">
+                #{dischargeDnCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                #{insureRegCode,jdbcType=VARCHAR},
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                #{medicineOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargeDnName != null and dischargeDnName != ''">
+                #{dischargeDnName,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargedDate != null">
+                #{dischargedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dischargedCase != null and dischargedCase != ''">
+                #{dischargedCase,jdbcType=VARCHAR},
+            </if>
+            <if test="settleway != null and settleway != ''">
+                #{settleway,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="insurePrice != null">
+                #{insurePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="planPrice != null">
+                #{planPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="seriousPrice != null">
+                #{seriousPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="civilPrice != null">
+                #{civilPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="retirePrice != null">
+                #{retirePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="personalPrice != null">
+                #{personalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="personPrice != null">
+                #{personPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="hospPrice != null">
+                #{hospPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="beforeSettle != null">
+                #{beforeSettle,jdbcType=DECIMAL},
+            </if>
+            <if test="lastSettle != null">
+                #{lastSettle,jdbcType=DECIMAL},
+            </if>
+            <if test="restsPrice != null">
+                #{restsPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="assignPrice != null">
+                #{assignPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="startingPrice != null">
+                #{startingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="topPrice != null">
+                #{topPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="planAccountPrice != null">
+                #{planAccountPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="portionPrice != null">
+                #{portionPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="state != null and state != ''">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="settleState != null and settleState != ''">
+                #{settleState,jdbcType=VARCHAR},
+            </if>
+            <if test="costbatch != null and costbatch != ''">
+                #{costbatch,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="isAccount != null and isAccount != ''">
+                #{isAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                #{insureSettleId,jdbcType=VARCHAR},
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                #{medicalRegNo,jdbcType=VARCHAR},
+            </if>
+            <if test="ext03 != null and ext03 != ''">
+                #{ext03,jdbcType=VARCHAR},
+            </if>
+            <if test="ext04 != null and ext04 != ''">
+                #{ext04,jdbcType=VARCHAR},
+            </if>
+            <if test="ext05 != null and ext05 != ''">
+                #{ext05,jdbcType=VARCHAR},
+            </if>
+            <if test="ext06 != null and ext06 != ''">
+                #{ext06,jdbcType=VARCHAR},
+            </if>
+            <if test="ext07 != null and ext07 != ''">
+                #{ext07,jdbcType=VARCHAR},
+            </if>
+            <if test="ext08 != null and ext08 != ''">
+                #{ext08,jdbcType=VARCHAR},
+            </if>
+            <if test="ext09 != null and ext09 != ''">
+                #{ext09,jdbcType=VARCHAR},
+            </if>
+            <if test="ext10 != null and ext10 != ''">
+                #{ext10,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBatchFund">
+        insert into insure_individual_fund
+        (id, hosp_code, visit_id, mib_id, fund_id, fund_name,
+        indi_freeze_status, crte_id, crte_name, crte_time, fund_pay_type, inscp_scp_amt,
+        crt_payb_lmt_amt, fund_payamt, fund_pay_type_name, setl_proc_info,insure_settle_id) values
+        <foreach collection="fundDTOList" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode},#{item.visitId},#{item.mibId},#{item.fundId},
+            #{item.fundName},#{item.indiFreezeStatus},#{item.crteId},#{item.crteName},
+            #{item.crteTime},#{item.fundPayType},#{item.inscpScpAmt},#{item.crtPaybLmtAmt},
+            #{item.fundPayamt},#{item.fundPayTypeName},#{item.setlProcInfo},#{item.insureSettleId})
+        </foreach>
+    </insert>
+
+    <delete id="delInsureIndividualSettleByVisitId" parameterType="java.util.Map">
+        delete
+        from insure_individual_settle
+        where hosp_code = #{hospCode}
+          AND visit_id = #{visitId}
+          AND settle_state = #{settleState}
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="insureIndividualSettleMap"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List"/>
+        FROM insure_individual_settle iis
+        where
+        iis.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            AND iis.visit_id = #{visitId}
+        </if>
+        <if test="settleId != null and settleId != ''">
+            AND iis.settle_id = #{settleId}
+        </if>
+        <if test="state != null and state != ''">
+            AND iis.state = #{state}
+        </if>
+
+    </select>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
+        update
+            insure_individual_settle
+        set hosp_code          = #{hospCode,jdbcType=VARCHAR},
+            visit_id           = #{visitId,jdbcType=VARCHAR},
+            settle_id          = #{settleId,jdbcType=VARCHAR},
+            is_hospital        = #{isHospital,jdbcType=VARCHAR},
+            visit_no           = #{visitNo,jdbcType=VARCHAR},
+            discharge_dn_code  = #{dischargeDnCode,jdbcType=VARCHAR},
+            insure_org_code    = #{insureOrgCode,jdbcType=VARCHAR},
+            insure_reg_code    = #{insureRegCode,jdbcType=VARCHAR},
+            medicine_org_code  = #{medicineOrgCode,jdbcType=VARCHAR},
+            discharge_dn_name  = #{dischargeDnName,jdbcType=VARCHAR},
+            discharged_date    = #{dischargedDate,jdbcType=TIMESTAMP},
+            discharged_case    = #{dischargedCase,jdbcType=VARCHAR},
+            settleway          = #{settleway,jdbcType=VARCHAR},
+            total_price        = #{totalPrice,jdbcType=DECIMAL},
+            insure_price       = #{insurePrice,jdbcType=DECIMAL},
+            plan_price         = #{planPrice,jdbcType=DECIMAL},
+            serious_price      = #{seriousPrice,jdbcType=DECIMAL},
+            civil_price        = #{civilPrice,jdbcType=DECIMAL},
+            retire_price       = #{retirePrice,jdbcType=DECIMAL},
+            personal_price     = #{personalPrice,jdbcType=DECIMAL},
+            person_price       = #{personPrice,jdbcType=DECIMAL},
+            hosp_price         = #{hospPrice,jdbcType=DECIMAL},
+            before_settle      = #{beforeSettle,jdbcType=DECIMAL},
+            last_settle        = #{lastSettle,jdbcType=DECIMAL},
+            rests_price        = #{restsPrice,jdbcType=DECIMAL},
+            assign_price       = #{assignPrice,jdbcType=DECIMAL},
+            starting_price     = #{startingPrice,jdbcType=DECIMAL},
+            top_price          = #{topPrice,jdbcType=DECIMAL},
+            plan_account_price = #{planAccountPrice,jdbcType=DECIMAL},
+            portion_price      = #{portionPrice,jdbcType=DECIMAL},
+            state              = #{state,jdbcType=VARCHAR},
+            settle_state       = #{settleState,jdbcType=VARCHAR},
+            costbatch          = #{costbatch,jdbcType=VARCHAR},
+            aka130             = #{aka130,jdbcType=VARCHAR},
+            bka006             = #{bka006,jdbcType=VARCHAR},
+            injury_borth_sn    = #{injuryBorthSn,jdbcType=VARCHAR},
+            is_account         = #{isAccount,jdbcType=VARCHAR},
+            remark             = #{remark,jdbcType=VARCHAR},
+            crte_id            = #{crteId,jdbcType=VARCHAR},
+            crte_name          = #{crteName,jdbcType=VARCHAR},
+            crte_time          = #{crteTime,jdbcType=TIMESTAMP},
+            medicalRegNo       = #{medicalRegNo,jdbcType=VARCHAR},
+            insureSettleId     = #{insureSettleId,jdbcType=VARCHAR},
+            ext03              = #{ext03,jdbcType=VARCHAR},
+            ext04              = #{ext04,jdbcType=VARCHAR},
+            ext05              = #{ext05,jdbcType=VARCHAR},
+            ext06              = #{ext06,jdbcType=VARCHAR},
+            ext07              = #{ext07,jdbcType=VARCHAR},
+            ext08              = #{ext08,jdbcType=VARCHAR},
+            ext09              = #{ext09,jdbcType=VARCHAR},
+            ext10              = #{ext10,jdbcType=VARCHAR}
+        where id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective"
+            parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
+        update
+        insure_individual_settle
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                is_hospital = #{isHospital,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargeDnCode != null and dischargeDnCode != ''">
+                discharge_dn_code = #{dischargeDnCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code = #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                insure_reg_code = #{insureRegCode,jdbcType=VARCHAR},
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                medicine_org_code = #{medicineOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargeDnName != null and dischargeDnName != ''">
+                discharge_dn_name = #{dischargeDnName,jdbcType=VARCHAR},
+            </if>
+            <if test="dischargedDate != null">
+                discharged_date = #{dischargedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dischargedCase != null and dischargedCase != ''">
+                discharged_case = #{dischargedCase,jdbcType=VARCHAR},
+            </if>
+            <if test="settleway != null and settleway != ''">
+                settleway = #{settleway,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="insurePrice != null">
+                insure_price = #{insurePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="planPrice != null">
+                plan_price = #{planPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="seriousPrice != null">
+                serious_price = #{seriousPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="civilPrice != null">
+                civil_price = #{civilPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="retirePrice != null">
+                retire_price = #{retirePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="personalPrice != null">
+                personal_price = #{personalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="personPrice != null">
+                person_price = #{personPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="hospPrice != null">
+                hosp_price = #{hospPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="beforeSettle != null">
+                before_settle = #{beforeSettle,jdbcType=DECIMAL},
+            </if>
+            <if test="lastSettle != null">
+                last_settle = #{lastSettle,jdbcType=DECIMAL},
+            </if>
+            <if test="restsPrice != null">
+                rests_price = #{restsPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="assignPrice != null">
+                assign_price = #{assignPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="startingPrice != null">
+                starting_price = #{startingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="topPrice != null">
+                top_price = #{topPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="planAccountPrice != null">
+                plan_account_price = #{planAccountPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="portionPrice != null">
+                portion_price = #{portionPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="state != null and state != ''">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="settleState != null and settleState != ''">
+                settle_state = #{settleState,jdbcType=VARCHAR},
+            </if>
+            <if test="costbatch != null and costbatch != ''">
+                costbatch = #{costbatch,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130 = #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006 = #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn = #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="isAccount != null and isAccount != ''">
+                is_account = #{isAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insureSettleId = #{insureSettleId,jdbcType=VARCHAR},
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                medicalRegNo = #{medicalRegNo,jdbcType=VARCHAR},
+            </if>
+            <if test="ext03 != null and ext03 != ''">
+                ext03 = #{ext03,jdbcType=VARCHAR},
+            </if>
+            <if test="ext04 != null and ext04 != ''">
+                ext04 = #{ext04,jdbcType=VARCHAR},
+            </if>
+            <if test="ext05 != null and ext05 != ''">
+                ext05 = #{ext05,jdbcType=VARCHAR},
+            </if>
+            <if test="ext06 != null and ext06 != ''">
+                ext06 = #{ext06,jdbcType=VARCHAR},
+            </if>
+            <if test="ext07 != null and ext07 != ''">
+                ext07 = #{ext07,jdbcType=VARCHAR},
+            </if>
+            <if test="ext08 != null and ext08 != ''">
+                ext08 = #{ext08,jdbcType=VARCHAR},
+            </if>
+            <if test="ext09 != null and ext09 != ''">
+                ext09 = #{ext09,jdbcType=VARCHAR},
+            </if>
+            <if test="ext10 != null and ext10 != ''">
+                ext10 = #{ext10,jdbcType=VARCHAR}
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                omsgid = #{omsgid,jdbcType=VARCHAR},
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                oinfno = #{oinfno,jdbcType=VARCHAR},
+            </if>
+
+            <if test="clrWay != null and clrWay != ''">
+                clr_way = #{clrWay,jdbcType=VARCHAR},
+            </if>
+            <if test="clrType != null and clrType != ''">
+                clr_type = #{clrType,jdbcType=VARCHAR},
+            </if>
+            <if test="clrOptins != null and clrOptins != ''">
+                clr_optins = #{clrOptins,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where 1=1
+        <if test="id != null and id!= ''">
+            and id = #{id}
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            and hosp_code = #{hospCode,jdbcType=VARCHAR}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId,jdbcType=VARCHAR}
+        </if>
+        <if test="insureSettleId != null and insureSettleId != ''">
+            and IFNULL(insureSettleId,'0') ='0'
+        </if>
+    </update>
+    <update id="updateSettleMsgId">
+        <foreach collection="settleDTOList" item="item" index="index" open="" close="" separator=";">
+            update insure_individual_settle
+            <set>
+                remote_msg_id=#{item.remoteMsgId}
+            </set>
+            where id = #{item.id} and hosp_code=#{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="getByParams" resultMap="insureIndividualSettleMap" parameterType="java.util.Map">
+        SELECT
+        <include refid="Base_ColumnAlias_List"/>
+        FROM insure_individual_settle iis
+        where
+        iis.hosp_code = #{hospCode}
+        AND iis.visit_id = #{visitId}
+        AND iis.settle_id = #{settleId}
+        <if test="state != null and state != ''">
+            and iis.state = #{state}
+        </if>
+    </select>
+    <select id="queryAll" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select iis.id,
+               iis.hosp_code,
+               iis.visit_id,
+               settle_id,
+               iis.is_hospital,
+               iis.visit_no,
+               discharge_dn_code,
+               iis.insure_org_code,
+               iis.insure_reg_code,
+               iis.medicine_org_code,
+               discharge_dn_name,
+               discharged_date,
+               discharged_case,
+               settleway,
+               total_price,
+               insure_price,
+               plan_price,
+               serious_price,
+               civil_price,
+               retire_price,
+               personal_price,
+               person_price,
+               hosp_price,
+               before_settle,
+               last_settle,
+               rests_price,
+               assign_price,
+               top_price,
+               plan_account_price,
+               portion_price,
+               state,
+               settle_state,
+               iis.omsgid,
+               costbatch,
+               is_account,
+               iiv.mdtrt_cert_no,
+               iis.crte_time,
+               insureSettleId,
+               medicalRegNo
+        from insure_individual_settle iis
+                 left join insure_individual_visit iiv
+                           on iiv.visit_id = iis.visit_id and iiv.hosp_code = iis.hosp_code
+        where iis.hosp_code = #{hospCode}
+          and iis.state = #{state}
+          and iis.settle_state = '1'
+          and date_format(iis.crte_time, '%Y-%m') = date_format(#{time}, '%Y-%m')
+
+    </select>
+    <select id="querySettle" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+    select id, hosp_code, visit_id, settle_id, is_hospital, visit_no, discharge_dn_code,
+           insure_org_code, insure_reg_code, medicine_org_code, discharge_dn_name,
+           discharged_date, discharged_case, settleway, total_price, insure_price,
+           plan_price, serious_price, civil_price, retire_price, personal_price,
+           person_price, hosp_price, before_settle, last_settle, rests_price,
+           assign_price, starting_price, top_price, plan_account_price, portion_price,
+           state, settle_state, costbatch, aka130, bka006, injury_borth_sn, is_account,
+           remark, crte_id, crte_name, crte_time, insureSettleId, medicalRegNo, ext03,
+           ext04, ext05, ext06, ext07, ext08, ext09, ext10, omsgid, oinfno,
+           remote_msg_id, clr_type, clr_way, clr_optins
+        from insure_individual_settle
+        where hosp_code = #{hospCode}
+          and state = #{state}
+          and settle_state = #{settleState}
+          and medicalRegNo = #{medicalRegNo}
+          and visit_id = #{visitId}
+            and insureSettleId is not null
+            limit 1
+    </select>
+
+    <select id="selectInsureSettInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select * from insure_individual_settle where hosp_code =#{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="insureSettleId != null and insureSettleId != ''">
+            and insureSettleId = #{insureSettleId}
+        </if>
+        <if test="state != null and state != ''">
+            and state = #{state}
+        </if>
+        <if test="settleState != null and settleState != ''">
+            and settle_state = #{settleState}
+        </if>
+    </select>
+    <select id="querySettleForMap" resultType="java.util.Map">
+        select iiv.id, iiv.hosp_code, iiv.visit_id, settle_id, iiv.is_hospital, iiv.visit_no, discharge_dn_code,
+               iiv.insure_org_code, iiv.insure_reg_code, iiv.medicine_org_code, discharge_dn_name, discharged_date,
+               discharged_case, settleway, iis.total_price as medfee_sumamt, insure_price, plan_price as fund_pay_sumamt, serious_price, civil_price,
+               retire_price, personal_price as acct_pay, person_price as psn_pay, hosp_price, before_settle, last_settle,
+               rests_price, assign_price,top_price, plan_account_price, portion_price,
+               state, settle_state, costbatch, iiv.aka130, iiv.bka006, iiv.injury_borth_sn, is_account, iiv.remark, insureSettleId, medicalRegNo,
+               iiv.omsgid, iiv.oinfno, remote_msg_id,iis.crte_time as setl_time,iiv.aka130 as med_type,
+               clr_type, clr_way, clr_optins ,iis.starting_price as act_pay_dedc,
+               if(iiv.is_hospital ='1',iv.birthday,ov.birthday) as birthday,
+               if(iiv.is_hospital ='1',iv.gender_code,ov.gender_code) as gend,
+               iib.aae140,iiv.bka006 as dise_codg ,iiv.bka006_name as dise_name,iib.bka035 as psn_type,
+               ( case iiv.is_hospital when '1' then iv.name when '0' then ov.name end) as psn_name,
+               iiv.mdtrt_cert_type as psn_cert_type, iiv.mdtrt_cert_no as certno
+                from insure_individual_settle iis
+               left join insure_individual_visit iiv on iiv.visit_id = iis.visit_id and iiv.hosp_code = iis.hosp_code
+                    and iis.medicalRegNo = iiv.medical_reg_no
+               left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
+               left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+                left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
+                where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode} and iis.insureSettleId = #{insureSettleId}
+                and iis.state='0' and iis.insureSettleId is not null and  iis.medicalRegNo =#{medicalRegNo}
+    </select>
+    <select id="queryInsureFundListMap" resultType="java.util.Map">
+        select id, hosp_code, visit_id, mib_id, fund_id, fund_name, indi_freeze_status, crte_id,
+               crte_name, crte_time, fund_pay_type, inscp_scp_amt, crt_payb_lmt_amt, fund_payamt,
+               fund_pay_type_name, setl_proc_info, insure_settle_id from insure_individual_fund
+            where visit_id =#{visitId} and hosp_code =#{hospCode}
+    </select>
+    <select id="queryInptSettle" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        select * from inpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
+                                    and status_code ='0'
+    </select>
+    <select id="queryOutptSettle" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select * from outpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
+        and status_code ='0'
+    </select>
+
+</mapper>

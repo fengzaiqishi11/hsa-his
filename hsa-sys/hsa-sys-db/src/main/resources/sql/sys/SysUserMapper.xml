@@ -1,0 +1,1325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.user.dao.SysUserDAO">
+
+	<resultMap type="cn.hsa.module.sys.user.dto.SysUserDTO" id="SysUserMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+		<result property="code" column="code" jdbcType="VARCHAR"/>
+		<result property="password" column="password" jdbcType="VARCHAR"/>
+		<result property="isInJob" column="is_in_job" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="age" column="age" jdbcType="INTEGER"/>
+		<result property="birthday" column="birthday" jdbcType="OTHER"/>
+		<result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+		<result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+		<result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+		<result property="isPm" column="is_pm" jdbcType="VARCHAR"/>
+		<result property="inPmDate" column="in_pm_date" jdbcType="OTHER"/>
+		<result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+		<result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+		<result property="photoImage" column="photo_image" jdbcType="VARCHAR"/>
+		<result property="signImage" column="sign_image" jdbcType="VARCHAR"/>
+		<result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+		<result property="speciality" column="speciality" jdbcType="VARCHAR"/>
+		<result property="address" column="address" jdbcType="VARCHAR"/>
+		<result property="email" column="email" jdbcType="VARCHAR"/>
+		<result property="phone" column="phone" jdbcType="VARCHAR"/>
+		<result property="educationCode" column="education_code" jdbcType="VARCHAR"/>
+		<result property="majorCode" column="major_code" jdbcType="VARCHAR"/>
+		<result property="school" column="school" jdbcType="VARCHAR"/>
+		<result property="schoolDate" column="school_date" jdbcType="OTHER"/>
+		<result property="schoolImage" column="school_image" jdbcType="VARCHAR"/>
+		<result property="workDate" column="work_date" jdbcType="OTHER"/>
+		<result property="workTypeCode" column="work_type_code" jdbcType="VARCHAR"/>
+		<result property="dutiesCode" column="duties_code" jdbcType="VARCHAR"/>
+		<result property="pracCertiNo" column="prac_certi_no" jdbcType="VARCHAR"/>
+		<result property="pracCertiName" column="prac_certi_name" jdbcType="VARCHAR"/>
+		<result property="durgCode" column="durg_code" jdbcType="VARCHAR"/>
+		<result property="antibacterialCode" column="antibacterial_code" jdbcType="VARCHAR"/>
+		<result property="phCode" column="ph_code" jdbcType="VARCHAR"/>
+		<result property="opeartionCode" column="opeartion_code" jdbcType="VARCHAR"/>
+		<result property="pswdErrCnt" column="pswd_err_cnt" jdbcType="INTEGER"/>
+		<result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
+		<result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
+		<result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+		<result property="pym" column="pym" jdbcType="VARCHAR"/>
+		<result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+		<result property="systemName" column="systemName" jdbcType="VARCHAR"/>
+		<result property="signaturePath" column="signature_path" jdbcType="VARCHAR"/>
+		<result property="doctorIntro" column="doctor_intro" jdbcType="VARCHAR"/>
+		<result property="isGuide" column="is_guide" jdbcType="VARCHAR"/>
+		<result property="isAnaesthesia" column="is_anaesthesia" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<resultMap type="cn.hsa.module.sys.user.dto.SysUserSystemDTO" id="SysUserSystemMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="usCode" column="us_code" jdbcType="VARCHAR"/>
+		<result property="userCode" column="user_code" jdbcType="VARCHAR"/>
+		<result property="systemCode" column="system_code" jdbcType="VARCHAR"/>
+		<result property="teacherCode" column="teacher_code" jdbcType="VARCHAR"/>
+		<result property="teacherName" column="teacher_name" jdbcType="VARCHAR"/>
+		<result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!--查询单个-->
+	<select id="getById" resultMap="SysUserMap">
+        select
+          id, hosp_code, dept_code, code, password, is_in_job, name, age,
+          birthday, gender_code, nation_code, native_place, marry_code,
+          is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image,
+          introduce, speciality, address, email, phone, education_code,
+          major_code, school, school_date, school_image, work_date,
+          work_type_code, duties_code, prac_certi_no,
+          prac_certi_name, durg_code, antibacterial_code, ph_code,
+          opeartion_code, pswd_err_cnt, last_login_time, last_login_ip,
+          status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path,
+          doctor_intro, is_guide,is_anaesthesia
+        from sys_user
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+	<!--通过实体作为筛选条件查询-->
+	<select id="queryAll" resultMap="SysUserMap">
+		select
+		a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+		a.nation_code,
+		a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+		a.introduce, a.speciality,
+		a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+		a.work_date, a.work_type_code,
+		a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+		a.ph_code,
+		a.opeartion_code,
+		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+		a.crte_id,a.crte_name,
+		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,a.is_anaesthesia,
+		b.name as deptName
+		from sys_user a
+		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="deptId != null and deptId != ''">
+				and b.id = #{deptId}
+			</if>
+			<if test="ids != null">
+				and a.id in
+				<foreach collection="ids" separator="," item="item" open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="workTypeList != null and workTypeList.size() > 0">
+				and a.work_type_code in
+				<foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+					#{workTypeCode}
+				</foreach>
+				and a.status_code = "0"
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				and a.dept_code = #{deptCode}
+			</if>
+			<if test="code != null and code != ''">
+				and a.code = #{code}
+			</if>
+			<if test="password != null and password != ''">
+				and a.password = #{password}
+			</if>
+			<if test="isInJob != null and isInJob != ''">
+				and a.is_in_job = #{isInJob}
+			</if>
+			<if test="name != null and name != ''">
+				and a.name = #{name}
+			</if>
+			<if test="age != null">
+				and a.age = #{age}
+			</if>
+			<if test="birthday != null">
+				and a.birthday = #{birthday}
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				and a.gender_code = #{genderCode}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="nativePlace != null and nativePlace != ''">
+				and a.native_place = #{nativePlace}
+			</if>
+			<if test="marryCode != null and marryCode != ''">
+				and a.marry_code = #{marryCode}
+			</if>
+			<if test="isPm != null and isPm != ''">
+				and a.is_pm = #{isPm}
+			</if>
+			<if test="inPmDate != null">
+				and a.in_pm_date = #{inPmDate}
+			</if>
+			<if test="certCode != null and certCode != ''">
+				and a.cert_code = #{certCode}
+			</if>
+			<if test="certNo != null and certNo != ''">
+				and a.cert_no = #{certNo}
+			</if>
+			<if test="photoImage != null and photoImage != ''">
+				and a.photo_image = #{photoImage}
+			</if>
+			<if test="signImage != null and signImage != ''">
+				and a.sign_image = #{signImage}
+			</if>
+			<if test="introduce != null and introduce != ''">
+				and a.introduce = #{introduce}
+			</if>
+			<if test="speciality != null and speciality != ''">
+				and a.speciality = #{speciality}
+			</if>
+			<if test="address != null and address != ''">
+				and a.address = #{address}
+			</if>
+			<if test="email != null and email != ''">
+				and a.email = #{email}
+			</if>
+			<if test="phone != null and phone != ''">
+				and a.phone = #{phone}
+			</if>
+			<if test="educationCode != null and educationCode != ''">
+				and a.education_code = #{educationCode}
+			</if>
+			<if test="majorCode != null and majorCode != ''">
+				and a.major_code = #{majorCode}
+			</if>
+			<if test="school != null and school != ''">
+				and a.school = #{school}
+			</if>
+			<if test="schoolDate != null">
+				and a.school_date = #{schoolDate}
+			</if>
+			<if test="schoolImage != null and schoolImage != ''">
+				and a.school_image = #{schoolImage}
+			</if>
+			<if test="workDate != null">
+				and a.work_date = #{workDate}
+			</if>
+			<if test="workTypeCode != null and workTypeCode != ''">
+				and a.work_type_code = #{workTypeCode}
+			</if>
+			<if test="dutiesCode != null and dutiesCode != ''">
+				and a.duties_code = #{dutiesCode}
+			</if>
+			<if test="pracCertiNo != null and pracCertiNo != ''">
+				and a.prac_certi_no = #{pracCertiNo}
+			</if>
+			<if test="pracCertiName != null and pracCertiName != ''">
+				and a.prac_certi_name = #{pracCertiName}
+			</if>
+			<if test="durgCode != null and durgCode != ''">
+				and a.durg_code = #{durgCode}
+			</if>
+			<if test="antibacterialCode != null and antibacterialCode != ''">
+				and a.antibacterial_code = #{antibacterialCode}
+			</if>
+			<if test="phCode != null and phCode != ''">
+				and a.ph_code = #{phCode}
+			</if>
+			<if test="opeartionCode != null and opeartionCode != ''">
+				and a.opeartion_code = #{opeartionCode}
+			</if>
+			<if test="pswdErrCnt != null">
+				and a.pswd_err_cnt = #{pswdErrCnt}
+			</if>
+			<if test="lastLoginTime != null">
+				and a.last_login_time = #{lastLoginTime}
+			</if>
+			<if test="lastLoginIp != null and lastLoginIp != ''">
+				and a.last_login_ip = #{lastLoginIp}
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				and a.status_code = #{statusCode}
+			</if>
+			<if test="pym != null and pym != ''">
+				and a.pym = #{pym}
+			</if>
+			<if test="wbm != null and wbm != ''">
+				and a.wbm = #{wbm}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			<if test="signaturePath != null and signaturePath != ''">
+				and a.signature_path = #{signaturePath}
+			</if>
+			<if test="doctorIntro != null and doctorIntro != ''">
+				and a.doctor_intro = #{doctorIntro}
+			</if>
+			<if test="isGuide != null and isGuide != ''">
+				and a.is_guide = #{isGuide}
+			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				and a.is_anaesthesia = #{isAnaesthesia}
+			</if>
+		</where>
+	</select>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="queryBedUserAll" resultMap="SysUserMap">
+    select
+    a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+    a.nation_code,
+    a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+    a.introduce, a.speciality,
+    a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+    a.work_date, a.work_type_code,
+    a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+    a.ph_code,
+    a.opeartion_code,
+    a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+    a.crte_id,a.crte_name,
+    a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,
+    b.name as deptName
+    from sys_user a
+    join sys_user_system s on a.hosp_code = s.hosp_code and a.code = s.user_code
+    and s.dept_code = #{loginDeptCode} and s.system_code = #{systemCode}
+    left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+    <where>
+      a.hosp_code = #{hospCode}
+      <if test="id != null and id != ''">
+        and a.id = #{id}
+      </if>
+      <if test="deptId != null and deptId != ''">
+        and b.id = #{deptId}
+      </if>
+      <if test="ids != null">
+        and a.id in
+        <foreach collection="ids" separator="," item="item" open="(" close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="workTypeList != null and workTypeList.size() > 0">
+        and a.work_type_code in
+        <foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+          #{workTypeCode}
+        </foreach>
+        and a.status_code = "0"
+      </if>
+      <if test="deptCode != null and deptCode != ''">
+        and a.dept_code = #{deptCode}
+      </if>
+      <if test="code != null and code != ''">
+        and a.code = #{code}
+      </if>
+      <if test="password != null and password != ''">
+        and a.password = #{password}
+      </if>
+      <if test="isInJob != null and isInJob != ''">
+        and a.is_in_job = #{isInJob}
+      </if>
+      <if test="name != null and name != ''">
+        and a.name = #{name}
+      </if>
+      <if test="age != null">
+        and a.age = #{age}
+      </if>
+      <if test="birthday != null">
+        and a.birthday = #{birthday}
+      </if>
+      <if test="genderCode != null and genderCode != ''">
+        and a.gender_code = #{genderCode}
+      </if>
+      <if test="nationCode != null and nationCode != ''">
+        and a.nation_code = #{nationCode}
+      </if>
+      <if test="nativePlace != null and nativePlace != ''">
+        and a.native_place = #{nativePlace}
+      </if>
+      <if test="marryCode != null and marryCode != ''">
+        and a.marry_code = #{marryCode}
+      </if>
+      <if test="isPm != null and isPm != ''">
+        and a.is_pm = #{isPm}
+      </if>
+      <if test="inPmDate != null">
+        and a.in_pm_date = #{inPmDate}
+      </if>
+      <if test="certCode != null and certCode != ''">
+        and a.cert_code = #{certCode}
+      </if>
+      <if test="certNo != null and certNo != ''">
+        and a.cert_no = #{certNo}
+      </if>
+      <if test="photoImage != null and photoImage != ''">
+        and a.photo_image = #{photoImage}
+      </if>
+      <if test="signImage != null and signImage != ''">
+        and a.sign_image = #{signImage}
+      </if>
+      <if test="introduce != null and introduce != ''">
+        and a.introduce = #{introduce}
+      </if>
+      <if test="speciality != null and speciality != ''">
+        and a.speciality = #{speciality}
+      </if>
+      <if test="address != null and address != ''">
+        and a.address = #{address}
+      </if>
+      <if test="email != null and email != ''">
+        and a.email = #{email}
+      </if>
+      <if test="phone != null and phone != ''">
+        and a.phone = #{phone}
+      </if>
+      <if test="educationCode != null and educationCode != ''">
+        and a.education_code = #{educationCode}
+      </if>
+      <if test="majorCode != null and majorCode != ''">
+        and a.major_code = #{majorCode}
+      </if>
+      <if test="school != null and school != ''">
+        and a.school = #{school}
+      </if>
+      <if test="schoolDate != null">
+        and a.school_date = #{schoolDate}
+      </if>
+      <if test="schoolImage != null and schoolImage != ''">
+        and a.school_image = #{schoolImage}
+      </if>
+      <if test="workDate != null">
+        and a.work_date = #{workDate}
+      </if>
+      <if test="workTypeCode != null and workTypeCode != ''">
+        and a.work_type_code = #{workTypeCode}
+      </if>
+      <if test="dutiesCode != null and dutiesCode != ''">
+        and a.duties_code = #{dutiesCode}
+      </if>
+      <if test="pracCertiNo != null and pracCertiNo != ''">
+        and a.prac_certi_no = #{pracCertiNo}
+      </if>
+      <if test="pracCertiName != null and pracCertiName != ''">
+        and a.prac_certi_name = #{pracCertiName}
+      </if>
+      <if test="durgCode != null and durgCode != ''">
+        and a.durg_code = #{durgCode}
+      </if>
+      <if test="antibacterialCode != null and antibacterialCode != ''">
+        and a.antibacterial_code = #{antibacterialCode}
+      </if>
+      <if test="phCode != null and phCode != ''">
+        and a.ph_code = #{phCode}
+      </if>
+      <if test="opeartionCode != null and opeartionCode != ''">
+        and a.opeartion_code = #{opeartionCode}
+      </if>
+      <if test="pswdErrCnt != null">
+        and a.pswd_err_cnt = #{pswdErrCnt}
+      </if>
+      <if test="lastLoginTime != null">
+        and a.last_login_time = #{lastLoginTime}
+      </if>
+      <if test="lastLoginIp != null and lastLoginIp != ''">
+        and a.last_login_ip = #{lastLoginIp}
+      </if>
+      <if test="statusCode != null and statusCode != ''">
+        and a.status_code = #{statusCode}
+      </if>
+      <if test="pym != null and pym != ''">
+        and a.pym = #{pym}
+      </if>
+      <if test="wbm != null and wbm != ''">
+        and a.wbm = #{wbm}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and a.crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and a.crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and a.crte_time = #{crteTime}
+      </if>
+      <if test="signaturePath != null and signaturePath != ''">
+        and a.signature_path = #{signaturePath}
+      </if>
+      <if test="doctorIntro != null and doctorIntro != ''">
+        and a.doctor_intro = #{doctorIntro}
+      </if>
+      <if test="isGuide != null and isGuide != ''">
+        and a.is_guide = #{isGuide}
+      </if>
+    </where>
+  </select>
+
+	<!--查询执行护士-->
+    <select id="queryExecuteNurseInfo" resultMap="SysUserMap">
+        select
+        a.id,
+        a.name,
+        from sys_user a
+        <where>
+            a.hosp_code = #{hospCode}
+            <if test="ids != null">
+                and a.id in
+                <foreach collection="ids" separator="," item="item" open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="workTypeList != null and workTypeList.size() > 0">
+                and a.work_type_code in
+                <foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+                    #{workTypeCode}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+
+	<!--通过实体作为筛选条件查询-->
+	<select id="queryPage" resultMap="SysUserMap">
+		select
+		a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+		a.nation_code,
+		a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+		a.introduce, a.speciality,
+		a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+		a.work_date, a.work_type_code,
+		a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+		a.ph_code,
+		a.opeartion_code,
+		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+		a.crte_id,a.crte_name,
+		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,a.is_anaesthesia,
+		b.name as deptName
+		from sys_user a
+		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				and a.dept_code = #{deptCode}
+			</if>
+			<if test="code != null and code != ''">
+				and a.code = #{code}
+			</if>
+			<if test="password != null and password != ''">
+				and a.password = #{password}
+			</if>
+			<if test="isInJob != null and isInJob != ''">
+				and a.is_in_job = #{isInJob}
+			</if>
+			<if test="age != null">
+				and a.age = #{age}
+			</if>
+			<if test="birthday != null">
+				and a.birthday = #{birthday}
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				and a.gender_code = #{genderCode}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="nativePlace != null and nativePlace != ''">
+				and a.native_place = #{nativePlace}
+			</if>
+			<if test="marryCode != null and marryCode != ''">
+				and a.marry_code = #{marryCode}
+			</if>
+			<if test="isPm != null and isPm != ''">
+				and a.is_pm = #{isPm}
+			</if>
+			<if test="inPmDate != null">
+				and a.in_pm_date = #{inPmDate}
+			</if>
+			<if test="certCode != null and certCode != ''">
+				and a.cert_code = #{certCode}
+			</if>
+			<if test="certNo != null and certNo != ''">
+				and a.cert_no = #{certNo}
+			</if>
+			<if test="photoImage != null and photoImage != ''">
+				and a.photo_image = #{photoImage}
+			</if>
+			<if test="signImage != null and signImage != ''">
+				and a.sign_image = #{signImage}
+			</if>
+			<if test="introduce != null and introduce != ''">
+				and a.introduce = #{introduce}
+			</if>
+			<if test="speciality != null and speciality != ''">
+				and a.speciality = #{speciality}
+			</if>
+			<if test="address != null and address != ''">
+				and a.address = #{address}
+			</if>
+			<if test="email != null and email != ''">
+				and a.email = #{email}
+			</if>
+			<if test="phone != null and phone != ''">
+				and a.phone = #{phone}
+			</if>
+			<if test="educationCode != null and educationCode != ''">
+				and a.education_code = #{educationCode}
+			</if>
+			<if test="majorCode != null and majorCode != ''">
+				and a.major_code = #{majorCode}
+			</if>
+			<if test="school != null and school != ''">
+				and a.school = #{school}
+			</if>
+			<if test="schoolDate != null">
+				and a.school_date = #{schoolDate}
+			</if>
+			<if test="schoolImage != null and schoolImage != ''">
+				and a.school_image = #{schoolImage}
+			</if>
+			<if test="workDate != null">
+				and a.work_date = #{workDate}
+			</if>
+			<if test="workTypeCode != null and workTypeCode != ''">
+				and a.work_type_code = #{workTypeCode}
+			</if>
+			<if test="dutiesCode != null and dutiesCode != ''">
+				and a.duties_code = #{dutiesCode}
+			</if>
+			<if test="pracCertiNo != null and pracCertiNo != ''">
+				and a.prac_certi_no = #{pracCertiNo}
+			</if>
+			<if test="pracCertiName != null and pracCertiName != ''">
+				and a.prac_certi_name = #{pracCertiName}
+			</if>
+			<if test="durgCode != null and durgCode != ''">
+				and a.durg_code = #{durgCode}
+			</if>
+			<if test="antibacterialCode != null and antibacterialCode != ''">
+				and a.antibacterial_code = #{antibacterialCode}
+			</if>
+			<if test="phCode != null and phCode != ''">
+				and a.ph_code = #{phCode}
+			</if>
+			<if test="opeartionCode != null and opeartionCode != ''">
+				and a.opeartion_code = #{opeartionCode}
+			</if>
+			<if test="pswdErrCnt != null">
+				and a.pswd_err_cnt = #{pswdErrCnt}
+			</if>
+			<if test="lastLoginTime != null">
+				and a.last_login_time = #{lastLoginTime}
+			</if>
+			<if test="lastLoginIp != null and lastLoginIp != ''">
+				and a.last_login_ip = #{lastLoginIp}
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				and a.status_code = #{statusCode}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			<if test="signaturePath != null and signaturePath != ''">
+				and a.signature_path = #{signaturePath}
+			</if>
+			<if test="doctorIntro != null and doctorIntro != ''">
+				and a.doctor_intro = #{doctorIntro}
+			</if>
+			<if test="isGuide != null and isGuide != ''">
+				and a.is_guide = #{isGuide}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and (a.name like concat('%',#{keyword},'%') OR
+				a.code like concat('%',#{keyword},'%') OR
+				a.pym like concat('%',#{keyword},'%') OR
+				a.wbm like concat('%',#{keyword},'%')
+				)
+			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				and a.is_anaesthesia = #{isAnaesthesia}
+			</if>
+		</where>
+		order by a.code asc
+	</select>
+
+	<!--新增所有列-->
+	<insert id="insert" keyProperty="" useGeneratedKeys="true">
+        insert into sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro, is_guide,is_anaesthesia)
+        values (#{id}, #{hospCode}, #{deptCode}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{isPm}, #{inPmDate}, #{certCode}, #{certNo}, #{photoImage}, #{signImage}, #{introduce}, #{speciality}, #{address}, #{email}, #{phone}, #{educationCode}, #{majorCode}, #{school}, #{schoolDate}, #{schoolImage}, #{workDate}, #{workTypeCode}, #{dutiesCode}, #{pracCertiNo}, #{pracCertiName}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{opeartionCode}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime}, #{signaturePath}, #{doctorIntro}, '0',#{isAnaesthesia})
+    </insert>
+
+	<!--通过主键修改数据-->
+	<update id="update">
+		update sys_user
+		<set>
+			<if test="id != null">
+				id = #{id},
+			</if>
+			<if test="hospCode != null">
+				hosp_code = #{hospCode},
+			</if>
+			<if test="deptCode != null">
+				dept_code = #{deptCode},
+			</if>
+			<if test="code != null">
+				code = #{code},
+			</if>
+			<if test="password != null">
+				password = #{password},
+			</if>
+			<if test="isInJob != null">
+				is_in_job = #{isInJob},
+			</if>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="age != null">
+				age = #{age},
+			</if>
+			<if test="birthday != null">
+				birthday = #{birthday},
+			</if>
+			<if test="genderCode != null">
+				gender_code = #{genderCode},
+			</if>
+			<if test="nationCode != null">
+				nation_code = #{nationCode},
+			</if>
+			<if test="nativePlace != null">
+				native_place = #{nativePlace},
+			</if>
+			<if test="marryCode != null">
+				marry_code = #{marryCode},
+			</if>
+			<if test="isPm != null">
+				is_pm = #{isPm},
+			</if>
+				in_pm_date = #{inPmDate},
+			<if test="certCode != null">
+				cert_code = #{certCode},
+			</if>
+			<if test="certNo != null">
+				cert_no = #{certNo},
+			</if>
+			<if test="photoImage != null">
+				photo_image = #{photoImage},
+			</if>
+			<if test="signImage != null">
+				sign_image = #{signImage},
+			</if>
+			<if test="introduce != null">
+				introduce = #{introduce},
+			</if>
+			<if test="speciality != null">
+				speciality = #{speciality},
+			</if>
+			<if test="address != null">
+				address = #{address},
+			</if>
+			<if test="email != null">
+				email = #{email},
+			</if>
+			<if test="phone != null">
+				phone = #{phone},
+			</if>
+			<if test="educationCode != null">
+				education_code = #{educationCode},
+			</if>
+			<if test="majorCode != null">
+				major_code = #{majorCode},
+			</if>
+			<if test="school != null">
+				school = #{school},
+			</if>
+			<if test="schoolDate != null">
+				school_date = #{schoolDate},
+			</if>
+			<if test="schoolImage != null">
+				school_image = #{schoolImage},
+			</if>
+			<if test="workDate != null">
+				work_date = #{workDate},
+			</if>
+			<if test="workTypeCode != null">
+				work_type_code = #{workTypeCode},
+			</if>
+			<if test="dutiesCode != null">
+				duties_code = #{dutiesCode},
+			</if>
+			<if test="pracCertiNo != null">
+				prac_certi_no = #{pracCertiNo},
+			</if>
+			<if test="pracCertiName != null">
+				prac_certi_name = #{pracCertiName},
+			</if>
+			<if test="durgCode != null">
+				durg_code = #{durgCode},
+			</if>
+			<if test="antibacterialCode != null">
+				antibacterial_code = #{antibacterialCode},
+			</if>
+			<if test="phCode != null">
+				ph_code = #{phCode},
+			</if>
+			<if test="opeartionCode != null">
+				opeartion_code = #{opeartionCode},
+			</if>
+			<if test="pswdErrCnt != null">
+				pswd_err_cnt = #{pswdErrCnt},
+			</if>
+			<if test="lastLoginTime != null">
+				last_login_time = #{lastLoginTime},
+			</if>
+			<if test="lastLoginIp != null">
+				last_login_ip = #{lastLoginIp},
+			</if>
+			<if test="statusCode != null">
+				status_code = #{statusCode},
+			</if>
+			<if test="pym != null">
+				pym = #{pym},
+			</if>
+			<if test="wbm != null">
+				wbm = #{wbm},
+			</if>
+			<if test="signaturePath != null and signaturePath != ''">
+				signature_path = #{signaturePath},
+			</if>
+			<if test="doctorIntro != null and doctorIntro != ''">
+				doctor_intro = #{doctorIntro},
+			</if>
+			<if test="isGuide != null and isGuide != ''">
+				is_guide = #{isGuide},
+			</if>
+			<if test="isAnaesthesia != null and isAnaesthesia != ''">
+				is_anaesthesia = #{isAnaesthesia},
+			</if>
+		</set>
+		where id= #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--通过实体作为筛选条件查询-->
+	<select id="querySysUserSystemAll" resultMap="SysUserSystemMap">
+		select
+		a.id, a.hosp_code, a.us_code, a.user_code,
+		a.system_code, a.teacher_code, a.dept_code,
+		a.crte_id, a.crte_name, a.crte_time,
+		b.name as deptName,
+		c.name as systemName
+		from sys_user_system a
+		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+		left join sys_system c on a.system_code = c.code and a.hosp_code = c.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="code != null and code != ''">
+				and a.user_code = #{code}
+			</if>
+		</where>
+		order by a.crte_time desc
+	</select>
+
+	<!--新增所有列-->
+	<insert id="insertSysUserSystem" keyProperty="" useGeneratedKeys="true">
+		insert into sys_user_system(id, hosp_code, us_code, user_code, system_code, teacher_code, dept_code, crte_id,
+		crte_name, crte_time)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id}, #{item.hospCode}, #{item.usCode}, #{item.userCode}, #{item.systemCode}, #{item.teacherCode},
+			#{item.deptCode}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+		</foreach>
+	</insert>
+
+	<!--通过主键修改数据-->
+	<update id="updateSysUserSystem">
+		<foreach collection="list" item="item" index="index" separator=";">
+			update sys_user_system
+			set	teacher_code = #{item.teacherCode}
+			where hosp_code = #{item.hospCode}
+			and user_code = #{item.userCode}
+			and system_code = #{item.systemCode}
+			and dept_code = #{item.deptCode}
+		</foreach>
+	</update>
+
+	<!--用户修改密码-->
+	<update id="updatePassWord" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+     update sys_user set
+     password = #{newPasswordByMd5}
+     where
+     id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+
+	<update id="updateResetPassword">
+		update sys_user set password = #{password}
+        where id= #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<update id="updateActivePassword">
+		update sys_user set pswd_err_cnt = 0,status_code = '0'
+        where id=#{id} and hosp_code = #{hospCode}
+	</update>
+
+	<delete id="deleteSysUserSystem">
+		delete from sys_user_system
+		where hosp_code = #{hospCode} and user_code = #{code}
+	</delete>
+
+	<delete id="deleteSysUserSystemS">
+		delete from sys_user_system where
+		<foreach collection="list" item="item" separator=" or " index="index">
+			(hosp_code = #{item.hospCode} and user_code = #{item.userCode}
+			and system_code = #{item.systemCode} and dept_code = #{item.deptCode})
+		</foreach>
+	</delete>
+
+	<select id="isCodeExist" resultType="java.lang.Integer">
+        select count(code)
+        from sys_user
+        where hosp_code = #{hospCode} and code = #{code} and id != #{id}
+    </select>
+
+	<select id="isCertNoExist" resultType="java.lang.Integer">
+        select count(id)
+        from sys_user
+        where
+        hosp_code = #{hospCode} and cert_code = '01'
+        and cert_no = #{certNo} and id != #{id}
+    </select>
+
+
+	<!-- 根据医院编码、登录工号获取用户信息 -->
+	<select id="getByCode" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        select a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code, a.nation_code,
+        a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image, a.introduce, a.speciality,
+        a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image, a.work_date, a.work_type_code,
+        a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code, a.ph_code, a.opeartion_code,
+        a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm, a.crte_id,a.crte_name, a.crte_time,a.signature_path, a.doctor_intro, a.is_guide
+        from sys_user a where a.hosp_code = #{hospCode} and a.code = #{userCode}
+    </select>
+
+
+	<select id="queryUserByOperationDeptId" resultMap="SysUserMap">
+		select
+		id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code,
+		native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality,
+		address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code,
+		duties_code, prac_certi_no, durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt,
+		last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro,is_guide,is_anaesthesia
+		from sys_user
+		where sys_user.hosp_code = #{hospCode}
+		<if test="workTypeCode != null and workTypeCode.size()>0">
+			and
+			<foreach collection="workTypeCode" separator="or" item="item" open="(" close=")">
+				sys_user.work_type_code like concat(#{item},'%')
+			</foreach>
+		</if>
+		and sys_user.code in
+		(select user_code from sys_user_system where sys_user_system.dept_code = #{deptCode} and
+		sys_user_system.hosp_code = #{hospCode} group by user_code
+		)
+	</select>
+
+	<!--查询用户系统信息-->
+	<select id="queryUserSysPage" resultMap="SysUserSystemMap">
+		select
+		us.id, us.hosp_code , us.user_code, us.us_code, u.name as name, sys.name as systemName, dept.name as deptName,
+		teacher_code,
+		(select name from sys_user where us.teacher_code = code)  as teacher_name
+		from sys_user_system us, sys_user u, base_dept dept, sys_system sys
+		where
+		us.user_code = u.code
+		and us.system_code = sys.code
+		and us.dept_code = dept.code
+		and us.hosp_code = #{hospCode}
+		<if test="systemCode != null and systemCode != ''">
+			and us.system_code = #{systemCode}
+		</if>
+
+		<if test="deptCode != null and deptCode != ''">
+			and dept.id = #{deptCode}
+		</if>
+
+		<if test="usCode != null and usCode != ''">
+			and u.id = #{usCode}
+		</if>
+
+		<if test="userCode != null and userCode != ''">
+			and us.user_code = #{userCode}
+		</if>
+
+		<if test="name != null and name != ''">
+			and u.name like '%${name}%'
+		</if>
+	</select>
+
+	<!--查询已绑定用户系统角色信息-->
+	<select id="queryCheckedUserRole" resultType="cn.hsa.module.sys.user.SysUserRoleDo">
+		select
+		sr.id, sr.hosp_code as hospCode, sr.us_code as usCode, sr.role_code as roleCode
+		from sys_user_role sr
+		where
+		sr.hosp_code = #{hospCode}
+		<if test="usCode != null and usCode != ''">
+			and sr.us_code = #{usCode}
+		</if>
+	</select>
+
+	<!--批量新增用户角色表-->
+	<insert id="saveUserRole" parameterType="list">
+		insert into sys_user_role
+		(id, hosp_code, us_code, role_code, crte_id, crte_name, crte_time)
+		values
+		<foreach item="item" collection="list" separator="," open="" close="" index="index">
+			(#{item.id},#{item.hospCode}, #{item.usCode}, #{item.roleCode}, #{item.crteId}, #{item.crteName},
+			#{item.crteTime})
+		</foreach>
+	</insert>
+
+	<insert id="insertBatch">
+		insert into
+		sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time,signature_path, doctor_intro, is_guide)
+        values
+		<foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.deptCode}, #{item.code}, #{item.password}, #{item.isInJob}, #{item.name}, #{item.age}, #{item.birthday}, #{item.genderCode}, #{item.nationCode}, #{item.nativePlace}, #{item.marryCode}, #{item.isPm}, #{item.inPmDate}, #{item.certCode}, #{item.certNo}, #{item.photoImage}, #{item.signImage}, #{item.introduce}, #{item.speciality}, #{item.address}, #{item.email}, #{item.phone}, #{item.educationCode}, #{item.majorCode}, #{item.school}, #{item.schoolDate}, #{item.schoolImage}, #{item.workDate}, #{item.workTypeCode}, #{item.dutiesCode}, #{item.pracCertiNo}, #{item.pracCertiName}, #{item.durgCode}, #{item.phCode}, #{item.antibacterialCode}, #{item.opeartionCode}, '0', #{item.lastLoginTime}, #{item.lastLoginIp}, #{item.statusCode}, #{item.pym}, #{item.wbm}, #{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.signaturePath}, #{item.doctorIntro}, '0')
+		</foreach>
+	</insert>
+
+
+	<delete id="deleteUserRole">
+    delete from sys_user_role
+    where hosp_code = #{hospCode} and
+    us_code = #{usCode}
+  </delete>
+
+	<delete id="deleteSysUserRole">
+		delete from sys_user_role
+		where hosp_code = #{hospCode} and
+		<if test="usCodes != null and usCodes.size()>0">
+			us_code in
+			<foreach collection="usCodes" item="usCode" separator="," open="(" close=")">
+				#{usCode}
+			</foreach>
+		</if>
+	</delete>
+
+	<select id="getTeachDoctor" resultMap="SysUserMap">
+		select c.* from sys_user a join sys_user_system b on a.code=b.user_code JOIN sys_user c on b.teacher_code = c.CODE
+		where a.id=#{id} and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
+	</select>
+
+	<select id="queryAllByWorkTypeCode" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+		select
+		a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+		a.nation_code,
+		a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+		a.introduce, a.speciality,
+		a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+		a.work_date, a.work_type_code,
+		a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+		a.ph_code,
+		a.opeartion_code,
+		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+		a.crte_id,a.crte_name,
+		a.crte_time,a.signature_path, a.doctor_intro,a.is_guide,a.is_anaesthesia,
+		b.name as deptName
+		from sys_user a
+		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="ids != null">
+				and a.id in
+				<foreach collection="ids" separator="," item="item" open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="workTypeList != null and workTypeList.size() > 0">
+				and a.work_type_code in
+				<foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+					#{workTypeCode}
+				</foreach>
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				and a.dept_code = #{deptCode}
+			</if>
+			<if test="code != null and code != ''">
+				and a.code = #{code}
+			</if>
+			<if test="password != null and password != ''">
+				and a.password = #{password}
+			</if>
+			<if test="isInJob != null and isInJob != ''">
+				and a.is_in_job = #{isInJob}
+			</if>
+			<if test="name != null and name != ''">
+				and a.name = #{name}
+			</if>
+			<if test="age != null">
+				and a.age = #{age}
+			</if>
+			<if test="birthday != null">
+				and a.birthday = #{birthday}
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				and a.gender_code = #{genderCode}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="nativePlace != null and nativePlace != ''">
+				and a.native_place = #{nativePlace}
+			</if>
+			<if test="marryCode != null and marryCode != ''">
+				and a.marry_code = #{marryCode}
+			</if>
+			<if test="isPm != null and isPm != ''">
+				and a.is_pm = #{isPm}
+			</if>
+			<if test="inPmDate != null">
+				and a.in_pm_date = #{inPmDate}
+			</if>
+			<if test="certCode != null and certCode != ''">
+				and a.cert_code = #{certCode}
+			</if>
+			<if test="certNo != null and certNo != ''">
+				and a.cert_no = #{certNo}
+			</if>
+			<if test="photoImage != null and photoImage != ''">
+				and a.photo_image = #{photoImage}
+			</if>
+			<if test="signImage != null and signImage != ''">
+				and a.sign_image = #{signImage}
+			</if>
+			<if test="introduce != null and introduce != ''">
+				and a.introduce = #{introduce}
+			</if>
+			<if test="speciality != null and speciality != ''">
+				and a.speciality = #{speciality}
+			</if>
+			<if test="address != null and address != ''">
+				and a.address = #{address}
+			</if>
+			<if test="email != null and email != ''">
+				and a.email = #{email}
+			</if>
+			<if test="phone != null and phone != ''">
+				and a.phone = #{phone}
+			</if>
+			<if test="educationCode != null and educationCode != ''">
+				and a.education_code = #{educationCode}
+			</if>
+			<if test="majorCode != null and majorCode != ''">
+				and a.major_code = #{majorCode}
+			</if>
+			<if test="school != null and school != ''">
+				and a.school = #{school}
+			</if>
+			<if test="schoolDate != null">
+				and a.school_date = #{schoolDate}
+			</if>
+			<if test="schoolImage != null and schoolImage != ''">
+				and a.school_image = #{schoolImage}
+			</if>
+			<if test="workDate != null">
+				and a.work_date = #{workDate}
+			</if>
+			<if test="workTypeCode != null and workTypeCode != ''">
+				and a.work_type_code like CONCAT(#{workTypeCode},'%')
+			</if>
+			<if test="dutiesCode != null and dutiesCode != ''">
+				and a.duties_code = #{dutiesCode}
+			</if>
+			<if test="pracCertiNo != null and pracCertiNo != ''">
+				and a.prac_certi_no = #{pracCertiNo}
+			</if>
+			<if test="pracCertiName != null and pracCertiName != ''">
+				and a.prac_certi_name = #{pracCertiName}
+			</if>
+			<if test="durgCode != null and durgCode != ''">
+				and a.durg_code = #{durgCode}
+			</if>
+			<if test="antibacterialCode != null and antibacterialCode != ''">
+				and a.antibacterial_code = #{antibacterialCode}
+			</if>
+			<if test="phCode != null and phCode != ''">
+				and a.ph_code = #{phCode}
+			</if>
+			<if test="opeartionCode != null and opeartionCode != ''">
+				and a.opeartion_code = #{opeartionCode}
+			</if>
+			<if test="pswdErrCnt != null">
+				and a.pswd_err_cnt = #{pswdErrCnt}
+			</if>
+			<if test="lastLoginTime != null">
+				and a.last_login_time = #{lastLoginTime}
+			</if>
+			<if test="lastLoginIp != null and lastLoginIp != ''">
+				and a.last_login_ip = #{lastLoginIp}
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				and a.status_code = #{statusCode}
+			</if>
+			<if test="pym != null and pym != ''">
+				and a.pym = #{pym}
+			</if>
+			<if test="wbm != null and wbm != ''">
+				and a.wbm = #{wbm}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			<if test="signaturePath != null and signaturePath != ''">
+				and a.signature_path = #{signaturePath}
+			</if>
+			<if test="doctorIntro != null and doctorIntro != ''">
+				and a.doctor_intro = #{doctorIntro}
+			</if>
+			<if test="isGuide != null and isGuide != ''">
+				and a.is_guide = #{isGuide}
+			</if>
+			<if test="deptTypeCode != null and deptTypeCode != ''">
+				and b.type_code = #{deptTypeCode}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryAllUsCode" resultType="java.lang.String">
+		select us_code
+		from sys_user_system
+		where (hosp_code,user_code,system_code,dept_code) in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			(#{item.hospCode},#{item.userCode},#{item.systemCode},#{item.deptCode})
+		</foreach>
+	</select>
+
+	<select id="querySysUserHaveTeachDoctor" resultMap="SysUserMap" >
+		SELECT
+			c.*
+		FROM
+			sys_user a,
+			sys_user_system b,
+			sys_user c
+		WHERE
+			a.code = b.user_code
+			AND a.hosp_code = b.hosp_code
+			AND b.teacher_code = c.code
+			AND b.hosp_code = c.hosp_code
+			AND a.hosp_code = #{hospCode}
+			and b.dept_code = #{deptCode}
+			and b.system_code =#{systemCode}
+			AND a.code = #{userCode}
+			<if test="code != null and code != ''">
+				and c.code = #{code}
+			</if>
+			<if test="password != null and password != ''">
+				and c.password = #{password}
+			</if>
+	</select>
+
+	<!--根据用户状态、科室类型 职工类型模糊查询-->
+	<select id="queryVisitDoctorByWorkTypeCode" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+		SELECT
+			a.id,
+			a.hosp_code,
+			a.dept_code,
+			a.CODE,
+			a.PASSWORD,
+			a.is_in_job,
+			a.NAME,
+			a.age,
+			a.birthday,
+			a.gender_code,
+			a.nation_code,
+			a.native_place,
+			a.marry_code,
+			a.is_pm,
+			a.in_pm_date,
+			a.cert_code,
+			a.cert_no,
+			a.photo_image,
+			a.sign_image,
+			a.introduce,
+			a.speciality,
+			a.address,
+			a.email,
+			a.phone,
+			a.education_code,
+			a.major_code,
+			a.school,
+			a.school_date,
+			a.school_image,
+			a.work_date,
+			a.work_type_code,
+			a.duties_code,
+			a.prac_certi_no,
+			a.prac_certi_name,
+			a.durg_code,
+			a.antibacterial_code,
+			a.ph_code,
+			a.opeartion_code,
+			a.pswd_err_cnt,
+			a.last_login_time,
+			a.last_login_ip,
+			a.status_code,
+			a.pym,
+			a.wbm,
+			a.crte_id,
+			a.crte_name,
+			a.crte_time,
+			a.signature_path,
+			a.doctor_intro,
+			a.is_guide,
+			a.is_anaesthesia,
+			b.NAME AS deptName
+		FROM
+			sys_user a
+			left join sys_user_system c on c.user_code = a.code
+			LEFT JOIN base_dept b ON c.dept_code = b.CODE
+			AND a.hosp_code = b.hosp_code
+		WHERE
+			a.hosp_code = #{hospCode}
+			<if test="statusCode != null and statusCode != ''">
+				AND a.status_code = #{statusCode}
+			</if>
+			<if test="workTypeCode != null and workTypeCode != ''">
+				AND a.work_type_code LIKE CONCAT(#{workTypeCode}, '%' )
+			</if>
+			<if test="deptTypeCode != null and deptTypeCode != ''">
+				AND b.type_code = #{deptTypeCode}
+			</if>
+			GROUP BY a.id,a.code
+	</select>
+
+</mapper>

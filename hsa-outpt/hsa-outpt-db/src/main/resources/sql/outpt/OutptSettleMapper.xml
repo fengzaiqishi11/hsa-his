@@ -1,0 +1,941 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.OutptSettleDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptSettleDtoMap" type="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="settle_no" property="settleNo" jdbcType="VARCHAR" />
+        <result column="patient_code" property="patientCode" jdbcType="VARCHAR" />
+        <result column="settle_time" property="settleTime" jdbcType="TIMESTAMP" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="reality_price" property="realityPrice" jdbcType="DECIMAL" />
+        <result column="trunc_price" property="truncPrice" jdbcType="DECIMAL" />
+        <result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+        <result column="self_price" property="selfPrice" jdbcType="DECIMAL" />
+        <result column="mi_price" property="miPrice" jdbcType="DECIMAL" />
+        <result column="card_price" property="cardPrice" jdbcType="DECIMAL" />
+        <result column="is_settle" property="isSettle" jdbcType="VARCHAR" />
+        <result column="daily_settle_id" property="dailySettleId" jdbcType="VARCHAR" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="red_id" property="redId" jdbcType="VARCHAR" />
+        <result column="is_print" property="isPrint" jdbcType="VARCHAR" />
+        <result column="old_settle_id" property="oldSettleId" jdbcType="VARCHAR" />
+        <result column="is_print_list" property="isPrintList" jdbcType="VARCHAR" />
+        <result column="print_list_time" property="printListTime" jdbcType="TIMESTAMP" />
+        <result column="source_pay_code" property="sourcePayCode" jdbcType="VARCHAR" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+        <result column="one_settle_id" property="oneSettleId" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        settle_no,
+        patient_code,
+        settle_time,
+        total_price,
+        reality_price,
+        trunc_price,
+        actual_price,
+        self_price,
+        mi_price,
+        is_settle,
+        daily_settle_id,
+        status_code,
+        red_id,
+        is_print,
+        old_settle_id,
+        is_print_list,
+        print_list_time,
+        source_pay_code,
+        order_no,
+        crte_id,
+        crte_name,
+        crte_time,
+        card_price
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        os.id,
+        os.hosp_code,
+        os.visit_id,
+        os.settle_no,
+        os.patient_code,
+        os.settle_time,
+        os.total_price,
+        os.reality_price,
+        os.trunc_price,
+        os.actual_price,
+        os.self_price,
+        os.mi_price,
+        os.is_settle,
+        os.daily_settle_id,
+        os.status_code,
+        os.red_id,
+        os.is_print,
+        os.old_settle_id,
+        os.is_print_list,
+        os.print_list_time,
+        os.source_pay_code,
+        os.order_no,
+        os.crte_id,
+        os.crte_name,
+        os.crte_time
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptSettleDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_settle
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleDO" >
+        insert into
+        outpt_settle
+        (
+          id,
+          hosp_code,
+          visit_id,
+          settle_no,
+          patient_code,
+          settle_time,
+          total_price,
+          reality_price,
+          trunc_price,
+          card_price,
+          actual_price,
+          self_price,
+          mi_price,
+          is_settle,
+          daily_settle_id,
+          status_code,
+          red_id,
+          is_print,
+          old_settle_id,
+          is_print_list,
+          print_list_time,
+          source_pay_code,
+          order_no,
+          one_settle_id,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{settleNo,jdbcType=VARCHAR},
+          #{patientCode,jdbcType=VARCHAR},
+          #{settleTime,jdbcType=TIMESTAMP},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{realityPrice,jdbcType=DECIMAL},
+          #{truncPrice,jdbcType=DECIMAL},
+          #{cardPrice,jdbcType=DECIMAL},
+          #{actualPrice,jdbcType=DECIMAL},
+          #{selfPrice,jdbcType=DECIMAL},
+          #{miPrice,jdbcType=DECIMAL},
+          #{isSettle,jdbcType=VARCHAR},
+          #{dailySettleId,jdbcType=VARCHAR},
+          #{statusCode,jdbcType=VARCHAR},
+          #{redId,jdbcType=VARCHAR},
+          #{isPrint,jdbcType=VARCHAR},
+          #{oldSettleId,jdbcType=VARCHAR},
+          #{isPrintList,jdbcType=VARCHAR},
+          #{printListTime,jdbcType=TIMESTAMP},
+          #{sourcePayCode,jdbcType=VARCHAR},
+          #{orderNo,jdbcType=VARCHAR},
+          #{oneSettleId,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleDO" >
+        insert into
+        outpt_settle
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id,
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code,
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id,
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                    settle_no,
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                    patient_code,
+                </if>
+                <if test="settleTime != null">
+                    settle_time,
+                </if>
+                <if test="totalPrice != null">
+                    total_price,
+                </if>
+                <if test="realityPrice != null">
+                    reality_price,
+                </if>
+                <if test="truncPrice != null">
+                    trunc_price,
+                </if>
+                <if test="actualPrice != null">
+                    actual_price,
+                </if>
+                <if test="selfPrice != null">
+                    self_price,
+                </if>
+                <if test="miPrice != null">
+                    mi_price,
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                    is_settle,
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                    daily_settle_id,
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                    status_code,
+                </if>
+                <if test="redId != null and redId != ''">
+                    red_id,
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                    is_print,
+                </if>
+                <if test="oldSettleId != null and oldSettleId != ''">
+                    old_settle_id,
+                </if>
+                <if test="isPrintList != null and isPrintList != ''">
+                    is_print_list,
+                </if>
+                <if test="printListTime != null">
+                    print_list_time,
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                    source_pay_code,
+                </if>
+                <if test="oneSettleId != null and oneSettleId != ''">
+                    one_settle_id,
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                    order_no,
+                </if>
+                <if test="crteId != null and crteId != ''">
+                    crte_id,
+                </if>
+                <if test="crteName != null and crteName != ''">
+                    crte_name,
+                </if>
+                <if test="crteTime != null">
+                    crte_time
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR},
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                        #{settleNo,jdbcType=VARCHAR},
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                        #{patientCode,jdbcType=VARCHAR},
+                </if>
+                <if test="settleTime != null">
+                        #{settleTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="totalPrice != null">
+                        #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="realityPrice != null">
+                        #{realityPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="truncPrice != null">
+                        #{truncPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="actualPrice != null">
+                        #{actualPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="selfPrice != null">
+                        #{selfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="miPrice != null">
+                        #{miPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                        #{isSettle,jdbcType=VARCHAR},
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                        #{dailySettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                        #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                        #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                        #{isPrint,jdbcType=VARCHAR},
+                </if>
+                <if test="oldSettleId != null and oldSettleId != ''">
+                        #{oldSettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrintList != null and isPrintList != ''">
+                        #{isPrintList,jdbcType=VARCHAR},
+                </if>
+                <if test="printListTime != null">
+                        #{printListTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                        #{sourcePayCode,jdbcType=VARCHAR},
+                </if>
+                <if test="oneSettleId != null and oneSettleId != ''">
+                        #{oneSettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                        #{orderNo,jdbcType=VARCHAR},
+                </if>
+                <if test="crteId != null and crteId != ''">
+                        #{crteId,jdbcType=VARCHAR},
+                </if>
+                <if test="crteName != null and crteName != ''">
+                        #{crteName,jdbcType=VARCHAR},
+                </if>
+                <if test="crteTime != null">
+                        #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleDO" >
+        update
+        outpt_settle
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                settle_no = #{settleNo,jdbcType=VARCHAR},
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+                settle_time = #{settleTime,jdbcType=TIMESTAMP},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+                trunc_price = #{truncPrice,jdbcType=DECIMAL},
+                actual_price = #{actualPrice,jdbcType=DECIMAL},
+                self_price = #{selfPrice,jdbcType=DECIMAL},
+                mi_price = #{miPrice,jdbcType=DECIMAL},
+                is_settle = #{isSettle,jdbcType=VARCHAR},
+                daily_settle_id = #{dailySettleId,jdbcType=VARCHAR},
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                red_id = #{redId,jdbcType=VARCHAR},
+                is_print = #{isPrint,jdbcType=VARCHAR},
+                old_settle_id = #{oldSettleId,jdbcType=VARCHAR},
+                is_print_list = #{isPrintList,jdbcType=VARCHAR},
+                print_list_time = #{printListTime,jdbcType=TIMESTAMP},
+                source_pay_code = #{sourcePayCode,jdbcType=VARCHAR},
+                order_no = #{orderNo,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleDO" >
+        update
+        outpt_settle
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                settle_no = #{settleNo,jdbcType=VARCHAR},
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+                </if>
+                <if test="settleTime != null">
+                settle_time = #{settleTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="realityPrice != null">
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="truncPrice != null">
+                trunc_price = #{truncPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="cardPrice != null">
+                    card_price = #{cardPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="actualPrice != null">
+                actual_price = #{actualPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="selfPrice != null">
+                self_price = #{selfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="miPrice != null">
+                mi_price = #{miPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle,jdbcType=VARCHAR},
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                daily_settle_id = #{dailySettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                red_id = #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                is_print = #{isPrint,jdbcType=VARCHAR},
+                </if>
+                <if test="oldSettleId != null and oldSettleId != ''">
+                old_settle_id = #{oldSettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrintList != null and isPrintList != ''">
+                is_print_list = #{isPrintList,jdbcType=VARCHAR},
+                </if>
+                <if test="printListTime != null">
+                print_list_time = #{printListTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                source_pay_code = #{sourcePayCode,jdbcType=VARCHAR},
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+                </if>
+                <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                </if>
+                <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                </if>
+                <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM outpt_settle WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM outpt_settle WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="outptSettleDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_settle os
+        <where>
+                    <if test="hospCode != null and hospCode != ''">
+                        AND os.hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+                    </if>
+                    <if test="visitId != null and visitId != ''">
+                        AND os.visit_id LIKE CONCAT('%', #{visitId}, '%')
+                    </if>
+                    <if test="settleNo != null and settleNo != ''">
+                        AND os.settle_no LIKE CONCAT('%', #{settleNo}, '%')
+                    </if>
+        </where>
+    </select>
+
+    <!--收费查询-->
+    <select id="queryCharge" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+            a.id,
+            a.status_code,
+            a.settle_no,
+            b.name,
+            b.gender_code,
+            b.age,
+            b.age_unit_code,
+            a.patient_code,
+            b.dept_name,
+            b.doctor_name,
+            a.total_price,
+            a.reality_price,
+            IFNULL(a.self_price,0) as self_price,
+            IFNULL(a.mi_price,0) as mi_price,
+            IFNULL(a.trunc_price,0) as trunc_price,
+            a.is_settle,
+            a.crte_name,
+            a.settle_time,
+            a.card_price as cardPrice,
+            CONCAT(
+            b.name,'/',
+                (CASE b.gender_code WHEN '0' THEN '未知的性别'
+                WHEN '1' THEN '男' WHEN '2' THEN '女'
+                WHEN '9' THEN '未说明的性别' ELSE '' END ),
+                '/',IFNULL( b.age, '-' ),
+                (CASE b.age_unit_code
+                WHEN '1' THEN '岁' WHEN '2' THEN '月'
+                WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+                ) AS personInfo,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
+            (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
+        FROM
+        outpt_settle a JOIN outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.is_settle='1'
+        <if test="keyword != null and keyword != ''">
+            and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and a.settle_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="chargeId != null and chargeId != ''">
+            and a.crte_id = #{chargeId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and b.doctor_id = #{doctorId}
+        </if>
+        order by a.settle_no desc, a.settle_time desc
+    </select>
+
+<select id="queryOutChargePage" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        a.id,
+        a.red_id,
+        a.visit_id,
+        a.settle_no,
+        b.name,
+        b.visit_no,
+        b.gender_code,
+        b.age,
+        b.cert_no,
+        b.out_profile,
+        b.age_unit_code,
+        a.patient_code,
+        b.dept_name,
+        b.doctor_name,
+        a.total_price,
+        a.total_price as invoice_price,
+        IFNULL(a.self_price,0) as self_price,
+        IFNULL(a.mi_price,0) as mi_price,
+        a.is_settle,
+        a.crte_name,
+        a.settle_time,
+        a.source_pay_code,
+        a.order_no,
+        a.status_code,
+        a.actual_price,
+        a.reality_price,
+        d.name as preferentialTypeName,
+        a.crte_time,
+        a.one_settle_id,
+        a.card_price as cardPrice,
+        c.card_no as cardNo,
+        b.profile_id as profileId
+        FROM
+        outpt_settle a
+        left join outpt_visit b on a.visit_id = b.id
+        left join base_preferential_type d on b.preferential_type_id = d.id
+        left join base_card_recharge_change bcrc on bcrc.settle_id = a.id and a.status_code = '0' and a.is_settle = '1'
+        left join base_card c on c.hosp_code = a.hosp_code and c.id = bcrc.card_id
+        where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
+        <if test="keyword != null and keyword != ''">
+            and ( b.name LIKE CONCAT('%',#{keyword},'%')
+            or b.cert_no LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and a.settle_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and a.settle_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and b.doctor_id = #{doctorId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and b.dept_id = #{deptId}
+        </if>
+        <if test="isSettle != null and isSettle != ''">
+            and a.is_settle = #{isSettle}
+        </if>
+        order by a.settle_no desc, a.settle_time desc
+    </select>
+
+    <!-- 门诊退费数量来源于已经确认申请退费的数量 -->
+    <select id="queryOutptPrescribesandRefundApply" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+            a.*,
+            case when a.is_dist = 0
+                then ra.num
+                else
+                 a.back_num
+                end
+            as backNum,
+            c.code as bfc_code,
+            c.name as bfc_name,
+            d.name as phar_name,
+            e.name as exec_dept_name,
+            b.content
+        FROM
+            outpt_cost a
+            left join outpt_prescribe_detail b ON a.opd_id = b.id
+            left join base_finance_classify c on a.bfc_id = c.id
+            left join base_dept d on a.phar_id = d.id
+            left join base_dept e on a.exec_dept_id = e.id
+            left join outpt_refund_apply ra on ra.cost_id = a.id and ra.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
+            and a.status_code = #{statusCode} and a.settle_id = #{id}
+    </select>
+
+    <select id="queryOutptPrescribes" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+            ifnull(a.back_num,0) as backNum,
+            a.*,
+            c.code as bfc_code,
+            c.name as bfc_name,
+            d.name as phar_name,
+            e.name as exec_dept_name,
+            b.content
+        FROM
+            outpt_cost a
+            left join outpt_prescribe_detail b ON a.opd_id = b.id
+            left join base_finance_classify c on a.bfc_id = c.id
+            left join base_dept d on a.phar_id = d.id
+            left join base_dept e on a.exec_dept_id = e.id
+        WHERE a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
+            and a.status_code = #{statusCode} and a.settle_id = #{id}
+    </select>
+
+    <select id="queryOutptPrescribe" resultType="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select * from outpt_prescribe where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id}
+    </select>
+
+    <select id="getVisitByVisitId" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" parameterType="java.util.Map">
+        select * from outpt_visit where hosp_code = #{hospCode} and id = #{visitId}
+    </select>
+
+    <delete id="delOutptSettleByParam" parameterType="java.util.Map">
+        DELETE
+        FROM
+          outpt_settle
+        WHERE
+        hosp_code = #{hospCode}
+        AND visit_id = #{visitId}
+        AND is_settle = #{isSettle}
+        AND status_code = #{statusCode}
+    </delete>
+
+    <select id="getDiagnoseInfo" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select b.id,b.name as diseaseName from outpt_diagnose a
+        left join base_disease b on a.disease_id = b.id
+        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
+    </select>
+
+    <select id="getInvoiceInfo" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select invoice_no as invoiceNo,total_price as totalPrice from outpt_settle_invoice
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id} and is_main = '1' and status_code = '0' and invoice_no is not null
+    </select>
+
+    <!-- 修改表信息 -->
+    <update id="updateOutptPrescribe" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" >
+        update
+          outpt_prescribe
+        set
+          is_settle = '0'
+        where
+          settle_id = #{id} and hosp_code = #{hospCode} and visit_id = #{visitId}
+    </update>
+
+
+    <select id="getInsureFee" resultType="cn.hsa.module.dzpz.hainan.UploadFee">
+        select #{appId} appId,#{orgCodg} orgCodg ,#{orgId} orgId,#{ecToken} ecToken,'460100' insuCode, b.cert_no idNo,b.name userName,b.cert_code idType,settle.id medOrgOrd,
+        '' initRxOrd,'0' erFlag,'0' trumFlag,'02' feeType,'1' otpType,'11' medType,settle.reality_price feeSumamt,date_format(settle.settle_time, '%Y%m%d') chrgDate,
+        date_format(settle.settle_time, 'H%i%s') chrgTime,'' rgstSn,'0.00' rgstFee,b.dept_name rgstDeptName,
+        b.doctor_name drName,'N' medreformDot,b.dept_id drDeptCodg,c.cert_code drCertNo, '3' rxItemVal,null iptType,b.visit_code iptOpNo,null iptDeptCodg,null iptDeptName,
+        null iptBegnDate,null iptEndDate,null dscgWay,null iptDays,null birctrlType,
+        null Birmtd,null babyNum,null birctrlDate,null prgDays,'管理员' opter,'2809229242' psnNum,settle.id docno,'7' systemNo
+        from outpt_settle settle
+        join outpt_visit b on settle.visit_id = b.id and settle.hosp_code = b.hosp_code
+        join sys_user c on b.doctor_id = c.id and b.hosp_code = c.hosp_code
+        where settle.id = #{id} and settle.hosp_code = #{hospCode}
+    </select>
+
+    <select id="getInsureFeeRxList" resultType="cn.hsa.module.dzpz.hainan.RxList">
+        select settle.id rxno,a.id rxDetlNo,a.item_id itemNo,a.item_name itemName,'' invoItemNo,'N' hiItem,a.price itemPric,
+        a.num_unit_code itemEmp,a.spec itemSpec,a.total_num itemCnt,a.preferential_price itemAmt,a.item_id prodBarc,
+        rate.code drugFrqu,a.num drugDos,a.use_days drutDays,a.prep_code dosform,null empMedcEmp,null drugTotlnt,null drugTotlntEmp,null drugDelvWay,
+        null drugCntDays,d.crte_name drName,'00766' drCertNo,date_format(d.crte_time, '%Y%m%d%H%i%s') rxDate, presDept.code rsDeptCodg,presDept.`name` rsDept
+        from outpt_settle settle
+        join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
+        left join base_rate rate on a.rate_id = rate.id and a.hosp_code = rate.hosp_code
+        join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        join sys_user c on b.doctor_id = c.id and b.hosp_code = c.hosp_code
+        join outpt_prescribe d on  a.op_id = d.id and a.hosp_code = d.hosp_code
+        join base_dept presDept on d.dept_id = presDept.id and d.hosp_code = presDept.hosp_code
+        where settle.id = #{id} and settle.hosp_code = #{hospCode}
+    </select>
+
+    <select id="getInsureFeeExtDataList" resultType="cn.hsa.module.dzpz.hainan.ExtDataList">
+        select a.id rxDetlNo,'1' chrgitmType,'11' chrgType,'0' chigitmCentCodg,a.usage_code used,'' minunt
+        from outpt_settle settle
+        join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
+        left join base_rate rate on a.rate_id = rate.id and a.hosp_code = rate.hosp_code
+        join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        join sys_user c on b.doctor_id = c.id and b.hosp_code = c.hosp_code
+        join outpt_prescribe d on  a.op_id = d.id and a.hosp_code = d.hosp_code
+        join base_dept presDept on d.dept_id = presDept.id and d.hosp_code = presDept.hosp_code
+        where settle.id = #{id} and settle.hosp_code = #{hospCode}
+    </select>
+
+
+    <select id="getInsureFeeDiseList" resultType="cn.hsa.module.dzpz.hainan.DiseList">
+        select '1' diseDetlType,'1' diseDetlSrtNo, c.`code` diseDetlCodg,c.name diseDetlName
+        from outpt_settle a
+        join outpt_diagnose b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        join base_disease c on b.disease_id = c.id and b.hosp_code = c.hosp_code
+        where a.id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+    <select id="getDzpzOrgId" resultType="cn.hsa.module.dzpz.hainan.UploadFee">
+        select c.code orgId, c.org_code orgCodg, b.ext01 appId,a.pay_ord_id payOrdId, a.pay_token payToken, d.cert_no idNo, d.name userName, d.cert_code idType,a.hosp_code hospCode,
+               d.id visitId,a.pay_ord_id payOrdId,a.pay_token payToken
+        from insure_individual_visit a
+        join insure_dict b on a.insure_reg_code = b.insure_reg_code and a.hosp_code = b.hosp_code and b.code = 'JSLX' and b.value = 'qrcode'
+        join insure_configuration c on a.insure_reg_code = c.reg_code  and a.hosp_code = c.hosp_code
+        join outpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and a.is_ecqr = '1'
+    </select>
+
+
+    <!-- 修改就诊信息信息 -->
+    <update id="updateIndividualVisitToken">
+        update insure_individual_visit set
+        pay_ord_id = #{payOrdId},
+        pay_token = #{payToken}
+        where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </update>
+
+    <select id="getInsureIndividualCost" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select a.hosp_code, a.visit_id, a.id cost_id, a.settle_id,b.insure_item_type  item_type,b.insure_item_code item_code,b.insure_item_name item_name,
+        a.reality_price primary_price,a.crte_time crteTime,a.crte_id crteId,a.crte_name crteName
+        from outpt_cost a
+        join insure_item_match b on a.item_id = b.hosp_item_id AND a.item_code = b.hosp_item_type
+        AND b.is_valid = '1'
+        AND a.hosp_code = b.hosp_code
+        where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+    </select>
+
+
+
+    <insert id="insertInsureCost" parameterType="java.util.List">
+        insert into insure_individual_cost
+        (id, hosp_code, visit_id, cost_id, settle_id, is_hospital, item_type, item_code, item_name, guest_ratio,
+        primary_price, apply_last_price, order_no, transmit_code, crte_id, crte_name, crte_time, rxSn, overlmtSelfpayAmt,
+        chrgItemLv, fulamtOwnpayFlag, ownpayRea, hiLmtpric)
+        values
+        <foreach collection="costDTOList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.costId},
+            #{item.settleId},#{item.isHospital},#{item.itemType},
+            #{item.itemCode},
+            #{item.itemName},
+            #{item.guestRatio},
+            #{item.primaryPrice},
+            #{item.applyLastPrice},
+            #{item.orderNo},
+            #{item.transmitCode},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime},
+            #{item.rxSn},
+            #{item.overlmtSelfpayAmt},
+            #{item.chrgItemLv},
+            #{item.fulamtOwnpayFlag},
+            #{item.ownpayRea},
+            #{item.hiLmtpric}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getInsureInsureIndividualSettle" resultType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
+        select a.hosp_code hospCode,a.visit_id visitId, b.id settleId, '0' isHospital,b.visit_no visitNo, b.insure_org_code insureOrgCode, b.insure_reg_code insureRegCode, b.medicine_org_code medicineOrgCode,
+               a.crte_id crteId,a.crte_time crteTime,a.crte_name crteName
+        from outpt_settle a
+        join insure_individual_visit b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        where (a.id = #{id} or a.settle_no = #{id}) and a.hosp_code = #{hospCode}
+    </select>
+
+    <insert id="insertInsureIndividualSettle" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO" >
+        insert into
+        insure_individual_settle
+        (
+          id,
+          hosp_code,
+          visit_id,
+          settle_id,
+          is_hospital,
+          visit_no,
+          discharge_dn_code,
+          insure_org_code,
+          insure_reg_code,
+          medicine_org_code,
+          discharge_dn_name,
+          discharged_date,
+          discharged_case,
+          settleway,
+          total_price,
+          insure_price,
+          plan_price,
+          serious_price,
+          civil_price,
+          retire_price,
+          personal_price,
+          person_price,
+          hosp_price,
+          before_settle,
+          last_settle,
+          rests_price,
+          assign_price,
+          starting_price,
+          top_price,
+          plan_account_price,
+          portion_price,
+          state,
+          settle_state,
+          costbatch,
+          aka130,
+          bka006,
+          injury_borth_sn,
+          is_account,
+          remark,
+          crte_id,
+          crte_name,
+          crte_time,
+          ext01,
+          ext02,
+          ext03,
+          ext04,
+          ext05,
+          ext06,
+          ext07,
+          ext08,
+          ext09,
+          ext10
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{settleId,jdbcType=VARCHAR},
+          #{isHospital,jdbcType=VARCHAR},
+          #{visitNo,jdbcType=VARCHAR},
+          #{dischargeDnCode,jdbcType=VARCHAR},
+          #{insureOrgCode,jdbcType=VARCHAR},
+          #{insureRegCode,jdbcType=VARCHAR},
+          #{medicineOrgCode,jdbcType=VARCHAR},
+          #{dischargeDnName,jdbcType=VARCHAR},
+          #{dischargedDate,jdbcType=TIMESTAMP},
+          #{dischargedCase,jdbcType=VARCHAR},
+          #{settleway,jdbcType=VARCHAR},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{insurePrice,jdbcType=DECIMAL},
+          #{planPrice,jdbcType=DECIMAL},
+          #{seriousPrice,jdbcType=DECIMAL},
+          #{civilPrice,jdbcType=DECIMAL},
+          #{retirePrice,jdbcType=DECIMAL},
+          #{personalPrice,jdbcType=DECIMAL},
+          #{personPrice,jdbcType=DECIMAL},
+          #{hospPrice,jdbcType=DECIMAL},
+          #{beforeSettle,jdbcType=DECIMAL},
+          #{lastSettle,jdbcType=DECIMAL},
+          #{restsPrice,jdbcType=DECIMAL},
+          #{assignPrice,jdbcType=DECIMAL},
+          #{startingPrice,jdbcType=DECIMAL},
+          #{topPrice,jdbcType=DECIMAL},
+          #{planAccountPrice,jdbcType=DECIMAL},
+          #{portionPrice,jdbcType=DECIMAL},
+          #{state,jdbcType=VARCHAR},
+          #{settleState,jdbcType=VARCHAR},
+          #{costbatch,jdbcType=VARCHAR},
+          #{aka130,jdbcType=VARCHAR},
+          #{bka006,jdbcType=VARCHAR},
+          #{injuryBorthSn,jdbcType=VARCHAR},
+          #{isAccount,jdbcType=VARCHAR},
+          #{remark,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          now(),
+          #{ext01,jdbcType=VARCHAR},
+          #{ext02,jdbcType=VARCHAR},
+          #{ext03,jdbcType=VARCHAR},
+          #{ext04,jdbcType=VARCHAR},
+          #{ext05,jdbcType=VARCHAR},
+          #{ext06,jdbcType=VARCHAR},
+          #{ext07,jdbcType=VARCHAR},
+          #{ext08,jdbcType=VARCHAR},
+          #{ext09,jdbcType=VARCHAR},
+          #{ext10,jdbcType=VARCHAR}
+        )
+    </insert>
+
+
+    <!-- 修改就诊信息信息 -->
+    <update id="updateOutptSettle">
+        update outpt_settle a set
+        mi_price = reality_price,
+        status_code = '0'
+        where (a.id = #{id} or a.settle_no = #{id}) and a.hosp_code = #{hospCode}
+    </update>
+
+
+    <select id="getById" resultMap="outptSettleDtoMap">
+       SELECT * from outpt_settle  where  id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <update id="updateOutptSettleStatus" >
+        update outpt_settle a set is_settle = '1'
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+</mapper>

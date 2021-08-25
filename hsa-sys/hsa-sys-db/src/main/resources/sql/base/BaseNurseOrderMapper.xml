@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.nurse.dao.BaseNurseOrderDAO">
+    <!--分页查询所有护理单据-->
+    <select id="queryPage" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        select id, hosp_code, code, name, is_assign, is_valid, dept_ids, pg_size, crte_id, crte_name, crte_time
+        from base_nurse_order
+        where hosp_code = #{hospCode}
+        and is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and code like CONCAT('%',#{keyword},'%') or name like concat('%',#{keyword},'%')
+        </if>
+        order by crte_time desc
+    </select>
+
+    <!--查询所有护理单据(供下拉选择)-->
+    <select id="queryAll" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        select id,
+               hosp_code,
+               code,
+               name,
+               is_assign,
+               is_valid,
+               dept_ids,
+               pg_size,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_order
+        where hosp_code = #{hospCode}
+          and is_valid = '1'
+    </select>
+
+    <!--查询单个护理单据-->
+    <select id="getById" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        select id,
+               hosp_code,
+               code,
+               name,
+               is_assign,
+               is_valid,
+               dept_ids,
+               pg_size,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_nurse_order
+        where hosp_code = #{hospCode}
+          and id = #{id}
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+    <!--新增护理单据-->
+    <insert id="insert" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        insert into base_nurse_order(id, hosp_code, code, name, is_assign, is_valid, dept_ids, pg_size, crte_id,
+                                     crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{isAssign}, #{isValid}, #{deptIds}, #{pgSize}, #{crteId},
+                #{crteName}, #{crteTime})
+    </insert>
+
+    <!--修改护理单据-->
+    <update id="update" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        update base_nurse_order
+        <set>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="isAssign != null and isAssign != ''">
+                is_assign = #{isAssign},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            dept_ids = #{deptIds},
+            pg_size = #{pgSize},
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--删除护理单据-->
+    <update id="delete" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
+        update base_nurse_order
+        set is_valid = #{isValid}
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--判断护理单据是否存在-->
+    <select id="getByCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO" resultType="int">
+        select count(1)
+        from base_nurse_order
+        where hosp_code = #{hospCode}
+        and code = #{code}
+        and is_valid = '1'
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--根据护理单据查询出对应下的所有表头格式数据-->
+    <select id="queryTbHeadByOrder" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
+            resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
+        select *
+        from base_nurse_tbhead
+        where is_valid = '1'
+          and hosp_code = #{hospCode}
+          and bno_code = #{bnoCode}
+        order by seq_no
+    </select>
+</mapper>

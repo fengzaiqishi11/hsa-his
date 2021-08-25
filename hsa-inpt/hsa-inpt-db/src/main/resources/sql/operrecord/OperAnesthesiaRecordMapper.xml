@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.oper.operrecord.dao.OperAnesthesiaRecordDAO">
+
+    <resultMap type="cn.hsa.module.oper.operrecord.dto.OperAnesthesiaRecordDTO" id="OperAnesthesiaRecordMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="anesthesiaDate" column="anesthesia_date" jdbcType="TIMESTAMP"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="weight" column="weight" jdbcType="VARCHAR"/>
+        <result property="height" column="height" jdbcType="VARCHAR"/>
+        <result property="operDiseaseBefore" column="oper_disease_before" jdbcType="VARCHAR"/>
+        <result property="operDiseaseAfter" column="oper_disease_after" jdbcType="VARCHAR"/>
+        <result property="asaCode" column="asa_code" jdbcType="VARCHAR"/>
+        <result property="proposedOper" column="proposed_oper" jdbcType="VARCHAR"/>
+        <result property="anesthesiaCode" column="anesthesia_code" jdbcType="VARCHAR"/>
+        <result property="anesthesiaMethod" column="anesthesia_method" jdbcType="VARCHAR"/>
+        <result property="positionCode" column="position_code" jdbcType="VARCHAR"/>
+        <result property="lateraldecubitusCode" column="lateraldecubitus_code" jdbcType="VARCHAR"/>
+        <result property="inRoomTime" column="in_room_time" jdbcType="VARCHAR"/>
+        <result property="anesthesiaTime" column="anesthesia_time" jdbcType="VARCHAR"/>
+        <result property="intubationTime" column="intubation_time" jdbcType="VARCHAR"/>
+        <result property="extubationTime" column="extubation_time" jdbcType="VARCHAR"/>
+        <result property="operStartTime" column="oper_start_time" jdbcType="VARCHAR"/>
+        <result property="operEndTime" column="oper_end_time" jdbcType="VARCHAR"/>
+        <result property="backTime" column="back_time" jdbcType="VARCHAR"/>
+        <result property="performSurgery" column="perform_surgery" jdbcType="VARCHAR"/>
+        <result property="operationDoctor" column="operation_doctor" jdbcType="VARCHAR"/>
+        <result property="anaesthesiaDoctor" column="anaesthesia_doctor" jdbcType="VARCHAR"/>
+        <result property="handwashingNurse" column="handwashing_nurse" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="intervalMinute" column="interval_minute" jdbcType="VARCHAR"/>
+        <result property="updtId" column="updt_id" jdbcType="VARCHAR"/>
+        <result property="updtName" column="updt_name" jdbcType="VARCHAR"/>
+        <result property="updtTime" column="updt_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.oper.operrecord.dto.OperAnesthesiaDurgDTO" id="OperAnesthesiaDurgMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+    <result property="anesthesiaId" column="anesthesia_id" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+    <result property="value1" column="value1" jdbcType="VARCHAR"/>
+    <result property="value2" column="value2" jdbcType="VARCHAR"/>
+    <result property="value3" column="value3" jdbcType="VARCHAR"/>
+    <result property="value4" column="value4" jdbcType="VARCHAR"/>
+    <result property="value5" column="value5" jdbcType="VARCHAR"/>
+    <result property="value6" column="value6" jdbcType="VARCHAR"/>
+    <result property="value7" column="value7" jdbcType="VARCHAR"/>
+    <result property="value8" column="value8" jdbcType="VARCHAR"/>
+    <result property="value9" column="value9" jdbcType="VARCHAR"/>
+    <result property="value10" column="value10" jdbcType="VARCHAR"/>
+    <result property="updtId" column="updt_id" jdbcType="VARCHAR"/>
+    <result property="updtName" column="updt_name" jdbcType="VARCHAR"/>
+    <result property="updtTime" column="updt_time" jdbcType="TIMESTAMP"/>
+    <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+    <resultMap type="cn.hsa.module.oper.operrecord.dto.OperAnesthesiaMonitorDTO" id="OperAnesthesiaMonitorMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+    <result property="anesthesiaId" column="anesthesia_id" jdbcType="VARCHAR"/>
+    <result property="monitorTime" column="monitor_time" jdbcType="VARCHAR"/>
+    <result property="sbp" column="sbp" jdbcType="VARCHAR"/>
+    <result property="dbp" column="dbp" jdbcType="VARCHAR"/>
+    <result property="pulse" column="pulse" jdbcType="VARCHAR"/>
+    <result property="breath" column="breath" jdbcType="VARCHAR"/>
+    <result property="map" column="map" jdbcType="VARCHAR"/>
+    <result property="noseTemperature" column="nose_temperature" jdbcType="VARCHAR"/>
+    <result property="rectumTemperature" column="rectum_temperature" jdbcType="VARCHAR"/>
+    <result property="updtId" column="updt_id" jdbcType="VARCHAR"/>
+    <result property="updtName" column="updt_name" jdbcType="VARCHAR"/>
+    <result property="updtTime" column="updt_time" jdbcType="TIMESTAMP"/>
+    <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+    <!--查询单个麻醉记录单-->
+    <select id="getOperAnesthesiaRecordById" resultMap="OperAnesthesiaRecordMap">
+        select
+          id,hosp_code,oper_id,anesthesia_date, visit_id, weight, height, oper_disease_before, oper_disease_after, asa_code, proposed_oper, anesthesia_code, anesthesia_method, position_code, lateraldecubitus_code,in_room_time, anesthesia_time, intubation_time, extubation_time, oper_start_time, oper_end_time, back_time, perform_surgery, operation_doctor, anaesthesia_doctor, handwashing_nurse, remark, interval_minute, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+        from oper_anesthesia_record
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and id = #{id}
+        </if>
+        <if test="visitId != null and visitId != ''">
+          and visit_id = #{visitId}
+        </if>
+        <if test="operId != null and operId != ''">
+          and oper_id = #{operId}
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询麻醉记录单-->
+    <select id="queryOperAnesthesiaRecordAll" resultMap="OperAnesthesiaRecordMap">
+        select
+          id, hosp_code, oper_id, anesthesia_date, visit_id, weight, height, oper_disease_before, oper_disease_after, asa_code, proposed_oper, anesthesia_code, anesthesia_method, position_code, lateraldecubitus_code,in_room_time, anesthesia_time, intubation_time, extubation_time, oper_start_time, oper_end_time, back_time, perform_surgery, operation_doctor, anaesthesia_doctor, handwashing_nurse, remark, interval_minute, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+        from oper_anesthesia_record
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="operId != null and operId != ''">
+              and oper_id = #{operId}
+            </if>
+            <if test="weight != null and weight != ''">
+                and weight = #{weight}
+            </if>
+            <if test="height != null and height != ''">
+                and height = #{height}
+            </if>
+            <if test="operDiseaseBefore != null and operDiseaseBefore != ''">
+                and oper_disease_before = #{operDiseaseBefore}
+            </if>
+            <if test="operDiseaseAfter != null and operDiseaseAfter != ''">
+                and oper_disease_after = #{operDiseaseAfter}
+            </if>
+            <if test="asaCode != null and asaCode != ''">
+                and asa_code = #{asaCode}
+            </if>
+            <if test="proposedOper != null and proposedOper != ''">
+                and proposed_oper = #{proposedOper}
+            </if>
+            <if test="anesthesiaCode != null and anesthesiaCode != ''">
+                and anesthesia_code = #{anesthesiaCode}
+            </if>
+            <if test="anesthesiaMethod != null and anesthesiaMethod != ''">
+                and anesthesia_method = #{anesthesiaMethod}
+            </if>
+            <if test="positionCode != null and positionCode != ''">
+                and position_code = #{positionCode}
+            </if>
+            <if test="inRoomTime != null and inRoomTime != ''">
+                and in_room_time = #{inRoomTime}
+            </if>
+            <if test="anesthesiaTime != null and anesthesiaTime != ''">
+                and anesthesia_time = #{anesthesiaTime}
+            </if>
+            <if test="intubationTime != null and intubationTime != ''">
+                and intubation_time = #{intubationTime}
+            </if>
+            <if test="extubationTime != null and extubationTime != ''">
+                and extubation_time = #{extubationTime}
+            </if>
+            <if test="operStartTime != null and operStartTime != ''">
+                and oper_start_time = #{operStartTime}
+            </if>
+            <if test="operEndTime != null and operEndTime != ''">
+                and oper_end_time = #{operEndTime}
+            </if>
+            <if test="backTime != null and backTime != ''">
+                and back_time = #{backTime}
+            </if>
+            <if test="performSurgery != null and performSurgery != ''">
+                and perform_surgery = #{performSurgery}
+            </if>
+            <if test="operationDoctor != null and operationDoctor != ''">
+                and operation_doctor = #{operationDoctor}
+            </if>
+            <if test="anaesthesiaDoctor != null and anaesthesiaDoctor != ''">
+                and anaesthesia_doctor = #{anaesthesiaDoctor}
+            </if>
+            <if test="handwashingNurse != null and handwashingNurse != ''">
+                and handwashing_nurse = #{handwashingNurse}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="intervalMinute != null and intervalMinute != ''">
+                and interval_minute = #{intervalMinute}
+            </if>
+            <if test="updtId != null and updtId != ''">
+                and updt_id = #{updtId}
+            </if>
+            <if test="updtName != null and updtName != ''">
+                and updt_name = #{updtName}
+            </if>
+            <if test="updtTime != null">
+                and updt_time = #{updtTime}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+    </select>
+
+    <!--新增麻醉记录单-->
+    <insert id="insertOperAnesthesiaRecord">
+        insert into oper_anesthesia_record(id,hosp_code, oper_id, visit_id, anesthesia_date,weight, height, oper_disease_before, oper_disease_after, asa_code, proposed_oper, anesthesia_code, anesthesia_method, position_code, lateraldecubitus_code,in_room_time, anesthesia_time, intubation_time, extubation_time, oper_start_time, oper_end_time, back_time, perform_surgery, operation_doctor, anaesthesia_doctor, handwashing_nurse, remark, interval_minute, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{operId}, #{visitId}, #{anesthesiaDate}, #{weight}, #{height}, #{operDiseaseBefore}, #{operDiseaseAfter}, #{asaCode}, #{proposedOper}, #{anesthesiaCode}, #{anesthesiaMethod}, #{positionCode}, #{lateraldecubitusCode}, #{inRoomTime}, #{anesthesiaTime}, #{intubationTime}, #{extubationTime}, #{operStartTime}, #{operEndTime}, #{backTime}, #{performSurgery}, #{operationDoctor}, #{anaesthesiaDoctor}, #{handwashingNurse}, #{remark}, #{intervalMinute}, #{updtId}, #{updtName}, #{updtTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateOperAnesthesiaRecord">
+        update oper_anesthesia_record
+        <set>
+            <if test="hospCode != null">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="operId != null">
+              oper_id = #{operId},
+            </if>
+            <if test="anesthesiaDate != null">
+              anesthesia_date = #{anesthesiaDate},
+            </if>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
+            <if test="operDiseaseBefore != null">
+                oper_disease_before = #{operDiseaseBefore},
+            </if>
+            <if test="operDiseaseAfter != null">
+                oper_disease_after = #{operDiseaseAfter},
+            </if>
+            <if test="asaCode != null">
+                asa_code = #{asaCode},
+            </if>
+            <if test="proposedOper != null">
+                proposed_oper = #{proposedOper},
+            </if>
+            <if test="lateraldecubitusCode != null">
+                lateraldecubitus_code = #{lateraldecubitusCode},
+            </if>
+            <if test="anesthesiaCode != null">
+                anesthesia_code = #{anesthesiaCode},
+            </if>
+            <if test="anesthesiaMethod != null">
+                anesthesia_method = #{anesthesiaMethod},
+            </if>
+            <if test="positionCode != null">
+                position_code = #{positionCode},
+            </if>
+            <if test="inRoomTime != null">
+                in_room_time = #{inRoomTime},
+            </if>
+            <if test="anesthesiaTime != null">
+                anesthesia_time = #{anesthesiaTime},
+            </if>
+            <if test="intubationTime != null">
+                intubation_time = #{intubationTime},
+            </if>
+            <if test="extubationTime != null">
+                extubation_time = #{extubationTime},
+            </if>
+            <if test="operStartTime != null">
+                oper_start_time = #{operStartTime},
+            </if>
+            <if test="operEndTime != null">
+                oper_end_time = #{operEndTime},
+            </if>
+            <if test="backTime != null">
+                back_time = #{backTime},
+            </if>
+            <if test="performSurgery != null">
+                perform_surgery = #{performSurgery},
+            </if>
+            <if test="operationDoctor != null">
+                operation_doctor = #{operationDoctor},
+            </if>
+            <if test="anaesthesiaDoctor != null">
+                anaesthesia_doctor = #{anaesthesiaDoctor},
+            </if>
+            <if test="handwashingNurse != null">
+                handwashing_nurse = #{handwashingNurse},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="intervalMinute != null">
+                interval_minute = #{intervalMinute},
+            </if>
+            <if test="updtId != null">
+                updt_id = #{updtId},
+            </if>
+            <if test="updtName != null">
+                updt_name = #{updtName},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除麻醉记录单-->
+    <delete id="deleteOperAnesthesiaRecordById">
+        delete from oper_anesthesia_record where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!--查询单个麻醉药品记录-->
+    <select id="getOperAnesthesiaDurgById" resultMap="OperAnesthesiaDurgMap">
+          select
+            id, hosp_code, anesthesia_id, remark, type_code, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+          from oper_anesthesia_durg
+          where id = #{id} and hosp_code = #{hospCode}
+      </select>
+
+    <!--通过实体作为筛选条件查询麻醉药品记录-->
+    <select id="queryOperAnesthesiaDurgAll" resultMap="OperAnesthesiaDurgMap">
+      select
+      id, hosp_code, anesthesia_id, remark, type_code, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+      from oper_anesthesia_durg
+      where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and id = #{id}
+        </if>
+        <if test="anesthesiaId != null and anesthesiaId != ''">
+          and anesthesia_id = #{anesthesiaId}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+          and type_code = #{typeCode}
+        </if>
+        <if test="value1 != null and value1 != ''">
+          and value1 = #{value1}
+        </if>
+        <if test="value2 != null and value2 != ''">
+          and value2 = #{value2}
+        </if>
+        <if test="value3 != null and value3 != ''">
+          and value3 = #{value3}
+        </if>
+        <if test="value4 != null and value4 != ''">
+          and value4 = #{value4}
+        </if>
+        <if test="value5 != null and value5 != ''">
+          and value5 = #{value5}
+        </if>
+        <if test="value6 != null and value6 != ''">
+          and value6 = #{value6}
+        </if>
+        <if test="value7 != null and value7 != ''">
+          and value7 = #{value7}
+        </if>
+        <if test="value8 != null and value8 != ''">
+          and value8 = #{value8}
+        </if>
+        <if test="value9 != null and value9 != ''">
+          and value9 = #{value9}
+        </if>
+        <if test="value10 != null and value10 != ''">
+          and value10 = #{value10}
+        </if>
+        <if test="updtId != null and updtId != ''">
+          and updt_id = #{updtId}
+        </if>
+        <if test="updtName != null and updtName != ''">
+          and updt_name = #{updtName}
+        </if>
+        <if test="updtTime != null">
+          and updt_time = #{updtTime}
+        </if>
+        <if test="crteId != null and crteId != ''">
+          and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+          and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+          and crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <!--新增麻醉药品记录-->
+    <insert id="insertOperAnesthesiaDurg" parameterType="java.util.List">
+          insert into oper_anesthesia_durg(id,hosp_code, anesthesia_id, remark,type_code, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time)
+          values
+          <foreach collection="list" item="item" index="index" separator=",">
+             (#{item.id},#{item.hospCode}, #{item.anesthesiaId}, #{item.remark},#{item.typeCode}, #{item.value1}, #{item.value2}, #{item.value3}, #{item.value4}, #{item.value5}, #{item.value6}, #{item.value7}, #{item.value8}, #{item.value9}, #{item.value10}, #{item.updtId}, #{item.updtName}, #{item.updtTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+          </foreach>
+      </insert>
+
+    <!--通过主键修改麻醉药品记录-->
+    <update id="updateOperAnesthesiaDurg" parameterType="java.util.List">
+      <foreach collection="list" item="item" separator=";">
+        update oper_anesthesia_durg
+        <set>
+          <if test="item.hospCode != null">
+            hosp_code = #{item.hospCode},
+          </if>
+          <if test="item.anesthesiaId != null">
+            anesthesia_id = #{item.anesthesiaId},
+          </if>
+          <if test="item.remark != null">
+            remark = #{item.remark},
+          </if>
+          <if test="item.typeCode != null">
+            type_code = #{item.typeCode},
+          </if>
+          <if test="item.value1 != null">
+            value1 = #{item.value1},
+          </if>
+          <if test="item.value2 != null">
+            value2 = #{item.value2},
+          </if>
+          <if test="item.value3 != null">
+            value3 = #{item.value3},
+          </if>
+          <if test="item.value4 != null">
+            value4 = #{item.value4},
+          </if>
+          <if test="item.value5 != null">
+            value5 = #{item.value5},
+          </if>
+          <if test="item.value6 != null">
+            value6 = #{item.value6},
+          </if>
+          <if test="item.value7 != null">
+            value7 = #{item.value7},
+          </if>
+          <if test="item.value8 != null">
+            value8 = #{item.value8},
+          </if>
+          <if test="item.value9 != null">
+            value9 = #{item.value9},
+          </if>
+          <if test="item.value10 != null">
+            value10 = #{item.value10},
+          </if>
+          <if test="item.updtId != null">
+            updt_id = #{item.updtId},
+          </if>
+          <if test="item.updtName != null">
+            updt_name = #{item.updtName},
+          </if>
+          <if test="item.updtTime != null">
+            updt_time = #{item.updtTime},
+          </if>
+          <if test="item.crteId != null">
+            crte_id = #{item.crteId},
+          </if>
+          <if test="item.crteName != null">
+            crte_name = #{item.crteName},
+          </if>
+          <if test="item.crteTime != null">
+            crte_time = #{item.crteTime},
+          </if>
+        </set>
+        where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除麻醉药品记录-->
+    <delete id="deleteOperAnesthesiaDurgById">
+          delete from oper_anesthesia_durg where id = #{id} and hosp_code = #{hospCode}
+      </delete>
+
+    <!--查询单个麻醉监测-->
+    <select id="getOperAnesthesiaMonitorById" resultMap="OperAnesthesiaMonitorMap">
+          select
+            id, hosp_code, anesthesia_id, monitor_time, sbp, dbp, pulse, breath, map, nose_temperature, rectum_temperature, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+          from oper_anesthesia_monitor
+          where id = #{id} and hosp_code = #{hospCode}
+      </select>
+
+    <!--通过实体作为筛选条件查询麻醉监测-->
+    <select id="queryOperAnesthesiaMonitorAll" resultMap="OperAnesthesiaMonitorMap">
+      select
+      id, hosp_code, anesthesia_id, monitor_time, sbp, dbp, pulse, breath, map, nose_temperature, rectum_temperature, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time
+      from oper_anesthesia_monitor
+      where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+          and id = #{id}
+        </if>
+        <if test="anesthesiaId != null and anesthesiaId != ''">
+          and anesthesia_id = #{anesthesiaId}
+        </if>
+        <if test="monitorTime != null and monitorTime != ''">
+          and monitor_time = #{monitorTime}
+        </if>
+        <if test="sbp != null and sbp != ''">
+          and sbp = #{sbp}
+        </if>
+        <if test="dbp != null and dbp != ''">
+          and dbp = #{dbp}
+        </if>
+        <if test="pulse != null and pulse != ''">
+          and pulse = #{pulse}
+        </if>
+        <if test="breath != null and breath != ''">
+          and breath = #{breath}
+        </if>
+        <if test="map != null and map != ''">
+          and map = #{map}
+        </if>
+        <if test="noseTemperature != null and noseTemperature != ''">
+          and nose_temperature = #{noseTemperature}
+        </if>
+        <if test="rectumTemperature != null and rectumTemperature != ''">
+          and rectum_temperature = #{rectumTemperature}
+        </if>
+        <if test="updtId != null and updtId != ''">
+          and updt_id = #{updtId}
+        </if>
+        <if test="updtName != null and updtName != ''">
+          and updt_name = #{updtName}
+        </if>
+        <if test="updtTime != null">
+          and updt_time = #{updtTime}
+        </if>
+        <if test="crteId != null and crteId != ''">
+          and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+          and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+          and crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <!--新增麻醉监测-->
+    <insert id="insertOperAnesthesiaMonitor" parameterType="java.util.List">
+          insert into oper_anesthesia_monitor(id,hosp_code, anesthesia_id, monitor_time, sbp, dbp, pulse, breath, map, nose_temperature, rectum_temperature, updt_id, updt_name, updt_time, crte_id, crte_name, crte_time)
+          values
+          <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.anesthesiaId}, #{item.monitorTime}, #{item.sbp}, #{item.dbp}, #{item.pulse}, #{item.breath}, #{item.map}, #{item.noseTemperature}, #{item.rectumTemperature}, #{item.updtId}, #{item.updtName}, #{item.updtTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+          </foreach>
+      </insert>
+
+    <!--通过主键修改麻醉监测-->
+    <update id="updateOperAnesthesiaMonitor">
+      <foreach collection="list" item="item" separator=";">
+        update oper_anesthesia_monitor
+        <set>
+          <if test="item.anesthesiaId != null">
+            anesthesia_id = #{item.anesthesiaId},
+          </if>
+          <if test="item.monitorTime != null">
+            monitor_time = #{item.monitorTime},
+          </if>
+          <if test="item.sbp != null">
+            sbp = #{item.sbp},
+          </if>
+          <if test="item.dbp != null">
+            dbp = #{item.dbp},
+          </if>
+          <if test="item.pulse != null">
+            pulse = #{item.pulse},
+          </if>
+          <if test="item.breath != null">
+            breath = #{item.breath},
+          </if>
+          <if test="item.map != null">
+            map = #{item.map},
+          </if>
+          <if test="item.noseTemperature != null">
+            nose_temperature = #{item.noseTemperature},
+          </if>
+          <if test="item.rectumTemperature != null">
+            rectum_temperature = #{item.rectumTemperature},
+          </if>
+          <if test="item.updtId != null">
+            updt_id = #{item.updtId},
+          </if>
+          <if test="item.updtName != null">
+            updt_name = #{item.updtName},
+          </if>
+          <if test="item.updtTime != null">
+            updt_time = #{item.updtTime},
+          </if>
+          <if test="item.crteId != null">
+            crte_id = #{item.crteId},
+          </if>
+          <if test="item.crteName != null">
+            crte_name = #{item.crteName},
+          </if>
+          <if test="item.crteTime != null">
+            crte_time = #{item.crteTime},
+          </if>
+        </set>
+        where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除麻醉监测-->
+    <delete id="deleteOperAnesthesiaMonitorById">
+          delete from oper_anesthesia_monitor where id = #{id} and hosp_code =#{hospCode}
+      </delete>
+
+</mapper>

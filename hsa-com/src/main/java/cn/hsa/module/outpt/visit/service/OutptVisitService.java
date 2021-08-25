@@ -1,0 +1,68 @@
+package cn.hsa.module.outpt.visit.service;
+
+import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.outpt.visit.service
+ * @Class_name: OutptVisitService
+ * @Describe:
+ * @Author: liaojunjie
+ * @Email: junjie.liao@powersi.com
+ * @Date: 2020/9/3 16:12
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+@FeignClient(value = "hsa-outpt")
+public interface OutptVisitService {
+
+    /**
+     * @Method queryVistRecords
+     * @Desrciption 通过档案id分页查询就诊记录
+     * @Param
+     * [map]
+     * @Author liaojunjie
+     * @Date   2020/9/3 16:15
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @PostMapping("/service/outpt/visit/queryVisitRecords")
+    WrapperResponse<PageDTO> queryVisitRecords(Map map);
+
+    /**
+     * @Method updateTranInCode
+     * @Desrciption 更新转入院代码
+     * @Param
+     * [map]
+     * @Author liaojunjie
+     * @Date   2020/9/25 9:03
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    WrapperResponse<Boolean> updateTranInCode(Map map);
+
+    /**
+     * @Menthod queryByVisitID
+     * @Desrciption 根据ID查询门诊患者信息
+     * @param param 查询条件
+     * @Author Ou·Mr
+     * @Date 2020/12/17 21:54
+     * @Return cn.hsa.module.outpt.visit.dto.OutptVisitDTO
+     */
+    @GetMapping("/service/outpt/visit/queryByVisitID")
+    OutptVisitDTO queryByVisitID(Map<String,String> param);
+
+    /**
+     * @Method updateOutptVisit
+     * @Desrciption  走统一支付平台时，登记挂号成功以后，修改病人类型
+     * @Param outptVisitMap
+     *
+     * @Author fuhui
+     * @Date   2021/3/8 15:25
+     * @Return
+     **/
+    WrapperResponse<Boolean> updateOutptVisit(Map<String, Object> outptVisitMap);
+}

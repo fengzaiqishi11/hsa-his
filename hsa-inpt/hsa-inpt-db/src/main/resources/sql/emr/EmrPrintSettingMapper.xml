@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrprintsetting.dao.EmrPrintSettingDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrprintsetting.dto.EmrPrintSettingDTO" id="EmrPrintSettingMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="width" column="width" jdbcType="NUMERIC"/>
+        <result property="height" column="height" jdbcType="NUMERIC"/>
+        <result property="marginLeft" column="margin_left" jdbcType="NUMERIC"/>
+        <result property="marginRight" column="margin_right" jdbcType="NUMERIC"/>
+        <result property="marginUp" column="margin_up" jdbcType="NUMERIC"/>
+        <result property="marginUnder" column="margin_under" jdbcType="NUMERIC"/>
+        <result property="isInfeed" column="is_infeed" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="EmrPrintSettingMap">
+        select
+          id, hosp_code, code, name, width, height, margin_left, margin_right, margin_up, margin_under, is_infeed, is_valid, crte_id, crte_name, crte_time
+        from emr_print_setting
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageorAll" resultMap="EmrPrintSettingMap">
+        select
+          id, hosp_code, code, name, width, height, margin_left, margin_right, margin_up, margin_under, is_infeed, is_valid, crte_id, crte_name, crte_time
+        from emr_print_setting
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="width != null">
+                and width = #{width}
+            </if>
+            <if test="height != null">
+                and height = #{height}
+            </if>
+            <if test="marginLeft != null">
+                and margin_left = #{marginLeft}
+            </if>
+            <if test="marginRight != null">
+                and margin_right = #{marginRight}
+            </if>
+            <if test="marginUp != null">
+                and margin_up = #{marginUp}
+            </if>
+            <if test="marginUnder != null">
+                and margin_under = #{marginUnder}
+            </if>
+            <if test="isInfeed != null and isInfeed != ''">
+                and is_infeed = #{isInfeed}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+              and (name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+            order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into emr_print_setting(id,hosp_code, code, name, width, height, margin_left, margin_right, margin_up, margin_under, is_infeed, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{code}, #{name}, #{width}, #{height}, #{marginLeft}, #{marginRight}, #{marginUp}, #{marginUnder}, #{isInfeed}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update emr_print_setting
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="width != null">
+                width = #{width},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
+            <if test="marginLeft != null">
+                margin_left = #{marginLeft},
+            </if>
+            <if test="marginRight != null">
+                margin_right = #{marginRight},
+            </if>
+            <if test="marginUp != null">
+                margin_up = #{marginUp},
+            </if>
+            <if test="marginUnder != null">
+                margin_under = #{marginUnder},
+            </if>
+            <if test="isInfeed != null">
+                is_infeed = #{isInfeed},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+      update emr_print_setting set is_valid = #{isValid}
+      where
+      hosp_code = #{hospCode}
+      <if test="ids != null and ids.size()>0">
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+      </if>
+    </update>
+
+</mapper>

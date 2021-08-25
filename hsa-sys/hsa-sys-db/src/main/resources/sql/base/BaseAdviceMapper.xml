@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.ba.dao.BaseAdviceDAO">
+
+    <resultMap type="cn.hsa.module.base.ba.dto.BaseAdviceDTO" id="BaseAdviceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="technologyCode" column="technology_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+        <result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+        <result property="bizType" column="biz_type" jdbcType="VARCHAR"/>
+        <result property="bizCode" column="biz_code" jdbcType="VARCHAR"/>
+        <result property="containerCode" column="container_code" jdbcType="VARCHAR"/>
+        <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
+        <result property="useScopeCode" column="use_scope_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="doctorLevelCode" column="doctor_level_code" jdbcType="VARCHAR"/>
+        <result property="opeartionCode" column="opeartion_code" jdbcType="VARCHAR"/>
+        <result property="insureListCode" column="insure_list_code" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="minAge" column="min_age" jdbcType="INTEGER"/>
+        <result property="maxAge" column="max_age" jdbcType="INTEGER"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="isStopSame" column="is_stop_same" jdbcType="VARCHAR"/>
+        <result property="isStopSameNot" column="is_stop_same_not" jdbcType="VARCHAR"/>
+        <result property="isStopMyself" column="is_stop_myself" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseAdviceMap">
+        select
+        id, hosp_code, code,oper_disease_icd9, name, other_name, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from base_advice
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryByCodes" resultMap="BaseAdviceMap">
+        select
+        id, hosp_code, code, name,other_name, oper_disease_icd9, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from base_advice
+        where hosp_code = #{hospCode} and code in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查询所有数据-->
+    <select id="queryAll" resultMap="BaseAdviceMap">
+        select
+        id, hosp_code, code, name,other_name, oper_disease_icd9, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time
+        from base_advice
+        <where>
+            hosp_code = #{hospCode}
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="isValid == null or isValid == ''">
+                and is_valid = '1'
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseAdviceMap">
+        select
+        id, hosp_code, code, name,other_name, oper_disease_icd9, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+        (select name from base_dept where base_dept.code = out_dept_code and base_dept.hosp_code = #{hospCode})as outDeptName,
+        (select name from base_dept where base_dept.code = in_dept_code and base_dept.hosp_code = #{hospCode})as inDeptName
+        from base_advice
+        <where>
+            and hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            /*使用范围条件*/
+            <if test="useScopeCode != '' and useScopeCode != null and useScopeCode !=0">
+                and  use_scope_code = #{useScopeCode}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="technologyCode != null and technologyCode != ''">
+                and technology_code = #{technologyCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="outDeptCode != null and outDeptCode != ''">
+                and out_dept_code = #{outDeptCode}
+            </if>
+            <if test="inDeptCode != null and inDeptCode != ''">
+                and in_dept_code = #{inDeptCode}
+            </if>
+            <if test="bizType != null and bizType != ''">
+                and biz_type = #{bizType}
+            </if>
+            <if test="bizCode != null and bizCode != ''">
+                and biz_code = #{bizCode}
+            </if>
+            <if test="containerCode != null and containerCode != ''">
+                and container_code = #{containerCode}
+            </if>
+            <if test="specimenCode != null and specimenCode != ''">
+                and specimen_code = #{specimenCode}
+            </if>
+            <if test="deptCode != null and deptCode != ''">
+                and dept_code = #{deptCode}
+            </if>
+            <if test="doctorLevelCode != null and doctorLevelCode != ''">
+                and doctor_level_code = #{doctorLevelCode}
+            </if>
+            <if test="opeartionCode != null and opeartionCode != ''">
+                and opeartion_code = #{opeartionCode}
+            </if>
+            <if test="insureListCode != null and insureListCode != ''">
+                and insure_list_code = #{insureListCode}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="minAge != null">
+                and min_age = #{minAge}
+            </if>
+            <if test="maxAge != null">
+                and max_age = #{maxAge}
+            </if>
+            <if test="isCost != null and isCost != ''">
+                and is_cost = #{isCost}
+            </if>
+            <if test="isStopSame != null and isStopSame != ''">
+                and is_stop_same = #{isStopSame}
+            </if>
+            <if test="isStopSameNot != null and isStopSameNot != ''">
+                and is_stop_same_not = #{isStopSameNot}
+            </if>
+            <if test="isStopMyself != null and isStopMyself != ''">
+                and is_stop_myself = #{isStopMyself}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword!=''" >
+                and (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%')or code like concat('%',#{keyword},'%'))
+            </if>
+            <!--新增门诊执行科室和住院执行科室作为筛选条件查询
+            <if test="inDeptName != null and inDeptName != ''">
+                and (select id from base_dept where base_dept.code = out_dept_code and base_dept.hosp_code = #{hospCode}) like CONCAT('%',#{inDeptName},'%')
+            </if>
+            <if test="outDeptName != null and outDeptName != ''">
+                and (select id from base_dept where base_dept.code = in_dept_code and base_dept.hosp_code = #{hospCode}) like CONCAT('%',#{outDeptName},'%')
+            </if>-->
+            <if test="ids != null and ids.size() > 0">
+                and type_code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" parameterType="java.util.List">
+        insert into base_advice(id,hosp_code, code, name,other_name,  type_code, technology_code, price, unit_code,
+         out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code,
+          doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same,
+           is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time,oper_disease_icd9)
+        values (#{id},#{hospCode}, #{code}, #{name},#{otherName}, #{typeCode}, #{technologyCode}, #{price}, #{unitCode}, #{outDeptCode},
+         #{inDeptCode}, #{bizType}, #{bizCode}, #{containerCode}, #{specimenCode}, #{useScopeCode}, #{deptCode},
+          #{doctorLevelCode}, #{opeartionCode}, #{insureListCode}, #{genderCode}, #{minAge}, #{maxAge}, #{isCost},
+           #{isStopSame}, #{isStopSameNot}, #{isStopMyself}, #{pym}, #{wbm},'1', #{crteId}, #{crteName}, #{crteTime},#{operDiseaseIcd9})
+    </insert>
+
+    <insert id="insertList" keyProperty="id" useGeneratedKeys="true">
+        insert into base_advice(id,hosp_code, code, name,other_name, type_code, technology_code, price, unit_code,
+        out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code,
+        doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same,
+        is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time,oper_disease_icd9)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.code}, #{item.name},#{item.otherName}, #{item.typeCode}, #{item.technologyCode}, #{item.price}, #{item.unitCode}, #{item.outDeptCode},
+            #{item.inDeptCode}, #{item.bizType}, #{item.bizCode}, #{item.containerCode}, #{item.specimenCode}, #{item.useScopeCode}, #{item.deptCode},
+            #{item.doctorLevelCode}, #{item.opeartionCode}, #{item.insureListCode}, #{item.genderCode}, #{item.minAge}, #{item.maxAge}, #{item.isCost},
+            #{item.isStopSame}, #{item.isStopSameNot}, #{item.isStopMyself}, #{item.pym}, #{item.wbm},'1', #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.operDiseaseIcd9})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_advice
+        <set>
+            hosp_code = #{hospCode},
+            code = #{code},
+            name = #{name},
+            other_name = #{otherName},
+            type_code = #{typeCode},
+            technology_code = #{technologyCode},
+            price = #{price},
+            unit_code = #{unitCode},
+            out_dept_code = #{outDeptCode},
+            in_dept_code = #{inDeptCode},
+            biz_type = #{bizType},
+            biz_code = #{bizCode},
+            container_code = #{containerCode},
+            specimen_code = #{specimenCode},
+            use_scope_code = #{useScopeCode},
+            dept_code = #{deptCode},
+            doctor_level_code = #{doctorLevelCode},
+            opeartion_code = #{opeartionCode},
+            insure_list_code = #{insureListCode},
+            gender_code = #{genderCode},
+            min_age = #{minAge},
+            max_age = #{maxAge},
+            is_cost = #{isCost},
+            is_stop_same = #{isStopSame},
+            is_stop_same_not = #{isStopSameNot},
+            is_stop_myself = #{isStopMyself},
+            pym = #{pym},
+            wbm = #{wbm},
+            is_valid = #{isValid},
+            oper_disease_icd9 = #{operDiseaseIcd9},
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateList">
+        <foreach collection="list" item="item" separator=";">
+            update base_advice
+            <set>
+                hosp_code = #{item.hospCode},
+                code = #{item.code},
+                name = #{item.name},
+                other_name = #{item.otherName},
+                type_code = #{item.typeCode},
+                technology_code = #{item.technologyCode},
+                price = #{item.price},
+                unit_code = #{item.unitCode},
+                out_dept_code = #{item.outDeptCode},
+                in_dept_code = #{item.inDeptCode},
+                biz_type = #{item.bizType},
+                biz_code = #{item.bizCode},
+                container_code = #{item.containerCode},
+                specimen_code = #{item.specimenCode},
+                use_scope_code = #{item.useScopeCode},
+                dept_code = #{item.deptCode},
+                doctor_level_code = #{item.doctorLevelCode},
+                opeartion_code = #{item.opeartionCode},
+                insure_list_code = #{item.insureListCode},
+                gender_code = #{item.genderCode},
+                min_age = #{item.minAge},
+                max_age = #{item.maxAge},
+                is_cost = #{item.isCost},
+                is_stop_same = #{item.isStopSame},
+                is_stop_same_not = #{item.isStopSameNot},
+                is_stop_myself = #{item.isStopMyself},
+                pym = #{item.pym},
+                wbm = #{item.wbm},
+                is_valid = #{item.isValid},
+            </set>
+            where id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="updateStatus">
+        update  base_advice
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </delete>
+
+    <!--根据条件获取医嘱目录-->
+    <select id="getBaseAdvices" resultMap="BaseAdviceMap">
+        select b.* from inpt_advice a join base_advice b on a.item_id=b.id
+        where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and a.item_code='4' and a.visit_id=#{visitId}
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and a.id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <!--根据编码获取医嘱目录信息-->
+    <select id="baseAdviceDTO" resultMap="BaseAdviceMap">
+        select * from base_advice where hosp_code=#{hospCode} and code=#{code}
+    </select>
+
+    <select id="queryOperationNameList" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        select * from base_advice where hosp_code=#{hospCode}
+        and
+        type_code = #{typeCode}
+        <if test="isValid != null and isValid != '' ">
+            and
+            is_valid = #{isValid}
+        </if>
+    </select>
+
+    <!-- 分页查询手术医嘱信息 -->
+    <select id="getOperationNamePage" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        select * from base_advice where hosp_code=#{hospCode}
+        and
+        type_code = #{typeCode}
+        <if test="isValid != null and isValid != '' ">
+            and
+            is_valid = #{isValid}
+        </if>
+        <if test="keyword != null and keyword!=''" >
+            and (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%')or code like concat('%',#{keyword},'%'))
+        </if>
+
+    </select>
+
+    <!-- 查询出项目存在哪些医嘱里-->
+    <select id="isExistItemInAdvice" resultMap="BaseAdviceMap">
+        select code,name from
+        base_advice
+        where code in(
+        select advice_code from base_advice_detail where hosp_code = #{hospCode} and item_code = #{code}
+        ) and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!-- 查询出材料存在哪些医嘱里-->
+    <select id="isExistMaterialInAdvice" resultMap="BaseAdviceMap">
+        select code,name from
+        base_advice
+        where code in(
+        select advice_code from base_advice_detail where hosp_code = #{hospCode} and item_code = #{code}
+        ) and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--合管条码打印查询合并-->
+    <select id="queryPtPipePrintPage" resultType="java.util.Map">
+        select * from  (select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,max( ba.container_code ) container_code,
+        max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,
+        max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
+        max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
+        max(ma.bar_code ) bar_code,
+        max(ba.technology_code) technology_code
+        from 	medic_apply ma
+        JOIN outpt_prescribe_detail opd ON
+        Convert(ma.opd_id USING utf8) COLLATE utf8_unicode_ci = opd.id
+        AND
+        Convert(ma.hosp_code USING utf8) COLLATE utf8_unicode_ci= opd.hosp_code
+        JOIN base_advice ba ON opd.item_id = ba.id
+        AND opd.hosp_code = ba.hosp_code
+        JOIN outpt_visit ov ON ma.visit_id = ov.id
+        AND ma.hosp_code = ov.hosp_code
+        JOIN outpt_prescribe op ON opd.op_id = op.id
+        AND op.hosp_code = opd.hosp_code
+        where op.is_settle ='1' and ma.hosp_code = #{hospCode}
+
+        <if test="name != null and name != '' ">
+            and ov.`name` like concat('%',#{name},'%')
+        </if>
+        <if test="deptId != null and deptId != '' ">
+            and ov.dept_id = #{deptId}
+        </if>
+        <if test="visitNo != null and visitNo != '' ">
+            and ov.visit_no like concat('%',#{visitNo},'%')
+        </if>
+        <if test="startDate != null and startDate != '' ">
+            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
+        </if>
+        <if test="endDate != null and endDate != '' ">
+            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
+        </if>
+        <if test="queryType != null and queryType == 'zy'.toString()">
+            and 1=2
+        </if>
+        <if test="printStatus != null and printStatus == '1'.toString()">
+            and ma.print_time is null
+        </if>
+        <if test="printStatus != null and printStatus == '2'.toString()">
+            and ma.print_time is not null
+        </if>
+        <if test="statList != null">
+            and (document_sta is null or document_sta in
+           <foreach collection="statList" item="item" open="(" separator="," close=")">
+               #{item}
+           </foreach>
+           )
+        </if>
+        group by ma.merge_id
+
+        union all
+        SELECT
+        ma.merge_id,
+        max(iv.in_dept_name) AS dept_name,
+        max(iv.in_no) AS visit_no,
+        max(ba.container_code) container_code,
+        max(ba.specimen_code) specimen_code,
+        GROUP_CONCAT(ia.content separator ',') content,
+        max(ma.document_sta) document_sta,
+        max(ma.apply_no) apply_no,
+        max(iv.name) name,
+        max(iv.gender_code) gender_code,
+        max(iv.age) age,
+        max(iv.age_unit_code) age_unit_code,
+        max(ma.crte_time) crte_time,
+        max(ma.bar_code) bar_code,
+        max(ba.technology_code) technology_code
+        FROM
+
+        medic_apply ma
+        join inpt_advice ia  on ma.hosp_code = ia.hosp_code and ma.order_no = ia.order_no
+        join inpt_advice_detail iad on ia.id = iad.ia_id and ia.hosp_code = iad.hosp_code
+        join base_advice ba on iad.hosp_code = ba.hosp_code and iad.ba_id = ba.id and ba.type_code = '3'
+        join inpt_visit iv on iad.hosp_code = iv.hosp_code and iad.visit_id = iv.id
+
+        where ma.hosp_code = #{hospCode}
+        <if test="name != null and name != '' ">
+            and iv.`name` like concat('%',#{name},'%')
+        </if>
+        <if test="deptId != null and deptId != '' ">
+            and iv.in_dept_id = #{deptId}
+        </if>
+        <if test="visitNo != null and visitNo != '' ">
+            and iv.in_no like concat('%',#{visitNo},'%')
+        </if>
+        <if test="startDate != null and startDate != '' ">
+            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
+        </if>
+        <if test="endDate != null and endDate != '' ">
+            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
+        </if>
+        <if test="queryType != null and queryType == 'mz'.toString()">
+            and 1=2
+        </if>
+        <if test="printStatus != null and printStatus == '1'.toString()">
+            and ma.print_time is null
+        </if>
+        <if test="printStatus != null and printStatus == '2'.toString()">
+            and ma.print_time is not null
+        </if>
+        <if test="statList != null">
+            and (document_sta is null or document_sta in
+            <foreach collection="statList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        group by ma.merge_id
+        ) tab1
+        order by tab1.crte_time desc
+    </select>
+
+    <!--合管条码打印更新-->
+    <update id="updateWithPipePrint">
+        UPDATE medic_apply
+        SET print_time = #{printTime},
+        print_times = ifnull(print_times,0)+1
+        WHERE
+            hosp_code = #{hospCode}
+            and merge_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+
+</mapper>

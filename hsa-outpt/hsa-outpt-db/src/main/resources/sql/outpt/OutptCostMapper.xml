@@ -1,0 +1,3335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.OutptCostDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptCostDtoMap" type="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result property="ykName" column="ykName" jdbcType="VARCHAR"/>
+        <result property="pharId" column="pharId" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="opId" column="op_id" jdbcType="VARCHAR"/>
+        <result property="opdId" column="opd_id" jdbcType="VARCHAR"/>
+        <result property="opeId" column="ope_id" jdbcType="VARCHAR"/>
+        <result property="sourceCode" column="source_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+        <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+        <result property="sourceDeptId" column="source_dept_id" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"/>
+        <result property="totalNum" column="total_num" jdbcType="DECIMAL"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="DECIMAL"/>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+        <result property="preferentialPrice" column="preferential_price" jdbcType="DECIMAL"/>
+        <result property="realityPrice" column="reality_price" jdbcType="DECIMAL"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="isDist" column="is_dist" jdbcType="VARCHAR"/>
+        <result property="backNum" column="back_num" jdbcType="DECIMAL"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+        <result property="selfRatio" column="self_ratio" jdbcType="DECIMAL"/>
+        <result property="isTechnologyOk" column="is_technology_ok" jdbcType="VARCHAR"/>
+        <result property="technologyOkId" column="technology_ok_id" jdbcType="VARCHAR"/>
+        <result property="technologyOkName" column="technology_ok_name" jdbcType="VARCHAR"/>
+        <result property="technologyOkTime" column="technology_ok_time" jdbcType="TIMESTAMP"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="DECIMAL"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="DECIMAL"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="stockNum" column="stockNum" jdbcType="DECIMAL"/>
+        <result property="goodPym" column="good_pym" jdbcType="VARCHAR"/>
+        <result property="goodWbm" column="good_wbm" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="drugRemark" column="drug_remark" jdbcType="VARCHAR"/>
+        <result property="isCg" column="is_cg" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+        <result property="reducedPrice" column="reducedPrice" jdbcType="DECIMAL"/>
+        <result property="reducedAfterPrice" column="reducedAfterPrice" jdbcType="DECIMAL"/>
+        <result property="splitReducedPrice" column="splitReducedPrice" jdbcType="DECIMAL"/>
+        <result property="splitReducedAfterPrice" column="splitReducedAfterPrice" jdbcType="DECIMAL"/>
+        <result property="primaryPrice" column="primaryPrice" jdbcType="DECIMAL"/>
+        <result property="rateCode" column="rateCode" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="xmlbName" column="xmlbname" jdbcType="VARCHAR"/>
+        <result property="lastRealityPrice" column="lastrealityprice" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="outptPrescribeCrteTime" column="prescribeCrteTime" jdbcType="TIMESTAMP"/>
+        <result property="code" column="xmlbcode" jdbcType="VARCHAR"/>
+        <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="stockOccupy" column="stock_occupy" jdbcType="VARCHAR"/>
+        <result property="stockNum" column="stock_num" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 门诊处方数据库映射配置 -->
+    <resultMap id="outptPrescribeMap" type="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="diagnose_id" property="diagnoseId" jdbcType="VARCHAR" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="doctor_id" property="doctorId" jdbcType="VARCHAR" />
+        <result column="doctor_name" property="doctorName" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+        <result column="prescribe_type_code" property="prescribeTypeCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="is_settle" property="isSettle" jdbcType="VARCHAR" />
+        <result column="is_cancel" property="isCancel" jdbcType="VARCHAR" />
+        <result column="is_print" property="isPrint" jdbcType="VARCHAR" />
+        <result column="is_herb_hospital" property="isHerbHospital" jdbcType="VARCHAR" />
+        <result column="herb_num" property="herbNum" jdbcType="DECIMAL" />
+        <result column="herb_use_code" property="herbUseCode" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="DECIMAL" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="agent_cert_no" property="agentCertNo" jdbcType="VARCHAR" />
+        <result column="cancel_id" property="cancelId" jdbcType="VARCHAR" />
+        <result column="cancel_name" property="cancelName" jdbcType="VARCHAR" />
+        <result column="cancel_date" property="cancelDate" jdbcType="TIMESTAMP" />
+        <result column="cancel_reason" property="cancelReason" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 医院优惠配置字段映射 -->
+    <resultMap type="cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO" id="BasePreferentialTypeMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 医院材料、项目、药品映射配置 -->
+    <resultMap type="cn.hsa.module.base.drug.dto.BaseDrugDTO" id="BaseDrugMap">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="usualName" column="usual_name" jdbcType="VARCHAR"/>
+        <result property="goodName" column="good_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="DECIMAL"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
+        <result property="inUnitCode" column="in_unit_code" jdbcType="VARCHAR"/>
+        <result property="rateCode" column="rate_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isLvp" column="is_lvp" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="drugRemark" column="drug_remark" jdbcType="VARCHAR"/>
+        <result property="drugImgPath" column="drug_img_path" jdbcType="VARCHAR"/>
+        <result property="maxDosage" column="max_dosage" jdbcType="DECIMAL"/>
+        <result property="minDosage" column="min_dosage" jdbcType="DECIMAL"/>
+        <result property="ddd" column="ddd" jdbcType="VARCHAR"/>
+        <result property="antlevelCode" column="antlevel_code" jdbcType="VARCHAR"/>
+        <result property="anelevelCode" column="anelevel_code" jdbcType="VARCHAR"/>
+        <result property="psyclevelCode" column="psyclevel_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="isBasic" column="is_basic" jdbcType="VARCHAR"/>
+        <result property="basicCode" column="basic_code" jdbcType="VARCHAR"/>
+        <result property="dan" column="dan" jdbcType="VARCHAR"/>
+        <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
+        <result property="usualPym" column="usual_pym" jdbcType="VARCHAR"/>
+        <result property="usualWbm" column="usual_wbm" jdbcType="VARCHAR"/>
+        <result property="goodPym" column="good_pym" jdbcType="VARCHAR"/>
+        <result property="goodWbm" column="good_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="inDeptName" jdbcType="VARCHAR"/>
+        <result property="stockNum" column="stockNum" jdbcType="INTEGER"/>
+        <result property="itemCode" column="itemCode" jdbcType="VARCHAR"/>
+        <result property="itemCodeName" column="itemCodeName" jdbcType="VARCHAR"/>
+        <result property="preferentialPrice" column="preferential_price" jdbcType="VARCHAR"/>
+        <result property="realityPrice" column="reality_price" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 医院优惠明细数据库映射配置 -->
+    <resultMap type="cn.hsa.module.base.bpft.dto.BasePreferentialDTO" id="BasePreferentialMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bizCode" column="biz_code" jdbcType="VARCHAR"/>
+        <result property="pfTypeCode" column="pf_type_code" jdbcType="VARCHAR"/>
+        <result property="outCode" column="out_code" jdbcType="VARCHAR"/>
+        <result property="outScale" column="out_scale" jdbcType="DECIMAL"/>
+        <result property="inCode" column="in_code" jdbcType="VARCHAR"/>
+        <result property="inScale" column="in_scale" jdbcType="DECIMAL"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 门诊个人信息数据库映射配置 -->
+    <resultMap type="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" id="OutptVisitResultMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="outProfile" column="out_profile" jdbcType="VARCHAR"/>
+        <result property="registerId" column="register_id" jdbcType="VARCHAR"/>
+        <result property="registerNo" column="register_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="OTHER"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"/>
+        <result property="visitCode" column="visit_code" jdbcType="VARCHAR"/>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"/>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"/>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"/>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"/>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="visitTime" column="visit_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isVisit" column="is_visit" jdbcType="VARCHAR"/>
+        <result property="isPhys" column="is_phys" jdbcType="VARCHAR"/>
+        <result property="isFirstVisit" column="is_first_visit" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="diseaseName" column="disease_name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="keyword" column="keyword" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settleId" jdbcType="VARCHAR"/>
+        <result property="settleNo" column="settleNo" jdbcType="VARCHAR"/>
+        <result property="medicalRegNo" column="medicalRegNo" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        oc.id,
+        oc.hosp_code,
+        oc.visit_id,
+        oc.op_id,
+        oc.opd_id,
+        oc.ope_id,
+        oc.source_code,
+        oc.source_id,
+        oc.old_cost_id,
+        oc.source_dept_id,
+        oc.bfc_id,
+        oc.item_code,
+        oc.item_id,
+        oc.item_name,
+        oc.price,
+        oc.num,
+        oc.spec,
+        oc.prep_code,
+        oc.dosage,
+        oc.dosage_unit_code,
+        oc.usage_code,
+        oc.rate_id,
+        oc.use_days,
+        oc.num_unit_code,
+        oc.total_num,
+        oc.herb_note_code,
+        oc.use_code,
+        oc.herb_num,
+        oc.total_price,
+        oc.preferential_price,
+        oc.reality_price,
+        oc.status_code,
+        oc.phar_id,
+        oc.is_dist,
+        oc.back_num,
+        oc.settle_id,
+        oc.settle_code,
+        oc.one_settle_id,
+        oc.self_ratio,
+        oc.is_technology_ok,
+        oc.technology_ok_id,
+        oc.technology_ok_name,
+        oc.technology_ok_time,
+        oc.avg_buy_price,
+        oc.avg_sell_price,
+        oc.doctor_id,
+        oc.doctor_name,
+        oc.dept_id,
+        oc.exec_dept_id,
+        oc.crte_id,
+        oc.crte_name,
+        oc.crte_time
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptCostDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_cost
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.fees.entity.OutptCostDO" >
+        insert into
+        outpt_cost
+        (
+          id,
+          hosp_code,
+          visit_id,
+          op_id,
+          opd_id,
+          ope_id,
+          source_code,
+          source_id,
+          old_cost_id,
+          source_dept_id,
+          bfc_id,
+          item_code,
+          item_id,
+          item_name,
+          price,
+          num,
+          spec,
+          prep_code,
+          dosage,
+          dosage_unit_code,
+          usage_code,
+          rate_id,
+          use_days,
+          num_unit_code,
+          total_num,
+          herb_note_code,
+          use_code,
+          herb_num,
+          total_price,
+          preferential_price,
+          reality_price,
+          status_code,
+          phar_id,
+          is_dist,
+          back_num,
+          settle_id,
+          settle_code,
+          one_settle_id,
+          self_ratio,
+          is_technology_ok,
+          technology_ok_id,
+          technology_ok_name,
+          technology_ok_time,
+          avg_buy_price,
+          avg_sell_price,
+          doctor_id,
+          doctor_name,
+          dept_id,
+          exec_dept_id,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{opId,jdbcType=VARCHAR},
+          #{opdId,jdbcType=VARCHAR},
+          #{opeId,jdbcType=VARCHAR},
+          #{sourceCode,jdbcType=VARCHAR},
+          #{sourceId,jdbcType=VARCHAR},
+          #{oldCostId,jdbcType=VARCHAR},
+          #{sourceDeptId,jdbcType=VARCHAR},
+          #{bfcId,jdbcType=VARCHAR},
+          #{itemCode,jdbcType=VARCHAR},
+          #{itemId,jdbcType=VARCHAR},
+          #{itemName,jdbcType=VARCHAR},
+          #{price,jdbcType=DECIMAL},
+          #{num,jdbcType=DECIMAL},
+          #{spec,jdbcType=VARCHAR},
+          #{prepCode,jdbcType=VARCHAR},
+          #{dosage,jdbcType=DECIMAL},
+          #{dosageUnitCode,jdbcType=VARCHAR},
+          #{usageCode,jdbcType=VARCHAR},
+          #{rateId,jdbcType=VARCHAR},
+          #{useDays,jdbcType=INTEGER},
+          #{numUnitCode,jdbcType=VARCHAR},
+          #{totalNum,jdbcType=DECIMAL},
+          #{herbNoteCode,jdbcType=VARCHAR},
+          #{useCode,jdbcType=VARCHAR},
+          #{herbNum,jdbcType=DECIMAL},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{preferentialPrice,jdbcType=DECIMAL},
+          #{realityPrice,jdbcType=DECIMAL},
+          #{statusCode,jdbcType=VARCHAR},
+          #{pharId,jdbcType=VARCHAR},
+          #{isDist,jdbcType=VARCHAR},
+          #{backNum,jdbcType=DECIMAL},
+          #{settleId,jdbcType=VARCHAR},
+          #{settleCode,jdbcType=VARCHAR},
+          #{oneSettleId,jdbcType=VARCHAR},
+          #{selfRatio,jdbcType=DECIMAL},
+          #{isTechnologyOk,jdbcType=VARCHAR},
+          #{technologyOkId,jdbcType=VARCHAR},
+          #{technologyOkName,jdbcType=VARCHAR},
+          #{technologyOkTime,jdbcType=TIMESTAMP},
+          #{avgBuyPrice,jdbcType=DECIMAL},
+          #{avgSellPrice,jdbcType=DECIMAL},
+          #{doctorId,jdbcType=VARCHAR},
+          #{doctorName,jdbcType=VARCHAR},
+          #{deptId,jdbcType=VARCHAR},
+          #{execDeptId,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into
+        outpt_cost
+        (
+        id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time,
+        distribute_all_detail_id
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.opeId,jdbcType=VARCHAR},
+            #{item.sourceCode,jdbcType=VARCHAR},
+            #{item.sourceId,jdbcType=VARCHAR},
+            #{item.oldCostId,jdbcType=VARCHAR},
+            #{item.sourceDeptId,jdbcType=VARCHAR},
+            #{item.bfcId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.prepCode,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.rateId,jdbcType=VARCHAR},
+            #{item.useDays,jdbcType=INTEGER},
+            #{item.numUnitCode,jdbcType=VARCHAR},
+            #{item.totalNum,jdbcType=DECIMAL},
+            #{item.herbNoteCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.herbNum,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.preferentialPrice,jdbcType=DECIMAL},
+            #{item.realityPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.isDist,jdbcType=VARCHAR},
+            #{item.backNum,jdbcType=DECIMAL},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.settleCode,jdbcType=VARCHAR},
+            #{item.oneSettleId,jdbcType=VARCHAR},
+            #{item.selfRatio,jdbcType=DECIMAL},
+            #{item.isTechnologyOk,jdbcType=VARCHAR},
+            #{item.technologyOkId,jdbcType=VARCHAR},
+            #{item.technologyOkName,jdbcType=VARCHAR},
+            #{item.technologyOkTime,jdbcType=TIMESTAMP},
+            #{item.avgBuyPrice,jdbcType=DECIMAL},
+            #{item.avgSellPrice,jdbcType=DECIMAL},
+            #{item.doctorId,jdbcType=VARCHAR},
+            #{item.doctorName,jdbcType=VARCHAR},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.execDeptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP},
+            #{item.distributeAllDetailId,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptCostDO" >
+        insert into
+        outpt_cost
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="opId != null and opId != ''">
+                op_id,
+            </if>
+            <if test="opdId != null and opdId != ''">
+                opd_id,
+            </if>
+            <if test="opeId != null and opeId != ''">
+                ope_id,
+            </if>
+            <if test="sourceCode != null and sourceCode != ''">
+                source_code,
+            </if>
+            <if test="sourceId != null and sourceId != ''">
+                source_id,
+            </if>
+            <if test="oldCostId != null and oldCostId != ''">
+                old_cost_id,
+            </if>
+            <if test="sourceDeptId != null and sourceDeptId != ''">
+                source_dept_id,
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                bfc_id,
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code,
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id,
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="spec != null and spec != ''">
+                spec,
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                prep_code,
+            </if>
+            <if test="dosage != null">
+                dosage,
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code,
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code,
+            </if>
+            <if test="rateId != null and rateId != ''">
+                rate_id,
+            </if>
+            <if test="useDays != null">
+                use_days,
+            </if>
+            <if test="numUnitCode != null and numUnitCode != ''">
+                num_unit_code,
+            </if>
+            <if test="totalNum != null">
+                total_num,
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                herb_note_code,
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code,
+            </if>
+            <if test="herbNum != null">
+                herb_num,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="preferentialPrice != null">
+                preferential_price,
+            </if>
+            <if test="realityPrice != null">
+                reality_price,
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code,
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id,
+            </if>
+            <if test="isDist != null and isDist != ''">
+                is_dist,
+            </if>
+            <if test="backNum != null">
+                back_num,
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id,
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code,
+            </if>
+            <if test="oneSettleId != null and oneSettleId != ''">
+                one_settle_id,
+            </if>
+            <if test="selfRatio != null">
+                self_ratio,
+            </if>
+            <if test="isTechnologyOk != null and isTechnologyOk != ''">
+                is_technology_ok,
+            </if>
+            <if test="technologyOkId != null and technologyOkId != ''">
+                technology_ok_id,
+            </if>
+            <if test="technologyOkName != null and technologyOkName != ''">
+                technology_ok_name,
+            </if>
+            <if test="technologyOkTime != null">
+                technology_ok_time,
+            </if>
+            <if test="avgBuyPrice != null">
+                avg_buy_price,
+            </if>
+            <if test="avgSellPrice != null">
+                avg_sell_price,
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id,
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name,
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id,
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                exec_dept_id,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="opId != null and opId != ''">
+                #{opId,jdbcType=VARCHAR},
+            </if>
+            <if test="opdId != null and opdId != ''">
+                #{opdId,jdbcType=VARCHAR},
+            </if>
+            <if test="opeId != null and opeId != ''">
+                #{opeId,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceCode != null and sourceCode != ''">
+                #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceId != null and sourceId != ''">
+                #{sourceId,jdbcType=VARCHAR},
+            </if>
+            <if test="oldCostId != null and oldCostId != ''">
+                #{oldCostId,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceDeptId != null and sourceDeptId != ''">
+                #{sourceDeptId,jdbcType=VARCHAR},
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                #{bfcId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                #{itemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                #{itemId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=DECIMAL},
+            </if>
+            <if test="spec != null and spec != ''">
+                #{spec,jdbcType=VARCHAR},
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                #{prepCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dosage != null">
+                #{dosage,jdbcType=DECIMAL},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                #{dosageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                #{usageCode,jdbcType=VARCHAR},
+            </if>
+            <if test="rateId != null and rateId != ''">
+                #{rateId,jdbcType=VARCHAR},
+            </if>
+            <if test="useDays != null">
+                #{useDays,jdbcType=INTEGER},
+            </if>
+            <if test="numUnitCode != null and numUnitCode != ''">
+                #{numUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                #{totalNum,jdbcType=DECIMAL},
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                #{herbNoteCode,jdbcType=VARCHAR},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                #{useCode,jdbcType=VARCHAR},
+            </if>
+            <if test="herbNum != null">
+                #{herbNum,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="preferentialPrice != null">
+                #{preferentialPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="realityPrice != null">
+                #{realityPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                #{statusCode,jdbcType=VARCHAR},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                #{pharId,jdbcType=VARCHAR},
+            </if>
+            <if test="isDist != null and isDist != ''">
+                #{isDist,jdbcType=VARCHAR},
+            </if>
+            <if test="backNum != null">
+                #{backNum,jdbcType=DECIMAL},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                #{settleCode,jdbcType=VARCHAR},
+            </if>
+            <if test="oneSettleId != null and oneSettleId != ''">
+                #{oneSettleId,jdbcType=VARCHAR},
+            </if>
+            <if test="selfRatio != null">
+                #{selfRatio,jdbcType=DECIMAL},
+            </if>
+            <if test="isTechnologyOk != null and isTechnologyOk != ''">
+                #{isTechnologyOk,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkId != null and technologyOkId != ''">
+                #{technologyOkId,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkName != null and technologyOkName != ''">
+                #{technologyOkName,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkTime != null">
+                #{technologyOkTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="avgBuyPrice != null">
+                #{avgBuyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="avgSellPrice != null">
+                #{avgSellPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                #{execDeptId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.fees.entity.OutptCostDO" >
+        update
+        outpt_cost
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                op_id = #{opId,jdbcType=VARCHAR},
+                opd_id = #{opdId,jdbcType=VARCHAR},
+                ope_id = #{opeId,jdbcType=VARCHAR},
+                source_code = #{sourceCode,jdbcType=VARCHAR},
+                source_id = #{sourceId,jdbcType=VARCHAR},
+                old_cost_id = #{oldCostId,jdbcType=VARCHAR},
+                source_dept_id = #{sourceDeptId,jdbcType=VARCHAR},
+                bfc_id = #{bfcId,jdbcType=VARCHAR},
+                item_code = #{itemCode,jdbcType=VARCHAR},
+                item_id = #{itemId,jdbcType=VARCHAR},
+                item_name = #{itemName,jdbcType=VARCHAR},
+                price = #{price,jdbcType=DECIMAL},
+                num = #{num,jdbcType=DECIMAL},
+                spec = #{spec,jdbcType=VARCHAR},
+                prep_code = #{prepCode,jdbcType=VARCHAR},
+                dosage = #{dosage,jdbcType=DECIMAL},
+                dosage_unit_code = #{dosageUnitCode,jdbcType=VARCHAR},
+                usage_code = #{usageCode,jdbcType=VARCHAR},
+                rate_id = #{rateId,jdbcType=VARCHAR},
+                use_days = #{useDays,jdbcType=INTEGER},
+                num_unit_code = #{numUnitCode,jdbcType=VARCHAR},
+                total_num = #{totalNum,jdbcType=DECIMAL},
+                herb_note_code = #{herbNoteCode,jdbcType=VARCHAR},
+                use_code = #{useCode,jdbcType=VARCHAR},
+                herb_num = #{herbNum,jdbcType=DECIMAL},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                preferential_price = #{preferentialPrice,jdbcType=DECIMAL},
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                phar_id = #{pharId,jdbcType=VARCHAR},
+                is_dist = #{isDist,jdbcType=VARCHAR},
+                back_num = #{backNum,jdbcType=DECIMAL},
+                settle_id = #{settleId,jdbcType=VARCHAR},
+                settle_code = #{settleCode,jdbcType=VARCHAR},
+                self_ratio = #{selfRatio,jdbcType=DECIMAL},
+                is_technology_ok = #{isTechnologyOk,jdbcType=VARCHAR},
+                technology_ok_id = #{technologyOkId,jdbcType=VARCHAR},
+                technology_ok_name = #{technologyOkName,jdbcType=VARCHAR},
+                technology_ok_time = #{technologyOkTime,jdbcType=TIMESTAMP},
+                avg_buy_price = #{avgBuyPrice,jdbcType=DECIMAL},
+                avg_sell_price = #{avgSellPrice,jdbcType=DECIMAL},
+                doctor_id = #{doctorId,jdbcType=VARCHAR},
+                doctor_name = #{doctorName,jdbcType=VARCHAR},
+                dept_id = #{deptId,jdbcType=VARCHAR},
+                exec_dept_id = #{execDeptId,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptCostDO" >
+        update
+        outpt_cost
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="opId != null and opId != ''">
+                op_id = #{opId,jdbcType=VARCHAR},
+            </if>
+            <if test="opdId != null and opdId != ''">
+                opd_id = #{opdId,jdbcType=VARCHAR},
+            </if>
+            <if test="opeId != null and opeId != ''">
+                ope_id = #{opeId,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceCode != null and sourceCode != ''">
+                source_code = #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceId != null and sourceId != ''">
+                source_id = #{sourceId,jdbcType=VARCHAR},
+            </if>
+            <if test="oldCostId != null and oldCostId != ''">
+                old_cost_id = #{oldCostId,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceDeptId != null and sourceDeptId != ''">
+                source_dept_id = #{sourceDeptId,jdbcType=VARCHAR},
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                bfc_id = #{bfcId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=DECIMAL},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec,jdbcType=VARCHAR},
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                prep_code = #{prepCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage,jdbcType=DECIMAL},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode,jdbcType=VARCHAR},
+            </if>
+            <if test="rateId != null and rateId != ''">
+                rate_id = #{rateId,jdbcType=VARCHAR},
+            </if>
+            <if test="useDays != null">
+                use_days = #{useDays,jdbcType=INTEGER},
+            </if>
+            <if test="numUnitCode != null and numUnitCode != ''">
+                num_unit_code = #{numUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum,jdbcType=DECIMAL},
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                herb_note_code = #{herbNoteCode,jdbcType=VARCHAR},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode,jdbcType=VARCHAR},
+            </if>
+            <if test="herbNum != null">
+                herb_num = #{herbNum,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="preferentialPrice != null">
+                preferential_price = #{preferentialPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="realityPrice != null">
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId,jdbcType=VARCHAR},
+            </if>
+            <if test="isDist != null and isDist != ''">
+                is_dist = #{isDist,jdbcType=VARCHAR},
+            </if>
+            <if test="backNum != null">
+                back_num = #{backNum,jdbcType=DECIMAL},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code = #{settleCode,jdbcType=VARCHAR},
+            </if>
+            <if test="selfRatio != null">
+                self_ratio = #{selfRatio,jdbcType=DECIMAL},
+            </if>
+            <if test="isTechnologyOk != null and isTechnologyOk != ''">
+                is_technology_ok = #{isTechnologyOk,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkId != null and technologyOkId != ''">
+                technology_ok_id = #{technologyOkId,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkName != null and technologyOkName != ''">
+                technology_ok_name = #{technologyOkName,jdbcType=VARCHAR},
+            </if>
+            <if test="technologyOkTime != null">
+                technology_ok_time = #{technologyOkTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="avgBuyPrice != null">
+                avg_buy_price = #{avgBuyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="avgSellPrice != null">
+                avg_sell_price = #{avgSellPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                exec_dept_id = #{execDeptId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM outpt_cost WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM outpt_cost WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteFCFCostByIds">
+        DELETE FROM outpt_cost WHERE op_id is null and settle_code in ('0','1') and hosp_code = #{hospCode} and id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="outptCostDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_cost oc join outpt_settle s on s.id=oc.settle_id and s.hosp_code=oc.hosp_code
+        where
+            oc.hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != ''">
+                AND oc.visit_id = #{visitId}
+            </if>
+            <if test="opId != null and opId != ''">
+                AND oc.op_id = #{opId}
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                AND oc.settle_code = #{settleCode}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                AND oc.status_code = #{statusCode}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                AND s.settle_no = #{settleId}
+            </if>
+    </select>
+
+    <!-- 查询就诊信息 -->
+    <select id="queryOutptVisitList" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultMap="OutptVisitResultMap">
+        SELECT
+        <if test="type != null and type !=''">
+            CONCAT(
+            v.NAME,'/',
+            (CASE v.gender_code WHEN '0' THEN '未知的性别'
+            WHEN '1' THEN '男' WHEN '2' THEN '女'
+            WHEN '9' THEN '未说明的性别' ELSE '' END ),
+            '/',IFNULL( v.age, '-' ),
+            (CASE v.age_unit_code
+            WHEN '1' THEN '岁' WHEN '2' THEN '月'
+            WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+            ) keyword,
+        </if>
+        v.id,
+        v.hosp_code,
+        v.profile_id,
+        v.out_profile,
+        v.register_id,
+        v.register_no,
+        v.name,
+        v.gender_code,
+        v.age,
+        v.age_unit_code,
+        v.birthday,
+        v.marry_code,
+        v.nation_code,
+        v.cert_code,
+        v.cert_no,
+        v.phone,
+        v.visit_no,
+        v.visit_code,
+        v.patient_code,
+        v.preferential_type_id,
+        v.insure_code,
+        v.insure_org_code,
+        v.insure_no,
+        v.insure_biz_code,
+        v.insure_treat_code,
+        v.insure_patient_id,
+        v.insure_remark,
+        v.doctor_id,
+        v.doctor_name,
+        v.dept_id,
+        v.dept_name,
+        v.visit_time,
+        v.remark,
+        v.pym,
+        v.wbm,
+        v.is_visit,
+        v.is_phys,
+        v.is_first_visit,
+        v.in_dept_id,
+        v.in_disease_id,
+        v.in_remark,
+        v.crte_id,
+        v.crte_name,
+        v.crte_time,
+        iiv.medical_reg_no as medicalRegNo,
+        iiv.is_ecqr as isEcqr
+        FROM
+        outpt_visit v left join insure_individual_visit iiv on iiv.hosp_code = v.hosp_code and iiv.visit_id = v.id
+        WHERE
+        v.hosp_code = #{hospCode}
+        AND v.is_visit = '1'
+        <if test="startDate != null">
+            AND DATE_FORMAT(v.visit_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="registerNo != null and registerNo != ''">
+            AND v.register_no LIKE CONCAT('%',#{registerNo},'%')
+        </if>
+        <if test="name != null and name != ''">
+            AND v.name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="certNo != null and certNo != ''">
+            AND v.cert_no LIKE CONCAT('%',#{certNo},'%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND v.phone LIKE CONCAT('%',#{phone},'%')
+        </if>
+        <if test="genderCode != null and genderCode != ''">
+            AND v.gender_code = #{genderCode}
+        </if>
+        <if test="isPhys != null and isPhys != ''">
+            AND v.is_phys =#{isPhys}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND(
+            v.name LIKE CONCAT('%',#{keyword},'%')
+            or
+            v.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or
+            v.phone LIKE CONCAT('%',#{keyword},'%')
+            or
+            v.register_no LIKE CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test='type == "0"'>
+        AND (
+            EXISTS(
+                select
+                id
+                from
+                outpt_cost
+                where
+                hosp_code = #{hospCode}
+                and source_code = '1'
+                and visit_id = v.id
+                and status_code = '0'
+                and settle_code in ('0','1')
+            )
+            OR EXISTS(
+                select
+                pp.id
+                from
+                outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
+                where
+                pp.hosp_code = #{hospCode}
+                and pp.visit_id = v.id
+                and pp.is_settle = '0'
+                and pp.is_cancel = '0'
+                and pp.is_submit = '1'
+                and cc.settle_code in ('0','1')
+            )
+        )
+        </if>
+        <if test='type == "1"'>
+            AND(
+            NOT EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and visit_id = v.id
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            AND NOT EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and visit_id = v.id
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
+        </if>
+        <if test='type == "2"'>
+            AND (
+            EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            OR EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
+        </if>
+        <if test='type == "3"'>
+            AND(
+            NOT EXISTS(
+            select
+            id
+            from
+            outpt_cost
+            where
+            hosp_code = #{hospCode}
+            and source_code = '1'
+            and status_code = '0'
+            and settle_code in ('0','1')
+            )
+            AND NOT EXISTS(
+            select
+            id
+            from
+            outpt_prescribe
+            where
+            hosp_code = #{hospCode}
+            and is_settle = '0'
+            and is_cancel = '0'
+            and is_submit = '1'
+            )
+            )
+        </if>
+        order by v.crte_time desc
+    </select>
+
+    <!-- 查询处方信息 -->
+    <select id="queryOutptPrescribeList" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" resultMap="outptPrescribeMap">
+        select
+            id,
+            hosp_code,
+            visit_id,
+            diagnose_id,
+            order_no,
+            doctor_id,
+            doctor_name,
+            dept_id,
+            dept_name,
+            type_code,
+            prescribe_type_code,
+            settle_id,
+            remark,
+            is_settle,
+            is_cancel,
+            is_print,
+            is_herb_hospital,
+            herb_num,
+            herb_use_code,
+            weight,
+            agent_name,
+            agent_cert_no,
+            cancel_id,
+            cancel_name,
+            cancel_date,
+            cancel_reason,
+            crte_id,
+            crte_name,
+            crte_time
+        from
+            outpt_prescribe
+        where
+            hosp_code = #{hospCode}
+            AND visit_id = #{visitId}
+            AND is_settle = '0'
+            AND is_cancel = '0'
+    </select>
+
+    <!-- 获取划价收费费用 -->
+    <select id="queryDrugMaterialByVisitId" resultMap="outptCostDtoMap" parameterType="java.util.Map">
+        SELECT
+        <include refid="Base_ColumnAlias_List"/>,  d.name as xmlbname, oc.reality_price as lastrealityprice
+        FROM outpt_cost oc left join sys_code_detail d on oc.item_code = d.value
+        WHERE
+        oc.`id` IS NOT NULL
+        AND oc.hosp_code = #{hospCode}
+        AND oc.visit_id = #{visitId}
+        AND oc.settle_code IN('0','1')
+        AND oc.status_code = '0'
+        AND oc.source_code = #{sourceCode}
+        AND oc.hosp_code = d.hosp_code
+        AND d.c_code = 'XMLB'
+    </select>
+
+    <!-- 划价收费获取当前科室所对应的药房药库 -->
+    <select id="queryDrugMaterialList" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        SELECT
+        A.*,
+        (
+            case bp.out_code
+            when '1'
+            then A.primaryPrice * (1-bp.out_scale)
+            when '2'
+            then  bp.out_scale
+            else
+            0
+            end
+        ) AS reducedPrice, /* 优惠金额 */
+        (
+            case bp.out_code
+            when '1'
+            then A.primaryPrice * bp.out_scale
+            when '2'
+            then A.primaryPrice - bp.out_scale
+            else
+            A.primaryPrice
+            end
+        ) AS reducedAfterPrice, /* 优惠后金额 */
+        (
+            case bp.out_code
+            when '1'
+            then A.split_price * (1-bp.out_scale)
+            when '2'
+            then bp.out_scale / A.split_ratio
+            else
+            0
+            end
+        ) AS splitReducedPrice, /* 拆零优惠金额 */
+        (
+            case bp.out_code
+            when '1'
+            then A.split_price * bp.out_scale
+            when '2'
+            then (A.primaryPrice - bp.out_scale) / A.split_ratio
+            else
+            A.split_price
+            end
+        ) AS splitReducedAfterPrice /* 拆零优惠后金额 */
+        FROM
+        (
+        /* 药品 */
+        SELECT
+        d.name as ykName,
+        ss.biz_id as pharId,
+        ss.item_id,
+        ss.item_code,
+        bd.type_code,
+        bd.big_type_code,
+        bd.code,
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bd.bfc_code and hosp_code = #{hospCode}) bfc_id,
+        ss.item_name,
+        bd.spec,
+        bd.dosage,
+        bd.price primaryPrice,
+        bd.unit_code,
+        bd.out_unit_code,
+        bd.avg_buy_price,
+        bd.avg_sell_price,
+        bd.split_ratio,
+        bd.split_unit_code,
+        bd.split_price,
+        bd.usage_code,
+        bd.ndan,
+        bd.good_pym,
+        bd.good_wbm,
+        '0' as is_cg,
+        ss.num as stock_num,
+        ss.split_num,
+        ss.stock_occupy,
+        bd.rate_code rateCode
+        FROM
+            stro_stock ss
+        join
+            base_drug bd
+        on
+        ss.hosp_code = #{hospCode}
+        AND bd.hosp_code = #{hospCode}
+        AND (bd.is_out = '1' or bd.is_out is null)
+        AND bd.is_valid = '1'
+        AND ss.item_id = bd.id
+        join base_dept d ON ss.biz_id = d.id and (d.type_code = '4' or d.type_code = '5') and d.hosp_code = #{hospCode}
+        where
+        bd.type_code is not null
+        and (ss.split_num - IFNULL(ss.stock_occupy,0)) > 0
+        <if test="pharId != null and pharId != ''">
+          and ss.biz_id = #{pharId}
+        </if>
+
+        UNION ALL
+        /* 材料 */
+        SELECT
+        d.name as ykName,
+        ss.biz_id as pharId,
+        ss.item_id,
+        ss.item_code,
+        bm.type_code,
+        '' AS big_type_code,
+        bm.code,
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bm.bfc_code and hosp_code = #{hospCode}) bfc_id,
+        ss.item_name,
+        bm.spec,
+        null AS dosage,
+        bm.price primaryPrice,
+        bm.unit_code,
+        bm.unit_code as out_unit_code,
+        bm.avg_buy_price,
+        bm.avg_sell_price,
+        bm.split_ratio,
+        bm.split_unit_code,
+        bm.split_price,
+        bm.use_code AS usage_code,
+        bm.reg_cert_no AS ndan,
+        bm.pym AS good_pym,
+        bm.wbm AS good_wbm,
+        '0' as is_cg,
+        ss.num as stock_num,
+        ss.split_num,
+        ss.stock_occupy,
+        '' rateCode
+        FROM
+            stro_stock ss
+        join
+            base_material bm
+        on
+            ss.hosp_code = #{hospCode}
+            AND bm.hosp_code = #{hospCode}
+            AND bm.is_valid = '1'
+            AND ss.item_id = bm.id
+        join base_dept d ON ss.biz_id = d.id and d.hosp_code = #{hospCode}
+        where
+        bm.type_code is not null
+        and bm.is_valid = '1'
+        <if test="pharId != null and pharId != ''">
+          and ss.biz_id = #{pharId}
+        </if>
+
+        UNION ALL
+        /* 项目 */
+        SELECT
+        '' as ykName,
+        '' as pharId,
+        id as item_id,
+        '3' AS item_code,
+        type_code,
+        '' AS big_type_code,
+        CODE,
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bfc_code and hosp_code = #{hospCode}) bfc_id,
+        NAME as item_name,
+        spec,
+        null as dosage,
+        price primaryPrice,
+        unit_code,
+        unit_code as out_unit_code,
+        '' AS avg_buy_price,
+        '' AS avg_sell_price,
+        '' AS split_ratio,
+        '' AS split_unit_code,
+        '' AS split_price,
+        '' AS usage_code,
+        '' AS ndan,
+        name_pym as good_pym,
+        name_wbm as good_wbm,
+        is_cg,
+        null as stock_num,
+        null as split_num,
+        null as stock_occupy,
+        '' rateCode
+        FROM
+        base_item
+        WHERE is_valid = '1'
+        AND (is_out = '1' or is_out is null)
+        AND hosp_code = #{hospCode}
+        ) A LEFT JOIN base_preferential bp
+        ON A.item_id = bp.biz_code AND bp.pf_type_code = #{pfTypeCode} AND bp.hosp_code = #{hospCode}
+        <where>
+            <if test="keyword != null and keyword != ''">
+                A.type_code like concat('%',#{keyword},'%')
+                OR A.item_name like concat('%',#{keyword},'%')
+                OR A.good_pym like concat('%',#{keyword},'%')
+                OR A.good_wbm like concat('%',#{keyword},'%')
+            </if>
+            <if test="items != null">
+                <foreach collection="items" item="item" separator="," open="A.item_id IN(" close=")">
+                    #{item.itemId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询医院药品、项目、材料信息 -->
+    <select id="queryDrugMaterialListByIds" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        SELECT
+        A.*
+        FROM
+        (
+        SELECT
+        id as item_id,
+        '1' item_code,
+        hosp_code,
+        type_code,
+
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bfc_code and hosp_code = #{hospCode}) bfc_id,
+        code,
+        good_name as item_name,
+        spec,
+        price AS primaryPrice,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        (select br.id from base_rate br where br.code = rate_code and hosp_code = #{hospCode}) rate_id,
+        unit_code,
+        avg_buy_price,
+        avg_sell_price,
+        split_ratio,
+        split_unit_code,
+        split_price,
+        drug_remark,
+        '0' as is_cg,
+        good_pym,
+        good_wbm
+        FROM
+        base_drug
+        WHERE  is_valid = '1'
+        AND (is_out = '1' or is_out is null)
+        AND hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        id as item_id,
+        '2' item_code,
+        hosp_code,
+        type_code,
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bfc_code and hosp_code = #{hospCode}) bfc_id,
+        code,
+        NAME as item_name,
+        spec,
+        price AS primaryPrice,
+        '' as prep_code,
+        '' as dosage,
+        '' as dosage_unit_code,
+        '' as usage_code,
+        '' as rate_id,
+        unit_code,
+        avg_buy_price,
+        avg_sell_price,
+        split_ratio,
+        split_unit_code,
+        split_price,
+        remark AS drug_remark,
+        '0' as is_cg,
+        pym as good_pym,
+        wbm as good_wbm
+        FROM
+        base_material
+        WHERE is_valid = '1'
+        AND hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        id as item_id,
+        '3' AS item_code,
+        hosp_code,
+        type_code,
+        (SELECT bfc.id FROM base_finance_classify bfc where bfc.code = bfc_code and hosp_code = #{hospCode}) bfc_id,
+        CODE,
+        NAME as item_name,
+        spec,
+        price AS primaryPrice,
+        '' as prep_code,
+        '' as dosage,
+        '' as dosage_unit_code,
+        '' as usage_code,
+        '' as rate_id,
+        unit_code,
+        '' as avg_buy_price,
+        '' as avg_sell_price,
+        '' AS split_ratio,
+        '' AS split_unit_code,
+        '' AS split_price,
+        remark AS drug_remark,
+        is_cg,
+        name_pym as good_pym,
+        name_wbm as good_wbm
+        FROM
+        base_item
+        WHERE is_valid = '1'
+        AND (is_out = '1' or is_out is null )
+        AND hosp_code = #{hospCode}
+        ) A
+        <where>
+        <if test="items != null">
+            <foreach collection="items" item="item" separator="," open="A.item_id IN(" close=")">
+                #{item.itemId}
+            </foreach>
+        </if>
+        </where>
+    </select>
+
+    <!-- 保存门诊就诊信息 -->
+    <insert id="addOutptVisit" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" >
+        insert into
+        outpt_visit
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="profileId != null and profileId != ''">
+                profile_id,
+            </if>
+            <if test="outProfile != null and outProfile != ''">
+                out_profile,
+            </if>
+            <if test="registerId != null and registerId != ''">
+                register_id,
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                register_no,
+            </if>
+            <if test="name != null and name != ''">
+                name,
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                age_unit_code,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                marry_code,
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                nation_code,
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code,
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no,
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                visit_code,
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                patient_code,
+            </if>
+            <if test="preferentialTypeId != null and preferentialTypeId != ''">
+                preferential_type_id,
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                insure_code,
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code,
+            </if>
+            <if test="insureNo != null and insureNo != ''">
+                insure_no,
+            </if>
+            <if test="insureBizCode != null and insureBizCode != ''">
+                insure_biz_code,
+            </if>
+            <if test="insureTreatCode != null and insureTreatCode != ''">
+                insure_treat_code,
+            </if>
+            <if test="insurePatientId != null and insurePatientId != ''">
+                insure_patient_id,
+            </if>
+            <if test="insureRemark != null and insureRemark != ''">
+                insure_remark,
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id,
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name,
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id,
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name,
+            </if>
+            <if test="visitTime != null">
+                visit_time,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+            <if test="pym != null and pym != ''">
+                pym,
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm,
+            </if>
+            <if test="isVisit != null and isVisit != ''">
+                is_visit,
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                is_first_visit,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                #{profileId,jdbcType=VARCHAR},
+            </if>
+            <if test="outProfile != null and outProfile != ''">
+                #{outProfile,jdbcType=VARCHAR},
+            </if>
+            <if test="registerId != null and registerId != ''">
+                #{registerId,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                #{registerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                #{genderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                #{ageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                #{marryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                #{nationCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                #{certCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                #{certNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                #{visitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                #{patientCode,jdbcType=VARCHAR},
+            </if>
+            <if test="preferentialTypeId != null and preferentialTypeId != ''">
+                #{preferentialTypeId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                #{insureCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureNo != null and insureNo != ''">
+                #{insureNo,jdbcType=VARCHAR},
+            </if>
+            <if test="insureBizCode != null and insureBizCode != ''">
+                #{insureBizCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureTreatCode != null and insureTreatCode != ''">
+                #{insureTreatCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insurePatientId != null and insurePatientId != ''">
+                #{insurePatientId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRemark != null and insureRemark != ''">
+                #{insureRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitTime != null">
+                #{visitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="pym != null and pym != ''">
+                #{pym,jdbcType=VARCHAR},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                #{wbm,jdbcType=VARCHAR},
+            </if>
+            <if test="isVisit != null and isVisit != ''">
+                #{isVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                #{isFirstVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 编辑门诊就诊信息 -->
+    <update id="editOutptVisitByKey" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" >
+        update
+        outpt_visit
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                profile_id = #{profileId,jdbcType=VARCHAR},
+            </if>
+            <if test="outProfile != null and outProfile != ''">
+                out_profile = #{outProfile,jdbcType=VARCHAR},
+            </if>
+            <if test="registerId != null and registerId != ''">
+                register_id = #{registerId,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                register_no = #{registerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                age_unit_code = #{ageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                marry_code = #{marryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                nation_code = #{nationCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code = #{certCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no = #{certNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                visit_code = #{visitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+            </if>
+            <if test="preferentialTypeId != null and preferentialTypeId != ''">
+                preferential_type_id = #{preferentialTypeId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                insure_code = #{insureCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code = #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureNo != null and insureNo != ''">
+                insure_no = #{insureNo,jdbcType=VARCHAR},
+            </if>
+            <if test="insureBizCode != null and insureBizCode != ''">
+                insure_biz_code = #{insureBizCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureTreatCode != null and insureTreatCode != ''">
+                insure_treat_code = #{insureTreatCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insurePatientId != null and insurePatientId != ''">
+                insure_patient_id = #{insurePatientId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRemark != null and insureRemark != ''">
+                insure_remark = #{insureRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitTime != null">
+                visit_time = #{visitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym,jdbcType=VARCHAR},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm,jdbcType=VARCHAR},
+            </if>
+            <if test="isVisit != null and isVisit != ''">
+                is_visit = #{isVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                is_first_visit = #{isFirstVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 删除划价收费费用 -->
+    <delete id="delOutptCostByVisitId" parameterType="java.util.Map">
+        DELETE
+        FROM
+          outpt_cost
+        WHERE
+        hosp_code = #{hospCode}
+        AND visit_id = #{visitId}
+        AND source_code = #{sourceCode}
+        <if test="settleCodes != null">
+        AND settle_code IN (
+        <foreach collection="settleCodes" item="settleCode" separator=",">
+            #{settleCode}
+        </foreach>
+        )
+        </if>
+    </delete>
+
+    <!-- 查询当前医院优惠列表 -->
+    <select id="getBasePreferentialTypeList" parameterType="java.util.Map" resultMap="BasePreferentialTypeMap">
+        SELECT
+          id,
+          hosp_code,
+          CODE,
+          NAME,
+          is_valid,
+          crte_id,
+          crte_name,
+          crte_time
+        FROM
+          base_preferential_type
+        WHERE hosp_code = #{hospCode}
+           AND is_valid = #{isValid}
+    </select>
+
+    <!-- 查询当前医院优惠明细信息 -->
+    <select id="getBasePreferentialList" parameterType="java.util.Map" resultMap="BasePreferentialMap">
+        SELECT
+          id,
+          hosp_code,
+          type_code,
+          biz_code,
+          pf_type_code,
+          out_code,
+          out_scale,
+          in_code,
+          in_scale,
+          is_valid,
+          crte_id,
+          crte_name,
+          crte_time
+        FROM
+          base_preferential
+        WHERE hosp_code = #{hospCode}
+           AND is_valid = #{isValid}
+           AND pf_type_code = #{pfTypeCode}
+    </select>
+
+    <update id="updateList">
+        <foreach collection="list" separator=";" item="item">
+            update
+            outpt_cost
+            <set>
+                <if test="item.hospCode != null and item.hospCode != ''">
+                    hosp_code = #{item.hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.visitId != null and item.visitId != ''">
+                    visit_id = #{item.visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.opId != null and item.opId != ''">
+                    op_id = #{item.opId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.opdId != null and item.opdId != ''">
+                    opd_id = #{item.opdId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.opeId != null and item.opeId != ''">
+                    ope_id = #{item.opeId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.sourceCode != null and item.sourceCode != ''">
+                    source_code = #{item.sourceCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.sourceId != null and item.sourceId != ''">
+                    source_id = #{item.sourceId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.oldCostId != null and item.oldCostId != ''">
+                    old_cost_id = #{item.oldCostId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.sourceDeptId != null and item.sourceDeptId != ''">
+                    source_dept_id = #{item.sourceDeptId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.bfcId != null and item.bfcId != ''">
+                    bfc_id = #{item.bfcId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.preferentialPrice != null">
+                    preferential_price = #{item.preferentialPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.realityPrice != null">
+                    reality_price = #{item.realityPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.statusCode != null and item.statusCode != ''">
+                    status_code = #{item.statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.pharId != null and item.pharId != ''">
+                    phar_id = #{item.pharId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.isDist != null and item.isDist != ''">
+                    is_dist = #{item.isDist,jdbcType=VARCHAR},
+                </if>
+                <if test="item.backNum != null">
+                    back_num = #{item.backNum,jdbcType=DECIMAL},
+                </if>
+                <if test="item.settleId != null and item.settleId != ''">
+                    settle_id = #{item.settleId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.settleCode != null and item.settleCode != ''">
+                    settle_code = #{item.settleCode,jdbcType=VARCHAR},
+                </if>
+                <if test="item.selfRatio != null">
+                    self_ratio = #{item.selfRatio,jdbcType=DECIMAL},
+                </if>
+                <if test="item.isTechnologyOk != null and item.isTechnologyOk != ''">
+                    is_technology_ok = #{item.isTechnologyOk,jdbcType=VARCHAR},
+                </if>
+                <if test="item.technologyOkId != null and item.technologyOkId != ''">
+                    technology_ok_id = #{item.technologyOkId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.technologyOkName != null and item.technologyOkName != ''">
+                    technology_ok_name = #{item.technologyOkName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.technologyOkTime != null">
+                    technology_ok_time = #{item.technologyOkTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="item.avgBuyPrice != null">
+                    avg_buy_price = #{item.avgBuyPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.avgSellPrice != null">
+                    avg_sell_price = #{item.avgSellPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.doctorId != null and item.doctorId != ''">
+                    doctor_id = #{item.doctorId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.doctorName != null and item.doctorName != ''">
+                    doctor_name = #{item.doctorName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.deptId != null and item.deptId != ''">
+                    dept_id = #{item.deptId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.execDeptId != null and item.execDeptId != ''">
+                    exec_dept_id = #{item.execDeptId,jdbcType=VARCHAR},
+                </if>
+            </set>
+            where
+            id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 根据结算id查询费用 -->
+    <select id="queryBySettleId" resultMap="outptCostDtoMap" parameterType="java.util.Map" >
+        select oc.id, oc.hosp_code, oc.visit_id, oc.op_id, oc.opd_id, oc.ope_id, oc.source_code,
+               oc.source_id, oc.old_cost_id, oc.source_dept_id, oc.bfc_id, oc.item_code, oc.item_id,
+               oc.item_name, oc.price, oc.num, oc.spec, oc.prep_code, oc.dosage, oc.dosage_unit_code, oc.usage_code,
+               oc.rate_id, oc.use_days, oc.num_unit_code, oc.total_num, oc.herb_note_code,oc.use_code, oc.herb_num,
+               oc.total_price, oc.preferential_price, oc.reality_price, oc.status_code, oc.phar_id, oc.is_dist,
+               oc.back_num, oc.settle_id, oc.settle_code, oc.self_ratio, oc.is_technology_ok, oc.technology_ok_id,
+               oc.technology_ok_name, oc.technology_ok_time, oc.avg_buy_price, oc.avg_sell_price, oc.doctor_id,
+               oc.doctor_name, oc.dept_id, oc.exec_dept_id, oc.crte_id, oc.crte_name, oc.crte_time,
+               op.order_no,op.crte_time as prescribeCrteTime
+        from
+        outpt_cost oc left join outpt_prescribe op on oc.op_id = op.id
+        where
+        oc.hosp_code = #{hospCode}
+        and oc.status_code = #{statusCode}
+        and oc.settle_code = #{settleCode}
+        and oc.settle_id = #{settleId}
+    </select>
+
+    <!-- 根据主键删除门诊发药主表信息 -->
+    <delete id="deletePharOutReceiveById" parameterType="cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO">
+        DELETE FROM phar_out_receive WHERE id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 根据领药主表ID删除门诊领药申请明细表信息 -->
+    <delete id="deletePharOutReceiveDetailById" parameterType="cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO">
+         DELETE FROM phar_out_receive_detail WHERE or_id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 根据领药申请主表ID获取门诊领药申请明细表信息 -->
+    <select id="queryPharOutReceiveDetailInfo" resultType = "cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO" parameterType="cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO">
+         SELECT
+            id,
+            hosp_code as hospCode,
+            or_id as orId,
+            op_id as opId,
+            opd_id as opdId,
+            cost_id as costId,
+            item_code itemCode,
+            item_id as itemId,
+            item_name as itemName,
+            spec,
+            dosage,
+            dosage_unit_code as dosageUnitCode,
+            num,
+            unit_code as unitCode,
+            price,
+            split_ratio as splitRatio,
+            split_unit_code as splitUnitCode,
+            split_num as splitNum,
+            split_price as splitPrice,
+            total_price as totalPrice,
+            chinese_drug_num as chineseDrugNum,
+            usage_code as usageCode,
+            use_code as useCode
+        FROM
+            phar_out_receive_detail
+            WHERE or_id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 批量插入数据至门诊领药申请明细表 -->
+    <insert id="batchInsertPharOutReceiveDetail" parameterType="list">
+        INSERT INTO phar_out_receive_detail (
+        id, hosp_code, or_id, op_id, opd_id, cost_id, item_code, item_id,
+        item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio,
+        split_unit_code, split_num, split_price, total_price, chinese_drug_num, usage_code, use_code
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.orId},
+            #{item.opId},
+            #{item.opdId},
+            #{item.costId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.spec},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.num},
+            #{item.unitCode},
+            #{item.price},
+            #{item.splitRatio},
+            #{item.splitUnitCode},
+            #{item.splitNum},
+            #{item.splitPrice},
+            #{item.totalPrice},
+            #{item.chineseDrugNum},
+            #{item.usageCode},
+            #{item.useCode}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 插入数据至门诊领药申请主表 -->
+    <insert id="insetPharOutReceive" parameterType="cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO">
+        INSERT INTO phar_out_receive (
+            id, hosp_code, visit_id, settle_id, total_price, status_code, phar_id, window_id,
+            assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id,
+            crte_name, crte_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{visitId},
+            #{settleId},
+            #{totalPrice},
+            #{statusCode},
+            #{pharId},
+            #{windowId},
+            #{assignUserId},
+            #{assignUserName},
+            #{assignTime},
+            #{distUserId},
+            #{distUserName},
+            #{distTime},
+            #{deptId},
+            #{crteId},
+            #{crteName},
+            #{crteTime}
+        )
+    </insert>
+
+    <!-- 批量插入数据至门诊发药主表 -->
+    <insert id="batchInsertPharOutDistributeDetail" parameterType="list">
+        INSERT INTO phar_out_distribute_detail (
+        id, hosp_code, distribute_id, op_id, opd_id, old_cost_id, cost_id, item_code,
+        item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price,
+        split_ratio, split_unit_code, split_price, split_num, total_price, chinese_drug_num, usage_code, use_code,
+        stock_detail_id, batch_no, back_num, total_back_num, up_batch_surplus_num, batch_surplus_num, up_buy_price_all, buy_price_all,
+        up_sell_price_all, sell_price_all, old_dist_id, status_code
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.distributeId},
+            #{item.opId},
+            #{item.opdId},
+            #{item.oldCostId},
+            #{item.costId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.spec},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.num},
+            #{item.unitCode},
+            #{item.price},
+            #{item.splitRatio},
+            #{item.splitUnitCode},
+            #{item.splitPrice},
+            #{item.splitNum},
+            #{item.totalPrice},
+            #{item.chineseDrugNum},
+            #{item.usageCode},
+            #{item.useCode},
+            #{item.stockDetailId},
+            #{item.batchNo},
+            #{item.backNum},
+            #{item.totalBackNum},
+            #{item.upBatchSurplusNum},
+            #{item.batchSurplusNum},
+            #{item.upBuyPriceAll},
+            #{item.buyPriceAll},
+            #{item.upSellPriceAll},
+            #{item.sellPriceAll},
+            #{item.oldDistId},
+            #{item.statusCode}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据发药表ID获取门诊发药明细表信息 -->
+    <select id="queryPharOutDistributeDetailIByList" resultType = "cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO" parameterType="java.util.ArrayList">
+        <foreach collection="list" item="item" separator="union all">
+         SELECT
+            id,
+            hosp_code as hospCode,
+            distribute_id as distributeId,
+            op_id as opId,
+            opd_id as opdId,
+            old_cost_id as oldCostId,
+            cost_id as costId,
+            item_code as itemCode,
+            item_id as itemId,
+            item_name as itemName,
+            spec,
+            dosage,
+            dosage_unit_code as dosageUnitCode,
+            case when curr_unit_code = split_unit_code then split_num else num end num,
+            unit_code as unitCode,
+            case when curr_unit_code = split_unit_code then split_price else price end price,
+            split_ratio as splitRatio,
+            split_unit_code as splitUnitCode ,
+            split_price as splitPrice,
+            split_num as splitNum,
+            total_price as totalPrice,
+            chinese_drug_num as chineseDrugNum,
+            usage_code as usageCode,
+            use_code as useCode,
+            ifnull(back_num,0) as backNum,
+            ifnull(total_back_num,0) as totalBackNum,
+            old_dist_id as oldDistId,
+            status_code as statusCode
+        FROM
+            phar_out_distribute_all_detail
+            WHERE hosp_code = #{item.hospCode} and distribute_id = #{item.id} and status_code = '0'
+     </foreach>
+
+    </select>
+
+    <!-- 根据发药表ID获取门诊发药明细表信息 -->
+    <select id="queryPharOutDistributeDetailIBySettleId" resultType = "cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        id,
+        hosp_code as hospCode,
+        distribute_id as distributeId,
+        op_id as opId,
+        opd_id as opdId,
+        old_cost_id as oldCostId,
+        cost_id as costId,
+        item_code as itemCode,
+        item_id as itemId,
+        item_name as itemName,
+        spec,
+        dosage,
+        dosage_unit_code as dosageUnitCode,
+        case when curr_unit_code = split_unit_code then split_num else num end num,
+        unit_code as unitCode,
+        case when curr_unit_code = split_unit_code then split_price else price end price,
+        split_ratio as splitRatio,
+        split_unit_code as splitUnitCode ,
+        split_price as splitPrice,
+        split_num as splitNum,
+        total_price as totalPrice,
+        chinese_drug_num as chineseDrugNum,
+        usage_code as usageCode,
+        use_code as useCode,
+        ifnull(back_num,0) as backNum,
+        ifnull(total_back_num,0) as totalBackNum,
+        old_dist_id as oldDistId,
+        status_code as statusCode
+        FROM
+        phar_out_distribute_all_detail
+        WHERE hosp_code = #{hospCode} and cost_id in (select id from outpt_cost where settle_id = #{oneSettleId} and hosp_code = #{hospCode})
+    </select>
+
+    <!-- 根据发药表ID获取门诊发药明细表信息 -->
+    <select id="queryPharOutDistributeDetail" resultType = "cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDetailDTO" parameterType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO">
+         SELECT
+            id,
+            hosp_code as hospCode,
+            distribute_id as distributeId,
+            op_id as opId,
+            opd_id as opdId,
+            old_cost_id as oldCostId,
+            cost_id as costId,
+            item_code as itemCode,
+            item_id as itemId,
+            item_name as itemName,
+            spec,
+            dosage,
+            dosage_unit_code as dosageUnitCode,
+            case when curr_unit_code = split_unit_code then ifnull(num,0)*split_ratio else num end num,
+            unit_code as unitCode,
+            case when curr_unit_code = split_unit_code then split_price else price end price,
+            split_ratio as splitRatio,
+            split_unit_code as splitUnitCode ,
+            split_price as splitPrice,
+            split_num as splitNum,
+            total_price as totalPrice,
+            chinese_drug_num as chineseDrugNum,
+            usage_code as usageCode,
+            use_code as useCode,
+            stock_detail_id as stockDetailId,
+            batch_no as batchNo,
+            ifnull(back_num,0) as backNum,
+            ifnull(total_back_num,0) as totalBackNum,
+            ifnull(up_batch_surplus_num,0) as upBatchSurplusNum,
+            ifnull(batch_surplus_num,0) as batchSurplusNum,
+            up_buy_price_all as upBuyPriceAll,
+            buy_price_all as buyPriceAll,
+            up_sell_price_all as upSellPriceAll,
+            sell_price_all as sellPriceAll,
+            old_dist_id as oldDistId,
+            status_code as statusCode
+        FROM
+            phar_out_distribute_detail
+            WHERE distribute_id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <insert id="insertPharOutDistribute" parameterType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO">
+        INSERT INTO phar_out_distribute (
+            id, hosp_code, visit_id, settle_id, total_price, phar_id, window_id, assign_user_id,
+            assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, dept_id, crte_id, crte_name,
+            crte_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{visitId},
+            #{settleId},
+            #{totalPrice},
+            #{pharId},
+            #{windowId},
+            #{assignUserId},
+            #{assignUserName},
+            #{assignTime},
+            #{distUserId},
+            #{distUserName},
+            #{distTime},
+            #{deptId},
+            #{crteId},
+            #{crteName},
+            #{crteTime}
+        )
+    </insert>
+    <insert id="batchOutptCostInsert">
+        insert into
+        outpt_cost
+        (
+        id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.opeId,jdbcType=VARCHAR},
+            #{item.sourceCode,jdbcType=VARCHAR},
+            #{item.sourceId,jdbcType=VARCHAR},
+            #{item.oldCostId,jdbcType=VARCHAR},
+            #{item.sourceDeptId,jdbcType=VARCHAR},
+            #{item.bfcId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.prepCode,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.rateId,jdbcType=VARCHAR},
+            #{item.useDays,jdbcType=INTEGER},
+            #{item.numUnitCode,jdbcType=VARCHAR},
+            #{item.totalNum,jdbcType=DECIMAL},
+            #{item.herbNoteCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.herbNum,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.preferentialPrice,jdbcType=DECIMAL},
+            #{item.realityPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.isDist,jdbcType=VARCHAR},
+            #{item.backNum,jdbcType=DECIMAL},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.settleCode,jdbcType=VARCHAR},
+            #{item.oneSettleId,jdbcType=VARCHAR},
+            #{item.selfRatio,jdbcType=DECIMAL},
+            #{item.isTechnologyOk,jdbcType=VARCHAR},
+            #{item.technologyOkId,jdbcType=VARCHAR},
+            #{item.technologyOkName,jdbcType=VARCHAR},
+            #{item.technologyOkTime,jdbcType=TIMESTAMP},
+            #{item.avgBuyPrice,jdbcType=DECIMAL},
+            #{item.avgSellPrice,jdbcType=DECIMAL},
+            #{item.doctorId,jdbcType=VARCHAR},
+            #{item.doctorName,jdbcType=VARCHAR},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.execDeptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updatePharOutDistributeBatchDetails" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE phar_out_distribute_all_detail
+            <set>
+                <if test="item.distributeId != null">
+                    distribute_id = #{item.distributeId},
+                </if>
+                <if test="item.opId != null">
+                    op_id = #{item.opId},
+                </if>
+                <if test="item.opdId != null">
+                    opd_id = #{item.opdId},
+                </if>
+                <if test="item.oldCostId != null">
+                    old_cost_id = #{item.oldCostId},
+                </if>
+                <if test="item.costId != null">
+                    cost_id = #{item.costId},
+                </if>
+                <if test="item.itemCode != null">
+                    item_code = #{item.itemCode},
+                </if>
+                <if test="item.itemId != null">
+                    item_id = #{item.itemId},
+                </if>
+                <if test="item.itemName != null">
+                    item_name = #{item.itemName},
+                </if>
+                <if test="item.spec != null">
+                    spec = #{item.spec},
+                </if>
+                <if test="item.dosage != null">
+                    dosage = #{item.dosage},
+                </if>
+                <if test="item.dosageUnitCode != null">
+                    dosage_unit_code = #{item.dosageUnitCode},
+                </if>
+                <if test="item.num != null">
+                    num = #{item.num},
+                </if>
+                <if test="item.unitCode != null">
+                    unit_code = #{item.unitCode},
+                </if>
+                <if test="item.price != null">
+                    price = #{item.price},
+                </if>
+                <if test="item.splitRatio != null">
+                    split_ratio = #{item.splitRatio},
+                </if>
+                <if test="item.splitUnitCode != null">
+                    split_unit_code = #{item.splitUnitCode},
+                </if>
+                <if test="item.splitPrice != null">
+                    split_price = #{item.splitPrice},
+                </if>
+                <if test="item.splitNum != null">
+                    split_num = #{item.splitNum},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice},
+                </if>
+                <if test="item.chineseDrugNum != null">
+                    chinese_drug_num = #{item.chineseDrugNum},
+                </if>
+                <if test="item.usageCode != null">
+                    usage_code = #{item.usageCode},
+                </if>
+                <if test="item.useCode != null">
+                    use_code = #{item.useCode},
+                </if>
+                <if test="item.backNum != null">
+                    back_num = #{item.backNum},
+                </if>
+                <if test="item.totalBackNum != null">
+                    total_back_num = #{item.totalBackNum},
+                </if>
+                <if test="item.oldDistId != null">
+                    old_dist_id = #{item.oldDistId},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode}
+                </if>
+            </set>
+            WHERE id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 根据参数获取门诊发药主表信息 -->
+    <select id="getPharOutDistribute" resultType = "cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+         SELECT
+            id,
+            hosp_code as hospCode,
+            distribute_id as distributeId,
+            op_id as opId,
+            opd_id as opdId,
+            old_cost_id as oldCostId,
+            cost_id as costId,
+            item_code as itemCode,
+            item_id as itemId,
+            item_name as itemName,
+            spec,
+            dosage,
+            dosage_unit_code as dosageUnitCode,
+            num,
+            unit_code as unitCode,
+            price,
+            split_ratio as splitRatio,
+            split_unit_code as splitUnitCode ,
+            split_price as splitPrice,
+            split_num as splitNum,
+            total_price as totalPrice,
+            chinese_drug_num as chineseDrugNum,
+            usage_code as usageCode,
+            use_code as useCode,
+            stock_detail_id as stockDetailId,
+            batch_no as batchNo,
+            back_num as backNum,
+            total_back_num as totalBackNum,
+            up_batch_surplus_num as upBatchSurplusNum,
+            batch_surplus_num as batchSurplusNum,
+            up_buy_price_all as upBuyPriceAll,
+            buy_price_all as buyPriceAll,
+            up_sell_price_all as upSellPriceAll,
+            sell_price_all as sellPriceAll,
+            old_dist_id as oldDistId,
+            status_code as statusCode
+        FROM
+            phar_out_distribute
+            WHERE visit_id = #{visitId} and hosp_code = #{hospCode} and settle_id = #{id}
+    </select>
+
+    <update id="batchEditCostPrice" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update
+                outpt_cost
+            set
+                settle_id = #{item.settleId},
+                total_price = #{item.totalPrice},
+                preferential_price = #{item.preferentialPrice},
+                reality_price = #{item.realityPrice},
+                settle_code = #{item.settleCode},
+                status_code = #{item.statusCode},
+                one_settle_id = #{item.oneSettleId}
+            where
+                id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 批量修改费用状态 -->
+    <update id="editCostSettleCodeByIDS" parameterType="java.util.Map">
+        update
+        outpt_cost
+        set
+        settle_code = #{settleCode}
+        where
+        id IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <select id="getPahrOutReceiceInfoBySelectMap" resultType = "cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO" parameterType="java.util.Map">
+        select * from phar_out_receive where 1=1 and hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id in (#{settleId}, #{oneSettleId})
+    </select>
+
+
+    <!--and settle_id = #{settleId}-->
+    <select id="queryPharOutDistribute" resultType = "cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO" parameterType="java.util.Map">
+        select * from phar_out_distribute where 1=1 and hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id in (#{settleId}, #{oneSettleId})
+    </select>
+
+    <select id="queryBaseDept" parameterType="cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select
+            bd.id,
+            bd.hosp_code hospCode,
+            bd.type_code typeCode,
+            bd.nation_code nationCode,
+            bd.code code,
+            bd.name name,
+            bd.ward_code wardCode,
+            bd.phone phone,
+            bd.up_dept_code upDeptCode,
+            bd.mg_dept_code mgDeptCode,
+            bd.intro intro,
+            bd.place place,
+            bd.remark remark,
+            bd.pym pym,
+            bd.wbm wbm,
+            bd.is_valid isValid,
+            bd.crte_id crteId,
+            bd.crte_name crteName,
+            bd.crte_time crteTime,
+            bd.code deptCode,
+            bd.type_code drugstoreTypeCode
+         from base_dept bd
+         where bd.hosp_code = #{hospCode} and bd.type_code in ('4','5','14')
+    </select>
+
+    <update id="updateOutptPrescribeByIds" parameterType="java.util.Map">
+        update outpt_prescribe
+        set
+        is_settle = #{isSettle},
+        settle_id = #{settleId}
+        where
+        hosp_code = #{hospCode}
+        AND id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <!-- 查询已提交的处方费用 -->
+    <select id="queryOutptCostSourceidNotNUll" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        select
+        <include refid="Base_ColumnAlias_List"/>, d.name as xmlbname, oc.reality_price as lastrealityprice, d.value as xmlbcode
+        from
+        outpt_cost oc
+        LEFT JOIN
+        outpt_prescribe op
+        on oc.op_id = op.id
+        AND op.hosp_code = #{hospCode}
+        left join sys_code_detail d on oc.item_code = d.value and oc.hosp_code = d.hosp_code AND d.c_code = 'XMLB'
+        where
+        oc.hosp_code = #{hospCode}
+        AND oc.source_code != '1'
+        AND op.is_settle = '0'
+        AND op.is_cancel = '0'
+        AND op.is_submit = '1'
+        AND oc.visit_id = #{visitId}
+        <if test="settleCodes != null">
+            AND oc.settle_code IN (
+            <foreach collection="settleCodes" item="settleCode" separator=",">
+                #{settleCode}
+            </foreach>
+            )
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND oc.status_code = #{statusCode}
+        </if>
+    </select>
+
+    <!-- 查询非处方、非划价收费费用 -->
+    <select id="queryOutptCostRest" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        select
+        <include refid="Base_ColumnAlias_List"/>
+        from
+        outpt_cost oc
+        where
+        oc.hosp_code = #{hospCode}
+        AND oc.visit_id = #{visitId}
+        <if test="settleCodes != null">
+            AND oc.settle_code IN (
+            <foreach collection="settleCodes" item="settleCode" separator=",">
+                #{settleCode}
+            </foreach>
+            )
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND oc.status_code = #{statusCode}
+        </if>
+        AND IFNULL(oc.op_id,'') = ''
+        AND IFNULL(oc.source_code,'') != ''
+        AND oc.source_code != '1'
+    </select>
+
+    <!-- 根据药房id查询最快捷的发药窗口 -->
+    <select id="queryShortcutWindows" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+          bw.id AS id,
+          COUNT(por.window_id) AS len
+        FROM
+          base_window bw
+          LEFT JOIN base_dept bd
+            ON bw.dept_code = bd.code
+            AND bd.hosp_code = #{hospCode}
+          LEFT JOIN phar_out_receive por
+            ON por.window_id = bw.id
+            AND por.hosp_code = #{hospCode}
+        WHERE
+        bw.hosp_code = #{hospCode}
+        AND bd.id = #{pharId}
+        AND bw.is_valid = #{isValid}
+        AND bd.is_valid = #{isValid}
+        GROUP BY bw.id
+        ORDER BY len ASC
+    </select>
+
+    <!-- 查询科室信息 -->
+    <select id="queryBaseDeptById" parameterType="java.util.Map" resultType="java.lang.String">
+        select
+        `name`
+        from
+        base_dept
+        where
+        hosp_code = #{hospCode}
+        AND is_valid = #{isValid}
+        AND id = #{pharId}
+    </select>
+
+    <!-- 查询已结算患者信息 -->
+    <select id="queryOutptSettleVisitList" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultMap="OutptVisitResultMap">
+        SELECT
+        <if test="type != null and type !=''">
+            CONCAT(
+            ov.NAME,
+            '/',
+            IFNULL((SELECT
+            s.name
+            FROM
+            sys_code_detail s
+            WHERE s.c_code = 'XB'
+            AND s.hosp_code = #{hospCode}
+            AND s.value = ov.gender_code),'-'),
+            '/',
+            IFNULL(ov.age,'-'),
+            IFNULL((SELECT
+            s.name
+            FROM
+            sys_code_detail s
+            WHERE s.c_code = 'NLDW'
+            AND s.hosp_code = #{hospCode}
+            AND s.value = ov.age_unit_code),'')) keyword,
+        </if>
+        ov.id,
+        ov.hosp_code,
+        ov.profile_id,
+        ov.out_profile,
+        ov.register_id,
+        ov.register_no,
+        ov.name,
+        ov.gender_code,
+        ov.age,
+        ov.age_unit_code,
+        ov.birthday,
+        ov.marry_code,
+        ov.nation_code,
+        ov.cert_code,
+        ov.cert_no,
+        ov.phone,
+        ov.visit_no,
+        ov.visit_code,
+        ov.patient_code,
+        ov.preferential_type_id,
+        ov.insure_code,
+        ov.insure_org_code,
+        ov.insure_no,
+        ov.insure_biz_code,
+        ov.insure_treat_code,
+        ov.insure_patient_id,
+        ov.insure_remark,
+        ov.doctor_id,
+        ov.doctor_name,
+        ov.dept_id,
+        ov.dept_name,
+        ov.visit_time,
+        ov.remark,
+        ov.pym,
+        ov.wbm,
+        ov.is_visit,
+        ov.is_first_visit,
+        ov.in_dept_id,
+        ov.in_disease_id,
+        ov.in_remark,
+        ov.crte_id,
+        ov.crte_name,
+        ov.crte_time,
+        os.id settleId,
+        os.settle_no settleNo,
+        os.settle_time settleTime
+        from
+        outpt_settle os
+        left join
+        outpt_visit ov
+        on os.visit_id = ov.id
+        where
+        ov.hosp_code = #{hospCode}
+        AND os.hosp_code = #{hospCode}
+        AND ov.is_visit = '1'
+        AND os.is_settle = '1'
+        AND os.status_code = '0'
+        <if test="startDate != null">
+            AND DATE_FORMAT(os.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            and DATE_FORMAT(os.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND(
+            ov.name LIKE CONCAT('%',#{keyword},'%')
+            or
+            ov.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or
+            ov.phone LIKE CONCAT('%',#{keyword},'%')
+            or
+            ov.register_no LIKE CONCAT('%',#{keyword},'%')
+            or
+            os.settle_no LIKE CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        order by os.settle_time desc
+    </select>
+
+    <!-- 批量更新项目费用的优惠金额，用于保存自定义优惠 -->
+    <update id="updateOutptCosts" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        update outpt_cost
+            SET preferential_price = CASE id
+            <foreach collection="list" item="item" index="index" open="" separator="" close="">
+                when #{item.id} then #{item.preferentialPrice}
+            </foreach>
+            END,
+            reality_price = CASE id
+            <foreach collection="list" item="item" index="index" open="" separator="" close="">
+                when #{item.id} then #{item.realityPrice}
+            </foreach>
+            END
+            WHERE id in
+            <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+                #{item.id}
+            </foreach>
+    </update>
+
+    <!-- 根据就诊id查询费用信息 -->
+    <select id="selectByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select source_code from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="selectXMZXKS" parameterType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" resultType="java.lang.String">
+        select d.id from base_dept d left join base_item t on d.code = t.out_dept_code
+        where d.hosp_code = #{hospCode} and t.hosp_code = d.hosp_code and t.id = #{itemId}
+    </select>
+
+    <!-- 更新患者类型代码与优惠类别 -->
+    <update id="updateOutptVisitPreferentialType" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        update outpt_visit set patient_code = #{patientCode}, preferential_type_id = #{preferentialTypeId}
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <select id="getOutptVisitById" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select * from outpt_visit where hosp_code = #{hospCode} and id = #{visitId}
+    </select>
+
+    <select id="getOutotCost" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select a.id,a.hosp_code,a.visit_id,a.op_id,a.opd_id,a.ope_id,a.source_code,a.source_id,a.old_cost_id,a.source_dept_id,
+        a.bfc_id,a.item_code,a.item_id,a.item_name,a.price,a.num,a.spec,a.prep_code,a.dosage,a.dosage_unit_code,a.usage_code,
+        a.rate_id,a.use_days,a.num_unit_code,a.total_num,a.herb_note_code,a.use_code,a.herb_num,a.total_price,a.preferential_price,
+        a.reality_price,a.status_code,a.phar_id,a.is_dist,a.back_num,a.settle_id,a.settle_code,a.self_ratio,a.is_technology_ok,
+        a.technology_ok_id,a.technology_ok_name,a.technology_ok_time,a.avg_buy_price,a.avg_sell_price,a.doctor_id,a.doctor_name,
+        a.dept_id,a.exec_dept_id,a.crte_id,a.crte_name,a.crte_time,b.name cwfl_bm , (select name  from sys_code_detail  where c_code='FPGL' and value =b.out_code and hosp_code=b.hosp_code)  mz_fpnr
+         from outpt_cost a left join base_finance_classify b  on a.bfc_id=b.id and a.hosp_code=b.hosp_code
+         where a.hosp_code = #{hospCode}  and a.visit_id =#{visit_id} and a.settle_id=#{settle_id}
+
+    </select>
+    <select id="queryOutptCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select *
+        from
+            outpt_cost oc
+
+        where
+            oc.hosp_code = #{hospCode}
+          AND oc.visit_id = #{visitId}
+          and oc.status_code =#{statusCode} and oc.settle_code !=#{settleCode}
+    </select>
+    <select id="queryPrescribeList" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" parameterType="java.util.Map">
+        select
+        a.id,a.hosp_code,a.visit_id,a.diagnose_ids,a.order_no,a.doctor_id,a.doctor_name,a.dept_id,a.dept_name,a.type_code,
+        a.prescribe_type_code,a.settle_id,a.remark,a.is_settle,a.is_cancel,a.is_print,a.is_herb_hospital,a.herb_num,a.herb_use_code,
+        a.weight,a.agent_name,a.agent_cert_no,a.cancel_id,a.cancel_name,a.cancel_date,a.cancel_reason,a.crte_id,a.crte_name,
+        a.crte_time,a.is_submit,a.submit_id,a.submit_name,a.submit_time
+        from
+        outpt_prescribe a
+         where  a.hosp_code = #{hosp_code} and  id in
+          <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="queryOutptInsureCostByVisit" resultType="java.util.Map">
+        SELECT
+            ic.id id,
+            ic.hosp_code hospCode,
+            ic.visit_id visitId,
+            ic.op_id opId,
+            ic.source_code sourceCode,
+            ic.source_id sourceId,
+            ic.old_cost_id oldCostId,
+            ic.source_dept_id sourceDeptId,
+            ic.bfc_id bfcId,
+            ic.item_code itemCode,
+            ic.item_id itemId,
+            ic.item_name itemName,
+            ic.price price,
+            ic.num num,
+            ic.item_code itemCode,
+            ic.spec spec,
+            ic.prep_code prepCode,
+            ic.dosage dosage,
+            ic.dosage_unit_code dosageUnitCode,
+            ic.usage_code usageCode,
+            ic.rate_id rateId,
+            ic.use_days useDays,
+            ic.num_unit_code numUnitCode,
+            ic.total_num totalNum,
+            ic.herb_note_code herbNoteCode,
+            ic.use_code useCode,
+            ic.herb_num herbNum,
+            ic.total_price totalPrice,
+            ic.preferential_price preferentialPrice,
+            ic.reality_price realityPrice,
+            ic.back_num backNum,
+            ic.doctor_id doctorId,
+            ic.doctor_name doctorName,
+            ic.dept_id deptId,
+            (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,
+            ic.phar_id pharId,
+            ic.is_dist isDist,
+            ic.crte_time crteTime,
+            ic.status_code statusCode,
+            iim.item_code insureMatchItemCode,
+            iim.insure_reg_code insureRegCode,
+            iim.molss_item_id molssItemId,
+            iim.pqcc_item_id pqccItemId,
+            iim.hosp_item_id hospItemId,
+            iim.hosp_item_name hospItemName,
+            iim.hosp_item_code hospItemCode,
+            iim.hosp_item_type hospItemType,
+            iim.hosp_item_spec hospItemSpec,
+            iim.hosp_item_unit_code hospItemUnitCode,
+            iim.hosp_item_prep_code hospItemPrepCode,
+            iim.hosp_item_price hospItemPrice,
+            iim.insure_item_name insureItemName,
+            iim.insure_item_code insureItemCode,
+            iim.insure_item_type insureItemType,
+            iim.insure_item_spec insureItemSpec,
+            iim.insure_item_unit_code insureItemUnitCode,
+            iim.insure_item_prep_code insureItemPrepCode,
+            iim.insure_item_price insureItemPrice,
+            iim.deductible deductible,
+            iim.standard_code standardCode,
+            iim.check_price checkCode,
+            iim.manufacturer manufacturer
+        FROM
+            outpt_cost ic
+                JOIN insure_item_match iim
+                     ON ic.`item_id` = iim.`hosp_item_id`
+                         AND ic.`item_code` = iim.`hosp_item_type`
+                         AND iim.`is_valid` = '1'
+                         AND ic.`hosp_code` = iim.`hosp_code`
+                LEFT JOIN insure_individual_cost iic
+                          ON ic.`id` = iic.`cost_id`
+                              AND ic.`hosp_code` = iic.`hosp_code`
+
+        WHERE ic.`hosp_code` = #{hospCode}
+          and
+            IFNULL(iic.transmit_code,'0') &lt;&gt; '1'
+          AND ic.`settle_code` IN ('0', '1')
+          AND ic.`visit_id` = #{visitId}
+          AND IFNULL(iim.`is_match`, '0') = #{isMatch}
+          AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+          AND iim.insure_reg_code = #{insureRegCode}
+        order by ic.crte_time desc
+    </select>
+    <update id="updatePharOutDistributeDetailsOldCostId" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE phar_out_distribute_detail
+            <set>
+                <if test="item.oldCostId != null">
+                    old_cost_id = #{item.oldCostId},
+                </if>
+                <if test="item.id != null">
+                    cost_id = #{item.id}
+                </if>
+            </set>
+            WHERE cost_id = #{item.oldCostId} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+    <update id="updateOperInfoRecord">
+        update oper_info_record a ,(
+            select sum(reality_price) reality_price, source_id, hosp_code
+            from outpt_cost a
+            where source_code = '8'
+            and source_dept_id = #{sourceDeptId}
+            and  source_id = #{sourceId} and hosp_code = #{hospCode}
+            )b set a.total_price = b.reality_price,
+            a.is_cost = '1',
+            a.cost_time = now()
+        where a.id = b.source_id and a.hosp_code = b.hosp_code
+    </update>
+
+</mapper>

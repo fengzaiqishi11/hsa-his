@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bor.dao.BaseOrderRuleDAO">
+
+    <resultMap type="cn.hsa.module.base.bor.dto.BaseOrderRuleDTO" id="BaseOrderRuleMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="format" column="format" jdbcType="VARCHAR"/>
+        <result property="currNo" column="curr_no" jdbcType="VARCHAR"/>
+        <result property="prefix" column="prefix" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isContinuity" column="is_continuity" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="isVlid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseOrderRuleMap">
+        select
+          id, hosp_code, type_code, name,format, curr_no, prefix, remark, is_continuity, crte_id, crte_name, crte_time
+        from base_order_rule
+        where id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseOrderRuleMap">
+        select
+          id, hosp_code, type_code, name, format, curr_no, prefix, remark, is_continuity, crte_id, crte_name, crte_time
+        from base_order_rule
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="isVlid != null and isVlid != ''">
+                and is_valid = #{isVlid}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code like concat('%',#{typeCode},'%')
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="format != null and format != ''">
+                and format = #{format}
+            </if>
+            <if test="currNo != null and currNo != ''">
+                and curr_no = #{currNo}
+            </if>
+            <if test="prefix != null and prefix != ''">
+                and prefix = #{prefix}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isContinuity != null and isContinuity != ''">
+                and is_continuity = #{isContinuity}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_order_rule(id,hosp_code, type_code, name, format, curr_no, prefix, remark, is_continuity, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{typeCode}, #{name}, #{format}, #{currNo}, #{prefix}, #{remark}, #{isContinuity}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_order_rule
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="format != null and format != ''">
+                format = #{format},
+            </if>
+            <if test="currNo != null and currNo != ''">
+                curr_no = #{currNo},
+            </if>
+            <if test="prefix != null and prefix != ''">
+                prefix = #{prefix},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="isContinuity != null and isContinuity != ''">
+                is_continuity = #{isContinuity},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据ID修改有效标识为无效-->
+    <update id="delete">
+        update base_order_rule set is_valid = '0' where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据医院编码、单据类型查询单 -->
+    <select id="getByHcAndTc" resultType="cn.hsa.module.base.bor.dto.BaseOrderRuleDTO">
+        select * from base_order_rule where hosp_code = #{hospCode} and type_code = #{typeCode}
+    </select>
+
+    <!-- 根据医院编码、单据类型查询单（行锁） -->
+    <select id="getByRowLock" resultType="cn.hsa.module.base.bor.dto.BaseOrderRuleDTO">
+        select * from base_order_rule where hosp_code = #{hospCode} and type_code = #{typeCode} for update
+    </select>
+
+    <!-- 根据主键ID，修改最新单据号 -->
+    <update id="updateCurrNo">
+        update base_order_rule set curr_no = #{orderNo} where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 生产者：暴露接口 -->
+    <!--医嘱-->
+    <dubbo:service interface="cn.hsa.module.inpt.doctor.service.DoctorAdviceService" ref="doctorAdviceService_provider"/>
+    <!--医嘱执行-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.DoctorAdviceExecuteService" ref="doctorAdviceExecuteService_provider"/>
+    <!--补记账管理-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.AddAccountByInptService" ref="addAccountByInptService_provider"/>
+    <!--住院退费-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.BackCostByInputService" ref="backCostByInputService_provider"/>
+    <!--住院退费确认-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.BackCostSureByInptService" ref="backCostSureWithInptService_provider"/>
+    <!--出院召回-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.LeaveHospitalRecallService" ref="leaveHospitalRecallService_provider"/>
+
+    <!--入院登记-->
+    <dubbo:service interface="cn.hsa.module.inpt.inregister.service.InptVisitService" ref="inptVisitService_provider"/>
+    <!--住院费用-->
+    <dubbo:service interface="cn.hsa.module.inpt.doctor.service.InptCostService" ref="inptCostService_provider"/>
+    <!--床位列表 -->
+    <dubbo:service interface="cn.hsa.module.inpt.bedlist.service.BedListService" ref="bedListService_provider"/>
+    <!--预交金管理-->
+    <dubbo:service interface="cn.hsa.module.inpt.advancepay.service.InptAdvancePayService" ref="inptAdvancePayService_provider"/>
+    <!--    护理执行卡-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurseexcutecard.service.NurseExcuteCardService" ref="nurseExcuteCard_provider"/>
+    <!--    护理模板-->
+    <dubbo:service interface="cn.hsa.module.inpt.careTemplate.service.InptNurseTemplateService" ref="inptNurseTemplate_provider"/>
+    <!--三测单-->
+    <dubbo:service interface="cn.hsa.module.inpt.inptnursethird.service.InptNurseThirdService" ref="inptNurseThirdService_provider"/>
+    <!--   既往诊疗-->
+    <dubbo:service interface="cn.hsa.module.inpt.pasttreat.service.InptPastTreatService" ref="inptPastTreat_provider" />
+    <!--住院医嘱费用核对-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.InptAdviceFeeCheckService" ref="inptAdviceFeeCheckService_provider"/>
+
+    <!--检验检查报告查询打印-->
+    <dubbo:service interface="cn.hsa.module.inpt.inspectionreport.service.InspectionReportService" ref="inspectionReportService_provider"/>
+
+    <!--综合查询-->
+    <dubbo:service interface="cn.hsa.module.inpt.compositequery.service.CompositeQueryService" ref="compositeQueryService_provider"/>
+
+    <!--护理记录单-->
+    <dubbo:service interface="cn.hsa.module.inpt.nurse.service.NursingRecordService" ref="nursingRecordService_provider"/>
+
+    <!--医嘱核收 -->
+    <dubbo:service interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" ref="medicalAdviceService_provider"/>
+    <!-- 住院结算 -->
+    <dubbo:service interface="cn.hsa.module.inpt.fees.service.InptSettlementService" ref="inptSettlementService_provider"/>
+    <!-- 住院取消结算 -->
+    <dubbo:service interface="cn.hsa.module.inpt.fees.service.InptCancelSettlementService" ref="inptCancelSettlementService_provider"/>
+    <!--科室领药申请 -->
+    <dubbo:service interface="cn.hsa.module.inpt.drawMedicine.service.DrawMedicineService" ref="drawMedicineService_provider"/>
+    <!--    病人综合查询-->
+    <dubbo:service interface="cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService" ref="patientComprehensiveQuery_provider"/>
+    <!--    医嘱模板-->
+    <dubbo:service interface="cn.hsa.module.inpt.doctor.service.InptAdviceTempService" ref="inptAdviceTempService_provider"/>
+    <!--    医嘱模板-->
+    <dubbo:service interface="cn.hsa.module.inpt.inptprint.service.InptPrintService" ref="inptPrintService_provider"/>
+    <!--    床位长期费用-->
+    <dubbo:service interface="cn.hsa.module.inpt.longcost.service.BedLongCostService" ref="bedLongCostService_provider"/>
+    <!--住院婴儿-->
+    <dubbo:service interface="cn.hsa.module.inpt.doctor.service.InptBabyService" ref="inptBabyService_provider"/>
+    <dubbo:service interface="cn.hsa.module.inpt.criticalvalues.service.CriticalValuesService" ref="criticalValuesService_provider"/>
+
+    <!--手术麻醉子系统-->
+
+    <!--手术信息-->
+    <dubbo:service interface="cn.hsa.module.oper.operInforecord.service.OperInfoRecordService" ref="operInfoRecordService_provider"/>
+
+    <!--手术病人信息-->
+    <dubbo:service interface="cn.hsa.module.oper.operpatientrecord.service.OperPatientRecordService" ref="operPatientRecordService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.oper.operRoom.service.OperRoomService" ref="operRoomService_provider"/>
+
+    <!--手术模板-->
+    <dubbo:service interface="cn.hsa.module.oper.operInforecord.service.OperAccountTempService" ref="operAccountTempService_provider"/>
+
+    <!--麻醉记录单-->
+    <dubbo:service interface="cn.hsa.module.oper.operrecord.service.OperAnesthesiaRecordService" ref="operAnesthesiaRecordService_provider"/>
+
+    <!--病案首页-->
+    <dubbo:service interface="cn.hsa.module.mris.mrisHome.service.MrisHomeService" ref="mrisHomeService_provider"/>
+
+
+    <!-- 电子病历子系统 -> 电子病历打印设置生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrprintsetting.service.EmrPrintSettingService" ref="emrPrintSettingService_provider"/>
+    <!-- 电子病历子系统 -> 电子病历元素生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrelement.service.EmrElementServcie" ref="emrElementServcie_provider"/>
+    <!-- 电子病历子系统 -> 电子病历分类生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrclassify.service.EmrClassifyServcie" ref="emrClassifyServcie_provider"/>
+    <!-- 电子病历子系统 -> 电子病历文档分类元素生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrclassifyelement.service.EmrClassifyElementService" ref="emrElementClassifyServcie_provider"/>
+    <!-- 电子病历子系统  病历书写与查看生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrpatient.service.EmrPatientService" ref="emrPatientService_provider"/>
+    <!-- 电子病历子系统  病历归档生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrarchivelogging.service.EmrArchiveLoggingService" ref="emrArchiveLoggingService_provider"/>
+    <!-- 电子病历子系统 -> 电子病历模板生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrclassifytemplate.service.EmrClassifyTemplateService" ref="emrClassifyTemplateServcie_provider"/>
+    <!-- 电子病历子系统  病历单项模板维护 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrelementtemplate.service.EmrElementTemplateService" ref="emrElementTemplateService_provider"/>
+    <!-- 电子病历子系统  医生个人另存病历模板维护 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" ref="emrDocTemplateService_provider"/>
+
+    <!-- 卫统数据上报 -->
+    <dubbo:service interface="cn.hsa.module.upload.healthreport.service.HealthReportService" ref="healthReportService_provider"/>
+
+    <!-- 医审接口 -->
+    <dubbo:service interface="cn.hsa.module.inpt.medicalcheck.service.MedicalCheckService" ref="medicalCheckService_provider"/>
+
+    <!-- 消息模板记录 -->
+    <dubbo:service interface="cn.hsa.module.inpt.msg.service.MsgTempRecordService" ref="msgTempRecordService_provider"/>
+    <dubbo:service interface="cn.hsa.module.inpt.medicaltechnology.service.MedicalTechnologyService" ref="medicalTechnologyService_provider"/>
+
+    <!-- 保证金管理 -->
+    <dubbo:service interface="cn.hsa.module.inpt.inptguarantee.service.InptGuaranteeService" ref="inptGuaranteeService_provider"/>
+</beans>

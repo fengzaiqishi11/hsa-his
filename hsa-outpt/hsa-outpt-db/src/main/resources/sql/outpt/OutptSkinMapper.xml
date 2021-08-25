@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.skin.dao.OutptSkinDAO">
+
+    <resultMap type="cn.hsa.module.outpt.skin.dto.OutptSkinDTO" id="OutptSkinResultMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="opdId" column="opd_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="skinDurgId" column="skin_durg_id" jdbcType="VARCHAR"/>
+        <result property="skinDurgName" column="skin_durg_name" jdbcType="VARCHAR"/>
+        <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
+        <result property="skinResultCode" column="skin_result_code" jdbcType="VARCHAR"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="execDate" column="exec_date" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="opId" column="op_id" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="getById" resultMap="OutptSkinResultMap">
+        select
+          id, hosp_code, opd_id, visit_id, skin_durg_id, skin_durg_name, is_positive, skin_result_code, exec_dept_id, exec_date, exec_id, exec_name, remark
+        from outpt_skin_result
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="OutptSkinResultMap">
+        select
+        id, hosp_code, opd_id, visit_id, skin_durg_id, skin_durg_name, is_positive, skin_result_code, exec_dept_id,
+        exec_date, exec_id, exec_name, remark
+        from outpt_skin_result
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+                and hosp_code = #{hospCode}
+            <if test="opdId != null and opdId != ''">
+                and opd_id = #{opdId}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultType="cn.hsa.module.outpt.skin.dto.OutptSkinDTO">
+        select
+        c.crte_time,
+        d.visit_no,
+        a.is_skin,
+        a.id as opdId,
+        e.id,
+        c.visit_id,
+        e.is_positive,
+        e.skin_result_code,
+        a.item_id,
+        a.item_name,
+        b.name as execDeptName,
+        e.exec_id,
+        e.exec_name,
+        e.exec_dept_id,
+        e.exec_date,
+        c.doctor_name,
+        c.dept_name,
+        d.name,d.age,d.age_unit_code,d.gender_code,
+        e.remark
+        from outpt_prescribe_detail a
+        inner JOIN outpt_prescribe c on a.op_id = c.id and a.hosp_code = c.hosp_code and a.visit_id
+        inner JOIN outpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        left JOIN outpt_skin_result e on a.visit_id = e.visit_id and a.hosp_code = e.hosp_code and a.id = e.opd_id
+        left JOIN base_dept b on b.hosp_code = a.hosp_code and e.exec_dept_id = b.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (d.name like CONCAT('%',#{keyword},'%')
+                or d.visit_no like CONCAT('%',#{keyword},'%')
+                or d.cert_no like CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="skinSign == '1'.toString()">
+               and e.is_positive is not null
+            </if>
+            <if test="skinSign == '0'.toString()">
+                and e.is_positive is null
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and DATE_FORMAT(c.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and DATE_FORMAT(c.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+            </if>
+              and a.hosp_code = #{hospCode} and a.is_skin = '1' and c.is_settle = '1' and c.is_cancel = '0'
+        </where>
+        order by c.crte_time desc
+    </select>
+    <select id="getPreDetailById"
+            parameterType="cn.hsa.module.outpt.skin.dto.OutptSkinDTO"
+            resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        select id, hosp_code, op_id, visit_id, opt_id, optd_group_no, optd_group_seq_no, optd_id, group_no, group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content, phar_id, bfc_id, use_code, exec_dept_id, exec_date, exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id, skin_unit_code,prescribe_prefix,prescribe_suffix,remark
+        from outpt_prescribe_detail
+        where id = #{opdId} and hosp_code = #{hospCode}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="" useGeneratedKeys="true" >
+        insert into outpt_skin_result(id, hosp_code, opd_id, visit_id, skin_durg_id, skin_durg_name, is_positive, skin_result_code, exec_dept_id, exec_date, exec_id, exec_name, remark)
+        values (#{id}, #{hospCode}, #{opdId}, #{visitId}, #{itemId}, #{itemName}, #{isPositive}, #{skinResultCode}, #{execDeptId}, #{execDate}, #{execId}, #{execName}, #{remark})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update outpt_skin_result
+        <set>
+                opd_id = #{opdId},
+                visit_id = #{visitId},
+                skin_durg_id = #{itemId},
+                skin_durg_name = #{itemName},
+                is_positive = #{isPositive},
+                skin_result_code = #{skinResultCode},
+                exec_dept_id = #{execDeptId},
+                exec_date = #{execDate},
+                exec_id = #{execId},
+                exec_name = #{execName},
+                remark = #{remark}
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <update id="updateS">
+        update outpt_prescribe_detail
+        <set>
+            is_positive = #{isPositive},
+        </set>
+        where hosp_code = #{hospCode} and id = #{opdId}
+    </update>
+    <update id="updatePreDetail" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        update outpt_prescribe_detail
+        set content = #{content}
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        update outpt_skin_result
+        set is_valid = '0'
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+    </delete>
+
+</mapper>

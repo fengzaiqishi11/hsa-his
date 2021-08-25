@@ -1,0 +1,1200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO">
+
+    <resultMap type="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO"
+               id="InsureIndividualBasicMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="aac001" column="aac001" jdbcType="VARCHAR"/>
+        <result property="injuryBorthSn" column="injury_borth_sn" jdbcType="VARCHAR"/>
+        <result property="aaa027" column="aaa027" jdbcType="VARCHAR"/>
+        <result property="aaa027Name" column="aaa027_name" jdbcType="VARCHAR"/>
+        <result property="aac003" column="aac003" jdbcType="VARCHAR"/>
+        <result property="aac004" column="aac004" jdbcType="VARCHAR"/>
+        <result property="aac002" column="aac002" jdbcType="VARCHAR"/>
+        <result property="aaz500" column="aaz500" jdbcType="VARCHAR"/>
+        <result property="aae005" column="aae005" jdbcType="VARCHAR"/>
+        <result property="aac006" column="aac006" jdbcType="TIMESTAMP"/>
+        <result property="orgcode" column="orgcode" jdbcType="VARCHAR"/>
+        <result property="aab999" column="aab999" jdbcType="VARCHAR"/>
+        <result property="aab019" column="aab019" jdbcType="VARCHAR"/>
+        <result property="aab001" column="aab001" jdbcType="VARCHAR"/>
+        <result property="bka008" column="bka008" jdbcType="VARCHAR"/>
+        <result property="bka035" column="bka035" jdbcType="VARCHAR"/>
+        <result property="bka035Name" column="bka035_name" jdbcType="VARCHAR"/>
+        <result property="aac008" column="aac008" jdbcType="VARCHAR"/>
+        <result property="aac008Name" column="aac008_name" jdbcType="VARCHAR"/>
+        <result property="bac001" column="bac001" jdbcType="VARCHAR"/>
+        <result property="bac001Name" column="bac001_name" jdbcType="VARCHAR"/>
+        <result property="aka130" column="aka130" jdbcType="VARCHAR"/>
+        <result property="aka130Name" column="aka130_name" jdbcType="VARCHAR"/>
+        <result property="bka006" column="bka006" jdbcType="VARCHAR"/>
+        <result property="bka006Name" column="bka006_name" jdbcType="VARCHAR"/>
+        <result property="aac148" column="aac148" jdbcType="VARCHAR"/>
+        <result property="aac148Name" column="aac148_name" jdbcType="VARCHAR"/>
+        <result property="aac013" column="aac013" jdbcType="VARCHAR"/>
+        <result property="aac013Name" column="aac013_name" jdbcType="VARCHAR"/>
+        <result property="aae140" column="aae140" jdbcType="VARCHAR"/>
+        <result property="bka888" column="bka888" jdbcType="VARCHAR"/>
+        <result property="akc252" column="akc252" jdbcType="NUMERIC"/>
+        <result property="aac066" column="aac066" jdbcType="VARCHAR"/>
+        <result property="aab301" column="aab301" jdbcType="VARCHAR"/>
+        <result property="aac031" column="aac031" jdbcType="VARCHAR"/>
+        <result property="aae030Last" column="aae030_last" jdbcType="TIMESTAMP"/>
+        <result property="aae031Last" column="aae031_last" jdbcType="TIMESTAMP"/>
+        <result property="aae030Special" column="aae030_special" jdbcType="TIMESTAMP"/>
+        <result property="aae031Special" column="aae031_special" jdbcType="TIMESTAMP"/>
+        <result property="aaz267" column="aaz267" jdbcType="VARCHAR"/>
+        <result property="baa027" column="baa027" jdbcType="VARCHAR"/>
+        <result property="baa027Name" column="baa027_name" jdbcType="VARCHAR"/>
+        <result property="akc193" column="akc193" jdbcType="VARCHAR"/>
+        <result property="akc193Name" column="akc193_name" jdbcType="VARCHAR"/>
+        <result property="aac158" column="aac158" jdbcType="VARCHAR"/>
+        <result property="akc026" column="akc026" jdbcType="VARCHAR"/>
+        <result property="baa301" column="baa301" jdbcType="VARCHAR"/>
+        <result property="aab300" column="aab300" jdbcType="VARCHAR"/>
+        <result property="akc009" column="akc009" jdbcType="VARCHAR"/>
+        <result property="bka010" column="bka010" jdbcType="INTEGER"/>
+        <result property="bkh015" column="bkh015" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="fundId" column="fund_id" jdbcType="VARCHAR"/>
+        <result property="fundName" column="fund_name" jdbcType="VARCHAR"/>
+        <result property="indiFreezeStatus" column="indi_freeze_status" jdbcType="VARCHAR"/>
+
+        <result property="voipCode" column="voip_code" jdbcType="VARCHAR"/>
+        <result property="vulnerability" column="vulnerability" jdbcType="VARCHAR"/>
+        <result property="payMark" column="pay_mark" jdbcType="VARCHAR"/>
+
+        <result property="shiftHospCode" column="shift_hosp_code" jdbcType="VARCHAR"/>
+        <result property="outHospCode" column="out_hosp_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="medicineOrgCode" column="medicine_org_code" jdbcType="VARCHAR"/>
+        <result property="visitIcdCode" column="visitIcdCode" jdbcType="VARCHAR"/>
+        <result property="visitIcdName" column="visitIcdName" jdbcType="VARCHAR"/>
+        <result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visitId" jdbcType="VARCHAR"/>
+        <result property="cardIden" column="card_iden" jdbcType="VARCHAR"/>
+        <result property="visitDrptName" column="visitDrptName" jdbcType="VARCHAR"/>
+        <result property="aac004" column="aac004" jdbcType="VARCHAR"/>
+        <result property="visitBerth" column="visitBerth" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="InsureIndividualBasicMap">
+        select
+        id, hosp_code, aac001, injury_borth_sn, aaa027, aaa027_name, aac003, aac004, aac002, aaz500, aae005, aac006,
+        orgcode, aab999, aab019, aab001, bka008, bka035, bka035_name, aac008, aac008_name, bac001, bac001_name, aka130,
+        aka130_name, bka006, bka006_name, aac148, aac148_name, aac013, aac013_name, aae140, bka888, akc252, aac066,
+        aab301, aac031, aae030_last, aae031_last, aae030_special, aae031_special, aaz267, baa027, baa027_name, akc193,
+        akc193_name, aac158, akc026, baa301, aab300, akc009, bka010, bkh015, crte_id, crte_name, crte_time,card_iden
+        from insure_individual_basic  where  hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                and aac001 = #{aac001}
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                and injury_borth_sn = #{injuryBorthSn}
+            </if>
+            <if test="aaa027 != null and aaa027 != ''">
+                and aaa027 = #{aaa027}
+            </if>
+            <if test="aaa027Name != null and aaa027Name != ''">
+                and aaa027_name = #{aaa027Name}
+            </if>
+            <if test="aac003 != null and aac003 != ''">
+                and aac003 = #{aac003}
+            </if>
+            <if test="aac004 != null and aac004 != ''">
+                and aac004 = #{aac004}
+            </if>
+            <if test="aac002 != null and aac002 != ''">
+                and aac002 = #{aac002}
+            </if>
+            <if test="aaz500 != null and aaz500 != ''">
+                and aaz500 = #{aaz500}
+            </if>
+            <if test="aae005 != null and aae005 != ''">
+                and aae005 = #{aae005}
+            </if>
+            <if test="aac006 != null">
+                and aac006 = #{aac006}
+            </if>
+            <if test="orgcode != null and orgcode != ''">
+                and orgcode = #{orgcode}
+            </if>
+            <if test="aab999 != null and aab999 != ''">
+                and aab999 = #{aab999}
+            </if>
+            <if test="aab019 != null and aab019 != ''">
+                and aab019 = #{aab019}
+            </if>
+            <if test="aab001 != null and aab001 != ''">
+                and aab001 = #{aab001}
+            </if>
+            <if test="bka008 != null and bka008 != ''">
+                and bka008 = #{bka008}
+            </if>
+            <if test="bka035 != null and bka035 != ''">
+                and bka035 = #{bka035}
+            </if>
+            <if test="bka035Name != null and bka035Name != ''">
+                and bka035_name = #{bka035Name}
+            </if>
+            <if test="aac008 != null and aac008 != ''">
+                and aac008 = #{aac008}
+            </if>
+            <if test="aac008Name != null and aac008Name != ''">
+                and aac008_name = #{aac008Name}
+            </if>
+            <if test="bac001 != null and bac001 != ''">
+                and bac001 = #{bac001}
+            </if>
+            <if test="bac001Name != null and bac001Name != ''">
+                and bac001_name = #{bac001Name}
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                and aka130 = #{aka130}
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                and aka130_name = #{aka130Name}
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                and bka006 = #{bka006}
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                and bka006_name = #{bka006Name}
+            </if>
+            <if test="aac148 != null and aac148 != ''">
+                and aac148 = #{aac148}
+            </if>
+            <if test="aac148Name != null and aac148Name != ''">
+                and aac148_name = #{aac148Name}
+            </if>
+            <if test="aac013 != null and aac013 != ''">
+                and aac013 = #{aac013}
+            </if>
+            <if test="aac013Name != null and aac013Name != ''">
+                and aac013_name = #{aac013Name}
+            </if>
+            <if test="aae140 != null and aae140 != ''">
+                and aae140 = #{aae140}
+            </if>
+            <if test="bka888 != null and bka888 != ''">
+                and bka888 = #{bka888}
+            </if>
+            <if test="akc252 != null">
+                and akc252 = #{akc252}
+            </if>
+            <if test="aac066 != null and aac066 != ''">
+                and aac066 = #{aac066}
+            </if>
+            <if test="aab301 != null and aab301 != ''">
+                and aab301 = #{aab301}
+            </if>
+            <if test="aac031 != null and aac031 != ''">
+                and aac031 = #{aac031}
+            </if>
+            <if test="aae030Last != null">
+                and aae030_last = #{aae030Last}
+            </if>
+            <if test="aae031Last != null">
+                and aae031_last = #{aae031Last}
+            </if>
+            <if test="aae030Special != null">
+                and aae030_special = #{aae030Special}
+            </if>
+            <if test="aae031Special != null">
+                and aae031_special = #{aae031Special}
+            </if>
+            <if test="aaz267 != null and aaz267 != ''">
+                and aaz267 = #{aaz267}
+            </if>
+            <if test="baa027 != null and baa027 != ''">
+                and baa027 = #{baa027}
+            </if>
+            <if test="baa027Name != null and baa027Name != ''">
+                and baa027_name = #{baa027Name}
+            </if>
+            <if test="akc193 != null and akc193 != ''">
+                and akc193 = #{akc193}
+            </if>
+            <if test="akc193Name != null and akc193Name != ''">
+                and akc193_name = #{akc193Name}
+            </if>
+            <if test="aac158 != null and aac158 != ''">
+                and aac158 = #{aac158}
+            </if>
+            <if test="akc026 != null and akc026 != ''">
+                and akc026 = #{akc026}
+            </if>
+            <if test="baa301 != null and baa301 != ''">
+                and baa301 = #{baa301}
+            </if>
+            <if test="aab300 != null and aab300 != ''">
+                and aab300 = #{aab300}
+            </if>
+            <if test="akc009 != null and akc009 != ''">
+                and akc009 = #{akc009}
+            </if>
+            <if test="bka010 != null">
+                and bka010 = #{bka010}
+            </if>
+            <if test="bkh015 != null and bkh015 != ''">
+                and bkh015 = #{bkh015}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="cardIden != null">
+                and card_iden = #{crteTime}
+            </if>
+    </select>
+
+
+    <!--通过实体作为筛选条件查询 分页查询医保个人信息-->
+    <select id="queryPage" resultMap="InsureIndividualBasicMap">
+        select
+        iib.id, iib.hosp_code, iib.aac001, iib.injury_borth_sn, iib.aaa027, iib.aaa027_name,
+        CASE iib.aac004 WHEN '男' THEN 2 WHEN '女' THEN 1 ELSE iib.aac004 END aac004,
+        iib.aac003,  iib.aac002, iib.aaz500, iib.aae005, iib.aac006,
+        iib.orgcode, iib.aab999, iib.aab019, iib.aab001, iib.bka008, iib.bka035, iib.bka035_name, iib.aac008,iib.aac008_name, iib.bac001, iib.bac001_name, iib.aka130,
+        iib.aka130_name, iib.bka006, iib.bka006_name, iib.aac148, iib.aac148_name, iib.aac013, iib.aac013_name, iib.aae140, iib.bka888, iib.akc252, iib.aac066,
+        iib.aab301, iib.aac031, iib.aae030_last, iib.aae031_last, iib.aae030_special, iib.aae031_special, iib.aaz267, iib.baa027, iib.baa027_name, iib.akc193,
+        iib.akc193_name, iib.aac158, iib.akc026, iib.baa301, iib.aab300, iib.akc009, iib.bka010, iib.bkh015, iib.crte_id, iib.crte_name,iib.crte_time,
+        iic.shift_hosp_code,iic.out_hosp_code,iic.insure_reg_code,iic.medicine_org_code,iic.insure_org_code,
+        iic.visit_icd_code as visitIcdCode,iic.visit_drpt_name visitDrptName,iic.visit_berth visitBerth,
+        iic.visit_id as visitId,
+        iic.visit_icd_name as visitIcdName,iic.medical_reg_no,iic.visit_no,iib.card_iden
+        from insure_individual_visit iic
+        join insure_individual_basic iib on iib.id = iic.mib_id and iib.hosp_code = iic.hosp_code
+        where iib.hosp_code = #{hospCode}
+        <if test="keyWord != null and keyWord != ''">
+            and ( iic.visit_no like concat('%',#{keyWord},'%')
+            or iib.aac003 like concat('%',#{keyWord},'%')
+            or iib.aac002 like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <!--业务名称-->
+        <if test="businessType != null and businessType !=''">
+            and iib.aka130_name  like concat('%',#{businessType},'%')
+        </if>
+        <!--疾病名称-->
+        <if test="diseaseName != null and diseaseName !=''">
+            and iic.visit_icd_name  like concat('%',#{diseaseName},'%')
+        </if>
+        <!--待遇类型名称-->
+        <if test="wageType != null and wageType !=''">
+            and iib.bka006_name  like concat('%',#{wageType},'%')
+        </if>
+        <!--医保机构编码-->
+        <if test="insureOrgCode != null and insureOrgCode != ''">
+            and iic.insure_org_code like concat('%',#{insureOrgCode},'%')
+        </if>
+        <if test="specialType != null and specialType != ''">
+            and  iic.aka130 ='14'
+        </if>
+        <!--业务类型选择-->
+        <if test="isHospital != null and isHospital != ''">
+            and  iic.is_hospital =#{isHospital}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null">
+            and date(iib.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null">
+            and date(iib.crte_time) &lt;= date(#{endDate})
+        </if>
+        order by iib.crte_time  desc
+    </select>
+    <!--通过主键Id查询医保个人信息-->
+    <select id="getById" resultMap="InsureIndividualBasicMap">
+        select
+            iib.id, iib.hosp_code, iib.aac001, iib.injury_borth_sn, iib.aaa027, iib.aaa027_name, iib.aac003,
+            (select name from sys_code_detail where value = iib.aac004 and c_code='XB') as aac004,
+               aac002, iib.aaz500, iib.aae005, iib.aac006,
+            iib.orgcode, iib.aab999, iib.aab019, iib.aab001, iib.bka008, iib.bka035, iib.bka035_name, iib.aac008,iib.aac008_name, iib.bac001, iib.bac001_name, iib.aka130,
+            iib.aka130_name, iib.bka006, iib.bka006_name, iib.aac148, iib.aac148_name, aac013, iib.aac013_name, iib.aae140, iib.bka888, iib.akc252, iib.aac066,
+            iib.aab301, iib.aac031, iib.aae030_last, iib.aae031_last, iib.aae030_special, iib.aae031_special, iib.aaz267, iib.baa027, iib.baa027_name, iib.akc193,
+            iib.akc193_name, iib.aac158, iib.akc026, iib.baa301, iib.aab300, iib.akc009, iib.bka010, iib.bkh015, iib.crte_id, iib.crte_name,iib.crte_time,
+            iif.fund_id,iif.fund_name,
+            (case iif.indi_freeze_status when '0' then '正常' when '1' then '冻结' when '2' then '暂停医保' when '3' then '中止参保' else '未参保' end)            as state,
+            ib.voip_code,ib.vulnerability,
+            (IF(ib.pay_mark= '1', '是', '否')) as settle_state,
+            iic.shift_hosp_code,iic.out_hosp_code,iic.insure_reg_code,iic.medicine_org_code,iic.insure_org_code,
+            iic.visit_icd_code as visitIcdCode,iic.visit_icd_name as visitIcdName,iic.medical_reg_no,iic.visit_no,iib.card_iden
+        from insure_individual_basic iib
+                 left join insure_individual_visit iic on iib.id = iic.mib_id and iib.hosp_code = iic.hosp_code
+                 left join insure_individual_business ib on iib.id= ib.mib_id and iib.hosp_code = ib.hosp_code
+                 left join insure_individual_fund iif on iib.id = iif.mib_id and iib.hosp_code = iif.hosp_code
+                 left join insure_individual_inpatient iii on iib.id= iii.mib_id and iib.hosp_code = iii.hosp_code
+        where iib.id=#{id} and iib.hosp_code =#{hospCode}
+    </select>
+    
+    <select id="getByVisitId" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
+        select aae140,bka006,bka008,bka035,aac002,aac004,aac006,aae140 from insure_individual_basic
+        where id = (
+        select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode} and medical_reg_no = #{medicalRegNo})
+        and hosp_code = #{hospCode}
+    </select>
+    <select id="queryInsurePatientPage" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select iiv.id, iiv.hosp_code, visit_id, mib_id, insure_org_code, insure_reg_code,
+               medicine_org_code, is_hospital, visit_no, iiv.aac001, medical_reg_no, iiv.aka130,
+        iiv.aka130_name, iiv.bka006, iiv.bka006_name, iiv.injury_borth_sn, visit_icd_code, visit_icd_name,
+               visit_time, visit_drpt_id, visit_drpt_name, visit_area_id, visit_area_name, visit_berth,
+               starting_price, shift_hosp_code, out_hosp_code, cause, remark, iiv.crte_id, iiv.crte_name,iiv.crte_time,
+               is_ecqr, pay_ord_id, pay_token, accessory_diagnosis_name,
+               accessory_diagnosis_code, insuplc_admdvs, mdtrt_cert_type, mdtrt_cert_no, omsgid,
+               oinfno from insure_individual_visit  iiv join  insure_individual_basic iib on iiv.mib_id = iib.id
+                and iiv.hosp_code = iib.hosp_code
+
+        where iiv.hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (iib.aac003 like concat('%',#{keyword},'%')
+                or iiv.visit_no like concat('%',#{keyword},'%')
+                or iiv.aac001 like concat('%',#{keyword},'%')
+                )
+        </if>
+
+    </select>
+    <select id="queryInptAndOutptPatientPage"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select * from
+            (select id,cert_no as aac002,hosp_code,age,age_unit_code,gender_code,name as aac003,visit_no as visitNo, dept_name as visitDrptName,'门诊' as aka130Name  from outpt_visit
+            where hosp_code =#{hospCode}
+            union all
+            select id,cert_no as aac002, hosp_code,age,age_unit_code,gender_code, name as aac003, in_no  as visitNo,in_dept_name as visitDrptName,'住院' as aka130Name from inpt_visit
+            where hosp_code =#{hospCode}
+            )t where t.hosp_code =#{hospCode}
+        <if test="keyWord != null and keyWord != ''">
+            and (t.aac003 like concat('%',#{keyWord},'%')
+            or t.aac002 like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <if test="isHospital != null and isHospital != ''">
+            <if test="isHospital == 1">
+                and t.aka130Name = '住院'
+            </if>
+            <if test="isHospital == 0">
+                and t.aka130Name = '门诊'
+            </if>
+        </if>
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
+        insert into
+        insure_individual_basic
+        (
+          id,
+          hosp_code,
+          aac001,
+          injury_borth_sn,
+          aaa027,
+          aaa027_name,
+          aac003,
+          aac004,
+          aac002,
+          aaz500,
+          aae005,
+          aac006,
+          orgcode,
+          aab999,
+          aab019,
+          aab001,
+          bka008,
+          bka035,
+          bka035_name,
+          aac008,
+          aac008_name,
+          bac001,
+          bac001_name,
+          aka130,
+          aka130_name,
+          bka006,
+          bka006_name,
+          aac148,
+          aac148_name,
+          aac013,
+          aac013_name,
+          aae140,
+          bka888,
+          akc252,
+          aac066,
+          aab301,
+          aac031,
+          aae030_last,
+          aae031_last,
+          aae030_special,
+          aae031_special,
+          aaz267,
+          baa027,
+          baa027_name,
+          akc193,
+          akc193_name,
+          aac158,
+          akc026,
+          baa301,
+          aab300,
+          akc009,
+          bka010,
+          bkh015,
+          crte_id,
+          crte_name,
+          crte_time,
+          card_iden
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{aac001,jdbcType=VARCHAR},
+          #{injuryBorthSn,jdbcType=VARCHAR},
+          #{aaa027,jdbcType=VARCHAR},
+          #{aaa027Name,jdbcType=VARCHAR},
+          #{aac003,jdbcType=VARCHAR},
+          #{aac004,jdbcType=VARCHAR},
+          #{aac002,jdbcType=VARCHAR},
+          #{aaz500,jdbcType=VARCHAR},
+          #{aae005,jdbcType=VARCHAR},
+          #{aac006,jdbcType=TIMESTAMP},
+          #{orgcode,jdbcType=VARCHAR},
+          #{aab999,jdbcType=VARCHAR},
+          #{aab019,jdbcType=VARCHAR},
+          #{aab001,jdbcType=VARCHAR},
+          #{bka008,jdbcType=VARCHAR},
+          #{bka035,jdbcType=VARCHAR},
+          #{bka035Name,jdbcType=VARCHAR},
+          #{aac008,jdbcType=VARCHAR},
+          #{aac008Name,jdbcType=VARCHAR},
+          #{bac001,jdbcType=VARCHAR},
+          #{bac001Name,jdbcType=VARCHAR},
+          #{aka130,jdbcType=VARCHAR},
+          #{aka130Name,jdbcType=VARCHAR},
+          #{bka006,jdbcType=VARCHAR},
+          #{bka006Name,jdbcType=VARCHAR},
+          #{aac148,jdbcType=VARCHAR},
+          #{aac148Name,jdbcType=VARCHAR},
+          #{aac013,jdbcType=VARCHAR},
+          #{aac013Name,jdbcType=VARCHAR},
+          #{aae140,jdbcType=VARCHAR},
+          #{bka888,jdbcType=VARCHAR},
+          #{akc252,jdbcType=DECIMAL},
+          #{aac066,jdbcType=VARCHAR},
+          #{aab301,jdbcType=VARCHAR},
+          #{aac031,jdbcType=VARCHAR},
+          #{aae030Last,jdbcType=TIMESTAMP},
+          #{aae031Last,jdbcType=TIMESTAMP},
+          #{aae030Special,jdbcType=TIMESTAMP},
+          #{aae031Special,jdbcType=TIMESTAMP},
+          #{aaz267,jdbcType=VARCHAR},
+          #{baa027,jdbcType=VARCHAR},
+          #{baa027Name,jdbcType=VARCHAR},
+          #{akc193,jdbcType=VARCHAR},
+          #{akc193Name,jdbcType=VARCHAR},
+          #{aac158,jdbcType=VARCHAR},
+          #{akc026,jdbcType=VARCHAR},
+          #{baa301,jdbcType=VARCHAR},
+          #{aab300,jdbcType=VARCHAR},
+          #{akc009,jdbcType=VARCHAR},
+          #{bka010,jdbcType=INTEGER},
+          #{bkh015,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP},
+          #{cardIden,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
+        insert into
+        insure_individual_basic
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                aac001,
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn,
+            </if>
+            <if test="aaa027 != null and aaa027 != ''">
+                aaa027,
+            </if>
+            <if test="aaa027Name != null and aaa027Name != ''">
+                aaa027_name,
+            </if>
+            <if test="aac003 != null and aac003 != ''">
+                aac003,
+            </if>
+            <if test="aac004 != null and aac004 != ''">
+                aac004,
+            </if>
+            <if test="aac002 != null and aac002 != ''">
+                aac002,
+            </if>
+            <if test="aaz500 != null and aaz500 != ''">
+                aaz500,
+            </if>
+            <if test="aae005 != null and aae005 != ''">
+                aae005,
+            </if>
+            <if test="aac006 != null">
+                aac006,
+            </if>
+            <if test="orgcode != null and orgcode != ''">
+                orgcode,
+            </if>
+            <if test="aab999 != null and aab999 != ''">
+                aab999,
+            </if>
+            <if test="aab019 != null and aab019 != ''">
+                aab019,
+            </if>
+            <if test="aab001 != null and aab001 != ''">
+                aab001,
+            </if>
+            <if test="bka008 != null and bka008 != ''">
+                bka008,
+            </if>
+            <if test="bka035 != null and bka035 != ''">
+                bka035,
+            </if>
+            <if test="bka035Name != null and bka035Name != ''">
+                bka035_name,
+            </if>
+            <if test="aac008 != null and aac008 != ''">
+                aac008,
+            </if>
+            <if test="aac008Name != null and aac008Name != ''">
+                aac008_name,
+            </if>
+            <if test="bac001 != null and bac001 != ''">
+                bac001,
+            </if>
+            <if test="bac001Name != null and bac001Name != ''">
+                bac001_name,
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130,
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                aka130_name,
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006,
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                bka006_name,
+            </if>
+            <if test="aac148 != null and aac148 != ''">
+                aac148,
+            </if>
+            <if test="aac148Name != null and aac148Name != ''">
+                aac148_name,
+            </if>
+            <if test="aac013 != null and aac013 != ''">
+                aac013,
+            </if>
+            <if test="aac013Name != null and aac013Name != ''">
+                aac013_name,
+            </if>
+            <if test="aae140 != null and aae140 != ''">
+                aae140,
+            </if>
+            <if test="bka888 != null and bka888 != ''">
+                bka888,
+            </if>
+            <if test="akc252 != null">
+                akc252,
+            </if>
+            <if test="aac066 != null and aac066 != ''">
+                aac066,
+            </if>
+            <if test="aab301 != null and aab301 != ''">
+                aab301,
+            </if>
+            <if test="aac031 != null and aac031 != ''">
+                aac031,
+            </if>
+            <if test="aae030Last != null">
+                aae030_last,
+            </if>
+            <if test="aae031Last != null">
+                aae031_last,
+            </if>
+            <if test="aae030Special != null">
+                aae030_special,
+            </if>
+            <if test="aae031Special != null">
+                aae031_special,
+            </if>
+            <if test="aaz267 != null and aaz267 != ''">
+                aaz267,
+            </if>
+            <if test="baa027 != null and baa027 != ''">
+                baa027,
+            </if>
+            <if test="baa027Name != null and baa027Name != ''">
+                baa027_name,
+            </if>
+            <if test="akc193 != null and akc193 != ''">
+                akc193,
+            </if>
+            <if test="akc193Name != null and akc193Name != ''">
+                akc193_name,
+            </if>
+            <if test="aac158 != null and aac158 != ''">
+                aac158,
+            </if>
+            <if test="akc026 != null and akc026 != ''">
+                akc026,
+            </if>
+            <if test="baa301 != null and baa301 != ''">
+                baa301,
+            </if>
+            <if test="aab300 != null and aab300 != ''">
+                aab300,
+            </if>
+            <if test="akc009 != null and akc009 != ''">
+                akc009,
+            </if>
+            <if test="bka010 != null">
+                bka010,
+            </if>
+            <if test="bkh015 != null and bkh015 != ''">
+                bkh015,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time,
+            </if>
+            <if test="cardIden != null">
+                card_iden
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                #{aac001,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="aaa027 != null and aaa027 != ''">
+                #{aaa027,jdbcType=VARCHAR},
+            </if>
+            <if test="aaa027Name != null and aaa027Name != ''">
+                #{aaa027Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac003 != null and aac003 != ''">
+                #{aac003,jdbcType=VARCHAR},
+            </if>
+            <if test="aac004 != null and aac004 != ''">
+                #{aac004,jdbcType=VARCHAR},
+            </if>
+            <if test="aac002 != null and aac002 != ''">
+                #{aac002,jdbcType=VARCHAR},
+            </if>
+            <if test="aaz500 != null and aaz500 != ''">
+                #{aaz500,jdbcType=VARCHAR},
+            </if>
+            <if test="aae005 != null and aae005 != ''">
+                #{aae005,jdbcType=VARCHAR},
+            </if>
+            <if test="aac006 != null">
+                #{aac006,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orgcode != null and orgcode != ''">
+                #{orgcode,jdbcType=VARCHAR},
+            </if>
+            <if test="aab999 != null and aab999 != ''">
+                #{aab999,jdbcType=VARCHAR},
+            </if>
+            <if test="aab019 != null and aab019 != ''">
+                #{aab019,jdbcType=VARCHAR},
+            </if>
+            <if test="aab001 != null and aab001 != ''">
+                #{aab001,jdbcType=VARCHAR},
+            </if>
+            <if test="bka008 != null and bka008 != ''">
+                #{bka008,jdbcType=VARCHAR},
+            </if>
+            <if test="bka035 != null and bka035 != ''">
+                #{bka035,jdbcType=VARCHAR},
+            </if>
+            <if test="bka035Name != null and bka035Name != ''">
+                #{bka035Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac008 != null and aac008 != ''">
+                #{aac008,jdbcType=VARCHAR},
+            </if>
+            <if test="aac008Name != null and aac008Name != ''">
+                #{aac008Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bac001 != null and bac001 != ''">
+                #{bac001,jdbcType=VARCHAR},
+            </if>
+            <if test="bac001Name != null and bac001Name != ''">
+                #{bac001Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                #{aka130Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                #{bka006Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac148 != null and aac148 != ''">
+                #{aac148,jdbcType=VARCHAR},
+            </if>
+            <if test="aac148Name != null and aac148Name != ''">
+                #{aac148Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac013 != null and aac013 != ''">
+                #{aac013,jdbcType=VARCHAR},
+            </if>
+            <if test="aac013Name != null and aac013Name != ''">
+                #{aac013Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aae140 != null and aae140 != ''">
+                #{aae140,jdbcType=VARCHAR},
+            </if>
+            <if test="bka888 != null and bka888 != ''">
+                #{bka888,jdbcType=VARCHAR},
+            </if>
+            <if test="akc252 != null">
+                #{akc252,jdbcType=DECIMAL},
+            </if>
+            <if test="aac066 != null and aac066 != ''">
+                #{aac066,jdbcType=VARCHAR},
+            </if>
+            <if test="aab301 != null and aab301 != ''">
+                #{aab301,jdbcType=VARCHAR},
+            </if>
+            <if test="aac031 != null and aac031 != ''">
+                #{aac031,jdbcType=VARCHAR},
+            </if>
+            <if test="aae030Last != null">
+                #{aae030Last,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae031Last != null">
+                #{aae031Last,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae030Special != null">
+                #{aae030Special,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae031Special != null">
+                #{aae031Special,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aaz267 != null and aaz267 != ''">
+                #{aaz267,jdbcType=VARCHAR},
+            </if>
+            <if test="baa027 != null and baa027 != ''">
+                #{baa027,jdbcType=VARCHAR},
+            </if>
+            <if test="baa027Name != null and baa027Name != ''">
+                #{baa027Name,jdbcType=VARCHAR},
+            </if>
+            <if test="akc193 != null and akc193 != ''">
+                #{akc193,jdbcType=VARCHAR},
+            </if>
+            <if test="akc193Name != null and akc193Name != ''">
+                #{akc193Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac158 != null and aac158 != ''">
+                #{aac158,jdbcType=VARCHAR},
+            </if>
+            <if test="akc026 != null and akc026 != ''">
+                #{akc026,jdbcType=VARCHAR},
+            </if>
+            <if test="baa301 != null and baa301 != ''">
+                #{baa301,jdbcType=VARCHAR},
+            </if>
+            <if test="aab300 != null and aab300 != ''">
+                #{aab300,jdbcType=VARCHAR},
+            </if>
+            <if test="akc009 != null and akc009 != ''">
+                #{akc009,jdbcType=VARCHAR},
+            </if>
+            <if test="bka010 != null">
+                #{bka010,jdbcType=INTEGER},
+            </if>
+            <if test="bkh015 != null and bkh015 != ''">
+                #{bkh015,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cardIden != null">
+                #{cardIden,jdbcType=TIMESTAMP}
+            </if>
+
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
+        update
+        insure_individual_basic
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                aac001 = #{aac001,jdbcType=VARCHAR},
+                injury_borth_sn = #{injuryBorthSn,jdbcType=VARCHAR},
+                aaa027 = #{aaa027,jdbcType=VARCHAR},
+                aaa027_name = #{aaa027Name,jdbcType=VARCHAR},
+                aac003 = #{aac003,jdbcType=VARCHAR},
+                aac004 = #{aac004,jdbcType=VARCHAR},
+                aac002 = #{aac002,jdbcType=VARCHAR},
+                aaz500 = #{aaz500,jdbcType=VARCHAR},
+                aae005 = #{aae005,jdbcType=VARCHAR},
+                aac006 = #{aac006,jdbcType=TIMESTAMP},
+                orgcode = #{orgcode,jdbcType=VARCHAR},
+                aab999 = #{aab999,jdbcType=VARCHAR},
+                aab019 = #{aab019,jdbcType=VARCHAR},
+                aab001 = #{aab001,jdbcType=VARCHAR},
+                bka008 = #{bka008,jdbcType=VARCHAR},
+                bka035 = #{bka035,jdbcType=VARCHAR},
+                bka035_name = #{bka035Name,jdbcType=VARCHAR},
+                aac008 = #{aac008,jdbcType=VARCHAR},
+                aac008_name = #{aac008Name,jdbcType=VARCHAR},
+                bac001 = #{bac001,jdbcType=VARCHAR},
+                bac001_name = #{bac001Name,jdbcType=VARCHAR},
+                aka130 = #{aka130,jdbcType=VARCHAR},
+                aka130_name = #{aka130Name,jdbcType=VARCHAR},
+                bka006 = #{bka006,jdbcType=VARCHAR},
+                bka006_name = #{bka006Name,jdbcType=VARCHAR},
+                aac148 = #{aac148,jdbcType=VARCHAR},
+                aac148_name = #{aac148Name,jdbcType=VARCHAR},
+                aac013 = #{aac013,jdbcType=VARCHAR},
+                aac013_name = #{aac013Name,jdbcType=VARCHAR},
+                aae140 = #{aae140,jdbcType=VARCHAR},
+                bka888 = #{bka888,jdbcType=VARCHAR},
+                akc252 = #{akc252,jdbcType=DECIMAL},
+                aac066 = #{aac066,jdbcType=VARCHAR},
+                aab301 = #{aab301,jdbcType=VARCHAR},
+                aac031 = #{aac031,jdbcType=VARCHAR},
+                aae030_last = #{aae030Last,jdbcType=TIMESTAMP},
+                aae031_last = #{aae031Last,jdbcType=TIMESTAMP},
+                aae030_special = #{aae030Special,jdbcType=TIMESTAMP},
+                aae031_special = #{aae031Special,jdbcType=TIMESTAMP},
+                aaz267 = #{aaz267,jdbcType=VARCHAR},
+                baa027 = #{baa027,jdbcType=VARCHAR},
+                baa027_name = #{baa027Name,jdbcType=VARCHAR},
+                akc193 = #{akc193,jdbcType=VARCHAR},
+                akc193_name = #{akc193Name,jdbcType=VARCHAR},
+                aac158 = #{aac158,jdbcType=VARCHAR},
+                akc026 = #{akc026,jdbcType=VARCHAR},
+                baa301 = #{baa301,jdbcType=VARCHAR},
+                aab300 = #{aab300,jdbcType=VARCHAR},
+                akc009 = #{akc009,jdbcType=VARCHAR},
+                bka010 = #{bka010,jdbcType=INTEGER},
+                bkh015 = #{bkh015,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+                card_iden = #{cardIden,jdbcType=VARCHAR}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
+        update
+        insure_individual_basic
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                aac001 = #{aac001,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn = #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="aaa027 != null and aaa027 != ''">
+                aaa027 = #{aaa027,jdbcType=VARCHAR},
+            </if>
+            <if test="aaa027Name != null and aaa027Name != ''">
+                aaa027_name = #{aaa027Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac003 != null and aac003 != ''">
+                aac003 = #{aac003,jdbcType=VARCHAR},
+            </if>
+            <if test="aac004 != null and aac004 != ''">
+                aac004 = #{aac004,jdbcType=VARCHAR},
+            </if>
+            <if test="aac002 != null and aac002 != ''">
+                aac002 = #{aac002,jdbcType=VARCHAR},
+            </if>
+            <if test="aaz500 != null and aaz500 != ''">
+                aaz500 = #{aaz500,jdbcType=VARCHAR},
+            </if>
+            <if test="aae005 != null and aae005 != ''">
+                aae005 = #{aae005,jdbcType=VARCHAR},
+            </if>
+            <if test="aac006 != null">
+                aac006 = #{aac006,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orgcode != null and orgcode != ''">
+                orgcode = #{orgcode,jdbcType=VARCHAR},
+            </if>
+            <if test="aab999 != null and aab999 != ''">
+                aab999 = #{aab999,jdbcType=VARCHAR},
+            </if>
+            <if test="aab019 != null and aab019 != ''">
+                aab019 = #{aab019,jdbcType=VARCHAR},
+            </if>
+            <if test="aab001 != null and aab001 != ''">
+                aab001 = #{aab001,jdbcType=VARCHAR},
+            </if>
+            <if test="bka008 != null and bka008 != ''">
+                bka008 = #{bka008,jdbcType=VARCHAR},
+            </if>
+            <if test="bka035 != null and bka035 != ''">
+                bka035 = #{bka035,jdbcType=VARCHAR},
+            </if>
+            <if test="bka035Name != null and bka035Name != ''">
+                bka035_name = #{bka035Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac008 != null and aac008 != ''">
+                aac008 = #{aac008,jdbcType=VARCHAR},
+            </if>
+            <if test="aac008Name != null and aac008Name != ''">
+                aac008_name = #{aac008Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bac001 != null and bac001 != ''">
+                bac001 = #{bac001,jdbcType=VARCHAR},
+            </if>
+            <if test="bac001Name != null and bac001Name != ''">
+                bac001_name = #{bac001Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130 = #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                aka130_name = #{aka130Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006 = #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                bka006_name = #{bka006Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac148 != null and aac148 != ''">
+                aac148 = #{aac148,jdbcType=VARCHAR},
+            </if>
+            <if test="aac148Name != null and aac148Name != ''">
+                aac148_name = #{aac148Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac013 != null and aac013 != ''">
+                aac013 = #{aac013,jdbcType=VARCHAR},
+            </if>
+            <if test="aac013Name != null and aac013Name != ''">
+                aac013_name = #{aac013Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aae140 != null and aae140 != ''">
+                aae140 = #{aae140,jdbcType=VARCHAR},
+            </if>
+            <if test="bka888 != null and bka888 != ''">
+                bka888 = #{bka888,jdbcType=VARCHAR},
+            </if>
+            <if test="akc252 != null">
+                akc252 = #{akc252,jdbcType=DECIMAL},
+            </if>
+            <if test="aac066 != null and aac066 != ''">
+                aac066 = #{aac066,jdbcType=VARCHAR},
+            </if>
+            <if test="aab301 != null and aab301 != ''">
+                aab301 = #{aab301,jdbcType=VARCHAR},
+            </if>
+            <if test="aac031 != null and aac031 != ''">
+                aac031 = #{aac031,jdbcType=VARCHAR},
+            </if>
+            <if test="aae030Last != null">
+                aae030_last = #{aae030Last,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae031Last != null">
+                aae031_last = #{aae031Last,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae030Special != null">
+                aae030_special = #{aae030Special,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aae031Special != null">
+                aae031_special = #{aae031Special,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aaz267 != null and aaz267 != ''">
+                aaz267 = #{aaz267,jdbcType=VARCHAR},
+            </if>
+            <if test="baa027 != null and baa027 != ''">
+                baa027 = #{baa027,jdbcType=VARCHAR},
+            </if>
+            <if test="baa027Name != null and baa027Name != ''">
+                baa027_name = #{baa027Name,jdbcType=VARCHAR},
+            </if>
+            <if test="akc193 != null and akc193 != ''">
+                akc193 = #{akc193,jdbcType=VARCHAR},
+            </if>
+            <if test="akc193Name != null and akc193Name != ''">
+                akc193_name = #{akc193Name,jdbcType=VARCHAR},
+            </if>
+            <if test="aac158 != null and aac158 != ''">
+                aac158 = #{aac158,jdbcType=VARCHAR},
+            </if>
+            <if test="akc026 != null and akc026 != ''">
+                akc026 = #{akc026,jdbcType=VARCHAR},
+            </if>
+            <if test="baa301 != null and baa301 != ''">
+                baa301 = #{baa301,jdbcType=VARCHAR},
+            </if>
+            <if test="aab300 != null and aab300 != ''">
+                aab300 = #{aab300,jdbcType=VARCHAR},
+            </if>
+            <if test="akc009 != null and akc009 != ''">
+                akc009 = #{akc009,jdbcType=VARCHAR},
+            </if>
+            <if test="bka010 != null">
+                bka010 = #{bka010,jdbcType=INTEGER},
+            </if>
+            <if test="bkh015 != null and bkh015 != ''">
+                bkh015 = #{bkh015,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cardIden != null">
+                card_iden = #{cardIden,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM insure_individual_basic WHERE id = #{id}
+    </delete>
+
+    <!-- 根据医院编码、电脑号删除表信息 -->
+    <delete id="deleteByAac001" parameterType="java.util.Map">
+        DELETE FROM insure_individual_basic WHERE hosp_code = #{hospCode} AND aac001 = #{aac001}
+    </delete>
+    <delete id="deleteInsureBasic">
+        delete from insure_individual_basic where  hosp_code = #{hospCode} and id =#{id}
+    </delete>
+
+    <!-- 插入数据 -->
+    <insert id="insertInsureIndividualBasic" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
+        INSERT INTO insure_individual_basic (
+            id, hosp_code, aac001, injury_borth_sn, aaa027, aaa027_name, aac003, aac004,
+            aac002, aaz500, aae005, aac006, orgcode, aab999, aab019, aab001,
+            bka008, bka035, bka035_name, aac008, aac008_name, bac001, bac001_name, aka130,
+            aka130_name, bka006, bka006_name, aac148, aac148_name, aac013, aac013_name, aae140,
+            bka888, akc252, aac066, aab301, aac031, aae030_last, aae031_last, aae030_special,
+            aae031_special, aaz267, baa027, baa027_name, akc193, akc193_name, aac158, akc026,
+            baa301, aab300, akc009, bka010, bkh015, crte_id, crte_name, crte_time,card_iden
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{aac001},
+            #{injuryBorthSn},
+            #{aaa027},
+            #{aaa027Name},
+            #{aac003},
+            #{aac004},
+            #{aac002},
+            #{aaz500},
+            #{aae005},
+            #{aac006},
+            #{orgcode},
+            #{aab999},
+            #{aab019},
+            #{aab001},
+            #{bka008},
+            #{bka035},
+            #{bka035Name},
+            #{aac008},
+            #{aac008Name},
+            #{bac001},
+            #{bac001Name},
+            #{aka130},
+            #{aka130Name},
+            #{bka006},
+            #{bka006Name},
+            #{aac148},
+            #{aac148Name},
+            #{aac013},
+            #{aac013Name},
+            #{aae140},
+            #{bka888},
+            #{akc252},
+            #{aac066},
+            #{aab301},
+            #{aac031},
+            #{aae030Last},
+            #{aae031Last},
+            #{aae030Special},
+            #{aae031Special},
+            #{aaz267},
+            #{baa027},
+            #{baa027Name},
+            #{akc193},
+            #{akc193Name},
+            #{aac158},
+            #{akc026},
+            #{baa301},
+            #{aab300},
+            #{akc009},
+            #{bka010},
+            #{bkh015},
+            #{crteId},
+            #{crteName},
+            #{crteTime},
+            #{cardIden}
+        )
+    </insert>
+</mapper>

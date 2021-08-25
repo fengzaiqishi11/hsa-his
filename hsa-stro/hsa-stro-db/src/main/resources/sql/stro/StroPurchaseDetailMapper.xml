@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.stro.purchase.dao.StroPurchaseDetailDAO" >
+  <resultMap id="BaseResultMap" type="cn.hsa.module.stro.purchase.entity.StroPurchaseDetailDO" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+    <result column="purchase_id" property="purchaseId" jdbcType="VARCHAR" />
+    <result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+    <result column="item_id" property="itemId" jdbcType="VARCHAR" />
+    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+    <result column="spec" property="spec" jdbcType="VARCHAR" />
+    <result column="num" property="num" jdbcType="INTEGER" />
+    <result column="unit_code" property="unitCode" jdbcType="VARCHAR" />
+    <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
+    <result column="sell_price" property="sellPrice" jdbcType="DECIMAL" />
+    <result column="buy_price_all" property="buyPriceAll" jdbcType="DECIMAL" />
+    <result column="sell_price_all" property="sellPriceAll" jdbcType="DECIMAL" />
+    <result column="seq_no" property="seqNo" jdbcType="INTEGER" />
+    <result column="stock_num" property="stockNum" jdbcType="INTEGER" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, hosp_code, purchase_id, item_code, item_id, item_name, spec, num, unit_code,
+    buy_price, sell_price, buy_price_all, sell_price_all, seq_no, stock_num, product_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from stro_purchase_detail
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from stro_purchase_detail
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="cn.hsa.module.stro.purchase.entity.StroPurchaseDetailDO" >
+    insert into stro_purchase_detail (id, hosp_code, purchase_id,
+      item_code, item_id, item_name,
+      spec, num, unit_code,
+      buy_price, sell_price, buy_price_all,
+      sell_price_all, seq_no, stock_num,
+      product_id)
+    values (#{id,jdbcType=VARCHAR}, #{hospCode,jdbcType=VARCHAR}, #{purchaseId,jdbcType=VARCHAR},
+      #{itemCode,jdbcType=VARCHAR}, #{itemId,jdbcType=VARCHAR}, #{itemName,jdbcType=VARCHAR},
+      #{spec,jdbcType=VARCHAR}, #{num,jdbcType=INTEGER}, #{unitCode,jdbcType=VARCHAR},
+      #{buyPrice,jdbcType=DECIMAL}, #{sellPrice,jdbcType=DECIMAL}, #{buyPriceAll,jdbcType=DECIMAL},
+      #{sellPriceAll,jdbcType=DECIMAL}, #{seqNo,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER},
+      #{productId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.hsa.module.stro.purchase.entity.StroPurchaseDetailDO" >
+    insert into stro_purchase_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="hospCode != null" >
+        hosp_code,
+      </if>
+      <if test="purchaseId != null" >
+        purchase_id,
+      </if>
+      <if test="itemCode != null" >
+        item_code,
+      </if>
+      <if test="itemId != null" >
+        item_id,
+      </if>
+      <if test="itemName != null" >
+        item_name,
+      </if>
+      <if test="spec != null" >
+        spec,
+      </if>
+      <if test="num != null" >
+        num,
+      </if>
+      <if test="unitCode != null" >
+        unit_code,
+      </if>
+      <if test="buyPrice != null" >
+        buy_price,
+      </if>
+      <if test="sellPrice != null" >
+        sell_price,
+      </if>
+      <if test="buyPriceAll != null" >
+        buy_price_all,
+      </if>
+      <if test="sellPriceAll != null" >
+        sell_price_all,
+      </if>
+      <if test="seqNo != null" >
+        seq_no,
+      </if>
+      <if test="stockNum != null" >
+        stock_num,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="hospCode != null" >
+        #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseId != null" >
+        #{purchaseId,jdbcType=VARCHAR},
+      </if>
+      <if test="itemCode != null" >
+        #{itemCode,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=VARCHAR},
+      </if>
+      <if test="itemName != null" >
+        #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="spec != null" >
+        #{spec,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null" >
+        #{num,jdbcType=INTEGER},
+      </if>
+      <if test="unitCode != null" >
+        #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="buyPrice != null" >
+        #{buyPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sellPrice != null" >
+        #{sellPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="buyPriceAll != null" >
+        #{buyPriceAll,jdbcType=DECIMAL},
+      </if>
+      <if test="sellPriceAll != null" >
+        #{sellPriceAll,jdbcType=DECIMAL},
+      </if>
+      <if test="seqNo != null" >
+        #{seqNo,jdbcType=INTEGER},
+      </if>
+      <if test="stockNum != null" >
+        #{stockNum,jdbcType=INTEGER},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.stro.purchase.entity.StroPurchaseDetailDO" >
+    update stro_purchase_detail
+    <set >
+      <if test="hospCode != null" >
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseId != null" >
+        purchase_id = #{purchaseId,jdbcType=VARCHAR},
+      </if>
+      <if test="itemCode != null" >
+        item_code = #{itemCode,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null" >
+        item_id = #{itemId,jdbcType=VARCHAR},
+      </if>
+      <if test="itemName != null" >
+        item_name = #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="spec != null" >
+        spec = #{spec,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null" >
+        num = #{num,jdbcType=INTEGER},
+      </if>
+      <if test="unitCode != null" >
+        unit_code = #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="buyPrice != null" >
+        buy_price = #{buyPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sellPrice != null" >
+        sell_price = #{sellPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="buyPriceAll != null" >
+        buy_price_all = #{buyPriceAll,jdbcType=DECIMAL},
+      </if>
+      <if test="sellPriceAll != null" >
+        sell_price_all = #{sellPriceAll,jdbcType=DECIMAL},
+      </if>
+      <if test="seqNo != null" >
+        seq_no = #{seqNo,jdbcType=INTEGER},
+      </if>
+      <if test="stockNum != null" >
+        stock_num = #{stockNum,jdbcType=INTEGER},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.stro.purchase.entity.StroPurchaseDetailDO" >
+    update stro_purchase_detail
+    set hosp_code = #{hospCode,jdbcType=VARCHAR},
+      purchase_id = #{purchaseId,jdbcType=VARCHAR},
+      item_code = #{itemCode,jdbcType=VARCHAR},
+      item_id = #{itemId,jdbcType=VARCHAR},
+      item_name = #{itemName,jdbcType=VARCHAR},
+      spec = #{spec,jdbcType=VARCHAR},
+      num = #{num,jdbcType=INTEGER},
+      unit_code = #{unitCode,jdbcType=VARCHAR},
+      buy_price = #{buyPrice,jdbcType=DECIMAL},
+      sell_price = #{sellPrice,jdbcType=DECIMAL},
+      buy_price_all = #{buyPriceAll,jdbcType=DECIMAL},
+      sell_price_all = #{sellPriceAll,jdbcType=DECIMAL},
+      seq_no = #{seqNo,jdbcType=INTEGER},
+      stock_num = #{stockNum,jdbcType=INTEGER},
+      product_id = #{productId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <!-- 查询采购计划明细结果集 -->
+  <select id="queryStroPurchaseDetailList" parameterType="cn.hsa.module.stro.purchase.dto.StroPurchaseDetailDTO" resultType="cn.hsa.module.stro.purchase.dto.StroPurchaseDetailDTO">
+    SELECT
+    spd.id,
+    spd.hosp_code,
+    spd.purchase_id,
+    spd.item_code,
+    spd.item_id,
+    spd.item_name,
+    spd.spec,
+    spd.num,
+    spd.unit_code,
+    spd.buy_price,
+    spd.sell_price,
+    spd.buy_price_all,
+    spd.sell_price_all,
+    spd.seq_no,
+    spd.stock_num,
+    spd.product_id,
+    bp.name prodName
+    FROM
+    stro_purchase_detail spd
+    LEFT JOIN base_product bp
+    ON spd.product_id = bp.id
+    where
+      spd.hosp_code = #{hospCode,jdbcType=VARCHAR}
+        AND spd.purchase_id = #{purchaseId,jdbcType=VARCHAR}
+      <if test="itemCode != null and purchaseId != ''" >
+        AND spd.item_code = #{itemCode,jdbcType=VARCHAR}
+      </if>
+      <if test="itemId != null and itemId != ''" >
+        AND spd.item_id = #{itemId,jdbcType=VARCHAR}
+      </if>
+      <if test="itemName != null and itemName != ''" >
+        AND spd.item_name = #{itemName,jdbcType=VARCHAR}
+      </if>
+      <if test="spec != null and spec != ''" >
+        AND spd.spec = #{spec,jdbcType=VARCHAR}
+      </if>
+      <if test="num != null and num != ''" >
+        AND spd.num = #{num,jdbcType=INTEGER}
+      </if>
+      <if test="unitCode != null and unitCode != ''" >
+        AND spd.unit_code = #{unitCode,jdbcType=VARCHAR}
+      </if>
+      <if test="buyPrice != null and buyPrice != ''" >
+        AND spd.buy_price = #{buyPrice,jdbcType=DECIMAL}
+      </if>
+      <if test="sellPrice != null and sellPrice != ''" >
+        AND spd.sell_price = #{sellPrice,jdbcType=DECIMAL}
+      </if>
+      <if test="buyPriceAll != null and buyPriceAll != ''" >
+        AND spd.buy_price_all = #{buyPriceAll,jdbcType=DECIMAL}
+      </if>
+      <if test="sellPriceAll != null and sellPriceAll != ''" >
+        AND spd.sell_price_all = #{sellPriceAll,jdbcType=DECIMAL}
+      </if>
+      <if test="seqNo != null and seqNo != ''" >
+        AND spd.seq_no = #{seqNo,jdbcType=INTEGER}
+      </if>
+      <if test="stockNum != null and stockNum != ''" >
+        AND spd.stock_num = #{stockNum,jdbcType=INTEGER}
+      </if>
+      <if test="productId != null and productId != ''" >
+        AND spd.product_id = #{productId,jdbcType=VARCHAR}
+      </if>
+      <if test="ids!=null and ids.length!=0">
+        AND spd.purchase_id in(
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+      </if>
+    order by spd.seq_no asc
+  </select>
+  <!-- 批量新增采购计划明细 -->
+  <insert id="addBatchDetail" parameterType="cn.hsa.module.stro.purchase.dto.StroPurchaseDetailDTO">
+    insert into stro_purchase_detail (id, hosp_code, purchase_id,
+      item_code, item_id, item_name,
+      spec, num, unit_code,
+      buy_price, sell_price, buy_price_all,
+      sell_price_all, seq_no, stock_num,
+      product_id)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      #{item.id,jdbcType=VARCHAR}, #{item.hospCode,jdbcType=VARCHAR},
+      #{item.purchaseId,jdbcType=VARCHAR},#{item.itemCode,jdbcType=VARCHAR},
+      #{item.itemId,jdbcType=VARCHAR}, #{item.itemName,jdbcType=VARCHAR},
+      #{item.spec,jdbcType=VARCHAR}, #{item.num,jdbcType=INTEGER},
+      #{item.unitCode,jdbcType=VARCHAR},#{item.buyPrice,jdbcType=DECIMAL},
+      #{item.sellPrice,jdbcType=DECIMAL}, #{item.buyPriceAll,jdbcType=DECIMAL},
+      #{item.sellPriceAll,jdbcType=DECIMAL}, #{item.seqNo,jdbcType=INTEGER},
+      #{item.stockNum,jdbcType=INTEGER},#{item.productId,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <!-- 根据采购id删除采购明细 -->
+  <delete id="delDetailByPurchaseId">
+    DELETE
+    FROM
+        stro_purchase_detail
+    where
+    purchase_id IN(
+    <foreach collection="ids" item="purchaseId" separator=",">
+      #{purchaseId}
+    </foreach>
+    )
+  </delete>
+</mapper>

@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.OutptSettleInvoiceDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="outptSettleInvoiceDtoMap" type="cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="invoice_id" property="invoiceId" jdbcType="VARCHAR" />
+        <result column="invoice_detail_id" property="invoiceDetailId" jdbcType="VARCHAR" />
+        <result column="invoice_no" property="invoiceNo" jdbcType="VARCHAR" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="print_id" property="printId" jdbcType="VARCHAR" />
+        <result column="print_name" property="printName" jdbcType="VARCHAR" />
+        <result column="print_time" property="printTime" jdbcType="TIMESTAMP" />
+        <result column="print_num" property="printNum" jdbcType="INTEGER" />
+        <result column="is_main" property="isMain" jdbcType="VARCHAR" />
+        <result column="main_id" property="mainId" jdbcType="VARCHAR" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="red_id" property="redId" jdbcType="VARCHAR" />
+        <result column="exec_dept_id" property="execDeptId" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        settle_id,
+        visit_id,
+        invoice_id,
+        invoice_detail_id,
+        invoice_no,
+        total_price,
+        print_id,
+        print_name,
+        print_time,
+        print_num,
+        is_main,
+        main_id,
+        status_code,
+        red_id
+        exec_dept_id,divide_remark
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        osi.id,
+        osi.hosp_code,
+        osi.settle_id,
+        osi.visit_id,
+        osi.invoice_id,
+        osi.invoice_detail_id,
+        osi.invoice_no,
+        osi.total_price,
+        osi.print_id,
+        osi.print_name,
+        osi.print_time,
+        osi.print_num,
+        osi.is_main,
+        osi.main_id,
+        osi.status_code,
+        osi.red_id,
+        osi.exec_dept_id
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="outptSettleInvoiceDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        outpt_settle_invoice
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" >
+        insert into
+        outpt_settle_invoice
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          invoice_id,
+          invoice_detail_id,
+          invoice_no,
+          total_price,
+          print_id,
+          print_name,
+          print_time,
+          print_num,
+          is_main,
+          main_id,
+          status_code,
+          red_id,
+          exec_dept_id,
+          divide_remark
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{settleId,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{invoiceId,jdbcType=VARCHAR},
+          #{invoiceDetailId,jdbcType=VARCHAR},
+          #{invoiceNo,jdbcType=VARCHAR},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{printId,jdbcType=VARCHAR},
+          #{printName,jdbcType=VARCHAR},
+          #{printTime,jdbcType=TIMESTAMP},
+          #{printNum,jdbcType=INTEGER},
+          #{isMain,jdbcType=VARCHAR},
+          #{mainId,jdbcType=VARCHAR},
+          #{statusCode,jdbcType=VARCHAR},
+          #{redId,jdbcType=VARCHAR},
+          #{execDeptId,jdbcType=VARCHAR},
+          #{divideRemark,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" >
+        insert into
+        outpt_settle_invoice
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id,
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code,
+                </if>
+                <if test="settleId != null and settleId != ''">
+                    settle_id,
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id,
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                    invoice_id,
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                    invoice_detail_id,
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                    invoice_no,
+                </if>
+                <if test="totalPrice != null">
+                    total_price,
+                </if>
+                <if test="printId != null and printId != ''">
+                    print_id,
+                </if>
+                <if test="printName != null and printName != ''">
+                    print_name,
+                </if>
+                <if test="printTime != null">
+                    print_time,
+                </if>
+                <if test="printNum != null">
+                    print_num,
+                </if>
+                <if test="isMain != null and isMain != ''">
+                    is_main,
+                </if>
+                <if test="mainId != null and mainId != ''">
+                    main_id,
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                    status_code,
+                </if>
+                <if test="redId != null and redId != ''">
+                    red_id,
+                </if>
+                <if test="execDeptId != null and execDeptId != ''">
+                    exec_dept_id
+                </if>
+                <if test="divideRemark != null and divideRemark != ''">
+                    divide_remark
+                </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR},
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="settleId != null and settleId != ''">
+                        #{settleId,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                        #{invoiceId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                        #{invoiceDetailId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                        #{invoiceNo,jdbcType=VARCHAR},
+                </if>
+                <if test="totalPrice != null">
+                        #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="printId != null and printId != ''">
+                        #{printId,jdbcType=VARCHAR},
+                </if>
+                <if test="printName != null and printName != ''">
+                        #{printName,jdbcType=VARCHAR},
+                </if>
+                <if test="printTime != null">
+                        #{printTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="printNum != null">
+                        #{printNum,jdbcType=INTEGER},
+                </if>
+                <if test="isMain != null and isMain != ''">
+                        #{isMain,jdbcType=VARCHAR},
+                </if>
+                <if test="mainId != null and mainId != ''">
+                        #{mainId,jdbcType=VARCHAR},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                        #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                        #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="execDeptId != null and execDeptId != ''">
+                        #{execDeptId,jdbcType=VARCHAR}
+                </if>
+                <if test="divideRemark != null and divideRemark != ''">
+                        #{divideRemark,jdbcType=VARCHAR}
+                </if>
+
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" >
+        update
+        outpt_settle_invoice
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                settle_id = #{settleId,jdbcType=VARCHAR},
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                invoice_id = #{invoiceId,jdbcType=VARCHAR},
+                invoice_detail_id = #{invoiceDetailId,jdbcType=VARCHAR},
+                invoice_no = #{invoiceNo,jdbcType=VARCHAR},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                print_id = #{printId,jdbcType=VARCHAR},
+                print_name = #{printName,jdbcType=VARCHAR},
+                print_time = #{printTime,jdbcType=TIMESTAMP},
+                print_num = #{printNum,jdbcType=INTEGER},
+                is_main = #{isMain,jdbcType=VARCHAR},
+                main_id = #{mainId,jdbcType=VARCHAR},
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                red_id = #{redId,jdbcType=VARCHAR},
+                exec_dept_id = #{execDeptId,jdbcType=VARCHAR}
+                 ,
+                divide_remark = #{divideRemark,jdbcType=VARCHAR}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" >
+        update
+        outpt_settle_invoice
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceId != null and invoiceId != ''">
+                invoice_id = #{invoiceId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                invoice_detail_id = #{invoiceDetailId,jdbcType=VARCHAR},
+                </if>
+                <if test="invoiceNo != null and invoiceNo != ''">
+                invoice_no = #{invoiceNo,jdbcType=VARCHAR},
+                </if>
+                <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="printId != null and printId != ''">
+                print_id = #{printId,jdbcType=VARCHAR},
+                </if>
+                <if test="printName != null and printName != ''">
+                print_name = #{printName,jdbcType=VARCHAR},
+                </if>
+                <if test="printTime != null">
+                print_time = #{printTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="printNum != null">
+                print_num = #{printNum,jdbcType=INTEGER},
+                </if>
+                <if test="isMain != null and isMain != ''">
+                is_main = #{isMain,jdbcType=VARCHAR},
+                </if>
+                <if test="mainId != null and mainId != ''">
+                main_id = #{mainId,jdbcType=VARCHAR},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                red_id = #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="execDeptId != null and execDeptId != ''">
+                exec_dept_id = #{execDeptId,jdbcType=VARCHAR}
+                </if>
+                <if test="divideRemark != null and divideRemark != ''">
+                divide_remark = #{divideRemark,jdbcType=VARCHAR}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM outpt_settle_invoice WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM outpt_settle_invoice WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="outptSettleInvoiceDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM outpt_settle_invoice osi
+        <where>
+                    <if test="hospCode != null and hospCode != ''">
+                        AND osi.hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+                    </if>
+                    <if test="settleId != null and settleId != ''">
+                        AND osi.settle_id LIKE CONCAT('%', #{settleId}, '%')
+                    </if>
+                    <if test="visitId != null and visitId != ''">
+                        AND osi.visit_id LIKE CONCAT('%', #{visitId}, '%')
+                    </if>
+        </where>
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="getSetteleInvoiceByParams" resultMap="outptSettleInvoiceDtoMap" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM outpt_settle_invoice
+        WHERE hosp_code = #{hospCode} AND visit_id = #{visitId} AND settle_id = #{id} AND status_code = '0'
+    </select>
+
+    <!-- 批量修改数据 -->
+    <update id="updateOutptSettleInvoices" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE outpt_settle_invoice
+            <set>
+                <if test="item.settleId != null">
+                    settle_id = #{item.settleId},
+                </if>
+                <if test="item.visitId != null">
+                    visit_id = #{item.visitId},
+                </if>
+                <if test="item.invoiceId != null">
+                    invoice_id = #{item.invoiceId},
+                </if>
+                <if test="item.invoiceDetailId != null">
+                    invoice_detail_id = #{item.invoiceDetailId},
+                </if>
+                <if test="item.invoiceNo != null">
+                    invoice_no = #{item.invoiceNo},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice},
+                </if>
+                <if test="item.printId != null">
+                    print_id = #{item.printId},
+                </if>
+                <if test="item.printName != null">
+                    print_name = #{item.printName},
+                </if>
+                <if test="item.printTime != null">
+                    print_time = #{item.printTime},
+                </if>
+                <if test="item.printNum != null">
+                    print_num = #{item.printNum},
+                </if>
+                <if test="item.isMain != null">
+                    is_main = #{item.isMain},
+                </if>
+                <if test="item.mainId != null">
+                    main_id = #{item.mainId},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode},
+                </if>
+                <if test="item.redId != null">
+                    red_id = #{item.redId},
+                </if>
+                <if test="item.execDeptId != null">
+                    exec_dept_id = #{item.execDeptId}
+                </if>
+                <if test="item.divideRemark != null">
+                    divide_remark = #{item.divideRemark}
+                </if>
+
+            </set>
+            WHERE id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertOutptSettleInvoices" parameterType="list">
+        INSERT INTO outpt_settle_invoice (
+        id, hosp_code, settle_id, visit_id, invoice_id, invoice_detail_id, invoice_no, total_price,
+        print_id, print_name, print_time, print_num, is_main, main_id, status_code, red_id,
+        exec_dept_id,divide_remark
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.settleId},
+            #{item.visitId},
+            #{item.invoiceId},
+            #{item.invoiceDetailId},
+            #{item.invoiceNo},
+            #{item.totalPrice},
+            #{item.printId},
+            #{item.printName},
+            #{item.printTime},
+            #{item.printNum},
+            #{item.isMain},
+            #{item.mainId},
+            #{item.statusCode},
+            #{item.redId},
+            #{item.execDeptId},
+            #{item.divideRemark}
+            )
+        </foreach>
+    </insert>
+
+
+
+<!-- 批量修改数据 -->
+    <update id="updateOutptSettleInvoicesBypj" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE outpt_settle_invoice
+            <set>
+                <if test="item.invoiceId != null">
+                    invoice_id = #{item.invoiceId},
+                </if>
+                <if test="item.invoiceDetailId != null">
+                    invoice_detail_id = #{item.invoiceDetailId},
+                </if>
+                <if test="item.invoiceNo != null">
+                    invoice_no = #{item.invoiceNo},
+                </if>
+
+                <if test="item.printId != null">
+                    print_id = #{item.printId},
+                </if>
+                <if test="item.printName != null">
+                    print_name = #{item.printName},
+                </if>
+                <if test="item.printTime != null">
+                    print_time = #{item.printTime},
+                </if>
+                <if test="item.printNum != null">
+                    print_num = #{item.printNum},
+                </if>
+            </set>
+            WHERE id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+</mapper>

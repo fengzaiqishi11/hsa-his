@@ -1,0 +1,37 @@
+server:
+  servlet:
+    context-path: /hsa-insure
+  port: 9010
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: hsa-insure
+  cloud:
+    nacos:
+      config:
+        file-extension: properties
+        group: dev
+        enabled: false
+        encode: UTF-8
+        server-addr: 127.0.0.1:8848
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+  consumer:
+    timeout: 600000
+  application:
+    name: hsa-insure
+  protocol:
+    name: dubbo
+    port: 29010
+  provider:
+    threads: 1000
+
+security:
+  oauth2:
+    client:
+      permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**

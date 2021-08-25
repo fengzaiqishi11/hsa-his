@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.sync.dao.CenterSyncDao">
+  <!-- 实体DTO及数据库字段映射 -->
+  <resultMap id="centerSyncDtoMap" type="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    <result column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="sync_code" property="syncCode" jdbcType="VARCHAR"/>
+    <result column="sync_name" property="syncName" jdbcType="VARCHAR"/>
+    <result column="type_code" property="typeCode" jdbcType="VARCHAR"/>
+    <result column="table_name" property="tableName" jdbcType="VARCHAR"/>
+    <result column="ref_table_name" property="refTableName" jdbcType="VARCHAR"/>
+    <result column="is_must" property="isMust" jdbcType="VARCHAR"/>
+    <result column="is_valid" property="isValid" jdbcType="VARCHAR"/>
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR"/>
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR"/>
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  <!-- 表所有字段 -->
+  <sql id="Base_Column_List">
+        id,
+        sync_code,
+        sync_name,
+        type_code,
+        table_name,
+        ref_table_name,
+        is_must,
+        is_valid,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+  <!-- 表所有字段（别名） -->
+  <sql id="Base_ColumnAlias_List">
+        cs.id,
+        cs.sync_code,
+        cs.sync_name,
+        cs.type_code,
+        cs.table_name,
+        cs.ref_table_name,
+        cs.is_must,
+        cs.is_valid,
+        cs.crte_id,
+        cs.crte_name,
+        cs.crte_time
+    </sql>
+  <!-- 根据主键查询表信息 -->
+  <select id="selectByPrimaryKey" resultType="cn.hsa.module.center.sync.entity.CenterSyncDO" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List"/>
+    from
+    center_sync
+    where
+    id = #{id,jdbcType=VARCHAR}
+  </select>
+  <!-- 新增表信息 -->
+  <insert id="insert" parameterType="cn.hsa.module.center.sync.entity.CenterSyncDO">
+        insert into
+        center_sync
+        (
+          id,
+          sync_code,
+          sync_name,
+          type_code,
+          table_name,
+          ref_table_name,
+          is_must,
+          is_valid,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{syncCode,jdbcType=VARCHAR},
+          #{syncName,jdbcType=VARCHAR},
+          #{typeCode,jdbcType=VARCHAR},
+          #{tableName,jdbcType=VARCHAR},
+          #{refTableName,jdbcType=VARCHAR},
+          #{isMust,jdbcType=VARCHAR},
+          #{isValid,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+  <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+  <insert id="insertSelective" parameterType="cn.hsa.module.center.sync.entity.CenterSyncDO">
+    insert into
+    center_sync
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null and id != ''">
+        id,
+      </if>
+      <if test="syncCode != null and syncCode != ''">
+        sync_code,
+      </if>
+      <if test="syncName != null and syncName != ''">
+        sync_name,
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code,
+      </if>
+      <if test="tableName != null and tableName != ''">
+        table_name,
+      </if>
+      <if test="refTableName != null and refTableName != ''">
+        ref_table_name,
+      </if>
+      <if test="isMust != null and isMust != ''">
+        is_must,
+      </if>
+      <if test="isValid != null and isValid != ''">
+        is_valid,
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id,
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name,
+      </if>
+      <if test="crteTime != null">
+        crte_time
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null and id != ''">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="syncCode != null and syncCode != ''">
+        #{syncCode,jdbcType=VARCHAR},
+      </if>
+      <if test="syncName != null and syncName != ''">
+        #{syncName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        #{typeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null and tableName != ''">
+        #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="refTableName != null and refTableName != ''">
+        #{refTableName,jdbcType=VARCHAR},
+      </if>
+      <if test="isMust != null and isMust != ''">
+        #{isMust,jdbcType=VARCHAR},
+      </if>
+      <if test="isValid != null and isValid != ''">
+        #{isValid,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </trim>
+  </insert>
+  <!-- 修改表信息 -->
+  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.center.sync.entity.CenterSyncDO">
+        update
+        center_sync
+        set
+            sync_code = #{syncCode,jdbcType=VARCHAR},
+            sync_name = #{syncName,jdbcType=VARCHAR},
+            type_code = #{typeCode,jdbcType=VARCHAR},
+            table_name = #{tableName,jdbcType=VARCHAR},
+            ref_table_name = #{refTableName,jdbcType=VARCHAR},
+            is_must = #{isMust,jdbcType=VARCHAR},
+            is_valid = #{isValid,jdbcType=VARCHAR},
+            crte_id = #{crteId,jdbcType=VARCHAR},
+            crte_name = #{crteName,jdbcType=VARCHAR},
+            crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id,jdbcType=VARCHAR}
+    </update>
+
+  <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.center.sync.entity.CenterSyncDO">
+    update
+    center_sync
+    <set>
+      <if test="syncCode != null and syncCode != ''">
+        sync_code = #{syncCode,jdbcType=VARCHAR},
+      </if>
+      <if test="syncName != null and syncName != ''">
+        sync_name = #{syncName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        type_code = #{typeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null and tableName != ''">
+        table_name = #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="refTableName != null">
+        ref_table_name = #{refTableName,jdbcType=VARCHAR},
+      </if>
+      <if test="isMust != null and isMust != ''">
+        is_must = #{isMust,jdbcType=VARCHAR},
+      </if>
+      <if test="isValid != null and isValid != ''">
+        is_valid = #{isValid,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id = #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name = #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null">
+        crte_time = #{crteTime,jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where
+    id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!-- 根据主键删除表信息 -->
+  <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM center_sync WHERE id = #{id,jdbcType=VARCHAR}
+  </delete>
+
+  <!-- 根据主键批量删除数据 -->
+  <delete id="deleteByIds">
+    DELETE FROM center_sync WHERE id IN
+    <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 根据主键批量删除数据 -->
+  <update id="editCenterSyncIsValidByids">
+    UPDATE
+    center_sync
+    SET
+    is_valid = #{isValid}
+    where id in(
+    <foreach collection="ids" index="index" item="id" separator=",">
+      #{id}
+    </foreach>
+    )
+  </update>
+
+  <!-- 根据条件参数查询数据列表 -->
+  <select id="findByCondition" resultMap="centerSyncDtoMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    SELECT
+    <include refid="Base_ColumnAlias_List"/>
+    FROM center_sync cs
+    <where>
+      <if test="syncCode != null and syncCode != ''">
+        cs.sync_code LIKE CONCAT('%', #{syncCode}, '%')
+      </if>
+      <if test="syncName != null and syncName != ''">
+        AND cs.sync_name LIKE CONCAT('%', #{syncName}, '%')
+      </if>
+      <if test="tableName != null and tableName != ''">
+        AND cs.table_name LIKE CONCAT('%', #{tableName}, '%')
+      </if>
+      <if test="refTableName != null and refTableName != ''">
+        AND cs.ref_table_name LIKE CONCAT('%', #{refTableName}, '%')
+      </if>
+      <if test="isValid != null and isValid != ''">
+        AND cs.is_valid = #{isValid}
+      </if>
+      <if test="typeCode != null and typeCode != ''">
+        AND cs.type_code = #{typeCode}
+      </if>
+      <if test="tableNameField != null and tableNameField != ''">
+        AND cs.table_name = #{tableNameField}
+      </if>
+      <if test="queryStr != null and queryStr != ''">
+        AND (cs.sync_name LIKE CONCAT('%', #{queryStr}, '%') or cs.table_name LIKE CONCAT('%', #{queryStr}, '%'))
+      </if>
+    </where>
+    order by crte_time desc
+  </select>
+
+
+  <!-- 根据医院编码查询表信息 -->
+  <select id="getSyncTableByHosp" resultMap="centerSyncDtoMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    select
+    cs.id, cs.sync_code, cs.type_code, cs.table_name
+    from
+    center_hospital_sync chs
+    inner join center_sync cs on chs.sync_code = cs.sync_code
+    where
+    chs.hosp_code = #{newHospCode}
+    and cs.is_valid = '1'
+  </select>
+
+  <!--查询同步表列表-->
+  <select id="queryCenterSyncTableList" resultMap="centerSyncDtoMap" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    center_sync
+    where
+    is_valid = #{isValid}
+    order by crte_time desc
+  </select>
+
+  <!-- 根据id查询那些id是绑定医院的 -->
+  <select id="queryBoundHospSync" resultType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    SELECT
+    cs.id AS id,
+    cs.table_name AS tableName
+    FROM
+    center_sync cs
+    WHERE
+    cs.sync_code IN ( SELECT sync_code FROM center_hospital_sync )
+    AND cs.`is_valid` = '1'
+    AND cs.`id` in(
+    <foreach collection="ids" item="id" separator=",">
+      #{id}
+    </foreach>
+    )
+  </select>
+  <!--  2021-01-11   pengbo  -->
+
+  <!-- 根据表名 查询数据库同步数据 -->
+  <select id="getAllNeedSyncTableName" resultType="map">
+        SELECT  table_name AS tableName FROM information_schema. TABLES WHERE  TABLE_NAME LIKE 'sync%' and table_name  not in (select table_name from center_sync where is_valid ='1') order by table_name
+  </select>
+
+  <!-- 根据表名 查询数据库同步数据 -->
+  <select id="getSyncDataByTableName" resultType="map" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO" >
+        select * from ${tableName}
+  </select>
+
+<!-- 查询同步表与目标表的对照信息 -->
+  <select id="getCenterTableContrast" resultType="map">
+        select table_name,sync_table_name from center_table_contrast
+  </select>
+
+<!--查询同步表（新增,修改时用来校验）-->
+<select id="getCenterSyncByTableNameOrCode" parameterType="cn.hsa.module.center.sync.dto.CenterSyncDTO" resultType="cn.hsa.module.center.sync.dto.CenterSyncDTO">
+    select * from center_sync  where (sync_code =#{syncCode}  or table_name = #{tableName} ) and is_valid ='1'
+
+    <if test="id != null and id !='' ">
+      and id &lt;&gt; #{id}
+    </if>
+
+</select>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bac.dao.BaseAssistCalcDao">
+
+    <resultMap type="cn.hsa.module.base.bac.dto.BaseAssistCalcDTO" id="BaseAssistMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="deptCodeName" column="dept_code_name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bizCode" column="biz_code" jdbcType="VARCHAR"/>
+        <result property="wayCode" column="way_code" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="isFirst" column="is_first" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseAssistMap">
+        select
+          id, hosp_code, code, name, usage_code, dept_code, type_code, biz_code, way_code, is_valid, crte_id, crte_name, crte_time, is_first
+        from base_assist
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseAssistMap">
+        select
+        a.id, a.hosp_code, a.code, a.name, a.usage_code, a.type_code, a.biz_code, a.way_code, a.is_valid, a.crte_id,
+        a.crte_name, a.crte_time ,b.name as dept_code_name,a.dept_code, a.is_first
+        from base_assist a
+        LEFT JOIN base_dept b on a.dept_code=b.code
+        <where>
+                and a.hosp_code = #{hospCode}
+            <if test="name != null and name != ''">
+                and a.name like concat('%',#{name},'%')
+            </if>
+            <!--            <if test="deptCode != null and deptCode != ''">-->
+            <!--                and a.dept_code = #{deptCode}-->
+            <!--            </if>-->
+            <if test="wayCode != null and wayCode != ''">
+                and a.way_code = #{wayCode}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and dept_code in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by a.crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_assist(id,hosp_code,is_first, code, name, usage_code, dept_code, type_code, biz_code, way_code, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{isFirst}, #{code}, #{name}, #{usageCode}, #{deptCode}, #{typeCode}, #{bizCode}, #{wayCode}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_assist
+        <set>
+                name = #{name},
+                usage_code = #{usageCode},
+                dept_code = #{deptCode},
+                type_code = #{typeCode},
+                biz_code = #{bizCode},
+                way_code = #{wayCode},
+                is_valid = #{isValid},
+                is_first = #{isFirst}
+        </set>
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from base_assist where id = #{id} and hosp_code= #{hospCode}
+    </delete>
+
+    <update id="deleteByIdlist" parameterType="list">
+        update base_assist set
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            is_valid = CASE
+            WHEN #{item.id} THEN #{item.isValid}
+            END
+        </foreach>
+        where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item.id}
+        </foreach>
+        and hosp_code in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--查询辅助计费-->
+    <select id="queryAssists" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDTO">
+        select a.id, a.hosp_code hospCode, a.code, a.name, a.usage_code usageCode, a.dept_code deptCode,
+        a.type_code typeCode, a.biz_code bizCode, a.way_code wayCode, b.id deptId,
+        case when a.type_code = '1' then c.id when a.type_code = '4' then d.id end zdxmid
+        from base_assist a
+        left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+        left join base_drug c on a.biz_code = c.code and a.hosp_code = c.hosp_code and a.type_code = '1'
+        left join base_advice d on a.biz_code = d.code and a.hosp_code = d.hosp_code and a.type_code = '4'
+        where a.hosp_code = #{hospCode} and a.way_code = #{wayCode} and a.is_valid = '1' and a.usage_code = #{usageCode}
+        <if test="isFirst!=null and isFirst!=''">
+            and a.is_first = #{isFirst}
+        </if>
+        order by a.crte_time desc
+    </select>
+    
+</mapper>

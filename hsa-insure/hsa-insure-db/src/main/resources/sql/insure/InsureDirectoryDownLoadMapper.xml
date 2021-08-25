@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDirectoryDownLoadDAO">
+
+    <!--    批量保存医保目录信息-->
+    <insert id="insertInsureDirectory">
+        insert into insure_unified_directory
+        (id, hosp_code, hilist_code,
+        hilist_name, insu_admdvs, begndate, enddate,
+        med_chrgitm_type, chrgitm_lv, lmt_used_flag,
+        list_type, med_use_flag, matn_used_flag, hilist_use_type,
+        lmt_cpnd_type, wubi, pinyin, memo, vali_flag, rid, updt_time, crter_id,
+        crter_name, crte_time, crte_optins_no,
+        opter_id, opter_name, opt_time, optins_no, poolarea_no) values
+        <foreach collection="directoryInfoDOList" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.hilistCode},
+            #{item.hilistName},
+            #{item.insuAdmdvs},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.medChrgitmType},
+            #{item.chrgitmLv},
+            #{item.lmtUsedFlag},
+            #{item.listType},
+            #{item.medUseFlag},
+            #{item.matnUsedFlag},
+            #{item.hilistUseType},
+            #{item.lmtCpndType},
+            #{item.wubi},
+            #{item.pinyin},
+            #{item.memo},
+            #{item.valiFlag},
+            #{item.rid},
+            #{item.updtTime},
+            #{item.crterId},
+            #{item.crterName},
+            #{item.crteTime},
+            #{item.crteOptinsNo},
+            #{item.opterId},
+            #{item.opterName},
+            #{item.optTime},
+            #{item.optinsNo},
+            #{item.poolareaNo}
+            )
+        </foreach>
+    </insert>
+    <!--    新增医疗目录与医保目录匹配信息-->
+    <insert id="insertInsureUnfiedMatch">
+        insert into insure_unified_match (id, hosp_code, med_list_codg, hilist_code,
+        list_type, insu_admdvs, begndate, enddate, memo,
+        vali_flag, rid, updt_time,
+        crter_id, crter_name, crte_time, crte_optins_no, opter_id, opter_name, opt_time, optins_no, poolarea_no)
+        values
+        <foreach collection="insertList" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.medListCodg},
+            #{item.hilistCode},
+            #{item.listType},
+            #{item.insuAdmdvs},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.memo},
+            #{item.valiFlag},
+            #{item.rid},
+            #{item.updtTime},
+            #{item.crterId},
+            #{item.crterName},
+            #{item.crteTime},
+            #{item.crteOptinsNo},
+            #{item.opterId},
+            #{item.opterName},
+            #{item.optTime},
+            #{item.optinsNo},
+            #{item.poolareaNo}
+            )
+        </foreach>
+    </insert>
+    <!--    批量新增医保目录限价信息-->
+    <insert id="insertInsureUnfiedLimitPrice">
+        insert into insure_unified_limitprice
+        (id, hilist_code, hosp_code, hilist_lmtpric_type, overlmt_dspo_way,
+        insu_admdvs, begndate, enddate, hilist_pric_uplmt_amt, vali_flag, rid, updt_time,
+        crter_id, crter_name, crte_time, crte_optins_no, opter_id, opter_name, opt_time, optins_no, tabname,
+        poolarea_no)
+        values
+        <foreach collection="insureUnifiedLimitPriceDOList" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hilistCode},
+            #{item.hospCode},
+            #{item.hilistLmtpricType},
+            #{item.overlmtDspoWay},
+            #{item.insuAdmdvs},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.hilistPricUplmtAmt},
+            #{item.valiFlag},
+            #{item.rid},
+            #{item.updtTime},
+            #{item.crterId},
+            #{item.crterName},
+            #{item.crteTime},
+            #{item.crteOptinsNo},
+            #{item.opterId},
+            #{item.opterName},
+            #{item.optTime},
+            #{item.optinsNo},
+            #{item.tabname},
+            #{item.poolareaNo}
+            )
+        </foreach>
+    </insert>
+    <!--    新增医保目录先自付比例信息-->
+    <insert id="insertInsureUnifiedRation">
+        insert into insure_unified_ratio(id, hosp_code, hilist_code, selfpay_prop_psn_type,
+        selfpay_prop_type, insu_admdvs, begndate, enddate,
+        selfpay_prop, vali_flag, rid,
+        updt_time, crter_id, crter_name, crte_time, crte_optins_no,
+        opter_id, opter_name, opt_time, optins_no, tabname, poolarea_no) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.hilistCode},
+            #{item.selfpayPropPsnType},
+            #{item.selfpayPropType},
+            #{item.insuAdmdvs},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.selfpayProp},
+            #{item.valiFlag},
+            #{item.rid},
+            #{item.updtTime},
+            #{item.crterId},
+            #{item.crterName},
+            #{item.crteTime},
+            #{item.crteOptinsNo},
+            #{item.opterId},
+            #{item.opterName},
+            #{item.optTime},
+            #{item.optinsNo},
+            #{item.tabname},
+            #{item.poolareaNo}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertInsureMedicinesMatch">
+        insert into insure_unified_medicmatch(id, hosp_code, fixmedins_code, medins_list_codg,
+        medins_list_name, med_list_codg, list_type, insu_admdvs,
+        begndate, enddate, aprvno, dosform, exct_cont, item_cont,
+        prcunt, spec, pacspec, memo, vali_flag, rid, updt_time, crter_id, crter_name,
+        crte_time, crte_optins_no, opter_id, opter_name, opt_time,
+        optins_no, poolarea_no) values
+        <foreach collection="unifiedMatchDOList" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.fixmedinsCode},#{item.medinsListCodg},#{item.medinsListName},#{item.medListCodg},
+            #{item.listType},#{item.insuAdmdvs},#{item.begndate}, #{item.enddate}, #{item.aprvno}, #{item.dosform},
+            #{item.exctCont},#{item.itemCont},#{item.prcunt}, #{item.spec}, #{item.pacspec},
+            #{item.memo},#{item.valiFlag},
+            #{item.rid},#{item.updtTime},
+            #{item.crterId}, #{item.crterName},
+            #{item.crteTime}, #{item.crteOptinsNo},
+            #{item.opterId},#{item.opterName},
+            #{item.optTime},#{item.optinsNo},#{item.poolareaNo}
+            )
+        </foreach>
+    </insert>
+    <!--    查询所有保存的医保目录信息-->
+    <select id="queryAllInsureDirectory" resultType="cn.hsa.module.insure.module.entity.InsureDirectoryInfoDO">
+        select id, hosp_code, hilist_code, hilist_name, insu_admdvs, begndate, enddate, med_chrgitm_type,
+        chrgitm_lv, lmt_used_flag, list_type, med_use_flag, matn_used_flag,
+        hilist_use_type, lmt_cpnd_type, wubi, pinyin, memo, vali_flag, rid, updt_time,
+        crter_id, crter_name, crte_time, crte_optins_no, opter_id, opter_name, opt_time,
+        optins_no, poolarea_no from insure_unified_directory
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_name like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    查询所有的医疗目录与医保目录匹配信息-->
+    <select id="queyrAllInsureUnifiedMatch"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedMatchDO">
+        select id, hosp_code, med_list_codg, hilist_code,
+        list_type, insu_admdvs, begndate, enddate, memo,
+        vali_flag, rid,
+        updt_time, crter_id, crter_name, crte_time, crte_optins_no,
+        opter_id, opter_name, opt_time, optins_no, poolarea_no from insure_unified_match
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( med_list_codg like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    查询所有的医保目录限价信息-->
+    <select id="queyrAllInsureUnifiedLimitPrice"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedLimitPriceDO">
+        select id, hilist_code, hosp_code, hilist_lmtpric_type,
+        overlmt_dspo_way, insu_admdvs, begndate, enddate,
+        hilist_pric_uplmt_amt, vali_flag, rid, updt_time,
+        crter_id, crter_name, crte_time, crte_optins_no, opter_id, opter_name,
+        opt_time, optins_no, tabname, poolarea_no from insure_unified_limitprice
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    分页查询所有的目录限价信息-->
+    <select id="queryPageInsureUnifiedLimitPrice"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedLimitPriceDO">
+        select id, hilist_code, hosp_code, hilist_lmtpric_type, overlmt_dspo_way, insu_admdvs,
+        begndate, enddate, hilist_pric_uplmt_amt, vali_flag, rid, updt_time,
+        crter_id, crter_name, crte_time, crte_optins_no, opter_id,
+        opter_name, opt_time, optins_no, tabname, poolarea_no from insure_unified_limitprice
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    分页查询所有医疗目录与医保目录匹配信息-->
+    <select id="queryPageInsureUnifiedMatch"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedMatchDO">
+        select id, hosp_code, med_list_codg, hilist_code,
+        list_type, insu_admdvs, begndate, enddate, memo,
+        vali_flag, rid, updt_time, crter_id,
+        crter_name, crte_time, crte_optins_no,
+        opter_id, opter_name, opt_time, optins_no, poolarea_no from insure_unified_match
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%') or
+            ( med_list_codg like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryPageInsureUnifiedDirectory"
+            resultType="cn.hsa.module.insure.module.entity.InsureDirectoryInfoDO">
+        select id, hosp_code, hilist_code, hilist_name, insu_admdvs, begndate,
+        enddate, med_chrgitm_type, chrgitm_lv, lmt_used_flag, list_type,
+        med_use_flag, matn_used_flag, hilist_use_type, lmt_cpnd_type, wubi,
+        pinyin, memo, vali_flag, rid, updt_time, crter_id,
+        crter_name, crte_time, crte_optins_no, opter_id, opter_name,
+        opt_time, optins_no, poolarea_no from insure_unified_directory
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            or hilist_name like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    分页查询所有的目录限价信息-->
+    <select id="queryPageInsureUnifiedRatio"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifidRatioDO">
+        select id, hosp_code, hilist_code, selfpay_prop_psn_type,
+        selfpay_prop_type, insu_admdvs, begndate, enddate, selfpay_prop,
+        vali_flag, rid, updt_time, crter_id, crter_name,
+        crte_time, crte_optins_no, opter_id, opter_name, opt_time, optins_no,
+        tabname, poolarea_no from insure_unified_ratio
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <!--    查询所有的医保目录先自付比例信息-->
+    <select id="queryAllInsureUnifiedRatio"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifidRatioDO">
+        select id, hosp_code, hilist_code, selfpay_prop_psn_type,
+        selfpay_prop_type, insu_admdvs, begndate, enddate, selfpay_prop, vali_flag, rid,
+        updt_time, crter_id, crter_name, crte_time, crte_optins_no,
+        opter_id, opter_name, opt_time, optins_no, tabname, poolarea_no from insure_unified_ratio
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <select id="queyrAllInsureMedicinesMatch"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedMatchMedicinsDO">
+        select id, hosp_code, fixmedins_code, medins_list_codg,
+        medins_list_name, med_list_codg, list_type, insu_admdvs
+        , begndate, enddate, aprvno, dosform, exct_cont, item_cont,
+        prcunt, spec, pacspec, memo, vali_flag, rid, updt_time, crter_id, crter_name,
+        crte_time, crte_optins_no, opter_id, opter_name, opt_time,
+        optins_no, poolarea_no from insure_unified_medicmatch
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queyrPageInsureMedicinesMatch"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedMatchMedicinsDO">
+        select id, hosp_code, fixmedins_code, medins_list_codg,
+        medins_list_name, med_list_codg, list_type, insu_admdvs
+        , begndate, enddate, aprvno, dosform, exct_cont, item_cont,
+        prcunt, spec, pacspec, memo, vali_flag, rid, updt_time, crter_id, crter_name,
+        crte_time, crte_optins_no, opter_id, opter_name, opt_time,
+        optins_no, poolarea_no from insure_unified_medicmatch
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <select id="queyrAllInsureNationDrug"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedNationDrugDO">
+            select id, hosp_code, med_list_codg, drug_prodname, genname_codg,
+                   drug_genname, ethdrug_type, chemname, alis, eng_name, dosform, each_dos, used_frqu,
+                   nat_drug_no, used_mtd, ing, chrt, defs, tabo, mnan, stog, drug_spec, prcunt_type, otc_flag,
+                   pacmatl, pacspec, min_useunt, min_salunt, manl, rute, begndate, enddate, pham_type, memo, pac_cnt, min_unt, min_pac_cnt, min_pacunt, min_prepunt, drug_expy, efcc_atd, min_prcunt, wubi, pinyin, vali_flag, rid, crte_time, updt_time,
+                   crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver from insure_unified_nation_drug
+        <if test="keyword != null and keyword != ''">
+            and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.lis.dao.LisDao">
+
+    <resultMap type="cn.hsa.module.base.dept.dto.BaseDeptDTO" id="BaseDeptMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="wardCode" column="ward_code" jdbcType="VARCHAR"/>
+        <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="upDeptCode" column="up_dept_code" jdbcType="VARCHAR"/>
+        <result property="mgDeptCode" column="mg_dept_code" jdbcType="VARCHAR"/>
+        <result property="mgName" column="mgName" jdbcType="VARCHAR"/>
+        <result property="intro" column="intro" jdbcType="VARCHAR"/>
+        <result property="place" column="place" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="typeIdentity" column="type_identity" jdbcType="VARCHAR"/>
+        <result property="drugStoreCode" column="drugStoreCode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.sys.user.dto.SysUserDTO" id="SysUserMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="isInJob" column="is_in_job" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="OTHER"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="isPm" column="is_pm" jdbcType="VARCHAR"/>
+        <result property="inPmDate" column="in_pm_date" jdbcType="OTHER"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="photoImage" column="photo_image" jdbcType="VARCHAR"/>
+        <result property="signImage" column="sign_image" jdbcType="VARCHAR"/>
+        <result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+        <result property="speciality" column="speciality" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="educationCode" column="education_code" jdbcType="VARCHAR"/>
+        <result property="majorCode" column="major_code" jdbcType="VARCHAR"/>
+        <result property="school" column="school" jdbcType="VARCHAR"/>
+        <result property="schoolDate" column="school_date" jdbcType="OTHER"/>
+        <result property="schoolImage" column="school_image" jdbcType="VARCHAR"/>
+        <result property="workDate" column="work_date" jdbcType="OTHER"/>
+        <result property="workTypeCode" column="work_type_code" jdbcType="VARCHAR"/>
+        <result property="dutiesCode" column="duties_code" jdbcType="VARCHAR"/>
+        <result property="pracCertiNo" column="prac_certi_no" jdbcType="VARCHAR"/>
+        <result property="pracCertiName" column="prac_certi_name" jdbcType="VARCHAR"/>
+        <result property="durgCode" column="durg_code" jdbcType="VARCHAR"/>
+        <result property="antibacterialCode" column="antibacterial_code" jdbcType="VARCHAR"/>
+        <result property="phCode" column="ph_code" jdbcType="VARCHAR"/>
+        <result property="opeartionCode" column="opeartion_code" jdbcType="VARCHAR"/>
+        <result property="pswdErrCnt" column="pswd_err_cnt" jdbcType="INTEGER"/>
+        <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
+        <result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="systemName" column="systemName" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="deptCode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.base.ba.dto.BaseAdviceDTO" id="BaseAdviceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="technologyCode" column="technology_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+        <result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+        <result property="bizType" column="biz_type" jdbcType="VARCHAR"/>
+        <result property="bizCode" column="biz_code" jdbcType="VARCHAR"/>
+        <result property="containerCode" column="container_code" jdbcType="VARCHAR"/>
+        <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
+        <result property="useScopeCode" column="use_scope_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="doctorLevelCode" column="doctor_level_code" jdbcType="VARCHAR"/>
+        <result property="opeartionCode" column="opeartion_code" jdbcType="VARCHAR"/>
+        <result property="insureListCode" column="insure_list_code" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="minAge" column="min_age" jdbcType="INTEGER"/>
+        <result property="maxAge" column="max_age" jdbcType="INTEGER"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="isStopSame" column="is_stop_same" jdbcType="VARCHAR"/>
+        <result property="isStopSameNot" column="is_stop_same_not" jdbcType="VARCHAR"/>
+        <result property="isStopMyself" column="is_stop_myself" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.outpt.lis.dto.LisInspectApplyActiveDTO" id="InspectApplyActiveMap">
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="msg" column="msg" jdbcType="VARCHAR"/>
+        <result property="data" column="data" jdbcType="VARCHAR"/>
+        <result property="areaCode" column="area_code" jdbcType="VARCHAR"/>
+        <result property="patInfoid" column="pat_infoId" jdbcType="VARCHAR"/>
+        <result property="testDate" column="test_date" jdbcType="TIMESTAMP"/>
+        <result property="scode" column="scode" jdbcType="VARCHAR"/>
+        <result property="ecode" column="ecode" jdbcType="VARCHAR"/>
+        <result property="eqpName" column="eqp_name" jdbcType="VARCHAR"/>
+        <result property="testNum" column="test_num" jdbcType="VARCHAR"/>
+        <result property="emergencyTag" column="emergency_tag" jdbcType="VARCHAR"/>
+        <result property="chargetag" column="chargeTag" jdbcType="VARCHAR"/>
+        <result property="criticalStatus" column="critical_status" jdbcType="VARCHAR"/>
+        <result property="reviewTag" column="review_tag" jdbcType="VARCHAR"/>
+        <result property="reviewTimes" column="review_times" jdbcType="VARCHAR"/>
+        <result property="positiveTag" column="positive_tag" jdbcType="VARCHAR"/>
+        <result property="pid" column="pid" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="pyCode" column="py_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="VARCHAR"/>
+        <result property="ageUnit" column="age_unit" jdbcType="VARCHAR"/>
+        <result property="fullAge" column="full_age" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="ssid" column="ssid" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="VARCHAR"/>
+        <result property="patientCompany" column="patient_company" jdbcType="VARCHAR"/>
+        <result property="patType" column="pat_type" jdbcType="VARCHAR"/>
+        <result property="patTypeName" column="pat_type_name" jdbcType="VARCHAR"/>
+        <result property="dptCode" column="dpt_code" jdbcType="VARCHAR"/>
+        <result property="dptName" column="dpt_name" jdbcType="VARCHAR"/>
+        <result property="dctCode" column="dct_code" jdbcType="VARCHAR"/>
+        <result property="dctName" column="dct_name" jdbcType="VARCHAR"/>
+        <result property="bedNum" column="bed_num" jdbcType="VARCHAR"/>
+        <result property="lczd" column="lczd" jdbcType="VARCHAR"/>
+        <result property="drugRemark" column="drug_remark" jdbcType="VARCHAR"/>
+        <result property="ordersRemark" column="orders_remark" jdbcType="VARCHAR"/>
+        <result property="orderTime" column="order_time" jdbcType="TIMESTAMP"/>
+        <result property="barcode" column="barcode" jdbcType="VARCHAR"/>
+        <result property="gatherTime" column="gather_time" jdbcType="TIMESTAMP"/>
+        <result property="receiveTime" column="receive_time" jdbcType="TIMESTAMP"/>
+        <result property="inputTime" column="input_time" jdbcType="TIMESTAMP"/>
+        <result property="testTime" column="test_time" jdbcType="TIMESTAMP"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="testTserCode" column="test_tser_code" jdbcType="VARCHAR"/>
+        <result property="testUserName" column="test_user_name" jdbcType="VARCHAR"/>
+        <result property="testUserSign" column="test_user_sign" jdbcType="OTHER"/>
+        <result property="checkUserCode" column="check_user_code" jdbcType="VARCHAR"/>
+        <result property="check_UserName" column="check__user_name" jdbcType="VARCHAR"/>
+        <result property="sampleState" column="sample_state" jdbcType="VARCHAR"/>
+        <result property="caseid" column="caseId" jdbcType="VARCHAR"/>
+        <result property="patientUniqueid" column="patient_uniqueId" jdbcType="VARCHAR"/>
+        <result property="sampleCode" column="sample_code" jdbcType="VARCHAR"/>
+        <result property="sampleName" column="sample_name" jdbcType="VARCHAR"/>
+        <result property="samplePart" column="sample_part" jdbcType="VARCHAR"/>
+        <result property="securityLevel" column="security_level" jdbcType="VARCHAR"/>
+        <result property="hospitalTimes" column="hospital_times" jdbcType="TIMESTAMP"/>
+        <result property="infectiousTag" column="infectious_tag" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="comment" column="comment" jdbcType="VARCHAR"/>
+        <result property="resultComment" column="result_comment" jdbcType="VARCHAR"/>
+        <result property="warnRemark" column="warn_remark" jdbcType="VARCHAR"/>
+        <result property="ageUnitName" column="age_unit_name" jdbcType="VARCHAR"/>
+<!--        <result property="resultlist" column="resultlist" jdbcType="VARCHAR"/>-->
+        <result property="testitemCode" column="testItem_code" jdbcType="VARCHAR"/>
+        <result property="testitemname" column="testItemName" jdbcType="VARCHAR"/>
+        <result property="testitemename" column="testItemEname" jdbcType="VARCHAR"/>
+        <result property="testtime" column="testTime" jdbcType="TIMESTAMP"/>
+        <result property="resultType" column="result_type" jdbcType="OTHER"/>
+        <result property="result" column="result" jdbcType="VARCHAR"/>
+        <result property="resultUnit" column="result_unit" jdbcType="VARCHAR"/>
+        <result property="rangeState" column="range_state" jdbcType="VARCHAR"/>
+        <result property="referenceRange" column="reference_range" jdbcType="VARCHAR"/>
+        <result property="rangeStateColor" column="range_state_color" jdbcType="VARCHAR"/>
+        <result property="feeitemName" column="feeItem_name" jdbcType="VARCHAR"/>
+        <result property="feeitemCode" column="feeItem_code" jdbcType="VARCHAR"/>
+        <result property="hisId" column="his_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.outpt.lis.dto.LisCallbackStatusDTO" id="LisCallbackStatusMap">
+        <result property="barcode" column="barcode" jdbcType="VARCHAR"/>
+        <result property="patinfoid" column="patinfoid" jdbcType="VARCHAR"/>
+        <result property="hisid" column="hisid" jdbcType="VARCHAR"/>
+        <result property="feeitemName" column="feeItem_name" jdbcType="VARCHAR"/>
+        <result property="feeitemCode" column="feeItem_code" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="date" column="date" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.medic.data.dto.MedicalDataDTO" id="MedicalDataMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="resultName" column="result_name" jdbcType="VARCHAR"/>
+        <result property="tableSql" column="table_sql" jdbcType="VARCHAR"/>
+        <result property="sourceType" column="source_type" jdbcType="VARCHAR"/>
+        <result property="sourceName" column="source_name" jdbcType="VARCHAR"/>
+        <result property="interfaceUrl" column="interface_url" jdbcType="VARCHAR"/>
+        <result property="interfaceType" column="interface_type" jdbcType="VARCHAR"/>
+        <result property="classUrl" column="class_url" jdbcType="VARCHAR"/>
+        <result property="methodName" column="method_name" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.medic.data.dto.MedicalDataDetailDTO" id="MedicalDataDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="resultEName" column="result_e_name" jdbcType="VARCHAR"/>
+        <result property="resultCName" column="result_c_name" jdbcType="VARCHAR"/>
+        <result property="resultType" column="result_type" jdbcType="VARCHAR"/>
+        <result property="resultRemark" column="result_remark" jdbcType="VARCHAR"/>
+        <result property="resourceEName" column="resource_e_name" jdbcType="VARCHAR"/>
+        <result property="resourceCName" column="resource_c_name" jdbcType="VARCHAR"/>
+        <result property="resourceType" column="resource_type" jdbcType="VARCHAR"/>
+        <result property="resourceRemark" column="resource_remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="getDeptList" resultMap="BaseDeptMap">
+        select
+        *
+        from
+        base_dept
+        where hosp_code = #{hospCode}
+        and is_valid = #{isValid}
+        order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="getDocList" resultMap="SysUserMap">
+        select
+        a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code,
+        a.nation_code,
+        a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image,
+        a.introduce, a.speciality,
+        a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image,
+        a.work_date, a.work_type_code,
+        a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code,
+        a.ph_code,
+        a.opeartion_code,
+        a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
+        a.crte_id,a.crte_name,
+        a.crte_time,
+        b.name as deptName,
+        b.name as deptCode
+        from sys_user a
+        left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
+        <where>
+            a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="workTypeList != null and workTypeList.size() > 0">
+                and a.work_type_code in
+                <foreach collection="workTypeList" separator="," item="workTypeCode" open="(" close=")">
+                    #{workTypeCode}
+                </foreach>
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and a.status_code = #{statusCode}
+            </if>
+            <if test="isInJob != null and isInJob != ''">
+                and a.is_in_job = #{isInJob}
+            </if>
+        </where>
+    </select>
+
+
+    <!--查询医院下的所有项目-->
+    <select id="getItemList" resultMap="BaseAdviceMap">
+        select
+        a.*
+        from base_advice a
+        <where>
+            a.hosp_code = #{hospCode}
+            and a.is_valid = #{isValid}
+            and type_code = '3'
+            <if test="id != null">
+                and a.id = #{id}
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and a.id in
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="codes != null">
+                and a.code in
+                <foreach collection="codes" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and a.nation_code = #{nationCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and a.type_code = #{typeCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and a.bfc_code = #{bfcCode}
+            </if>
+            <if test="abbr != null and abbr != ''">
+                and a.abbr = #{abbr}
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="price != null">
+                and a.price = #{price}
+            </if>
+            <if test="onePrice != null">
+                and a.one_price = #{onePrice}
+            </if>
+            <if test="twoPrice != null">
+                and a.two_price = #{twoPrice}
+            </if>
+            <if test="threePrice != null">
+                and a.three_price = #{threePrice}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and a.unit_code = #{unitCode}
+            </if>
+            <if test="intension != null and intension != ''">
+                and a.intension = #{intension}
+            </if>
+            <if test="prompt != null and prompt != ''">
+                and a.prompt = #{prompt}
+            </if>
+            <if test="except != null and except != ''">
+                and a.except = #{except}
+            </if>
+            <if test="remark != null and remark != ''">
+                and a.remark = #{remark}
+            </if>
+            <if test="isOut != null and isOut != ''">
+                and a.is_out = #{isOut}
+            </if>
+            <if test="isIn != null and isIn != ''">
+                and a.is_in = #{isIn}
+            </if>
+            <if test="isCg != null and isCg != ''">
+                and a.is_cg = #{isCg}
+            </if>
+            <if test="isMs != null and isMs != ''">
+                and a.is_ms = #{isMs}
+            </if>
+            <if test="isSuppCurtain != null and isSuppCurtain != ''">
+                and a.is_supp_curtain = #{isSuppCurtain}
+            </if>
+            <if test="outDeptCode != null and outDeptCode != ''">
+                and a.out_dept_code = #{outDeptCode}
+            </if>
+            <if test="inDeptCode != null and inDeptCode != ''">
+                and a.in_dept_code = #{inDeptCode}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and a.crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and a.crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and a.crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (a.code like concat('%',#{keyword},'%')
+                or a.name like concat('%',#{keyword},'%')
+                or a.name_pym like concat('%',#{keyword},'%')
+                or a.name_wbm like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="getPrescribeLis" resultType="java.util.LinkedHashMap">
+        select #{hospCode} as areaCode,
+        d.visit_no as pid,
+        d.name as name,
+        d.pym as pyCode,
+        d.age as age,
+        (select name from sys_code_detail where c_code = 'NLDW' and value = d.age_unit_code) as ageUnit,
+        (select name from sys_code_detail where c_code = 'XB' and value = d.gender_code) as sex,
+        '' as caseId,
+        '' as securityLevel,
+        d.cert_no as ssid,
+        d.phone as mobile,
+        d.birthday as birthday,
+        1 as infectiousTag,
+        1 as hospitalTimes,
+        '1' as patTypeName,
+        0 as emergencyTag,
+        c.dept_id as dptCode,
+        c.dept_name as dptName,
+        c.doctor_id as dctCode,
+        c.doctor_name as dctName,
+        '' as bedNum,
+        '' as lczd,
+        '' as drugRemark,
+        '' as ordersRemark,
+        '' as sampleCode,
+        '' as sampleState,
+        '' as samplePart,
+        '' as sampleDesc,
+        DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s') as orderTime,
+        DATE_FORMAT(now(),'%Y-%m-%d') as orderDate,
+        a.item_name as feeItemName,
+        a.item_id as feeItemCode,
+        '1' as feeItemCount,
+        a.total_price as feeItemMoney,
+        '1' as feeState,
+        '' as invoiceNo,
+        '' as hisid,
+        '' as fullAge,
+        '' as patientUniqueId,
+        '' as orderUserName,
+        '' as barcode,
+        null as barcodeTime,
+        'HIS' as source
+        from outpt_prescribe_detail a
+        inner join base_advice b
+        on a.item_id = b.id and a.hosp_code = b.hosp_code
+        left join outpt_prescribe c
+        on a.op_id = c.id and a.hosp_code = c.hosp_code
+        left join outpt_visit d
+        on c.visit_id = d.id and c.hosp_code = d.hosp_code
+        <where>
+            a.hosp_code = #{hospCode}
+            and a.item_code = '4'
+            and b.type_code = '3'
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="getAdviceLis" resultType="java.util.Map">
+        select d.in_no as pid, d.name as name, d.pym as pyCode, d.age as age,
+        (select name from sys_code_detail where c_code = 'NLDW' and value = d.age_unit_code) as ageUnit,
+        (select name from sys_code_detail where c_code = 'XB' and value = d.gender_code) as sex,
+        '' as caseId,
+        '' as securityLevel,
+        d.cert_no as ssid,
+        d.phone as mobile,
+        d.birthday as birthday,
+        '' as hospitalTimes,
+        '2' as patTypeName,
+        a.dept_id as dptCode,
+        (select name from base_dept where id = a.dept_id) as dptName,
+        a.crte_id as dctCode,
+        a.crte_name as dctName,
+        (select name from base_bed where id = d.bed_id) as bedNum,
+        '' as lczd,
+        '' as drugRemark,
+        '' as ordersRemark,
+        '' as sampleCode,
+        '' as sampleState,
+        '' as samplePart,
+        '' as sampleDesc,
+        now() as orderTime,
+        DATE_FORMAT(now(),'%Y-%m-%d') as orderDate,
+        a.item_name as feeItemName,
+        a.item_id as feeItemCode,
+        '1' as feeItemCount,
+        a.total_price as feeItemMoney,
+        '1' as feeState,
+        '' as invoiceNo,
+        '1' as hisid,
+        '' as fullAge,
+        '' as patientUniqueId,
+        '' as orderUserName,
+        '' as barcode,
+        null as barcodeTime,
+        'HIS' as source
+        from inpt_advice a
+        inner join base_advice b
+        on a.item_id = b.id and a.hosp_code = b.hosp_code
+        left join outpt_visit d
+        on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        <where>
+            a.hosp_code = #{hospCode}
+            and a.item_code = '4'
+            and b.type_code = '3'
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+        </where>
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insertLisInspect">
+        insert into lis_inspect_apply_active(status, msg, data, area_code, pat_infoId, test_date, scode, ecode, eqp_name, test_num, emergency_tag, chargeTag, critical_status, review_tag, review_times, positive_tag, pid, name, py_code, age, age_unit, full_age, sex, ssid, mobile, birthday, patient_company, pat_type, pat_type_name, dpt_code, dpt_name, dct_code, dct_name, bed_num, lczd, drug_remark, orders_remark, order_time, barcode, gather_time, receive_time, input_time, test_time, check_time, test_tser_code, test_user_name, test_user_sign, check_user_code, check__user_name, sample_state, caseId, patient_uniqueId, sample_code, sample_name, sample_part, security_level, hospital_times, infectious_tag, remark, comment, result_comment, warn_remark, age_unit_name, resultlist, testItem_code, testItemName, testItemEname, testTime, result_type, result, result_unit, range_state, reference_range, range_state_color, feeItem_name, feeItem_code, his_id, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+        (#{item.status}, #{item.msg}, #{item.data}, #{item.areaCode}, #{item.patInfoid}, #{item.testDate}, #{item.scode}, #{item.ecode}, #{item.eqpName}, #{item.testNum}, #{item.emergencyTag}, #{item.chargetag}, #{item.criticalStatus}, #{item.reviewTag}, #{item.reviewTimes}, #{item.positiveTag}, #{item.pid}, #{item.name}, #{item.pyCode}, #{item.age}, #{item.ageUnit}, #{item.fullAge}, #{item.sex}, #{item.ssid}, #{item.mobile}, #{item.birthday}, #{item.patientCompany}, #{item.patType}, #{item.patTypeName}, #{item.dptCode}, #{item.dptName}, #{item.dctCode}, #{item.dctName}, #{item.bedNum}, #{item.lczd}, #{item.drugRemark}, #{item.ordersRemark}, #{item.orderTime}, #{item.barcode}, #{item.gatherTime}, #{item.receiveTime}, #{item.inputTime}, #{item.testTime}, #{item.checkTime}, #{item.testTserCode}, #{item.testUserName}, #{item.testUserSign}, #{item.checkUserCode}, #{item.check_UserName}, #{item.sampleState}, #{item.caseid}, #{item.patientUniqueid}, #{item.sampleCode}, #{item.sampleName}, #{item.samplePart}, #{item.securityLevel}, #{item.hospitalTimes}, #{item.infectiousTag}, #{item.remark}, #{item.comment}, #{item.resultComment}, #{item.warnRemark}, #{item.ageUnitName}, #{item.resultlist}, #{item.testitemCode}, #{item.testitemname}, #{item.testitemename}, #{item.testtime}, #{item.resultType}, #{item.result}, #{item.resultUnit}, #{item.rangeState}, #{item.referenceRange}, #{item.rangeStateColor}, #{item.feeitemName}, #{item.feeitemCode}, #{item.hisId}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--新增所有列-->
+    <insert id="insertLisInspectResult">
+        insert into lis_inspect_apply_active(area_code, pat_infoId, test_date, scode, ecode, eqp_name, test_num, emergency_tag, chargeTag, critical_status, review_tag, review_times, positive_tag, pid, name, py_code, age, age_unit, full_age, sex, ssid, mobile, birthday, patient_company, pat_type, pat_type_name, dpt_code, dpt_name, dct_code, dct_name, bed_num, lczd, drug_remark, orders_remark, order_time, barcode, gather_time, receive_time, input_time, test_time, check_time, test_tser_code, test_user_name, test_user_sign, check_user_code, check__user_name, sample_state, caseId, patient_uniqueId, sample_code, sample_name, sample_part, security_level, hospital_times, infectious_tag, remark, comment, result_comment, warn_remark, age_unit_name, resultlist, testItem_code, testItemName, testItemEname, testTime, result_type, result, result_unit, range_state, reference_range, range_state_color, feeItem_name, feeItem_code, his_id, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.areaCode}, #{item.patInfoid}, #{item.testDate}, #{item.scode}, #{item.ecode}, #{item.eqpName}, #{item.testNum}, #{item.emergencyTag}, #{item.chargetag}, #{item.criticalStatus}, #{item.reviewTag}, #{item.reviewTimes}, #{item.positiveTag}, #{item.pid}, #{item.name}, #{item.pyCode}, #{item.age}, #{item.ageUnit}, #{item.fullAge}, #{item.sex}, #{item.ssid}, #{item.mobile}, #{item.birthday}, #{item.patientCompany}, #{item.patType}, #{item.patTypeName}, #{item.dptCode}, #{item.dptName}, #{item.dctCode}, #{item.dctName}, #{item.bedNum}, #{item.lczd}, #{item.drugRemark}, #{item.ordersRemark}, #{item.orderTime}, #{item.barcode}, #{item.gatherTime}, #{item.receiveTime}, #{item.inputTime}, #{item.testTime}, #{item.checkTime}, #{item.testTserCode}, #{item.testUserName}, #{item.testUserSign}, #{item.checkUserCode}, #{item.check_UserName}, #{item.sampleState}, #{item.caseid}, #{item.patientUniqueid}, #{item.sampleCode}, #{item.sampleName}, #{item.samplePart}, #{item.securityLevel}, #{item.hospitalTimes}, #{item.infectiousTag}, #{item.remark}, #{item.comment}, #{item.resultComment}, #{item.warnRemark}, #{item.ageUnitName}, #{item.resultlist}, #{item.testitemCode}, #{item.testitemname}, #{item.testitemename}, #{item.testtime}, #{item.resultType}, #{item.result}, #{item.resultUnit}, #{item.rangeState}, #{item.referenceRange}, #{item.rangeStateColor}, #{item.feeitemName}, #{item.feeitemCode}, #{item.hisId}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+
+
+    <insert id="insertLisCallbackStatus">
+        insert into lis_callback_status(barcode, patinfoid, hisid, feeItem_name, feeItem_code, status, date, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+        (#{item.barcode}, #{item.patInfoId}, #{item.hisId}, #{item.feeItemName}, #{item.feeItemCode}, #{item.status}, #{item.date}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--新增所有列-->
+    <insert id="insertLisPDF">
+        insert into lis_pdf(pdfurl, pdffile, pdfpath, crte_id, crte_name, crte_time)
+        values
+        (#{pdfurl}, #{pdffile}, #{pdfpath}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--新增所有列-->
+    <insert id="insertLisCallbackCriticalValue">
+        insert into lis_critical_value(area_code, pat_infoId, test_item_code, critical_result, critical_state, critical_time, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+        (#{item.areaCode}, #{item.patInfoId}, #{item.testItemCode}, #{item.criticalResult}, #{item.criticalState}, #{item.criticalTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+
+
+
+
+
+
+
+
+
+
+    <insert id="insertMedicalData" keyProperty="id" useGeneratedKeys="true">
+        insert into medic_data(id,hosp_code,name,type,result_name,source_type,source_name,table_sql,interface_url,interface_type,
+        class_url,method_name,status_code,remark,crte_id,crte_name,crte_time)
+         values(#{id},#{hospCode},#{name},#{type},#{resultName},#{sourceType},#{tableSql},#{sourceName},#{interfaceUrl},#{interfaceType}
+         ,#{classUrl},#{methodName},#{statusCode},#{remark},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <insert id="insertMedicalDataDetails" keyProperty="id" useGeneratedKeys="true">
+        insert into medic_data_detail(id,hosp_code,type,result_e_name,result_c_name,result_type,result_remark,
+        resource_e_name,resource_c_name,resource_type,resource_remark,crte_id,crte_name,crte_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.hospCode},#{item.type},#{item.resultEName},#{item.resultCName},#{item.resultType},#{item.resultRemark},#{item.resourceEName}
+            ,#{item.resourceCName},#{item.resourceType},#{item.resourceRemark},#{item.crteId},#{item.crteName},#{item.crteTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertResults" keyProperty="id" useGeneratedKeys="true">
+        insert into medic_result(id,hosp_code,visit_id,in_no,advice_id,bar_code,type_code,item_code,item_name,result_type,result,result_detail,reporte_text,
+        pic_url,is_positive,reference_value,result_unit,range_state,range_state_color,check_part,check_ways,check_type,diagnosis_id,diagnosis_name,crte_id,
+        crte_name,crte_time,apply_id,pat_info_id,result_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.hospCode},#{item.visitId},#{item.inNo},#{item.adviceId},#{item.barCode},#{item.typeCode},#{item.itemCode}
+            ,#{item.itemName},#{item.resultType},#{item.result},#{item.resultDetail},#{item.reporteText}
+            ,#{item.picUrl},#{item.isPositive},#{item.referenceValue},#{item.resultUnit},#{item.rangeState},#{item.rangeStateColor},#{item.checkPart}
+            ,#{item.checkWays},#{item.checkType},#{item.diagnosisId},#{item.diagnosisName}
+            ,#{item.crteId},#{item.crteName},#{item.crteTime},#{item.applyId},#{item.patInfoId},#{item.resultId})
+        </foreach>
+    </insert>
+
+    <update id="updateMedicalData" keyProperty="id" useGeneratedKeys="true">
+        update medic_data set name=#{name},type = #{type},table_sql = #{tableSql},result_name = #{resultName},source_type = #{sourceType},
+        source_name = #{sourceName},interface_url = #{interfaceUrl},interface_type = #{interfaceType},class_url = #{classUrl},method_name = #{methodName},
+        remark = #{remark},crte_id = #{crteId},crte_name = #{crteName},crte_time = #{crteTime}
+        where hosp_code=#{hospCode} and id=#{id}
+    </update>
+
+    <select id="getLisDataList" parameterType="String" resultType="java.util.Map">
+         <![CDATA[
+            ${sql}
+          ]]>
+    </select>
+
+    <delete id="deleteMedicalDataDetails">
+        delete from medic_data_detail where hosp_code=#{hospCode} and type=#{type}
+    </delete>
+
+    <delete id="deleteMedicalData">
+        <foreach collection="list" item="item" separator=";">
+            update medic_data
+            <set >
+                <if test="item.statusCode!=null and item.statusCode!=''">
+                    status_code=#{item.statusCode},
+                </if>
+            </set>
+            where hosp_code=#{item.hospCode} and id=#{item.id} and status_code=#{item.oldStatusCode}
+        </foreach>
+    </delete>
+    <delete id="deleteResultByResultId">
+        delete from medic_result where hosp_code=#{hospCode} and result_id=#{resultId}
+    </delete>
+
+    <select id="getMedicalDatas" resultMap="MedicalDataMap">
+        select id,hosp_code,name,type,result_name,source_type,source_name,interface_url,interface_type,
+        class_url,method_name,status_code,remark,crte_id,crte_name,crte_time,table_sql
+        from medic_data
+        where hosp_code=#{hospCode}
+        <if test="statusCode!=null and statusCode!=''">
+            and status_code=#{statusCode}
+        </if>
+        <if test="sourceType!=null and sourceType!=''">
+            and source_type=#{sourceType}
+        </if>
+        <if test="type!=null and type!=''">
+            and type=#{type}
+        </if>
+        <if test="keyword!=null and keyword!=''">
+            and name like concat('%',#{keyword},'%')
+        </if>
+        order by crte_time desc
+    </select>
+
+    <select id="getMedicalDataDetails" resultMap="MedicalDataDetailMap">
+        select id,hosp_code,type,result_e_name,result_c_name,result_type,result_remark,
+        resource_e_name,resource_c_name,resource_type,resource_remark,resource_remark,crte_id,crte_name,crte_time
+        from medic_data_detail
+        where hosp_code=#{hospCode} and type=#{type}
+    </select>
+
+    <select id="getMedicalData" resultMap="MedicalDataDetailMap">
+        select id,hosp_code,name,type,result_name,source_type,source_name,interface_url,interface_type,
+        class_url,method_name,status_code,remark,crte_id,crte_name,crte_time,table_sql
+        from medic_data
+        where hosp_code=#{hospCode} and id=#{id}
+    </select>
+
+    <select id="getMedicalDataByType" resultMap="MedicalDataMap">
+        select id,hosp_code,name,type,result_name,source_type,source_name,interface_url,interface_type,
+        class_url,method_name,status_code,remark,crte_id,crte_name,crte_time,table_sql
+        from medic_data
+        where hosp_code=#{hospCode} and type=#{type} and status_code='1'
+    </select>
+
+    <select id="getMedicalDataDetail" resultMap="MedicalDataDetailMap">
+        select id,hosp_code,type,result_e_name,result_c_name,result_type,result_remark,
+        resource_e_name,resource_c_name,resource_type,resource_remark,resource_remark,crte_id,crte_name,crte_time
+        from medic_data_detail
+        where hosp_code=#{hospCode} and id=#{id}
+    </select>
+</mapper>

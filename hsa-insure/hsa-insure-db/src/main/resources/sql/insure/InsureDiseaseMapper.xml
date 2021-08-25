@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDiseaseDAO">
+    <insert id="insertDisease" parameterType="java.util.List">
+        insert into insure_disease (id, hosp_code, insure_reg_code,
+                                   insure_illness_id, insure_illness_code,
+                                   `insure_illness_name`, icd10, pym,
+                                   wbm, take_date, lose_date, remark, crte_id,down_load_type,
+                                   crte_name, crte_time, ver, ver_name,size,num,record_counts) values
+    <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.insureRegCode}, #{item.insureIllnessId}, #{item.insureIllnessCode},
+        #{item.insureIllnessName},#{item.icd10},
+        #{item.pym},#{item.wbm},#{item.takeDate},#{item.loseDate},
+        #{item.remark},
+        #{item.crteId},
+        #{item.downLoadType},
+        #{item.crteName},
+        #{item.crteTime},
+        #{item.ver},
+        #{item.verName},#{item.size},#{item.num},#{item.recordCounts}
+        )
+    </foreach>
+    </insert>
+    <select id="queryAll" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select id, hosp_code, insure_reg_code, insure_illness_id,
+               insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date, lose_date,
+               remark, crte_id, crte_name, crte_time, ver, ver_name,
+               down_load_type from insure_disease where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( insure_illness_name like concat('%',#{keyword},'%')
+            or insure_illness_code like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="insureRegCode !=null and insureRegCode != ''">
+            and insure_reg_code =#{insureRegCode}
+        </if>
+        <if test="downLoadType !=null and downLoadType != ''">
+            and down_load_type =#{downLoadType}
+        </if>
+    </select>
+    <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select * from insure_disease where hosp_code =#{hospCode} and id =#{id}
+    </select>
+    <select id="getInsureDiseaseById" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name
+        from insure_disease where hosp_code =#{hospCode} and id =#{insureId} and insure_reg_code = #{insureRegCode}
+    </select>
+    <select id="selectLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO" parameterType="map">
+        select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date,
+               lose_date, remark, crte_id, crte_name, crte_time, ver, ver_name, down_load_type,num,size,record_counts from insure_disease
+        where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code =#{insureRegCode}
+        order by crte_time desc limit 1
+    </select>
+</mapper>

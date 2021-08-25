@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharoutreceive.dao.PharOutReceiveDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="pharOutReceiveDtoMap" type="cn.hsa.module.phar.pharoutreceive.dto.PharOutReceiveDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="phar_id" property="pharId" jdbcType="VARCHAR" />
+        <result column="window_id" property="windowId" jdbcType="VARCHAR" />
+        <result column="assign_user_id" property="assignUserId" jdbcType="VARCHAR" />
+        <result column="assign_user_name" property="assignUserName" jdbcType="VARCHAR" />
+        <result column="assign_time" property="assignTime" jdbcType="TIMESTAMP" />
+        <result column="dist_user_id" property="distUserId" jdbcType="VARCHAR" />
+        <result column="dist_user_name" property="distUserName" jdbcType="VARCHAR" />
+        <result column="dist_time" property="distTime" jdbcType="TIMESTAMP" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        settle_id,
+        total_price,
+        status_code,
+        phar_id,
+        window_id,
+        assign_user_id,
+        assign_user_name,
+        assign_time,
+        dist_user_id,
+        dist_user_name,
+        dist_time,
+        dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        por.id,
+        por.hosp_code,
+        por.visit_id,
+        por.settle_id,
+        por.total_price,
+        por.status_code,
+        por.phar_id,
+        por.window_id,
+        por.assign_user_id,
+        por.assign_user_name,
+        por.assign_time,
+        por.dist_user_id,
+        por.dist_user_name,
+        por.dist_time,
+        por.dept_id,
+        por.crte_id,
+        por.crte_name,
+        por.crte_time
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="pharOutReceiveDtoMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        phar_out_receive
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO" >
+        insert into
+        phar_out_receive
+        (
+          id,
+          hosp_code,
+          visit_id,
+          settle_id,
+          total_price,
+          status_code,
+          phar_id,
+          window_id,
+          assign_user_id,
+          assign_user_name,
+          assign_time,
+          dist_user_id,
+          dist_user_name,
+          dist_time,
+          dept_id,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{settleId,jdbcType=VARCHAR},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{statusCode,jdbcType=VARCHAR},
+          #{pharId,jdbcType=VARCHAR},
+          #{windowId,jdbcType=VARCHAR},
+          #{assignUserId,jdbcType=VARCHAR},
+          #{assignUserName,jdbcType=VARCHAR},
+          #{assignTime,jdbcType=TIMESTAMP},
+          #{distUserId,jdbcType=VARCHAR},
+          #{distUserName,jdbcType=VARCHAR},
+          #{distTime,jdbcType=TIMESTAMP},
+          #{deptId,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO" >
+        insert into
+        phar_out_receive
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code,
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id,
+            </if>
+            <if test="windowId != null and windowId != ''">
+                window_id,
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id,
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name,
+            </if>
+            <if test="assignTime != null">
+                assign_time,
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id,
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name,
+            </if>
+            <if test="distTime != null">
+                dist_time,
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="crteTime != null">
+                crte_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                #{statusCode,jdbcType=VARCHAR},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                #{pharId,jdbcType=VARCHAR},
+            </if>
+            <if test="windowId != null and windowId != ''">
+                #{windowId,jdbcType=VARCHAR},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                #{assignUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                #{assignUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="assignTime != null">
+                #{assignTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                #{distUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                #{distUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="distTime != null">
+                #{distTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO" >
+        update
+        phar_out_receive
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                settle_id = #{settleId,jdbcType=VARCHAR},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                phar_id = #{pharId,jdbcType=VARCHAR},
+                window_id = #{windowId,jdbcType=VARCHAR},
+                assign_user_id = #{assignUserId,jdbcType=VARCHAR},
+                assign_user_name = #{assignUserName,jdbcType=VARCHAR},
+                assign_time = #{assignTime,jdbcType=TIMESTAMP},
+                dist_user_id = #{distUserId,jdbcType=VARCHAR},
+                dist_user_name = #{distUserName,jdbcType=VARCHAR},
+                dist_time = #{distTime,jdbcType=TIMESTAMP},
+                dept_id = #{deptId,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO" >
+        update
+        phar_out_receive
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId,jdbcType=VARCHAR},
+            </if>
+            <if test="windowId != null and windowId != ''">
+                window_id = #{windowId,jdbcType=VARCHAR},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id = #{assignUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name = #{assignUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id = #{distUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name = #{distUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="distTime != null">
+                dist_time = #{distTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM phar_out_receive WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM phar_out_receive WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="pharOutReceiveDtoMap" parameterType="cn.hsa.module.phar.pharoutreceive.dto.PharOutReceiveDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM phar_out_receive por
+        where
+            por.hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != ''">
+                AND por.visit_id LIKE CONCAT('%', #{visitId}, '%')
+            </if>
+            <if test="settleId != null and settleId != ''">
+                AND por.settle_id LIKE CONCAT('%', #{settleId}, '%')
+            </if>
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into
+        phar_out_receive
+        (
+          id,
+          hosp_code,
+          visit_id,
+          settle_id,
+          total_price,
+          status_code,
+          phar_id,
+          window_id,
+          assign_user_id,
+          assign_user_name,
+          assign_time,
+          dist_user_id,
+          dist_user_name,
+          dist_time,
+          dept_id,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.windowId,jdbcType=VARCHAR},
+            #{item.assignUserId,jdbcType=VARCHAR},
+            #{item.assignUserName,jdbcType=VARCHAR},
+            #{item.assignTime,jdbcType=TIMESTAMP},
+            #{item.distUserId,jdbcType=VARCHAR},
+            #{item.distUserName,jdbcType=VARCHAR},
+            #{item.distTime,jdbcType=TIMESTAMP},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+</mapper>

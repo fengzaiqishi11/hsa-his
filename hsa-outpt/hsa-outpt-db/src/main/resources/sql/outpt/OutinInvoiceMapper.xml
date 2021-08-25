@@ -1,0 +1,1699 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.outinInvoice.dao.OutinInvoiceDAO">
+    <resultMap id="outinInvoiceMap" type="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="receive_id" property="receiveId" jdbcType="VARCHAR" />
+        <result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+        <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP" />
+        <result column="use_id" property="useId" jdbcType="VARCHAR" />
+        <result column="use_name" property="useName" jdbcType="VARCHAR" />
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+        <result column="prefix" property="prefix" jdbcType="VARCHAR" />
+        <result column="start_no" property="startNo" jdbcType="VARCHAR" />
+        <result column="end_no" property="endNo" jdbcType="VARCHAR" />
+        <result column="curr_no" property="currNo" jdbcType="VARCHAR" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="num" property="num" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表查询字段 -->
+    <sql id="allColumns">
+        id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
+        prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
+        crte_name, crte_time
+    </sql>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="getInvoicePage" resultMap="outinInvoiceMap" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outin_invoice WHERE 1 = 1
+        AND hosp_code = #{hospCode}
+        <if test="receiveId != null and receiveId != ''">
+            AND receive_id = #{receiveId}
+        </if>
+        <if test="receiveId != null and receiveId != ''">
+            AND receive_id = #{receiveId}
+        </if>
+        <if test="receiveName != null and receiveName != ''">
+            AND receive_name = #{receiveName}
+        </if>
+        <if test="receiveTime != null">
+            AND  receive_time = #{receiveTime}
+        </if>
+
+        <if test="startTime != null">
+            AND receive_time &gt;= #{startTime}
+        </if>
+
+        <if test="endTime != null">
+            AND receive_time &lt;= #{endTime}
+        </if>
+
+        <if test="useId != null and useId != ''">
+            AND use_id = #{useId}
+        </if>
+        <if test="useName != null and useName != ''">
+            AND use_name = #{useName}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            AND type_code = #{typeCode}
+        </if>
+        <if test="prefix != null and prefix != ''">
+            AND prefix = #{prefix}
+        </if>
+        <if test="startNo != null and startNo != ''">
+            AND start_no = #{startNo}
+        </if>
+        <if test="endNo != null and endNo != ''">
+            AND end_no = #{endNo}
+        </if>
+        <if test="currNo != null and currNo != ''">
+            AND curr_no = #{currNo}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        <if test="num != null">
+            AND num = #{num}
+        </if>
+        <if test="remark != null and remark != ''">
+            AND remark = #{remark}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            AND crte_time = #{crteTime}
+        </if>
+        order by receive_time desc
+    </select>
+
+    <select id="getInvoiceList" resultMap="outinInvoiceMap" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outin_invoice WHERE 1 = 1
+        AND hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            AND id = #{id}
+        </if>
+        <if test="receiveId != null and receiveId != ''">
+            AND receive_id = #{receiveId}
+        </if>
+        <if test="receiveId != null and receiveId != ''">
+            AND receive_id = #{receiveId}
+        </if>
+        <if test="receiveName != null and receiveName != ''">
+            AND receive_name = #{receiveName}
+        </if>
+        <if test="receiveTime != null">
+            AND receive_time = #{receiveTime}
+        </if>
+        <if test="useId != null and useId != ''">
+            AND use_id = #{useId}
+        </if>
+        <if test="useName != null and useName != ''">
+            AND use_name = #{useName}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            AND type_code = #{typeCode}
+        </if>
+        <if test="typeCodeList != null">
+            AND type_code in
+            <foreach collection="typeCodeList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+
+            <if test="type == '0'.toString()">
+                AND type_code = '0'
+            </if>
+            <if test="type == '1'.toString()">
+                AND type_code in ('3','4')
+            </if>
+            <if test="type == '2'.toString()">
+                AND type_code in ('1','2','4')
+            </if>
+        </if>
+        <if test="prefix != null and prefix != ''">
+            AND prefix = #{prefix}
+        </if>
+        <if test="startNo != null and startNo != ''">
+            AND start_no = #{startNo}
+        </if>
+        <if test="endNo != null and endNo != ''">
+            AND end_no = #{endNo}
+        </if>
+        <if test="currNo != null and currNo != ''">
+            AND curr_no = #{currNo}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        <if test="num != null">
+            AND num = #{num}
+        </if>
+        <if test="remark != null and remark != ''">
+            AND remark = #{remark}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            AND crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <!-- 根据主键查询数据 -->
+    <select id="getOutinInvoiceById" resultMap="outinInvoiceMap" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outin_invoice WHERE id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据主键批量查询数据 -->
+    <select id="getOutinInvoiceByIds" resultMap="outinInvoiceMap" parameterType="list">
+        SELECT
+        <include refid="allColumns" />
+        FROM outin_invoice WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insertOutinInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        INSERT INTO outin_invoice (
+            id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
+            prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
+            crte_name, crte_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{receiveId},
+            #{receiveName},
+            #{receiveTime},
+            #{useId},
+            #{useName},
+            #{typeCode},
+            #{prefix},
+            #{startNo},
+            #{endNo},
+            #{currNo},
+            #{statusCode},
+            #{num},
+            #{remark},
+            #{crteId},
+            #{crteName},
+            #{crteTime}
+        )
+    </insert>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertOutinInvoices" parameterType="list">
+        INSERT INTO outin_invoice (
+        id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
+        prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
+        crte_name, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.receiveId},
+            #{item.receiveName},
+            #{item.receiveTime},
+            #{item.useId},
+            #{item.useName},
+            #{item.typeCode},
+            #{item.prefix},
+            #{item.startNo},
+            #{item.endNo},
+            #{item.currNo},
+            #{item.statusCode},
+            #{item.num},
+            #{item.remark},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateOutinInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO">
+        UPDATE outin_invoice
+        <set>
+            <if test="receiveId != null">
+                receive_id = #{receiveId},
+            </if>
+            <if test="receiveName != null">
+                receive_name = #{receiveName},
+            </if>
+            <if test="receiveTime != null">
+                receive_time = #{receiveTime},
+            </if>
+            <if test="useId != null">
+                use_id = #{useId},
+            </if>
+            <if test="useName != null">
+                use_name = #{useName},
+            </if>
+            <if test="typeCode != null">
+                type_code = #{typeCode},
+            </if>
+            <if test="prefix != null">
+                prefix = #{prefix},
+            </if>
+            <if test="startNo != null">
+                start_no = #{startNo},
+            </if>
+            <if test="endNo != null">
+                end_no = #{endNo},
+            </if>
+            <if test="currNo != null">
+                curr_no = #{currNo},
+            </if>
+            <if test="statusCode != null">
+                status_code = #{statusCode},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 批量修改数据 -->
+    <update id="updateOutinInvoices" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE outin_invoice
+            <set>
+                <if test="item.receiveId != null">
+                    receive_id = #{item.receiveId},
+                </if>
+                <if test="item.receiveName != null">
+                    receive_name = #{item.receiveName},
+                </if>
+                <if test="item.receiveTime != null">
+                    receive_time = #{item.receiveTime},
+                </if>
+                <if test="item.useId != null">
+                    use_id = #{item.useId},
+                </if>
+                <if test="item.useName != null">
+                    use_name = #{item.useName},
+                </if>
+                <if test="item.typeCode != null">
+                    type_code = #{item.typeCode},
+                </if>
+                <if test="item.prefix != null">
+                    prefix = #{item.prefix},
+                </if>
+                <if test="item.startNo != null">
+                    start_no = #{item.startNo},
+                </if>
+                <if test="item.endNo != null">
+                    end_no = #{item.endNo},
+                </if>
+                <if test="item.currNo != null">
+                    curr_no = #{item.currNo},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode},
+                </if>
+                <if test="item.num != null">
+                    num = #{item.num},
+                </if>
+                <if test="item.remark != null">
+                    remark = #{item.remark},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--
+       检查发票号是否已使用
+       条件:根据机构编码、票据号前缀、起始号码、结束号码、非退领
+       返回：是否有数据
+   -->
+    <select id="checkInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select sum(num) num from (
+            select count(1) num from outin_invoice a
+            where a.hosp_code = #{hospCode} and a.prefix = #{prefix} and (
+                cast(a.start_no as SIGNED) between #{startNo} and #{endNo}  or
+                cast(a.end_no as SIGNED) between #{startNo} and #{endNo}
+            ) and a.status_code != '2' and a.status_code != '3'
+            union all
+            select count(1) num from outin_invoice_detail a
+            join outin_invoice b on a.invoice_id = b.id
+            where b.hosp_code = #{hospCode} and b.prefix = #{prefix} and (
+                    cast(a.invoice_no as SIGNED) between #{startNo} and #{endNo}
+            ) and a.status_code != '1' and a.status_code != '3'
+        ) a
+    </select>
+
+    <select id="checkOutinInvoiceExistence" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select count(*) num from outin_invoice a
+            where a.hosp_code = #{hospCode} and a.prefix = #{prefix} and (
+                #{startNo} between a.start_no and a.end_no  or
+                #{endNo} between a.start_no and a.end_no) and a.status_code in ('1','2','4','5')
+    </select>
+
+
+    <!--
+       检查开始号码
+       条件：根据机构编码、开始号码段、UUID
+       返回：是否有数据。有：数据有误
+   -->
+    <select id="checkInvoiceStartNum" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select count(1) num from outin_invoice a
+        where a.hosp_code = #{hospCode} and a.id = #{id} and a.curr_no != #{invalidStartNo}
+    </select>
+
+    <select id="getUsedInvoiceByUseId" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" >
+        select * from outin_invoice a
+        where a.hosp_code = #{hospCode} and a.use_id = #{useId}
+    </select>
+
+
+    <!--
+       检查截止号码是否小于终止号码、UUID
+       条件：根据机构编码、结束号码段
+       返回：是否有数据。有：数据有误
+    -->
+    <select id="checkInvoiceEndNum" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select count(1) num from outin_invoice a
+        where a.hosp_code = #{hospCode} and cast(a.end_no as SIGNED) &lt; #{invalidEndNo} and a.id = #{id}
+    </select>
+
+    <!--
+            检查票据是否用完 或者退领
+            条件：根据机构编码、UUID、使用标识
+            返回：是否有数据。有：数据有误
+        -->
+    <select id="checkInvoiceStatus" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select count(1) num from outin_invoice a
+        where a.hosp_code = #{hospCode} and a.id = #{id} and (a.status_code='4' or a.status_code='5' or status_code='3')
+    </select>
+
+    <!--
+       检查号码段是否使用
+       条件：根据机构编码、开始号码段、结束号码段、UUID
+       返回：是否有数据。有：数据有误
+   -->
+    <select id="checkInvoiceNumSegment" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" resultType="java.lang.Integer" >
+        select count(1) num from outin_invoice_detail a
+        where a.hosp_code = #{hospCode} and a.invoice_id = #{id} and a.invoice_no = #{startNo}
+    </select>
+
+    <!-- 批量插入发票明细数据 -->
+    <insert id="insertOutinInvoiceDetailBatch" parameterType="java.util.List">
+        INSERT INTO outin_invoice_detail (
+        id, hosp_code, invoice_id, invoice_no, status_code, use_time, settle_id
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id},
+            #{item.hospCode},
+            #{item.invoiceId},
+            #{item.invoiceNo},
+            #{item.statusCode},
+            #{item.useTime},
+            #{item.settleId})
+        </foreach>
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateOutinInvoiceDetail" parameterType="map">
+        UPDATE outin_invoice_detail
+        <set>
+            <if test="statusCode != null">
+                status_code = #{statusCode},
+            </if>
+            <if test="useTime != null">
+                use_time = #{useTime},
+            </if>
+            <if test="settleId != null">
+                settle_id = #{settleId}
+            </if>
+        </set>
+        WHERE hosp_code = #{hospCode} and invoice_id = #{invoiceId} and invoice_no = #{invoiceNo}
+    </update>
+
+    <!-- 修改数据 -->
+    <update id="updateInvoiceDetailById" parameterType="map">
+        UPDATE outin_invoice_detail
+        <set>
+            <if test="statusCode != null">
+                status_code = #{statusCode}
+            </if>
+        </set>
+        WHERE hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+
+
+    <!-- 根据条件查询门诊挂号发票结算列表信息 -->
+    <select id="queryOutptRegisterInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+    SELECT
+        a.visit_id as visitId,
+        a.id AS registerId,
+        a.register_no AS settleNo,-- 结算单号
+        a.name,
+        b.bill_id AS invoiceId, -- 发票id
+        b.bill_no AS invoiceNo,-- 发票号
+        '0' AS settleType,-- 结算类型(挂号默认正常结算类型)
+        b.reality_price AS invoiceTotalPrice,-- 发票金额
+        '0' AS miPrice,-- 统筹支付
+        b.reality_price AS selfPrice,-- 个人支付金额
+        b.total_price AS settleTotalPrice,-- 挂号总金额（项目金额）
+        b.reality_price AS realityPrice,-- 单据应缴金额
+        a.doctor_id AS doctorId,-- 就诊医生id
+        a.doctor_name AS doctorName,-- 就诊医生
+        b.settle_time AS settleTime,-- 结算时间
+        b.preferential_price AS preferentialPrice,-- 单据优惠金额
+        '0' AS truncPrice,-- 舍入金额
+        b.reality_price as actualPrice, -- 实收金额
+        '0' AS settleAddMoney,-- 结算补收
+        b.daily_settle_id as dailySettleId, -- 缴款id(为空：未缴款；不为空：已缴款)
+        c.status_code AS statusCode,-- 状态标志
+        a.register_no as registerNo, -- 挂号单号
+        a.doctor_id AS createInvoiceId,-- 开票人id
+        a.doctor_name AS createInvoiceName,-- 开票人姓名
+        a.register_time AS createInvoiceTime,-- 开票时间
+        a.crte_id AS crteId,-- 操作人ID
+        a.crte_name AS crteName,-- 操作人姓名
+        a.crte_time AS crteTime, -- 创建时间
+        '0' AS isPrintList,-- 是否打印清单
+        b.order_no as orderNo, -- 支付订单号
+        b.pay_code as sourcePayCode, -- 支付来源
+        '2' as invoiceType, -- 发票类型
+        e.type_code as typeCode,
+        b.id as settleId,
+        f.visit_no
+        FROM
+        outpt_register_settle b
+        LEFT JOIN outpt_register a ON a.id = b.register_id
+        left join outin_invoice_detail c on (b.bill_id = c.invoice_id and b.bill_no = c.invoice_no)
+        left join outin_invoice e on b.bill_id = e.id
+        left join outpt_visit f on f.id = a.visit_id
+    WHERE 1=1 and a.hosp_code = #{hospCode} and a.is_cancel != '1'
+        <if test="keyword != null and keyword != ''">
+            AND concat(a.name,a.register_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND b.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND b.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by  a.crte_time desc
+    </select>
+
+    <!-- 根据条件查询门诊发票结算列表信息 -->
+    <select id="queryOutptInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+    SELECT
+        a.visit_id as visitId,
+        a.id as settleId,
+        a.settle_no AS settleNo,-- 结算单号
+        c.name,
+        b.invoice_id as invoiceId,
+        b.invoice_no as invoiceNo,
+        '1' AS settleType,-- 结算类型
+        b.total_price AS invoiceTotalPrice,-- 发票总金额
+        a.mi_price AS miPrice,-- 统筹支付金额
+        a.self_price AS selfPrice,-- 个人支付
+        a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
+        a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）
+        a.trunc_price AS truncPrice,-- 舍入金额
+        a.actual_price as actualPrice, -- 实收金额
+        d.status_code AS statusCode,-- 状态标志
+        a.daily_settle_id AS dailySettleId,-- 缴款id(为空：未缴款；不为空：已缴款)
+        a.is_print_list AS isPrintList,-- 是否打印清单
+        c.doctor_id AS doctorId,-- 医生id
+        c.doctor_name AS doctorName,-- 医生姓名
+        a.settle_time AS settleTime,-- 结算时间
+        a.crte_id AS crteId,-- 操作人ID
+        a.crte_name AS crteName, -- 操作人姓名
+        a.crte_time AS crteTime, -- 创建时间
+        (a.total_price - a.reality_price) as preferentialPrice, -- 单据优惠金额
+        a.order_no as orderNo, -- 支付订单号
+        a.source_pay_code as sourcePayCode, -- 支付来源
+        '1' as invoiceType, -- 发票类型
+        e.type_code as typeCode,
+        c.visit_no
+    FROM
+        outpt_settle a
+        LEFT JOIN outpt_settle_invoice b ON ( a.id = b.settle_id AND a.visit_id = b.visit_id )
+        LEFT JOIN outpt_visit c ON a.visit_id = c.id
+        left join outin_invoice e on b.invoice_id = e.id
+        left join outin_invoice_detail d on (d.id = b.invoice_detail_id)
+    WHERE
+        1 = 1
+        AND a.status_code = '0'
+        AND a.is_settle = '1' -- 正常且已经结算
+        AND a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            AND concat(c.name,a.settle_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND a.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by a.settle_time desc
+    </select>
+
+    <!-- 根据条件查询住院发票结算列表信息 -->
+    <select id="queryHospInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        a.visit_id as visitId,
+        a.id as settleId,
+        a.settle_no AS settleNo,-- 结算单号
+        c.name,
+        b.invoice_id as invoiceId,
+        b.invoice_no as invoiceNo,
+        a.type_code AS settleType,-- 结算类型
+        b.total_price AS invoiceTotalPrice,-- 发票总金额
+        a.mi_price AS miPrice,-- 统筹支付金额
+        a.self_price AS selfPrice,-- 个人支付
+        a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
+        a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）Mris
+        a.trunc_price AS truncPrice,-- 舍入金额
+        a.actual_price as actualPrice, -- 实收金额
+        d.status_code AS statusCode,-- 状态标志
+        a.daily_settle_id AS dailySettleId,-- 日缴款id(为空：未缴款；不为空：已缴款)
+        a.is_print AS isPrintList,-- 是否打印
+        c.zz_doctor_id AS doctorId,-- 医生id
+        c.zz_doctor_Name AS doctorName,-- 医生姓名
+        a.settle_time AS settleTime,-- 结算时间
+        a.crte_id AS crteId,-- 操作人ID
+        a.crte_name AS crteName, -- 操作人姓名
+        a.crte_time AS crteTime, -- 创建时间
+        (a.total_price - a.reality_price) as preferentialPrice, -- 单据优惠金额
+        a.order_no as orderNo, -- 支付订单号
+        a.source_pay_code as sourcePayCode, -- 支付来源
+        '4' as invoiceType, -- 发票类型
+        e.type_code as typeCode,
+        f.visit_no
+        FROM
+        inpt_settle a
+        LEFT JOIN inpt_settle_invoice b ON ( a.id = b.settle_id AND a.visit_id = b.visit_id )
+        LEFT JOIN inpt_visit c ON a.visit_id = c.id
+        LEFT JOIN outin_invoice e on b.invoice_id = e.id
+        LEFT JOIN outin_invoice_detail d on (d.id = b.invoice_detail_id)
+        left join outpt_visit f on f.id = b.visit_id
+        WHERE
+        1 = 1
+        AND a.status_code = '0'
+        AND a.is_settle = '1' -- 正常且已经结算
+        AND a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            AND concat(c.name,a.settle_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND a.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by a.settle_time desc
+    </select>
+
+    <!-- 根据条件查询门诊通用发票结算列表信息 -->
+    <select id="queryOutptCurrencyInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        a.visit_id as visitId,
+        a.id AS registerId,
+        a.register_no AS settleNo,-- 结算单号
+        a.name,
+        b.bill_id AS invoiceId, -- 发票id
+        b.bill_no AS invoiceNo,-- 发票号
+        '0' AS settleType,-- 结算类型(挂号默认正常结算类型)
+        b.reality_price AS invoiceTotalPrice,-- 发票金额
+        '0' AS miPrice,-- 统筹支付
+        b.reality_price AS selfPrice,-- 个人支付金额
+        b.total_price AS settleTotalPrice,-- 挂号总金额（项目金额）
+        b.reality_price AS realityPrice,-- 单据应缴金额
+        a.doctor_id AS doctorId,-- 就诊医生id
+        a.doctor_name AS doctorName,-- 就诊医生
+        b.settle_time AS settleTime,-- 结算时间
+        b.preferential_price AS preferentialPrice,-- 单据优惠金额
+        '0' AS truncPrice,-- 舍入金额
+        b.reality_price as actualPrice, -- 实收金额
+        '0' AS settleAddMoney,-- 结算补收
+        b.daily_settle_id as dailySettleId, -- 缴款id(为空：未缴款；不为空：已缴款)
+        c.status_code AS statusCode,-- 状态标志
+        a.register_no as registerNo, -- 挂号单号
+        a.doctor_id AS createInvoiceId,-- 开票人id
+        a.doctor_name AS createInvoiceName,-- 开票人姓名
+        a.register_time AS createInvoiceTime,-- 开票时间
+        a.crte_id AS crteId,-- 操作人ID
+        a.crte_name AS crteName,-- 操作人姓名
+        a.crte_time AS crteTime, -- 创建时间
+        '0' AS isPrintList,-- 是否打印清单
+        b.order_no as orderNo, -- 支付订单号
+        b.pay_code as sourcePayCode, -- 支付来源
+        '2' as invoiceType, -- 发票类型
+        e.type_code as typeCode,
+        b.id as settleId,
+        f.visit_no
+        FROM
+        outpt_register_settle b
+        LEFT JOIN outpt_register a ON a.id = b.register_id
+        left join outin_invoice_detail c on (b.bill_id = c.invoice_id and b.bill_no = c.invoice_no)
+        left join outin_invoice e on b.bill_id = e.id
+        left join outpt_visit f on f.id = a.visit_id
+        WHERE 1=1 and a.hosp_code = #{hospCode} and a.is_cancel != '1'
+        <if test="keyword != null and keyword != ''">
+            AND concat(a.name,a.register_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND b.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND b.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        order by  a.crte_time desc
+    </select>
+
+    <!-- 根据条件查询发票明细表列表信息 -->
+    <select id="queryInvoiceDetailPage" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO">
+        select id,hosp_code as hospCode,date_format(use_time, '%Y-%m-%d %H:%i:%s') AS useTime,invoice_id as invoiceId,invoice_no as invoiceNo,status_code as statusCode from outin_invoice_detail where invoice_id = #{invoiceId} and hosp_code = #{hospCode} order by use_time desc
+    </select>
+
+    <!-- 根据条件查询用户信息 -->
+    <select id="getUserNameByUserId" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from sys_user where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据条件查询挂号发票明细表列表信息 -->
+    <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select b.*,v.name, a.crte_name as crteName, a.crte_time as crteTime, v.visit_no as visitNo from (
+        SELECT
+        ifnull(sum(a.reality_price),0) as totalPrice,
+        (select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
+        (select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName,
+        a.visit_id
+        FROM outpt_register_detail a
+        WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
+        group by a.bfc_id,a.visit_id
+        )b join outpt_visit v on b.visit_id = v.id
+				join outpt_register_detail a on a.visit_id = v.id
+			where b.totalPrice>0
+    </select>
+
+    <!-- 根据条件查询门诊发票明细表列表信息 -->
+    <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime from (
+        SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
+			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
+			(select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName
+        FROM outpt_cost a
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId}
+        group by a.bfc_id
+        ) b join outpt_settle os on os.id = #{settleId} and os.hosp_code = #{hospCode}
+         where b.totalPrice>0
+    </select>
+
+    <!-- 根据条件查询门诊发票明细表列表信息 -->
+    <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
+        left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+         where s.hosp_code = #{hospCode} and s.id = #{outptSettleInvoiceId}
+    </select>
+
+    <!-- 根据条件查询住院发票明细表列表信息 -->
+    <select id="queryOutinItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select b.*, s.crte_name as crteName, s.crte_time as crteTime, s.mi_price as miPrice, s.self_price as selfPrice from (
+        SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
+			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
+			(select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName
+        FROM inpt_cost a
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId}
+        group by a.bfc_id
+        ) b join inpt_settle s on s.id = #{settleId} and s.hosp_code = #{hospCode}
+         where b.totalPrice>0
+    </select>
+
+    <!-- 根据条件查询挂号发票明细表列表信息 -->
+    <select id="queryChangeDetails" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            a.item_id as item_id, -- 项目ID
+            a.item_name as itemName, -- 项目名称
+            a.spec as spec, -- 规格
+            a.total_num as num, -- 数量
+            a.dosage_unit_code as unitCode, -- 单位
+            a.price as price, -- 单价
+            opd.use_days as phone, -- 付数
+            a.preferential_price as preferentialPrice, -- 优惠金额
+            a.reality_price as realityPrice, -- 实收总金额
+            b.code as bfc_code, -- 计费类别编码
+            b.name as bfcName, -- 计费类别名称
+            a.total_price as totalPrice, -- 计价金额
+            s.crte_time as settleTime,
+            v.gender_code as genderCode,
+            v.age as age,
+            v.dept_name as deptName, -- 执行科室
+            a.doctor_name as doctorName, -- 开方医生
+            o.dept_name as createDeptName, -- 开方科室
+            bd.name as bdname, -- 发药药房
+            o.type_code as typeCode,  -- 处方类别
+            opd.content , -- 处方内容
+            v.age_unit_code as ageUnitCode,
+            s.reality_price as settleRealityPrice,
+            s.self_price as selfPrice,
+            s.mi_price as miPrice
+        FROM
+            outpt_cost a
+            left join base_finance_classify b on a.bfc_id = b.id
+            left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
+            left join outpt_prescribe o on a.op_id = o.id and o.hosp_code = a.hosp_code
+            left join outpt_prescribe_detail opd on a.opd_id = opd.id and o.hosp_code = a.hosp_code
+            left join base_dept bd on a.phar_id = bd.id and o.hosp_code = a.hosp_code
+            left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
+    </select>
+
+    <!-- 根据条件查询挂号发票明细表列表信息 -->
+    <select id="queryRegiestItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            a.item_id as item_id, -- 项目ID
+            a.item_name as itemName, -- 项目名称
+            a.spec as spec, -- 规格
+            a.num as num, -- 数量
+            a.item_code as itemCode, -- 项目编码
+            a.unit_code as unitCode, -- 单位
+            a.price as price, -- 单价
+            a.preferential_price as preferentialPrice, -- 优惠金额
+            a.reality_price as realityPrice, -- 实收总金额
+            b.code as bfc_code, -- 计费类别编码
+            b.name as bfcName, -- 计费类别名称
+            a.total_price as totalPrice, -- 计价金额
+            a.crte_time as settleTime,
+            v.gender_code as genderCode,
+            v.age as age,
+            v.age_unit_code as ageUnitCode,
+            (select sum(reality_price) from outpt_register_detail where hosp_code = #{hospCode} and register_id = #{registerId}) as sumRealityPrice
+        FROM
+            outpt_register_detail a
+            left join base_finance_classify b on a.bfc_id = b.id
+            left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
+    </select>
+
+    <!-- 根据条件查询门诊发票明细表列表信息 -->
+    <select id="queryOutptItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and bd.id = a.source_dept_id) as createDeptName, -- 开方科室
+            (select bd2.name from base_dept bd2 where bd2.hosp_code = a.hosp_code and bd2.id = a.phar_id) as pharName, -- 发药药房
+            (select bd3.name from base_dept bd3 where bd3.hosp_code = a.hosp_code and bd3.id = a.exec_dept_id) as execDeptName, -- 执行科室
+            a.item_id as item_id, -- 项目ID
+            a.item_name as itemName, -- 项目名称
+            a.spec as spec, -- 规格
+            a.total_num as num, -- 数量
+            a.item_code as itemCode, -- 项目编码
+            a.dosage_unit_code as unitCode, -- 单位
+            a.price as price, -- 单价
+            a.preferential_price as preferentialPrice, -- 优惠金额
+            a.reality_price as realityPrice, -- 实收总金额
+            b.code as bfc_code, -- 计费类别编码
+            b.name as bfcName, -- 计费类别名称
+            a.total_price as totalPrice, -- 计价金额
+            s.crte_time as settleTime,
+            v.gender_code as genderCode,
+            v.age as age,
+            v.age_unit_code as ageUnitCode,
+            s.reality_price as settleRealityPrice,
+            s.self_price as selfPrice,
+            s.mi_price as miPrice,
+            v.doctor_id as doctorId,
+            u.name as doctorName,
+            u.prac_certi_no as pracCertiNo,
+            (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice
+        FROM
+            outpt_cost a left join base_finance_classify b
+            on a.bfc_id = b.id
+            left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
+            left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+            left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
+    </select>
+
+    <!-- 根据结算id查询门诊处方费用信息 -->
+    <select id="queryOutptCFItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            tp.id as opdId,
+            tp.item_id as item_id,
+            tp.item_name as itemName,
+            tp.spec as spec,
+            tp.total_num as num,
+            tp.item_code as itemCode,
+            tp.dosage_unit_code as unitCode,
+            c.price as price,
+            c.preferentialPrice as preferentialPrice,
+            c.realityPrice as realityPrice,
+            c.realityPrice as totalPrice,
+            '' as bfc_code, -- 计费类别编码
+            '' as bfcName, -- 计费类别名称
+            '' as settleTime,
+            '' as genderCode,
+            '' as age,
+            '' as ageUnitCode
+        FROM
+           (select d.id,d.item_name,d.total_num,d.spec,d.item_id,d.dosage_unit_code, d.visit_id, d.bfc_id, d.item_code
+            from outpt_prescribe p, outpt_prescribe_detail d where p.settle_id = #{settleId} and d.hosp_code = #{hospCode} and p.hosp_code = d.hosp_code and d.op_id = p.id) tp
+            join
+            (select opd_id as opdId, sum(preferential_price) as preferentialPrice,sum(reality_price) as realityPrice, sum(price) as price from outpt_cost where settle_id = #{settleId} and hosp_code = #{hospCode} GROUP BY opd_id) c on tp.id = c.opdId
+
+        UNION ALL
+           SELECT
+           '' as opdId,
+            a.item_id as item_id, -- 项目ID
+            a.item_name as itemName, -- 项目名称
+            a.spec as spec, -- 规格
+            a.total_num as num, -- 数量
+            a.item_code as itemCode, -- 项目编码
+            a.dosage_unit_code as unitCode, -- 单位
+            a.price as price, -- 单价
+            a.preferential_price as preferentialPrice, -- 优惠金额
+            a.reality_price as realityPrice, -- 实收总金额
+            b.code as bfc_code, -- 计费类别编码
+            b.name as bfcName, -- 计费类别名称
+            a.total_price as totalPrice, -- 计价金额
+            s.crte_time as settleTime,
+            v.gender_code as genderCode,
+            v.age as age,
+            v.age_unit_code as ageUnitCode
+        FROM
+            outpt_cost a left join base_finance_classify b
+            on a.bfc_id = b.id
+            left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
+            left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} and a.source_code &lt;&gt; '0'
+
+    </select>
+
+    <!-- 根据结算id查询门诊费用计费类别 -->
+    <select id="queryOutptBfcInfo" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select v.name, v.gender_code as genderCode, v.age, v.age_unit_code as ageUnitCode, s.crte_time as settleTime, bfc.code as bfc_code,
+            bfc.name as bfcName, c.opd_id as opdId
+        from outpt_settle s join outpt_cost c on s.id = c.settle_id and s.hosp_code = c.hosp_code
+        join base_finance_classify bfc on c.bfc_id = bfc.id and bfc.hosp_code = s.hosp_code
+        join outpt_visit v on v.id = s.visit_id and v.hosp_code = s.hosp_code
+        where s.id = #{settleId} and s.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据结算id查询住院处方费用信息 -->
+    <select id="queryInptCFBfcInfo" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            tp.id as opdId,
+            tp.item_id as item_id,
+            tp.item_name as itemName,
+            tp.spec as spec,
+            tp.total_num as num,
+            tp.item_code as itemCode,
+            tp.dosage_unit_code as unitCode,
+            c.price as price,
+            c.preferentialPrice as preferentialPrice,
+            c.realityPrice as realityPrice,
+            c.realityPrice as totalPrice
+        FROM
+           (select d.id,d.item_name,d.total_num,d.spec,d.item_id,d.dosage_unit_code, d.visit_id, d.bfc_id, d.item_code
+            from outpt_prescribe p, outpt_prescribe_detail d where p.settle_id = #{settleId} and d.hosp_code = #{hospCode} and p.hosp_code = d.hosp_code and d.op_id = p.id) tp
+            join
+            (select opd_id as opdId, sum(preferential_price) as preferentialPrice,sum(reality_price) as realityPrice, sum(price) as price from inpt_cost where settle_id = #{settleId} and hosp_code = #{hospCode} GROUP BY opd_id) c on tp.id = c.opdId
+    </select>
+
+    <!-- 根据条件查询住院发票明细表列表信息 -->
+    <select id="queryOutinItemInfoDetail" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+            (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and bd.id = a.source_dept_id) as createDeptName, -- 开嘱科室
+            (select bd2.name from base_dept bd2 where bd2.hosp_code = a.hosp_code and bd2.id = a.phar_id) as pharName, -- 发药药房
+            (select bd3.name from base_dept bd3 where bd3.hosp_code = a.hosp_code and bd3.id = a.exec_dept_id) as execDeptName, -- 执行科室
+            a.doctor_name as doctorName, -- 开嘱医生
+            a.item_id as item_id, -- 项目ID
+            a.item_name as itemName, -- 项目名称
+            a.spec as spec, -- 规格
+            a.total_num as num, -- 数量
+            a.item_code as itemCode, -- 项目编码
+            a.dosage_unit_code as unitCode, -- 单位
+            a.price as price, -- 单价
+            a.preferential_price as preferentialPrice, -- 优惠金额
+            a.reality_price as realityPrice, -- 实收总金额
+            b.code as bfc_code, -- 计费类别编码
+            b.name as bfcName, -- 计费类别名称
+            a.total_price as totalPrice, -- 计价金额
+            s.crte_time as settleTime,
+            v.gender_code as genderCode,
+            v.age as age,
+            v.age_unit_code as ageUnitCode,
+            s.reality_price as settleRealityPrice,
+            s.self_price as selfPrice,
+            s.mi_price as miPrice,
+            u.prac_certi_no as pracCertiNo,
+            (select sum(reality_price) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id =#{settleId} and a.status_code = '0') as sumRealityPrice
+        FROM
+            inpt_cost a left join base_finance_classify b
+            on a.bfc_id = b.id
+            left join inpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
+            left join inpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+            left join sys_user u on u.id = a.doctor_id and u.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.visit_id = #{visitId}  and a.settle_id =#{settleId} and a.status_code = '0' order by a.crte_time desc
+    </select>
+
+
+
+
+    <insert id="insertOutinInvoiceDetail" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO">
+        INSERT INTO outin_invoice_detail (
+        id, hosp_code, invoice_id, invoice_no, status_code, use_time, settle_id
+        ) VALUES(
+        #{id},
+        #{hospCode},
+        #{invoiceId},
+        #{invoiceNo},
+        #{statusCode},
+        #{useTime},
+        #{settleId})
+    </insert>
+
+    <select id="queryOutinInvoiceForUpdate" resultMap="outinInvoiceMap" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM outin_invoice
+        WHERE
+        hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            AND id = #{id}
+        </if>
+        <if test="receiveId != null and receiveId != ''">
+            AND receive_id = #{receiveId}
+        </if>
+        <if test="receiveName != null and receiveName != ''">
+            AND receive_name = #{receiveName}
+        </if>
+        <if test="receiveTime != null">
+            AND receive_time = #{receiveTime}
+        </if>
+        <if test="useId != null and useId != ''">
+            AND use_id = #{useId}
+        </if>
+        <if test="useName != null and useName != ''">
+            AND use_name = #{useName}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            AND type_code = #{typeCode}
+        </if>
+        <if test="typeCodeList != null">
+            AND type_code in
+            <foreach collection="typeCodeList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="prefix != null and prefix != ''">
+            AND prefix = #{prefix}
+        </if>
+        <if test="startNo != null and startNo != ''">
+            AND start_no = #{startNo}
+        </if>
+        <if test="endNo != null and endNo != ''">
+            AND end_no = #{endNo}
+        </if>
+        <if test="currNo != null and currNo != ''">
+            AND curr_no = #{currNo}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        <if test="num != null">
+            AND num = #{num}
+        </if>
+        <if test="remark != null and remark != ''">
+            AND remark = #{remark}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            AND crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <update id="updatePrintChecklist"  parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        update outpt_settle
+        set is_print_list = '1'
+        WHERE hosp_code = #{hospCode} and id = #{settleId}
+    </update>
+
+    <select id="queryInactiveOutinInvoices" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+              *
+        FROM
+              outin_invoice
+        WHERE hosp_code = #{hospCode}
+        and type_code in
+        <foreach collection="typeCodeList" index="index" item="typeCodeList" open="(" separator="," close=")">
+            #{typeCodeList}
+        </foreach>
+
+        <if test="type == '0'.toString()">
+            AND type_code = '0'
+        </if>
+        <if test="type == '1'.toString()">
+            AND type_code in ('3','4')
+        </if>
+        <if test="type == '2'.toString()">
+            AND type_code in ('1','2','4')
+        </if>
+        <if test="statusCode != '' and statusCode != null">
+            AND status_code = #{statusCode}
+        </if>
+        <if test="useId != null">
+            and (use_id = #{useId} or use_id = '')
+        </if>
+    </select>
+
+    <!-- 根据条件查询发票明细表列表信息 -->
+    <select id="getInvocieDetailInfo" resultType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select * from outin_invoice_detail where invoice_id = #{invoiceId} and hosp_code = #{hospCode} and invoice_no = #{invoiceNo}
+    </select>
+
+    <select id="getSettleInvoiceById" resultType="cn.hsa.module.inpt.fees.dto.InptSettleInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select * from inpt_settle_invoice where visit_id = #{visitId} and hosp_code = #{hospCode} and settle_id = #{settleId}
+    </select>
+
+    <!--/*select * from outpt_settle_invoice where visit_id = #{visitId} and hosp_code = #{hospCode} and settle_id = #{settleId}*/-->
+    <select id="getOutptSettleInvoiceById" resultType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO">
+        select * from outpt_settle_invoice where id=#{id} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="getInptSettleInfoById" resultType="java.lang.Object" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select ifnull(reality_price,0) from inpt_settle where hosp_code = #{hospCode} and id = #{settleId}
+    </select>
+
+    <select id="getOutptSettleInfoById" resultType="java.lang.Object" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select ifnull(reality_price,0) from outpt_settle where hosp_code = #{hospCode} and id = #{settleId}
+    </select>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertInptSettleInvoice" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleInvoiceDO" >
+        insert into
+        inpt_settle_invoice
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="invoiceId != null and invoiceId != ''">
+                invoice_id,
+            </if>
+            <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                invoice_detail_id,
+            </if>
+            <if test="invoiceNo != null and invoiceNo != ''">
+                invoice_no,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="printId != null and printId != ''">
+                print_id,
+            </if>
+            <if test="printName != null and printName != ''">
+                print_name,
+            </if>
+            <if test="printTime != null">
+                print_time,
+            </if>
+            <if test="printNum != null">
+                print_num,
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code,
+            </if>
+            <if test="redId != null and redId != ''">
+                red_id
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceId != null and invoiceId != ''">
+                #{invoiceId,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceDetailId != null and invoiceDetailId != ''">
+                #{invoiceDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceNo != null and invoiceNo != ''">
+                #{invoiceNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="printId != null and printId != ''">
+                #{printId,jdbcType=VARCHAR},
+            </if>
+            <if test="printName != null and printName != ''">
+                #{printName,jdbcType=VARCHAR},
+            </if>
+            <if test="printTime != null">
+                #{printTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="printNum != null">
+                #{printNum,jdbcType=INTEGER},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                #{statusCode,jdbcType=VARCHAR},
+            </if>
+            <if test="redId != null and redId != ''">
+                #{redId,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 新增表信息 -->
+    <insert id="insertOutptSettleInvoice" parameterType="cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO" >
+        insert into
+        outpt_settle_invoice
+        (
+          id,
+          hosp_code,
+          settle_id,
+          visit_id,
+          invoice_id,
+          invoice_detail_id,
+          invoice_no,
+          total_price,
+          print_id,
+          print_name,
+          print_time,
+          print_num,
+          is_main,
+          main_id,
+          status_code,
+          red_id,
+          exec_dept_id
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{settleId,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{invoiceId,jdbcType=VARCHAR},
+          #{invoiceDetailId,jdbcType=VARCHAR},
+          #{invoiceNo,jdbcType=VARCHAR},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{printId,jdbcType=VARCHAR},
+          #{printName,jdbcType=VARCHAR},
+          #{printTime,jdbcType=TIMESTAMP},
+          #{printNum,jdbcType=INTEGER},
+          #{isMain,jdbcType=VARCHAR},
+          #{mainId,jdbcType=VARCHAR},
+          #{statusCode,jdbcType=VARCHAR},
+          #{redId,jdbcType=VARCHAR},
+          #{execDeptId,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateInptSettleInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        UPDATE inpt_settle_invoice
+        <set>
+            invoice_id = #{invoiceId},
+            invoice_no = #{invoiceNo},
+            status_code = '0',
+            invoice_detail_id = #{invoiceDetailId}
+
+        </set>
+        WHERE settle_id = #{settleId} and visit_id = #{visitId} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 修改数据 -->
+    <update id="updateSettleInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO">
+        UPDATE outpt_settle_invoice
+        <set>
+            invoice_id = #{invoiceId},
+            invoice_no = #{invoiceNo},
+            status_code = '0',
+            print_num = '1',
+            invoice_detail_id = #{invoiceDetailId}
+        </set>
+        WHERE id=#{outptSettleInvoiceId} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateOutptSettleInvoiceInfo" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO">
+        UPDATE outpt_settle_invoice
+        <set>
+            invoice_no = '',
+            print_num = '0',
+        </set>
+        WHERE id=#{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 修改数据 -->
+    <update id="updateRegisterSettleInvoice" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        UPDATE outpt_register_settle
+        <set>
+            bill_id = #{invoiceId},
+            bill_no = #{invoiceNo},
+            status_code = '0'
+        </set>
+        WHERE id = #{settleId} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 日结缴款确认，修改发票号段数据 -->
+    <update id="updateInvoiceUseInfo" parameterType="java.util.Map">
+        UPDATE outin_invoice
+        <set>
+            use_id = '',
+            use_name = '',
+            status_code = '1'
+        </set>
+        WHERE use_id = #{useId} and hosp_code = #{hospCode} and status_code = '2'
+    </update>
+
+    <!-- 根据条件查询所有发票结算列表信息 -->
+    <select id="queryAllInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT
+        *
+        FROM
+        (
+        SELECT DISTINCT
+            a.visit_id AS visitId,
+            a.id AS registerId,
+            b.id AS settleId,
+            a.register_no AS settleNo,-- 结算单号
+            a.NAME AS NAME,
+            b.bill_id AS invoiceId,-- 发票id
+            b.bill_no AS invoiceNo,-- 发票号
+            '0' AS settleType,-- 结算类型(挂号默认正常结算类型)
+            b.reality_price AS invoiceTotalPrice,-- 发票金额
+            '0' AS miPrice,-- 统筹支付
+            b.reality_price AS selfPrice,-- 个人支付金额
+            b.total_price AS settleTotalPrice,-- 挂号总金额（项目金额）
+            b.reality_price AS realityPrice,-- 单据应缴金额
+            a.doctor_id AS doctorId,-- 就诊医生id
+            a.doctor_name AS doctorName,-- 就诊医生
+            b.settle_time AS settleTime,-- 结算时间
+            b.preferential_price AS preferentialPrice,-- 单据优惠金额
+            '0' AS truncPrice,-- 舍入金额
+            b.reality_price AS actualPrice,-- 实收金额
+            b.daily_settle_id AS dailySettleId,-- 缴款id(为空：未缴款；不为空：已缴款)
+            c.status_code AS statusCode,-- 状态标志
+            a.crte_id AS crteId,-- 操作人ID
+            a.crte_name AS crteName,-- 操作人姓名
+            a.crte_time AS crteTime,-- 创建时间
+            '0' AS isPrintList,-- 是否打印清单
+            b.order_no AS orderNo,-- 支付订单号
+            b.pay_code AS sourcePayCode,-- 支付来源
+            '2' AS invoiceType,-- 发票类型
+            e.type_code AS typeCode,
+            f.visit_no AS visitNo
+        FROM
+            outpt_register_settle b
+            LEFT JOIN outpt_register a ON a.id = b.register_id
+            LEFT JOIN outin_invoice_detail c ON ( b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
+            LEFT JOIN outin_invoice e ON b.bill_id = e.id
+            LEFT JOIN outpt_visit f ON f.id = a.visit_id
+        WHERE
+            a.hosp_code = #{hospCode} and a.is_cancel != '1'
+        UNION ALL
+
+        SELECT DISTINCT
+            a.visit_id AS visitId,
+            f.id AS registerId,
+            a.id AS settleId,
+            a.settle_no AS settleNo,-- 结算单号
+            c.NAME AS NAME,
+            b.invoice_id AS invoiceId,
+            b.invoice_no AS invoiceNo,
+            '1' AS settleType,-- 结算类型
+            b.total_price AS invoiceTotalPrice,-- 发票总金额
+            a.mi_price AS miPrice,-- 统筹支付金额
+            a.self_price AS selfPrice,-- 个人支付
+            a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
+            a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）
+            c.doctor_id AS doctorId,-- 医生id
+            c.doctor_name AS doctorName,-- 医生姓名
+            a.settle_time AS settleTime,-- 结算时间
+            ( a.total_price - a.reality_price ) AS preferentialPrice,-- 单据优惠金额
+            a.trunc_price AS truncPrice,-- 舍入金额
+            a.actual_price AS actualPrice,-- 实收金额
+            a.daily_settle_id AS dailySettleId,-- 缴款id(为空：未缴款；不为空：已缴款)
+            d.status_code AS statusCode,-- 状态标志
+            a.crte_id AS crteId,-- 操作人ID
+            a.crte_name AS crteName,-- 操作人姓名
+            a.crte_time AS crteTime,-- 创建时间
+            a.is_print_list AS isPrintList,-- 是否打印清单
+            a.order_no AS orderNo,-- 支付订单号
+            a.source_pay_code AS sourcePayCode,-- 支付来源
+            '1' AS invoiceType,-- 发票类型
+            e.type_code AS typeCode,
+            c.visit_no AS visitNo
+        FROM
+            outpt_settle a
+            LEFT JOIN outpt_settle_invoice b ON ( a.id = b.settle_id AND a.visit_id = b.visit_id )
+            LEFT JOIN outpt_visit c ON a.visit_id = c.id
+            LEFT JOIN outin_invoice e ON b.invoice_id = e.id
+            LEFT JOIN outin_invoice_detail d ON ( d.id = b.invoice_detail_id )
+            LEFT JOIN outpt_register f ON f.id = c.register_id
+        WHERE
+            1 = 1
+            AND a.status_code = '0'
+            AND a.is_settle = '1' -- 正常且已经结算
+            AND a.hosp_code = #{hospCode}
+        UNION ALL
+        SELECT DISTINCT
+            a.visit_id AS visitId,
+            '' AS registerId,
+            a.id AS settleId,
+            a.settle_no AS settleNo,-- 结算单号
+            c.NAME AS NAME,
+            b.invoice_id AS invoiceId,
+            b.invoice_no AS invoiceNo,
+            a.type_code AS settleType,-- 结算类型
+            b.total_price AS invoiceTotalPrice,-- 发票总金额
+            a.mi_price AS miPrice,-- 统筹支付金额
+            a.self_price AS selfPrice,-- 个人支付
+            a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
+            a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）Mris
+            c.zz_doctor_id AS doctorId,-- 医生id
+            c.zz_doctor_Name AS doctorName,-- 医生姓名
+            a.settle_time AS settleTime,-- 结算时间
+            ( a.total_price - a.reality_price ) AS preferentialPrice,-- 单据优惠金额
+            a.trunc_price AS truncPrice,-- 舍入金额
+            a.actual_price AS actualPrice,-- 实收金额
+            a.daily_settle_id AS dailySettleId,-- 日缴款id(为空：未缴款；不为空：已缴款)
+            d.status_code AS statusCode,-- 状态标志
+            a.crte_id AS crteId,-- 操作人ID
+            a.crte_name AS crteName,-- 操作人姓名
+            a.crte_time AS crteTime,-- 创建时间
+            a.is_print AS isPrintList,-- 是否打印清单
+            a.order_no AS orderNo,-- 支付订单号
+            a.source_pay_code AS sourcePayCode,-- 支付来源
+            '4' AS invoiceType,-- 发票类型
+            e.type_code AS typeCode,
+            '' AS visitNo
+        FROM
+            inpt_settle a
+            LEFT JOIN inpt_settle_invoice b ON ( a.id = b.settle_id AND a.visit_id = b.visit_id )
+            LEFT JOIN inpt_visit c ON a.visit_id = c.id
+            LEFT JOIN outin_invoice e ON b.invoice_id = e.id
+            LEFT JOIN outin_invoice_detail d ON ( d.id = b.invoice_detail_id )
+        WHERE
+            1 = 1
+            AND a.status_code = '0'
+            AND a.is_settle = '1'
+            AND a.hosp_code = #{hospCode}
+        ) a where 1=1
+            <if test="keyword != null and keyword != ''">
+                AND concat(a.name,a.settleNo) LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND a.settleTime &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.settleTime &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                AND a.typeCode = #{typeCode}
+            </if>
+            order by a.crteTime desc
+    </select>
+
+    <!-- 根据结算单号查询费用明细(门诊) -->
+    <select id="getCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select c.*, d.name as xmName,
+        (select v.name from outpt_visit v where v.id = s.visit_id) as patientName,
+        (select v.dept_name from outpt_visit v where v.id = s.visit_id) as deptName,
+        (select v.gender_code from outpt_visit v where v.id = s.visit_id) as sex,
+        s.settle_time, s.crte_name as crteName, bfc.name as bfcName, bfc.code as bfcCode, s.self_price as selfPrice, s.mi_price as miPrice,
+        scd.name as fpglName, scd.value as fpglKey
+        from outpt_settle s join outpt_cost c on c.settle_id = s.id
+        join sys_code_detail d on c.item_code = d.value and d.hosp_code = #{hospCode} and d.c_code = 'XMLB'
+        join base_finance_classify bfc on bfc.id = c.bfc_id and bfc.hosp_code = c.hosp_code
+        join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        where s.settle_no = #{settleNo} and s.hosp_code = #{hospCode} and s.status_code = '0'
+    </select>
+
+    <!-- 根据挂号结算单号查询挂号费用明细(挂号) -->
+    <select id="getMZGHCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select c.name as xmName, a.name as patientName, a.crte_time as settleTime, d.price, d.num as totalNum, d.preferential_price, a.dept_name as deptName, d.reality_price, d.reality_price as selfPrice,
+        a.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode, a.crte_name as crteName, a.crte_time as crteTime, bfc.name as bfcName, bfc.code as bfcCode,
+        scd.name as fpglName, scd.value as fpglKey, a.doctor_name as registerDoctorName, cd.name as visitCode
+        from outpt_register a
+        left join outpt_register_detail d on a.visit_id = d.visit_id and a.hosp_code = d.hosp_code
+        left join sys_code_detail c on d.item_code = c.value and c.c_code = 'XMLB' and c.hosp_code = #{hospCode}
+        left join outpt_visit v on a.visit_id =v.id
+        join base_finance_classify bfc on bfc.id = d.bfc_id and bfc.hosp_code = d.hosp_code
+        join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        join sys_code_detail cd on a.visit_code = cd.value and cd.hosp_code = #{hospCode} and cd.c_code = 'JZLB'
+        where a.hosp_code = #{hospCode} and a.register_no = #{settleNo}
+
+    </select>
+
+    <!-- 根据结算单号查询费用明细(住院) -->
+    <select id="getZyCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select c.*, d.name as xmName, v.name as patientName, v.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode,
+         s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
+         s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
+         scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo,
+         case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays
+        from inpt_settle s join inpt_cost c on c.settle_id = s.id
+        left join inpt_visit v on v.id = s.visit_id and v.hosp_code = s.hosp_code
+        left join sys_code_detail d on c.item_code = d.value and d.hosp_code = #{hospCode} and d.c_code = 'XMLB'
+        left join base_finance_classify bfc on bfc.id = c.bfc_id and bfc.hosp_code = c.hosp_code
+        left join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        where s.settle_no = #{settleNo} and s.hosp_code = #{hospCode} and s.status_code = '0'
+    </select>
+
+    <!-- 根据条件查询门诊发票结算列表信息 -->
+    <select id="queryMZInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        SELECT DISTINCT
+        a.visit_id AS visitId,
+        a.id AS registerId,
+        b.id AS settleId,
+        a.register_no AS settleNo,
+        a.NAME AS NAME,
+        b.bill_id AS invoiceId,
+        b.bill_no AS invoiceNo,
+        '0' AS settleType,
+        b.total_price AS invoiceTotalPrice,
+        '0' AS miPrice,
+        b.reality_price AS selfPrice,
+        b.total_price AS settleTotalPrice,
+        b.reality_price AS realityPrice,
+        a.doctor_id AS doctorId,
+        a.doctor_name AS doctorName,
+        b.settle_time AS settleTime,
+        b.preferential_price AS preferentialPrice,
+        '0' AS truncPrice,
+        b.reality_price AS actualPrice,
+        b.daily_settle_id AS dailySettleId,
+        c.status_code AS statusCode,
+        a.crte_id AS crteId,
+        a.crte_name AS crteName,
+        a.crte_time AS crteTime,
+        '0' AS isPrintList,
+        b.order_no AS orderNo,
+        b.pay_code AS sourcePayCode,
+        '2' AS invoiceType,
+        e.type_code AS typeCode,
+        f.visit_no AS visitNo,
+        f.gender_code as genderCode,
+        '' AS outptSettleInvoiceId
+        FROM
+        outpt_register_settle b
+        LEFT JOIN outpt_register a ON a.id = b.register_id
+        LEFT JOIN outin_invoice_detail c ON ( b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
+        LEFT JOIN outin_invoice e ON b.bill_id = e.id
+        LEFT JOIN outpt_visit f ON f.id = a.visit_id
+        WHERE
+        a.hosp_code = #{hospCode} and a.is_cancel != '1'
+        <if test="keyword != null and keyword != ''">
+            AND concat(a.name,a.register_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND b.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND b.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        UNION ALL
+
+        SELECT DISTINCT
+        a.visit_id AS visitId,
+        f.id AS registerId,
+        a.id AS settleId,
+        a.settle_no AS settleNo,
+        c.NAME AS NAME,
+        b.invoice_id AS invoiceId,
+        b.invoice_no AS invoiceNo,
+        '1' AS settleType,
+        ifnull(b.total_price, a.total_price) AS invoiceTotalPrice,
+        a.mi_price AS miPrice,
+        a.self_price AS selfPrice,
+        a.total_price AS settleTotalPrice,
+        ifnull(b.total_price, a.reality_price) AS realityPrice,
+        c.doctor_id AS doctorId,
+        c.doctor_name AS doctorName,
+        a.settle_time AS settleTime,
+        ( a.total_price - a.reality_price ) AS preferentialPrice,
+        a.trunc_price AS truncPrice,
+        a.actual_price AS actualPrice,
+        a.daily_settle_id AS dailySettleId,
+        d.status_code AS statusCode,
+        a.crte_id AS crteId,
+        a.crte_name AS crteName,
+        a.crte_time AS crteTime,
+        a.is_print_list AS isPrintList,
+        a.order_no AS orderNo,
+        a.source_pay_code AS sourcePayCode,
+        '1' AS invoiceType,
+        e.type_code AS typeCode,
+        c.visit_no AS visitNo,
+        c.gender_code as genderCode,
+        b.id AS outptSettleInvoiceId
+        FROM
+        outpt_settle_invoice b
+        right JOIN outpt_settle a ON b.hosp_code = a.hosp_code AND b.visit_id = a.visit_id  and a.id = b.settle_id
+        LEFT JOIN outpt_visit c ON a.hosp_code = c.hosp_code and a.visit_id = c.id
+        LEFT JOIN outin_invoice e ON b.invoice_id = e.id
+        LEFT JOIN outin_invoice_detail d ON ( d.id = b.invoice_detail_id )
+        LEFT JOIN outpt_register f ON f.id = c.register_id
+        WHERE
+        1 = 1
+        AND a.status_code = '0'
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            AND concat(c.name,a.settle_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND a.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+
+        order by settleTime desc
+    </select>
+
+    <!-- 根据条件查询住院发票结算列表信息 -->
+    <select id="queryZYInvoicePage" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+
+        SELECT DISTINCT
+        a.visit_id AS visitId,
+        '' AS registerId,
+        a.id AS settleId,
+        a.settle_no AS settleNo,-- 结算单号
+        case when a.baby_id is not null
+        then  concat(c.NAME, '婴') else c.NAME end AS NAME,
+        b.invoice_id AS invoiceId,
+        b.invoice_no AS invoiceNo,
+        a.type_code AS settleType,-- 结算类型
+        b.total_price AS invoiceTotalPrice,-- 发票总金额
+        a.mi_price AS miPrice,-- 统筹支付金额
+        a.self_price AS selfPrice,-- 个人支付
+        a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
+        a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）Mris
+        c.zz_doctor_id AS doctorId,-- 医生id
+        c.zz_doctor_Name AS doctorName,-- 医生姓名
+        a.settle_time AS settleTime,-- 结算时间
+        ( a.total_price - a.reality_price ) AS preferentialPrice,-- 单据优惠金额
+        a.trunc_price AS truncPrice,-- 舍入金额
+        a.actual_price AS actualPrice,-- 实收金额
+        a.daily_settle_id AS dailySettleId,-- 日缴款id(为空：未缴款；不为空：已缴款)
+        d.status_code AS statusCode,-- 状态标志
+        a.crte_id AS crteId,-- 操作人ID
+        a.crte_name AS crteName,-- 操作人姓名
+        a.crte_time AS crteTime,-- 创建时间
+        a.is_print AS isPrintList,-- 是否打印清单
+        a.order_no AS orderNo,-- 支付订单号
+        a.source_pay_code AS sourcePayCode,-- 支付来源
+        '4' AS invoiceType,-- 发票类型
+        e.type_code AS typeCode,
+        '' AS visitNo
+        FROM
+        inpt_settle a
+        LEFT JOIN inpt_settle_invoice b ON b.hosp_code = a.hosp_code and a.id = b.settle_id AND a.visit_id = b.visit_id
+        LEFT JOIN inpt_visit c ON c.hosp_code = a.hosp_code and a.visit_id = c.id
+        LEFT JOIN outin_invoice e ON b.invoice_id = e.id
+        LEFT JOIN outin_invoice_detail d ON  d.id = b.invoice_detail_id
+        WHERE
+        a.status_code = '0'
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            AND concat(c.name,a.settle_no) LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND a.settle_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+
+        order by settleTime desc
+    </select>
+
+    <select id="selectKYFPs" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO" resultType="java.lang.Integer">
+        select count(*) from outin_invoice where use_id = #{useId} and hosp_code = #{hospCode} and status_code = '2' and type_code = #{typeCode}
+    </select>
+</mapper>

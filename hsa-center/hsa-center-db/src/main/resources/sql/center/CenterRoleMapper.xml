@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.role.dao.CenterRoleDAO">
+    <!--新增角色-->
+    <insert id="insertRole">
+        insert into center_role(id,code,name,remark,seq_no,is_valid,crte_id,crte_name,crte_time)
+        values(#{id},#{code},#{name},#{remark},#{seqNo},#{isValid},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--保存角色权限-->
+    <insert id="insertRoleMenus">
+        insert into center_role_menu(id,role_code,menu_code,crte_id,crte_name,crte_time)
+        values
+        <foreach collection="menuDOList" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.roleCode}, #{item.menuCode}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--更新角色-->
+    <update id="updateRole">
+        update center_role
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="remark!=null and remark">
+                remark=#{remark},
+            </if>
+            <if test="seqNo!=null and seqNo!=''">
+                seq_no=#{seqNo},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--删除角色-->
+    <delete id="deleteRoles">
+        update center_role set is_valid='0' where is_valid='1'
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+
+    <!--根据角色编码删除相关权限-->
+    <delete id="deleteRoleMenuByCode">
+        delete from center_role_menu where role_code=#{code}
+    </delete>
+
+    <!--根据参数查询角色列表-->
+    <select id="queryRoles" resultType="cn.hsa.module.center.role.entity.CenterRoleDO">
+        select * from center_role where is_valid='1'
+        <if test="keyword!=null and keyword!=''">
+            and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%')))
+        </if>
+        order by CAST(seq_no AS SIGNED)
+    </select>
+
+    <!--根据编码和id查询数量-->
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(1) as num from center_role where code=#{code} and is_valid='1' and id!=#{id}
+    </select>
+
+    <!--根据参数获取菜单树结构数据-->
+    <select id="getMenuTree" resultType="cn.hsa.base.TreeMenuNode">
+        select distinct a.CODE id,a.NAME label,IFNULL(a.up_code, "-1" ) parentId,
+        (case (select ifnull(count(1),0) num from center_role_menu b where b.menu_code=a.code
+        <if test="code!=null and code!=''">
+            and b.role_code=#{code}
+        </if>
+        )  when 0 then 'false' else 'true' end) isAble
+        from center_menu a where a.is_valid='1'
+    </select>
+
+</mapper>

@@ -171,7 +171,7 @@
 				and a.id = #{id}
 			</if>
 			<if test="isNationCode == true">
-				and nation_code is not null and LENGTH(trim(nation_code))>0
+				and a.nation_code is not null and LENGTH(trim(a.nation_code))>0
 			</if>
             <if test="ids != null and ids.size() > 0">
                 and a.id in

@@ -6,6 +6,7 @@ import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualFundDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -177,7 +178,7 @@ public interface InsureIndividualSettleDAO {
 
     /**
      * @Method queryInptSettle
-     * @Desrciption  根据就诊id,his结算id,医院编码查询患者结算信息
+     * @Desrciption  根据就诊id,his结算id,医院编码查询患者住院结算信息
      * @Param map
      *
      * @Author fuhui
@@ -185,5 +186,16 @@ public interface InsureIndividualSettleDAO {
      * @Return
     **/
     InptSettleDTO queryInptSettle(Map<String, Object> map);
+
+    /**
+     * @Method queryInptSettle
+     * @Desrciption  根据就诊id,his结算id,医院编码查询患者门诊结算信息
+     * @Param map
+     *
+     * @Author fuhui
+     * @Date   2021/8/6 17:38
+     * @Return
+     **/
+    OutptSettleDTO queryOutptSettle(Map<String, Object> map);
 }
 

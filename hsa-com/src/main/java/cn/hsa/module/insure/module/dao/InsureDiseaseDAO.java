@@ -61,4 +61,6 @@ public interface InsureDiseaseDAO {
      * @Return 
     **/
     InsureDiseaseDTO selectLatestVer(Map<String, Object> map);
+
+    InsureDiseaseDTO getInsureDiseaseById(InsureItemMatchDTO insureItemMatchDTO);
 }

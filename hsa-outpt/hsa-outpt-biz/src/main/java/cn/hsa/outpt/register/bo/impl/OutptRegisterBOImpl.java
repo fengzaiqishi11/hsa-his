@@ -213,7 +213,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         List<OutptRegisterDetailDto> regDetailList = outptRegisterDTO.getRegDetailList();
         OutptRegisterSettleDto outptRegisterSettleDto = MapUtils.get(map,"outptRegisterSettleDto");
         String cardNo = outptRegisterDTO.getCardNo(); // 一卡通卡号
-        BigDecimal price = outptRegisterDTO.getCardPrice();   // 一卡通支付金额
+        BigDecimal price = outptRegisterDTO.getCardPrice() != null ? outptRegisterDTO.getCardPrice() : new BigDecimal(0);   // 一卡通支付金额
         Boolean SFJS = MapUtils.get(map,"SFJS");
         Boolean isInvoice = MapUtils.get(map, "isInvoice");
         String docId = outptVisitDTO.getCrteId();
@@ -690,6 +690,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         BigDecimal zfb_zf = outptRegisterSettleDto.getZfbZf();
         // 实收现金支付
         BigDecimal xjzf = outptRegisterSettleDto.getXjZf();
+        // 实收现金支付
+        BigDecimal zzzf = outptRegisterSettleDto.getZzZf();
         // 退款金额
         BigDecimal tsxj = outptRegisterSettleDto.getTsxj();
         List<OutptRegisterPayDto> payList = new ArrayList<>();
@@ -765,6 +767,19 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterPayDto.setVisitId(visitId);
             outptRegisterPayDto.setPayCode(Constants.ZFFS.XJ);
             outptRegisterPayDto.setPrice(BigDecimalUtils.subtract(xjzf, tsxj));
+            payList.add(outptRegisterPayDto);
+        }
+        // 现金支付
+        if (null != zzzf && !BigDecimalUtils.isZero(zzzf) && zzzf.compareTo(BigDecimal.ZERO) == 1) {
+//            outptRegisterSettleDto.setRealityPrice(xjzf);
+            outptRegisterSettleDto.setPayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+            OutptRegisterPayDto outptRegisterPayDto = new OutptRegisterPayDto();
+            outptRegisterPayDto.setId(SnowflakeUtils.getId());
+            outptRegisterPayDto.setHospCode(hospCode);
+            outptRegisterPayDto.setRsId(settleId);
+            outptRegisterPayDto.setVisitId(visitId);
+            outptRegisterPayDto.setPayCode(Constants.ZFFS.ZZ);
+            outptRegisterPayDto.setPrice(zzzf);
             payList.add(outptRegisterPayDto);
         }
 

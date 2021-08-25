@@ -194,14 +194,9 @@ public class InsureUnifiedMatchController extends BaseController {
      **/
     @PostMapping("/insertUnifiedAutoMatch")
     public WrapperResponse<Integer> insertUnifiedAutoMatch(@RequestBody InsureItemMatchDTO insureItemMatchDTO, HttpServletRequest req, HttpServletResponse res){
+        Map map = new HashMap();
         SysUserDTO sysUserDTO = getSession(req, res);
         WrapperResponse<Integer> result = new WrapperResponse<>();
-        Map map = new HashMap();
-        map.put("hospCode",sysUserDTO.getHospCode());
-        insureItemMatchDTO.setCrteId(sysUserDTO.getId());
-        insureItemMatchDTO.setCrteName(sysUserDTO.getName());
-        insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode());
-        map.put("insureItemMatchDTO",insureItemMatchDTO);
 
         // 根据医保机构编码查询医保配置信息
         InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
@@ -215,23 +210,18 @@ public class InsureUnifiedMatchController extends BaseController {
         if (ListUtils.isEmpty(configurationDTOList)) {
             throw new RuntimeException("未找到医保机构，请先配置医保信息！");
         }
-        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
-        // 获取该医保配置是否走统一支付平台，1走，0/null不走
-        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
-        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
-            // 调用统一支付平台
-            result = insureUnifiedPayRestService_consumer.insertUnifiedAutoMatch(map);
-        } else {
-            if (StringUtils.isEmpty(insureItemMatchDTO.getMatchType())) {
-                throw new AppException("请选择匹配类型");
-            }
 
-            if (!"3".equals(insureItemMatchDTO.getMatchType())) {
-                throw new AppException("请选择自动匹配");
-            }
-            result = insureUnifiedPayRestService_consumer.insertInsureMatch(map);
-        }
-        return result;
+        // 是否走统一支付平台
+        InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
+        map.put("hospCode",sysUserDTO.getHospCode());
+        insureItemMatchDTO.setCrteId(sysUserDTO.getId());
+        insureItemMatchDTO.setCrteName(sysUserDTO.getName());
+        insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode());
+        insureItemMatchDTO.setIsUpay(isUnifiedPay);
+        map.put("insureItemMatchDTO",insureItemMatchDTO);
+        return insureUnifiedPayRestService_consumer.insertUnifiedAutoMatch(map);
     }
 
     /**

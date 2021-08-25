@@ -51,4 +51,7 @@ public class InsureItemMatchDTO extends InsureItemMatchDO implements Serializabl
          * 是否报销
          */
         private String isReimburse;
+        private String isUpay; // 是否为新医保
+        private String hospId; // HIS端ID
+        private String insureId; // 医保端ID
 }

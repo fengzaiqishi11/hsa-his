@@ -1553,11 +1553,13 @@
         ss.hosp_code = #{hospCode}
         AND bd.hosp_code = #{hospCode}
         AND (bd.is_out = '1' or bd.is_out is null)
+        AND (bd.out_unit_code = bd.unit_code or bd.out_unit_code = bd.split_unit_code or ifnull(bd.out_unit_code,'')='')
         AND bd.is_valid = '1'
         AND ss.item_id = bd.id
         join base_dept d ON ss.biz_id = d.id and (d.type_code = '4' or d.type_code = '5') and d.hosp_code = #{hospCode}
         where
         bd.type_code is not null
+
         and (ss.split_num - IFNULL(ss.stock_occupy,0)) > 0
         <if test="pharId != null and pharId != ''">
           and ss.biz_id = #{pharId}

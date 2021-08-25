@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
@@ -14,6 +15,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -572,6 +574,9 @@ public class EmrPatientController extends BaseController {
 	@GetMapping("/uploadEmr")
 	public WrapperResponse<Boolean> uploadEmr(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
 		SysUserDTO sysUserDTO = getSession(req, res);
+		if (StringUtils.isEmpty(inptVisitDTO.getVisitId())){
+			throw new AppException("请选择要上传病历的病人");
+		}
 		if (sysUserDTO.getLoginBaseDeptDTO() != null) {
 			inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
 		}

@@ -91,6 +91,8 @@ public class InptNurseThirdDO extends PageDO implements Serializable {
     //体重（kg）
 //    private BigDecimal weight;
     private String weight;
+    // 腹围
+    private String girth;
     //上午血压（mmHg）
     private String amBp;
     //下午血压（mmHg）

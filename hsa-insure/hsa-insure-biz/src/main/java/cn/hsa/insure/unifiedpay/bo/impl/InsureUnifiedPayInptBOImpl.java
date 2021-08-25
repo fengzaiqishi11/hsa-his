@@ -1827,44 +1827,52 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
     private List<Map<String, Object>> handeleSmtzData(List<InptNurseThirdDTO> smtzList) {
         List<Map<String, Object>> data = new ArrayList<>();
         if (!ListUtils.isEmpty(smtzList)) {
-            smtzList.forEach(dto -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("mdtrt_sn", dto.getVisitId()); // 就医流水号
-                if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
-                    if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
-                        map.put("mdtrt_id", dto.getMedicalRegNo()); // 就诊ID
-                        map.put("psn_no", dto.getAac001()); // 人员编号
-                    } else {
-                        throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
+            InptNurseThirdDTO nurseThirdDTO = smtzList.get(0);
+            // todo 目前只支持医保病人上传
+            if (StringUtils.isNotEmpty(nurseThirdDTO.getPatientCode()) && !Constants.BRLX.PTBR.equals(nurseThirdDTO.getPatientCode())) {
+                smtzList.forEach(dto -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("mdtrt_sn", dto.getVisitId()); // 就医流水号
+                    if (!Constants.BRLX.PTBR.equals(dto.getPatientCode())) {
+                        if (StringUtils.isNotEmpty(dto.getAac001()) && StringUtils.isNotEmpty(dto.getMedicalRegNo())) {
+                            map.put("mdtrt_id", dto.getMedicalRegNo()); // 就诊ID
+                            map.put("psn_no", dto.getAac001()); // 人员编号
+                        } else {
+                            throw new RuntimeException("【" + dto.getName() + "】为医保病人，请先进行医保登记");
+                        }
                     }
-                }
-                map.put("dept_code", dto.getInDeptCode()); // 科室代码
-                map.put("dept_name", dto.getInDeptName()); // 科室名称
-                map.put("wardarea_name", dto.getInWardName()); // 病区名称
-                map.put("bedno", dto.getBedName()); // 病床号
-                map.put("diag_code", dto.getInDiseaseCode()); // 诊断代码
-                map.put("adm_time", dto.getInTimeBatch()); // 入院时间
-                map.put("act_ipt_days", dto.getInDays()); // 实际住院天数
-                map.put("afpn_days", dto.getOperationDays()); // 手术后天数
-                map.put("rcd_time", dto.getRecordTime()); // 记录日期时间
-                map.put("vent_frqu", dto.getBreath()); // 呼吸频率（次/min）
-                map.put("use_vent_flag", dto.getIsVentilator()); // 使用呼吸机标志
-                map.put("pule", dto.getPulse()); // 脉率（次/min）
-                map.put("pat_heart_rate", dto.getHeartRate()); // 起搏器心率（次/min）
-                map.put("tprt", dto.getTemperature()); // 体温（℃）
-                String amBp = dto.getAmBp();
-                String[] split = amBp.split("/");
-                map.put("systolic_pre", StringUtils.isNotEmpty(split[0]) ? split[0] : ""); // 收缩压（mmHg）
-                map.put("dstl_pre", StringUtils.isNotEmpty(split[1]) ? split[1] : ""); // 舒张压（mmHg）
-                map.put("wt", dto.getWeight()); // 体重（kg）
-                map.put("abde", dto.getHeight()); // 腹围（cm）
-                map.put("nurscare_obsv_item_name", ""); // 护理观察项目名称
-                map.put("nurscare_obsv_rslt", ""); // 护理观察结果
-                map.put("nurs_name", dto.getCrteName()); // 护士姓名
-                map.put("sign_time", dto.getCrteTime()); // 签字时间
-                map.put("vali_flag", Constants.SF.S); // 有效标志
-                data.add(map);
-            });
+                    map.put("dept_code", dto.getInDeptCode()); // 科室代码
+                    map.put("dept_name", dto.getInDeptName()); // 科室名称
+                    map.put("wardarea_name", dto.getInWardName()); // 病区名称
+                    map.put("bedno", dto.getBedName()); // 病床号
+                    map.put("diag_code", dto.getInDiseaseCode()); // 诊断代码
+                    map.put("adm_time", dto.getInTimeBatch()); // 入院时间
+                    map.put("act_ipt_days", dto.getInDays()); // 实际住院天数
+                    map.put("afpn_days", dto.getOperationDays()); // 手术后天数
+                    map.put("rcd_time", dto.getRecordTime()); // 记录日期时间
+                    map.put("vent_frqu", dto.getBreath()); // 呼吸频率（次/min）
+                    map.put("use_vent_flag", dto.getIsVentilator()); // 使用呼吸机标志
+                    map.put("pule", dto.getPulse()); // 脉率（次/min）
+                    map.put("pat_heart_rate", dto.getHeartRate()); // 起搏器心率（次/min）
+                    map.put("tprt", BigDecimalUtils.scale(dto.getTemperature(), 1)); // 体温（℃）
+                    String amBp = dto.getAmBp();
+                    String[] split = amBp.split("/");
+                    map.put("systolic_pre", StringUtils.isNotEmpty(split[0]) ? split[0] : ""); // 收缩压（mmHg）
+                    if (split.length <= 1) {
+                        map.put("dstl_pre", ""); // 舒张压（mmHg）
+                    } else {
+                        map.put("dstl_pre", StringUtils.isNotEmpty(split[1]) ? split[1] : ""); // 舒张压（mmHg）
+                    }
+                    map.put("wt", dto.getWeight()); // 体重（kg）
+                    map.put("abde", dto.getGirth()); // 腹围（cm）
+                    map.put("nurscare_obsv_item_name", ""); // 护理观察项目名称
+                    map.put("nurscare_obsv_rslt", ""); // 护理观察结果
+                    map.put("nurs_name", dto.getCrteName()); // 护士姓名
+                    map.put("sign_time", dto.getCrteTime()); // 签字时间
+                    map.put("vali_flag", Constants.SF.S); // 有效标志
+                    data.add(map);
+                });
+            }
         }
         return data;
     }

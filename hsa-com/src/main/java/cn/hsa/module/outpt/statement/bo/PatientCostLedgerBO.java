@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -315,4 +316,24 @@ public interface PatientCostLedgerBO {
    * @Return cn.hsa.base.PageDTO
    **/
   PageDTO queryInPatientDaily(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod queryMedicalCostMz
+   * @Desrciption 门诊医疗汇总报表
+   * @Param OutptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/08/24 16：23
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO queryMedicalCostMz(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod queryMedicalCostTitle
+   * @Desrciption 门诊医疗汇总报表表头
+   * @Param OutptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/08/24 16：23
+   * @Return map
+   **/
+  Map queryMedicalCostTitle(OutptVisitDTO outptVisitDTO);
 }

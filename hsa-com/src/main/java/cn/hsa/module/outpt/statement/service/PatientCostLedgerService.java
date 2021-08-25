@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -370,5 +371,29 @@ public interface PatientCostLedgerService {
    **/
   @GetMapping("/service/outpt/statement/queryInPatientDaily")
   WrapperResponse<PageDTO> queryInPatientDaily(Map map);
+
+  /**
+   * @Menthod queryMedicalCostMz
+   * @Desrciption  门诊医疗汇总报表
+   * @Param Map
+   * @Author liuliyun
+   * @Date   2021/08/24 16：40
+   * @Return PageDTO
+   **/
+  @GetMapping("/service/outpt/statement/queryMedicalCostMz")
+  WrapperResponse<PageDTO> queryMedicalCostMz(Map map);
+
+
+  /**
+   * @Menthod queryMedicalCostTitle
+   * @Desrciption  门诊医疗汇总报表
+   * @Param Map
+   * @Author liuliyun
+   * @Date   2021/08/24 20：21
+   * @Return PageDTO
+   **/
+  @GetMapping("/service/outpt/statement/queryMedicalCostTitle")
+  WrapperResponse<Map> queryMedicalCostTitle(Map map);
+
 }
 

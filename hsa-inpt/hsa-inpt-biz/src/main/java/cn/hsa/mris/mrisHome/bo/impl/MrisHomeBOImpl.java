@@ -709,9 +709,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         List<MrisOperInfoDO> insertOperList = new ArrayList<>();
         if (!ListUtils.isEmpty(operList)) {
             for (MrisOperInfoDO mrisOperInfoDO : operList) {
-                if (StringUtils.isEmpty(mrisOperInfoDO.getOperDiseaseIcd9())) {
-                    continue;
-                }
+//                if (StringUtils.isEmpty(mrisOperInfoDO.getOperDiseaseIcd9())) {
+//                    continue;
+//                }
                 mrisOperInfoDO.setId(SnowflakeUtils.getId());
                 mrisOperInfoDO.setVisitId(mrisBaseInfoDTO.getVisitId());
                 mrisOperInfoDO.setHospCode(mrisBaseInfoDTO.getHospCode());
@@ -977,6 +977,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 mrisOperInfoDO.setHospCode(String.valueOf(map.get("hospCode")));
                 mrisOperInfoDO.setMbiId(String.valueOf(map.get("mrisId")));
                 mrisOperInfoDO.setVisitId(String.valueOf(map.get("visitId")));
+                mrisOperInfoDO.setOperDiseaseIcd9(operInfoRecordDO.getOperDiseaseIcd9());
                 mrisOperInfoDO.setOperTime(DateUtils.format(operInfoRecordDO.getCrteTime(),"yyyy-MM-dd'T'HH:mm:ss.SSS"));
                 mrisOperInfoDO.setOperDoctorId(operInfoRecordDO.getDoctorId()); // 术者
                 mrisOperInfoDO.setAssistantId4(operInfoRecordDO.getAssistantId1()); // I 助

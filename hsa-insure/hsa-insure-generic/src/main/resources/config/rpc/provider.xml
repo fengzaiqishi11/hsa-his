@@ -68,5 +68,5 @@
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" ref="insureInptTransfusionRecordService_provider"/>
     <!--护理生命记录-统一支付平台-->
     <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" ref="insureNurseRecordService_provider"/>
-
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" ref="insureRecruitPurchaseService_provider"/>
 </beans>

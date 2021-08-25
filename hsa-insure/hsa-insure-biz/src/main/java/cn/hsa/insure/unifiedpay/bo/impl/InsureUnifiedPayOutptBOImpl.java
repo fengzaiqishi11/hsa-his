@@ -1393,14 +1393,20 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     }
                 }
                 map.put("medrcdno", dto.getOutProfile()); //病历号
-                map.put("oprn_oprt_sn", dto.getId()); //手术操作序号
+                for (int i = 1; i <= ssList.size(); i++) {
+                    map.put("oprn_oprt_sn", i); //手术操作序号
+                }
                 map.put("oprn_oprt_code", dto.getOperDiseaseCode()); //手术操作代码
                 map.put("oprn_oprt_name", dto.getOperDiseaseName()); //手术操作名称
                 map.put("oprn_oprt_tagt_part_name", " "); //手术操作目标部位名称
                 map.put("itvt_name", " "); //介入物名称
                 map.put("oprn_oprt_mtd_dscr", dto.getContent()); //手术及操作方法描述
                 map.put("oprn_oprt_cnt", 1); //手术及操作次数
-                map.put("oprn_oprt_time", dto.getOperEndTime()); //手术及操作时间
+                if (dto.getOperEndTime() != null) {
+                    map.put("oprn_oprt_time", dto.getOperEndTime()); //手术及操作时间
+                } else {
+                    throw new RuntimeException("患者【"+ dto.getName() +"】的【"+ dto.getOperDiseaseName() + "】未完成登记，请先完成手术相关信息");
+                }
                 map.put("vali_flag", Constants.SF.S); //有效标志
                 oprninfo.add(map);
             });

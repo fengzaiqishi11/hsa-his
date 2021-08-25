@@ -227,4 +227,10 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
      * 是否新医保，用于判断业务是否走统一支付平台
      */
     private String isUnifiedPay;
+
+    private String sql; // 动态sql
+    //结算时间
+    private String settleStartTime;
+    //结算时间
+    private String settleEndTime;
 }

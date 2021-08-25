@@ -27,8 +27,9 @@
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="excrementCode" column="excrement_code" jdbcType="VARCHAR"/>
         <result property="peeCode" column="pee_code" jdbcType="VARCHAR"/>
-        <result property="height" column="height" jdbcType="OTHER"/>
-        <result property="weight" column="weight" jdbcType="OTHER"/>
+        <result property="height" column="height" jdbcType="VARCHAR"/>
+        <result property="weight" column="weight" jdbcType="VARCHAR"/>
+        <result property="girth" column="girth" jdbcType="VARCHAR"/>
         <result property="amBp" column="am_bp" jdbcType="VARCHAR"/>
         <result property="pmBp" column="pm_bp" jdbcType="VARCHAR"/>
         <result property="isOperation" column="is_operation" jdbcType="VARCHAR"/>
@@ -46,7 +47,7 @@
         select
         id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
         heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
-        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time , drug_allergy
         from inpt_nurse_third
         <where>
@@ -130,6 +131,9 @@
             <if test="weight != null">
                 and weight = #{weight}
             </if>
+            <if test="girth != null">
+                and girth = #{girth}
+            </if>
             <if test="amBp != null and amBp != ''">
                 and am_bp = #{amBp}
             </if>
@@ -165,7 +169,7 @@
         select
         id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
         heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
-        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy
         from inpt_nurse_third
         <where>
@@ -203,7 +207,7 @@
         insert into inpt_nurse_third
         (id,hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
         heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
-        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, am_bp, pm_bp, is_operation,
+        thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy)
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
@@ -211,7 +215,7 @@
             #{item.temperature}, #{item.temperatureRetest}, #{item.pulse}, #{item.heartRate}, #{item.isVentilator},
             #{item.breath}, #{item.fortyUpCode}, #{item.fortyUpRemark}, #{item.thirtyFiveDownCode},
             #{item.thirtyFiveDownRemark}, #{item.intake}, #{item.output}, #{item.otherOutput}, #{item.skinCode}, #{item.remark}, #{item.excrementCode}, #{item.peeCode},
-            #{item.height}, #{item.weight}, #{item.amBp}, #{item.pmBp}, #{item.isOperation}, #{item.operationDays},
+            #{item.height}, #{item.weight}, #{item.girth}, #{item.amBp}, #{item.pmBp}, #{item.isOperation}, #{item.operationDays},
             #{item.operationCnt}, #{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.drugAllergy})
         </foreach>
     </insert>
@@ -252,6 +256,7 @@
         SCD.pee_code,
         SCD.height,
         SCD.weight,
+        SCD.girth,
         SCD.am_bp,
         SCD.pm_bp,
         SCD.is_operation,
@@ -713,6 +718,7 @@
             a.temperature,
             a.am_bp,
             a.weight,
+            a.girth,
             a.height,
             a.crte_name,
             a.crte_time
@@ -757,6 +763,7 @@
                 pee_code = #{dto.peeCode},
                 height = #{dto.height},
                 weight = #{dto.weight},
+                girth = #{dto.girth},
                 am_bp = #{dto.amBp},
                 pm_bp = #{dto.pmBp},
                 is_operation = #{dto.isOperation},

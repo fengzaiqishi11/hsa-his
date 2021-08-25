@@ -781,7 +781,7 @@
             b.patient_code,
             a.id,
             a.oper_disease_id,
-            (select code from base_disease bd where bd.hosp_code = b.hosp_code and bd.id = a.oper_disease_id) as oper_disease_code,
+            (select code from base_advice bd where bd.hosp_code = b.hosp_code and bd.id = a.oper_disease_id) as oper_disease_code,
             a.oper_disease_name,
             a.content,
             a.oper_end_time

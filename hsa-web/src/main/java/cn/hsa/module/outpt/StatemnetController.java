@@ -670,4 +670,32 @@ public class StatemnetController extends BaseController {
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.queryInPatientDaily(map);
   }
+
+  @GetMapping("/queryMedicalCostMz")
+  public WrapperResponse<PageDTO> queryMedicalCostMz(OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("outptVisitDTO", outptVisitDTO);
+    return patientCostLedgerService_consumer.queryMedicalCostMz(map);
+  }
+
+  /**
+   * @Menthod 门诊医疗汇总报表表头
+   * @Desrciption
+   * @Param [inptVisitDTO]
+   * @Author liuliyun
+   * @Date 2021/08/24
+   * @Return Map
+   **/
+  @PostMapping("/queryMedicalCostTitle")
+  public WrapperResponse<Map> queryMedicalCostTitle(@RequestBody OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("outptVisitDTO", outptVisitDTO);
+    return patientCostLedgerService_consumer.queryMedicalCostTitle(map);
+  }
 }

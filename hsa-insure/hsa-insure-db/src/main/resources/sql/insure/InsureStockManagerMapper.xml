@@ -63,36 +63,125 @@
 
     </select>
 
-    <select id="queryInsureGoodInfoDeletePage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
+    <select id="queryInsureUploadDataPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
+        select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId from insure_stock_upload
 
+        where 1=1
+
+        <if test="insureType != null and insureType != ''">
+           and  insure_type = #{insureType}
+        </if>
     </select>
 
-    <select id="queryInsureGoodSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
+    <insert id="insertStockUploadBatch" >
+        INSERT INTO insure_stock_upload(
+        id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id}, #{item.hospCode},  #{item.insureType}, #{item.fixmedinsBchno}, #{item.invDataType}, #{item.uploadTime}, #{item.certId})
+        </foreach>
+    </insert>
 
+    <delete id="deleteStockUpload">
+        delete from insure_stock_upload  where id = #{id} and fixmedins_bchno = #{fixmedinsBchno} and hosp_code = #{hospCode}
+    </delete>
+
+    <select id="queryInsureGoodSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
+    SELECT
+	CASE
+	WHEN a.item_code = '2' THEN b.nation_code ELSE c.nation_code END AS medListCodg,
+	CASE
+	WHEN a.item_code = '2' THEN b.CODE ELSE c.CODE  END AS fixmedinsHilistId,
+		a.item_name AS fixmedins_hilist_name,
+		a.id AS fixmedinsBchno,
+		NULL AS prscDrCertType,
+		'' AS prscDrCertno,
+		NULL AS prscDrCertName,
+		NULL AS pharCertType,
+		NULL AS pharCertno,
+		NULL AS pharName,
+		NULL AS pharPracCertNo,
+		NULL AS hiFeesetlType,
+		'1' AS setlId,
+		NULL AS mdtrtSn,
+		NULL AS psnNo,
+		NULL AS psnCertType,
+		NULL AS certno,
+		NULL AS psnName,
+		NULL AS manuLotnum,
+		NULL AS manuDate,
+		NULL AS expyEnd,
+		NULL AS rxFlag,
+		NULL AS trdnFlag,
+		NULL AS finlTrnsPric,
+		NULL AS rxno,
+		NULL AS rxCircFlag,
+		NULL AS rtalDocno,
+		NULL AS stooutNo,
+		NULL AS bchno,
+		NULL AS drugTracCodg,
+		NULL AS drugProdDarc,
+		NULL AS shelfPosi,
+		NULL AS selRetnCnt,
+		NULL AS selRetnTime,
+		NULL AS selRetnOpterName,
+		NULL AS memo
+	FROM
+		stro_invoicing a
+		LEFT JOIN base_material b ON a.item_id = b.id  AND a.hosp_code = b.hosp_code
+	  LEFT JOIN base_drug c ON a.item_id = c.id  AND a.hosp_code = c.hosp_code
     </select>
 
     <select id="queryInsureGoodSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
-
+        SELECT
+	CASE
+	WHEN a.item_code = '2' THEN b.nation_code ELSE c.nation_code END AS medListCodg,
+	CASE
+	WHEN a.item_code = '2' THEN b.CODE ELSE c.CODE  END AS fixmedinsHilistId,
+		a.item_name AS fixmedinsHilistName,
+		a.id AS fixmedinsBchno,
+		'1' AS setlId,
+		NULL AS psnNo,
+		NULL AS psnCertType,
+		NULL AS certno,
+		NULL AS psnName,
+		NULL AS manuLotnum,
+		NULL AS manuDate,
+		NULL AS expyEnd,
+		NULL AS rxFlag,
+		NULL AS trdnFlag,
+		NULL AS finlTrnsPric,
+		NULL AS selRetnCnt,
+		NULL AS selRetnTime,
+		NULL AS selRetnOpterName,
+		NULL AS medinsProdSelNo ,
+		NULL AS memo
+	FROM
+		stro_invoicing a
+		LEFT JOIN base_material b ON a.item_id = b.id  AND a.hosp_code = b.hosp_code
+	  LEFT JOIN base_drug c ON a.item_id = c.id  AND a.hosp_code = c.hosp_code
     </select>
 
     <select id="queryInsureInventoryCheckPage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryCheck">
     SELECT
         e.insure_item_code  as  medListCodg,
-        e.hosp_item_code as fixmedinsHilistId,
-        e.hosp_item_name as fixmedinsHilistName,
+        case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
+        b.item_name as fixmedinsHilistName,
         '1' as rx_flag,
         a.crte_time as invdate,
         b.final_num as invCnt,
         b.batch_no as manuLotnum,
         a.order_no as fixmedinsBchno,
         a.crte_time  as  manuDate,
-        b.expiry_date  as  expyEnd,
+        a.crte_time  as  expyEnd,
         a.remark as	memo
     FROM
         stro_inventory a
         JOIN stro_inventory_detail b ON a.id = b.inventory_id and a.hosp_code = b.hosp_code
-        join insure_item_match e on b.item_id = e.hosp_item_id and e.hosp_code = b.hosp_code
-        where a.hosp_code = #{hospCode} and e.is_trans ='1'
+        LEFT JOIN base_material c on b.item_id = c.id  and c.hosp_code = b.hosp_code
+        left join base_drug d on b.item_id = d.id  and d.hosp_code = b.hosp_code
+        left join insure_item_match e on b.item_id = e.hosp_item_id and e.hosp_code = b.hosp_code
     </select>
 
     <select id="queryInsureInventoryStockUpdatePage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">
@@ -104,9 +193,9 @@
         b.batch_no as fixmedinsBchno,
         b.sell_price as price,
         b.num as cnt,
-        '' as rxFlag,
-        null as invChgTime,
-        '' as invChgOpterName,
+        '1' as rxFlag,
+        c.crte_time as invChgTime,
+        c.crte_name as invChgOpterName,
         '' as	memo,
         '1' as trdnFlag
     FROM

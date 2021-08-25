@@ -2,8 +2,10 @@ package cn.hsa.module.insure.stock.dao;
 
 import cn.hsa.module.insure.stock.entity.*;
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.insure.stock.service
@@ -40,7 +42,7 @@ public interface InsureStockManagerDAO {
      * @param listInsureGoodBuyBack
      * @return
      */
-    int updateInsureGoodBuyBackBatch(List<InsureGoodBuyBack> listInsureGoodBuyBack);
+    int updateInsureGoodBuyBackBatch(@Param("list") List<InsureGoodBuyBack> listInsureGoodBuyBack);
 
 
     /**
@@ -48,13 +50,19 @@ public interface InsureStockManagerDAO {
      * @param insureGoodInfoDelete
      * @return
      */
-    List<InsureGoodInfoDelete> queryInsureGoodInfoDeletePage(InsureGoodInfoDelete insureGoodInfoDelete);
+    List<InsureGoodInfoDelete> queryInsureUploadDataPage(InsureGoodInfoDelete insureGoodInfoDelete);
     /**
      * 批量修改商品删除信息
-     * @param listInsureGoodInfoDelete
+     * @param map
      * @return
      */
-    int updateInsureGoodInfoDelete(List<InsureGoodInfoDelete> listInsureGoodInfoDelete);
+    int deleteStockUpload(Map<String, Object> map);
+    /**
+     * 批量插入商品删除信息
+     * @param insureGoodInfoDelete
+     * @return
+     */
+    int insertStockUploadBatch(@Param("list") List<InsureGoodInfoDelete> insureGoodInfoDelete);
 
 
     /**

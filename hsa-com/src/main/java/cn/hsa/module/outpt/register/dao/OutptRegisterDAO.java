@@ -197,4 +197,14 @@ public interface OutptRegisterDAO {
 
     // 根据就诊id查询挂号记录(outpt_register)
     OutptRegisterDTO getOutptRegisterByVisitId(Map<String, Object> map);
+
+    /**
+     * @Description: 查询当前发票号段已经使用的最大发票号码
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/25 12:06
+     * @Return
+     */
+    String getMaxInvoiceNo(OutptRegisterSettleDto outptRegisterSettleDto);
 }

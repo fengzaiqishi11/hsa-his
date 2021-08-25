@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureRecruitPurchaseDAO">
+
+
+    <!--    获取当前医院库存列表-->
+    <select id="queryAll" resultType="java.util.Map">
+        SELECT
+            prodCode,
+            fixmedinsHilistId,
+            fixmedinsHilistName,
+            rxFlag,
+            invdate,
+            manuLotnum,
+            fixmedinsBchno,
+            manuDate,
+            expyEnd,
+            memo,
+            invChgType,
+            pric,
+            invCnt,
+            invChgTime,
+            invChgOpterName,
+            trdnFlag
+        FROM
+    </select>
+<!--    获取商品销售记录列表-->
+    <select id="queryCommoditySalesRecord" resultType="java.util.Map"></select>
+    <!--    新增、修改当前医院库存表-->
+    <insert id="insertinvChgMedinsInfo">
+
+    </insert>
+<!--    新增商品销售记录-->
+    <insert id="insertCommoditySalesRecord"></insert>
+<!--    新增商品销售退货记录-->
+    <insert id="insertCommoditySalesReturnRecord"></insert>
+    <!--    新增、修改当前医院库存表-->
+    <update id="updateinvChgMedinsInfo">
+
+    </update>
+
+
+</mapper>

@@ -63,9 +63,29 @@
 
     </select>
 
-    <select id="queryInsureGoodInfoDeletePage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
+    <select id="queryInsureUploadDataPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
+        select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId from insure_stock_upload
 
+        where 1=1
+
+        <if test="insureType != null and insureType != ''">
+           and  insure_type = #{insureType}
+        </if>
     </select>
+
+    <insert id="insertStockUploadBatch" >
+        INSERT INTO insure_stock_upload(
+        id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id}, #{item.hospCode},  #{item.insureType}, #{item.fixmedinsBchno}, #{item.invDataType}, #{item.uploadTime}, #{item.certId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteStockUpload">
+        delete from insure_stock_upload  where id = #{id} and fixmedins_bchno = #{fixmedinsBchno} and hosp_code = #{hospCode}
+    </delete>
 
     <select id="queryInsureGoodSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
     SELECT
@@ -148,7 +168,7 @@
         e.insure_item_code  as  medListCodg,
         case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
         b.item_name as fixmedinsHilistName,
-        '' as rx_flag,
+        '1' as rx_flag,
         a.crte_time as invdate,
         b.final_num as invCnt,
         b.batch_no as manuLotnum,
@@ -173,9 +193,9 @@
         b.batch_no as fixmedinsBchno,
         b.sell_price as price,
         b.num as cnt,
-        '' as rxFlag,
-        null as invChgTime,
-        '' as invChgOpterName,
+        '1' as rxFlag,
+        c.crte_time as invChgTime,
+        c.crte_name as invChgOpterName,
         '' as	memo,
         '1' as trdnFlag
     FROM

@@ -1022,13 +1022,20 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
     }
 
     private void disposeFpxx(OutptRegisterSettleDto outptRegisterSettleDto, String hospCode){
+        // 取最新的发票号码
+        String invoiceNo = outptRegisterDAO.getMaxInvoiceNo(outptRegisterSettleDto);
         Map queryMap = new HashMap();
         OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();
         outinInvoiceDTO.setId(outptRegisterSettleDto.getBillId());
         outinInvoiceDTO.setHospCode(hospCode);
         outinInvoiceDTO.setSettleId(outptRegisterSettleDto.getId());
         outinInvoiceDTO.setPrefix(outptRegisterSettleDto.getPrefix());
-        outinInvoiceDTO.setCurrNo(outptRegisterSettleDto.getCurrNo());
+        if (invoiceNo != null && !"".equals(invoiceNo)) {
+            outinInvoiceDTO.setCurrNo(invoiceNo);
+        } else {
+            outinInvoiceDTO.setCurrNo(outptRegisterSettleDto.getCurrNo());
+        }
+
         queryMap.put("hospCode", hospCode);
         queryMap.put("outinInvoiceDTO", outinInvoiceDTO);
         outinInvoiceService.updateInvoiceStatus(queryMap);

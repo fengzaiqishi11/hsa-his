@@ -39,7 +39,7 @@
           AND audit_code = #{auditCode}
         <if test="keyword !=null and keyword != ''">
             and (hosp_illness_code like '%${keyword}%'
-            or hosp_illness_name like '%${keyword}%'
+            or hosp_illness_name like '%${keyword}%')
         </if>
     </select>
 
@@ -335,12 +335,18 @@
         where hosp_code = #{hospCode}
           and id = #{id}
     </update>
+
+    <select id="getInsureDiseaseById" parameterType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select
+        from insure_disease
+        where hosp_code = #{hospCode}
+          and id = #{id}
+          and insure_reg_code = #{insureRegCode}
+    </select>
+
     <update id="updateDisease">
         update insure_disease_match
         <set>
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode},
-            </if>
             <if test="insureRegCode != null and insureRegCode != ''">
                 insure_reg_code = #{insureRegCode},
             </if>

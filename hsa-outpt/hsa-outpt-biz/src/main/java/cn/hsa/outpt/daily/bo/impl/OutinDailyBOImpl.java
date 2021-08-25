@@ -382,6 +382,9 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             }
         }
 
+        // 回写一卡通异动表日结缴款ID
+        outinDailyDAO.updateDailyIdToBaseCardRechangeChargeDO(outinDailyDTO);
+
         // 门诊结算记录
         Map<String, Map<String, Object>>  mzMap = outinDailyDAO.queryOutptSettleAll(dto);
         if (MapUtils.isEmpty(mzMap)) {
@@ -479,8 +482,6 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         }
         // 回写门诊结算表日结缴款ID
         outinDailyDAO.updateDailyIdByOutptSettle(outinDailyDTO);
-        // 回写一卡通异动表日结缴款ID
-        outinDailyDAO.updateDailyIdToBaseCardRechangeChargeDO(outinDailyDTO);
     }
 
     /**

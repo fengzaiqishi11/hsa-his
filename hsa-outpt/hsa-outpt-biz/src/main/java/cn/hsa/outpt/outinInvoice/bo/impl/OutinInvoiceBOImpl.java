@@ -651,11 +651,17 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 		if (Constants.PJLX.GH.equals(outinInvoiceDTO.getInvoiceType())) {
 			resultList = outinInvoiceDao.queryRegiestItemInfoByParams(outinInvoiceDTO);
 		} else if (Constants.PJLX.MZ.equals(outinInvoiceDTO.getInvoiceType())) { // 门诊发票
+			// 默认不分单，查询费用表
 			if (sys == null || sys.getValue() == null || "0".equals(sys.getValue())) {
 				resultList = outinInvoiceDao.queryOutptItemInfoByParams(outinInvoiceDTO);
 			}
+			// 发票分单，查询发票财务分类表
 			if (sys != null && sys.getValue() != null && !"0".equals(sys.getValue())) {
 				resultList = outinInvoiceDao.queryOutptsettleInvoiceConent(outinInvoiceDTO);
+			}
+			//
+			if (ListUtils.isEmpty(resultList)) {
+				resultList = outinInvoiceDao.queryOutptItemInfoByParams(outinInvoiceDTO);
 			}
 		} else if (Constants.PJLX.ZY.equals(outinInvoiceDTO.getInvoiceType())) { // 住院发票
 			resultList = outinInvoiceDao.queryOutinItemInfoByParams(outinInvoiceDTO);

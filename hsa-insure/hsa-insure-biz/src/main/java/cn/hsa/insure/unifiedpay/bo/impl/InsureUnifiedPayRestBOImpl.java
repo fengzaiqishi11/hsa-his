@@ -993,7 +993,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         Integer integer = 0;
         if (Constants.XMLB.YP.equals(itemCode) || Constants.XMLB.CL.equals(itemCode) || Constants.XMLB.XM.equals(itemCode)) {
             if (Constants.SF.F.equals(isUpay)) {
-                this.insertInsureMatch(itemMatchDTO);
+                integer = this.insertInsureMatch(itemMatchDTO);
             } else {
                 InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
                 insureItemMatchDTO.setHospCode(hospCode);

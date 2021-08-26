@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -147,4 +148,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
      * 医嘱ids字符串
      */
     private String idsStr;
+    // 处方总金额
+    private BigDecimal printTotalPrice;
+
 }

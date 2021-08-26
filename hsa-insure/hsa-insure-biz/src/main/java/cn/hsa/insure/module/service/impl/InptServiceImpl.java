@@ -3,7 +3,7 @@ package cn.hsa.insure.module.service.impl;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.insure.inpt.bo.InptBo;
+import cn.hsa.module.insure.inpt.bo.InptBO;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.util.MapUtils;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ import java.util.Map;
 @Service("inptService_provider")
 public class InptServiceImpl extends HsafService implements InptService {
     @Resource
-    private InptBo inptBo;
+    private InptBO inptBo;
 
     /**
      * @Method udapteCanleInptSettle

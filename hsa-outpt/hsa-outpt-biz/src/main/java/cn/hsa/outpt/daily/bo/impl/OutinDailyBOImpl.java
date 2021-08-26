@@ -1273,9 +1273,9 @@ public class OutinDailyBOImpl implements OutinDailyBO {
 
             // *******************************住院日结 - 预交金结算*******************************
             // 预交金结算 -->> 预交金结算、预交金冲抵、 预交金补退
-            resultMap.put("RT_0401", TMP_0102.getYjjsTotalPrice());
-            resultMap.put("RT_0402", TMP_0102.getYjcdTotalPrice());
-            resultMap.put("RT_0403", TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()));
+            resultMap.put("RT_0301", TMP_0102.getYjjsTotalPrice());
+            resultMap.put("RT_0302", TMP_0102.getYjcdTotalPrice());
+            resultMap.put("RT_0303", TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()));
 
             // *******************************住院日结 - 结算详情*******************************
             // 实缴金额

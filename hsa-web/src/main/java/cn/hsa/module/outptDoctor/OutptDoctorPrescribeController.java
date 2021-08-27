@@ -250,6 +250,10 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptVisitDTO.setTranInCode("1");
     // 开住院证时间
     outptVisitDTO.setInCertTime(new Date());
+    // 就诊医生id
+    outptVisitDTO.setDoctorId(sysUserDTO.getId());
+    // 就诊医生姓名
+    outptVisitDTO.setDoctorName(sysUserDTO.getName());
     //就诊信息
     paramMap.put("outptVisitDTO", outptVisitDTO);
     return outptDoctorPrescribeService_consumer.updateVisitInHospital(paramMap);

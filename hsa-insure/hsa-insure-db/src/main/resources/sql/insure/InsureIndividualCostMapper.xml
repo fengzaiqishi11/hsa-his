@@ -617,7 +617,7 @@
         DELETE
         FROM
         insure_individual_cost
-        WHERE visit_id = #{visitId} and hosp_code =#{hospCode} and insure_settle_id is not null
+        WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
         <if test="insureIsTransmit !=null and insureIsTransmit != ''">
             and insure_is_transmit is not null
         </if>

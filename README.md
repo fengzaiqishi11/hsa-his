@@ -82,49 +82,10 @@ hsa-his (parent pom)
 
 编译打包
 
-````
-1. 方式一：
-  a.将hsa-api安装到本地maven仓库
-      mvn clean install
-  b.将hsa-biz安装到本地maven仓库
-      mvn clean install
-  c.将hsa-db安装到本地maven仓库
-      mvn clean install      
-  d.在hsa-main-xxx中，打包
-      mvn clean package
-2. 方式二（推荐）
-  在根目录下打包，运行打包命令，会自动依赖，并会将三套环境下的包都生成
-    mvn clean package
-````
+his
 
-项目运行
-
-````
-1. 在阿里开发环境下
-   a. 运行edas
-   b. （可选）设置启动启动参数：-Dpandora.location=/Users/localuser/.m2/repository/com/taobao/pandora/taobao-hsf.sar/dev-SNAPSHOT/taobao-hsf.sar-dev-SNAPSHOT.jar
-      运行hsa-main-ali目录下的cn.hsa.xxx.HsaAliApplication
-2. 在腾讯开发环境下
-   a. 运行consul
-   b. 运行hsa-main-tencent目录下的cn.hsa.xxx.HsaTencentApplication
-3. 在开源开发环境下
-   a. 启动Nacos
-   b. 运行hsa-main-generic目录下的cn.hsa.xxx.HsaGenericApplication
-````
-
-测试地址
-
-````
-打开Swagger页面
-http://127.0.0.1:8080/hsa-web/swagger-ui.html
-````
-
-开源方案中的加解密
-
-````
-1. 通过jasypt，加密明文字符串root
-java -cp jasypt-1.9.2.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI password=G0CvDz7oJn6 algorithm=PBEWithMD5AndDES input=root
-2. 假设生成的加密串为6eaMh/RX5oXUVca9ignvtg==
-将加密后的值配置到配置中心或application.properties文件中,例如
-spring.datasource.username=ENC(6eaMh/RX5oXUVca9ignvtg==)
-````
+<<<<<<<<< Temporary merge branch 1
+add this is to test release branch work status 模拟新版本发布的修改工作
+=========
+模拟 fix xxx bug，测试热修复分支 
+>>>>>>>>> Temporary merge branch 2

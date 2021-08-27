@@ -529,6 +529,9 @@
         <if test="typeCode != null and typeCode != ''">
             AND ic.type_code = #{typeCode}
         </if>
+        <if test="isValid != null and isValid != ''">
+            AND ic.is_Valid = #{isValid}
+        </if>
     </select>
 
     <!--查询单个-->

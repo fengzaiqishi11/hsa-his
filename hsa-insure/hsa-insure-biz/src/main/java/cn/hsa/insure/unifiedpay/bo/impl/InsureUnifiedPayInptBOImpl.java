@@ -520,16 +520,17 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     for(Map<String, Object> item : resultDataMap){
                         DecimalFormat df1 = new DecimalFormat("0.00");
                         String feedetlSn = MapUtils.get(item,"feedetl_sn");
+                        Map<String, Object> feedetlSnObjectMap = newFeedetlSnMap.get(feedetlSn);
                         insureIndividualCostDTO = new InsureIndividualCostDTO();
                         insureIndividualCostDTO.setId(SnowflakeUtils.getId());
                         insureIndividualCostDTO.setHospCode(hospCode);
                         insureIndividualCostDTO.setVisitId(visitId);//就诊id
                         insureIndividualCostDTO.setSettleId(null);
                         insureIndividualCostDTO.setIsHospital("1");
-                        insureIndividualCostDTO.setItemType(newFeedetlSnMap.get(feedetlSn).get("list_type").toString());
-                        insureIndividualCostDTO.setItemCode(newFeedetlSnMap.get(feedetlSn).get("medins_list_code").toString());
-                        insureIndividualCostDTO.setItemName(newFeedetlSnMap.get(feedetlSn).get("medins_list_name").toString());
-                        insureIndividualCostDTO.setCostId(newFeedetlSnMap.get(feedetlSn).get("id").toString());//费用id
+                        insureIndividualCostDTO.setItemType(MapUtils.get(feedetlSnObjectMap,"list_type"));
+                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"medins_list_code"));
+                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnMap,"medins_list_name"));
+                        insureIndividualCostDTO.setCostId(MapUtils.get(feedetlSnObjectMap,"id"));//费用id
                         insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
                         insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop").toString()); // 自付比例
                         insureIndividualCostDTO.setPrimaryPrice(BigDecimalUtils.convert(newFeedetlSnMap.get(MapUtils.get(item,"feedetl_sn")).get("det_item_fee_sumamt").toString())); // 上传到医保的费用

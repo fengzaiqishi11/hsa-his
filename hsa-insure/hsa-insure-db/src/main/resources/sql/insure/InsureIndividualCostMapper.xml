@@ -617,7 +617,7 @@
         DELETE
         FROM
         insure_individual_cost
-        WHERE visit_id = #{visitId} and hosp_code =#{hospCode} and insure_settle_id is not null
+        WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
         <if test="insureIsTransmit !=null and insureIsTransmit != ''">
             and insure_is_transmit is not null
         </if>
@@ -1172,7 +1172,7 @@
     <select id="queryAllQueryUnMatchPage" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
         iv.name,b.id,b.item_name,b.total_num,b.spec,b.price,b.crte_time,b.doctor_name,
-        (case b.item_code
+        (case
         when b.item_code ='1' then (select bd.code from base_drug bd where b.item_id = bd.id and bd.hosp_code
         =b.hosp_code )
         when b.item_code='2' then (select bm.code from base_material bm where b.item_id = bm.id and bm.hosp_code =

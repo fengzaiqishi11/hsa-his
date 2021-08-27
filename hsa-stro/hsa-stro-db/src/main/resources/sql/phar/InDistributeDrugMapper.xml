@@ -430,7 +430,7 @@
 
     <!--根据就诊id和配药id查询医嘱信息-->
     <select id="queryDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
-        select a.*,sum(pc.total_price) as printTotalPrice from inpt_advice a
+        select a.*,pc.total_price as printTotalPrice from inpt_advice a
         join phar_in_receive_detail pc on pc.advice_id = a.id and pc.hosp_code = a.hosp_code
         and pc.receive_id = #{id} and pc.visit_id = #{visitId}
         --       left join phar_in_receive b on pc.receive_id = b.id and pc.hosp_code = b.hosp_code
@@ -439,7 +439,7 @@
 
     <!--根据就诊id和发药id查询医嘱信息-->
     <select id="queryDrugByDistributeIdAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
-        select a.*,sum(pc.total_price) as printTotalPrice from inpt_advice a
+        select a.*,pc.total_price as printTotalPrice from inpt_advice a
         join phar_in_distribute_detail pc on pc.distribute_id = a.id and pc.hosp_code = a.hosp_code
         and pc.distribute_id = #{id} and pc.visit_id = #{visitId}
         where a.hosp_code = #{hospCode}

@@ -118,4 +118,7 @@
 
     <!-- 保证金管理 -->
     <dubbo:service interface="cn.hsa.module.inpt.inptguarantee.service.InptGuaranteeService" ref="inptGuaranteeService_provider"/>
+
+    <!-- 保证金管理 -->
+    <dubbo:service interface="cn.hsa.module.inpt.costclassification.service.CostClassificationService" ref="costClassificationService_provider"/>
 </beans>

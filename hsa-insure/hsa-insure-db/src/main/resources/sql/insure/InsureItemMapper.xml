@@ -52,7 +52,7 @@
             and insure_reg_code =#{insureRegCode}
         </if>
         <if test="downLoadType !=null and downLoadType != ''">
-            and item_type =#{itemType}
+            and down_load_type =#{downLoadType}
         </if>
     </select>
     <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">

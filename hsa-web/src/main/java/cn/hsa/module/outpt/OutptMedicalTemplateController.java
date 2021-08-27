@@ -155,7 +155,7 @@ public class OutptMedicalTemplateController extends BaseController {
   public WrapperResponse<Boolean> updateStatus(@RequestBody OutptMedicalTemplateDTO outptMedicalTemplateDTO,HttpServletRequest req, HttpServletResponse res) {
     Map map = new HashMap();
     SysUserDTO userDTO = getSession(req, res) ;
-    map.put("hospCode",userDTO.getId());
+    map.put("hospCode",userDTO.getHospCode());
     map.put("outptMedicalTemplateDTO",outptMedicalTemplateDTO);
     outptMedicalTemplateDTO.setHospCode(userDTO.getHospCode());
     return outptMedicalTemplateService_consumer.updateStatus(map);

@@ -7,7 +7,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.inpt.InptFunction;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
-import cn.hsa.module.insure.inpt.bo.InptBo;
+import cn.hsa.module.insure.inpt.bo.InptBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.insure.module.bo.impl
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
 @Component
-public class InptBoImpl extends HsafBO implements InptBo {
+public class InptBOImpl extends HsafBO implements InptBO {
 
     @Resource
     private InptFunction inptFunction;

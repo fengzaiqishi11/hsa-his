@@ -17,7 +17,7 @@ import java.util.Map;
  * @Date: 2020/11/09 9:25
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
-public interface InptBo {
+public interface InptBO {
     /**
      * @Method insertInptRegister
      * @Desrciption 入院登记

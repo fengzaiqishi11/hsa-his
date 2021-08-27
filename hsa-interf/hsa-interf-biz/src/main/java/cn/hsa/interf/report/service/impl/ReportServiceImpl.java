@@ -1,4 +1,4 @@
-package cn.hsa.interf.report.service;
+package cn.hsa.interf.report.service.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;

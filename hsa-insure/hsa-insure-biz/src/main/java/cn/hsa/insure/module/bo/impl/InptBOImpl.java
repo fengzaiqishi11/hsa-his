@@ -215,7 +215,6 @@ public class InptBOImpl extends HsafBO implements InptBO {
          */
 //        if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
         if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
-           if(!ListUtils.isEmpty(individualCostDTOList)){
                Map<String, Object> insureUnifiedMap = new HashMap<>();
                insureUnifiedMap.put("individualCostDTOList",individualCostDTOList);
                insureUnifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
@@ -225,7 +224,7 @@ public class InptBOImpl extends HsafBO implements InptBO {
                    //删除本次患者取消医保费用信息
                    insureIndividualCostService_consumer.delInsureCost(insureVisitParam).getData();
                }
-           }
+
         } else{
             String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();//医保注册编码
             insureIndividualVisitDTO.setCrteName(inptVisitDTO.getCrteName());

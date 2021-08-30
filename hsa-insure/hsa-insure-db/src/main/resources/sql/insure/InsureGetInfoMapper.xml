@@ -91,7 +91,7 @@
         left join mris_base_info e on a.visit_id=e.visit_id and a.hosp_code=e.hosp_code
         left join insure_setl_info f on a.visit_id=f.visit_id and a.hosp_code=f.hosp_code
         left join inpt_settle g on a.visit_id=g.visit_id and a.hosp_code=g.hosp_code
-        left join inpt_settle_invoice h on a.visit_id=h.visit_id and a.hosp_code=h.hosp_code
+        left join inpt_settle_invoice h on a.visit_id=h.visit_id and a.hosp_code=h.hosp_code and a.settle_id = h.settle_id
         where a.insureSettleId = #{insureSettleId} and a.state = '0' AND A.settle_state = '1' AND G.status_code = '0'
            AND  A.settle_id = #{settleId}
         order by a.visit_id

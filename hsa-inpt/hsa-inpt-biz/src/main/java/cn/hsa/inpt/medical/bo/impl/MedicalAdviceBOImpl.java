@@ -464,7 +464,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (!flag) {
                         //判断该医嘱目录的医技分类是否包含在参数里面,采血费
                         if (codeArray!=null && codeArray.length>0 && cxfBaseItem!=null &&
-                                !(Arrays.stream(codeArray).filter(code->code.equals(baseAdvice.getCode())).collect(Collectors.toList()).size()>0)) {
+                                !(Arrays.stream(codeArray).filter(code->code.equals(baseAdvice.getTechnologyCode())).collect(Collectors.toList()).size()>0)) {
                             saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
                         }
                         //容器费

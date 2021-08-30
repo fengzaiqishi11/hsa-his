@@ -1299,7 +1299,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
 
             // 支付方式
             StringBuffer RT_0404 = new StringBuffer();
-            TMP_0103.forEach(m -> {
+            List<Map<String, Object>> TMP_0404 = outinDailyDAO.queryOutinDailyPayAndAdvancePay(dto);
+            TMP_0404.forEach(m -> {
                 if (RT_0404.length() != 0) {
                     RT_0404.append("，");
                 }

@@ -993,7 +993,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         Integer integer = 0;
         if (Constants.XMLB.YP.equals(itemCode) || Constants.XMLB.CL.equals(itemCode) || Constants.XMLB.XM.equals(itemCode)) {
             if (Constants.SF.F.equals(isUpay)) {
-                this.insertInsureMatch(itemMatchDTO);
+                integer = this.insertInsureMatch(itemMatchDTO);
             } else {
                 InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
                 insureItemMatchDTO.setHospCode(hospCode);
@@ -1285,7 +1285,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchList) {
                 if (!collect.isEmpty() && collect.containsKey(insureItemMatchDTO.getHospItemName())) {
                     InsureItemDTO itemDto = collect.get(insureItemMatchDTO.getHospItemName());
-                    insureItemMatchDTO.setItemCode(itemDto.getItemMark()); // 项目类别标志
+                    //insureItemMatchDTO.setItemCode(itemDto.getItemMark()); // 项目类别标志
                     insureItemMatchDTO.setInsureItemName(itemDto.getItemName()); // 医保中心项目名称
                     insureItemMatchDTO.setInsureItemCode(itemDto.getItemCode()); // 医保中心项目编码
                     insureItemMatchDTO.setInsureItemType(itemDto.getItemType()); // 医保中心项目类别

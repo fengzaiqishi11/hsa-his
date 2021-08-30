@@ -152,6 +152,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         List<BaseItemDTO> oldItems = insureItemMatchDAO.queryAllItemsInfo(selectMap);
         List<BaseMaterialDTO> oldMaterials = insureItemMatchDAO.queryAllMaterialsInfo(selectMap);
 
+        // 基础表中的ID
         List<String> oldDrugIds = oldDrugs.stream().map(BaseDrugDTO::getId).collect(Collectors.toList());
         List<String> oldItemIds = oldItems.stream().map(BaseItemDTO::getId).collect(Collectors.toList());
         List<String> oldMaterialIds = oldMaterials.stream().map(BaseMaterialDTO::getId).collect(Collectors.toList());
@@ -164,20 +165,24 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 
         // insureItemMatchDTOS 不为空，则是修改和新增，为空只新增
         if (!ListUtils.isEmpty(insureItemMatchDTOS)) {
-            Map<String, List<InsureItemMatchDTO>> collect = insureItemMatchDTOS.stream().collect(Collectors.groupingBy(InsureItemMatchDTO::getItemCode));
+            Map<String, List<InsureItemMatchDTO>> collect = insureItemMatchDTOS.stream().collect(Collectors.groupingBy(InsureItemMatchDTO::getHospItemType));
             List<InsureItemMatchDTO> drugs = new ArrayList<>();
             List<InsureItemMatchDTO> items = new ArrayList<>();
             List<InsureItemMatchDTO> materials = new ArrayList<>();
 
             for (String key : collect.keySet()) {
-                //药品
-                if ("11".equals(key) || "12".equals(key) || "13".equals(key)) {
-                    drugs.addAll(collect.get(key));
-                } else if ("2".equals(key)) {
-                    //项目
-                    items.addAll(collect.get(key));
-                } else {
-                    materials.addAll(collect.get(key));
+                switch (key) {
+                    case Constants.XMLB.YP:
+                        drugs.addAll(collect.get(key));
+                        break;
+                    case Constants.XMLB.XM:
+                        items.addAll(collect.get(key));
+                        break;
+                    case Constants.XMLB.CL:
+                        materials.addAll(collect.get(key));
+                        break;
+                    default:
+                        break;
                 }
             }
             List<String> newDrugIds = drugs.stream().map(InsureItemMatchDTO::getHospItemId).collect(Collectors.toList());

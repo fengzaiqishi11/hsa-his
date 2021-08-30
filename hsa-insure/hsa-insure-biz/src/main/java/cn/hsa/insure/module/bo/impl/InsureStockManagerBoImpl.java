@@ -457,6 +457,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         if(!ListUtils.isEmpty(listInsureInventoryCheck)){
             listInsureInventoryCheck = JSONObject.parseArray(JSONObject.toJSONString(listInsureInventoryCheck),InsureInventoryCheck.class);
         }
+        Map<String, Object> paramMap = new HashMap<>();
         List<Map<String, Object>> listMap = new ArrayList<>();
         Map<String, Object> dataMap = null;
         for (InsureInventoryCheck insureInventoryCheck : listInsureInventoryCheck) {
@@ -474,10 +475,10 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             dataMap.put("memo", insureInventoryCheck.getMemo());//备注	字符型	500	　	　	新医保
             listMap.add(dataMap);
         }
-        dataMap.clear();
-        dataMap.put("purcinfo", JSONObject.toJSONString(listMap));
 
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3501, dataMap);
+        paramMap.put("purcinfo", listMap);
+
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3501, paramMap);
 
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据

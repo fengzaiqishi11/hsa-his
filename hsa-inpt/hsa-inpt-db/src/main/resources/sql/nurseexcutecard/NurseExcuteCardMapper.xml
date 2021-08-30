@@ -312,7 +312,7 @@
       </if>
       left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
       where ia.hosp_code=#{hospCode}
-      and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code = '3' and ia.use_code ='1') or (ia.item_code != '1'))
+      and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
       and ia.is_check='1'
       <!--数据共享标志为1，需根据单据类型判断打印状态-->
       <if test="isShared != null and isShared == '1'.toString()">

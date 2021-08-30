@@ -29,6 +29,7 @@
             </foreach>
         </if>
     </select>
+
     <select id="selectLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
         select id, hosp_code, insure_reg_code, item_mark, item_code, item_name, item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible, check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time, ver, ver_name,
                down_load_type, sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,num,size,record_counts
@@ -36,6 +37,7 @@
         and ver_name is not null
         order by crte_time desc limit 1
     </select>
+
     <select id="queryPageUnifiedItem" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
         select ID, HOSP_CODE, INSURE_REG_CODE, ITEM_MARK, ITEM_CODE, ITEM_NAME,ITEM_TYPE,
         ITEM_DOSAGE, ITEM_SPEC, ITEM_PRICE, ITEM_UNIT_CODE, PROD, DEDUCTIBLE, CHECK_PRICE
@@ -55,6 +57,7 @@
             and down_load_type =#{downLoadType}
         </if>
     </select>
+
     <select id="getById" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
         select *
         from insure_item

@@ -518,7 +518,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         inptCostDTO.setIatdSeqNo(adviceDTO.getGroupSeqNo());
         inptCostDTO.setSourceCode(Constants.FYLYFS.QTFY);
         //费用来源ID->医嘱目录ID
-        inptCostDTO.setSourceId(sysCodeDetailDTOList.get(0).getRemark());
+        inptCostDTO.setSourceId(materialDTO.getId());
         inptCostDTO.setSourceDeptId(adviceDTO.getDeptId());
         inptCostDTO.setInDeptId(adviceDTO.getInDeptId());
         //财务分类

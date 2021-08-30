@@ -19,6 +19,7 @@ import java.io.Serializable;
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureInventoryCheck   extends PageDO implements Serializable {
+    private String hospCode;
     private String medListCodg	;//医疗目录编码	字符型	50		Y	新医保
     private String fixmedinsHilistId	;//定点医药机构目录编号	字符型	20	Y	Y	新医保/核3	核3：drug_code
     private String fixmedinsHilistName	;//定点医药机构目录名称	字符型	200		Y	新医保/核3	核3：drug_name

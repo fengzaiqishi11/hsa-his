@@ -433,12 +433,12 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_way"))){
                         individualSettleDTO.setClrWay(MapUtils.get(setlInfoMap,"clr_way"));
                     }else {
-                        individualSettleDTO.setClrOptins(selectEntity.getClrWay());
+                        individualSettleDTO.setClrWay(selectEntity.getClrWay());
                     }
                     if(StringUtils.isNotEmpty(MapUtils.get(setlInfoMap,"clr_type"))){
                         individualSettleDTO.setClrType(MapUtils.get(setlInfoMap,"clr_type"));
                     }else{
-                        individualSettleDTO.setClrOptins(selectEntity.getClrType());
+                        individualSettleDTO.setClrType(selectEntity.getClrType());
                     }
                     inptVisitDAO.updateInsureSettleById(individualSettleDTO);
                 }

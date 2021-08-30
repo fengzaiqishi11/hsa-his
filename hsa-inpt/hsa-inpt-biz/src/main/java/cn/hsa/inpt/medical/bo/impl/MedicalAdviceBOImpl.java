@@ -1507,6 +1507,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptCostDTO.setCrteId(medicalAdviceDTO.getCheckId());
                 inptCostDTO.setCrteName(medicalAdviceDTO.getCheckName());
                 inptCostDTO.setCrteTime(medicalAdviceDTO.getCheckTime());
+                inptCostDTO.setAttributionCode("0");
 
                 //计算优惠金额
                 calculatPreferential(inptCostDTO, visitDTO.getPreferentialTypeId());
@@ -2068,6 +2069,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         inptCostDTO.setCrteId(medicalAdviceDTO.getCheckId());
         inptCostDTO.setCrteName(medicalAdviceDTO.getCheckName());
         inptCostDTO.setCrteTime(date);
+        inptCostDTO.setAttributionCode("0");
 
         //交病人类型判断 如果交病人且为临时医嘱时   (重新赋值  总数量，总数量单位，单价，总价)
         //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){

@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Package_name: cn.hsa.module.inpt.patientcomprehensivequery.dto
@@ -27,6 +28,8 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class PatientCompreHensiveQueryDTO extends PageDO implements Serializable {
     private static final long serialVersionUID = 6312150114445807803L;
+    // 项目id
+    private String id;
     // 医院编码
     private String hospCode;
     //搜索的关键字 项目，材料，药品名称等
@@ -78,4 +81,8 @@ public class PatientCompreHensiveQueryDTO extends PageDO implements Serializable
     private String babyId;
     // 是否查询婴儿
     private String queryBaby;
+    // 费用类型
+    private String attributionCode;
+    //  项目明细费用
+    private List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOList;
 }

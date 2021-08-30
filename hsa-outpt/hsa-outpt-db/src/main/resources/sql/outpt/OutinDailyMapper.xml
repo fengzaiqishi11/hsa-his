@@ -679,4 +679,20 @@
         left join outin_daily d on c.hosp_code = d.hosp_code and c.daily_settle_id = d.id
         where d.hosp_code = #{hospCode} and d.daily_no = #{dailyNo} and c.status_code = '8' order by c.crte_time desc
     </select>
+
+    <!-- 根据日结单号、日结类型查询日结支付方式表 -->
+    <select id="queryOutinDailyPayAndAdvancePay" resultType="java.util.Map">
+         select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
+            left join (
+                select a.pay_code, sum(total_price) as total_price from (
+                    SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
+                    WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
+                    union all
+                    select pay_code, total_price from outin_daily_advance_pay where hosp_code = #{hospCode} AND daily_no = #{dailyNo} and type_code = #{typeCode}
+                ) a
+                GROUP BY a.pay_code
+            ) t1 on t.value = t1.pay_code
+         where t.c_code = 'ZFFS' and (t.is_valid = '1' or (t.is_valid = '0' and t1.total_price is not null))
+         order by t.seq_no
+    </select>
 </mapper>

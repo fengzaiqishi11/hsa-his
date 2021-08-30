@@ -9,6 +9,7 @@ import cn.hsa.module.stro.stock.dto.CheckStockRespDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -89,12 +90,16 @@ public class CheckStockBOImpl implements CheckStockBO {
                 .setScale(2, BigDecimal.ROUND_HALF_UP);
         BigDecimal result = BigDecimalUtils.subtractMany(strockSplitNum, stockOccupy,
                 totalNumberNoCaculate, totalNumberNoCheck, prescribeOuptNumber, prescribeInptNumber);
-        // 通过频率Id 获得每日次数、执行周期
-        Map<String, BigDecimal> rateMap = checkStockDAO.getRateMessage(checkStockDTO);
-        // 每日次数
-        BigDecimal dailyTimes = MapUtils.get(rateMap, "dailyTimes");
-        // 执行周期
-        BigDecimal execInterval = MapUtils.get(rateMap, "execInterval");
+      BigDecimal dailyTimes = new BigDecimal(0);
+      BigDecimal execInterval = new BigDecimal(0);
+      if(StringUtils.isNotEmpty(checkStockDTO.getRateId())){
+          // 通过频率Id 获得每日次数、执行周期
+          Map<String, BigDecimal> rateMap = checkStockDAO.getRateMessage(checkStockDTO);
+          // 每日次数
+           dailyTimes = MapUtils.get(rateMap, "dailyTimes");
+          // 执行周期
+           execInterval = MapUtils.get(rateMap, "execInterval");
+        }
         // 频率 = 每日次数/执行周期
         BigDecimal rate = new BigDecimal(1);
         if (!BigDecimalUtils.isZero(dailyTimes) && !BigDecimalUtils.isZero(execInterval)){

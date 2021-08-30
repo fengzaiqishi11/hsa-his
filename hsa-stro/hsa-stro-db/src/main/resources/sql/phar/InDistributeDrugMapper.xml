@@ -428,7 +428,7 @@
      </if>
    </select>
 
-    <!--根据就诊id和配药id查询医嘱信息-->
+    <!--根据就诊id和配药id查询医嘱11信息-->
     <select id="queryDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select a.*,pc.total_price as printTotalPrice from inpt_advice a
         join phar_in_receive_detail pc on pc.advice_id = a.id and pc.hosp_code = a.hosp_code

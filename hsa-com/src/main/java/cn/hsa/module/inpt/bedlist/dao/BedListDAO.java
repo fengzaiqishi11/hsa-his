@@ -373,4 +373,15 @@ public interface BedListDAO {
      * @Return Integer
      **/
     Integer getInptDiagnoseByVisitId(@Param("hospCode") String hospCode,@Param("visitId")String visitId,@Param("diseaseId") String diseaseId);
+
+
+    /**
+     * @Method updateInptVisitTotalDays
+     * @Desrciption 更新住院天数
+     * @param inptVisitDTO
+     * @Author liuliyun
+     * @Date   2021/08/31 09:08
+     * @Return int
+     **/
+    int updateInptVisitTotalDays(InptVisitDTO inptVisitDTO);
 }

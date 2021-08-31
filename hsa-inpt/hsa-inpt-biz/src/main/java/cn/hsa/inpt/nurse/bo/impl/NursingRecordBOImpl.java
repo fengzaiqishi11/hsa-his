@@ -346,7 +346,7 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
     public List<InptNurseRecordDTO> queryNurseRecordByPrint(InptNurseRecordDTO inptNurseRecordDTO) {
         //根据护理单据id查询护理单据
         BaseNurseOrderDTO orderDTO = this.getOrderDTO(inptNurseRecordDTO);
-        if ("hljld".equals(orderDTO.getCode()) || "xsehljld".equals(orderDTO.getCode()) || "cqdchljld".equals(orderDTO.getCode()) || "chhljld".equals(orderDTO.getCode())) {
+        if ("hljld".equals(orderDTO.getCode()) || "xsehljld".equals(orderDTO.getCode()) || "cqdchljld".equals(orderDTO.getCode()) || "ckhljld".equals(orderDTO.getCode())) {
             inptNurseRecordDTO.setOrderFlag(Constants.SF.S);
         }
         return nursingRecordDAO.queryNursingRecord(inptNurseRecordDTO);

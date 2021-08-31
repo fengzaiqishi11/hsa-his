@@ -24,6 +24,48 @@
     <insert id="saveNationStandardDrugZYBatch">
         insert into nation_standard_drug_zy
         ( `id`,
+        `code` ,
+        `Decoction_name` ,
+        `good_name` ,
+        `function_type` ,
+        `drugs_source_subject` ,
+        `drugs_source_race` ,
+        `pharmacy_position`,
+        `Processing_method` ,
+        `Sexual_taste` ,
+        `Function_indications` ,
+        `usage_dosage` ,
+        `insurance_policy` ,
+        `is_valid` ,
+        `crte_id` ,
+        `crte_name`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.code },
+            #{item.decoctionName},
+            #{item.goodName },
+            #{item.functionType },
+            #{item.drugsSourceSubject},
+            #{item.drugsSourceRace },
+            #{item.pharmacyPosition},
+            #{item.processingMethod },
+            #{item.sexualTaste },
+            #{item.functionIndications },
+            #{item.usageDosage},
+            #{item.insurancePolicy},
+            #{item.isValid},
+            #{item.crteId},
+            #{item.crteName}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="saveNationStandardDrugZY">
+        insert into nation_standard_drug_zy
+        ( `id`,
           `code` ,
           `Decoction_name` ,
           `good_name` ,
@@ -41,27 +83,45 @@
           `crte_name`
         )
         values
-        <foreach collection="list" item="item" separator=",">
-            (
-                #{item.id},
-                #{item.code },
-                #{item.decoctionName},
-                #{item.goodName },
-                #{item.functionType },
-                #{item.drugsSourceSubject},
-                #{item.drugsSourceRace },
-                #{item.pharmacyPosition},
-                #{item.processingMethod },
-                #{item.sexualTaste },
-                #{item.functionIndications },
-                #{item.usageDosage},
-                #{item.insurancePolicy},
-                #{item.isValid},
-                #{item.crteId},
-                #{item.crteName}
-            )
-        </foreach>
+        ( #{id},
+          #{code },
+          #{decoctionName},
+          #{goodName },
+          #{functionType },
+          #{drugsSourceSubject},
+          #{drugsSourceRace },
+          #{pharmacyPosition},
+          #{processingMethod },
+          #{sexualTaste },
+          #{functionIndications },
+          #{usageDosage},
+          #{insurancePolicy},
+          #{isValid},
+          #{crteId},
+          #{crteName}
+        )
     </insert>
+
+    <update id="updateNationStandardDrugZY">
+        update nation_standard_drug_zy
+        set
+            code= #{code },
+            decoction_name=#{decoctionName},
+            good_name=#{goodName },
+            function_type=#{functionType },
+            drugs_source_subject=#{drugsSourceSubject},
+            drugs_source_race=#{drugsSourceRace },
+            pharmacy_position=#{pharmacyPosition},
+            processing_method=#{processingMethod },
+            sexual_taste=#{sexualTaste },
+            function_indications=#{functionIndications },
+            usage_dosage=#{usageDosage},
+            insurance_policy=#{insurancePolicy},
+            is_valid=#{isValid},
+            crte_id=#{crteId},
+            crte_name=#{crteName}
+        where    id=#{id}
+    </update>
 
     <!--查询单个-->
     <select id="getZYById" resultMap="NationStandardDrugZYMap">
@@ -75,7 +135,7 @@
             `drugs_source_race` ,
             `pharmacy_position`,
             `Processing_method` as processing_method ,
-            `Sexual_taste` as  sexual_tasteas ,
+            `Sexual_taste` as  sexual_taste ,
             `Function_indications` as function_indications ,
             `usage_dosage` ,
             `insurance_policy` ,
@@ -88,7 +148,7 @@
 
 
     <select id="queryNationStandardDrugZYPage" resultMap="NationStandardDrugZYMap">
-      select   `id`,
+        select   `id`,
         `code` ,
         `Decoction_name` as register_name,
         `good_name` ,

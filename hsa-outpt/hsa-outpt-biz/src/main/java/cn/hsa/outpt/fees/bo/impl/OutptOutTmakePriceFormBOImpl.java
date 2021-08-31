@@ -703,7 +703,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
                             && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
 
@@ -740,7 +740,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
 //                            && pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
 
@@ -1253,7 +1253,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
                             && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
                         // 部分退且已经发药
                         if (!isAllOut) {
                             itemIdList.add(outptCostDTO.getItemId());
@@ -1295,7 +1295,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
  //                           && pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
                         // 部分退且已经发药
                         if (!isAllOut) {
                             itemIdList.add(outptCostDTO.getItemId());

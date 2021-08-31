@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.advice.dao.SyncAdviceDetailDAO">
+
+    <resultMap type="cn.hsa.module.sync.advice.dto.SyncAdviceDetailDTO" id="SyncAdviceDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="adviceCode" column="advice_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+        <result property="isAloneCost" column="is_alone_cost" jdbcType="VARCHAR"/>
+        <result property="isFristCost" column="is_frist_cost" jdbcType="VARCHAR"/>
+        <result property="isAppointRate" column="is_appoint_rate" jdbcType="VARCHAR"/>
+        <result property="rateCode" column="rate_code" jdbcType="VARCHAR"/>
+        <result property="insureListCode" column="insure_list_code" jdbcType="VARCHAR"/>
+        <result property="itemTypeCode" column="itemTypeCode" jdbcType="VARCHAR"/>
+        <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="itemCode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
+    <select id="queryItemAndMaterialPage" resultMap="SyncAdviceDetailMap">
+        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.code as itemCode,a.use_code,
+        a.spec
+        FROM
+        (
+        select id,`name`,type_code as itemTypeCode,price,unit_code,spec,code,'' as use_code,
+        '3' as type_code from sync_item
+        where is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%'))
+        </if>
+        UNION ALL
+        select id,`name`,type_code as itemTypeCode,price,unit_code,spec,code,use_code,
+        '2' as type_code from sync_material
+        where is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and  (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+        </if>
+        )  a
+    </select>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="SyncAdviceDetailMap">
+         select
+          id, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from sync_advice_detail
+        where id = #{id}
+    </select>
+
+    <!--查询所有数据-->
+    <select id="queryAll" resultMap="SyncAdviceDetailMap">
+        select
+          id, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from sync_advice_detail
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="adviceCode != null and adviceCode != ''">
+                and advice_code = #{adviceCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and item_code = #{itemCode}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and item_name = #{itemName}
+            </if>
+            <if test="num != null">
+                and num = #{num}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and use_code = #{useCode}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="isAloneCost != null and isAloneCost != ''">
+                and is_alone_cost = #{isAloneCost}
+            </if>
+            <if test="isFristCost != null and isFristCost != ''">
+                and is_frist_cost = #{isFristCost}
+            </if>
+            <if test="isAppointRate != null and isAppointRate != ''">
+                and is_appoint_rate = #{isAppointRate}
+            </if>
+            <if test="rateCode != null and rateCode != ''">
+                and rate_code = #{rateCode}
+            </if>
+            <if test="insureListCode != null and insureListCode != ''">
+                and insure_list_code = #{insureListCode}
+            </if>
+            <if test="ids !=null">
+                and id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--通过医嘱编码查询项目信息数据-->
+    <select id="queryItemByAdviceCode" resultMap="SyncAdviceDetailMap">
+         select
+          b.id, b.advice_code, b.type_code, b.item_code, b.item_name, b.num, b.unit_code, b.price, b.spec, b.use_code,
+           b.total_price, b.is_alone_cost, b.is_frist_cost, b.is_appoint_rate, b.rate_code, b.insure_list_code,a.itemName,a.itemTypeCode,a.typeCode,
+          a.id as itemId,(select name from sync_rate where b.rate_code = sync_rate.code)as rateName
+					from sync_advice_detail b
+					left join
+					(select id,`name` as itemName,code,itemTypeCode,typeCode
+					from
+                        (select id,`name`,code,type_code as itemTypeCode,'3' as typeCode
+					    from sync_item where  is_valid = '1'
+					    union all
+					    select id,`name`,code,type_code as itemTypeCode,'2' as typeCode
+					    from sync_material where is_valid = '1'
+					    )mAndi
+					) a
+					on b.item_code = a.code  and a.typeCode =b.type_code
+					where   b.advice_code = #{code}
+    </select>
+
+    <!--通过医嘱编码查询医嘱详细数据-->
+    <select id="queryDetailByAdviceCode" resultMap="SyncAdviceDetailMap">
+        select
+        id, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price,
+        is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        where  advice_code = #{code}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="SyncAdviceDetailMap">
+        select
+        id, advice_code, type_code, item_code, item_name, num, unit_code, price, spec, use_code, total_price,
+        is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code
+        from sync_advice_detail
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="adviceCode != null and adviceCode != ''">
+                and advice_code = #{adviceCode}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and item_code = #{itemCode}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and item_name = #{itemName}
+            </if>
+            <if test="num != null">
+                and num = #{num}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and use_code = #{useCode}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="isAloneCost != null and isAloneCost != ''">
+                and is_alone_cost = #{isAloneCost}
+            </if>
+            <if test="isFristCost != null and isFristCost != ''">
+                and is_frist_cost = #{isFristCost}
+            </if>
+            <if test="isAppointRate != null and isAppointRate != ''">
+                and is_appoint_rate = #{isAppointRate}
+            </if>
+            <if test="rateCode != null and rateCode != ''">
+                and rate_code = #{rateCode}
+            </if>
+            <if test="insureListCode != null and insureListCode != ''">
+                and insure_list_code = #{insureListCode}
+            </if>
+            <if test="ids !=null">
+                and id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_advice_detail(id, advice_code, type_code, item_code, item_name, num, unit_code, price,
+        spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.adviceCode}, #{item.typeCode}, #{item.itemCode}, #{item.itemName}, #{item.num}, #{item.unitCode}, #{item.price}, #{item.spec}, #{item.useCode},
+            #{item.totalPrice}, #{item.isAloneCost}, #{item.isFristCost}, #{item.isAppointRate}, #{item.rateCode}, #{item.insureListCode})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="java.util.List">
+        <foreach collection="list"  item="item" separator=";">
+            update sync_advice_detail
+            <set>
+                advice_code = #{item.adviceCode},
+                type_code = #{item.typeCode},
+                item_code = #{item.itemCode},
+                item_name = #{item.itemName},
+                num = #{item.num},
+                unit_code = #{item.unitCode},
+                price = #{item.price},
+                spec = #{item.spec},
+                use_code = #{item.useCode},
+                total_price = #{item.totalPrice},
+                is_alone_cost = #{item.isAloneCost},
+                is_frist_cost = #{item.isFristCost},
+                is_appoint_rate = #{item.isAppointRate},
+                rate_code = #{item.rateCode},
+                insure_list_code = #{item.insureListCode},
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        delete from sync_advice_detail
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+</mapper>

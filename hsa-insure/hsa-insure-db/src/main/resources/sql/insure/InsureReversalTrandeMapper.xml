@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO">
+
+    <!--新增冲正交易记录-->
+    <insert id="insertInsureReversalTrade" parameterType="cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO">
+        insert
+        into insure_reversal_trade(
+            id,
+            hosp_code,
+            omsgid,
+            oinfno,
+            oinfname,
+            psn_no,
+            crte_id,
+            crte_name,
+            crte_time
+            )
+        values (
+            #{id},
+            #{hospCode},
+            #{omsgid},
+            #{oinfno},
+            #{oinfname},
+            #{psnNo},
+            #{crteId},
+            #{crteName},
+            #{crteTime}
+        )
+    </insert>
+
+    <!--冲正交易查询-->
+    <select id="queryReversalTradePage" resultType="cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO">
+        SELECT
+            e.insure_reg_code,
+            t.aac001 as psnNo,
+            (select aac003 from insure_individual_basic c where c.id = t.mib_id) as psnName,
+            e.crte_time,
+            e.omsgid,
+            e.oinfno,
+            l.name oinfname
+        FROM
+            insure_individual_settle e,
+            insure_individual_visit t,
+            sys_code_detail l
+        WHERE
+            e.hosp_code = t.hosp_code
+            AND e.visit_id = t.visit_id
+            AND e.hosp_code = l.hosp_code
+            AND e.oinfno = l.value
+            AND l.c_code = 'YBCZLX'
+            AND e.hosp_code = #{hospCode}
+        <if test="psnNo != null and psnNo != ''">
+            AND t.aac001 like concat('%',#{psnNo},'%')
+        </if>
+        <if test="oinfno != null and oinfno != ''">
+            AND e.oinfno = #{oinfno}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and e.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and e.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+
+            union all
+
+        select
+            t.insure_reg_code,
+            t.aac001 as psnNo,
+            (select aac003 from insure_individual_basic c where c.id = t.mib_id) as psnName,
+            t.crte_time,
+            t.omsgid,
+            t.oinfno,
+            l.name oinfname
+            from
+            insure_individual_visit t,
+            sys_code_detail l
+            where
+                t.hosp_code = l.hosp_code
+                AND t.oinfno = l.value
+                AND l.c_code = 'YBCZLX'
+                AND t.hosp_code = #{hospCode}
+            <if test="psnNo != null and psnNo != ''">
+                AND t.aac001 like concat('%',#{psnNo},'%')
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                AND t.oinfno = #{oinfno}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and t.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and t.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            </if>
+    </select>
+
+    <!--结算单查询-->
+    <select id="queryDataWith5261" resultType="java.util.Map">
+            SELECT
+                e.insure_reg_code AS insureRegCode,
+                e.visit_id,
+                t.medical_reg_no AS mdtrtId,
+                e.insureSettleId AS setlId,
+                e.settle_id,
+                t.aka130 as med_type,
+                t.aac001 AS psnNo,
+                c.aac003 AS psnName,
+                c.aac004 AS sex,
+                c.aac002 as idCard,
+                c.aac006 AS birthday,
+                e.crte_time AS crteTime,
+                t.visit_drpt_name,
+                e.total_price
+            FROM
+            insure_individual_settle e,
+            insure_individual_visit t,
+            insure_individual_basic c
+            WHERE
+            e.hosp_code = t.hosp_code
+            AND e.visit_id = t.visit_id
+            AND c.hosp_code = t.hosp_code
+            AND c.id = t.mib_id
+            AND t.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+          and  ( c.aac003 like concat('%',#{keyword},'%')
+            or t.medical_reg_no like concat('%',#{keyword},'%')
+            or  e.insureSettleId like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and t.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and t.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+        </if>
+        <!--业务类型选择-->
+        <if test="isHospital != null and isHospital != ''">
+            and  t.is_hospital =#{isHospital}
+        </if>
+    </select>
+
+    <!--医药机构费用结算对总账查询-->
+    <select id="queryDataWith3201" resultType="java.util.Map">
+        SELECT
+            max(e.insure_reg_code) as insureRegCode,
+            c.aae140 as insutype,
+            t.is_hospital,
+            e.clr_type,
+            e.clr_optins,
+            sum(e.person_price) as person_price,
+            t.medicine_org_code fixmedins_code,
+            sum(e.total_price) as medfee_sumamt,
+            (sum(e.insure_price) -  sum(e.personal_price)) as fund_pay_sumamt,
+            sum(e.personal_price) as acct_pay,
+            count(1) as fixmedins_setl_cnt
+        FROM
+            insure_individual_settle e,
+            insure_individual_visit t,
+			insure_individual_basic c
+        WHERE
+            e.hosp_code = t.hosp_code
+            AND e.visit_id = t.visit_id
+            AND c.hosp_code = t.hosp_code
+            AND c.id = t.mib_id
+            AND t.hosp_code = #{hospCode}
+            AND c.aae140 IS NOT NULL
+            AND e.settle_state = '1' and e.insureSettleId is not null
+        <if test="psnNo != null and psnNo != ''">
+            AND t.aac001 like concat('%',#{psnNo},'%')
+        </if>
+
+
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="refdSetlFlag == '0'">
+            and e.state = '0'
+        </if>
+        group by c.aae140,t.is_hospital,e.clr_type,
+        e.clr_optins,t.medicine_org_code
+    </select>
+
+
+
+    <!--医药机构费用结算对明细账查询-->
+    <select id="queryDataWith3202" resultType="java.util.Map">
+        SELECT
+            c.aac002 as name,
+            e.insure_reg_code as insureRegCode,
+            t.aac001 as psn_no,
+            e.settle_id,
+            e.visit_id,
+            t.medical_reg_no AS mdtrt_id,
+            e.insureSettleId AS setl_id,
+            e.state as refd_setl_flag,
+            (select aac003 from insure_individual_basic c where c.id = t.mib_id) as psnName,
+            c.aae140 as insutype,
+            t.is_hospital,
+            e.clr_type ,
+            if (e.state = '0','0','1') as refd_setl_flag,
+            e.state,
+            e.clr_optins,
+            t.insure_reg_code as setl_optins,
+            e.total_price as medfee_sumamt,
+            (e.insure_price - e.personal_price) as fund_pay_sumamt,
+            e.personal_price as acct_pay
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND c.id = t.mib_id
+        AND t.hosp_code = #{hospCode}
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        <if test="psnNo != null and psnNo != ''">
+            AND t.aac001 like concat('%',#{psnNo},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND e.insure_reg_code = #{insureRegCode}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="clrType != null and clrType != ''">
+            and e.clr_type = #{clrType}
+        </if>
+    </select>
+
+</mapper>

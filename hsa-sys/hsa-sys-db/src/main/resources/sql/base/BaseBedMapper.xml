@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bb.dao.BaseBedDao">
+
+    <resultMap type="cn.hsa.module.base.bb.dto.BaseBedDTO" id="BaseBedMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+        <result property="deptCodeName" column="dept_code_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="roomNo" column="room_no" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseBedMap">
+        select
+          id, hosp_code, dept_code, code, name, remark, status_code, seq_no, room_no, visit_id, is_valid, crte_id, crte_name, crte_time
+        from base_bed
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseBedMap">
+        select
+        a.id, a.hosp_code,b.name as dept_code_name, a.code, a.name, a.remark, a.status_code, a.seq_no, a.room_no,
+        a.visit_id, a.is_valid, a.crte_id, a.crte_name,a.dept_code,
+        a.crte_time
+        from base_bed a
+        LEFT JOIN base_dept b on a.dept_code=b.code
+        <where>
+            and a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="deptCode != null and deptCode != ''">
+                and a.dept_code = #{deptCode}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and a.visit_id = #{visitId}
+            </if>
+            <if test="visitFlag != null">
+                and (a.visit_id is null or a.visit_id = 0)
+                and (status_code = '1' or status_code is null)
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and a.id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by a.seq_no
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_bed(id,hosp_code, dept_code, code, name, remark, status_code, seq_no, room_no, visit_id, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{deptCode}, #{code}, #{name}, #{remark}, #{statusCode}, #{seqNo}, #{roomNo}, #{visitId}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_bed
+        <set>
+                dept_code = #{deptCode},
+                code = #{code},
+                name = #{name},
+                remark = #{remark},
+                status_code = #{statusCode},
+                room_no = #{roomNo},
+            visit_id = #{visitId}
+        </set>
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from base_bed where id = #{id} and hosp_code= #{hospCode}
+    </delete>
+
+    <!--code-->
+    <delete id="deleteBycode">
+        delete from base_bed_item where bed_code = #{code} and hosp_code= #{hospCode}
+    </delete>
+
+    <!--批量新增所有列-->
+    <insert id="insertList" parameterType="list">
+        insert into base_bed
+        (id,hosp_code, dept_code, code, name, remark, status_code, seq_no, room_no, visit_id, is_valid, crte_id,
+        crte_name, crte_time)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.deptCode}, #{item.code}, #{item.name}, #{item.remark},
+            #{item.statusCode}, #{item.seqNo}, #{item.roomNo}, #{item.visitId}, #{item.isValid}, #{item.crteId},
+            #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+    <!--批量删除-->
+    <update id="updateStatus">
+        update base_bed set
+            is_valid = #{isValid}
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <!--批量更新床位占用-->
+    <update id="updateVisit">
+        update base_bed set
+        visit_id = #{visitId} ,status_code = #{statusCode}
+        where
+        hosp_code = #{hospCode}
+        <if test="ids != null">
+            and id in
+            <foreach item="item" collection="ids" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+    </update>
+
+
+    <!--    判断编码是否已被使用-->
+    <select id="queryVisitIdIsExist" resultType="java.lang.Integer">
+        select count(*) from base_bed
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="id != null and id != ''">
+            id = #{id}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and status_code &lt;&gt; #{statusCode}
+        </if>
+            and visit_id is not null
+            and hosp_code = #{hospCode}
+            and is_valid = '1'
+    </select>
+    <!--    判断同科室下顺序号是否存在-->
+    <select id="queryDeptCodeSeqNoIsExist" resultType="java.lang.Integer">
+        select count(*) from base_bed
+        where
+        dept_code = #{deptCode} and seq_no = #{seqNo}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+	<select id="getMaxSeq" resultType="java.lang.Integer">
+        select ifnull(max(seq_no),0) from base_bed where hosp_code= #{hospCode}
+    </select>
+
+	<!--通过主键删除-->
+    <delete id="deleteByDto">
+        delete from base_bed where id = #{id} and hosp_code= #{hospCode}
+    </delete>
+
+    <select id="queryBedItem" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+        SELECT
+            *
+        FROM
+            base_item bi
+        WHERE
+            bi.hosp_code = #{hospCode}
+            AND EXISTS ( SELECT 1 FROM base_bed_item bbi WHERE bi.CODE = bbi.item_code and bbi.bed_code = #{bedCode} AND bi.hosp_code = bbi.hosp_code )
+    </select>
+</mapper>

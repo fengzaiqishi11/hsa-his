@@ -1,0 +1,44 @@
+package cn.hsa.module.interf.wxsettle.service;
+
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.interf.wxsettle.service
+ * @Class_name: WxSettleService
+ * @Describe: 微信试算，结算接口
+ * @Author: guanhongqiang
+ * @Eamil: hongqiang.guan@powersi.com.cn
+ * @Date: 2021/6/28 19:01
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+@FeignClient(value = "hsa-interf")
+public interface WxSettleService {
+
+	/**
+	 * @Description: 微信小程序门诊收费试算接口
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/6/28 19:25
+	 * @Return
+	 */
+	@PostMapping("/service/interf/wxsettle/saveTestSettle")
+	WrapperResponse<String> saveTestSettle(@RequestBody Map<String, Object> map);
+
+	/**
+	 * @Description: 微信小程序结算接口
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/6/28 19:26
+	 * @Return
+	 */
+	@PostMapping("/service/interf/wxsettle/saveSettle")
+	WrapperResponse<String> saveSettle(@RequestBody Map<String, Object> map);
+
+}

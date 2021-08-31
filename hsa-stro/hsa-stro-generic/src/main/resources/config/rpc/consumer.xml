@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+<!--    <dubbo:reference id="baseFinanceClassifyApi_dubbo" interface="BaseFinanceClassifyApi" check="false"/>-->
+    <!--<dubbo:consumer timeout="30000"/>-->
+
+    <!-- 基础信息子系统 -> 科室信息维护消费者 -->
+    <dubbo:reference id="baseDeptService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService"
+                     check="false"/>
+    <!--中心平台 >> 医院数据源管理 -->
+    <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
+
+    <!--基础数据 >> 单据号生成 -->
+    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>
+
+    <!--基础数据 >> 药品接口调用 -->
+    <dubbo:reference id="baseDrugService_consumer" interface="cn.hsa.module.base.drug.service.BaseDrugService" check="false"/>
+
+    <!--基础数据 >> 医嘱接口调用 -->
+    <dubbo:reference id="baseAdviceService_provider" interface="cn.hsa.module.base.ba.service.BaseAdviceService" check="false"/>
+
+
+    <!-- 基础信息子系统 -> 材料信息消费者接口调用 -->
+    <dubbo:reference id="baseMaterialService_consumer" interface="cn.hsa.module.base.bmm.service.BaseMaterialService" check="false"/>
+    <!-- 挂号子系统 -> 费用信息消费者接口-->
+    <dubbo:reference id="outptTmakePriceFormService_consumer" interface="cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService" check="false"/>
+
+    <!--住院费用 -->
+    <dubbo:reference id="inptCostService_consumer" interface="cn.hsa.module.inpt.doctor.service.InptCostService" check="false"/>
+
+    <!--用户信息 -->
+    <dubbo:reference id="sysUserService_consumer" interface="cn.hsa.module.sys.user.service.SysUserService" check="false"/>
+
+    <!--医嘱-->
+    <dubbo:reference id="doctorAdviceService_consumer" interface="cn.hsa.module.inpt.doctor.service.DoctorAdviceService" check="false"/>
+    <!-- 公共配置业务服务层接口 -->
+    <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false" />
+    <!--码表-->
+    <dubbo:reference id="sysCodeService_consumer" interface="cn.hsa.module.sys.code.service.SysCodeService" check="false" />
+    <!--校验库存-->
+    <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer" check="false"/>
+</beans>

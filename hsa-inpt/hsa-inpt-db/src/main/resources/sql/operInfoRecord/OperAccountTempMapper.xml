@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.oper.operInforecord.dao.OperAccountTempDAO">
+
+    <resultMap type="cn.hsa.module.oper.operInforecord.dto.OperAccountTempDTO" id="OperAccountTempMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="queryOperAccountTempDTOById" resultMap="OperAccountTempMap">
+        select
+          id, hosp_code, name, dept_id, dept_name, remark, pym, wbm, crte_id, crte_name, crte_time
+        from oper_account_temp
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+    </select>
+
+    <!--分页查询-->
+    <select id="queryOperAccountTempDTOPage" resultMap="OperAccountTempMap">
+        select
+          id, hosp_code, name, dept_id, dept_name, remark, pym, wbm, crte_id, crte_name, crte_time
+        from oper_account_temp
+        where hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and name like concat('%',#{keyword},'%')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertOperAccountTempDTO" keyProperty="id" useGeneratedKeys="true">
+        insert into oper_account_temp(id, hosp_code, name, dept_id, dept_name, remark, pym, wbm, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{name}, #{deptId}, #{deptName}, #{remark}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--修改数据-->
+    <update id="updateOperAccountTempDTO">
+        update oper_account_temp
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--删除数据-->
+    <delete id="deleteOperAccountTempDTOById">
+        delete from oper_account_temp where hosp_code = #{hospCode} and id = #{id}
+    </delete>
+
+
+    <delete id="deleteOperAccountTempDetailByTempId">
+        delete from oper_account_temp_detail where hosp_code = #{hospCode} and temp_id = #{id}
+    </delete>
+
+
+</mapper>

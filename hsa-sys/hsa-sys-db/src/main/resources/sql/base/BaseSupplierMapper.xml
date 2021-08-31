@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bspl.dao.BaseSupplierDAO">
+
+    <resultMap type="cn.hsa.module.base.bspl.dto.BaseSupplierDTO" id="BaseSupplierMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="abbr" column="abbr" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="contact" column="contact" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="fax" column="fax" jdbcType="VARCHAR"/>
+        <result property="postCode" column="post_code" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="bank" column="bank" jdbcType="VARCHAR"/>
+        <result property="account" column="account" jdbcType="VARCHAR"/>
+        <result property="taxNum" column="tax_num" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="abbrPym" column="abbr_pym" jdbcType="VARCHAR"/>
+        <result property="abbrWbm" column="abbr_wbm" jdbcType="VARCHAR"/>
+        <result property="namePym" column="name_pym" jdbcType="VARCHAR"/>
+        <result property="nameWbm" column="name_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="BaseSupplierMap" parameterType="java.util.Map">
+        select
+          id, hosp_code, code, abbr, name, contact, phone, fax, post_code, email, bank, account, tax_num, address, remark, abbr_pym, abbr_wbm, name_pym, name_wbm, is_valid, crte_id, crte_name, crte_time,company_type
+        from base_supplier
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--判断编码是否存在-->
+    <select id="queryCodeIsExist" resultType="java.lang.Integer">
+       select count(code) from base_supplier
+        where
+        code = #{code} and hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+        and id != #{id}
+        </if>
+    </select>
+
+    <!--查询所有供应商信息-->
+    <select id="queryAll" resultMap="BaseSupplierMap">
+        select
+          id, hosp_code, code, abbr, name, contact, phone, fax, post_code, email, bank, account, tax_num, address, remark, abbr_pym, abbr_wbm, name_pym, name_wbm, is_valid, crte_id, crte_name, crte_time,company_type
+        from base_supplier
+      where
+        hosp_code = #{hospCode}
+      <if test="id != null">
+        and id = #{id}
+      </if>
+      <if test="code != null and code != ''">
+        and code = #{code}
+      </if>
+      <if test="abbr != null and abbr != ''">
+        and abbr = #{abbr}
+      </if>
+      <if test="name != null and name != ''">
+        and name = #{name}
+      </if>
+      <if test="contact != null and contact != ''">
+        and contact = #{contact}
+      </if>
+      <if test="phone != null and phone != ''">
+        and phone = #{phone}
+      </if>
+      <if test="fax != null and fax != ''">
+        and fax = #{fax}
+      </if>
+      <if test="postCode != null and postCode != ''">
+        and post_code = #{postCode}
+      </if>
+      <if test="email != null and email != ''">
+        and email = #{email}
+      </if>
+      <if test="bank != null and bank != ''">
+        and bank = #{bank}
+      </if>
+      <if test="account != null and account != ''">
+        and account = #{account}
+      </if>
+      <if test="taxNum != null and taxNum != ''">
+        and tax_num = #{taxNum}
+      </if>
+      <if test="address != null and address != ''">
+        and address = #{address}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="isValid != null and isValid != ''" >
+        and is_valid = #{isValid}
+      </if>
+      <if test="crteId != null">
+        and crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and crte_time = #{crteTime}
+      </if>
+      <if test="companyType != null and companyType != ''" >
+        and company_type = #{companyType}
+      </if>
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultMap="BaseSupplierMap" parameterType="cn.hsa.module.base.bspl.dto.BaseSupplierDTO">
+        select
+          id, hosp_code, code, abbr, name, contact, phone, fax, post_code, email, bank, account, tax_num, address, remark, abbr_pym, abbr_wbm, name_pym, name_wbm, is_valid, crte_id, crte_name, crte_time,company_type
+        from base_supplier
+        where
+            hosp_code = #{hospCode}
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="abbr != null and abbr != ''">
+                and abbr = #{abbr}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="contact != null and contact != ''">
+                and contact = #{contact}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="fax != null and fax != ''">
+                and fax = #{fax}
+            </if>
+            <if test="postCode != null and postCode != ''">
+                and post_code = #{postCode}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="bank != null and bank != ''">
+                and bank = #{bank}
+            </if>
+            <if test="account != null and account != ''">
+                and account = #{account}
+            </if>
+            <if test="taxNum != null and taxNum != ''">
+                and tax_num = #{taxNum}
+            </if>
+            <if test="address != null and address != ''">
+                and address = #{address}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="companyType != null and companyType != ''" >
+              and company_type = #{companyType}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (abbr_pym like concat('%',#{keyword},'%') or abbr_wbm like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%')
+                or name_wbm like concat('%',#{keyword},'%') or abbr like concat('%',#{keyword},'%') or name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+            order by crte_time desc
+    </select>
+
+    <!--新增供应商信息-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_supplier(id,hosp_code, code, abbr, name, contact, phone, fax, post_code, email, bank, account, tax_num, address, remark, abbr_pym, abbr_wbm, name_pym, name_wbm, is_valid, crte_id, crte_name, crte_time,company_type)
+        values (#{id},#{hospCode}, #{code}, #{abbr}, #{name}, #{contact}, #{phone}, #{fax}, #{postCode}, #{email}, #{bank}, #{account}, #{taxNum}, #{address}, #{remark}, #{abbrPym}, #{abbrWbm}, #{namePym}, #{nameWbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{companyType})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="cn.hsa.module.base.bspl.dto.BaseSupplierDTO">
+        update base_supplier
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="abbr != null">
+                abbr = #{abbr},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="contact != null">
+                contact = #{contact},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="fax != null">
+                fax = #{fax},
+            </if>
+            <if test="postCode != null">
+                post_code = #{postCode},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="bank != null">
+                bank = #{bank},
+            </if>
+            <if test="account != null">
+                account = #{account},
+            </if>
+            <if test="taxNum != null">
+                tax_num = #{taxNum},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="abbrPym != null">
+                abbr_pym = #{abbrPym},
+            </if>
+            <if test="abbrWbm != null">
+                abbr_wbm = #{abbrWbm},
+            </if>
+            <if test="namePym != null">
+                name_pym = #{namePym},
+            </if>
+            <if test="nameWbm != null">
+                name_wbm = #{nameWbm},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="companyType != null">
+              company_type = #{companyType},
+            </if>
+        </set>
+        where
+        hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="updateStatus">
+        update base_supplier set is_valid = #{isValid}
+        where
+        hosp_code = #{hospCode}
+        <if test="ids != null and ids.size()>0">
+           and id in
+           <foreach collection="ids" item="id" separator="," open="(" close=")">
+           #{id}
+           </foreach>
+        </if>
+    </update>
+
+    <!--新增供应商信息-->
+    <insert id="insertList">
+        insert into base_supplier(id,hosp_code, code, abbr, name, contact, phone, fax, post_code, email, bank, account, tax_num, address, remark, abbr_pym, abbr_wbm, name_pym, name_wbm, is_valid, crte_id, crte_name, crte_time,company_type)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.code}, #{item.abbr}, #{item.name}, #{item.contact}, #{item.phone}, #{item.fax},
+             #{item.postCode}, #{item.email}, #{item.bank}, #{item.account}, #{item.taxNum}, #{item.address}, #{item.remark},
+             #{item.abbrPym}, #{item.abbrWbm}, #{item.namePym}, #{item.nameWbm}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.companyType})
+        </foreach>
+    </insert>
+
+</mapper>

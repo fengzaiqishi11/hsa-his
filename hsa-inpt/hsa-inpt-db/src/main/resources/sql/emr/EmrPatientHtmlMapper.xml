@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrpatienthtml.dao.EmrPatientHtmlDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO" id="EmrPatientHtmlDTOMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="patientId" column="patient_id" jdbcType="VARCHAR"/>
+        <result property="classifyTemplateId" column="classify_template_id" jdbcType="VARCHAR"/>
+        <result property="patientRecordId" column="patient_record_id" jdbcType="VARCHAR"/>
+        <result property="html" column="html" jdbcType="BLOB"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="reviewId" column="review_id" jdbcType="VARCHAR"/>
+        <result property="reviewName" column="review_name" jdbcType="VARCHAR"/>
+        <result property="reviewTime" column="review_time" jdbcType="VARCHAR"/>
+        <result property="isSpecify" column="is_specify" jdbcType="VARCHAR"/>
+        <result property="specifyId" column="specify_id" jdbcType="VARCHAR"/>
+        <result property="specifyName" column="specify_name" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditOption" column="audit_option" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个 病人病历 html内容-->
+    <select id="getEmrPatientHtmlDO" resultMap="EmrPatientHtmlDTOMap">
+        select
+         h.*
+        from emr_patient_html h join emr_patient p on p.patient_html_id = h.id
+        where p.id = #{patientId}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertEmrPatientHtml" parameterType="cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO">
+         insert into emr_patient_html(id, hosp_code, visit_id, patient_id, classify_template_id, patient_record_id, html, audit_code, review_id, review_name, review_time, is_specify, specify_id, specify_name, audit_id, audit_name, audit_time, audit_option, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{visitId}, #{patientId}, #{classifyTemplateId}, #{patientRecordId}, #{html}, #{auditCode}, #{reviewId}, #{reviewName}, #{reviewTime}, #{isSpecify}, #{specifyId}, #{specifyName}, #{auditId}, #{auditName}, #{auditTime}, #{auditOption}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateEmrPatientHtml" parameterType="cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO">
+        update emr_patient_html
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="patientId != null and patientId != ''">
+                patient_id = #{patientId},
+            </if>
+            <if test="classifyTemplateId != null and classifyTemplateId != ''">
+                classify_template_id = #{classifyTemplateId},
+            </if>
+            <if test="patientRecordId != null and patientRecordId != ''">
+                patient_record_id = #{patientRecordId},
+            </if>
+            <if test="html != null and html != ''">
+                html = #{html},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="reviewId != null and reviewId != ''">
+                review_id = #{reviewId},
+            </if>
+            <if test="reviewName != null and reviewName != ''">
+                review_name = #{reviewName},
+            </if>
+            <if test="reviewTime != null">
+                review_time = #{reviewTime},
+            </if>
+            <if test="isSpecify != null and isSpecify != ''">
+                is_specify = #{isSpecify},
+            </if>
+            <if test="specifyId != null and specifyId != ''">
+                specify_id = #{specifyId},
+            </if>
+            <if test="specifyName != null and specifyName != ''">
+                specify_name = #{specifyName},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="auditOption != null and auditOption != ''">
+                audit_option = #{auditOption},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+</mapper>

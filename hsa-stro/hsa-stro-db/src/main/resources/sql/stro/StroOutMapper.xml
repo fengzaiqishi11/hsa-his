@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.stroout.dao.StroOutDAO">
+	<resultMap type="cn.hsa.module.stro.stroout.dto.StroOutDTO" id="StroOutMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="outCode" column="out_code" jdbcType="VARCHAR"/>
+		<result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+		<result property="outStockId" column="out_stock_id" jdbcType="VARCHAR"/>
+		<result property="inStockId" column="in_stock_id" jdbcType="VARCHAR"/>
+		<result property="buyPriceAll" column="buy_price_all" jdbcType="NUMERIC"/>
+		<result property="sellPriceAll" column="sell_price_all" jdbcType="NUMERIC"/>
+		<result property="remark" column="remark" jdbcType="VARCHAR"/>
+		<result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+		<result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+		<result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+		<result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+		<result property="okAuditCode" column="ok_audit_code" jdbcType="VARCHAR"/>
+		<result property="okAuditId" column="ok_audit_id" jdbcType="VARCHAR"/>
+		<result property="okAuditName" column="ok_audit_name" jdbcType="VARCHAR"/>
+		<result property="okAuditTime" column="ok_audit_time" jdbcType="TIMESTAMP"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<resultMap type="cn.hsa.module.stro.stroout.dto.StroOutDetailDTO" id="StroOutDetailMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="outId" column="out_id" jdbcType="VARCHAR"/>
+		<result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+		<result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+		<result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+		<result property="spec" column="spec" jdbcType="VARCHAR"/>
+		<result property="num" column="num" jdbcType="NUMERIC"/>
+		<result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+		<result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+		<result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+		<result property="buyPrice" column="buy_price" jdbcType="NUMERIC"/>
+		<result property="sellPrice" column="sell_price" jdbcType="NUMERIC"/>
+		<result property="buyPriceAll" column="buy_price_all" jdbcType="NUMERIC"/>
+		<result property="sellPriceAll" column="sell_price_all" jdbcType="NUMERIC"/>
+		<result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+		<result property="splitNum" column="split_num" jdbcType="NUMERIC"/>
+		<result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+		<result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+		<result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+		<result property="expiryDate" column="expiry_date" jdbcType="OTHER"/>
+    <result property="model" column="model" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<resultMap type="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" id="StroStockDetailMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+		<result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+		<result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+		<result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+		<result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+		<result property="num" column="num" jdbcType="INTEGER"/>
+		<result property="buyPrice" column="buy_price" jdbcType="OTHER"/>
+		<result property="sellPrice" column="sell_price" jdbcType="OTHER"/>
+		<result property="buyPriceAll" column="buy_price_all" jdbcType="OTHER"/>
+		<result property="sellPriceAll" column="sell_price_all" jdbcType="OTHER"/>
+		<result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+		<result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+		<result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+		<result property="splitPrice" column="split_price" jdbcType="OTHER"/>
+		<result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+		<result property="spec" column="spec" jdbcType="VARCHAR"/>
+		<result property="splitRatio" column="split_ratio" jdbcType="OTHER"/>
+	</resultMap>
+
+	<!--查询单个出库单信息-->
+	<select id="getById" parameterType="cn.hsa.module.stro.outinstro.dto.StroOutinDTO" resultMap="StroOutMap">
+        select
+          id, hosp_code, out_code, order_no, out_stock_id, in_stock_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, ok_audit_code, ok_audit_id, ok_audit_name, ok_audit_time, in_order_no, crte_id, crte_name, crte_time
+        from stro_out
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+	<!--查询多个出库单信息-->
+	<select id="queryByIds" resultMap="StroOutMap">
+		select
+		  id, hosp_code, out_code, order_no, out_stock_id, in_stock_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, ok_audit_code, ok_audit_id, ok_audit_name, ok_audit_time, in_order_no, crte_id, crte_name, crte_time
+		from stro_out
+		where id in
+		<foreach item="item" collection="ids" separator="," open="(" close=")" index="index">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--查询所有出库单信息-->
+	<select id="queryAll" resultMap="StroOutMap">
+		select
+        a.id, a.hosp_code, a.out_code, a.order_no, a.out_stock_id, a.in_stock_id, a.buy_price_all,
+        a.sell_price_all, a.remark, a.audit_code, a.audit_id, a.audit_name, a.audit_time, a.ok_audit_code,
+        a.ok_audit_id, a.ok_audit_name, a.ok_audit_time, a.in_order_no, a.crte_id, a.crte_name, a.crte_time,
+		b.name as deptName
+		from stro_out a
+		left join base_dept b on a.hosp_code = b.hosp_code and a.in_stock_id = b.id
+		<where>
+			a.hosp_code = #{hospCode} and a.out_code in ('4','5','10','26')
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="outStockId != null and outStockId != ''">
+				and a.out_stock_id = #{outStockId}
+			</if>
+			<if test="buyPriceAll != null">
+				and a.buy_price_all = #{buyPriceAll}
+			</if>
+			<if test="sellPriceAll != null">
+				and a.sell_price_all = #{sellPriceAll}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="auditCode != null and auditCode != ''">
+				and a.audit_code = #{auditCode}
+			</if>
+			<if test="auditId != null and auditId != ''">
+				and a.audit_id = #{auditId}
+			</if>
+			<if test="auditName != null and auditName != ''">
+				and a.audit_name = #{auditName}
+			</if>
+			<if test="auditTime != null">
+				and a.audit_time = #{auditTime}
+			</if>
+			<if test="okAuditCode != null and okAuditCode != ''">
+				and a.ok_audit_code = #{okAuditCode}
+			</if>
+			<if test="okAuditId != null and okAuditId != ''">
+				and a.ok_audit_id = #{okAuditId}
+			</if>
+			<if test="okAuditName != null and okAuditName != ''">
+				and a.ok_audit_name = #{okAuditName}
+			</if>
+			<if test="okAuditTime != null">
+				and a.ok_audit_time = #{okAuditTime}
+			</if>
+			<if test="inOrderNo != null and inOrderNo != ''">
+				and in_order_no = #{inOrderNo}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			/*开始日期*/
+			<if test="startDate != null">
+				and date(a.crte_time) &gt;= date(#{startDate})
+			</if>
+			/*结束日期*/
+			<if test="endDate != null">
+				and date(a.crte_time) &lt;= date(#{endDate})
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and (a.order_no like '%${keyword}%' or
+				a.in_stock_id in
+				(select c.id from base_dept c where (c.name like '%${keyword}%' or c.pym like '%${keyword}%' or c.wbm like '%${keyword}%')))
+			</if>
+		</where>
+	</select>
+
+
+	<!--分页查询出库单信息-->
+	<select id="queryPage" resultMap="StroOutMap">
+		select
+		a.id, a.hosp_code, a.out_code, a.order_no, a.out_stock_id, a.in_stock_id, a.buy_price_all,
+		a.sell_price_all, a.remark, a.audit_code, a.audit_id, a.audit_name, a.audit_time, a.ok_audit_code,
+		a.ok_audit_id, a.ok_audit_name, a.ok_audit_time, a.in_order_no, a.crte_id, a.crte_name, a.crte_time,
+		b.name as deptName
+		from stro_out a
+		left join base_dept b on a.hosp_code = b.hosp_code and a.in_stock_id = b.id
+		<where>
+			a.hosp_code = #{hospCode} and a.out_code in ('4','5','10','26')
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="outStockId != null and outStockId != ''">
+				and a.out_stock_id = #{outStockId}
+			</if>
+			<if test="buyPriceAll != null">
+				and a.buy_price_all = #{buyPriceAll}
+			</if>
+			<if test="sellPriceAll != null">
+				and a.sell_price_all = #{sellPriceAll}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="auditCode != null and auditCode != ''">
+				and a.audit_code = #{auditCode}
+			</if>
+			<if test="auditId != null and auditId != ''">
+				and a.audit_id = #{auditId}
+			</if>
+			<if test="auditName != null and auditName != ''">
+				and a.audit_name = #{auditName}
+			</if>
+			<if test="auditTime != null">
+				and a.audit_time = #{auditTime}
+			</if>
+			<if test="okAuditCode != null and okAuditCode != ''">
+				and a.ok_audit_code = #{okAuditCode}
+			</if>
+			<if test="okAuditId != null and okAuditId != ''">
+				and a.ok_audit_id = #{okAuditId}
+			</if>
+			<if test="okAuditName != null and okAuditName != ''">
+				and a.ok_audit_name = #{okAuditName}
+			</if>
+			<if test="okAuditTime != null">
+				and a.ok_audit_time = #{okAuditTime}
+			</if>
+			<if test="inOrderNo != null and inOrderNo != ''">
+				and in_order_no = #{inOrderNo}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+			/*开始日期*/
+			<if test="startDate != null">
+				and a.crte_time &gt;=#{startDate}
+			</if>
+			/*结束日期*/
+			<if test="endDate != null">
+				and a.crte_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and (a.order_no like '%${keyword}%' or
+				a.in_stock_id in
+				(select c.id from base_dept c where (c.name like '%${keyword}%' or c.pym like '%${keyword}%' or c.wbm like '%${keyword}%')))
+			</if>
+		</where>
+		order by a.crte_time desc
+	</select>
+
+	<!--新增出库-->
+	<insert id="insert" keyProperty="" useGeneratedKeys="true">
+        insert into stro_out(id, hosp_code, out_code, order_no, out_stock_id, in_stock_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, ok_audit_code, ok_audit_id, ok_audit_name, ok_audit_time,in_order_no, crte_id, crte_name, crte_time)
+        values (#{id} ,#{hospCode}, #{outCode}, #{orderNo}, #{outStockId}, #{inStockId}, #{buyPriceAll}, #{sellPriceAll}, #{remark}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{okAuditCode}, #{okAuditId}, #{okAuditName}, #{okAuditTime},#{inOrderNo}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+	<!--修改出库信息-->
+	<update id="update">
+		update stro_out
+		<set>
+			out_code = #{outCode},
+			order_no = #{orderNo},
+			out_stock_id = #{outStockId},
+			in_stock_id = #{inStockId},
+			buy_price_all = #{buyPriceAll},
+			sell_price_all = #{sellPriceAll},
+			remark = #{remark},
+			audit_code = #{auditCode},
+			audit_id = #{auditId},
+			audit_name = #{auditName},
+			audit_time = #{auditTime},
+			ok_audit_code = #{okAuditCode},
+			ok_audit_id = #{okAuditId},
+			ok_audit_name = #{okAuditName},
+			ok_audit_time = #{okAuditTime},
+			<if test="inOrderNo != null and inOrderNo != ''">
+				in_order_no = #{inOrderNo},
+			</if>
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--批量审核/作废-->
+	<update id="updateAuditCode">
+		update stro_out
+		<set>
+			audit_code = #{auditCode},
+			<if test="okAuditCode != null and okAuditCode != ''">
+				ok_audit_code = #{okAuditCode},
+			</if>
+			<if test="auditId != null and auditId != ''">
+				audit_id = #{auditId},
+			</if>
+			<if test="auditName != null and auditName != ''">
+				audit_name = #{auditName},
+			</if>
+			<if test="auditTime != null">
+				audit_time = #{auditTime}
+			</if>
+		</set>
+		where hosp_code = #{hospCode} and audit_code = '0' and
+		<if test="ids != null and ids.size()>0">
+			id in
+			<foreach collection="ids" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+	</update>
+
+	<!-- >>>>>>>>>>>>>>      从表操作    >>>>>>>>>>>>>>  -->
+
+	<!--通过实体作为筛选条件查询入库明细-->
+	<select id="queryAllDetails" resultMap="StroOutDetailMap">
+		select sum(b.num) as remainNum,a.id, a.hosp_code, a.out_id, a.item_code, a.item_id, a.item_name, a.spec, a.num,
+		a.unit_code, a.dosage, a.dosage_unit_code, a.buy_price,
+		a.sell_price, a.buy_price_all, a.sell_price_all, a.split_ratio, a.split_num, a.split_price, a.split_unit_code,
+		a.expiry_date,a.batch_no,
+		(
+		CASE WHEN a.item_code = '1' THEN
+		(select name from base_product where code = bd.prod_code and hosp_code = a.hosp_code)
+		end
+		) as DrugProductName,
+		(
+		CASE WHEN a.item_code = '2' THEN
+		(select name from base_product where code = bm.prod_code and hosp_code = a.hosp_code)
+		end
+		)as materialProductName,
+    case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+    case when a.item_code='2' then bm.model end model
+		from stro_out_detail as a
+    left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+    left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+		LEFT JOIN stro_stock_detail as b
+		on a.item_name = b.item_name and a.item_code = b.item_code and a.item_id = b.item_id and a.batch_no = b.batch_no
+		and b.biz_id = #{outStockId} and a.hosp_code = b.hosp_code
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="id != null and id != ''">
+				and a.out_id = #{id}
+			</if>
+			<if test="ids != null and ids.size()>0">
+				and a.out_id in
+				<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+					#{id}
+				</foreach>
+			</if>
+		</where>
+		group by a.batch_no,a.id, a.hosp_code, a.out_id, a.item_code, a.item_id, a.item_name, a.spec, a.num,
+		a.unit_code, a.dosage, a.dosage_unit_code, a.buy_price,
+		a.sell_price, a.buy_price_all, a.sell_price_all, a.split_ratio, a.split_num, a.split_price, a.split_unit_code,
+		a.expiry_date
+		order by a.id
+	</select>
+
+	<!--批量新增出库明细数据-->
+	<insert id="insertDetails" keyProperty="" useGeneratedKeys="true">
+		insert into stro_out_detail(id, hosp_code, out_id, item_code, item_id, item_name, spec, num, unit_code, dosage,
+		dosage_unit_code, buy_price, sell_price, buy_price_all, sell_price_all, split_ratio, split_num, split_price,
+		split_unit_code, batch_no, expiry_date)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id}, #{item.hospCode}, #{item.outId}, #{item.itemCode}, #{item.itemId}, #{item.itemName},
+			#{item.spec}, #{item.num}, #{item.unitCode}, #{item.dosage}, #{item.dosageUnitCode}, #{item.buyPrice},
+			#{item.sellPrice}, #{item.buyPriceAll}, #{item.sellPriceAll}, #{item.splitRatio}, #{item.splitNum},
+			#{item.splitPrice}, #{item.splitUnitCode}, #{item.batchNo}, #{item.expiryDate})
+		</foreach>
+	</insert>
+
+	<!--批量修改出库明细数据-->
+	<update id="updateDetail">
+		<foreach collection="list" item="item" separator=";">
+			update stro_out_detail
+			<set>
+				out_id = #{item.outId},
+				item_code = #{item.itemCode},
+				item_id = #{item.itemId},
+				item_name = #{item.itemName},
+				spec = #{item.spec},
+				num = #{item.num},
+				unit_code = #{item.unitCode},
+				dosage = #{item.dosage},
+				dosage_unit_code = #{item.dosageUnitCode},
+				buy_price = #{item.buyPrice},
+				sell_price = #{item.sellPrice},
+				buy_price_all = #{item.buyPriceAll},
+				sell_price_all = #{item.sellPriceAll},
+				split_ratio = #{item.splitRatio},
+				split_num = #{item.splitNum},
+				split_price = #{item.splitPrice},
+				split_unit_code = #{item.splitUnitCode},
+				batch_no = #{item.batchNo},
+				expiry_date = #{item.expiryDate},
+			</set>
+			where hosp_code = #{item.hospCode} and id = #{item.id}
+		</foreach>
+	</update>
+
+
+	<delete id="deleteOutDetail">
+		delete from stro_out_detail
+		where hosp_code = #{hospCode} and
+		<if test="ids != null and ids.size()>0">
+			id in
+			<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</delete>
+
+	<delete id="deleteByStroOut">
+		delete from stro_out_detail
+		where hosp_code = #{hospCode} and
+		out_id = #{id}
+	</delete>
+
+	<!--查询库存-->
+	<!--    <select id="queryDrugStock" resultMap="StroStockDetailMap">-->
+	<!--        select-->
+	<!--            a.id,  a.hosp_code,  a.biz_id,  a.item_code,  a.item_id,  a.item_name,  a.unit_code,-->
+	<!--            a.num,  a.buy_price,  a.sell_price,  a.buy_price_all,  a.sell_price_all,  a.batch_no,-->
+	<!--            a.expiry_date,  a.split_num,  a.split_unit_code,-->
+
+	<!--        from stro_stock_detail as a, base_drug as b-->
+	<!--        where a.biz_id = #{bizId} and  a.hosp_code = b.hosp_code and  a.item_id = b.id-->
+	<!--    </select>-->
+
+	<!--    <select id="queryMaterialStock" resultMap="StroStockDetailMap">-->
+	<!--        select-->
+	<!--            a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name,-->
+	<!--            a.prep_code, a.num, a.unit_code, a.buy_price_all, a.sell_price_all, a.split_num,-->
+	<!--            a.split_price, a.split_unit_code, a.stock_max, a.stock_min, a.stock_occupy,-->
+
+	<!--        from stro_stock as a, base_material as b-->
+	<!--        where a.biz_id = #{bizId}  and  a.hosp_code = b.hosp_code and  a.item_id = b.id-->
+	<!--    </select>-->
+
+	<select id="queryStockByIds" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+		select
+		id, hosp_code, out_id, item_code, item_id, item_name, spec, num, unit_code, dosage,
+		dosage_unit_code, buy_price, sell_price, buy_price_all, sell_price_all, split_ratio,
+		split_num, split_price, split_unit_code, expiry_date, batch_no, expiry_date,
+		#{auditId} as crteId,#{auditName} as crteName,
+		(select stro_out.out_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+		#{hospCode} ) as biz_id,
+    (select dp.name from base_dept dp where
+        id = (select stro_out.in_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =#{hospCode}) and dp.hosp_code = #{hospCode}) as invoicingTargetName,
+    (select stro_out.in_stock_id from stro_out where out_id = stro_out.id and stro_out.hosp_code =#{hospCode} ) as invoicingTargetId,
+		(select stro_out.order_no from stro_out where out_id = stro_out.id and stro_out.hosp_code =
+		#{hospCode} ) as orderNo,
+		(
+		case
+		stro_out_detail.item_code
+		when '1' then
+		(SELECT base_drug.prep_code FROM base_drug WHERE base_drug.id = item_id and
+		base_drug.hosp_code = #{hospCode})
+		end
+		) as prepCode
+		from stro_out_detail
+		<where>
+			and hosp_code = #{hospCode}
+			<if test="ids != null and ids.size() > 0">
+				and out_id in
+				<foreach collection="ids" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<select id="queryIsAuditNo" resultType="java.lang.Integer">
+        select count(id) from stro_out
+        where audit_code in ('1','0') and in_order_no = #{inOrderNo} and hosp_code = #{hospCode}
+    </select>
+
+  <select id="queryIsAuditNo1" resultType="java.lang.Integer">
+        select count(id) from stro_in
+        where audit_code in ('1','0')  and in_order_no = #{inOrderNo} and hosp_code = #{hospCode}
+    </select>
+
+	<select id="queryStroOutNoDetail" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+		SELECT
+		max(a.hosp_code) as hosp_code,
+		max(a.item_code) as item_code,
+		max(a.item_id) as item_id,
+		max(a.item_name) as item_name,
+		max(a.unit_code) as unit_code,
+		sum(a.num) as num,
+		max(a.buy_price) as buy_price,
+		max(a.sell_price) as sell_price,
+		sum(a.buy_price_all) as buy_price_all,
+		sum(a.sell_price_all)as sell_price_all,
+		max(a.batch_no) as batch_no,
+		max(a.expiry_date) as expiry_date,
+		max(a.split_ratio) as split_ratio,
+		max(a.split_num) as split_num,
+		max(a.split_price) as split_price,
+		max(a.split_unit_code) as split_unit_code
+		FROM
+		stro_stock_detail AS a
+		WHERE(a.biz_id,a.item_id,a.batch_no,a.hosp_code) in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			(#{item.bizId},#{item.itemId},#{item.batchNo},#{item.hospCode})
+		</foreach>
+		GROUP BY a.hosp_code,a.item_id,a.batch_no
+    </select>
+
+	<select id="queryStroOutNoDetails" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+		SELECT
+		max(a.hosp_code) as hosp_code,
+		max(a.item_code) as item_code,
+		max(a.item_id) as item_id,
+		max(a.item_name) as item_name,
+		max(a.unit_code) as unit_code,
+		sum(a.num) as num,
+		max(a.buy_price) as buy_price,
+		max(a.sell_price) as sell_price,
+		sum(a.buy_price_all) as buy_price_all,
+		sum(a.sell_price_all)as sell_price_all,
+		max(a.batch_no) as batch_no,
+		max(a.expiry_date) as expiry_date,
+		max(a.split_ratio) as split_ratio,
+		sum(a.split_num) as split_num,
+		max(a.split_price) as split_price,
+		max(a.split_unit_code) as split_unit_code
+		FROM
+		stro_stock_detail AS a
+		WHERE(a.biz_id,a.item_id,a.batch_no,a.hosp_code) in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			(#{item.bizId},#{item.itemId},#{item.batchNo},#{item.hospCode})
+		</foreach>
+		GROUP BY a.hosp_code,a.item_id,a.batch_no
+	</select>
+
+	<select id="queryDetailStock" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+		SELECT
+		max(a.hosp_code) as hosp_code,
+		max(a.item_code) as item_code,
+		max(a.item_id) as item_id,
+		max(a.item_name) as item_name,
+		max(a.unit_code) as unit_code,
+		sum(a.num) as num,
+		max(a.buy_price) as buy_price,
+		max(a.sell_price) as sell_price,
+		sum(a.buy_price_all) as buy_price_all,
+		sum(a.sell_price_all)as sell_price_all,
+		max(a.batch_no) as batch_no,
+		max(a.expiry_date) as expiry_date,
+		max(a.split_ratio) as split_ratio,
+		sum(a.split_num) as split_num,
+		max(a.split_price) as split_price,
+		max(a.split_unit_code) as split_unit_code
+		FROM
+		stro_stock_detail AS a
+		WHERE(a.biz_id,a.item_id,a.batch_no,a.hosp_code) in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			(#{item.bizId},#{item.itemId},#{item.batchNo},#{item.hospCode})
+		</foreach>
+		GROUP BY a.hosp_code,a.item_id,a.batch_no
+	</select>
+  <!-- 批量插入出库单-->
+  <insert id="insertStroOutAll">
+    insert into stro_out(id, hosp_code, out_code, order_no, out_stock_id, in_stock_id, buy_price_all, sell_price_all,
+     remark, audit_code, audit_id, audit_name, audit_time, ok_audit_code, ok_audit_id, ok_audit_name, ok_audit_time,
+     in_order_no, crte_id, crte_name, crte_time)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id}, #{item.hospCode}, #{item.outCode}, #{item.orderNo}, #{item.outStockId}, #{item.inStockId},
+      #{item.buyPriceAll}, #{item.sellPriceAll}, #{item.remark}, #{item.auditCode}, #{item.auditId},
+      #{item.auditName} , #{item.auditTime}, #{item.okAuditCode}, #{item.okAuditId}, #{item.okAuditName},
+      #{item.okAuditTime},#{item.inOrderNo}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+    </foreach>
+  </insert>
+</mapper>

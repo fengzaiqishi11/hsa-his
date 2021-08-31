@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.inptprint.dao.InptPrintDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+        <result property="iatdGroupNo" column="iatd_group_no" jdbcType="INTEGER"/>
+        <result property="iatdSeqNo" column="iatd_seq_no" jdbcType="INTEGER"/>
+        <result property="adviceExecId" column="advice_exec_id" jdbcType="VARCHAR"/>
+        <result property="sourceCode" column="source_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+        <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+        <result property="sourceDeptId" column="source_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="preferentialPrice" column="preferential_price" jdbcType="NUMERIC"/>
+        <result property="realityPrice" column="reality_price" jdbcType="NUMERIC"/>
+        <result property="backNum" column="back_num" jdbcType="NUMERIC"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="isDist" column="is_dist" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="backCode" column="back_code" jdbcType="VARCHAR"/>
+        <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
+        <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
+        <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
+        <result property="okTime" column="ok_time" jdbcType="TIMESTAMP"/>
+        <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+        <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+        <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="bfcName" column="bfcName" jdbcType="VARCHAR"/>
+        <result property="backAmount" column="backAmount" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+          id,
+          hosp_code,
+          visit_id,
+          baby_id,
+          iat_id,
+          iatd_group_no,
+          iatd_seq_no,
+          advice_exec_id,
+          source_code,
+          source_id,
+          old_cost_id,
+          source_dept_id,
+          in_dept_id,
+          bfc_id,
+          item_code,
+          item_id,
+          item_name,
+          price,
+          num,
+          spec,
+          prep_code,
+          dosage,
+          dosage_unit_code,
+          usage_code,
+          rate_id,
+          speed_code,
+          use_days,
+          num_unit_code,
+          total_num,
+          total_num_unit_code,
+          herb_note_code,
+          use_code,
+          herb_num,
+          total_price,
+          preferential_price,
+          reality_price,
+          back_num,
+          back_code,
+          doctor_id,
+          doctor_name,
+          dept_id,
+          phar_id,
+          is_dist,
+          is_give,
+          is_ok,
+          ok_id,
+          ok_name,
+          ok_time,
+          settle_code,
+          settle_id,
+          is_check,
+          check_id,
+          check_name,
+          check_time,
+          zz_doctor_id,
+          zz_doctor_name,
+          jz_doctor_id,
+          jz_doctor_name,
+          zg_doctor_id,
+          zg_doctor_name,
+          exec_id,
+          exec_name,
+          exec_time,
+          exec_dept_id,
+          plan_exec_time,
+          status_code,
+          is_cost,
+          cost_time,
+          crte_id,
+          crte_name,
+          crte_time
+      </sql>
+
+  <!-- 费用清单打印 -->
+    <select id="queryInptCostListPrint" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select id,hosp_code,visit_id,baby_id,iat_id,iatd_group_no,iatd_seq_no,advice_exec_id,source_code,source_id,old_cost_id,source_dept_id,
+        in_dept_id,bfc_id,item_code,item_id,item_name,price,spec,prep_code,dosage,dosage_unit_code,usage_code,
+        rate_id,speed_code,use_days,total_num as num,total_num_unit_code as numUnitCode,herb_note_code,use_code,herb_num,total_price,
+        preferential_price,reality_price as amountMoney,back_num,back_code,doctor_id,doctor_name,dept_id,phar_id,is_dist,is_give,
+        is_ok,ok_id,ok_name,ok_time,settle_code,settle_id,is_check,check_id,check_name,check_time,zz_doctor_id,zz_doctor_name,jz_doctor_id,
+        jz_doctor_name,zg_doctor_id,zg_doctor_name,exec_id,exec_name,exec_time,exec_dept_id,plan_exec_time,status_code,is_cost,
+        cost_time,DATE_FORMAT(cost_time,'%Y-%m-%d') as cost_date,crte_id,crte_name,crte_time,
+        (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
+        (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
+        (select c.name from base_finance_classify c where c.id = bfc_id and c.hosp_code = #{hospCode}) as bfcName from inpt_cost
+        where hosp_code = #{hospCode} and cost_time is not null
+            <if test="visitId != null and visitId != ''">
+                AND visit_id = #{visitId}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                AND status_code = #{statusCode}
+            </if>
+            <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
+                and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
+            </if>
+            <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
+                <![CDATA[
+                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
+                ]]>
+            </if>
+            <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
+                <![CDATA[
+                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
+                ]]>
+            </if>
+        <if test='queryBaby =="N"'>
+            and (baby_id is null or baby_id = '')
+        </if>
+        <if test="babyId != null and babyId != ''">
+            AND baby_id = #{babyId}
+        </if>
+            order by cost_time,bfc_id
+    </select>
+
+    <!-- 费用清单打印批量-->
+    <select id="queryInptCostListPrintBatch" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select id,hosp_code,visit_id,baby_id,iat_id,iatd_group_no,iatd_seq_no,advice_exec_id,source_code,source_id,old_cost_id,source_dept_id,
+        in_dept_id,bfc_id,item_code,item_id,item_name,price,spec,prep_code,dosage,dosage_unit_code,usage_code,
+        rate_id,speed_code,use_days,total_num as num,total_num_unit_code as numUnitCode,herb_note_code,use_code,herb_num,total_price,
+        preferential_price,reality_price as amountMoney,back_num,back_code,doctor_id,doctor_name,dept_id,phar_id,is_dist,is_give,
+        is_ok,ok_id,ok_name,ok_time,settle_code,settle_id,is_check,check_id,check_name,check_time,zz_doctor_id,zz_doctor_name,jz_doctor_id,
+        jz_doctor_name,zg_doctor_id,zg_doctor_name,exec_id,exec_name,exec_time,exec_dept_id,plan_exec_time,status_code,is_cost,
+        cost_time,DATE_FORMAT(cost_time,'%Y-%m-%d') as cost_date,crte_id,crte_name,crte_time,
+        (select min(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as startCostDate,
+        (select max(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as endCostDate,
+        (select c.name from base_finance_classify c where c.id = bfc_id and c.hosp_code = hosp_code) as bfcName
+        from inpt_cost
+        where hosp_code = #{hospCode} and cost_time is not null
+        <if test="visitIds != null and visitIds.size() > 0">
+          AND visit_id in
+          <foreach collection="visitIds" item="visitId" open="(" close=")" separator=",">
+              #{visitId}
+          </foreach>
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        order by cost_time,bfc_id
+    </select>
+
+  <!-- 费用清单打印 -->
+  <select id="queryInptItemCostListPrint" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+    select max(ic.id) as id,
+    max(ic.hosp_code) as hospCode,
+    max(ic.visit_id) as visitId,
+    max(ic.bfc_id) as bfcId,
+    max(ic.item_code) as itemCode,
+      ic.item_id,
+    max(ic.item_name) as itemName,
+    max(ic.price) as price,
+    sum(ic.total_num) as num,
+    max(ic.spec) as spec,
+    max(ic.dosage_unit_code) as dosageUnitCode,
+    max(ic.usage_code) as usageCode,
+    max(ic.total_num_unit_code) as numUnitCode ,
+    sum(ic.total_price) as amountMoney,
+    max(ic.cost_time) as costTime,
+    DATE_FORMAT(max(ic.cost_time),'%Y-%m-%d') as costDate,
+    max(ic.crte_time),
+    (select min(DATE_FORMAT(crte_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
+    (select max(DATE_FORMAT(crte_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
+    (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode
+      from
+     inpt_cost ic
+     left join
+     base_drug bd
+     on bd.id = ic.item_id and bd.hosp_code = ic.hosp_code
+      left join
+      base_item bi
+      on bi.id = ic.item_id and bi.hosp_code = ic.hosp_code
+      left join
+      base_material bm
+      on bm.id = ic.item_id and bm.hosp_code = ic.hosp_code
+    where ic.hosp_code = #{hospCode} and ic.cost_time is not null
+    <if test="visitId != null and visitId != ''">
+      AND ic.visit_id = #{visitId}
+    </if>
+    <if test="statusCode != null and statusCode != ''">
+      AND ic.status_code = #{statusCode}
+    </if>
+    <if test='queryBaby =="N"'>
+        and (ic.baby_id is null or ic.baby_id = '')
+    </if>
+    <if test="babyId != null and babyId != ''">
+        AND ic.baby_id = #{babyId}
+    </if>
+      <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
+          and DATE_FORMAT(ic.cost_time,'%Y-%m-%d') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d') &lt;= #{costStopTime}
+      </if>
+      <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
+          <![CDATA[
+                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d') <= #{costStopTime}
+                ]]>
+      </if>
+      <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
+          <![CDATA[
+                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d') >= #{costStartTime}
+                ]]>
+      </if>
+    group by ic.item_id
+    order by max(ic.crte_time),max(ic.bfc_id)
+  </select>
+    <!-- 费用清单打印批量-->
+    <select id="queryInptItemCostListPrintBatch" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select max(id) as id,
+        max(hosp_code) as hospCode,
+        max(visit_id) as visitId,
+        max(bfc_id) as bfcId,
+        max(item_code) as itemCode,
+        item_id,
+        max(item_name) as itemName,
+        max(price) as price,
+        sum(total_num) as num,
+        max(spec) as spec,
+        max(dosage_unit_code) as dosageUnitCode,
+        max(usage_code) as usageCode,
+        max(total_num_unit_code) as numUnitCode ,
+        sum(total_price) as amountMoney,
+        max(cost_time) as costTime,
+        DATE_FORMAT(max(crte_time),'%Y-%m-%d') as costDate,
+        max(crte_time),
+        (select min(DATE_FORMAT(ic.crte_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as startCostDate,
+        (select max(DATE_FORMAT(ic.crte_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as endCostDate,
+        (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = hosp_code) as bfcName
+        from inpt_cost
+        where hosp_code = #{hospCode} and cost_time is not null
+        <if test="visitIds != null and visitIds.size() > 0">
+            AND visit_id in
+            <foreach collection="visitIds" item="visitId" open="(" close=")" separator=",">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        group by item_id
+        order by max(crte_time),max(bfc_id)
+    </select>
+
+
+
+  <resultMap type="cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO" id="InptAdvicePrintMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+    <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+    <result property="iaId" column="ia_id" jdbcType="VARCHAR"/>
+    <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+    <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+    <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+    <result property="content" column="content" jdbcType="VARCHAR"/>
+    <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+    <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+    <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+    <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+    <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
+    <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+    <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+    <result property="secondExecId" column="second_exec_id" jdbcType="VARCHAR"/>
+    <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
+    <result property="lastExecTime" column="last_exec_time" jdbcType="TIMESTAMP"/>
+    <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+    <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+    <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+    <result property="stopDoctorId" column="stop_doctor_id" jdbcType="VARCHAR"/>
+    <result property="stopDoctorName" column="stop_doctor_name" jdbcType="VARCHAR"/>
+    <result property="teachDoctorId" column="teach_doctor_id" jdbcType="VARCHAR"/>
+    <result property="teachDoctorName" column="teach_doctor_name" jdbcType="VARCHAR"/>
+    <result property="stopTime" column="stop_time" jdbcType="TIMESTAMP"/>
+    <result property="stopCheckId" column="stop_check_id" jdbcType="VARCHAR"/>
+    <result property="stopCheckName" column="stop_check_name" jdbcType="VARCHAR"/>
+    <result property="stopCheckTime" column="stop_check_time" jdbcType="TIMESTAMP"/>
+    <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+    <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    <result property="isInPrint" column="is_in_print" jdbcType="VARCHAR"/>
+    <result property="isStopPrint" column="is_stop_print" jdbcType="VARCHAR"/>
+    <result property="isExecPrint" column="is_exec_print" jdbcType="VARCHAR"/>
+    <result property="isSkinPrint" column="is_skin_print" jdbcType="VARCHAR"/>
+    <result property="isInCheckPrint" column="is_in_check_print" jdbcType="VARCHAR"/>
+    <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+    <result property="isStopCheckPrint" column="is_stop_check_print" jdbcType="VARCHAR"/>
+    <result property="longStartTime" column="long_start_time" jdbcType="TIMESTAMP"/>
+    <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+    <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+    <result property="isStopMyself" column="is_stop_myself" jdbcType="VARCHAR"/>
+    <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--通过实体作为筛选条件查询医嘱信息-->
+  <select id="queryAdviceByVistiId" resultMap="InptAdvicePrintMap">
+    select
+      id as ia_id,hosp_code,visit_id, order_no, group_no, group_seq_no, content, usage_code, rate_id,
+      speed_code, is_skin, is_positive, exec_id, exec_name, second_exec_id, second_exec_name, last_exec_time,
+      check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id,
+      stop_check_name, stop_check_time, is_long, crte_id, crte_name, crte_time,long_start_time,
+      cancel_id,cancel_name,cancel_time,skin_result_code
+      from inpt_advice where hosp_code = #{hospCode} and visit_id = #{visitId} and is_submit='1'
+      <if test="ids1 != null and ids1 != ''">
+        and find_in_set(id,#{ids1})
+      </if>
+      <if test="isLong != null and isLong != ''">
+        and is_long = #{isLong}
+      </if>
+    order by long_start_time
+  </select>
+
+  <select id="queryAdvicePrintByIds" resultMap="InptAdvicePrintMap">
+    select
+        id, hosp_code, visit_id, ia_id, order_no, group_no, group_seq_no, content, usage_code, rate_id, speed_code,
+        is_skin, is_positive, exec_id, exec_name, second_exec_id, second_exec_name, last_exec_time, check_id, check_name,
+        check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time,
+        is_long, crte_id, crte_name, crte_time, is_in_print, is_stop_print, is_exec_print, is_skin_print, is_in_check_print,
+        is_stop_check_print,seq_no,cancel_id,cancel_name,cancel_time,DATE_FORMAT(last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,
+        long_start_time,DATE_FORMAT(long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(long_start_time,'%H:%i') as startOnlyTime,
+        DATE_FORMAT(stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(stop_time,'%H:%i') as stopOnlyTime
+        from inpt_advice_print
+        where hosp_code = #{hospCode} and visit_id = #{visitId}
+        <if test="ids1 != null and ids1 != ''">
+        and find_in_set(id,#{ids1})
+        </if>
+        <if test="isLong != null and isLong != ''">
+        and is_long = #{isLong}
+       </if>
+        <if test="isValid != null and isValid != ''">
+        and is_valid = #{isValid}
+      </if>
+  </select>
+  <!--通过实体作为筛选条件查询医嘱打印信息-->
+  <select id="queryAdvicePrintByVisitId" resultMap="InptAdvicePrintMap">
+    select
+    a.id, a.hosp_code, a.visit_id, a.ia_id, a.order_no, a.group_no, a.group_seq_no, a.content, a.usage_code, a.rate_id, a.speed_code,
+    a.is_skin, a.is_positive, a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.last_exec_time, a.check_id, a.check_name,
+    a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time,ia.teach_doctor_id,ia.teach_doctor_name, a.stop_check_id, a.stop_check_name, a.stop_check_time,
+    a.is_long, a.crte_id, a.crte_name, a.crte_time, a.is_in_print, a.is_stop_print, a.is_exec_print, a.is_skin_print, a.is_in_check_print,
+    a.is_stop_check_print,a.seq_no,a.cancel_id,a.cancel_name,a.cancel_time,a.skin_result_code,
+    DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,ia.item_name,
+    ia.item_id,ia.item_code,ia.yylx,ia.type_code,ia.total_num,ia.total_num_unit_code,ia.use_code,ia.dosage,ia.dosage_unit_code,
+    a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
+    DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,
+    (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName, bd.big_type_code,
+    ba.is_stop_myself
+    from inpt_advice_print a
+    join inpt_advice ia on ia.id = a.ia_id and ia.hosp_code = a.hosp_code
+    left JOIN base_drug bd on ia.hosp_code = bd.hosp_code and ia.item_id = bd.id
+    left join base_advice ba on ia.hosp_code = ba.hosp_code and ia.item_id = ba.id
+    where a.hosp_code = #{hospCode}
+      <if test="id != null and id != ''">
+        and a.id = #{id}
+      </if>
+      <if test="visitId != null and visitId != ''">
+        and a.visit_id = #{visitId}
+      </if>
+      <if test="orderNo != null and orderNo != ''">
+        and a.order_no = #{orderNo}
+      </if>
+      <if test="groupNo != null">
+        and a.group_no = #{groupNo}
+      </if>
+      <if test="groupSeqNo != null">
+        and a.group_seq_no = #{groupSeqNo}
+      </if>
+      <if test="content != null and content != ''">
+        and a.content = #{content}
+      </if>
+      <if test="usageCode != null and usageCode != ''">
+        and a.usage_code = #{usageCode}
+      </if>
+      <if test="rateId != null and rateId != ''">
+        and a.rate_id = #{rateId}
+      </if>
+      <if test="speedCode != null and speedCode != ''">
+        and a.speed_code = #{speedCode}
+      </if>
+      <if test="isSkin != null and isSkin != ''">
+        and a.is_skin = #{isSkin}
+      </if>
+      <if test="isPositive != null and isPositive != ''">
+        and a.is_positive = #{isPositive}
+      </if>
+      <if test="execId != null and execId != ''">
+        and a.exec_id = #{execId}
+      </if>
+      <if test="execName != null and execName != ''">
+        and a.exec_name = #{execName}
+      </if>
+      <if test="secondExecId != null and secondExecId != ''">
+        and a.second_exec_id = #{secondExecId}
+      </if>
+      <if test="secondExecName != null and secondExecName != ''">
+        and a.second_exec_name = #{secondExecName}
+      </if>
+      <if test="lastExecTime != null">
+        and a.last_exec_time = #{lastExecTime}
+      </if>
+      <if test="checkId != null and checkId != ''">
+        and a.check_id = #{checkId}
+      </if>
+      <if test="checkName != null and checkName != ''">
+        and a.check_name = #{checkName}
+      </if>
+      <if test="checkTime != null">
+        and a.check_time = #{checkTime}
+      </if>
+      <if test="stopDoctorId != null and stopDoctorId != ''">
+        and a.stop_doctor_id = #{stopDoctorId}
+      </if>
+      <if test="stopDoctorName != null and stopDoctorName != ''">
+        and a.stop_doctor_name = #{stopDoctorName}
+      </if>
+      <if test="stopTime != null">
+        and a.stop_time = #{stopTime}
+      </if>
+      <if test="stopCheckId != null and stopCheckId != ''">
+        and a.stop_check_id = #{stopCheckId}
+      </if>
+      <if test="stopCheckName != null and stopCheckName != ''">
+        and a.stop_check_name = #{stopCheckName}
+      </if>
+      <if test="stopCheckTime != null">
+        and a.stop_check_time = #{stopCheckTime}
+      </if>
+      <if test="isLong != null and isLong != ''">
+        and a.is_long = #{isLong}
+      </if>
+      <if test="crteId != null and crteId != ''">
+        and a.crte_id = #{crteId}
+      </if>
+      <if test="crteName != null and crteName != ''">
+        and a.crte_name = #{crteName}
+      </if>
+      <if test="crteTime != null">
+        and a.crte_time = #{crteTime}
+      </if>
+      <if test="isInPrint != null and isInPrint != ''">
+        and a.is_in_print = #{isInPrint}
+      </if>
+      <if test="isStopPrint != null and isStopPrint != ''">
+        and a.is_stop_print = #{isStopPrint}
+      </if>
+      <if test="isExecPrint != null and isExecPrint != ''">
+        and a.is_exec_print = #{isExecPrint}
+      </if>
+      <if test="isSkinPrint != null and isSkinPrint != ''">
+        and a.is_skin_print = #{isSkinPrint}
+      </if>
+      <if test="isInCheckPrint != null and isInCheckPrint != ''">
+        and a.is_in_check_print = #{isInCheckPrint}
+      </if>
+      <if test="isStopCheckPrint != null and isStopCheckPrint != ''">
+        and a.is_stop_check_print = #{isStopCheckPrint}
+      </if>
+      <if test="isValid != null and isValid != ''">
+      and a.is_valid = #{isValid}
+      </if>
+      <if test="babyId != null and babyId != '' ">
+          and ia.baby_id =#{babyId}
+      </if>
+      <if test="babyId == null or babyId == ''">
+          and (ia.baby_id is null or LENGTH(TRIM(ia.baby_id)) &lt; 1)
+      </if>
+      <if test='queryBaby =="N"'>
+          and (ia.baby_id is null or ia.baby_id = '')
+      </if>
+      order by a.long_start_time,a.seq_no
+  </select>
+
+  <!--批量新增新增所医嘱打印信息-->
+  <insert id="insertAdvicePrint" parameterType="java.util.List">
+    insert into inpt_advice_print(id, hosp_code, visit_id, ia_id, order_no, group_no, group_seq_no,
+    content, usage_code, rate_id, speed_code, is_skin, is_positive, exec_id, exec_name, second_exec_id,
+    second_exec_name, last_exec_time, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
+    stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, crte_id, crte_name, crte_time,
+    is_in_print, is_stop_print, is_exec_print, is_skin_print, is_in_check_print, is_stop_check_print,
+    long_start_time,seq_no,is_valid,cancel_id,cancel_name,cancel_time)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.iaId}, #{item.orderNo}, #{item.groupNo}, #{item.groupSeqNo},
+      #{item.content}, #{item.usageCode}, #{item.rateId}, #{item.speedCode}, #{item.isSkin}, #{item.isPositive},
+      #{item.execId}, #{item.execName}, #{item.secondExecId}, #{item.secondExecName}, #{item.lastExecTime},
+      #{item.checkId}, #{item.checkName}, #{item.checkTime}, #{item.stopDoctorId}, #{item.stopDoctorName},
+      #{item.stopTime}, #{item.stopCheckId}, #{item.stopCheckName}, #{item.stopCheckTime}, #{item.isLong},
+      #{item.crteId}, #{item.crteName}, #{item.crteTime}, '0', '0', '0', '0', '0', '0',#{item.longStartTime},
+      #{item.seqNo},#{item.isValid},#{item.cancelId},#{item.cancelName},#{item.cancelTime})
+    </foreach>
+  </insert>
+
+  <!--通过主键批量修改医嘱打印数据-->
+  <update id="updateAdvicePrint" parameterType="java.util.List">
+    <foreach collection="list" item="item" separator=";">
+      update inpt_advice_print
+      <set>
+        <if test="item.hospCode != null">
+          hosp_code = #{item.hospCode},
+        </if>
+        <if test="item.visitId != null">
+          visit_id = #{item.visitId},
+        </if>
+        <if test="item.iaId != null">
+          ia_id = #{item.iaId},
+        </if>
+        <if test="item.orderNo != null">
+          order_no = #{item.orderNo},
+        </if>
+        <if test="item.groupNo != null">
+          group_no = #{item.groupNo},
+        </if>
+        <if test="item.groupSeqNo != null">
+          group_seq_no = #{item.groupSeqNo},
+        </if>
+        <if test="item.content != null">
+          content = #{item.content},
+        </if>
+        <if test="item.usageCode != null">
+          usage_code = #{item.usageCode},
+        </if>
+        <if test="item.rateId != null">
+          rate_id = #{item.rateId},
+        </if>
+        <if test="item.speedCode != null">
+          speed_code = #{item.speedCode},
+        </if>
+        <if test="item.isSkin != null">
+          is_skin = #{item.isSkin},
+        </if>
+        <if test="item.isPositive != null">
+          is_positive = #{item.isPositive},
+        </if>
+        <if test="item.execId != null">
+          exec_id = #{item.execId},
+        </if>
+        <if test="item.execName != null">
+          exec_name = #{item.execName},
+        </if>
+        <if test="item.secondExecId != null">
+          second_exec_id = #{item.secondExecId},
+        </if>
+        <if test="item.secondExecName != null">
+          second_exec_name = #{item.secondExecName},
+        </if>
+        <if test="item.lastExecTime != null">
+          last_exec_time = #{item.lastExecTime},
+        </if>
+        <if test="item.checkId != null">
+          check_id = #{item.checkId},
+        </if>
+        <if test="item.checkName != null">
+          check_name = #{item.checkName},
+        </if>
+        <if test="item.checkTime != null">
+          check_time = #{item.checkTime},
+        </if>
+        <if test="item.stopDoctorId != null">
+          stop_doctor_id = #{item.stopDoctorId},
+        </if>
+        <if test="item.stopDoctorName != null">
+          stop_doctor_name = #{item.stopDoctorName},
+        </if>
+        <if test="item.stopTime != null">
+          stop_time = #{item.stopTime},
+        </if>
+        <if test="item.stopCheckId != null">
+          stop_check_id = #{item.stopCheckId},
+        </if>
+        <if test="item.stopCheckName != null">
+          stop_check_name = #{item.stopCheckName},
+        </if>
+        <if test="item.stopCheckTime != null">
+          stop_check_time = #{item.stopCheckTime},
+        </if>
+        <if test="item.isLong != null">
+          is_long = #{item.isLong},
+        </if>
+        <if test="item.longStartTime != null">
+          long_start_time = #{item.longStartTime},
+        </if>
+        <if test="item.seqNo != null">
+          seq_no = #{item.seqNo},
+        </if>
+        <if test="item.cancelId != null">
+          cancel_id = #{item.cancelId},
+        </if>
+        <if test="item.cancelName != null">
+          cancel_name = #{item.cancelName},
+        </if>
+        <if test="item.cancelTime != null">
+          cancel_time = #{item.cancelTime},
+        </if>
+        <if test="item.skinResultCode != null">
+          skin_result_code = #{item.skinResultCode},
+        </if>
+      </set>
+      where id = #{item.id} and hosp_code = #{item.hospCode}
+    </foreach>
+  </update>
+
+  <!--通过id和就诊id修改医嘱打印数据-->
+  <update id="updateAdvicePrintStatus" parameterType="java.util.List">
+    <foreach collection="list" item="item" separator=";">
+     update inpt_advice_print
+      <set>
+        <if test="item.isInPrint != null">
+          is_in_print = #{item.isInPrint},
+        </if>
+        <if test="item.isStopPrint != null">
+          is_stop_print = #{item.isStopPrint},
+        </if>
+        <if test="item.isExecPrint != null">
+          is_exec_print = #{item.isExecPrint},
+        </if>
+        <if test="item.isSkinPrint != null">
+          is_skin_print = #{item.isSkinPrint},
+        </if>
+        <if test="item.isInCheckPrint != null">
+          is_in_check_print = #{item.isInCheckPrint},
+        </if>
+        <if test="item.isStopCheckPrint != null">
+           is_stop_check_print = #{item.isStopCheckPrint},
+        </if>
+        <if test="item.isValid != null">
+          is_valid = #{item.isValid},
+        </if>
+        <if test="item.seqNo != null">
+          seq_no = #{item.seqNo},
+        </if>
+      </set>
+      where id = #{item.id} and hosp_code = #{item.hospCode} and visit_id = #{item.visitId}
+    </foreach>
+  </update>
+
+  <update id="updateAdvicePrintResetStatus">
+    update inpt_advice_print
+    <set>
+      is_in_print = '0',
+      is_stop_print = '0',
+      is_exec_print = '0',
+      is_skin_print = '0',
+      is_in_check_print = '0',
+      is_stop_check_print = '0',
+    </set>
+    where hosp_code = #{hospCode} and visit_id = #{visitId}
+    <if test="isLong != null and isLong != ''">
+      and is_long = #{isLong}
+    </if>
+  </update>
+
+  <!--删除改病人在医嘱打印表里面的数据  根据就诊id和是否长期医嘱-->
+  <delete id="deleteAdvicePrintByVisit">
+    delete from inpt_advice_print where visit_id = #{visitId} and hosp_code = #{hospCode} and is_long = #{isLong}
+  </delete>
+
+  <!--删除医嘱打印信息，根据医嘱id-->
+  <delete id="deleteAdvicePrintByIaid">
+    delete from inpt_advice_print where hosp_code = #{hospCode} and ia_id = #{iaId}
+  </delete>
+
+  <!--通过id修改医嘱打印状态未无效-->
+  <update id="updateAdvicePrintIsVlidStatus" >
+    update inpt_advice_print set is_valid = "0"
+    where hosp_code = #{hospCode} and visit_id = #{visitId}
+    <if test="deleteIds !=null and deleteIds != ''">
+      and find_in_set(id,#{deleteIds})
+    </if>
+    <if test="ids1 !=null and ids1 != ''">
+      and find_in_set(id,#{ids1})
+    </if>
+  </update>
+
+  <!--根据就诊id查询该患者在打印表中的医嘱最大序号-->
+  <select id="queryMaxSeqNoByVisit" resultType="java.lang.Integer">
+    select ifnull(max(seq_no),0) from inpt_advice_print where hosp_code = #{hospCode} and visit_id = #{visitId}
+  </select>
+
+</mapper>

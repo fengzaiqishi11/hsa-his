@@ -1,0 +1,93 @@
+package cn.hsa.outpt.outptvisit.bo.impl;
+
+import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
+import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.outpt.outptvisit.bo.impl
+ * @Class_name: OutptVisitBOImpl
+ * @Describe:
+ * @Author: liaojunjie
+ * @Email: junjie.liao@powersi.com
+ * @Date: 2020/9/3 16:21
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+@Component
+@Slf4j
+public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
+    /**
+     * 门诊挂号数据访问层
+     */
+    @Resource
+    private OutptVisitDAO outptVisitDAO;
+
+    /**
+     * @Method queryVisitRecords
+     * @Desrciption
+     * @Param
+     * [outptVisitDTO]
+     * @Author liaojunjie
+     * @Date   2020/9/25 9:04
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @Override
+    public PageDTO queryVisitRecords(OutptVisitDTO outptVisitDTO) {
+        // 设置分页信息
+        PageHelper.startPage(outptVisitDTO.getPageNo(),outptVisitDTO.getPageSize());
+        return PageDTO.of(outptVisitDAO.queryVisitRecords(outptVisitDTO));
+    }
+
+    /**
+     * @Method updateTranInCode
+     * @Desrciption
+     * @Param
+     * [outptVisitDTO]
+     * @Author liaojunjie
+     * @Date   2020/9/25 9:04
+     * @Return java.lang.Boolean
+     **/
+    @Override
+    public Boolean updateTranInCode(OutptVisitDTO outptVisitDTO) {
+        return outptVisitDAO.updateTranInCode(outptVisitDTO)>0;
+    }
+
+
+    /**
+     * @Menthod queryByVisitID
+     * @Desrciption 根据ID查询门诊患者信息
+     * @param param 查询条件
+     * @Author Ou·Mr
+     * @Date 2020/12/17 21:54
+     * @Return cn.hsa.module.outpt.visit.dto.OutptVisitDTO
+     */
+    @Override
+    public OutptVisitDTO queryByVisitID(Map<String, String> param) {
+        return outptVisitDAO.queryByVisitID(param);
+    }
+
+
+    /**
+     * @Method updateOutptVisit
+     * @Desrciption  走统一支付平台时，登记挂号成功以后，修改病人类型
+     * @Param outptVisitMap
+     *
+     * @Author fuhui
+     * @Date   2021/3/8 15:25
+     * @Return
+     **/
+    @Override
+    public Boolean updateOutptVisit(OutptVisitDTO outptVisitDTO) {
+        return outptVisitDAO.updateOutptVisit(outptVisitDTO);
+    }
+
+
+}

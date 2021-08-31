@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+<!--    <dubbo:reference id="baseFinanceClassifyApi_dubbo" interface="BaseFinanceClassifyApi" check="false"/>-->
+    <!--<dubbo:consumer timeout="30000"/>-->
+
+    <!--中心平台 >> 医院数据源管理 -->
+    <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
+
+    <!--基础数据 >> 单据号生成 -->
+    <dubbo:reference id="baseOrderRuleService_consumer" interface="cn.hsa.module.base.bor.service.BaseOrderRuleService" check="false"/>
+    <!--基础数据 >> 科室 -->
+    <dubbo:reference id="baseDeptService_consumer" interface="cn.hsa.module.base.dept.service.BaseDeptService" check="false"/>
+    <!--基础数据 >> 药品 -->
+    <dubbo:reference id="baseDrugService_consumer" interface="cn.hsa.module.base.drug.service.BaseDrugService" check="false"/>
+    <!--基础数据 >> 项目 -->
+    <dubbo:reference id="baseItemService_consumer" interface="cn.hsa.module.base.bi.service.BaseItemService" check="false"/>
+    <!--基础数据 >> 疾病 -->
+    <dubbo:reference id="baseDiseaseService_consumer" interface="cn.hsa.module.base.bd.service.BaseDiseaseService" check="false"/>
+   <!--    住院就诊-->
+    <dubbo:reference id="inptVisitService_consumer" interface="cn.hsa.module.inpt.inregister.service.InptVisitService" check="false"/>
+    <!--医嘱核收-->
+    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false"/>
+    <!-- 系统管理子系统 -> 医院信息维护 -->
+    <dubbo:reference id="centerHospitalService_consumer" interface="cn.hsa.module.center.hospital.service.CenterHospitalService" check="false"/>
+    <!--床位长期费用-->
+    <dubbo:reference id="bedLongCostService_consumer" interface="cn.hsa.module.inpt.longcost.service.BedLongCostService" check="false"/>
+    <!--库存服务-->
+    <dubbo:reference id="stroStockService_consumer" interface="cn.hsa.module.stro.stock.service.StroStockService" check="false"/>
+    <!--电子病历服务-->
+    <dubbo:reference id="emrArchiveLoggingService_consumer" interface="cn.hsa.module.emr.emrarchivelogging.service.EmrArchiveLoggingService" check="false"/>
+    <!--医保服务-->
+    <dubbo:reference id="insureIndividualCostService_comsumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
+
+</beans>

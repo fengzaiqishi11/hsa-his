@@ -1,0 +1,1934 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.doctor.dao.InptAdviceDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" id="InptAdviceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+        <result property="iatdGroupNo" column="iatd_group_no" jdbcType="INTEGER"/>
+        <result property="iatdGroupSeqNo" column="iatd_group_seq_no" jdbcType="INTEGER"/>
+        <result property="iatdId" column="iatd_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
+        <result property="startExecNum" column="start_exec_num" jdbcType="INTEGER"/>
+        <result property="endExecNum" column="end_exec_num" jdbcType="INTEGER"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="planStopTime" column="plan_stop_time" jdbcType="TIMESTAMP"/>
+        <result property="technologyNo" column="technology_no" jdbcType="VARCHAR"/>
+        <result property="herbUseCode" column="herb_use_code" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="secondExecId" column="second_exec_id" jdbcType="VARCHAR"/>
+        <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
+        <result property="longStartTime" column="long_start_time" jdbcType="TIMESTAMP"/>
+        <result property="lastExecTime" column="last_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="teachDoctorId" column="teach_doctor_id" jdbcType="VARCHAR"/>
+        <result property="teachDoctorName" column="teach_doctor_name" jdbcType="VARCHAR"/>
+        <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+        <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="stopDoctorId" column="stop_doctor_id" jdbcType="VARCHAR"/>
+        <result property="stopDoctorName" column="stop_doctor_name" jdbcType="VARCHAR"/>
+        <result property="stopTime" column="stop_time" jdbcType="TIMESTAMP"/>
+        <result property="stopCheckId" column="stop_check_id" jdbcType="VARCHAR"/>
+        <result property="stopCheckName" column="stop_check_name" jdbcType="VARCHAR"/>
+        <result property="stopCheckTime" column="stop_check_time" jdbcType="TIMESTAMP"/>
+        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="isStop" column="is_stop" jdbcType="VARCHAR"/>
+        <result property="isReject" column="is_reject" jdbcType="VARCHAR"/>
+        <result property="rejectRemark" column="reject_remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="isStopCheck" column="is_stop_check" jdbcType="VARCHAR"/>
+        <result property="skinDurgId" column="skin_durg_id" jdbcType="VARCHAR"/>
+        <result property="skinPharId" column="skin_phar_id" jdbcType="VARCHAR"/>
+        <result property="skinUnitCode" column="skin_unit_code" jdbcType="VARCHAR"/>
+        <result property="skinDurgName" column="skinDurgName" jdbcType="VARCHAR"/>
+        <result property="sourceIaId" column="source_ia_id" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"/>
+        <result property="isSubmit" column="is_submit" jdbcType="VARCHAR"/>
+        <result property="submitName" column="submit_name" jdbcType="VARCHAR"/>
+        <result property="submitTime" column="submit_time" jdbcType="VARCHAR"/>
+        <result property="isStopSame" column="isStopSame" jdbcType="VARCHAR"/>
+        <result property="isStopSameNot" column="isStopSameNot" jdbcType="VARCHAR"/>
+        <result property="isStopMyself" column="isStopMyself" jdbcType="VARCHAR"/>
+        <result property="advicePrefix" column="advice_prefix" jdbcType="VARCHAR"/>
+        <result property="adviceSuffix" column="advice_suffix" jdbcType="VARCHAR"/>
+        <result property="collectBloodTime" column="collect_blood_time" jdbcType="VARCHAR"/>
+        <result property="isWz" column="isWz" jdbcType="VARCHAR"/>
+        <result property="cancelId" column="cancel_id" jdbcType="VARCHAR"/>
+        <result property="cancelName" column="cancel_name" jdbcType="VARCHAR"/>
+        <result property="cancelTime" column="cancel_time" jdbcType="VARCHAR"/>
+        <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
+        <result property="yylx" column="yylx" jdbcType="VARCHAR"/>
+        <result property="advanceDays" column="advance_days" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="OTHER"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+        <result property="receiveHospName" column="receive_hosp_name" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
+        <result property="dietType" column="diet_type" jdbcType="VARCHAR"/>
+        <result property="illnessCode" column="Illness_code" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="inWardId" column="in_ward_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="in_dept_name" jdbcType="VARCHAR"/>
+        <result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+        <result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
+        <result property="inModeCode" column="in_mode_code" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="inSituationCode" column="in_situation_code" jdbcType="VARCHAR"/>
+        <result property="outptVisitNo" column="outpt_visit_no" jdbcType="VARCHAR"/>
+        <result property="outptDoctorId" column="outpt_doctor_id" jdbcType="VARCHAR"/>
+        <result property="outptDoctorName" column="outpt_doctor_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseId" column="outpt_disease_id" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseName" column="outpt_disease_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseIcd10" column="outpt_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outWardId" column="out_ward_id" jdbcType="VARCHAR"/>
+        <result property="outDeptId" column="out_dept_id" jdbcType="VARCHAR"/>
+        <result property="outDeptName" column="out_dept_name" jdbcType="VARCHAR"/>
+        <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="outDiseaseId" column="out_disease_id" jdbcType="VARCHAR"/>
+        <result property="outDiseaseName" column="out_disease_name" jdbcType="VARCHAR"/>
+        <result property="outDiseaseIcd10" column="out_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outOperId" column="out_oper_id" jdbcType="VARCHAR"/>
+        <result property="outOperName" column="out_oper_name" jdbcType="VARCHAR"/>
+        <result property="outOperTime" column="out_oper_time" jdbcType="TIMESTAMP"/>
+        <result property="outSituationCode" column="out_situation_code" jdbcType="VARCHAR"/>
+        <result property="outRemark" column="out_remark" jdbcType="VARCHAR"/>
+        <result property="outModeCode" column="out_mode_code" jdbcType="VARCHAR"/>
+        <result property="isArchive" column="is_archive" jdbcType="VARCHAR"/>
+        <result property="archiveTime" column="archive_time" jdbcType="TIMESTAMP"/>
+        <result property="archiveId" column="archive_id" jdbcType="VARCHAR"/>
+        <result property="archiveName" column="archive_name" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"/>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"/>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"/>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"/>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"/>
+        <result property="totalAdvance" column="total_advance" jdbcType="NUMERIC"/>
+        <result property="totalCost" column="total_cost" jdbcType="NUMERIC"/>
+        <result property="totalBalance" column="total_balance" jdbcType="NUMERIC"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="inTimestring" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="inNum" column="inNum" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="abbr" column="abbr" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="onePrice" column="one_price" jdbcType="NUMERIC"/>
+        <result property="twoPrice" column="two_price" jdbcType="NUMERIC"/>
+        <result property="threePrice" column="three_price" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="intension" column="intension" jdbcType="VARCHAR"/>
+        <result property="prompt" column="prompt" jdbcType="VARCHAR"/>
+        <result property="except" column="except" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isCg" column="is_cg" jdbcType="VARCHAR"/>
+        <result property="isMs" column="is_ms" jdbcType="VARCHAR"/>
+        <result property="isSuppCurtain" column="is_supp_curtain" jdbcType="VARCHAR"/>
+        <result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+        <result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+        <result property="namePym" column="name_pym" jdbcType="VARCHAR"/>
+        <result property="nameWbm" column="name_wbm" jdbcType="VARCHAR"/>
+        <result property="abbrPym" column="abbr_pym" jdbcType="VARCHAR"/>
+        <result property="abbrWbm" column="abbr_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="inDeptName" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询住院就诊信息-->
+    <select id="queryInptVisitPage" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select
+        a.id, a.hosp_code, a.profile_id, a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code, a.birthday, a.nation_code, a.cert_code,
+        a.cert_no, a.marry_code, a.phone, a.address, a.preferential_type_id, a.patient_code, a.receive_hosp_name, a.bed_id, a.bed_name, a.nursing_code,
+        a.diet_type, a.Illness_code, a.status_code, a.in_ward_id, a.in_dept_id, a.in_dept_name, a.in_time, a.zz_doctor_id, a.zz_doctor_name,
+        a.jz_doctor_id, a.jz_doctor_name, a.zg_doctor_id, a.zg_doctor_name,
+        a.in_remark, a.in_mode_code, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.in_situation_code, a.outpt_visit_no, a.outpt_doctor_id,
+        a.outpt_doctor_name, a.outpt_disease_id, a.outpt_disease_name, a.outpt_disease_icd10, a.out_ward_id, a.out_dept_id, a.out_dept_name, a.out_time,
+        a.out_disease_id, a.out_disease_name, a.out_disease_icd10, a.out_oper_id, a.out_oper_name, a.out_oper_time, a.out_situation_code, a.out_remark,
+        a.out_mode_code,
+        a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
+        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
+        (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
+        (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum
+        from inpt_visit a
+        where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
+        <if test="id != null and id != ''">
+            and a.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%')
+            or a.in_no like concat('%',#{keyword},'%') or a.bed_name like concat('%',#{keyword},'%'))
+        </if>
+        <if test='zgbrQuery =="1"'>
+            and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        order by a.crte_time desc
+    </select>
+
+    <!--查询住院就诊医嘱信息-->
+    <select id="queryInptAdviceVisitID" resultMap="InptAdviceMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+        a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
+        a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
+        a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
+        a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
+        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+        a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
+        a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,
+        case when a.item_code = '4' then (
+        case when b.type_code = '3' then '4' when b.type_code = '12' then '5' else '6' end
+        ) when a.item_code = '1' then (
+        case when c.big_type_code = '2' then  '3' else '1' end
+        ) when a.item_code = '2' then '2' end type,
+        case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+        case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
+        case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode,
+        a.is_submit,
+        if(a.item_code = '4', b.is_stop_same,null  ) isStopSame,if(a.item_code = '4', b.is_stop_same_not,null  ) isStopSameNot,
+        if(a.item_code = '4', b.is_stop_myself,null  ) isStopMyself, a.source_ia_id source_ia_id, a.advice_prefix, a.advice_suffix, a.collect_blood_time,
+        case when e.id is null then '0' else '1' end isWz, a.cancel_id, a.cancel_name, a.cancel_time, a.skin_durg_id,
+        ef.good_name skinDurgName, a.skin_phar_id, a.skin_unit_code, case when a.item_code = '1' then '2' when a.item_code = '2' then '3' when a.item_code = '4' and e.id is not null then '4'
+        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx
+        from inpt_advice a
+        left join base_advice b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '4'
+        left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+        left join base_drug ef on a.skin_durg_id = ef.id and a.hosp_code = ef.hosp_code
+        left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
+        left join sys_parameter e on e.code = 'WZYZ_YZCODE' and b.code = e.value and a.hosp_code = e.hosp_code and e.is_valid = '1'
+        where a.hosp_code = #{hospCode}
+        and a.visit_id = #{visitId}
+        <if test="isLong != null and isLong != ''">
+            and a.is_long = #{isLong}
+        </if>
+        <if test="isStop != null and isStop != ''">
+            and a.is_stop = #{isStop}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and a.type_code = #{typeCode}
+        </if>
+        <if test="babyId != null and babyId != ''">
+            and a.baby_id = #{babyId}
+        </if>
+        <if test="babyId == null or babyId == ''">
+            and (a.baby_id is null or LENGTH(TRIM(a.baby_id)) &lt; 1)
+        </if>
+    </select>
+
+    <!--批量新增医嘱主表-->
+    <insert id="insertBathInptAdvice" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into inpt_advice(
+        id,hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id,
+        exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code,
+        item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price,
+        total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark,
+        plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time,
+        last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
+        stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time,
+        skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.visitId},
+            #{item.babyId},
+            #{item.orderNo},
+            #{item.iatId},
+            #{item.iatdGroupNo},
+            #{item.iatdGroupSeqNo},
+            #{item.iatdId},
+            #{item.inDeptId},
+            #{item.execDeptId},
+            #{item.deptId},
+            #{item.groupNo},
+            #{item.groupSeqNo},
+            #{item.typeCode},
+            #{item.signCode},
+            #{item.startExecNum},
+            #{item.endExecNum},
+            #{item.bfcId},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.content},
+            #{item.spec},
+            #{item.prepCode},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.usageCode},
+            #{item.rateId},
+            #{item.speedCode},
+            #{item.num},
+            #{item.unitCode},
+            #{item.price},
+            #{item.totalPrice},
+            #{item.totalNum},
+            #{item.totalNumUnitCode},
+            #{item.herbNum},
+            #{item.useDays},
+            #{item.useCode},
+            #{item.isSkin},
+            #{item.isPositive},
+            #{item.herbNoteCode},
+            #{item.pharId},
+            #{item.remark},
+            #{item.planStopTime},
+            #{item.technologyNo},
+            #{item.herbUseCode},
+            #{item.isGive},
+            #{item.execId},
+            #{item.execName},
+            #{item.secondExecId},
+            #{item.secondExecName},
+            #{item.longStartTime},
+            #{item.lastExecTime},
+            #{item.teachDoctorId},
+            #{item.teachDoctorName},
+            #{item.isCheck},
+            #{item.checkId},
+            #{item.checkName},
+            #{item.checkTime},
+            #{item.stopDoctorId},
+            #{item.stopDoctorName},
+            #{item.stopTime},
+            #{item.stopCheckId},
+            #{item.stopCheckName},
+            #{item.stopCheckTime},
+            #{item.isLong},
+            #{item.isStop},
+            #{item.isReject},
+            #{item.rejectRemark},
+            #{item.crteId},
+            #{item.crteName},
+            now(),
+            #{item.skinDurgId},
+            #{item.skinPharId},
+            #{item.skinUnitCode},
+            #{item.sourceIaId},
+            #{item.isSubmit},
+            #{item.advicePrefix},
+            #{item.adviceSuffix},
+            #{item.collectBloodTime},
+            #{item.yylx}
+            )
+        </foreach>
+    </insert>
+
+    <!--新增医嘱明细-->
+    <insert id="insertBathInptAdviceDetail" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into inpt_advice_detail(
+        id,hosp_code, visit_id, ia_id, ba_id, ia_group_no, item_code, item_id, item_name, num,
+        unit_code, price, total_price, use_code, source_code, bfc_id
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.visitId},
+            #{item.iaId},
+            #{item.baId},
+            #{item.iaGroupNo},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.num},
+            #{item.unitCode},
+            #{item.price},
+            #{item.totalPrice},
+            #{item.useCode},
+            #{item.sourceCode},
+            #{item.bfcId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 删除医嘱 -->
+    <delete id="deleteInptAdvice" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        delete from inpt_advice  where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 删除医嘱明细 -->
+    <delete id="deleteInptAdviceDetail" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        delete from inpt_advice_detail  where ia_id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 删除医嘱皮试 -->
+    <delete id="deleteInptAdvicePs" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        delete from inpt_advice  where source_ia_id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 删除医嘱明细皮试 -->
+    <delete id="deleteInptAdviceDetailPs" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        delete from inpt_advice_detail where ia_id in (
+            select id from inpt_advice where source_ia_id = #{id} and hosp_code = #{hospCode}
+        ) and hosp_code = #{hospCode}
+    </delete>
+
+    <!--批量更新医嘱停嘱或者取消停嘱-->
+    <update id="updateBatchInptAdviceStop">
+        update inpt_advice
+        set
+            is_stop = #{isStop},
+            stop_doctor_id = #{stopDoctorId},
+            stop_doctor_name = #{stopDoctorName},
+            end_exec_num = #{endExecNum},
+            stop_time = #{stopTime}
+        where hosp_code = #{hospCode}
+        and find_in_set(id,#{iatIds})
+    </update>
+
+    <!--批量更新医嘱预停时间-->
+    <update id="updateBatchInptAdviceplan">
+        update inpt_advice
+        set
+            plan_stop_time = #{planStopTime}
+        where hosp_code = #{hospCode}
+        and find_in_set(id,#{iatIds})
+    </update>
+
+
+    <!--  获取最大组号 -->
+    <select id="getMaxGroupNo" resultType="java.lang.Integer" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select ifnull(max(ifnull(group_no,0)),0) groupNo from inpt_advice a where visit_id = #{visitId} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 获取医嘱信息 -->
+    <select id="getAdviceDetail" resultMap="BaseItemMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select if(b.type_code = '3', c.id, e.id) id, if(b.type_code = '3', c.name, e.name) name, if(b.type_code = '3', c.spec, e.spec) spec,
+        num num, if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
+        a.is_cost isCost, b.type_code, b.unit_code,b.use_code
+        from base_advice a
+        join base_advice_detail b on a.code = b.advice_code and a.hosp_code = b.hosp_code
+        left join base_item c on b.item_code = c.code and b.hosp_code = c.hosp_code and b.type_code = '3'
+        left join base_finance_classify d on c.bfc_code = d.code and b.hosp_code = d.hosp_code
+        left join base_material e on b.item_code = e.code and b.hosp_code = e.hosp_code and b.type_code = '2'
+        left join base_finance_classify f on e.bfc_code = f.code and e.hosp_code = f.hosp_code
+        where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!--  检查医嘱是否核收 -->
+    <select id="checkIsCheck" resultMap="InptAdviceMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select * from inpt_advice a where id = #{id} and a.hosp_code = #{hospCode}
+    </select>
+
+
+    <!--查询单个-->
+    <select id="getInptAdviceById" resultMap="InptAdviceMap">
+        select
+          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id,
+           exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id,
+            item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id,
+             speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code,
+              is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id,
+           second_exec_name, long_start_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name,
+            check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long,
+             is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time,last_exec_time,source_ia_id,skin_unit_code
+        from inpt_advice
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryInptAdvicePage" resultMap="InptAdviceMap">
+        select
+          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
+        from inpt_advice
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--单个新增-->
+    <insert id="insertInptAdvice" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_advice(id,hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time, yylx)
+        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{orderNo}, #{iatId}, #{iatdGroupNo}, #{iatdGroupSeqNo}, #{iatdId}, #{inDeptId}, #{execDeptId}, #{deptId}, #{groupNo}, #{groupSeqNo}, #{typeCode}, #{signCode}, #{startExecNum}, #{endExecNum}, #{bfcId}, #{itemCode}, #{itemId}, #{itemName}, #{content}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{usageCode}, #{rateId}, #{speedCode}, #{num}, #{unitCode}, #{price}, #{totalPrice}, #{totalNum}, #{totalNumUnitCode}, #{herbNum}, #{useDays}, #{useCode}, #{isSkin}, #{isPositive}, #{herbNoteCode}, #{pharId}, #{remark}, #{planStopTime}, #{technologyNo}, #{herbUseCode}, #{isGive}, #{execId}, #{execName}, #{secondExecId}, #{secondExecName}, #{longStartTime}, #{lastExecTime}, #{teachDoctorId}, #{teachDoctorName}, #{isCheck}, #{checkId}, #{checkName}, #{checkTime}, #{stopDoctorId}, #{stopDoctorName}, #{stopTime}, #{stopCheckId}, #{stopCheckName}, #{stopCheckTime}, #{isLong}, #{isStop}, #{isReject}, #{rejectRemark}, #{crteId}, #{crteName}, #{crteTime}, #{yylx})
+    </insert>
+
+    <!--单个修改-->
+    <update id="updateInptAdvice">
+        update inpt_advice
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="iatId != null and iatId != ''">
+                iat_id = #{iatId},
+            </if>
+            <if test="iatdGroupNo != null">
+                iatd_group_no = #{iatdGroupNo},
+            </if>
+            <if test="iatdGroupSeqNo != null">
+                iatd_group_seq_no = #{iatdGroupSeqNo},
+            </if>
+            <if test="iatdId != null and iatdId != ''">
+                iatd_id = #{iatdId},
+            </if>
+            <if test="inDeptId != null and inDeptId != ''">
+                in_dept_id = #{inDeptId},
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                exec_dept_id = #{execDeptId},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="groupNo != null">
+                group_no = #{groupNo},
+            </if>
+            <if test="groupSeqNo != null">
+                group_seq_no = #{groupSeqNo},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+            <if test="signCode != null and signCode != ''">
+                sign_code = #{signCode},
+            </if>
+            <if test="startExecNum != null">
+                start_exec_num = #{startExecNum},
+            </if>
+            <if test="endExecNum != null">
+                end_exec_num = #{endExecNum},
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                bfc_id = #{bfcId},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                prep_code = #{prepCode},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="rateId != null and rateId != ''">
+                rate_id = #{rateId},
+            </if>
+            <if test="speedCode != null and speedCode != ''">
+                speed_code = #{speedCode},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum},
+            </if>
+            <if test="totalNumUnitCode != null and totalNumUnitCode != ''">
+                total_num_unit_code = #{totalNumUnitCode},
+            </if>
+            <if test="herbNum != null">
+                herb_num = #{herbNum},
+            </if>
+            <if test="useDays != null">
+                use_days = #{useDays},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="isSkin != null and isSkin != ''">
+                is_skin = #{isSkin},
+            </if>
+            <if test="isPositive != null and isPositive != ''">
+                is_positive = #{isPositive},
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                herb_note_code = #{herbNoteCode},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="planStopTime != null">
+                plan_stop_time = #{planStopTime},
+            </if>
+            <if test="technologyNo != null and technologyNo != ''">
+                technology_no = #{technologyNo},
+            </if>
+            <if test="herbUseCode != null and herbUseCode != ''">
+                herb_use_code = #{herbUseCode},
+            </if>
+            <if test="isGive != null and isGive != ''">
+                is_give = #{isGive},
+            </if>
+            <if test="execId != null and execId != ''">
+                exec_id = #{execId},
+            </if>
+            <if test="execName != null and execName != ''">
+                exec_name = #{execName},
+            </if>
+            <if test="secondExecId != null and secondExecId != ''">
+                second_exec_id = #{secondExecId},
+            </if>
+            <if test="secondExecName != null and secondExecName != ''">
+                second_exec_name = #{secondExecName},
+            </if>
+            <if test="longStartTime != null">
+                long_start_time = #{longStartTime},
+            </if>
+            <if test="lastExecTime != null">
+                last_exec_time = #{lastExecTime},
+            </if>
+            <if test="teachDoctorId != null and teachDoctorId != ''">
+                teach_doctor_id = #{teachDoctorId},
+            </if>
+            <if test="teachDoctorName != null and teachDoctorName != ''">
+                teach_doctor_name = #{teachDoctorName},
+            </if>
+            <if test="isCheck != null and isCheck != ''">
+                is_check = #{isCheck},
+            </if>
+            <if test="checkId != null and checkId != ''">
+                check_id = #{checkId},
+            </if>
+            <if test="checkName != null and checkName != ''">
+                check_name = #{checkName},
+            </if>
+            <if test="checkTime != null">
+                check_time = #{checkTime},
+            </if>
+            <if test="stopDoctorId != null and stopDoctorId != ''">
+                stop_doctor_id = #{stopDoctorId},
+            </if>
+            <if test="stopDoctorName != null and stopDoctorName != ''">
+                stop_doctor_name = #{stopDoctorName},
+            </if>
+            <if test="stopTime != null">
+                stop_time = #{stopTime},
+            </if>
+            <if test="stopCheckId != null and stopCheckId != ''">
+                stop_check_id = #{stopCheckId},
+            </if>
+            <if test="stopCheckName != null and stopCheckName != ''">
+                stop_check_name = #{stopCheckName},
+            </if>
+            <if test="stopCheckTime != null">
+                stop_check_time = #{stopCheckTime},
+            </if>
+            <if test="isLong != null and isLong != ''">
+                is_long = #{isLong},
+            </if>
+            <if test="isStop != null and isStop != ''">
+                is_stop = #{isStop},
+            </if>
+            <if test="isReject != null and isReject != ''">
+                is_reject = #{isReject},
+            </if>
+            <if test="rejectRemark != null and rejectRemark != ''">
+                reject_remark = #{rejectRemark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="yylx != null">
+                yylx = #{yylx},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--批量更新医嘱-->
+    <update id="updateInptAdviceBatch">
+        <foreach collection="list" item="dto" separator=";">
+            update inpt_advice
+            set
+            is_positive = #{dto.isPositive},
+            exec_id = #{dto.execId},
+            exec_name = #{dto.execName},
+            exec_name = #{dto.execName},
+            second_exec_id = #{dto.secondExecId},
+            second_exec_name = #{dto.secondExecName},
+            sign_code = #{dto.signCode},
+            skin_result_code = #{dto.skinResultCode},
+            content = #{dto.content}
+            where hosp_code = #{dto.hospCode}
+            and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <!--更新停嘱核收信息-->
+    <update id="updateStopInptAdviceBatch">
+        <foreach collection="inptAdviceDTOs" item="dto" separator=";">
+            update inpt_advice
+            <set>
+                <if test="dto.stopCheckId!=null and dto.stopCheckId!=''">
+                    stop_check_id=#{dto.stopCheckId},
+                </if>
+                <if test="dto.stopCheckName!=null and dto.stopCheckName!=''">
+                    stop_check_name=#{dto.stopCheckName},
+                </if>
+                <if test="dto.stopCheckTime!=null">
+                    stop_check_time=#{dto.stopCheckTime},
+                </if>
+                <if test="dto.isStopCheck!=null and dto.isStopCheck!=''">
+                    is_stop_check=#{dto.isStopCheck},
+                </if>
+                <if test="dto.endExecNum!=null and dto.endExecNum!=''">
+                    end_exec_num=#{dto.endExecNum},
+                </if>
+                <if test="dto.teachDoctorId!=null and dto.teachDoctorId!=''">
+                    teach_doctor_id=#{dto.teachDoctorId},
+                </if>
+                <if test="dto.teachDoctorName!=null and dto.teachDoctorName!=''">
+                    teach_doctor_name=#{dto.teachDoctorName},
+                </if>
+                <if test="dto.stopDoctorId!=null and dto.stopDoctorId!=''">
+                    stop_doctor_id=#{dto.stopDoctorId},
+                </if>
+                <if test="dto.stopDoctorName!=null and dto.stopDoctorName!=''">
+                    stop_doctor_name=#{dto.stopDoctorName},
+                </if>
+                <if test="dto.stopTime!=null">
+                    stop_time=#{dto.stopTime},
+                </if>
+                <if test="dto.isStop!=null and dto.isStop!=''">
+                    is_stop=#{dto.isStop},
+                </if>
+            </set>
+            where hosp_code = #{dto.hospCode} and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <!--更新开嘱核收信息-->
+    <update id="updateStartInptAdviceBatch">
+        <foreach collection="inptAdviceDTOs" item="dto" separator=";">
+            update inpt_advice
+            <set>
+                <if test="dto.checkId!=null and dto.checkId!=''">
+                    check_id=#{dto.checkId},
+                </if>
+                <if test="dto.checkName!=null and dto.checkName!=''">
+                    check_name=#{dto.checkName},
+                </if>
+                <if test="dto.checkTime!=null">
+                    check_time=#{dto.checkTime},
+                </if>
+                <if test="dto.isCheck!=null and dto.isCheck!=''">
+                    is_check=#{dto.isCheck},
+                </if>
+                <if test="dto.endExecNum!=null and dto.endExecNum!=''">
+                    end_exec_num=#{dto.endExecNum},
+                </if>
+                <if test="dto.teachDoctorId!=null and dto.teachDoctorId!=''">
+                    teach_doctor_id=#{dto.teachDoctorId},
+                </if>
+                <if test="dto.teachDoctorName!=null and dto.teachDoctorName!=''">
+                    teach_doctor_name=#{dto.teachDoctorName},
+                </if>
+                <if test="dto.stopTime!=null">
+                    stop_time=#{dto.stopTime},
+                </if>
+                <if test="dto.isStop!=null and dto.isStop!=''">
+                    is_stop=#{dto.isStop},
+                </if>
+            </set>
+            where hosp_code = #{dto.hospCode} and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <!--获取未核收医嘱列表-->
+    <select id="getMedicalAdvices" resultType="cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO">
+        select a.id,a.visit_id visitId, a.baby_id babyId,a.type_code typeCode,a.group_no groupNo,b.name visitName,b.age visitAge,
+        b.gender_code visitSex,b.cert_no visitCardNo,a.spec,a.dosage,a.num,a.use_code useCode,a.stop_time AS stopTime,a.end_exec_num AS endExecNum,
+        a.usage_code usageCode,a.rate_id rateId,a.use_days useDays,a.remark,
+        a.total_num totalNum,a.total_num_unit_code totalNumUnitCode,a.speed_code speedCode,a.is_long isLong,a.is_stop isStop,a.is_reject isReject,a.is_check isCheck,
+        a.price,a.total_price totalPrice,a.long_start_time longStartTime,a.content content,a.start_exec_num startExecNum,
+        <!--(concat(b.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=b.gender_code and e.c_code='XB'),'') ), '/',b.age,
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=b.age_unit_code and hosp_code=b.hosp_code),'岁')))) visitInfo,-->
+        IF(
+        a.baby_id ,
+        CONCAT(ib.name, '/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = ib.gender_code AND e.c_code = 'XB' ), '' )), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
+        concat(b.NAME,'/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = b.gender_code AND e.c_code = 'XB' ), '' )),'/', b.age,(ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = b.age_unit_code AND hosp_code = b.hosp_code ), '岁' )))
+        ) as visitInfo,
+        (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
+        (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
+        (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName
+        from inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
+        left join base_drug c on a.item_id=c.id and a.item_code='1' and c.hosp_code=a.hosp_code
+        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        where a.is_submit='1' and a.hosp_code=#{hospCode}
+        and (
+        <!--新开医嘱  未核收   未拒收-->
+        ((a.is_stop='0' or a.is_stop is null) and (a.is_check='0' or a.is_check is null))
+        or
+        <!--新开停嘱  未核收   未拒收-->
+        (a.is_stop='1' and (a.is_stop_check='0' or a.is_stop_check is null))
+        )
+        and (a.is_reject='0' or a.is_reject is null)
+        <if test="isLong!=null and isLong!=2">
+            and a.is_long=#{isLong}
+        </if>
+        <if test="isStop!=null and isStop!=2">
+            and a.is_stop=#{isStop}
+        </if>
+        <if test="deptId!=null and deptId!=''">
+            and a.dept_id=#{deptId}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.id=#{visitId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( b.NAME LIKE CONCAT( '%', #{keyword}, '%' )
+            OR b.bed_name LIKE CONCAT( '%', #{keyword}, '%' ))
+        </if>
+        order by a.crte_time, a.visit_id, a.baby_id, group_no, group_seq_no asc, a.long_start_time desc
+    </select>
+
+    <!--医嘱拒收-->
+    <update id="modifyMedicalAdvices">
+        update inpt_advice set is_submit = '0' ,is_reject=1,reject_remark=#{rejectRemark},check_time=#{checkTime} where hosp_code=#{hospCode}
+        <if test="ids !=null and ids.size()>0">
+            and id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--新停医嘱更新核收信息-->
+    <update id="updateInptAdviceStopCheckInfo">
+        update inpt_advice set is_stop_check=1,stop_check_id=#{medicalAdviceDTO.checkId},stop_check_name=#{medicalAdviceDTO.checkName},
+        stop_check_time=#{medicalAdviceDTO.checkTime}
+        where hosp_code=#{medicalAdviceDTO.hospCode} and is_stop='1'
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--新开医嘱更新核收信息-->
+    <update id="updateInptAdviceCheckInfo">
+        update inpt_advice set is_check=1,check_id=#{medicalAdviceDTO.checkId},check_name=#{medicalAdviceDTO.checkName},
+        check_time=#{medicalAdviceDTO.checkTime}
+        where hosp_code=#{medicalAdviceDTO.hospCode}
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--根据医嘱ID查询停同类、停非同类、停自身的医嘱列表-->
+    <select id="getTzInptAdvices" resultMap="InptAdviceMap">
+        select
+        a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id,
+        a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code, a.sign_code, a.start_exec_num,
+        a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code,
+        a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code,
+        a.herb_num, a.use_days, a.use_code, a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no,
+        a.herb_use_code, a.is_give, a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id,
+        a.teach_doctor_name, a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id,
+        a.stop_check_name, a.stop_check_time, a.is_long, a.is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time
+        from inpt_advice a join base_advice b on a.item_id=b.id
+        where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and a.item_code='4'
+        and (ifnull(b.is_stop_same,'0')='1' or ifnull(b.is_stop_same_not,'0')='1' or ifnull(b.is_stop_myself,'0')='1')
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and a.id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        order by a.order_no asc
+    </select>
+
+    <!--根据参数查询非同类医嘱-->
+    <select id="getFtlAdvices" resultMap="InptAdviceMap">
+        select
+         id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
+        and (is_stop_check='0' or is_stop_check is null) and stop_time is not null
+        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code!=#{typeCode} and id!=#{id}
+    </select>
+
+    <!--根据参数查询同类医嘱-->
+    <select id="getTlAdvices" resultMap="InptAdviceMap">
+        select
+         id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
+        and (is_stop_check='0' or is_stop_check is null) and stop_time is not null
+        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code=#{typeCode} and id!=#{id}
+    </select>
+
+    <!--根据医嘱ID获取医嘱-->
+    <select id="getInptAdviceByIds" resultMap="InptAdviceMap">
+        select
+        a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
+        a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
+        a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
+        a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
+        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+        a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
+        a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,is_stop_check,a.is_submit,a.yylx,
+        d.type_code as execDeptKsxz,advance_days
+        from inpt_advice a left join base_dept d on a.exec_dept_id = d.id and a.hosp_code = d.hosp_code
+        where a.hosp_code=#{hospCode}
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and a.id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        order by a.group_no,a.group_seq_no
+    </select>
+
+    <!-- 医嘱核对查询 医嘱类型：(长期/临时 -is_long) ;
+    医嘱类别：type_code;医嘱编号：order_no;开嘱时间：crte_time;-->
+    <select id="queryInptAdviceFeeCheckPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        SELECT
+        DISTINCT
+        a.*,
+        b.bed_id,
+        b.bed_name,
+        b.NAME,
+        b.age,
+        b.gender_code,
+        c.name as exec_dept,
+        d.is_check as costIsCheck,
+        e.name as rateName
+        FROM
+        inpt_visit b
+        LEFT JOIN inpt_advice a ON a.visit_id = b.id
+        LEFT JOIN base_dept c ON a.exec_dept_id = c.id
+        LEFT JOIN inpt_cost d ON a.id = d.iat_id
+        LEFT JOIN base_rate e ON a.rate_id = e.id
+        WHERE 1=1 AND
+        a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}
+        AND d.id is not null
+        <if test="isCheck != null and isCheck != ''">
+            AND d.is_check = #{isCheck}
+        </if>
+        <if test="isLong != null and isLong != ''">
+            AND a.is_long = #{isLong}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND CONCAT(b.name,b.bed_name,b.in_no) LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND b.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            DATE_FORMAT(b.in_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        <if test="newExecStatus == 1">
+            AND (a.check_id is not null and a.check_id != '')
+        </if>
+        <if test="newExecStatus == 2">
+            AND (a.stop_check_id is not null and a.stop_check_id != '')
+        </if>
+        <if test="costTime != null and costTime != ''">
+            AND date(d.cost_time) = STR_TO_DATE(#{costTime},'%Y-%m-%d')
+        </if>
+        <if test="babyId != null and babyId != ''">
+            AND a.baby_id = #{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (a.baby_id is null or a.baby_id = '')
+        </if>
+        ORDER BY a.check_time DESC
+    </select>
+
+    <!--通过就诊id查询医嘱记录条数-->
+    <select id="queryAdviceNumByVisitId" resultType="java.lang.Integer">
+        select count(0)
+        from inpt_advice
+        <where>
+            hosp_code = #{hospCode} and is_stop = '0' and  cancel_id is null
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getExecNum" resultType="java.lang.Integer" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        SELECT
+            ifnull(SUM( a.num ),0)
+        FROM
+            (
+            SELECT
+                a.id,
+                a.visit_id,
+                count( b.id ) AS num
+            FROM
+                inpt_advice a
+                LEFT JOIN inpt_advice_exec b ON a.id = b.advice_id
+                AND a.visit_id = b.visit_id
+                where a.id = #{id} and a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and a.sign_code in('1','2')
+            GROUP BY
+                a.id,
+                a.visit_id,
+                b.id
+            ) a
+        GROUP BY
+            a.id
+    </select>
+
+    <select id="queryInptPatientPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT DISTINCT
+        b.id as visitId,
+        b.name,
+        b.gender_code as genderCode,
+        b.age,
+        b.age_unit_code as ageUnitCode,
+        b.in_no as inNo,
+        b.bed_id as bedId,
+        b.bed_name as bedName,
+        b.in_time as inTime
+        FROM
+        inpt_visit b
+        WHERE b.hosp_code = #{hospCode}
+        AND b.in_dept_id = #{deptId}
+
+        AND b.status_code in (#{statusCode})
+        <if test="keyword != null and keyword != ''">
+            AND CONCAT(b.name,b.in_no,b.bed_name) LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND b.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND b.in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        order by b.in_time desc
+    </select>
+
+    <!--医嘱费用核对-->
+    <update id="updateAdviceFeeCheck">
+        <foreach collection="list" item="item" separator=";">
+            update inpt_cost
+            set is_check = #{item.isCheck},
+            check_id = #{item.checkId},
+            check_time = #{item.checkTime},
+            check_name = #{item.checkName}
+            where
+            hosp_code = #{item.hospCode}
+            and iat_id = #{item.iatId}
+        </foreach>
+    </update>
+
+    <!-- 根据ID集合批量更新数据 -->
+    <update id="updateInptAdviceBatchByIds">
+        update inpt_advice
+        set is_check = #{isCheck}
+        where
+        hosp_code = #{hospCode} and id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- (case item_code when '3' then
+         (select item.ybbz from base_item item where item.id = cost.item_id)
+         else
+         (select item.ybbz from insure_code item where item.id = cost.item_id)
+         end
+         ) as ybbz
+         and cost.visit_id = #{visitId}-->
+    <select id="queryInptAdviceFeeInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select cost.*,
+        case insure.is_match
+        when '1' then '医保' else '自费' end as isMatch
+        from inpt_cost cost
+        left join insure_individual_visit iiv on iiv.visit_id = cost.visit_id and iiv.hosp_code = cost.hosp_code
+        left join insure_item_match insure on cost.item_id = insure.hosp_item_id and cost.hosp_code = insure.hosp_code and iiv.insure_reg_code = insure.insure_reg_code
+        where cost.hosp_code = #{hospCode}
+        and cost.iat_id in
+        <foreach collection="iatIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="sourceCode == '6'.toString()">
+            AND cost.source_code = '6'
+        </if>
+        <if test="sourceCode != '6'.toString()">
+            AND cost.source_code != '6'
+        </if>
+        <if test="costTime != null and costTime != ''">
+            and date(cost.cost_time) = STR_TO_DATE(#{costTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <select id="queryNoMedical" resultMap="InptAdviceMap">
+        select a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code, a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code, a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give, a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name, a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name, a.stop_check_time, a.is_long, a.is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time
+        ,c.name ,c.bed_name
+        FROM inpt_advice a
+        LEFT JOIN stro_stock b ON a.item_id =b.id and a.phar_id=b.biz_id
+        LEFT JOIN inpt_visit c ON a.visit_id=c.id
+        where  b.num>a.total_num and a.item_code='1' and a.is_long='0' and ((a.is_stop='0' or a.is_stop is null)) and a.hosp_code= #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (c.name like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%'))
+        </if>
+    </select>
+
+
+    <!--根据参数查询同类医嘱-->
+    <select id="getAdviceByGroupNo" resultMap="InptAdviceMap">
+        select
+         id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id,
+          group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code,
+           dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num,
+            use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id,
+            exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name,
+            check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name,
+         stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and group_no=#{groupNo}
+        AND ifnull(stop_time,SYSDATE) &gt; SYSDATE
+        AND ((ifnull(is_long, 1) = '0') OR (ifnull(sign_code, '1') != '3' AND SUBSTR(is_long, 1) = '1'))
+        order by a.crte_time desc limit 1
+    </select>
+
+    <select id="queryOperationNameList" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        select
+        item_id,item_name
+        from inpt_advice_detail
+        where hosp_code = #{hospCode}
+        <if test="visitId !='' and visitId != null">
+            and visit_id = #{visitId}
+        </if>
+        <if test="itemCode !='' and itemCode != null">
+            and item_code = #{itemCode}
+        </if>
+        <if test="itemName !='' and itemName != null">
+            and item_name like concat('%', #{itemName}, '%')
+        </if>
+    </select>
+
+    <!--列表查询-->
+    <select id="queryAll" resultMap="InptAdviceMap">
+        select
+        id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no,
+        type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code,
+        phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time,
+        teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name,
+        stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time, is_stop_check, cancel_id, cancel_name, cancel_time
+        from inpt_advice
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="iatIds !='' and iatIds != null">
+            and find_in_set(id,#{iatIds})
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and id in
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 新增诊断信息 -->
+    <insert id="insertDiagnose" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into inpt_diagnose(
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.diseaseId},
+            #{item.visitId},
+            #{item.typeCode},
+            #{item.isMain},
+            #{item.crteId},
+            #{item.crteName},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertMedicalApply">
+        insert into medic_apply(id,hosp_code,apply_no,type_code,visit_id,baby_id,in_no,order_no,is_inpt,dept_id,dept_name,doctor_id,doctor_name,
+        apply_time,imp_dept_id,bar_code,print_time,print_times,rporter,is_allergy,result_id,is_positive,document_sta,opd_id,content,medic_type,
+        is_merge,merge_id,remark,report_time,crte_id,crte_name,crte_time)
+        values(#{id},#{hospCode},#{applyNo},#{typeCode},#{visitId},#{babyId},#{inNo},#{orderNo},#{isInpt},#{deptId},#{deptName},#{doctorId},#{doctorName}
+        ,#{applyTime},#{impDeptId},#{barCode},#{printTime},#{printTimes},#{rporter},#{isAllergy},#{resultId},#{isPositive},#{documentSta},#{opdId}
+        ,#{content},#{medicType},#{isMerge},#{mergeId},#{remark},#{reportTime},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <insert id="insertMedicalApplyDetail">
+        insert medic_apply_detail(id,hosp_code,apply_id,visit_id,opd_id,advice_code,dept_id,order_no,content,remark,blob_id)
+        values(#{id},#{hospCode},#{applyId},#{visitId},#{opdId},#{adviceCode},#{deptId},#{orderNo},#{content},#{remark},#{blobId})
+    </insert>
+
+    <!--  获取诊断信息 -->
+    <select id="getInptDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode, a.is_main isMain, b.name diseaseName
+        from inpt_diagnose a
+        join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+    </select>
+
+    <!-- 删除诊断 -->
+    <delete id="deleteDiagnose" parameterType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        delete from inpt_diagnose  where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </delete>
+
+    <!--获取需要滚动长期费用的医嘱集合(长期医嘱、已核收、未停止、在院病人、拒收标志正常)-->
+    <select id="queryAdvicesToLongCost" resultType="java.lang.String">
+        select
+        --         a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
+        --         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
+        --         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
+        --         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
+        --         a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+        --         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
+        --         a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time
+        distinct a.id
+        from
+        inpt_advice a join inpt_visit b on a.visit_id=b.id
+        where 1=1 and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode}
+        --         已提交
+        and a.is_submit='1'
+        --         长期医嘱
+        and a.is_long='0'
+        --         已核收
+        and a.is_check='1'
+        --         排除停嘱并核收
+        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         非据收医嘱
+        and (a.is_reject is null or a.is_reject='0')
+        --         在院
+        and b.status_code='2'
+        --         医嘱开始时间小于等于当前时间
+        and date_format(a.long_start_time, '%Y-%m-%d') &lt;= date_format(now(), '%Y-%m-%d')
+        --         预停时间不为空,那么需要大于当前时间
+        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date_format(a.plan_stop_time, '%Y-%m-%d') &gt; date_format(now(), '%Y-%m-%d')))
+        <if test="visitId!=null and visitId!=''">
+            and b.id=#{visitId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.exec_dept_id = #{deptId}
+        </if>
+
+        <!-- 提前领药修改,为了不影响长期医嘱加了判断, -->
+        <choose>
+            <when test="sfTqly != null and sfTqly != ''">
+                and a.item_code in ('1','2')
+                and IFNULL(a.advance_days,0) &gt; 0
+            </when>
+            <otherwise>
+                --    最近执行时间要小于当前时间，如果执行时间为空,那就判断是否医嘱开始时间是否小于当前时间
+                and (date_format(ifnull(a.last_exec_time,a.long_start_time), '%Y-%m-%d') &lt; date_format(now(), '%Y-%m-%d'))
+            </otherwise>
+        </choose>
+
+        <if test="ids != null and ids.size()>0">
+            and a.id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+
+    </select>
+
+    <update id="updateLastExeTime">
+        update inpt_advice set last_exec_time=#{medicalAdviceDTO.checkTime}
+        where hosp_code=#{medicalAdviceDTO.hospCode}
+        and id in
+        <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 获取医嘱信息 -->
+    <select id="getAdviceData" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select a.*, '4' itemCode, c.id outDeptId
+        from base_advice a
+        left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_valid = '1' and a.code = #{code}
+
+    </select>
+
+    <!-- 获取药品信息 -->
+    <select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select a.*, b.trunc_code truncCode, c.id bfcId
+        from base_drug a
+        left join base_special_calc b on a.code = b.drug_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
+        left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
+        left join base_dept d on b.dept_code = d.code and b.hosp_code = d.hosp_code and d.id = #{loginDeptId}
+        where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!-- 获取材料信息 -->
+    <select id="getBaseMaterial" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select a.*
+        from base_material a
+        where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+    <!-- 检查库存-->
+    <select id="checkStock" resultType="java.util.Map" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select * from stro_stock a
+        left join (
+            select a.biz_id,a.item_id, a.hosp_code,sum(totalNum) totalNum  from (
+                select receive.phar_id biz_id, a.item_id, a.hosp_code, case when a.item_code = '1' and a.unit_code = b.split_unit_code then a.num
+                when a.item_code = '1' and a.unit_code = b.unit_code then a.num*b.split_ratio
+                when a.item_code = '2' and a.unit_code = c.split_unit_code then a.num
+                when a.item_code = '2' and a.unit_code = c.unit_code then a.num*c.split_ratio else 0 end totalNum
+                from phar_in_receive receive
+                join phar_in_receive_detail a on receive.id = a.receive_id and receive.hosp_code = a.hosp_code
+                left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
+                left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+                where receive.hosp_code = #{hospCode} and receive.status_code in ('0','1') and date_sub(receive.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and receive.phar_id = #{pharId} and a.item_id = #{itemId}
+                union all
+                select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
+                from stro_stock a
+                where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
+                union all
+                select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{unitCode} then #{totalNum}
+                when a.unit_code = #{unitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+                from base_drug a
+                where a.hosp_code = #{hospCode} and a.id = #{itemId}
+                union all
+                select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{unitCode} then #{totalNum}
+                when a.unit_code = #{unitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+                from base_material a
+                where a.hosp_code = #{hospCode} and a.id = #{itemId}
+            )a group by a.biz_id,a.item_id, a.hosp_code
+        )b on a.hosp_code = b.hosp_code and a.item_id = b.item_id and a.biz_id = b.biz_id
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId} and (a.split_num - ifnull(b.totalNum,0)) &gt;= 0
+    </select>
+
+    <!-- 计算余额-->
+    <select id="checkBalance" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select  a.id, a.hosp_code, a.profile_id, a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code, a.birthday, a.nation_code, a.cert_code,
+        a.cert_no, a.marry_code, a.phone, a.address, a.preferential_type_id, a.patient_code, a.receive_hosp_name, a.bed_id, a.bed_name, a.nursing_code,
+        a.diet_type, a.Illness_code, a.status_code, a.in_ward_id, a.in_dept_id, a.in_dept_name, a.in_time, a.zz_doctor_id, a.zz_doctor_name,
+        a.jz_doctor_id, a.jz_doctor_name, a.zg_doctor_id, a.zg_doctor_name,
+        a.in_remark, a.in_mode_code, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.in_situation_code, a.outpt_visit_no, a.outpt_doctor_id,
+        a.outpt_doctor_name, a.outpt_disease_id, a.outpt_disease_name, a.outpt_disease_icd10, a.out_ward_id, a.out_dept_id, a.out_dept_name, a.out_time,
+        a.out_disease_id, a.out_disease_name, a.out_disease_icd10, a.out_oper_id, a.out_oper_name, a.out_oper_time, a.out_situation_code, a.out_remark,
+        a.out_mode_code,a.guarantee_balance,
+        a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
+        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time, (ifnull(b.value,0) + ifnull(a.guarantee_balance,0))  qfCose
+        from inpt_visit a
+        left join sys_parameter b on a.hosp_code = b.hosp_code and b.code = 'YZ_YJJQFFW'
+        where a.id = #{visitId} and a.hosp_code = #{hospCode} and (a.total_balance + ifnull(a.guarantee_balance,0)) &lt;= ifnull(b.value,0)*-1
+    </select>
+
+    <!-- 批量更新停嘱-->
+    <update id="updateBatchAdvice" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update inpt_advice
+            set
+            is_stop = #{item.isStop},
+            stop_doctor_id = #{item.stopDoctorId},
+            stop_doctor_name = #{item.stopDoctorName},
+            end_exec_num = #{item.endExecNum},
+            stop_time = #{item.stopTime}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id} and ifnull(is_stop,'0') = '0'
+        </foreach>
+    </update>
+
+    <!--批量提交医嘱-->
+    <update id="updateInptAdviceBatchSumbit">
+        update inpt_advice
+        set
+        is_reject = '0',
+        reject_remark = null,
+        is_submit = '1',
+        teach_doctor_id = #{teachDoctorId},
+        teach_doctor_name = #{teachDoctorName},
+        submit_id = #{submitId},
+        submit_name = #{submitName},
+        submit_time = now()
+         where hosp_code = #{hospCode}
+        and find_in_set(id,#{ids}) and ifnull(is_submit, '0') = '0'
+    </update>
+
+    <update id="updateLastExeTimeById">
+        update inpt_advice set crte_time=ifnull(last_exec_time,crte_time),last_exec_time=#{date} where hosp_code=#{hospCode} and id=#{id}
+    </update>
+
+    <update id="modifyLastExeTimeById">
+        update inpt_advice set last_exec_time=crte_time,crte_time=submit_time where hosp_code=#{hospCode} and id=#{id}
+    </update>
+
+    <!-- 获取辅助计费明细数据 -->
+    <select id="getAssistDetail" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO">
+    SELECT
+        a.name,
+        bd.id id,
+        bd.hosp_code hospCode,
+        bd.ac_code acCode,
+        bd.type_code itemCode,
+        a.id assistId,
+        bd.use_code useCode,
+        bd.start_time startTime,
+        bd.end_time endTime,
+        bd.num,
+    CASE
+            WHEN bd.type_code = '3' THEN
+            b.id
+            WHEN bd.type_code = '2' THEN
+            c.id
+        END itemId,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.unit_code
+            WHEN bd.type_code = '2' THEN
+            c.unit_code
+        END itemUnitCode,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.NAME
+            WHEN bd.type_code = '2' THEN
+            c.NAME
+        END itemName,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.price
+            WHEN bd.type_code = '2' THEN
+            c.price
+        END price,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.price * bd.num
+            WHEN bd.type_code = '2' THEN
+            c.price * bd.num
+        END itemPriceAll,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.price
+            WHEN bd.type_code = '2' THEN
+            c.price
+        END itemPreferentialPrice,
+    CASE
+
+            WHEN bd.type_code = '3' THEN
+            b.price * bd.num
+            WHEN bd.type_code = '2' THEN
+            c.price * bd.num
+        END itemPreferentialAllPrice,
+    CASE
+
+            WHEN bd.type_code = '2' THEN
+            e.id
+            WHEN bd.type_code = '3' THEN
+            d.id
+        END bfcId
+    FROM
+        base_assist a
+        JOIN base_assist_detail bd ON a.CODE = bd.ac_code
+        AND a.hosp_code = bd.hosp_code
+        LEFT JOIN base_item b ON bd.item_code = b.CODE
+        AND bd.hosp_code = b.hosp_code
+        AND bd.type_code = '3'
+        LEFT JOIN base_material c ON bd.item_code = c.CODE
+        AND bd.hosp_code = c.hosp_code
+        AND bd.type_code = '2'
+        LEFT JOIN base_finance_classify d ON b.bfc_code = d.CODE
+        AND b.hosp_code = d.hosp_code
+        LEFT JOIN base_finance_classify e ON c.bfc_code = e.CODE
+        AND c.hosp_code = e.hosp_code
+        where a.hosp_code = #{hospCode} and a.code = #{code} and bd.is_valid = '1'
+    </select>
+
+    <select id="getAdvicesByVisitId" resultMap="InptAdviceMap">
+        select a.*
+        from inpt_advice a join inpt_visit b on a.visit_id=b.id
+        where a.is_submit='1' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and a.is_check='1'
+        and !(a.is_stop='1' and a.is_stop_check='1' and DATE_FORMAT(a.stop_check_time, '%Y-%m-%d') &gt; DATE_FORMAT(now(), '%Y-%m-%d'))
+        and (a.is_reject='0' or a.is_reject is null)
+        <if test="visitId!=null and visitId!=''">
+            and b.id=#{visitId}
+        </if>
+        order by a.group_no,a.group_seq_no
+    </select>
+
+    <select id="queryAdvicesByVisitId" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        select b.id id,a.hosp_code hospCode,a.code code,a.technology_code technologyCode,a.container_code containerCode,a.specimen_code specimenCode
+        from base_advice a join inpt_advice b on a.id=b.item_id
+        where a.is_valid='1' and b.item_code='4' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and b.visit_id=#{visitId}
+        and (b.is_reject='0' or b.is_reject is null)
+        and !(b.is_stop='1' and b.is_stop_check='1')
+    </select>
+
+    <select id="queryApplyByAdviceId" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
+        select * from medic_apply where hosp_code=#{hospCode} and opd_id=#{opdId} and visit_id=#{visitId}
+    </select>
+
+    <!--批量取消医嘱-->
+    <update id="updateBatchInptAdviceCancel">
+        update inpt_advice
+        set
+            cancel_id = #{cancelId},
+            cancel_name = #{cancelName},
+            cancel_time = now()
+        where hosp_code = #{hospCode}
+        and find_in_set(id,#{iatIds})
+    </update>
+
+    <!-- 查询费用 -->
+    <select id="queryInptCostList" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" >
+        select * from
+        inpt_cost
+        where
+        hosp_code = #{hospCode}
+        and find_in_set(iat_id,#{iatIds})
+    </select>
+
+    <!--根据医嘱ID获取医嘱-->
+    <select id="getVisitByAdviceIds" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select distinct a.* from inpt_visit a join inpt_advice b on a.id=b.visit_id and a.hosp_code=b.hosp_code
+        where a.hosp_code=#{hospCode} and b.item_code='1' and b.hosp_code=#{hospCode}
+        and b.id in
+        <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 获取就诊信息-->
+    <select id="getInptVisit" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select  a.id, a.hosp_code, a.profile_id, a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code, a.birthday, a.nation_code, a.cert_code,
+        a.cert_no, a.marry_code, a.phone, a.address, a.preferential_type_id, a.patient_code, a.receive_hosp_name, a.bed_id, a.bed_name, a.nursing_code,
+        a.diet_type, a.Illness_code, a.status_code, a.in_ward_id, a.in_dept_id, a.in_dept_name, a.in_time, a.zz_doctor_id, a.zz_doctor_name,
+        a.jz_doctor_id, a.jz_doctor_name, a.zg_doctor_id, a.zg_doctor_name,
+        a.in_remark, a.in_mode_code, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.in_situation_code, a.outpt_visit_no, a.outpt_doctor_id,
+        a.outpt_doctor_name, a.outpt_disease_id, a.outpt_disease_name, a.outpt_disease_icd10, a.out_ward_id, a.out_dept_id, a.out_dept_name, a.out_time,
+        a.out_disease_id, a.out_disease_name, a.out_disease_icd10, a.out_oper_id, a.out_oper_name, a.out_oper_time, a.out_situation_code, a.out_remark,
+        a.out_mode_code,
+        a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
+        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time
+        from inpt_visit a
+        where a.id = #{visitId} and a.hosp_code = #{hospCode}
+    </select>
+    <select id="queryInptDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
+               a.is_main isMain, b.name diseaseName,b.code diseaseCode,a.crte_time
+             ,c.in_dept_name inDeptName,c.in_dept_id inDeptId,a.crte_id zzDoctorId,c.crte_name zzDoctorName,
+                iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName
+        from inpt_diagnose a
+                 join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+                 join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
+                 join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
+        where  a.visit_id = #{id} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+    </select>
+
+
+    <!--回写医技申请单号-->
+    <update id="updateTechnologyNoById">
+        update inpt_advice set technology_no = #{technologyNo} where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+
+    <update id="updateLastExeTimeByIds">
+        <foreach collection="inptAdviceExecDTOs" item="item" separator=";">
+            update inpt_advice
+            set
+            last_exec_time = #{item.execTime}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.adviceId}
+        </foreach>
+    </update>
+
+
+    <!--    根据固定条件查询需要修改 提前领药天数的医嘱-->
+    <select id="queryInptAdviceAdvanceTake" resultType="map" resultMap="InptAdviceMap">
+        select a.* from inpt_advice a,
+        inpt_medicine_advance b,
+        inpt_medicine_advance_advice c
+        WHERE
+        a.id = c.advice_id
+        AND b.id = c.advance_id
+        AND b.hosp_code = #{hospCode}
+        AND a.hosp_code = #{hospCode}
+        AND c.hosp_code = #{hospCode}
+        AND b.dept_id = #{deptId}
+        AND b.type_code = #{typeCode}
+        and b.sfpy ='0'
+        and CONVERT(a.advance_days,SIGNED) >0
+    </select>
+
+    <!--  根据ids修改医嘱提前领药天数  -->
+    <update id="updateAdvanceDays" >
+        update  inpt_advice a  set advance_days = #{advance_days}  where
+        id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--  根据ids修改医嘱提前领药天数  -->
+    <update id="updateAdvanceDaysLastExcTime" >
+        update  inpt_advice a ,inpt_medicine_advance b,inpt_medicine_advance_advice c
+        set a.advance_days = #{advance_days} ,a.last_exec_time = b.end_date
+        where a.id = c.advice_id
+        and b.id = c.advance_id
+        and b.sfpy ='0'
+        and CONVERT(a.advance_days,SIGNED) >0
+        and a.id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--查询对应库存 获取数量最多的库位ID-->
+    <select id="getStroStockById" resultType="map">
+        select b.type_code as typeCode,c.id from base_dept a,base_dept_drugstore b, base_dept c  where  a.code = b.dept_code and b.drugstore_code = c.code  and a.id = #{deptId} and b.type_code ='4'  AND a.hosp_code =#{hospCode} AND a.hosp_code =#{hospCode}  AND a.hosp_code =#{hospCode}
+    </select>
+
+    <insert id="insertMedicineAdvance">
+        insert into inpt_medicine_advance
+        ( id, hosp_code, dept_id, advance_days, type_code, start_date, end_date, sfpy,crte_time,crte_id, crte_name )
+        values
+        ( #{id}, #{hospCode}, #{deptId}, #{advanceDays}, #{typeCode}, #{startDate}, #{endDate},#{sfpy}, #{crteTime}, #{crteId}, #{crteName} )
+    </insert>
+
+    <select id="selectMedicineAdvance" resultType="map" parameterType="map">
+        select id,
+        advance_days,
+        type_code,
+        DATE_FORMAT( start_date, '%Y-%m-%d' ) AS start_date,
+        DATE_FORMAT( END_date, '%Y-%m-%d' ) AS end_date,
+        sfpy,
+        (select name from base_order_receive a where a.id = type_code and a.hosp_code = hosp_code) as typeName,
+        (case when sfpy = '0' then '未配药' when sfpy = '1' then '已配药' when sfpy = '2' then '已取消' end) as sfpyName,
+        crte_name  from inpt_medicine_advance
+        where
+        hosp_code = #{hospCode}
+        and dept_id = #{deptId}
+        order by crte_time desc limit 5
+    </select>
+
+    <!--获取科室提前领药记录-->
+    <select id="getMedicineAdvance" resultType="map" parameterType="map">
+        select * from inpt_medicine_advance
+        where
+        hosp_code = #{hospCode}
+        and dept_id = #{deptId} and sfpy = '0' and type_code = #{advanceType}
+    </select>
+
+    <!--修改提前领药记录-->
+    <update id="updateMedicineAdvance" parameterType="map">
+        update inpt_medicine_advance set sfpy =#{sfpy}
+        where 1=1
+        <if test="hospCode != null and hospCode != ''">
+            and dept_id = #{deptId}
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            and hosp_code = #{hospCode}
+        </if>
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and type_code = #{typeCode}
+        </if>
+
+    </update>
+
+    <!--修改提前领药医嘱天数-->
+    <update id="updateInptAdviceAdvanceDays" parameterType="map">
+        update inpt_advice a, inpt_medicine_advance_advice b set a.advance_days = 0 where a.id = b.advice_id and b.advance_id = #{advanceId}
+    </update>
+
+    <!--删除提前领药记录-->
+    <delete id="deleteMedicineAdvanceAdvice" parameterType="map">
+        delete from inpt_medicine_advance_advice
+        where advance_id = #{advanceId}
+    </delete>
+
+    <!--	查下某个病人的病重医嘱项目-->
+    <select id="getIllnessAdviceByVisitId" parameterType="map" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+		SELECT
+		b.biz_type as bizType,
+		b.biz_code as bizCode,
+		b.id
+		FROM
+			inpt_advice a,base_advice b
+		WHERE
+		1=1
+		and a.visit_id = #{visitId}
+		and a.hosp_code = #{hospCode}
+		and a.item_id = b.id
+		AND ifnull(b.biz_type,'') !=''
+		AND ifnull(b.biz_code,'') !=''
+		and a.is_stop ='0'
+		and a.cancel_id is null
+		and a.is_submit ='1'
+		and a.is_reject = '0'
+		and a.is_check='1'
+		order by a.check_time
+	</select>
+
+    <insert id="insertMedicineAdvanceAdvice" parameterType="list">
+        insert into inpt_medicine_advance_advice (id,advance_id,advice_id,hosp_code)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id}, #{item.advance_id}, #{item.advice_id},#{item.hosp_code})
+        </foreach>
+    </insert>
+
+    <!--根据visitIds，itemIds查询出对应的医嘱明细表数据-->
+    <select id="queryInptAdviceDetail" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        SELECT
+        a.*
+        FROM
+        inpt_advice_detail a
+        left join inpt_advice b on a.hosp_code = b.hosp_code and a.ia_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," open="(" close=")" item="visitId">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() > 0">
+            and a.item_id in
+            <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+        order by a.ia_id, b.group_no, b.group_seq_no asc
+    </select>
+
+    <!--根据医嘱ids字符串和visitId从处方明细表副表查询出处方列表-->
+    <select id="queryAdviceByIdsAndVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        select
+            *
+        from inpt_advice_detail
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and FIND_IN_SET(ia_id, #{idsStr})
+    </select>
+
+    <!--更新医嘱明细表副表数据，限制用药字段-->
+    <update id="updateInptAdviceDetail" parameterType="java.util.List">
+        <foreach collection="detailsExtDTOS" item="item" separator=";">
+            update inpt_advice_detail
+            set
+            lmt_user_flag = #{item.lmtUserFlag},
+            lim_user_explain = #{item.limUserExplain},
+            is_reimburse = #{item.isReimburse}
+            where hosp_code = #{item.hospCode}
+            and id = #{item.id}
+            <if test="item.visitId != null and item.visitId != ''">
+                and visit_id = #{item.visitId}
+            </if>
+            <if test="item.itemId != null and item.itemId != ''">
+                and item_id = #{item.itemId}
+            </if>
+        </foreach>
+    </update>
+
+    <!--根据科室,领药单据，查询提前领药的医嘱-->
+
+    <select id="selectAdviceByDeptAndType" resultType="String">
+        select DISTINCT aaa.id from (select
+        distinct a.id,a.item_code,(case when a.item_code ='1' then c.good_name else d.name end ) as item_name,c.is_lvp,
+        c.ph_code,c.big_type_code,a.use_code,a.usage_code,a.yylx
+        from
+        inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
+        LEFT JOIN base_drug c ON a.item_id = c.id  and a.hosp_code = c.hosp_code AND a.item_code = '1'
+        LEFT JOIN base_material d ON a.item_id = d.id and a.hosp_code = d.hosp_code AND a.item_code = '2'
+        where 1=1  and a.item_code in ('1','2')
+        and a.hosp_code=#{hospCode}
+        --         已提交
+        and a.is_submit='1'
+        --         长期医嘱
+        and a.is_long='0'
+        --         已核收
+        and a.is_check='1'
+        --         排除停嘱并核收
+        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         非据收医嘱
+        and (a.is_reject is null or a.is_reject='0')
+        --         在院
+        and b.status_code='2'
+        --         医嘱开始时间小于等于当前时间
+        and date(a.long_start_time) &lt;= date(#{endDate})
+        and date(ifnull(a.last_exec_time,a.long_start_time)) &lt; date(#{endDate})
+        and a.exec_dept_id = #{deptId}
+        and ifnull(a.advance_days,'0') = '0'
+        and A.use_code in ('1','4')
+
+        ) aaa  where 1=1
+
+        <if test="isAll != null and isAll == '0'.toString()">
+            and
+            -- 用法 >
+            <if test="usageCodes != null and usageCodes.size()>0">
+                 aaa.usage_code in
+                <foreach collection="usageCodes" open="(" close=")" item="usageCode" separator=",">
+                    #{usageCode}
+                </foreach>
+            </if>
+            -- 材料>
+            <if test="isMaterial != null and isMaterial == '1'.toString()">
+                or aaa.item_code ='2'
+            </if>
+            -- 大输液>
+            <if test="isIvdrip != null and isIvdrip == '1'.toString()">
+                or ifnull(aaa.is_lvp,'') = '1'
+            </if>
+            -- 特殊药品>
+            <if test="isPh != null and isPh == '1'.toString()">
+                or ifnull(aaa.ph_code,'') != '5'
+            </if>
+            -- 中草药>
+            <if test="isHerb != null and isHerb == '1'.toString()">
+                or ifnull(aaa.big_type_code,'') = '2'
+            </if>
+            -- 出院带药>
+            <if test="isGive != null and isGive == '1'.toString()">
+                or aaa.use_code ='4'
+            </if>
+            -- 叫病人>
+            <if test="isPatient != null and isPatient == '1'.toString()">
+                or aaa.yylx ='2'
+            </if>
+        </if>
+    </select>
+
+
+</mapper>

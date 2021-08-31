@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncdrug.dao.SyncDrugDAO">
+
+    <resultMap type="cn.hsa.module.sync.syncdrug.dto.SyncDrugDTO" id="CenterDrugMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="usualName" column="usual_name" jdbcType="VARCHAR"/>
+        <result property="goodName" column="good_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="outUnitCode" column="out_unit_code" jdbcType="VARCHAR"/>
+        <result property="inUnitCode" column="in_unit_code" jdbcType="VARCHAR"/>
+        <result property="rateCode" column="rate_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="lastBuyPrice" column="last_buy_price" jdbcType="NUMERIC"/>
+        <result property="lastSplitBuyPrice" column="last_split_buy_price" jdbcType="NUMERIC"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="NUMERIC"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="NUMERIC"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="NUMERIC"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="NUMERIC"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isLvp" column="is_lvp" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="drugRemark" column="drug_remark" jdbcType="VARCHAR"/>
+        <result property="drugImgPath" column="drug_img_path" jdbcType="VARCHAR"/>
+        <result property="maxDosage" column="max_dosage" jdbcType="NUMERIC"/>
+        <result property="minDosage" column="min_dosage" jdbcType="NUMERIC"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="minAge" column="min_age" jdbcType="INTEGER"/>
+        <result property="maxAge" column="max_age" jdbcType="INTEGER"/>
+        <result property="ddd" column="ddd" jdbcType="VARCHAR"/>
+        <result property="durgCode" column="durg_code" jdbcType="VARCHAR"/>
+        <result property="phCode" column="ph_code" jdbcType="VARCHAR"/>
+        <result property="antibacterialCode" column="antibacterial_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="isBasic" column="is_basic" jdbcType="VARCHAR"/>
+        <result property="basicCode" column="basic_code" jdbcType="VARCHAR"/>
+        <result property="dan" column="dan" jdbcType="VARCHAR"/>
+        <result property="ndan" column="ndan" jdbcType="VARCHAR"/>
+        <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
+        <result property="usualPym" column="usual_pym" jdbcType="VARCHAR"/>
+        <result property="usualWbm" column="usual_wbm" jdbcType="VARCHAR"/>
+        <result property="goodPym" column="good_pym" jdbcType="VARCHAR"/>
+        <result property="goodWbm" column="good_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="prodName" column="prod_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="CenterDrugMap">
+        select
+        id, type_code, big_type_code, bfc_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, basic_code, dan, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time,
+        (select name from sync_product where code = prod_code) as prod_name
+        from sync_drug
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CenterDrugMap">
+        select
+        id, type_code, big_type_code, bfc_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code,
+        out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price,
+        avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code,
+        nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code,
+        ph_code, antibacterial_code, is_skin, is_basic, basic_code, dan, ndan, prod_code, usual_pym, usual_wbm,
+        good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time
+        from sync_drug
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="bigTypeCode != null and bigTypeCode != ''">
+                and big_type_code = #{bigTypeCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and bfc_code = #{bfcCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and prep_code = #{prepCode}
+            </if>
+            <if test="dosage != null">
+                and dosage = #{dosage}
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                and dosage_unit_code = #{dosageUnitCode}
+            </if>
+            <if test="outUnitCode != null and outUnitCode != ''">
+                and out_unit_code = #{outUnitCode}
+            </if>
+            <if test="inUnitCode != null and inUnitCode != ''">
+                and in_unit_code = #{inUnitCode}
+            </if>
+            <if test="rateCode != null and rateCode != ''">
+                and rate_code = #{rateCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="lastBuyPrice != null">
+                and last_buy_price = #{lastBuyPrice}
+            </if>
+            <if test="lastSplitBuyPrice != null">
+                and last_split_buy_price = #{lastSplitBuyPrice}
+            </if>
+            <if test="avgBuyPrice != null">
+                and avg_buy_price = #{avgBuyPrice}
+            </if>
+            <if test="avgSellPrice != null">
+                and avg_sell_price = #{avgSellPrice}
+            </if>
+            <if test="splitRatio != null">
+                and split_ratio = #{splitRatio}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="splitPrice != null">
+                and split_price = #{splitPrice}
+            </if>
+            <if test="isOut != null and isOut != ''">
+                and is_out = #{isOut}
+            </if>
+            <if test="isIn != null and isIn != ''">
+                and is_in = #{isIn}
+            </if>
+            <if test="isLvp != null and isLvp != ''">
+                and is_lvp = #{isLvp}
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                and usage_code = #{usageCode}
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                and insure_code = #{insureCode}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="drugRemark != null and drugRemark != ''">
+                and drug_remark = #{drugRemark}
+            </if>
+            <if test="drugImgPath != null and drugImgPath != ''">
+                and drug_img_path = #{drugImgPath}
+            </if>
+            <if test="maxDosage != null">
+                and max_dosage = #{maxDosage}
+            </if>
+            <if test="minDosage != null">
+                and min_dosage = #{minDosage}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="minAge != null">
+                and min_age = #{minAge}
+            </if>
+            <if test="maxAge != null">
+                and max_age = #{maxAge}
+            </if>
+            <if test="ddd != null and ddd != ''">
+                and ddd = #{ddd}
+            </if>
+            <if test="durgCode != null and durgCode != ''">
+                and durg_code = #{durgCode}
+            </if>
+            <if test="phCode != null and phCode != ''">
+                and ph_code = #{phCode}
+            </if>
+            <if test="antibacterialCode != null and antibacterialCode != ''">
+                and antibacterial_code = #{antibacterialCode}
+            </if>
+            <if test="isSkin != null and isSkin != ''">
+                and is_skin = #{isSkin}
+            </if>
+            <if test="isBasic != null and isBasic != ''">
+                and is_basic = #{isBasic}
+            </if>
+            <if test="basicCode != null and basicCode != ''">
+                and basic_code = #{basicCode}
+            </if>
+            <if test="dan != null and dan != ''">
+                and dan = #{dan}
+            </if>
+            <if test="ndan != null and ndan != ''">
+                and ndan = #{ndan}
+            </if>
+            <if test="prodCode != null and prodCode != ''">
+                and prod_code = #{prodCode}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (good_name like concat('%',#{keyword},'%')
+                or usual_name like concat('%',#{keyword},'%')
+                or good_pym like concat('%',#{keyword},'%')
+                or good_wbm like concat('%',#{keyword},'%')
+                or usual_pym like concat('%',#{keyword},'%')
+                or usual_wbm like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体作为筛选条件分页查询-->
+    <select id="queryPage" resultMap="CenterDrugMap">
+        select
+        id, type_code, big_type_code, bfc_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code,
+        out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price,
+        avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code,
+        nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code,
+        ph_code, antibacterial_code, is_skin, is_basic, basic_code, dan, ndan, prod_code, usual_pym, usual_wbm,
+        good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time,
+        (select name from sync_finance_classify where bfc_code = code ) as bfcName
+        from sync_drug
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="bigTypeCode != null and bigTypeCode != ''">
+                and big_type_code = #{bigTypeCode}
+            </if>
+            <if test="bfcCode != null and bfcCode != ''">
+                and bfc_code = #{bfcCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and prep_code = #{prepCode}
+            </if>
+            <if test="dosage != null">
+                and dosage = #{dosage}
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                and dosage_unit_code = #{dosageUnitCode}
+            </if>
+            <if test="outUnitCode != null and outUnitCode != ''">
+                and out_unit_code = #{outUnitCode}
+            </if>
+            <if test="inUnitCode != null and inUnitCode != ''">
+                and in_unit_code = #{inUnitCode}
+            </if>
+            <if test="rateCode != null and rateCode != ''">
+                and rate_code = #{rateCode}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="lastBuyPrice != null">
+                and last_buy_price = #{lastBuyPrice}
+            </if>
+            <if test="lastSplitBuyPrice != null">
+                and last_split_buy_price = #{lastSplitBuyPrice}
+            </if>
+            <if test="avgBuyPrice != null">
+                and avg_buy_price = #{avgBuyPrice}
+            </if>
+            <if test="avgSellPrice != null">
+                and avg_sell_price = #{avgSellPrice}
+            </if>
+            <if test="splitRatio != null">
+                and split_ratio = #{splitRatio}
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                and split_unit_code = #{splitUnitCode}
+            </if>
+            <if test="splitPrice != null">
+                and split_price = #{splitPrice}
+            </if>
+            <if test="isOut != null and isOut != ''">
+                and is_out = #{isOut}
+            </if>
+            <if test="isIn != null and isIn != ''">
+                and is_in = #{isIn}
+            </if>
+            <if test="isLvp != null and isLvp != ''">
+                and is_lvp = #{isLvp}
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                and usage_code = #{usageCode}
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                and insure_code = #{insureCode}
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                and nation_code = #{nationCode}
+            </if>
+            <if test="drugRemark != null and drugRemark != ''">
+                and drug_remark = #{drugRemark}
+            </if>
+            <if test="drugImgPath != null and drugImgPath != ''">
+                and drug_img_path = #{drugImgPath}
+            </if>
+            <if test="maxDosage != null">
+                and max_dosage = #{maxDosage}
+            </if>
+            <if test="minDosage != null">
+                and min_dosage = #{minDosage}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="minAge != null">
+                and min_age = #{minAge}
+            </if>
+            <if test="maxAge != null">
+                and max_age = #{maxAge}
+            </if>
+            <if test="ddd != null and ddd != ''">
+                and ddd = #{ddd}
+            </if>
+            <if test="durgCode != null and durgCode != ''">
+                and durg_code = #{durgCode}
+            </if>
+            <if test="phCode != null and phCode != ''">
+                and ph_code = #{phCode}
+            </if>
+            <if test="antibacterialCode != null and antibacterialCode != ''">
+                and antibacterial_code = #{antibacterialCode}
+            </if>
+            <if test="isSkin != null and isSkin != ''">
+                and is_skin = #{isSkin}
+            </if>
+            <if test="isBasic != null and isBasic != ''">
+                and is_basic = #{isBasic}
+            </if>
+            <if test="basicCode != null and basicCode != ''">
+                and basic_code = #{basicCode}
+            </if>
+            <if test="dan != null and dan != ''">
+                and dan = #{dan}
+            </if>
+            <if test="ndan != null and ndan != ''">
+                and ndan = #{ndan}
+            </if>
+            <if test="prodCode != null and prodCode != ''">
+                and prod_code = #{prodCode}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword !=null and keyword != ''">
+                and (good_name like concat('%',#{keyword},'%')
+                or usual_name like concat('%',#{keyword},'%')
+                or good_pym like concat('%',#{keyword},'%')
+                or good_wbm like concat('%',#{keyword},'%')
+                or usual_pym like concat('%',#{keyword},'%')
+                or usual_wbm like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into sync_drug(id, type_code, bfc_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, basic_code, dan, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{typeCode}, #{bfcCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{basicCode}, #{dan}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update sync_drug
+        <set>
+            type_code = #{typeCode},
+            big_type_code = #{bigTypeCode},
+            bfc_code = #{bfcCode},
+            code = #{code},
+            usual_name = #{usualName},
+            good_name = #{goodName},
+            spec = #{spec},
+            prep_code = #{prepCode},
+            dosage = #{dosage},
+            dosage_unit_code = #{dosageUnitCode},
+            out_unit_code = #{outUnitCode},
+            in_unit_code = #{inUnitCode},
+            rate_code = #{rateCode},
+            price = #{price},
+            unit_code = #{unitCode},
+            last_buy_price = #{lastBuyPrice},
+            last_split_buy_price = #{lastSplitBuyPrice},
+            avg_buy_price = #{avgBuyPrice},
+            avg_sell_price = #{avgSellPrice},
+            split_ratio = #{splitRatio},
+            split_unit_code = #{splitUnitCode},
+            split_price = #{splitPrice},
+            is_out = #{isOut},
+            is_in = #{isIn},
+            is_lvp = #{isLvp},
+            usage_code = #{usageCode},
+            insure_code = #{insureCode},
+            nation_code = #{nationCode},
+            drug_remark = #{drugRemark},
+            drug_img_path = #{drugImgPath},
+            max_dosage = #{maxDosage},
+            min_dosage = #{minDosage},
+            gender_code = #{genderCode},
+            min_age = #{minAge},
+            max_age = #{maxAge},
+            ddd = #{ddd},
+            durg_code = #{durgCode},
+            ph_code = #{phCode},
+            antibacterial_code = #{antibacterialCode},
+            is_skin = #{isSkin},
+            is_basic = #{isBasic},
+            basic_code = #{basicCode},
+            dan = #{dan},
+            ndan = #{ndan},
+            prod_code = #{prodCode},
+            usual_pym = #{usualPym},
+            usual_wbm = #{usualWbm},
+            good_pym = #{goodPym},
+            good_wbm = #{goodWbm},
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--批量和单个修改有效状态-->
+    <update id="updateStatus" parameterType="java.util.List">
+        update sync_drug
+        set is_valid = #{isValid} where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+</mapper>

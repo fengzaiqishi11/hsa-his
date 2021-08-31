@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.prescribe.dao.OutptPrescribeTempDetailDAO">
+
+    <resultMap type="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDetailDTO" id="OutptPrescribeTempDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="optId" column="opt_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getOutptPrescribeTempDetailById" resultMap="OutptPrescribeTempDetailMap">
+        select
+          id, hosp_code, opt_id, group_no, group_seq_no, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, total_num, price, total_price, bfc_id, use_days, exec_dept_id, use_code, herb_note_code, is_skin, content
+        from outpt_prescribe_temp_detail
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--根据处方模板id查询出处方模板明细-->
+    <select id="queryOutptPrescribeTempDetails" resultMap="OutptPrescribeTempDetailMap">
+        select
+          id, hosp_code, opt_id, group_no, group_seq_no, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, total_num, price, total_price, bfc_id, use_days, exec_dept_id, use_code, herb_note_code, is_skin, content
+        from outpt_prescribe_temp_detail
+        where hosp_code = #{hospCode}
+        and opt_id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryOutptPrescribeTempDetailPage" resultMap="OutptPrescribeTempDetailMap">
+        select
+          id, hosp_code, opt_id, group_no, group_seq_no, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, total_num, price, total_price, bfc_id, use_days, exec_dept_id, use_code, herb_note_code, is_skin, content
+        from outpt_prescribe_temp_detail
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--单个新增-->
+    <insert id="insertOutptPrescribeTempDetail" keyProperty="" useGeneratedKeys="true">
+        insert into outpt_prescribe_temp_detail(id, hosp_code, opt_id, group_no, group_seq_no, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, total_num, price, total_price, bfc_id, use_days, exec_dept_id, use_code, herb_note_code, is_skin, content)
+        values (#{id}, #{hospCode}, #{optId}, #{groupNo}, #{groupSeqNo}, #{itemCode}, #{itemId}, #{itemName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{usageCode}, #{rateId}, #{speedCode}, #{num}, #{unitCode}, #{totalNum}, #{price}, #{totalPrice}, #{bfcId}, #{useDays}, #{execDeptId}, #{useCode}, #{herbNoteCode}, #{isSkin}, #{content})
+    </insert>
+
+    <!--单个修改-->
+    <update id="updateOutptPrescribeTempDetail">
+        update outpt_prescribe_temp_detail
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="optId != null and optId != ''">
+                opt_id = #{optId},
+            </if>
+            <if test="groupNo != null">
+                group_no = #{groupNo},
+            </if>
+            <if test="groupSeqNo != null">
+                group_seq_no = #{groupSeqNo},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                prep_code = #{prepCode},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="rateId != null and rateId != ''">
+                rate_id = #{rateId},
+            </if>
+            <if test="speedCode != null and speedCode != ''">
+                speed_code = #{speedCode},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                bfc_id = #{bfcId},
+            </if>
+            <if test="useDays != null">
+                use_days = #{useDays},
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                exec_dept_id = #{execDeptId},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                herb_note_code = #{herbNoteCode},
+            </if>
+            <if test="isSkin != null and isSkin != ''">
+                is_skin = #{isSkin},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--根据处方模板id删除处方模板明细-->
+    <delete id="deleteOutptPrescribeTempDetail">
+        delete from outpt_prescribe_temp_detail where  hosp_code = #{hospCode}
+        and opt_id = #{id}
+    </delete>
+
+</mapper>

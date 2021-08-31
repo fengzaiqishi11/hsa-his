@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.inpt.fees.dao.InptSettleDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="inptSettleDtoMap" type="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="baby_id" property="babyId" jdbcType="VARCHAR" />
+        <result column="settle_no" property="settleNo" jdbcType="VARCHAR" />
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+        <result column="patient_code" property="patientCode" jdbcType="VARCHAR" />
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="reality_price" property="realityPrice" jdbcType="DECIMAL" />
+        <result column="trunc_price" property="truncPrice" jdbcType="DECIMAL" />
+        <result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+        <result column="self_price" property="selfPrice" jdbcType="DECIMAL" />
+        <result column="mi_price" property="miPrice" jdbcType="DECIMAL" />
+        <result column="ap_total_price" property="apTotalPrice" jdbcType="DECIMAL" />
+        <result column="ap_offset_price" property="apOffsetPrice" jdbcType="DECIMAL" />
+        <result column="settle_take_price" property="settleTakePrice" jdbcType="DECIMAL" />
+        <result column="settle_back_price" property="settleBackPrice" jdbcType="DECIMAL" />
+        <result column="settle_back_code" property="settleBackCode" jdbcType="VARCHAR" />
+        <result column="is_settle" property="isSettle" jdbcType="VARCHAR" />
+        <result column="settle_time" property="settleTime" jdbcType="TIMESTAMP" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="red_id" property="redId" jdbcType="VARCHAR" />
+        <result column="is_print" property="isPrint" jdbcType="VARCHAR" />
+        <result column="hosp_df_price" property="hospDfPrice" jdbcType="DECIMAL" />
+        <result column="hosp_jm_price" property="hospJmPrice" jdbcType="DECIMAL" />
+        <result column="out_settle_code" property="outSettleCode" jdbcType="VARCHAR" />
+        <result column="daily_settle_id" property="dailySettleId" jdbcType="VARCHAR" />
+        <result column="source_pay_code" property="sourcePayCode" jdbcType="VARCHAR" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+        <result column="keyword" property="keyword" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 费用表映射配置 -->
+    <resultMap id="inptCostDtoMap" type="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR" />
+        <result column="baby_id" property="babyId" jdbcType="VARCHAR" />
+        <result column="iat_id" property="iatId" jdbcType="VARCHAR" />
+        <result column="iatd_group_no" property="iatdGroupNo" jdbcType="INTEGER" />
+        <result column="iatd_seq_no" property="iatdSeqNo" jdbcType="INTEGER" />
+        <result column="advice_exec_id" property="adviceExecId" jdbcType="VARCHAR" />
+        <result column="source_code" property="sourceCode" jdbcType="VARCHAR" />
+        <result column="source_id" property="sourceId" jdbcType="VARCHAR" />
+        <result column="old_cost_id" property="oldCostId" jdbcType="VARCHAR" />
+        <result column="source_dept_id" property="sourceDeptId" jdbcType="VARCHAR" />
+        <result column="in_dept_id" property="inDeptId" jdbcType="VARCHAR" />
+        <result column="bfc_id" property="bfcId" jdbcType="VARCHAR" />
+        <result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+        <result column="item_id" property="itemId" jdbcType="VARCHAR" />
+        <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="num" property="num" jdbcType="DECIMAL" />
+        <result column="spec" property="spec" jdbcType="VARCHAR" />
+        <result column="prep_code" property="prepCode" jdbcType="VARCHAR" />
+        <result column="dosage" property="dosage" jdbcType="DECIMAL" />
+        <result column="dosage_unit_code" property="dosageUnitCode" jdbcType="VARCHAR" />
+        <result column="usage_code" property="usageCode" jdbcType="VARCHAR" />
+        <result column="rate_id" property="rateId" jdbcType="VARCHAR" />
+        <result column="speed_code" property="speedCode" jdbcType="VARCHAR" />
+        <result column="use_days" property="useDays" jdbcType="INTEGER" />
+        <result column="num_unit_code" property="numUnitCode" jdbcType="VARCHAR" />
+        <result column="total_num" property="totalNum" jdbcType="DECIMAL" />
+        <result column="total_num_unit_code" property="totalNumUnitCode" jdbcType="VARCHAR" />
+        <result column="herb_note_code" property="herbNoteCode" jdbcType="VARCHAR" />
+        <result column="use_code" property="useCode" jdbcType="VARCHAR" />
+        <result column="herb_num" property="herbNum" jdbcType="DECIMAL" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="preferential_price" property="preferentialPrice" jdbcType="DECIMAL" />
+        <result column="reality_price" property="realityPrice" jdbcType="DECIMAL" />
+        <result column="back_num" property="backNum" jdbcType="DECIMAL" />
+        <result column="back_code" property="backCode" jdbcType="VARCHAR" />
+        <result column="doctor_id" property="doctorId" jdbcType="VARCHAR" />
+        <result column="doctor_name" property="doctorName" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="phar_id" property="pharId" jdbcType="VARCHAR" />
+        <result column="is_dist" property="isDist" jdbcType="VARCHAR" />
+        <result column="is_give" property="isGive" jdbcType="VARCHAR" />
+        <result column="is_ok" property="isOk" jdbcType="VARCHAR" />
+        <result column="ok_id" property="okId" jdbcType="VARCHAR" />
+        <result column="ok_name" property="okName" jdbcType="VARCHAR" />
+        <result column="ok_time" property="okTime" jdbcType="TIMESTAMP" />
+        <result column="settle_code" property="settleCode" jdbcType="VARCHAR" />
+        <result column="settle_id" property="settleId" jdbcType="VARCHAR" />
+        <result column="is_check" property="isCheck" jdbcType="VARCHAR" />
+        <result column="check_id" property="checkId" jdbcType="VARCHAR" />
+        <result column="check_name" property="checkName" jdbcType="VARCHAR" />
+        <result column="check_time" property="checkTime" jdbcType="TIMESTAMP" />
+        <result column="zz_doctor_id" property="zzDoctorId" jdbcType="VARCHAR" />
+        <result column="zz_doctor_name" property="zzDoctorName" jdbcType="VARCHAR" />
+        <result column="jz_doctor_id" property="jzDoctorId" jdbcType="VARCHAR" />
+        <result column="jz_doctor_name" property="jzDoctorName" jdbcType="VARCHAR" />
+        <result column="zg_doctor_id" property="zgDoctorId" jdbcType="VARCHAR" />
+        <result column="zg_doctor_name" property="zgDoctorName" jdbcType="VARCHAR" />
+        <result column="exec_id" property="execId" jdbcType="VARCHAR" />
+        <result column="exec_name" property="execName" jdbcType="VARCHAR" />
+        <result column="exec_time" property="execTime" jdbcType="TIMESTAMP" />
+        <result column="exec_dept_id" property="execDeptId" jdbcType="VARCHAR" />
+        <result column="plan_exec_time" property="planExecTime" jdbcType="TIMESTAMP" />
+        <result column="status_code" property="statusCode" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        baby_id,
+        settle_no,
+        type_code,
+        patient_code,
+        start_time,
+        end_time,
+        total_price,
+        reality_price,
+        trunc_price,
+        actual_price,
+        self_price,
+        mi_price,
+        ap_total_price,
+        ap_offset_price,
+        settle_take_price,
+        settle_back_price,
+        settle_back_code,
+        is_settle,
+        settle_time,
+        status_code,
+        red_id,
+        is_print,
+        hosp_df_price,
+        hosp_jm_price,
+        out_settle_code,
+        daily_settle_id,
+        source_pay_code,
+        order_no,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        is.id,
+        is.hosp_code,
+        is.visit_id,
+        is.baby_id,
+        is.settle_no,
+        is.type_code,
+        is.patient_code,
+        is.start_time,
+        is.end_time,
+        is.total_price,
+        is.reality_price,
+        is.trunc_price,
+        is.actual_price,
+        is.self_price,
+        is.mi_price,
+        is.ap_total_price,
+        is.ap_offset_price,
+        is.settle_take_price,
+        is.settle_back_price,
+        is.settle_back_code,
+        is.is_settle,
+        is.settle_time,
+        is.status_code,
+        is.red_id,
+        is.is_print,
+        is.hosp_df_price,
+        is.hosp_jm_price,
+        is.out_settle_code,
+        is.daily_settle_id,
+        is.source_pay_code,
+        is.order_no,
+        is.crte_id,
+        is.crte_name,
+        is.crte_time
+    </sql>
+
+    <!-- 费用表所有字段 -->
+    <sql id="Cost_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        baby_id,
+        iat_id,
+        iatd_group_no,
+        iatd_seq_no,
+        advice_exec_id
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        in_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        speed_code,
+        use_days,
+        num_unit_code,
+        total_num,
+        total_num_unit_code,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        back_num,
+        back_code,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        phar_id,
+        is_dist,
+        is_give,
+        is_ok,
+        ok_id,
+        ok_name,
+        ok_time,
+        settle_code,
+        settle_id,
+        is_check,
+        check_id,
+        check_name,
+        check_time,
+        zz_doctor_id,
+        zz_doctor_name,
+        jz_doctor_id,
+        jz_doctor_name,
+        zg_doctor_id,
+        zg_doctor_name,
+        exec_id,
+        exec_name,
+        exec_time,
+        exec_dept_id,
+        plan_exec_time,
+        status_code,
+        is_cost,
+        crte_id,
+        crte_name,
+        crte_time
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultType="cn.hsa.module.inpt.fees.entity.InptSettleDO" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from
+        inpt_settle
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleDO" >
+        insert into
+        inpt_settle
+        (
+          id,
+          hosp_code,
+          visit_id,
+          baby_id,
+          settle_no,
+          type_code,
+          patient_code,
+          start_time,
+          end_time,
+          total_price,
+          reality_price,
+          trunc_price,
+          actual_price,
+          self_price,
+          mi_price,
+          ap_total_price,
+          ap_offset_price,
+          settle_take_price,
+          settle_back_price,
+          settle_back_code,
+          is_settle,
+          settle_time,
+          status_code,
+          red_id,
+          is_print,
+          hosp_df_price,
+          hosp_jm_price,
+          out_settle_code,
+          daily_settle_id,
+          source_pay_code,
+          order_no,
+          crte_id,
+          crte_name,
+          crte_time
+        ) values (
+          #{id,jdbcType=VARCHAR},
+          #{hospCode,jdbcType=VARCHAR},
+          #{visitId,jdbcType=VARCHAR},
+          #{babyId,jdbcType=VARCHAR},
+          #{settleNo,jdbcType=VARCHAR},
+          #{typeCode,jdbcType=VARCHAR},
+          #{patientCode,jdbcType=VARCHAR},
+          #{startTime,jdbcType=TIMESTAMP},
+          #{endTime,jdbcType=TIMESTAMP},
+          #{totalPrice,jdbcType=DECIMAL},
+          #{realityPrice,jdbcType=DECIMAL},
+          #{truncPrice,jdbcType=DECIMAL},
+          #{actualPrice,jdbcType=DECIMAL},
+          #{selfPrice,jdbcType=DECIMAL},
+          #{miPrice,jdbcType=DECIMAL},
+          #{apTotalPrice,jdbcType=DECIMAL},
+          #{apOffsetPrice,jdbcType=DECIMAL},
+          #{settleTakePrice,jdbcType=DECIMAL},
+          #{settleBackPrice,jdbcType=DECIMAL},
+          #{settleBackCode,jdbcType=VARCHAR},
+          #{isSettle,jdbcType=VARCHAR},
+          #{settleTime,jdbcType=TIMESTAMP},
+          #{statusCode,jdbcType=VARCHAR},
+          #{redId,jdbcType=VARCHAR},
+          #{isPrint,jdbcType=VARCHAR},
+          #{hospDfPrice,jdbcType=DECIMAL},
+          #{hospJmPrice,jdbcType=DECIMAL},
+          #{outSettleCode,jdbcType=VARCHAR},
+          #{dailySettleId,jdbcType=VARCHAR},
+          #{sourcePayCode,jdbcType=VARCHAR},
+          #{orderNo,jdbcType=VARCHAR},
+          #{crteId,jdbcType=VARCHAR},
+          #{crteName,jdbcType=VARCHAR},
+          #{crteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleDO" >
+        insert into
+        inpt_settle
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                    id,
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code,
+                </if>
+                <if test="visitId != null and visitId != ''">
+                    visit_id,
+                </if>
+                <if test="babyId != null and babyId != ''">
+                    baby_id,
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                    settle_no,
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                    type_code,
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                    patient_code,
+                </if>
+                <if test="startTime != null">
+                    start_time,
+                </if>
+                <if test="endTime != null">
+                    end_time,
+                </if>
+                <if test="totalPrice != null">
+                    total_price,
+                </if>
+                <if test="realityPrice != null">
+                    reality_price,
+                </if>
+                <if test="truncPrice != null">
+                    trunc_price,
+                </if>
+                <if test="actualPrice != null">
+                    actual_price,
+                </if>
+                <if test="selfPrice != null">
+                    self_price,
+                </if>
+                <if test="miPrice != null">
+                    mi_price,
+                </if>
+                <if test="apTotalPrice != null">
+                    ap_total_price,
+                </if>
+                <if test="apOffsetPrice != null">
+                    ap_offset_price,
+                </if>
+                <if test="settleTakePrice != null">
+                    settle_take_price,
+                </if>
+                <if test="settleBackPrice != null">
+                    settle_back_price,
+                </if>
+                <if test="settleBackCode != null and settleBackCode != ''">
+                    settle_back_code,
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                    is_settle,
+                </if>
+                <if test="settleTime != null">
+                    settle_time,
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                    status_code,
+                </if>
+                <if test="redId != null and redId != ''">
+                    red_id,
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                    is_print,
+                </if>
+                <if test="hospDfPrice != null">
+                    hosp_df_price,
+                </if>
+                <if test="hospJmPrice != null">
+                    hosp_jm_price,
+                </if>
+                <if test="outSettleCode != null and outSettleCode != ''">
+                    out_settle_code,
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                    daily_settle_id,
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                    source_pay_code,
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                    order_no,
+                </if>
+                <if test="crteId != null and crteId != ''">
+                    crte_id,
+                </if>
+                <if test="crteName != null and crteName != ''">
+                    crte_name,
+                </if>
+                <if test="crteTime != null">
+                    crte_time
+                </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="id != null and id != ''">
+                        #{id,jdbcType=VARCHAR},
+                </if>
+                <if test="hospCode != null and hospCode != ''">
+                        #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                        #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="babyId != null and babyId != ''">
+                        #{babyId,jdbcType=VARCHAR},
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                        #{settleNo,jdbcType=VARCHAR},
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                        #{typeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                        #{patientCode,jdbcType=VARCHAR},
+                </if>
+                <if test="startTime != null">
+                        #{startTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="endTime != null">
+                        #{endTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="totalPrice != null">
+                        #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="realityPrice != null">
+                        #{realityPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="truncPrice != null">
+                        #{truncPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="actualPrice != null">
+                        #{actualPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="selfPrice != null">
+                        #{selfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="miPrice != null">
+                        #{miPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="apTotalPrice != null">
+                        #{apTotalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="apOffsetPrice != null">
+                        #{apOffsetPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleTakePrice != null">
+                        #{settleTakePrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleBackPrice != null">
+                        #{settleBackPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleBackCode != null and settleBackCode != ''">
+                        #{settleBackCode,jdbcType=VARCHAR},
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                        #{isSettle,jdbcType=VARCHAR},
+                </if>
+                <if test="settleTime != null">
+                        #{settleTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                        #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                        #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                        #{isPrint,jdbcType=VARCHAR},
+                </if>
+                <if test="hospDfPrice != null">
+                        #{hospDfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="hospJmPrice != null">
+                        #{hospJmPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="outSettleCode != null and outSettleCode != ''">
+                        #{outSettleCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                        #{dailySettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                        #{sourcePayCode,jdbcType=VARCHAR},
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                        #{orderNo,jdbcType=VARCHAR},
+                </if>
+                <if test="crteId != null and crteId != ''">
+                        #{crteId,jdbcType=VARCHAR},
+                </if>
+                <if test="crteName != null and crteName != ''">
+                        #{crteName,jdbcType=VARCHAR},
+                </if>
+                <if test="crteTime != null">
+                        #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleDO" >
+        update
+        inpt_settle
+        set
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                baby_id = #{babyId,jdbcType=VARCHAR},
+                settle_no = #{settleNo,jdbcType=VARCHAR},
+                type_code = #{typeCode,jdbcType=VARCHAR},
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+                trunc_price = #{truncPrice,jdbcType=DECIMAL},
+                actual_price = #{actualPrice,jdbcType=DECIMAL},
+                self_price = #{selfPrice,jdbcType=DECIMAL},
+                mi_price = #{miPrice,jdbcType=DECIMAL},
+                ap_total_price = #{apTotalPrice,jdbcType=DECIMAL},
+                ap_offset_price = #{apOffsetPrice,jdbcType=DECIMAL},
+                settle_take_price = #{settleTakePrice,jdbcType=DECIMAL},
+                settle_back_price = #{settleBackPrice,jdbcType=DECIMAL},
+                settle_back_code = #{settleBackCode,jdbcType=VARCHAR},
+                is_settle = #{isSettle,jdbcType=VARCHAR},
+                settle_time = #{settleTime,jdbcType=TIMESTAMP},
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                red_id = #{redId,jdbcType=VARCHAR},
+                is_print = #{isPrint,jdbcType=VARCHAR},
+                hosp_df_price = #{hospDfPrice,jdbcType=DECIMAL},
+                hosp_jm_price = #{hospJmPrice,jdbcType=DECIMAL},
+                out_settle_code = #{outSettleCode,jdbcType=VARCHAR},
+                daily_settle_id = #{dailySettleId,jdbcType=VARCHAR},
+                source_pay_code = #{sourcePayCode,jdbcType=VARCHAR},
+                order_no = #{orderNo,jdbcType=VARCHAR},
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+        where
+        id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.inpt.fees.entity.InptSettleDO" >
+        update
+        inpt_settle
+        <set >
+                <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+                </if>
+                <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId,jdbcType=VARCHAR},
+                </if>
+                <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId,jdbcType=VARCHAR},
+                </if>
+                <if test="settleNo != null and settleNo != ''">
+                settle_no = #{settleNo,jdbcType=VARCHAR},
+                </if>
+                <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="patientCode != null and patientCode != ''">
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+                </if>
+                <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="realityPrice != null">
+                reality_price = #{realityPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="truncPrice != null">
+                trunc_price = #{truncPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="actualPrice != null">
+                actual_price = #{actualPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="selfPrice != null">
+                self_price = #{selfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="miPrice != null">
+                mi_price = #{miPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="apTotalPrice != null">
+                ap_total_price = #{apTotalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="apOffsetPrice != null">
+                ap_offset_price = #{apOffsetPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleTakePrice != null">
+                settle_take_price = #{settleTakePrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleBackPrice != null">
+                settle_back_price = #{settleBackPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="settleBackCode != null and settleBackCode != ''">
+                settle_back_code = #{settleBackCode,jdbcType=VARCHAR},
+                </if>
+                <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle,jdbcType=VARCHAR},
+                </if>
+                <if test="settleTime != null">
+                settle_time = #{settleTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode,jdbcType=VARCHAR},
+                </if>
+                <if test="redId != null and redId != ''">
+                red_id = #{redId,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrint != null and isPrint != ''">
+                is_print = #{isPrint,jdbcType=VARCHAR},
+                </if>
+                <if test="hospDfPrice != null">
+                hosp_df_price = #{hospDfPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="hospJmPrice != null">
+                hosp_jm_price = #{hospJmPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="outSettleCode != null and outSettleCode != ''">
+                out_settle_code = #{outSettleCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dailySettleId != null and dailySettleId != ''">
+                daily_settle_id = #{dailySettleId,jdbcType=VARCHAR},
+                </if>
+                <if test="sourcePayCode != null and sourcePayCode != ''">
+                source_pay_code = #{sourcePayCode,jdbcType=VARCHAR},
+                </if>
+                <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+                </if>
+                <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+                </if>
+                <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+                </if>
+                <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM inpt_settle WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM inpt_settle WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="inptSettleDtoMap" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List" />
+        FROM inpt_settle is
+        <where>
+            <if test="hospCode != null and hospCode != ''">
+                AND is.hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+            </if>
+            <if test="visitId != null and visitId != ''">
+                AND is.visit_id LIKE CONCAT('%', #{visitId}, '%')
+            </if>
+            <if test="babyId != null and babyId != ''">
+                AND is.baby_id LIKE CONCAT('%', #{babyId}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="deleteByVisitId" parameterType="java.util.Map">
+        delete from inpt_settle
+        where
+        hosp_code = #{hospCode}
+        AND visit_id = #{visitId}
+        AND is_settle = #{isSettle}
+        AND status_code = #{statusCode}
+        <if test="babyId != null and babyId != ''">
+            and baby_id=#{babyId}
+        </if>
+    </delete>
+
+    <!-- 查询费用 -->
+    <select id="queryInptCostList" resultMap="inptCostDtoMap" parameterType="java.util.Map">
+        select
+        <include refid="Cost_Column_List"/>
+        from
+        inpt_cost
+        where
+        hosp_code = #{hospCode}
+        AND settle_id is null
+        <if test="visitId != null and visitId != ''">
+            AND visit_id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND status_code = #{statusCode}
+        </if>
+        order by crte_time asc
+    </select>
+
+    <select id="queryInptSettleIsVisit" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO" resultMap="inptSettleDtoMap">
+        select
+        <include refid="Base_ColumnAlias_List"/>
+        ,CONCAT(
+        iv.name,'/',
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value = iv.gender_code),'-'),'/',
+        IFNULL(iv.age,'-'),
+        IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value = iv.age_unit_code),''),'/',
+        IFNULL((select ib.name from inpt_baby ib where ib.hosp_code = #{hospCode} and ib.id = `is`.baby_id),'')
+        ) AS keyword
+        from
+        inpt_settle `is`
+        left join
+        inpt_visit iv
+        on `is`.visit_id = iv.id
+        where
+        iv.hosp_code = #{hospCode}
+        and `is`.hosp_code = #{hospCode}
+        and `is`.is_settle = '1'
+
+            <if test="startDate != null">
+                and `is`.settle_time >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                <![CDATA[ AND `is`.settle_time <= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d') ]]>
+            </if>
+            <if test="visitId != null and visitId != ''">
+                AND iv.id = #{visitId}
+            </if>
+            <if test="id != null and id != ''">
+                AND `is`.id = #{id}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                AND `is`.status_code = #{statusCode}
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                AND `is`.is_settle = #{isSettle}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND(
+                iv.name like CONCAT('%',#{keyword},'%')
+                or iv.cert_no like CONCAT('%',#{keyword},'%')
+                or iv.phone like CONCAT('%',#{keyword},'%')
+                )
+            </if>
+        order by `is`.settle_time desc
+    </select>
+
+    <!--获取住院发票数据-->
+    <select id="querySettle" resultType="java.util.Map">
+        select e.name, d.miPrice, d.selfPrice, d.settleRealityPrice, d.settleTime,e.patient_code as patientCode,
+            (select name from sys_code_detail where c_code='XB' and value=e.gender_code and hosp_code=d.hospCode) sex,
+            e.address,e.out_dept_name outDeptName,e.in_no inNo,YEAR(e.in_time) inYear,
+            MONTH(e.in_time) inMonth,DAY(e.in_time) inDay,YEAR(e.out_time) outYear,
+            MONTH(e.out_time) outMonth,DAY(e.out_time) outDay,
+            case when ifnull(datediff(e.out_time,e.in_time),0) = 0 then 1 else datediff(e.out_time,e.in_time) end diff,
+            (select code from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) bfcCode,
+            (select in_code from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) inCode,
+            (select cd.name from sys_code_detail cd, base_finance_classify bfc where bfc.in_code = cd.value and cd.hosp_code=d.hospCode and cd.c_code = 'FPGL' and bfc.hosp_code=d.hospCode and d.bfcId= bfc.id) fpglName,
+            (select name from base_finance_classify where hosp_code=d.hospCode and d.bfcId=id) bfcName,ifnull(d.realityPrice,0) realityPrice,
+            case when d.babyId is not null then 0 else
+            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') end as yjxj,
+            case when d.babyId is not null then 0 else
+            (select ifnull(sum(price),0) from inpt_advance_pay where visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') end as yjzz,
+            (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code='1') tkxj,
+            (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code!='1') tkzz,
+            (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') bsxj,
+            (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') bszz,
+            (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr
+            from
+            (
+            select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice, c.self_price as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId
+            from inpt_cost a join inpt_visit b on a.visit_id=b.id
+            join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id
+            where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
+            and c.status_code='0' and a.status_code='0'  and c.id=#{settleId}
+            group by a.bfc_id,a.visit_id,a.hosp_code
+            ) d
+            left join inpt_visit e on e.id=d.visitId and e.hosp_code=d.hospCode
+        where d.realityPrice>0
+    </select>
+
+    <!--根据就诊id查询对应的诊断列表-->
+    <select id="queryDiagnose" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        SELECT
+            a.id,
+            a.hosp_code,
+            a.disease_id,
+            bd.name AS disease_name,
+            bd.type_code as disease_type_code,
+            bd.code as disease_code,
+            bd.attach_code,
+            bd.nation_code,
+            a.visit_id,
+            a.type_code,
+            a.is_main,
+            a.crte_id,
+            a.crte_name,
+            a.crte_time
+        FROM inpt_diagnose a
+           JOIN base_disease bd on a.disease_id = bd.id and a.hosp_code = bd.hosp_code
+        where a.visit_id = #{id}
+          AND a.hosp_code = #{hospCode}
+        ORDER BY
+            crte_time DESC
+    </select>
+
+</mapper>

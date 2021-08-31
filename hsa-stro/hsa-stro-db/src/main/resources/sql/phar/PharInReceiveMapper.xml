@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.phar.pharinbackdrug.dao.PharInReceiveDAO">
+
+    <resultMap type="cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO" id="PharInReceiveMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="windowId" column="window_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="orderReceiveId" column="order_receive_id" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="assignUserId" column="assign_user_id" jdbcType="VARCHAR"/>
+        <result property="assignUserName" column="assign_user_name" jdbcType="VARCHAR"/>
+        <result property="assignTime" column="assign_time" jdbcType="TIMESTAMP"/>
+        <result property="distUserId" column="dist_user_id" jdbcType="VARCHAR"/>
+        <result property="distUserName" column="dist_user_name" jdbcType="VARCHAR"/>
+        <result property="distTime" column="dist_time" jdbcType="TIMESTAMP"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="getPharInReceiveById" resultMap="PharInReceiveMap">
+        select
+          id, hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time
+        from phar_in_receive
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+    <!--批量查询-->
+    <select id="queryPharInReceives" resultMap="PharInReceiveMap">
+        select
+          id, hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time
+        from phar_in_receive
+        where (hosp_code,id) in
+        <foreach collection="list" item="dto" open="(" close=")" separator=",">
+            (#{dto.hospCode},#{dto.receiveId})
+        </foreach>
+    </select>
+
+    <select id="queryAll" resultMap="PharInReceiveMap">
+        select
+        id, hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time
+        from phar_in_receive
+        where hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and status_code = #{statusCode}
+        </if>
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPharInReceivePage" resultMap="PharInReceiveMap">
+        select
+          a.*,b.name as orderName
+        from phar_in_receive a left join base_order_receive b
+        on a.order_receive_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        order by a.crte_time desc
+    </select>
+
+    <select id="queryPharInReceiveList" resultMap="PharInReceiveMap">
+        select
+        id, hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time,
+        b.name as orderName
+        from phar_in_receive a
+        left join base_order_receive b on a.order_receive_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="statusCode != null and statusCode != ''">
+            and a.status_code = #{statusCode}
+        </if>
+    </select>
+
+
+    <!--单个新增-->
+    <insert id="insertPharInReceive" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_receive(hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time)
+        values (#{hospCode}, #{pharId}, #{windowId}, #{orderNo}, #{orderReceiveId}, #{totalPrice}, #{assignUserId}, #{assignUserName}, #{assignTime}, #{distUserId}, #{distUserName}, #{distTime}, #{statusCode}, #{deptId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--批量新增-->
+    <insert id="insertPharInReceives" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_receive(id,hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id,
+        assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, status_code, dept_id, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id}, #{dto.hospCode}, #{dto.pharId}, #{dto.windowId}, #{dto.orderNo}, #{dto.orderReceiveId}, #{dto.totalPrice},
+             #{dto.assignUserId}, #{dto.assignUserName}, #{dto.assignTime}, #{dto.distUserId}, #{dto.distUserName}, #{dto.distTime},
+            #{dto.statusCode}, #{dto.deptId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime})
+
+        </foreach>
+    </insert>
+
+    <!--单个修改-->
+    <update id="updatePharInReceive">
+        update phar_in_receive
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="windowId != null and windowId != ''">
+                window_id = #{windowId},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="orderReceiveId != null and orderReceiveId != ''">
+                order_receive_id = #{orderReceiveId},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id = #{assignUserId},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name = #{assignUserName},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id = #{distUserId},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name = #{distUserName},
+            </if>
+            <if test="distTime != null">
+                dist_time = #{distTime},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!--批量删除领药表数据-->
+    <delete id="deletePharInReceive">
+        delete from phar_in_receive
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量删除领药明细数据-->
+    <delete id="deletePharInReceiveDetail">
+        delete from phar_in_receive_detail
+        where hosp_code = #{hospCode}
+        and receive_id in
+        <foreach collection="receiveIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

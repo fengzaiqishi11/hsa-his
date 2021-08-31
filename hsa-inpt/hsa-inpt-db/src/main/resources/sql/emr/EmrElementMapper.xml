@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrelement.dao.EmrElementDAO">
+
+    <resultMap type="cn.hsa.module.emr.emrelement.dto.EmrElementDTO" id="EmrElementMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="upCode" column="up_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isEnd" column="is_end" jdbcType="VARCHAR"/>
+        <result property="isRequire" column="is_require" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="defaultVlaue" column="default_vlaue" jdbcType="VARCHAR"/>
+        <result property="minValue" column="min_value" jdbcType="NUMERIC"/>
+        <result property="maxValue" column="max_value" jdbcType="NUMERIC"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="minAge" column="min_age" jdbcType="INTEGER"/>
+        <result property="maxAge" column="max_age" jdbcType="INTEGER"/>
+        <result property="patientCodeRef" column="patient_code_ref" jdbcType="VARCHAR"/>
+        <result property="sysCodeRef" column="sys_code_ref" jdbcType="VARCHAR"/>
+        <result property="sysCodeDefault" column="sys_code_default" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getByIdorCode" resultMap="EmrElementMap">
+        select
+          id, hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template,
+            (select name from sys_code where code = sys_code_ref and hosp_code = #{hospCode}) as sysCodeRefName,
+            (select name from sys_code_detail where c_code = 'BLBRGLX' and value = patient_code_ref and hosp_code = #{hospCode}) as patientCodeRefName
+        from emr_element
+        where hosp_code = #{hospCode} and code = #{code}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageorAll" resultMap="EmrElementMap">
+        select
+          id, hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template
+        from emr_element
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="upCode != null and upCode != ''">
+                and up_code = #{upCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="pym != null and pym != ''">
+                and pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and wbm = #{wbm}
+            </if>
+            <if test="isEnd != null and isEnd != ''">
+                and is_end = #{isEnd}
+            </if>
+            <if test="isRequire != null and isRequire != ''">
+                and is_require = #{isRequire}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="defaultVlaue != null and defaultVlaue != ''">
+                and default_vlaue = #{defaultVlaue}
+            </if>
+            <if test="minValue != null">
+                and min_value = #{minValue}
+            </if>
+            <if test="maxValue != null">
+                and max_value = #{maxValue}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="minAge != null">
+                and min_age = #{minAge}
+            </if>
+            <if test="maxAge != null">
+                and max_age = #{maxAge}
+            </if>
+            <if test="patientCodeRef != null and patientCodeRef != ''">
+                and patient_code_ref = #{patientCodeRef}
+            </if>
+            <if test="sysCodeRef != null and sysCodeRef != ''">
+                and sys_code_ref = #{sysCodeRef}
+            </if>
+            <if test="sysCodeDefault != null and sysCodeDefault != ''">
+                and sys_code_default = #{sysCodeDefault}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="isSingleTemplate != null and isSingleTemplate != ''">
+              and is_single_template = #{isSingleTemplate}
+            </if>
+    </select>
+
+    <select id="queryElementCodes" resultType="java.lang.String" parameterType="java.util.Map">
+       select code from emr_element where sys_code_ref = #{sysCodeRef} and hosp_code = #{hospCode}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into emr_element(id,hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template)
+        values (#{id},#{hospCode}, #{upCode}, #{code}, #{name}, #{typeCode}, #{pym}, #{wbm}, #{isEnd}, #{isRequire}, '1', #{defaultVlaue}, #{minValue}, #{maxValue}, #{genderCode}, #{minAge}, #{maxAge}, #{patientCodeRef}, #{sysCodeRef}, #{sysCodeDefault}, #{crteId}, #{crteName}, #{crteTime},#{isSingleTemplate})
+    </insert>
+
+    <!-- 查找出同一父节点下最大的code-->
+    <select id="getMaxCode" resultMap="EmrElementMap" parameterType="java.util.Map">
+        select id, hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template
+        from emr_element where up_code = #{upCode} and hosp_code = #{hospCode} order by code DESC limit 1
+    </select>
+
+    <!-- 将新增的元素作为字段扩充到emr_patient表中-->
+    <update id="addColumn" parameterType="java.util.Map">
+       alter table ${recordTableName} add column ${columnName} ${type}
+    </update>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update emr_element
+        <set>
+            <if test="upCode != null">
+                up_code = #{upCode},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="typeCode != null">
+                type_code = #{typeCode},
+            </if>
+            <if test="pym != null">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null">
+                wbm = #{wbm},
+            </if>
+            <if test="isEnd != null">
+                is_end = #{isEnd},
+            </if>
+            <if test="isRequire != null">
+                is_require = #{isRequire},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid},
+            </if>
+            <if test="defaultVlaue != null">
+                default_vlaue = #{defaultVlaue},
+            </if>
+            <if test="minValue != null">
+                min_value = #{minValue},
+            </if>
+            <if test="maxValue != null">
+                max_value = #{maxValue},
+            </if>
+            <if test="genderCode != null">
+                gender_code = #{genderCode},
+            </if>
+            <if test="minAge != null">
+                min_age = #{minAge},
+            </if>
+            <if test="maxAge != null">
+                max_age = #{maxAge},
+            </if>
+            <if test="patientCodeRef != null">
+                patient_code_ref = #{patientCodeRef},
+            </if>
+            <if test="sysCodeRef != null">
+                sys_code_ref = #{sysCodeRef},
+            </if>
+            <if test="sysCodeDefault != null">
+                sys_code_default = #{sysCodeDefault},
+            </if>
+            <if test="isSingleTemplate != null">
+              is_single_template = #{isSingleTemplate},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过父级批量修改数据-->
+    <update id="updateList">
+        update emr_element set is_valid = #{isValid} where hosp_code = #{hospCode}
+        <if test="codes != null and codes.size()>0">
+          and code in
+          <foreach collection="codes" item="code" separator="," open="(" close=")">
+            #{code}
+          </foreach>
+        </if>
+    </update>
+
+    <!--获取元素树-->
+    <select id="getEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
+      select `code` id,name label,up_code as parentId from emr_element where hosp_code = #{hospCode}
+    </select>
+
+    <select id="getEmrElementTreeByCodes" resultType="cn.hsa.base.TreeMenuNode">
+        select
+        code as id,name as label,up_code as parentId,
+        #{deptId} as dept_id,
+        type_code as typeCode,
+        sys_code_ref as sysCodeRef,
+        sys_code_default as sysCodeDefault,
+        is_single_template as isSingleTemplate
+        from emr_element where hosp_code = #{hospCode}
+        <if test="codes != null and codes.size()>0">
+            and code in
+            <foreach collection="codes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 查询当前数据库指定表的列数 -->
+    <select id="getEmrPatientRecordColumns" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from information_schema.COLUMNS
+        where TABLE_SCHEMA = (select DATABASE()) and table_name=#{tableName}
+    </select>
+
+</mapper>

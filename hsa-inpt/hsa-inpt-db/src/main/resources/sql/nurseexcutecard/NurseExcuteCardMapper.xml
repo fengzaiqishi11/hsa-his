@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.inpt.nurseexcutecard.dao.NurseExcuteCardDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="OTHER"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+        <result property="receiveHospName" column="receive_hosp_name" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
+        <result property="dietType" column="diet_type" jdbcType="VARCHAR"/>
+        <result property="illnessCode" column="Illness_code" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="inWardId" column="in_ward_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="in_dept_name" jdbcType="VARCHAR"/>
+        <result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+        <result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
+        <result property="inModeCode" column="in_mode_code" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="inSituationCode" column="in_situation_code" jdbcType="VARCHAR"/>
+        <result property="outptVisitNo" column="outpt_visit_no" jdbcType="VARCHAR"/>
+        <result property="outptDoctorId" column="outpt_doctor_id" jdbcType="VARCHAR"/>
+        <result property="outptDoctorName" column="outpt_doctor_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseId" column="outpt_disease_id" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseName" column="outpt_disease_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseIcd10" column="outpt_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outWardId" column="out_ward_id" jdbcType="VARCHAR"/>
+        <result property="outDeptId" column="out_dept_id" jdbcType="VARCHAR"/>
+        <result property="outDeptName" column="out_dept_name" jdbcType="VARCHAR"/>
+        <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="outDiseaseId" column="out_disease_id" jdbcType="VARCHAR"/>
+        <result property="outDiseaseName" column="out_disease_name" jdbcType="VARCHAR"/>
+        <result property="outDiseaseIcd10" column="out_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outOperId" column="out_oper_id" jdbcType="VARCHAR"/>
+        <result property="outOperName" column="out_oper_name" jdbcType="VARCHAR"/>
+        <result property="outOperTime" column="out_oper_time" jdbcType="TIMESTAMP"/>
+        <result property="outSituationCode" column="out_situation_code" jdbcType="VARCHAR"/>
+        <result property="outRemark" column="out_remark" jdbcType="VARCHAR"/>
+        <result property="outModeCode" column="out_mode_code" jdbcType="VARCHAR"/>
+        <result property="isArchive" column="is_archive" jdbcType="VARCHAR"/>
+        <result property="archiveTime" column="archive_time" jdbcType="TIMESTAMP"/>
+        <result property="archiveId" column="archive_id" jdbcType="VARCHAR"/>
+        <result property="archiveName" column="archive_name" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"/>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"/>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"/>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"/>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"/>
+        <result property="totalAdvance" column="total_advance" jdbcType="NUMERIC"/>
+        <result property="totalCost" column="total_cost" jdbcType="NUMERIC"/>
+        <result property="totalBalance" column="total_balance" jdbcType="NUMERIC"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="dailyTimes" column="dailyTimes" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="inTimestring" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <update id="updatePrintFlag">
+        update inpt_advice_exec set is_print= '1'
+        <if test="inptAdviceExecIds != null and inptAdviceExecIds.size() > 0">
+          and id in
+          <foreach collection="inptAdviceExecIds" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and advice_id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updatePrintFlagByType" parameterType="java.util.List">
+        <foreach collection="inptAdviceExecDTOS" item="dto" separator=";">
+            update inpt_advice_exec set is_print = #{dto.isPrint} where hosp_code = #{dto.hospCode} and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <select id="queryPatient" resultMap="InptVisitMap">
+        select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,
+        iv.age, iv.age_unit_code, iv.birthday, iv.nation_code, iv.cert_code, iv.cert_no,
+        iv.marry_code, iv.phone, iv.address, iv.preferential_type_id,iv. patient_code,
+        iv.receive_hosp_name, iv.bed_id, bed_name, iv.nursing_code, diet_type, iv.Illness_code,
+        iv.status_code, iv.in_ward_id, iv.in_dept_id, iv.in_dept_name, in_time, iv.zz_doctor_id,
+        iv.zz_doctor_name, iv.jz_doctor_id, iv.jz_doctor_name, iv.zg_doctor_id, iv.zg_doctor_name, in_remark,
+        iv.in_mode_code, iv.in_disease_id, iv.in_disease_name, iv.in_disease_icd10,iv. in_situation_code,
+        iv.outpt_visit_no, iv.outpt_doctor_id, iv.outpt_doctor_name, iv.outpt_disease_id, iv.outpt_disease_name,
+        iv.outpt_disease_icd10, iv.out_ward_id, iv.out_dept_id, out_dept_name, out_time, iv.out_disease_id,
+        iv.out_disease_name, iv.out_disease_icd10, iv.out_oper_id, iv.out_oper_name, out_oper_time,
+        iv.out_situation_code,
+        iv.out_remark, iv.out_mode_code, iv.is_archive, iv.archive_time, iv.archive_id, iv.archive_name, iv.insure_code,
+        iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code, iv.insure_patient_id,
+        iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
+        CONCAT(
+        iv.name,'/',
+        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
+        WHEN '1' THEN '男' WHEN '2' THEN '女'
+        WHEN '9' THEN '未说明的性别' ELSE '' END ),
+        '/',IFNULL( iv.age, '-' ),
+        (CASE iv.age_unit_code
+        WHEN '1' THEN '岁' WHEN '2' THEN '月'
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        )AS patientInfo
+        from inpt_visit iv
+        where iv.hosp_code=#{hospCode} and iv.status_code in ('2','3') and iv.in_dept_id=#{inDeptId}
+        <if test="keyword != null and keyword != ''">
+            and ( iv.bed_name like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            )
+        </if>
+        /*开始日期*/
+        <if test="startTime != null and startTime != ''">
+            and DATE_FORMAT(iv.in_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        /*结束日期*/
+        <if test="endTime != null and endTime != ''">
+            and DATE_FORMAT(iv.in_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="name != null and name != ''">
+            and iv.name like concat('%',#{name},'%')
+        </if>
+        <if test="insureOrgCode != null and insureOrgCode != ''">
+            and iv.insure_org_code = #{insureOrgCode}
+        </if>
+        <if test="inDeptName != null and inDeptName != ''">
+            and iv.in_dept_name = #{inDeptName}
+        </if>
+        <if test="ids !=null and ids.size()>0">
+          and iv.id in
+          <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        order by iv.crte_time desc
+    </select>
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" id="InptAdviceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+        <result property="iatdGroupNo" column="iatd_group_no" jdbcType="INTEGER"/>
+        <result property="iatdGroupSeqNo" column="iatd_group_seq_no" jdbcType="INTEGER"/>
+        <result property="iatdId" column="iatd_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
+        <result property="startExecNum" column="start_exec_num" jdbcType="INTEGER"/>
+        <result property="endExecNum" column="end_exec_num" jdbcType="INTEGER"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="planStopTime" column="plan_stop_time" jdbcType="TIMESTAMP"/>
+        <result property="technologyNo" column="technology_no" jdbcType="VARCHAR"/>
+        <result property="herbUseCode" column="herb_use_code" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="secondExecId" column="second_exec_id" jdbcType="VARCHAR"/>
+        <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
+        <result property="longStartTime" column="long_start_time" jdbcType="TIMESTAMP"/>
+        <result property="lastExecTime" column="last_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="teachDoctorId" column="teach_doctor_id" jdbcType="VARCHAR"/>
+        <result property="teachDoctorName" column="teach_doctor_name" jdbcType="VARCHAR"/>
+        <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+        <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+        <result property="stopDoctorId" column="stop_doctor_id" jdbcType="VARCHAR"/>
+        <result property="stopDoctorName" column="stop_doctor_name" jdbcType="VARCHAR"/>
+        <result property="stopTime" column="stop_time" jdbcType="TIMESTAMP"/>
+        <result property="stopCheckId" column="stop_check_id" jdbcType="VARCHAR"/>
+        <result property="stopCheckName" column="stop_check_name" jdbcType="VARCHAR"/>
+        <result property="stopCheckTime" column="stop_check_time" jdbcType="TIMESTAMP"/>
+        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="isStop" column="is_stop" jdbcType="VARCHAR"/>
+        <result property="isReject" column="is_reject" jdbcType="VARCHAR"/>
+        <result property="rejectRemark" column="reject_remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bedName" jdbcType="VARCHAR"/>
+        <result property="inNo" column="inNo" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="nursingCode" column="nursingCode" jdbcType="VARCHAR"/>
+        <result property="illnessCode" column="illnessCode" jdbcType="VARCHAR"/>
+        <result property="dietType" column="dietType" jdbcType="VARCHAR"/>
+        <result property="rateName" column="rateName" jdbcType="VARCHAR"/>
+        <result property="dailyTimes" column="daily_times" jdbcType="NUMERIC"/>
+        <result property="containerCode" column="containerCode" jdbcType="VARCHAR"/>
+        <result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="in_dept_name" jdbcType="VARCHAR"/>
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="adviceType" column="adviceType" jdbcType="VARCHAR"/>
+        <result property="execPlaneTime" column="execPlaneTime" jdbcType="TIMESTAMP"/>
+        <result property="execPlaneTime1" column="execPlaneTime1" jdbcType="VARCHAR"/>
+        <result property="bedSeqNo" column="bedSeqNo" jdbcType="VARCHAR"/>
+        <result property="inptAdviceExecId" column="inptAdviceExecId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--    1.如果打印类型 输液瓶贴|静脉输液卡|静脉输液一览卡|皮下/皮内/肌肉注射单|口服卡|留观输液瓶贴-->
+    <!--    查询医嘱类别是药品的
+            2.//治疗护理执行卡-按床位|治疗护理执行卡-按项目
+            查询医嘱类别是 治疗/护理
+            3. //医嘱执行单|停嘱转抄单|医嘱变更单|医嘱执行单
+            4.如果打印类型是Lis
+            查询医嘱类别lis
+            14:停嘱转抄单
+     -->
+    <select id="queryDocterAdvice" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select A.* from (
+      (select ia.id, ia.hosp_code, ia.visit_id,
+      ia.group_no,ia.group_seq_no, ia.type_code,
+      ia.end_exec_num, ia.item_code,
+      ia.item_name, ia.content, ia.spec, ia.prep_code,ia.dosage, ia.dosage_unit_code,
+      ia.usage_code, ia.speed_code, ia.num, ia.unit_code, ia.price,
+      ia.technology_no,ia.long_start_time,ia.is_check, ia.check_name,ia.check_time,ia.is_stop_check,
+      ia.stop_doctor_name, ia.stop_time, ia.stop_check_name,
+      ia.stop_check_time, ia.is_long, ia.is_stop,ia.crte_id, ia.crte_name,ia.crte_time,
+      if(ia.is_long='0','长嘱','临时') as adviceType,
+      br.name as rateName,br.daily_times,
+      iv.gender_code,iv.age_unit_code,
+      iv.name ,iv.age,iv.in_no as inNo,iv.in_profile,iv.in_dept_name,iv.bed_id,iv.bed_name as
+      bedName,iv.nursing_code,iv.Illness_code as illnessCode,iv.diet_type as dietType,
+      ba.container_code as containerCode ,
+      ba.specimen_code as specimenCode,
+      MIN(iae.is_print) as isPrint,
+      MIN(DATE_FORMAT( iae.plan_exec_time, '%Y-%m-%d' )) as execPlaneTime,
+      MIN(iae.plan_exec_time) as execPlaneTime1,
+      MIN(iae.id) as inptAdviceExecId,
+      (select bd.seq_no from base_bed bd where bd.hosp_code = #{hospCode} and bd.id = iv.bed_id) as bedSeqNo,
+        CONCAT(
+        iv.NAME,'/',
+        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
+        WHEN '1' THEN '男' WHEN '2' THEN '女'
+        WHEN '9' THEN '未说明的性别' ELSE '' END ),
+        '/',IFNULL( iv.age, '-' ),
+        (CASE iv.age_unit_code
+        WHEN '1' THEN '岁' WHEN '2' THEN '月'
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        ) AS patientInfo
+    from inpt_advice ia inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+      and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
+      <if test="keyword !=null and keyword != ''">
+        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+      </if>
+      left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
+      left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
+      join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
+      <if test="queryDate !=null and queryDate != ''">
+          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
+          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
+      </if>
+      left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
+      where ia.hosp_code=#{hospCode}
+      and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
+      and ia.is_check='1'
+      <!--数据共享标志为1，需根据单据类型判断打印状态-->
+      <if test="isShared != null and isShared == '1'.toString()">
+          <!--护理单据对应、未打印的-->
+          <if test="printFlag != null and printFlag == '0'.toString()">
+              and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
+          </if>
+          <!--护理单据对应、已打印的-->
+          <if test="printFlag != null and printFlag == '1'.toString()">
+              and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
+          </if>
+      </if>
+      <!--数据共享标志为0，直接根据打印标志拍段打印状态-->
+      <if test="isShared != null and isShared == '0'.toString()">
+          and iae.is_print = #{printFlag}
+      </if>
+      <if test="isStop !=null and isStop != ''">
+        and ia.is_stop = #{isStop}
+      </if>
+      <if test="ids !=null and ids.size()>0">
+        and ia.visit_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="usageCodeList !=null and usageCodeList.size()>0">
+        and ia.usage_code in
+        <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="typeCodeList !=null and typeCodeList.size()>0">
+          and ia.type_code in
+          <foreach collection="typeCodeList" item="item" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      <if test="printType =='11'.toString()">
+        and ba.biz_code is not null and ba.biz_code != '' and ia.is_stop = '0'
+      </if>
+      <if test="adviceType !=null and adviceType !=''">
+        and ia.is_long=#{adviceType}
+      </if>
+      <if test="typeCode !=null and typeCode !=''">
+          and ia.type_code=#{typeCode}
+      </if>
+        GROUP BY ia.id)
+    ) A  where 1=1
+    order by A.bedSeqNo, A.execPlaneTime1 asc, A.group_no asc, A.group_seq_no asc
+    </select>
+
+    <select id="queryExcuteByIds" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceExecDTO">
+        select id, hosp_code, advice_id, advice_detail_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time, exec_time, exec_id, exec_name,
+               second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time
+        from inpt_advice_exec
+        where hosp_code = #{hospCode}
+        <if test="inptAdviceExecIds != null and inptAdviceExecIds.size() > 0">
+            and id in
+            <foreach collection="inptAdviceExecIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and advice_id in
+            <foreach collection="ids" item="adviceId" separator="," open="(" close=")">
+                #{adviceId}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 根据查询条件-->
+    <select id="queryVistId" resultType="java.lang.String">
+      select distinct A.visit_id from (
+      (select  i.id, i.hosp_code, i.visit_id,
+      iae.plan_exec_time as execPlaneTime
+      from inpt_advice i inner join inpt_visit iv on i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+      and iv.hosp_code = i.hosp_code and iv.status_code = '2'
+      <if test="keyword !=null and keyword != ''">
+        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+      </if>
+      left join base_rate br on i.rate_id= br.id and i.hosp_code= br.hosp_code
+      left join base_advice ba on i.item_id = ba.id and i.hosp_code = ba.hosp_code
+      join inpt_advice_exec iae on iae.hosp_code = i.hosp_code and iae.advice_id =i.id and iae.visit_id = i.visit_id
+      <if test="queryDate !=null and queryDate != ''">
+        and iae.plan_exec_time &gt; DATE_ADD(#{queryDate},INTERVAL 0 day) and iae.plan_exec_time &lt; DATE_ADD(#{queryDate},INTERVAL 1 day)
+      </if>
+      where i.hosp_code=#{hospCode}
+      <if test="printFlag != null and printFlag == '0'.toString()">
+        and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
+      </if>
+      <!--护理单据对应、已打印的-->
+      <if test="printFlag != null and printFlag == '1'.toString()">
+        and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
+      </if>
+      and i.use_code in ('2','3') and i.is_check='1'
+      <if test="isStop !=null and isStop != ''">
+        and i.is_stop = #{isStop}
+      </if>
+      <if test="ids !=null and ids.size()>0">
+        and i.visit_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="usageCodeList !=null and usageCodeList.size()>0">
+        and i.usage_code in
+        <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="adviceType !=null and adviceType !=''">
+        and i.is_long=#{adviceType}
+      </if>
+      <if test="typeCodeList !=null and typeCodeList.size()>0">
+        and i.type_code in
+        <foreach collection="typeCodeList" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="printType =='11'.toString()">
+        and ba.biz_code is not null and ba.biz_code != '' and i.is_stop = '0'
+      </if>
+        group by i.id
+      )
+      union all
+      (select  ia.id, ia.hosp_code, ia.visit_id,
+      iae.plan_exec_time as execPlaneTime
+      from inpt_advice ia inner join inpt_visit iv on ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
+      and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
+      <if test="keyword !=null and keyword != ''">
+        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+      </if>
+      left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
+      left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
+      join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
+      <if test="queryDate !=null and queryDate != ''">
+          and iae.plan_exec_time &gt; DATE_ADD(#{queryDate},INTERVAL 0 day) and iae.plan_exec_time &lt; DATE_ADD(#{queryDate},INTERVAL 1 day)
+      </if>
+      left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
+      where ia.hosp_code=#{hospCode}
+      <if test="printFlag != null and printFlag == '0'.toString()">
+        and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
+      </if>
+      <!--护理单据对应、已打印的-->
+      <if test="printFlag != null and printFlag == '1'.toString()">
+        and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
+      </if>
+      and (( ia.item_code = '1' and piwr.status_code >'0' and ia.use_code ='1') or (ia.item_code != '1'))
+      and ia.is_check='1'
+      <if test="isStop !=null and isStop != ''">
+        and ia.is_stop = #{isStop}
+      </if>
+      <if test="ids !=null and ids.size()>0">
+        and ia.visit_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="usageCodeList !=null and usageCodeList.size()>0">
+        and ia.usage_code in
+        <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="typeCodeList !=null and typeCodeList.size()>0">
+        and ia.type_code in
+        <foreach collection="typeCodeList" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="printType =='11'.toString()">
+        and ba.biz_code is not null and ba.biz_code != '' and ia.is_stop = '0'
+      </if>
+      <if test="adviceType !=null and adviceType !=''">
+        and ia.is_long=#{adviceType}
+      </if>
+        GROUP BY ia.id
+        )
+      ) A  where 1=1
+      <if test="typeCode !=null and typeCode !=''">
+        and A.type_code=#{typeCode}
+      </if>
+    </select>
+
+    <select id="queryPatientByIds" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+      select iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code,
+      iv.age, iv.age_unit_code, iv.birthday, iv.nation_code, iv.cert_code, iv.cert_no,
+      iv.marry_code, iv.phone, iv.address, iv.preferential_type_id,iv. patient_code,
+      iv.receive_hosp_name, iv.bed_id, bed_name, iv.nursing_code, diet_type, iv.Illness_code,
+      iv.status_code, iv.in_ward_id, iv.in_dept_id, iv.in_dept_name, in_time, iv.zz_doctor_id,
+      iv.zz_doctor_name, iv.jz_doctor_id, iv.jz_doctor_name, iv.zg_doctor_id, iv.zg_doctor_name, in_remark,
+      iv.in_mode_code, iv.in_disease_id, iv.in_disease_name, iv.in_disease_icd10,iv. in_situation_code,
+      iv.outpt_visit_no, iv.outpt_doctor_id, iv.outpt_doctor_name, iv.outpt_disease_id, iv.outpt_disease_name,
+      iv.outpt_disease_icd10, iv.out_ward_id, iv.out_dept_id, out_dept_name, out_time, iv.out_disease_id,
+      iv.out_disease_name, iv.out_disease_icd10, iv.out_oper_id, iv.out_oper_name, out_oper_time,
+      iv.out_situation_code,
+      iv.out_remark, iv.out_mode_code, iv.is_archive, iv.archive_time, iv.archive_id, iv.archive_name, iv.insure_code,
+      iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code, iv.insure_patient_id,
+      iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
+      CONCAT(
+      iv.name,'/',
+        (CASE iv.gender_code WHEN '0' THEN '未知的性别'
+        WHEN '1' THEN '男' WHEN '2' THEN '女'
+        WHEN '9' THEN '未说明的性别' ELSE '' END ),
+        '/',IFNULL( iv.age, '-' ),
+        (CASE iv.age_unit_code
+        WHEN '1' THEN '岁' WHEN '2' THEN '月'
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        ) AS patientInfo
+      from inpt_visit iv
+      where iv.hosp_code = #{hospCode}
+      and iv.id in
+      <foreach collection="ids" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+      order by iv.crte_time desc
+    </select>
+</mapper>

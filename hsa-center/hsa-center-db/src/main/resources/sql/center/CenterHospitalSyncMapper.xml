@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.center.sync.dao.CenterHospitalSyncDao" >
+  <resultMap id="BaseResultMap" type="cn.hsa.module.center.sync.entity.CenterHospitalSyncDO" >
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+    <result column="sync_code" property="syncCode" jdbcType="VARCHAR" />
+    <result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+    <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+    <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+    <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <insert id="insert" parameterType="cn.hsa.module.center.sync.entity.CenterHospitalSyncDO" >
+    insert into center_hospital_sync (id, hosp_code, sync_code, 
+      type_code, crte_id, crte_name, 
+      crte_time)
+    values (#{id,jdbcType=VARCHAR}, #{hospCode,jdbcType=VARCHAR}, #{syncCode,jdbcType=VARCHAR}, 
+      #{typeCode,jdbcType=VARCHAR}, #{crteId,jdbcType=VARCHAR}, #{crteName,jdbcType=VARCHAR}, 
+      #{crteTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.hsa.module.center.sync.entity.CenterHospitalSyncDO" >
+    insert into center_hospital_sync
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="hospCode != null" >
+        hosp_code,
+      </if>
+      <if test="syncCode != null" >
+        sync_code,
+      </if>
+      <if test="typeCode != null" >
+        type_code,
+      </if>
+      <if test="crteId != null" >
+        crte_id,
+      </if>
+      <if test="crteName != null" >
+        crte_name,
+      </if>
+      <if test="crteTime != null" >
+        crte_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="hospCode != null" >
+        #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="syncCode != null" >
+        #{syncCode,jdbcType=VARCHAR},
+      </if>
+      <if test="typeCode != null" >
+        #{typeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="crteId != null" >
+        #{crteId,jdbcType=VARCHAR},
+      </if>
+      <if test="crteName != null" >
+        #{crteName,jdbcType=VARCHAR},
+      </if>
+      <if test="crteTime != null" >
+        #{crteTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="queryHospitalSyncList" parameterType="cn.hsa.module.center.sync.entity.CenterHospitalSyncDO" resultMap="BaseResultMap">
+    SELECT
+      id,
+      hosp_code,
+      sync_code,
+      type_code,
+      crte_id,
+      crte_name,
+      crte_time
+    FROM
+      center_hospital_sync
+    WHERE hosp_code = #{hospCode}
+  </select>
+  
+  <delete id="delHospitalSyncByHospCode">
+    delete
+    from
+    center_hospital_sync
+    where
+    hosp_code in (
+    <foreach collection="ids" item="hospCode" separator=",">
+      #{hospCode}
+    </foreach>
+    )
+  </delete>
+
+  <insert id="batchInsert" parameterType="java.util.List" >
+    insert into center_hospital_sync (id, hosp_code, sync_code,
+      type_code, crte_id, crte_name,
+      crte_time)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.id,jdbcType=VARCHAR},
+      #{item.hospCode,jdbcType=VARCHAR},
+      #{item.syncCode,jdbcType=VARCHAR},
+      #{item.typeCode,jdbcType=VARCHAR},
+      #{item.crteId,jdbcType=VARCHAR},
+      #{item.crteName,jdbcType=VARCHAR},
+      #{item.crteTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.phys.dao.LisResultDAO">
+
+    <insert id="saveLisResult">
+        insert into medic_apply(id, hosp_code, apply_no, type_code, visit_id, baby_id, in_no, order_no, is_inpt,
+        dept_id, dept_name, doctor_id, doctor_name, apply_time, imp_dept_id, bar_code, print_time, print_times, rporter,
+        is_allergy, result_id, is_positive, document_sta, opd_id, content, medic_type, is_merge, merge_id, remark,
+        report_time, crte_id, crte_name, crte_time, coll_blood_id, coll_blood_name, coll_blood_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.applyNo}, #{entity.typeCode}, #{entity.visitId},
+            #{entity.babyId}, #{entity.inNo}, #{entity.orderNo}, #{entity.isInpt}, #{entity.deptId}, #{entity.deptName},
+            #{entity.doctorId}, #{entity.doctorName}, #{entity.applyTime}, #{entity.impDeptId}, #{entity.barCode},
+            #{entity.printTime}, #{entity.printTimes}, #{entity.rporter}, #{entity.isAllergy}, #{entity.resultId},
+            #{entity.isPositive}, #{entity.documentSta}, #{entity.opdId}, #{entity.content}, #{entity.medicType},
+            #{entity.isMerge}, #{entity.mergeId}, #{entity.remark}, #{entity.reportTime}, #{entity.crteId},
+            #{entity.crteName}, #{entity.crteTime}, #{entity.collBloodId}, #{entity.collBloodName},
+            #{entity.collBloodTime})
+        </foreach>
+    </insert>
+
+    <select id="queryNoResult">
+        select visit_id from medic_apply where result_id is null and crte_time > DATE_SUB(now(), INTERVAL #{days} DAY)
+    </select>
+
+    <insert id="insertResult" keyProperty="" useGeneratedKeys="true">
+        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        crte_name, crte_time, apply_no)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.in_no}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            #{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.result_type}, #{entity.result},
+            #{entity.testitem_name}, #{entity.reportte_text}, #{entity.pic_url}, #{entity.isPositive},
+            #{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
+            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
+        </foreach>
+    </insert>
+
+    <delete id="deleteResult">
+        delete from medic_result where visit_id in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+          #{entity}
+        </foreach>
+    </delete>
+    <select id="queryAdvice" resultType="java.util.Map">
+        select * from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode}
+    </select>
+
+    <select id="queryDept" resultType="java.util.Map">
+        select * from base_dept where hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryUser" resultType="java.util.Map">
+        select * from sys_user where hosp_code = #{hospCode}
+    </select>
+
+</mapper>
+

@@ -1,0 +1,87 @@
+package cn.hsa.module.sys.parameter.bo;
+
+import cn.hsa.base.PageDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.sys.parameter.bo
+ * @Class_name: SysParameterBO
+ * @Describe:  参数管理业务逻辑实现层
+ * @Author: zhangxuan
+ * @Email: zhangxuan@powersi.com
+ * @Date: 2020/7/28 16:32
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+public interface SysParameterBO {
+
+  /**
+   * @Menthod queryPage
+   * @Desrciption 根据条件查询参数信息
+   * @Param
+   * 1. SysParameterDTO  参数数据对象
+   * @Author zhangxuan
+   * @Date   2020/7/28 17:02
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO queryPage(SysParameterDTO sysParameterDTO);
+
+  /**
+   * @Menthod queryAll()
+   * @Desrciption  查询所有参数信息
+   * @Param
+   * [1. SysParameterDTO]
+   * @Author zhangxuan
+   * @Date   2020/7/28 14:47
+   * @Return java.util.List<cn.hsa.module.sys.parameter.dto.SysParameterDTO>
+   **/
+  List<SysParameterDTO> queryAll(SysParameterDTO sysParameterDTO);
+
+  /**
+   * @Menthod insert()
+   * @Desrciption 新增参数
+   * @Param
+   * 1. SysParameterDTO  参数数据对象
+   * @Author zhangxuan
+   * @Date   2020/7/28 15:53
+   * @Return int
+   **/
+  boolean insert(SysParameterDTO sysParameterDTO);
+
+  /**
+   * @Menthod deleteSuppelier()
+   * @Desrciption 删除参数
+   * @Param
+   *  1. map
+   * @Author zhangxuan
+   * @Date   2020/7/28 15:57
+   * @Return int
+   **/
+  boolean delete(SysParameterDTO sysParameterDTO);
+
+  /**
+   * @Menthod update()
+   * @Desrciption 修改参数信息
+   * @Param
+   * 1. SysParameterDTO  参数数据对象
+   * @Author zhangxuan
+   * @Date   2020/7/28 15:58
+   * @Return int
+   **/
+  boolean update(SysParameterDTO sysParameterDTO);
+
+  /**
+   * @Method: getParameterByCode
+   * @Description: 根据编码获取参数信息
+   * @Param: [code]
+   * @Author: youxianlin
+   * @Email: 254580179@qq.com
+   * @Date: 2020/9/15 16:15
+   * @Return: cn.hsa.module.sys.parameter.dto.SysParameterDTO
+   **/
+  SysParameterDTO getParameterByCode(String hospCode, String code);
+
+  Map<String, SysParameterDTO> getParameterByCodeList(String hospCode, String[] codeList);
+}

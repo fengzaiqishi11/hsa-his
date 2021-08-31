@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.costclassification.dao.CostClassificationDAO">
+
+  <resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+    <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+    <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+    <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+    <result property="iatdGroupNo" column="iatd_group_no" jdbcType="INTEGER"/>
+    <result property="iatdSeqNo" column="iatd_seq_no" jdbcType="INTEGER"/>
+    <result property="adviceExecId" column="advice_exec_id" jdbcType="VARCHAR"/>
+    <result property="sourceCode" column="source_code" jdbcType="VARCHAR"/>
+    <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+    <result property="oldCostId" column="old_cost_id" jdbcType="VARCHAR"/>
+    <result property="sourceDeptId" column="source_dept_id" jdbcType="VARCHAR"/>
+    <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+    <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+    <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+    <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+    <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+    <result property="price" column="price" jdbcType="NUMERIC"/>
+    <result property="num" column="num" jdbcType="NUMERIC"/>
+    <result property="spec" column="spec" jdbcType="VARCHAR"/>
+    <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+    <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+    <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+    <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+    <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+    <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+    <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+    <result property="numUnitCode" column="num_unit_code" jdbcType="VARCHAR"/>
+    <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+    <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+    <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+    <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+    <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+    <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+    <result property="preferentialPrice" column="preferential_price" jdbcType="NUMERIC"/>
+    <result property="realityPrice" column="reality_price" jdbcType="NUMERIC"/>
+    <result property="backNum" column="back_num" jdbcType="NUMERIC"/>
+    <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+    <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+    <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+    <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
+    <result property="isDist" column="is_dist" jdbcType="VARCHAR"/>
+    <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+    <result property="backCode" column="back_code" jdbcType="VARCHAR"/>
+    <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
+    <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
+    <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
+    <result property="okTime" column="ok_time" jdbcType="TIMESTAMP"/>
+    <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+    <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+    <result property="isCheck" column="is_check" jdbcType="VARCHAR"/>
+    <result property="checkId" column="check_id" jdbcType="VARCHAR"/>
+    <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+    <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
+    <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+    <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+    <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+    <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+    <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+    <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+    <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+    <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+    <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+    <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+    <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
+    <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+    <result property="isCost" column="is_cost" jdbcType="VARCHAR"/>
+    <result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+    <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    <result property="name" column="name" jdbcType="VARCHAR"/>
+    <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+    <result property="age" column="age" jdbcType="VARCHAR"/>
+    <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+    <result property="bfcName" column="bfcName" jdbcType="VARCHAR"/>
+    <result property="backAmount" column="backAmount" jdbcType="NUMERIC"/>
+    <result property="isWait" column="is_wait" jdbcType="NUMERIC"/>
+    <result property="hospItemCode" column="hospItemCode" jdbcType="VARCHAR"/>
+  </resultMap>
+
+
+  <update id="updateCostAttributionCode">
+    update inpt_cost set attribution_code = #{attributionCode}
+    where hosp_code = #{hospCode}
+    and id in
+    <foreach collection="ids" item="item" separator="," open="(" close=")">
+      #{item}
+    </foreach>
+  </update>
+</mapper>

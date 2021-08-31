@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.bedlist.dao.BedListDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+
+        <result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="OTHER"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+        <result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+        <result property="receiveHospName" column="receive_hosp_name" jdbcType="VARCHAR"/>
+        <result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
+        <result property="dietType" column="diet_type" jdbcType="VARCHAR"/>
+        <result property="illnessCode" column="Illness_code" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="inWardId" column="in_ward_id" jdbcType="VARCHAR"/>
+        <result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="in_dept_name" jdbcType="VARCHAR"/>
+        <result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+        <result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+        <result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+        <result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+        <result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
+        <result property="inModeCode" column="in_mode_code" jdbcType="VARCHAR"/>
+        <result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+        <result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+        <result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="inSituationCode" column="in_situation_code" jdbcType="VARCHAR"/>
+        <result property="outptVisitNo" column="outpt_visit_no" jdbcType="VARCHAR"/>
+        <result property="outptDoctorId" column="outpt_doctor_id" jdbcType="VARCHAR"/>
+        <result property="outptDoctorName" column="outpt_doctor_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseId" column="outpt_disease_id" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseName" column="outpt_disease_name" jdbcType="VARCHAR"/>
+        <result property="outptDiseaseIcd10" column="outpt_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outWardId" column="out_ward_id" jdbcType="VARCHAR"/>
+        <result property="outDeptId" column="out_dept_id" jdbcType="VARCHAR"/>
+        <result property="outDeptName" column="out_dept_name" jdbcType="VARCHAR"/>
+        <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="outDiseaseId" column="out_disease_id" jdbcType="VARCHAR"/>
+        <result property="outDiseaseName" column="out_disease_name" jdbcType="VARCHAR"/>
+        <result property="outDiseaseIcd10" column="out_disease_icd10" jdbcType="VARCHAR"/>
+        <result property="outOperId" column="out_oper_id" jdbcType="VARCHAR"/>
+        <result property="outOperName" column="out_oper_name" jdbcType="VARCHAR"/>
+        <result property="outOperTime" column="out_oper_time" jdbcType="TIMESTAMP"/>
+        <result property="outSituationCode" column="out_situation_code" jdbcType="VARCHAR"/>
+        <result property="outRemark" column="out_remark" jdbcType="VARCHAR"/>
+        <result property="outModeCode" column="out_mode_code" jdbcType="VARCHAR"/>
+        <result property="isArchive" column="is_archive" jdbcType="VARCHAR"/>
+        <result property="archiveTime" column="archive_time" jdbcType="TIMESTAMP"/>
+        <result property="archiveId" column="archive_id" jdbcType="VARCHAR"/>
+        <result property="archiveName" column="archive_name" jdbcType="VARCHAR"/>
+        <result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+        <result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+        <result property="insureNo" column="insure_no" jdbcType="VARCHAR"/>
+        <result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"/>
+        <result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"/>
+        <result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"/>
+        <result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"/>
+        <result property="criticalValueCode" column="critical_value_code" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="diseaseId" column="diseaseId" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="diseaseName" jdbcType="VARCHAR"/>
+        <result property="diseaseIcd10" column="diseaseIcd10" jdbcType="VARCHAR"/>
+        <result property="criticalValueCode" column="criticalValueCode" jdbcType="VARCHAR"/>
+        <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
+        <result property="isOutHosp" column="isOutHosp" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 根据医院编码、住院就诊ID查询人员在床信息 updated by zhongming 20201221 -->
+    <select id="queryPage" resultMap="InptVisitMap">
+        select iv.*, bb.name as bbBedName, bb.status_code as bbStatusCode, bb.id as bbId,
+        c.id as diseaseId, c.name as diseaseName, c.nation_code as diseaseIcd10,
+        iv.critical_value_code as criticalValueCode,iv.patient_code, d.name wardName
+        from base_bed bb
+        left join inpt_visit iv on bb.visit_id = iv.id and bb.hosp_code = iv.hosp_code
+        left join (
+            select visit_id, hosp_code, max(disease_id) disease_id
+            from inpt_diagnose a where type_code = '204' and is_main = '1'
+            group by visit_id, hosp_code
+        ) diagnose on diagnose.visit_id = bb.visit_id and diagnose.hosp_code = iv.hosp_code
+        left join base_disease c on diagnose.disease_id = c.id and diagnose.hosp_code = c.hosp_code
+        left join base_dept d on iv.in_ward_id = d.id and iv.hosp_code = d.hosp_code
+        where
+        bb.hosp_code = #{hospCode}
+        <!-- 入院科室ID -->
+        and exists (
+        select 1 from base_dept bd where bb.hosp_code = bd.hosp_code and bd.id = #{inDeptId} and bd.code = bb.dept_code
+        )
+        and bb.is_valid = '1'
+        <!-- 查询条件 -->
+        <if test="keyword != null and keyword != ''">
+            and ( bb.name like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            or iv.in_no like concat('%',#{keyword},'%') )
+        </if>
+        <!-- 病情标识 -->
+        <if test='isIllness == "1"'>
+            and (iv.Illness_code = '1' or iv.Illness_code = '2')
+        </if>
+        <!-- 新医嘱病人 -->
+        <if test='isNewAdvice == "1"'>
+            and exists (
+            select 1 from inpt_advice ia where bb.hosp_code = ia.hosp_code and ia.visit_id = iv.id and is_submit = '1' and submit_time > CURDATE()
+            )
+        </if>
+        <!-- 待执行医嘱病人 -->
+        <if test='isImplementAdvice == "1"'>
+            and exists (
+            select 1 from inpt_advice ia where bb.hosp_code = ia.hosp_code and ia.visit_id = iv.id and sign_code = '1'
+            )
+        </if>
+        order by bb.seq_no, bb.crte_time
+    </select>
+
+    <!-- 根据医院编码、科室ID查询待安床人员列表 updated by zhongming 20201221 -->
+    <select id="queryWaitVisitAll" resultMap="InptVisitMap">
+        select * from inpt_visit iv
+        where iv.hosp_code = #{hospCode}
+        and iv.in_dept_id = #{inDeptId}
+        and iv.status_code = '1'
+        and ifnull(iv.bed_id, '') = ''
+        ORDER BY iv.in_time asc
+    </select>
+
+    <!--新增长期费用表所有列-->
+    <insert id="insertLongCost">
+        insert into
+        inpt_long_cost(id, hosp_code, visit_id, baby_id, dept_id, item_id, item_name, price, num, unit_code,
+         total_price, last_exec_time, start_time, end_time, source_type_code, source_id, is_cancel,
+          cancel_id, cancel_name, cancel_time, cancel_remark, crte_id, crte_name, crte_time,attribution_code)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.itemId},
+            #{item.itemName}, #{item.price}, #{item.num}, #{item.unitCode}, #{item.totalPrice},
+            #{item.lastExecTime}, #{item.startTime}, #{item.endTime}, #{item.sourceTypeCode}, #{item.sourceId},
+             #{item.isCancel}, #{item.cancelId}, #{item.cancelName}, #{item.cancelTime}, #{item.cancelRemark},
+              #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.attributionCode})
+        </foreach>
+
+    </insert>
+
+    <!-- *************************************zhongming****************************************** -->
+    <select id="getInptVisitById" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select iv.*, ward.id wardId, ward.name wardName, dept.code deptCode from inpt_visit iv
+        inner join base_dept dept on iv.in_dept_id = dept.id and iv.hosp_code = dept.hosp_code
+        inner join base_dept ward on dept.ward_code = ward.code and dept.hosp_code = ward.hosp_code
+        where iv.id = #{id}
+    </select>
+
+    <!-- 根据床位ID查询床位信息 -->
+    <select id="getBaseBedById" resultType="cn.hsa.module.base.bb.dto.BaseBedDTO">
+		select bb.*, bd.id deptId from base_bed bb, base_dept bd where bb.id = #{id} and bb.dept_code = bd.code and bb.hosp_code = bd.hosp_code
+	</select>
+
+    <!-- 根据用户ID查询用户信息 -->
+    <select id="querySysUserByIds" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        select * from sys_user where id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据床位ID查询床位项目信息 -->
+    <select id="queryBaseBedItemByBedId" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO">
+        SELECT
+            bi.*
+        FROM
+            base_bed bb
+            INNER JOIN base_bed_item bbi ON bb.CODE = bbi.bed_code AND bb.hosp_code = bbi.hosp_code
+            INNER JOIN base_item bi ON bb.hosp_code = bi.hosp_code AND bbi.item_code = bi.CODE
+        WHERE
+            bb.hosp_code = #{hospCode} and bb.id = #{bedId}  AND bi.is_valid = '1'
+    </select>
+
+    <!-- 修改住院病人信息-安床 -->
+    <update id="updateInptVisit_Ac">
+        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',
+        jz_doctor_id = #{jzDoctorId}, jz_doctor_name = #{jzDoctorName}, zz_doctor_id = #{zzDoctorId}, zz_doctor_name = #{zzDoctorName},
+        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName}
+        where id = #{id} and status_code = '1'
+    </update>
+
+    <!-- 修改床位信息-安床 -->
+    <update id="updateBaseBedVisit_Ac">
+        update base_bed set visit_id = #{visitId} where id = #{bedId} and ifnull(visit_id, '') = '' and is_valid = '1' and status_code = '1'
+    </update>
+
+    <!-- 修改床位信息-包床 -->
+    <update id="updateBaseBedVisit_Bc">
+        update base_bed set visit_id = #{visitId}, status_code = '3' where id = #{bedId} and ifnull(visit_id, '') = '' and is_valid = '1' and status_code = '1'
+    </update>
+
+    <!-- 修改床位信息-包床取消 -->
+    <update id="updateBaseBedVisit_Bcqx">
+        update base_bed set visit_id = null, status_code = '1' where id = #{bedId} and visit_id = #{visitId} and is_valid = '1' and status_code = '3'
+    </update>
+
+    <!-- 新增虚拟床位 -->
+    <insert id="insertBaseBedVisit_Cyzh">
+        insert into base_bed(id,hosp_code, dept_code, code, name, remark, status_code, seq_no, room_no, visit_id, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{deptCode}, #{code}, #{name}, #{remark}, #{statusCode}, #{seqNo}, #{roomNo}, #{visitId}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!-- 删除虚拟床位 -->
+    <delete id="deleteBaseBed_XN">
+        delete from base_bed where id = #{id} and status_code = '4'
+    </delete>
+
+    <!-- 取消床位长期费用 -->
+    <update id="stopInptLongCost">
+        update inpt_long_cost set end_time = #{endTime}, is_cancel = '1', cancel_id = #{cancelId}, cancel_name = #{cancelName}, cancel_time = #{cancelTime}, cancel_remark = #{cancelRemark}
+        where  is_cancel = '0'
+        and visit_id = #{visitId}
+        and dept_id = #{deptId}
+        <!-- 预出院 转科,  这时候不需要根据source_type_code,source_id 取消费用 而是直接停掉这个人所有的 -->
+        <if  test="changeCode == null or changeCode == '' ">
+            and source_type_code = #{sourceTypeCode}
+            and source_id in
+            <foreach collection="bedIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <!-- 根据就诊ID查询床位信息 -->
+    <select id="queryBaseBedByVisit" resultType="cn.hsa.module.base.bb.dto.BaseBedDTO">
+        select * from base_bed where visit_id = #{visitId} and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!-- 清空已占床就诊ID -->
+    <update id="clearBaseBedVisitByBedId">
+        update base_bed set status_code = '1', visit_id = null
+        where id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 修改住院病人信息-换床 -->
+    <update id="updateInptVisit_Hc">
+        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName},
+        jz_doctor_id = #{jzDoctorId}, jz_doctor_name = #{jzDoctorName}, zz_doctor_id = #{zzDoctorId}, zz_doctor_name = #{zzDoctorName},
+        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName}
+        where id = #{id} and status_code = '2'
+    </update>
+
+    <!-- 修改住院病人信息-转科 -->
+    <update id="updateInptVisit_Zk">
+        update inpt_visit set bed_id = null, bed_name = null, status_code = '1',
+        jz_doctor_id = null, jz_doctor_name = null, zz_doctor_id = null, zz_doctor_name = null,
+        zg_doctor_id = null, zg_doctor_name = null, resp_nurse_id = null, resp_nurse_name = null,
+        in_dept_id = #{inDeptId}, in_dept_name = #{inDeptName}, in_ward_id = #{inWardId}
+        where id = #{id} and status_code = '2'
+    </update>
+
+    <!-- 修改床位信息-换床 -->
+    <update id="updateBaseBedVisit_Hc">
+        update base_bed set visit_id = #{visitId} where id = #{bedId} and ifnull(visit_id, '') = '' and is_valid = '1' and status_code = '1'
+    </update>
+
+    <!-- 修改住院病人信息-预出院 -->
+    <update id="updateInptVisit_Ycy">
+        update inpt_visit set out_ward_id = #{outWardId}, out_dept_id = #{outDeptId}, out_dept_name = #{outDeptName},
+        out_time = #{outTime}, out_disease_id = #{outDiseaseId}, out_disease_name = #{outDiseaseName}, out_disease_icd10 = #{outDiseaseIcd10},
+        out_oper_id = #{outOperId}, out_oper_name = #{outOperName}, out_oper_time = #{outOperTime}, out_situation_code = #{outSituationCode},
+        out_remark = #{outRemark}, out_mode_code = #{outModeCode}, status_code = '5'
+        where id = #{id} and status_code = '2'
+    </update>
+
+    <!-- 修改住院病人信息-出院召回 -->
+    <update id="updateInptVisit_Cyzh">
+        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',out_time = null
+        where id = #{id} and status_code = '5'
+    </update>
+
+    <!-- 生成床位异动数据 -->
+    <insert id="insertInptBedChange">
+        insert into inpt_bed_change(id, hosp_code, visit_id, change_code, before_bed_id, before_bed_name, after_bed_id, after_bed_name, before_dept_id, before_dept_name, after_dept_id, after_dept_name, before_ward_id, before_ward_name, after_ward_id, after_ward_name, before_zz_doctor_id, before_zz_doctor_name, after_zz_doctor_id, after_zz_doctor_name, before_jz_doctor_id, before_jz_doctor_name, after_jz_doctor_id, after_jz_doctor_name, before_zg_doctor_id, before_zg_doctor_name, after_zg_doctor_id, after_zg_doctor_name, before_resp_nurse_id, before_resp_nurse_name, after_resp_nurse_id, after_resp_nurse_name, end_time, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.changeCode}, #{item.beforeBedId}, #{item.beforeBedName}, #{item.afterBedId}, #{item.afterBedName}, #{item.beforeDeptId}, #{item.beforeDeptName}, #{item.afterDeptId}, #{item.afterDeptName}, #{item.beforeWardId}, #{item.beforeWardName}, #{item.afterWardId}, #{item.afterWardName}, #{item.beforeZzDoctorId}, #{item.beforeZzDoctorName}, #{item.afterZzDoctorId}, #{item.afterZzDoctorName}, #{item.beforeJzDoctorId}, #{item.beforeJzDoctorName}, #{item.afterJzDoctorId}, #{item.afterJzDoctorName}, #{item.beforeZgDoctorId}, #{item.beforeZgDoctorName}, #{item.afterZgDoctorId}, #{item.afterZgDoctorName}, #{item.beforeRespNurseId}, #{item.beforeRespNurseName}, #{item.afterRespNurseId}, #{item.afterRespNurseName}, #{item.endTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!-- 根据科室ID查询科室信息 -->
+    <select id="getBaseDeptById" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select dept.*, ward.id wardId, ward.name wardName from base_dept dept
+        inner join base_dept ward on dept.ward_code = ward.code and dept.hosp_code = ward.hosp_code
+        where dept.id = #{id}
+    </select>
+
+    <!--
+        转科：校验是否有未停止的长期医嘱、未核收的医嘱、未填写皮试结果的医嘱、未确认的费用、未发并且未退的药品
+        预出院：校验是否有未停止的长期医嘱、未核收的医嘱、未填写皮试结果的医嘱、未确认的费用、未发并且未退的药品、判断手术是否已完成、判断手术是否已补记账
+     -->
+    <select id="checkIsAllowZkOrYcy" resultType="java.lang.String">
+        select if(count(1) > 0, concat('[',group_concat(ia.content),']未提交医嘱'), '') errMsg from inpt_advice ia
+        where ia.hosp_code = #{hospCode} and  ia.visit_id = #{visitId} and ifnull(ia.is_submit,'0') = '0'
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ia.content),']未核收'), '') errMsg from inpt_advice ia
+        where ia.hosp_code = #{hospCode} and  ia.visit_id = #{visitId} and ia.is_submit = '1' and (ifnull(ia.is_check, '0') = '0' or (ifnull(ia.is_stop, '0') = '1' and ifnull(ia.is_stop_check, '0') = '0')) and ifnull(ia.is_reject, '0') = '0'
+        union all
+        select if( status_code = '0', if( count( 1 ) > 0, concat('[',group_concat(ic.item_name),']药品未发'), '' ), if( count( 1 ) > 0, concat('[',group_concat(ic.item_name),']药品未退'), '' )) errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ic.item_code in ('1', '2') and ic.use_code in ('1', '4')
+        and (
+            <!-- 发药 -->
+            ( status_code = '0' AND ifnull( ic.is_dist, '0' ) = '0' )
+            or
+            <!-- 退药 -->
+            ( status_code = '1' AND back_code != '2' AND back_code != '3' )
+        )
+        group by status_code
+
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ia.content),']未填写皮试结果'), '' ) errMsg from inpt_advice ia,
+        (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where a.id = b.advice_id ) ic
+        where ic.source_ia_id = ia.id
+        and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
+        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ic.item_name),']退费未确认'), '') errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '1'
+        union all
+        SELECT if(count(1) > 0, concat('[',group_concat(ia.content),']医嘱未停止'), '') errMsg  FROM inpt_advice ia
+        WHERE ia.hosp_code = #{hospCode} and  ia.visit_id = #{visitId} and is_submit = '1' and ia.is_long = '0' AND ifnull(is_stop, '0') = '0'  and ifnull(ia.is_reject, '0') = '0'
+
+        <!-- 预出院判断 -->
+        <if test="type == 1">
+            union all
+            select if(count(1) > 0, concat('[',group_concat(oir.oper_disease_name),']手术未完成'), '') errMsg from oper_info_record oir
+            where oir.hosp_code = #{hospCode} and oir.visit_id = #{visitId} and oir.status_code != '3' and oir.status_code != '-1'    <!-- 手术状态：3、已完成，-1、手术取消 -->
+            union all
+            <!-- 住院手术计费方式：1、开医嘱计费，2、手术补记账 -->
+            select if((select value from sys_parameter sp where sp.code = 'ZY_SSJFFS') = '0', '', if(count(1) > 0, concat('[',group_concat(oir.oper_disease_name),']手术未补记账'), '')) errMsg from oper_info_record oir
+            where oir.hosp_code = #{hospCode} and oir.visit_id = #{visitId} and oir.status_code = '3' and ifnull(oir.is_cost, '0') = '0'
+        </if>
+    </select>
+
+    <!-- 根据疾病ID查询疾病信息 -->
+    <select id="getBaseDiseaseById" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO">
+        select * from base_disease where id = #{id}
+    </select>
+
+    <!-- 根据病区ID查询下属科室信息 -->
+    <select id="queryDeptByWardId" resultType="java.util.Map">
+        SELECT
+            a.id deptId, a.name deptName
+        FROM
+            base_dept a
+        WHERE
+            a.hosp_code = #{hospCode}
+            AND EXISTS ( SELECT 1 FROM base_dept b WHERE b.type_code = '15' AND b.id = #{wardId} and a.ward_code = b.code )
+    </select>
+
+    <!-- 根据医院编码、科室编码获取最大床位排序号 -->
+    <select id="getMaxSeqNoByDeptCode" resultType="java.lang.Integer">
+        select ifnull(max(seq_no), 0) + 1 from base_bed where hosp_code =#{hospCode} and dept_code = #{deptCode}
+    </select>
+
+    <!--出院诊断保存 lly 20210723-->
+    <insert id="insertDiagnose" parameterType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" useGeneratedKeys="false">
+        insert into inpt_diagnose(
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        )
+        values
+            (
+            #{id},
+            #{hospCode},
+            #{diseaseId},
+            #{visitId},
+            #{typeCode},
+            #{isMain},
+            #{crteId},
+            #{crteName},
+            now()
+            )
+    </insert>
+    <select id="getInptDiagnose" resultType="java.lang.Integer">
+        select count(*) from inpt_diagnose where
+        hosp_code =#{hospCode} and visit_id =#{visitId} and is_main ='1' and type_code !='201' and (type_code='204' or type_code='303')
+    </select>
+
+    <select id="getInptDiagnoseByVisitId" resultType="java.lang.Integer">
+        select count(*) from inpt_diagnose where
+        hosp_code =#{hospCode} and visit_id =#{visitId} and (type_code ='204' or type_code ='303') and  disease_id=#{diseaseId} and is_main ='1'
+    </select>
+</mapper>

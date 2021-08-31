@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureInptTransfusionRecordDAO">
+
+    <insert id="insertInsureInptTransfusionRecord" >
+        INSERT INTO `insure_inpt_transfusion_record`
+        (`id`, `mdtrt_sn`, `mdtrt_id`, `psn_no`, `abo_code`, `rh_code`, `bld_natu_code`, `bld_abo_code`, `bld_rh_code`,
+            `bld_cat_code`, `bld_amt`, `bld_amt_unt`, `bld_defs_type_code`, `bld_cnt`, `bld_time`, `bld_rea`, `vali_flag`,
+            `is_transmission`, `transmission_time`, `transmission_times`,`hosp_code`)
+            VALUES (#{id}, #{mdtrtSn}, #{mdtrtId}, #{psnNo}, #{aboCode}, #{rhCode}, #{bldNatuCode}, #{bldAboCode}, #{bldRhCode},
+        #{bldCatCode}, #{bldAmt},#{bldAmtUnt}, #{bldDefsTypeCode},#{bldCnt}, #{bldTime},#{bldRea},#{valiFlag},
+        #{isTransmission}, #{transmissionTime}, #{transmissionTimes},#{hospCode});
+    </insert>
+
+    <select id="queryInsureInptTransfusionRecords" resultType="cn.hsa.module.insure.module.dto.InsureInptTransfusionRecordDTO" parameterType="map">
+        select * from insure_inpt_transfusion_record where psn_no = #{psnNo} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryInsureInptTransfusionRecordsMap" resultType="map">
+        select  id	, mdtrt_sn,
+        psn_no	, abo_code, rh_code	, bld_natu_code, bld_abo_code,bld_rh_code	, bld_cat_code,
+        bld_amt	, bld_amt_unt	, bld_defs_type_code	, bld_cnt	, bld_time,bld_rea	,vali_flag
+        from insure_inpt_transfusion_record where id in
+        <foreach collection="idList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </select>
+
+    <update id="updateInsureInptTransfusionRecord">
+        UPDATE `insure_inpt_transfusion_record` SET `abo_code` = #{aboCode},`rh_code` = #{rhCode},
+        `bld_natu_code` = #{bldNatuCode}, `bld_abo_code` = #{bldAboCode}, `bld_rh_code` = #{bldRhCode}, `bld_cat_code` = #{bldCatCode},
+        `bld_amt` = #{bldAmt}, `bld_amt_unt` = #{bldAmtUnt}, `bld_defs_type_code` = #{bldDefsTypeCode}, `bld_cnt` = #{bldCnt}, `bld_time` = #{bldTime},
+        `bld_rea` = #{bldRea}, `vali_flag` = #{valiFlag}, `is_transmission` = #{isTransmission}
+        WHERE `id` = #{id} and hosp_code = #{hospCode}
+
+    </update>
+
+    <update id="updateInsureTransfusionRecordTransferred">
+        UPDATE `insure_inpt_transfusion_record` set is_transmission = #{isTransmission},transmission_time= #{transmissionTime},
+        transmission_times = (ifnull(transmission_times,0) + 1) where
+        id in
+         <foreach collection="idList" open="(" separator="," item="item" close=")">
+             #{item}
+         </foreach>
+         and hosp_code = #{hospCode}
+    </update>
+</mapper>

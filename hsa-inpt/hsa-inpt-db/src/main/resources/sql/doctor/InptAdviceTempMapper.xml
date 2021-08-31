@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.doctor.dao.InptAdviceTempDAO">
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceTempDTO" id="InptAdviceTempMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="doctorName" column="doctor_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailTempDTO" id="InptAdviceDetailTempMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="iatId" column="iat_id" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"/>
+        <result property="totalNumUnitCode" column="totalNumUnitCode" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"/>
+        <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
+        <result property="pharId" column="pharId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--分页查询-->
+    <select id="queryInptAdviceTemp" resultMap="InptAdviceTempMap">
+        select
+        a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.remark, a.is_valid, a.pym, a.wbm, a.audit_code, a.audit_id,
+        a.audit_name, a.audit_time, a.crte_id, a.crte_name, a.crte_time
+        from inpt_advice_temp a
+        where a.hosp_code = #{hospCode}
+        <if test="id != null and id !=''">
+            and id = #{id}
+        </if>
+        <if test="keyword != null and keyword !=''">
+            and (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
+        </if>
+        <if test="auditCode != null and auditCode !=''">
+            and a.audit_code = #{auditCode}
+        </if>
+        <if test="typeCode != null and typeCode !=''">
+            and a.type_code = #{typeCode}
+        </if>
+    </select>
+
+    <!--获取模板数据-->
+    <select id="getInptAdviceTemp" resultMap="InptAdviceTempMap">
+        select
+        a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.remark, a.is_valid, a.pym, a.wbm, a.audit_code, a.audit_id,
+        a.audit_name, a.audit_time, a.crte_id, a.crte_name, a.crte_time
+        from inpt_advice_temp a
+        where a.hosp_code = #{hospCode} and a.id = #{id}
+    </select>
+
+    <!--根据处方模板id查询出处方模板明细-->
+    <select id="queryInptAdviceDetailTemp" resultMap="InptAdviceDetailTempMap">
+        select a.id, a.hosp_code, a.iat_id, a.group_no, a.group_seq_no, a.item_code,
+        a.item_id, a.item_name, case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code,
+        a.num, a.unit_code,  case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
+        when a.item_code = '1' and a.unit_code = c.unit_code then c.price
+        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price
+        when a.item_code = '2' and a.unit_code = d.unit_code then d.price
+        when a.item_code = '4' then e.price end price,
+        case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price*a.total_num
+        when a.item_code = '1' and a.unit_code = c.unit_code then c.price*a.total_num
+        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price*a.total_num
+        when a.item_code = '2' and a.unit_code = d.unit_code then d.price*a.total_num
+        when a.item_code = '4' then e.price*a.total_num  end total_price, a.total_num, a.bfc_id, a.use_days, a.exec_dept_id, a.use_code, a.herb_note_code, a.is_skin, a.is_give, a.is_long, a.content,
+        case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+        a.total_num_unit_code totalNumUnitCode,
+        case when a.item_code = '2' then dd.clf when c.big_type_code = '2' then dd.cyf when c.big_type_code = '1' then dd.zcf when c.big_type_code = '0' then dd.xyf end pharId,
+        case when a.item_code = '4' then (
+            case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
+        ) when a.item_code = '1' then (
+            case when c.big_type_code = '2' then  '3' else '1' end
+        ) when a.item_code = '2' then '2' end type,
+        <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
+        case when a.item_code = '1' then '1'  when a.item_code = '2' then '2' else e.type_code end typeCode,
+        case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
+        case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode,
+        case when f.id is null then '0' else '1' end isWz
+        from inpt_advice_temp_detail a
+        left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+        left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
+        left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
+        left join sys_parameter f on f.code = 'WZYZ_YZCODE' and e.code = f.value and a.hosp_code = f.hosp_code and f.is_valid = '1'
+        left join(
+            select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
+            max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+            from base_dept a
+            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+        )dd on 1 = 1
+        where a.hosp_code = #{hospCode}  and a.iat_id = #{id}
+        and (
+            (a.item_code = '4' and e.is_valid = '1' and e.id is not null) or (a.item_code ='1' and c.is_valid = '1' and c.id is not null )
+            or (a.item_code ='2' and d.is_valid = '1' and d.id is not null )
+        )
+    </select>
+
+    <!--批量新增医嘱主表模板-->
+    <insert id="insertInptAdviceTemp" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_advice_temp(
+            id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, remark, is_valid,
+            pym, wbm, audit_code, audit_id, audit_name, audit_time, crte_id, crte_name, crte_time
+        )
+        values
+            (
+                #{id},
+                #{hospCode},
+                #{name},
+                #{typeCode},
+                #{deptId},
+                #{deptName},
+                #{doctorId},
+                #{doctorName},
+                #{remark},
+                #{isValid},
+                #{pym},
+                #{wbm},
+                #{auditCode},
+                #{auditId},
+                #{auditName},
+                #{auditTime},
+                #{crteId},
+                #{crteName},
+                now()
+            )
+    </insert>
+
+    <!--批量新增医嘱模板明细-->
+    <insert id="insertBathInptAdviceDetailTemp" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into inpt_advice_temp_detail(
+            id, hosp_code, iat_id, group_no, group_seq_no, item_code,
+            item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price,
+            total_price, total_num, bfc_id, use_days, exec_dept_id, use_code, herb_note_code, is_skin, is_give, is_long, content, type_code,
+            total_num_unit_code
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+                #{item.id},
+                #{item.hospCode},
+                #{item.iatId},
+                #{item.groupNo},
+                #{item.groupSeqNo},
+                #{item.itemCode},
+                #{item.itemId},
+                #{item.itemName},
+                #{item.spec},
+                #{item.prepCode},
+                #{item.dosage},
+                #{item.dosageUnitCode},
+                #{item.usageCode},
+                #{item.rateId},
+                #{item.speedCode},
+                #{item.num},
+                #{item.unitCode},
+                #{item.price},
+                #{item.totalPrice},
+                #{item.totalNum},
+                #{item.bfcId},
+                #{item.useDays},
+                #{item.execDeptId},
+                #{item.useCode},
+                #{item.herbNoteCode},
+                #{item.isSkin},
+                #{item.isGive},
+                #{item.isLong},
+                #{item.content},
+                #{item.typeCode},
+                #{item.totalNumUnitCode}
+            )
+        </foreach>
+    </insert>
+
+    <!--修改住院模板-->
+    <update id="updateAdviceTemp">
+        update inpt_advice_temp
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
+    <!-- 删除模板信息 -->
+    <delete id="deleteInptAdviceTemp" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
+        update inpt_advice_temp set is_valid = '0' and audit_code = '2' where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 删除模板明细信息 -->
+    <delete id="deletePrescribeTempDetail" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
+        delete from inpt_advice_temp_detail  where iat_id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!--  获取最大组号 -->
+    <select id="checkIsAuditCode" resultType="java.lang.Integer" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select count(1) num from inpt_advice_temp a where id = #{id} and a.hosp_code = #{hospCode} and a.audit_code = #{auditCode}
+    </select>
+
+</mapper>

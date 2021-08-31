@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.pasttreat.dao.InptPastTreatDAO">
+
+
+    <resultMap type="cn.hsa.module.base.drug.dto.BaseDrugDTO" id="BaseDrugMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="usualName" column="usual_name" jdbcType="VARCHAR"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rateId" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.inpt.pasttreat.dto.InptPastTreatDTO" id="InptPastTreatMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="chiefComplaint" column="chief_complaint" jdbcType="VARCHAR"/>
+        <result property="diseaseId" column="disease_id" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="diseaseName" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO" id="InptPastAdrsMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="drugId" column="drug_id" jdbcType="VARCHAR"/>
+        <result property="drugName" column="drug_name" jdbcType="VARCHAR"/>
+        <result property="adrs" column="adrs" jdbcType="VARCHAR"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="serious" column="serious" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.inpt.pasttreat.dto.InptPastOperationDTO" id="InptPastOperationMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="chiefComplaint" column="chief_complaint" jdbcType="VARCHAR"/>
+        <result property="diseaseId" column="disease_id" jdbcType="VARCHAR"/>
+        <result property="operationId" column="operation_id" jdbcType="VARCHAR"/>
+        <result property="operationName" column="operation_name" jdbcType="VARCHAR"/>
+        <result property="operationTime" column="operation_time" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="diseaseName" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.inpt.pasttreat.dto.InptPastDrugDTO" id="InptPastDrugMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="drugId" column="drug_id" jdbcType="VARCHAR"/>
+        <result property="drugName" column="drug_name" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result column="rateName" property="rateName" jdbcType="DECIMAL"></result>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO" id="InptPastAllergyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="drugId" column="drug_id" jdbcType="VARCHAR"/>
+        <result property="drugName" column="drug_name" jdbcType="VARCHAR"/>
+        <result property="allergy" column="allergy" jdbcType="VARCHAR"/>
+        <result property="serious" column="serious" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--    根据id删除既往手术史记录-->
+    <delete id="deleteInptPastOperation" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastOperationDTO" >
+        delete from inpt_past_operation where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+    <!--    修改既往手术史记录-->
+    <update id="updateInptPastOperation" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastOperationDTO">
+        update inpt_past_operation set chief_complaint=#{chiefComplaint},
+                                       disease_id=#{diseaseId},operation_id=#{operationId},
+                                       operation_name=#{operationName},operation_time=#{operationTime}
+        where id=#{id} and hosp_code =#{hospCode}
+    </update>
+    <!--    修改既往过敏史记录数据-->
+    <update id="updateInptPastAllergy" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO">
+        update inpt_past_allergy set drug_id=#{drugId}, drug_name =#{drugName},
+                                     allergy=#{allergy},serious=#{serious},
+                                     start_time=#{startTime}
+        where id=#{id} and hosp_code =#{hospCode}
+    </update>
+    <!--    修改不良反应史的记录数据-->
+    <update id="updateInptPastAdrs" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO">
+        update inpt_past_adrs set drug_id=#{drugId}, drug_name =#{drugName},
+                                  adrs=#{adrs},reason=#{reason},
+                                  serious=#{serious},start_time=#{startTime}
+        where id=#{id} and hosp_code =#{hospCode}
+    </update>
+    <!--    删除既往过敏史录数据-->
+    <delete id="deleteInptPastAllergy" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO">
+        delete from inpt_past_allergy where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+    <!--    删除不良反应史的记录数据-->
+    <delete id="deleteInptPastAdrs" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO">
+        delete from inpt_past_adrs where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+    <!--既往诊疗史分页查询-->
+    <select id="queryPastTreatPage" resultMap="InptPastTreatMap">
+        select
+        ipt.id, ipt.hosp_code, ipt.profile_id, ipt.visit_id, ipt.chief_complaint, ipt.disease_id, ipt.dept_id, ipt.dept_name, ipt.crte_id, ipt.crte_name,
+        ipt.crte_time,b.name as diseaseName
+        from inpt_past_treat ipt left join base_dept bd on ipt.dept_id=bd.id and ipt.hosp_code=bd.hosp_code
+        left join base_disease b on ipt.disease_id=b.id and ipt.hosp_code=b.hosp_code
+        where ipt.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and ipt.id = #{id}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and ipt.profile_id = #{profileId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and ipt.visit_id = #{visitId}
+        </if>
+        <if test="chiefComplaint != null and chiefComplaint != ''">
+            and ipt.chief_complaint = #{chiefComplaint}
+        </if>
+        <if test="diseaseId != null and diseaseId != ''">
+            and ipt.disease_id = #{diseaseId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and ipt.dept_id = #{deptId}
+        </if>
+        <if test="deptName != null and deptName != ''">
+            and ipt.dept_name = #{deptName}
+        </if>
+        order by ipt.crte_time desc
+    </select>
+    <!--新增既往诊疗史记录-->
+    <insert id="insertPastTreat" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastTreatDTO">
+        insert into inpt_past_treat(id,hosp_code, profile_id, visit_id, chief_complaint, disease_id, dept_id,
+                                    dept_name, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{chiefComplaint}, #{diseaseId}, #{deptId}, #{deptName},
+                #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+    <!--    删除既往诊疗史的记录数据-->
+    <delete id="deletePastTreat">
+        delete from inpt_past_treat where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+    <!--    修改既往诊疗史的记录数据-->
+    <update id="updatePastTreat" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastTreatDTO">
+        update inpt_past_treat set chief_complaint=#{chiefComplaint},
+                                   disease_id=#{diseaseId},dept_id=#{deptId},
+                                   dept_name=#{deptName}
+        where id=#{id} and hosp_code =#{hospCode}
+    </update>
+
+    <!--    不良反应史分页查询-->
+    <select id="queryInptPastAdrsPage" resultMap="InptPastAdrsMap">
+        select
+        id, hosp_code, profile_id, visit_id, drug_id, drug_name, adrs, reason, serious, start_time, crte_id, crte_name,
+        crte_time
+        from inpt_past_adrs where hosp_code = #{hospCode}
+
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and profile_id = #{profileId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="drugId != null and drugId != ''">
+            and drug_id = #{drugId}
+        </if>
+        <if test="drugName != null and drugName != ''">
+            and drug_name = #{drugName}
+        </if>
+        <if test="adrs != null and adrs != ''">
+            and adrs = #{adrs}
+        </if>
+        <if test="reason != null and reason != ''">
+            and reason = #{reason}
+        </if>
+        <if test="serious != null and serious != ''">
+            and serious = #{serious}
+        </if>
+        <if test="startTime != null">
+            and start_time = #{startTime}
+        </if>
+        order by crte_time desc
+    </select>
+
+
+    <!--既往过敏史分页查询-->
+    <select id="queryInptPastAllergyDTOPage" resultMap="InptPastAllergyMap">
+        select
+        id, hosp_code, profile_id, visit_id, drug_id, drug_name, allergy, serious, start_time, crte_id, crte_name,
+        crte_time
+        from inpt_past_allergy where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and profile_id = #{profileId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="drugId != null and drugId != ''">
+            and drug_id = #{drugId}
+        </if>
+        <if test="drugName != null and drugName != ''">
+            and drug_name = #{drugName}
+        </if>
+        <if test="allergy != null and allergy != ''">
+            and allergy = #{allergy}
+        </if>
+        <if test="serious != null and serious != ''">
+            and serious = #{serious}
+        </if>
+        <if test="startTime != null">
+            and start_time = #{startTime}
+        </if>
+        order by crte_time desc
+    </select>
+
+    <!--    既往用药史分页查询-->
+    <select id="queryInptPastDrugDTOPage" resultMap="InptPastDrugMap">
+        select  ipd.id, ipd.hosp_code, ipd.profile_id, ipd.visit_id, ipd.drug_id, ipd.drug_name, ipd.start_time, ipd.end_time, ipd.dosage, ipd.dosage_unit_code,
+        ipd.usage_code, ipd.rate_id, ipd.crte_id, ipd.crte_name, ipd.crte_time,br.name as rateName
+        from inpt_past_drug ipd left join base_rate br on ipd.rate_id=br.id
+        where ipd.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and ipd.id = #{id}
+        </if>
+        <if test="hospCode != null and hospCode != ''">
+            and ipd.hosp_code = #{hospCode}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and ipd.profile_id = #{profileId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and ipd.visit_id = #{visitId}
+        </if>
+        <if test="drugId != null and drugId != ''">
+            and ipd.drug_id = #{drugId}
+        </if>
+        <if test="drugName != null and drugName != ''">
+            and ipd.drug_name = #{drugName}
+        </if>
+        <if test="startTime != null">
+            and ipd.start_time = #{startTime}
+        </if>
+        <if test="endTime != null">
+            and ipd.end_time = #{endTime}
+        </if>
+        <if test="dosage != null">
+            and ipd.dosage = #{dosage}
+        </if>
+        <if test="dosageUnitCode != null and dosageUnitCode != ''">
+            and ipd.dosage_unit_code = #{dosageUnitCode}
+        </if>
+        <if test="usageCode != null and usageCode != ''">
+            and ipd.usage_code = #{usageCode}
+        </if>
+        <if test="rateId != null and rateId != ''">
+            and ipd.rate_id = #{rateId}
+        </if>
+        order by ipd.crte_time desc
+    </select>
+    <!--    修改既往用药史记录-->
+    <update id="updateInptPastDrug">
+        update inpt_past_drug set drug_id=#{drugId}, drug_name =#{drugName},
+                                  start_time =#{startTime},end_time=#{endTime},
+                                  dosage=#{dosage},dosage_unit_code=#{dosageUnitCode},
+                                  usage_code=#{usageCode},rate_id=#{rateId}
+        where id=#{id} and hosp_code =#{hospCode}
+    </update>
+    <!--    根据id删除既往用药史记录-->
+    <delete id="deleteInptPastDrug" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastDrugDTO">
+        delete from inpt_past_drug where id=#{id} and hosp_code =#{hospCode}
+    </delete>
+
+    <!--    既往手术史分页查询-->
+    <select id="queryInptPastOperationDTOPage" resultMap="InptPastOperationMap">
+        select
+        ipo.id, ipo.hosp_code, ipo.profile_id, ipo.visit_id, ipo.chief_complaint, ipo.disease_id, ipo.operation_id, ipo.operation_name,ipo.operation_time,
+        ipo.crte_id, ipo.crte_name, ipo.crte_time,bd.name as diseaseName
+        from inpt_past_operation ipo left join base_disease bd on ipo.disease_id = bd.id
+        and ipo.hosp_code=bd.hosp_code
+        where ipo.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and ipo.id = #{id}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and ipo.profile_id = #{profileId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and ipo.visit_id = #{visitId}
+        </if>
+        <if test="chiefComplaint != null and chiefComplaint != ''">
+            and ipo.chief_complaint = #{chiefComplaint}
+        </if>
+        <if test="diseaseId != null and diseaseId != ''">
+            and ipo.disease_id = #{diseaseId}
+        </if>
+        <if test="operationId != null and operationId != ''">
+            and ipo.operation_id = #{operationId}
+        </if>
+        <if test="operationName != null and operationName != ''">
+            and ipo.operation_name = #{operationName}
+        </if>
+        <if test="operationTime != null and operationTime != ''">
+            and ipo.operation_time = #{operationTime}
+        </if>
+        order by ipo.crte_time desc
+    </select>
+    <!--    查询药品信息-->
+    <select id="queryDrugPage" resultMap="BaseDrugMap">
+        select bd.id,bd.usual_name,bd.dosage_unit_code,bd.usage_code,br.id as rateId from base_drug bd left join base_rate br
+        on bd.rate_code=br.code and bd.hosp_code = br.hosp_code
+        where bd.hosp_code=#{hospCode}
+        <if test="keyword !=null and keyword != ''">
+            and (bd.good_name like '%${keyword}%'
+            or bd.usual_name like '%${keyword}%'
+            or bd.good_pym like '%${keyword}%'
+            or bd.good_wbm like '%${keyword}%'
+            or bd.usual_pym like '%${keyword}%'
+            or bd.usual_wbm like '%${keyword}%')
+        </if>
+        <if test="isValid !=null and isValid != ''">
+            and bd.is_valid=#{isValid}
+        </if>
+        order by bd.crte_time desc
+    </select>
+    <!--    根据id查找既往手术史记录-->
+    <select id="getInptPastOperationById" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastOperationDTO" resultMap="InptPastOperationMap">
+        select
+            ipo.id, ipo.hosp_code, ipo.profile_id, ipo.visit_id, ipo.chief_complaint, ipo.disease_id, ipo.operation_id, ipo.operation_name,ipo.operation_time,
+            ipo.crte_id, ipo.crte_name, ipo.crte_time,bd.name as diseaseName
+        from inpt_past_operation ipo left join base_disease bd on ipo.disease_id = bd.id
+            and ipo.hosp_code=bd.hosp_code
+        where ipo.hosp_code = #{hospCode} and ipo.id = #{id}
+    </select>
+    <!--    根据id查找既往用药史数据-->
+    <select id="getInptPastDrugById" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastDrugDTO" resultMap="InptPastDrugMap">
+        select  ipd.id, ipd.hosp_code, ipd.profile_id, ipd.visit_id, ipd.drug_id, ipd.drug_name, ipd.start_time, ipd.end_time, ipd.dosage, ipd.dosage_unit_code,
+                ipd.usage_code, ipd.rate_id, ipd.crte_id, ipd.crte_name, ipd.crte_time,br.name as rateName
+        from inpt_past_drug ipd left join base_rate br on ipd.rate_id=br.id
+        where ipd.hosp_code = #{hospCode} and ipd.id=#{id}
+    </select>
+    <!--    根据id查找既往过敏史数据-->
+    <select id="getInptPastAllergyById" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO" resultType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO">
+        select * from inpt_past_allergy where id=#{id} and hosp_code =#{hospCode}
+    </select>
+    <!--    根据id查找不良不反应史记录-->
+    <select id="getInptPastAdrsById" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO" resultType="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO">
+        select * from inpt_past_adrs where id=#{id} and hosp_code =#{hospCode}
+    </select>
+    <!--    根据id查询既往诊疗史的数据-->
+    <select id="getPastTreatById" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastTreatDTO" resultMap="InptPastTreatMap">
+        select
+            ipt.id, ipt.hosp_code, ipt.profile_id, ipt.visit_id, ipt.chief_complaint, ipt.disease_id, ipt.dept_id, ipt.dept_name, ipt.crte_id, ipt.crte_name,
+            ipt.crte_time,b.name as diseaseName
+        from inpt_past_treat ipt left join base_dept bd on ipt.dept_id=bd.id and ipt.hosp_code=bd.hosp_code
+                                 left join base_disease b on ipt.disease_id=b.id and ipt.hosp_code=b.hosp_code
+        where ipt.hosp_code = #{hospCode} and ipt.id = #{id}
+    </select>
+
+
+    <!--新增不良反应史-->
+    <insert id="insertInptPastAdrs" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAdrsDTO">
+        insert into inpt_past_adrs(id,hosp_code,profile_id, visit_id, drug_id, drug_name, adrs, reason, serious,
+                                   start_time, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{drugId}, #{drugName}, #{adrs}, #{reason}, #{serious},
+                #{startTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--新增既往用药史史记录-->
+    <insert id="insertInptPastDrug" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastDrugDTO">
+        insert into inpt_past_drug(id,hosp_code, profile_id, visit_id, drug_id, drug_name, start_time, end_time,
+                                   dosage, dosage_unit_code, usage_code, rate_id, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{drugId}, #{drugName}, #{startTime}, #{endTime}, #{dosage},
+                #{dosageUnitCode}, #{usageCode}, #{rateId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+    <!--    新增既往手术史记录-->
+    <insert id="insertInptPastOperation" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastOperationDTO">
+        insert into inpt_past_operation(id, hosp_code, profile_id, visit_id, chief_complaint, disease_id, operation_id, operation_name, operation_time, crte_id, crte_name, crte_time)
+        values  (#{id},#{hospCode}, #{profileId}, #{visitId}, #{chiefComplaint}, #{diseaseId}, #{operationId}, #{operationName}, #{operationTime},#{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--    新增既往过敏史记录-->
+    <insert id="insertInptPastAllergy" parameterType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO">
+        insert into inpt_past_allergy(id, hosp_code, profile_id, visit_id, drug_id, drug_name, allergy, serious, start_time, crte_id, crte_name,crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{drugId}, #{drugName}, #{allergy}, #{serious},
+                #{startTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+</mapper>

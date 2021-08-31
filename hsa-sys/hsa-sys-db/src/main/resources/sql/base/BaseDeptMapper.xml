@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.dept.dao.BaseDeptDAO">
+
+    <resultMap type="cn.hsa.module.base.dept.dto.BaseDeptDTO" id="BaseDeptMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="wardCode" column="ward_code" jdbcType="VARCHAR"/>
+        <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="personName" column="person_name" jdbcType="VARCHAR"/>
+        <result property="upDeptCode" column="up_dept_code" jdbcType="VARCHAR"/>
+        <result property="mgDeptCode" column="mg_dept_code" jdbcType="VARCHAR"/>
+        <result property="mgName" column="mgName" jdbcType="VARCHAR"/>
+        <result property="intro" column="intro" jdbcType="VARCHAR"/>
+        <result property="place" column="place" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="typeIdentity" column="type_identity" jdbcType="VARCHAR"/>
+        <result property="drugStoreCode" column="drugStoreCode" jdbcType="VARCHAR"/>
+        <result property="pharName" column="pharName" jdbcType="VARCHAR"/>
+        <result property="pharId" column="pharId" jdbcType="VARCHAR"/>
+
+    </resultMap>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="BaseDeptMap" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        SELECT
+        bd.id,
+        bd.hosp_code,
+        bd.type_code,
+        bd.nation_code,
+        bd.ward_code,
+        bd.code,
+        bd.name,
+        bd.phone,
+        bd.person_name,
+        bd.up_dept_code,
+        pDept.name as upName,
+        mDept.name as mgName,
+        wDept.name as wardName,
+        bd.mg_dept_code,
+        bd.intro,
+        bd.place,
+        bd.remark,
+        bd.pym,
+        bd.wbm,
+        bd.is_valid,
+        bd.crte_id,
+        bd.crte_name,
+        bd.crte_time,
+        bd.type_identity
+        FROM
+        base_dept bd
+        left join base_dept pDept on bd.up_dept_code = pDept.code and bd.hosp_code = pDept.hosp_code
+        left join base_dept mDept on bd.mg_dept_code = mDept.code and bd.hosp_code = mDept.hosp_code
+        left join base_dept wDept on bd.ward_code = wDept.code and bd.hosp_code = wDept.hosp_code
+        where bd.hosp_code=#{hospCode}
+        <if test="id != null and id != '' ">
+            and bd.id = #{id}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and bd.type_code = #{typeCode}
+        </if>
+        <if test="nationCode != null and nationCode != ''">
+            and bd.nation_code = #{nationCode}
+        </if>
+        <if test="code != null and code != ''">
+            and bd.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and bd.name = #{name}
+        </if>
+        <if test="wardCode != null and wardCode != ''">
+            and bd.ward_code = #{wardCode}
+        </if>
+        <if test="phone != null and phone != ''">
+            and bd.phone = #{phone}
+        </if>
+        <if test="upDeptCode!= null and upDeptCode != ''">
+            and bd.up_dept_code = #{upDeptCode}
+        </if>
+        <if test="mgDeptCode!= null and mgDeptCode != ''">
+            and bd.mg_dept_code = #{mgDeptCode}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and bd.is_valid = #{isValid}
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            and bd.is_upload = #{isUpload}
+        </if>
+        <if test="crteTime != null">
+            and bd.crte_time = #{crteTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( bd.code like concat('%',#{keyword},'%')
+            or bd.name like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%')
+            or bd.wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and bd.code in
+            <foreach collection="deptIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by bd.crte_time desc
+    </select>
+
+    <!--    根据id，科室编码 查询科室信息-->
+    <select id="getById" resultMap="BaseDeptMap"
+            parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        SELECT
+        bd.id,
+        bd.hosp_code,
+        bd.type_code,
+        bd.nation_code,
+        bd.ward_code,
+        bd.code,
+        bd.name,
+        bd.phone,
+        bd.person_name,
+        bd.up_dept_code,
+        pDept.name as upName,
+        mDept.name as mgName,
+        wDept.name as wardName,
+        bd.mg_dept_code,
+        bd.intro,
+        bd.place,
+        bd.remark,
+        bd.pym,
+        bd.wbm,
+        bd.is_valid,
+        bd.crte_id,
+        bd.crte_name,
+        bd.crte_time,
+        bd.type_identity
+        FROM
+        base_dept bd
+        left join base_dept pDept on bd.up_dept_code = pDept.code and bd.hosp_code = pDept.hosp_code
+        left join base_dept mDept on bd.mg_dept_code = mDept.code and bd.hosp_code = mDept.hosp_code
+        left join base_dept wDept on bd.ward_code = wDept.code and bd.hosp_code = wDept.hosp_code
+        where bd.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and bd.id = #{id}
+        </if>
+        <if test="code != null and code != ''">
+            and bd.code = #{code}
+        </if>
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and bd.id in
+            <foreach collection="deptIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!--查询科室信息维护编码/姓名是否存在-->
+    <select id="queryCode" resultMap="BaseDeptMap">
+        select * from base_dept where hosp_code=#{hospCode}
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+        <if test="isValid == null and isValid == ''">
+            and is_valid = '1'
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+    <!--查询科室信息维护编码/姓名是否存在-->
+    <select id="queryName" resultMap="BaseDeptMap">
+        select * from base_dept where hosp_code=#{hospCode}
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+        <if test="isValid == null and isValid == ''">
+            and is_valid = '1'
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+    <!--查询科室信息维护编码/姓名是否存在-->
+    <select id="queryAllByBed" resultMap="BaseDeptMap">
+        select * from base_dept where hosp_code=#{hospCode}
+        <if test="code != null and code != ''">
+            and name = #{name}
+        </if>
+        <if test="id!= null and id!=''">
+            and id = #{id}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseDeptMap" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        SELECT
+        bd.id,
+        bd.hosp_code,
+        bd.type_code,
+        bd.nation_code,
+        bd.ward_code,
+        bd.code,
+        bd.name,
+        bd.phone,
+        bd.person_name,
+        bd.up_dept_code,
+        pDept.name as upName,
+        mDept.name as mgName,
+        wDept.name as wardName,
+        bd.mg_dept_code,
+        bd.intro,
+        bd.place,
+        bd.remark,
+        bd.pym,
+        bd.wbm,
+        bd.is_valid,
+        bd.crte_id,
+        bd.crte_name,
+        bd.crte_time,
+        bd.type_identity
+        FROM
+        base_dept bd
+        left join base_dept pDept on bd.up_dept_code = pDept.code and bd.hosp_code = pDept.hosp_code
+        left join base_dept mDept on bd.mg_dept_code = mDept.code and bd.hosp_code = mDept.hosp_code
+        left join base_dept wDept on bd.ward_code = wDept.code and bd.hosp_code = wDept.hosp_code
+        where bd.hosp_code=#{hospCode}  and bd.code not in (select DISTINCT up_dept_code from
+        base_dept where up_dept_code is not null)
+        <if test="id != null and id != ''">
+            and bd.id = #{id}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and bd.type_code = #{typeCode}
+        </if>
+        <if test="nationCode != null and nationCode != ''">
+            and bd.nation_code = #{nationCode}
+        </if>
+        <if test="code != null and code != ''">
+            and bd.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and bd.name = #{name}
+        </if>
+        <if test="wardCode != null and wardCode != ''">
+            and bd.ward_code = #{wardCode}
+        </if>
+        <if test="phone != null and phone != ''">
+            and bd.phone = #{phone}
+        </if>
+        <if test="upDeptCode != null and upDeptCode != ''">
+            and bd.up_dept_code = #{upDeptCode}
+        </if>
+        <if test="mgDeptCode != null and mgDeptCode != ''">
+            and bd.mg_dept_code = #{mgDeptCode}
+        </if>
+        <if test="pym != null and pym != ''">
+            and bd.pym = #{pym}
+        </if>
+        <if test="wbm != null and wbm != ''">
+            and bd.wbm = #{wbm}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and bd.is_valid = #{isValid}
+        </if>
+        <if test="isValid == null or isValid == ''">
+            and bd.is_valid = '1'
+        </if>
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and bd.id in
+            <foreach collection="deptIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deptTypeCodeList != null and deptTypeCodeList.size() > 0">
+            and bd.type_code in
+            <foreach collection="deptTypeCodeList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="notId != null and notId != ''">
+            and bd.id = #{notId}
+        </if>
+        order by bd.name desc
+    </select>
+    <!--新增所有列-->
+    <insert id="insert">
+        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code,
+                              mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+                              type_identity)
+        values (#{id}, #{hospCode}, #{typeCode}, #{nationCode}, #{code}, #{name}, #{wardCode}, #{phone}, #{personName}, #{upDeptCode},
+                #{mgDeptCode}, #{intro}, #{place}, #{remark}, #{pym}, #{wbm}, #{isValid}, #{crteId}, #{crteName},
+                #{crteTime}, #{typeIdentity})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        update base_dept
+        set type_code    = #{typeCode},
+            nation_code  = #{nationCode},
+            code         = #{code},
+            name         = #{name},
+            ward_code    = #{wardCode},
+            phone        = #{phone},
+            person_name        = #{personName},
+            up_dept_code = #{upDeptCode},
+            mg_dept_code = #{mgDeptCode},
+            intro        = #{intro},
+            place        = #{place},
+            remark       = #{remark},
+            pym          = #{pym},
+            wbm          = #{wbm},
+            is_valid     = #{isValid},
+            crte_id      = #{crteId},
+            crte_name    = #{crteName},
+            crte_time    = #{crteTime},
+            type_identity= #{typeIdentity}
+        where id = #{id}
+          and hosp_code = #{hospCode}
+    </update>
+
+    <!--批量修改科室维护信息有效标识符-->
+    <update id="updateIsValid" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        update base_dept set is_valid = #{isValid} where id in
+        <foreach collection="deptIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </update>
+
+    <!--统一支付平台上传科室信息后更新上传状态-->
+    <update id="updateBatchDept">
+        <foreach collection="deptDTOList" item="item" separator=";" >
+            update base_dept set is_upload = #{item.isUpload}
+            where id =#{item.id}
+            and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getDeptTree" resultType="cn.hsa.base.TreeMenuNode">
+        select id deptId, code id, name label, type_code, ifnull(up_dept_code, "-1") parentId
+        from base_dept
+        where hosp_code = #{hospCode}
+        and is_valid = #{isValid}
+        order by crte_time desc
+    </select>
+
+    <!--查询出库库位-->
+    <select id="getOutDept" resultMap="BaseDeptMap">
+        select id,
+               hosp_code,
+               type_code,
+               nation_code,
+               code,
+               name,
+               ward_code,
+               phone,
+               person_name,
+               up_dept_code,
+               mg_dept_code,
+               intro,
+               place,
+               remark,
+               pym,
+               wbm,
+               is_valid,
+               crte_id,
+               crte_name,
+               crte_time
+        from base_dept
+        where hosp_code = #{hospCode}
+          and type_code = '3'
+          and is_valid = #{isValid}
+          and code not in (select DISTINCT up_dept_code from base_dept where up_dept_code is not null)
+        order by name
+    </select>
+    <select id="getDeptTypeCode" resultMap="BaseDeptMap">
+        select
+             id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code, mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time, type_identity
+               from base_dept where hosp_code = #{hospCode}
+      <if test="deptTypeCodeList != null and deptTypeCodeList.size() > 0">
+        and type_code in
+        <foreach collection="deptTypeCodeList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+      </if>
+        and is_valid = #{isValid} and code not in (select DISTINCT up_dept_code from base_dept where
+        up_dept_code is not null)
+        order by name
+    </select>
+
+    <!-- 护士站补记账获取药房信息 -->
+    <select id="getPharInfo" resultMap="BaseDeptMap">
+        select a.*,c.name as pharName,c.id as pharId
+        from  base_dept a ,
+        base_dept_drugstore  b ,
+        base_dept c ,
+        sys_code_detail d
+        where  a.hosp_code = b.hosp_code and a.`code` = b.dept_code
+        and c.`code` in(SELECT
+        SUBSTRING_INDEX(SUBSTRING_INDEX(b.drugstore_code,',',help_topic_id+1),',',-1) AS num
+        FROM
+        mysql.help_topic
+        WHERE
+        help_topic_id &lt; LENGTH(b.drugstore_code)-LENGTH(REPLACE(b.drugstore_code,',',''))+1 )
+          and b.hosp_code = d.hosp_code and  c_code ='YFLB' and b.type_code = d.`value`
+          and b.type_code = '4'
+          and a.id = #{loginDeptId}
+          and a.is_valid = #{isValid}
+          and a.hosp_code = #{hospCode}
+    </select>
+    <select id="getDeptTypeIdentity" resultMap="BaseDeptMap">
+      select c.id, c.name , c.hosp_code,c.type_code,c.type_identity,c.code,c.up_dept_code
+          from base_dept a
+          join sys_code_detail b on b.c_code = 'YFLBBS' and FIND_IN_SET(b.value,a.type_identity) and a.hosp_code = b.hosp_code
+          join base_dept c on a.hosp_code = c.hosp_code and FIND_IN_SET(b.value,c.type_identity)
+          where a.id = #{id}
+          group by c.id, c.name , c.hosp_code
+    </select>
+
+    <!--根据登录科室id获得匹配的发药药房信息-->
+    <select id="getDeptInfoByLoginDeptId" resultMap="BaseDeptMap">
+        SELECT
+            (select pt.id from base_dept pt where pt.hosp_code =e.hosp_code and pt.code = e.drugstore_code) id,
+            e.type_code as type_identity,
+            e.drugstore_code as drugStoreCode,
+            t.name
+        FROM
+            base_dept_drugstore e,
+            base_dept t
+        WHERE
+            e.hosp_code = t.hosp_code
+            AND e.dept_code = t.CODE
+            AND e.is_valid = '1'
+            AND e.hosp_code = #{hospCode}
+            <if test="id != null and id !=''">
+                and t.id = #{id}
+            </if>
+    </select>
+
+    <select id="getNewDeptInfoByLoginDeptId" resultMap="BaseDeptMap">
+      select a.* from base_dept a where find_in_set(a.code,#{code}) and a.hosp_code = #{hospCode} and a.is_valid = '1'
+    </select>
+
+
+   <select id="getDrugstoreCode" resultType="java.lang.String">
+       SELECT e.drugstore_code
+       FROM
+       base_dept_drugstore e,
+       base_dept t
+       WHERE
+       e.hosp_code = t.hosp_code
+       AND e.dept_code = t.CODE
+       AND e.is_valid = '1'
+       AND e.hosp_code = #{hospCode}
+       <if test="id != null and id !=''">
+         and t.id = #{id}
+       </if>
+   </select>
+
+
+    <!--    根据科室id查找科室编码-->
+    <select id="queryDeptById" resultMap="BaseDeptMap" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select code from base_dept where id in
+        <foreach collection="deptIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and hosp_code = #{hospCode}
+    </select>
+    <!--多个查询-->
+    <select id="getDeptByIds" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select type_code,id,code,name,ward_code
+        from base_dept
+        <where>
+            hosp_code= #{hospCode}
+            <if test="ids !=null and ids.size()>0">
+                and id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getDeptByCodes" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select type_code,id,code,name,ward_code
+        from base_dept
+        <where>
+            hosp_code= #{hospCode}
+            <if test="codes !=null and codes.size()>0">
+                and code in
+                <foreach collection="codes" item="code" separator="," open="(" close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryNotId" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select *
+        from base_dept
+        <where>
+            hosp_code= #{hospCode}
+            <if test="notId != null and notId != ''">
+                and id &lt;&gt; #{notId}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+        </where>
+    </select>
+    <!--    根据科室编码查找用户绑定的操作科室-->
+    <select id="selectSysUserSystemCode" resultType="java.lang.String"
+            parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select distinct su.name
+        from sys_user_system sus
+                 left join sys_user su on sus.user_code = su.code
+        where sus.dept_code = #{code}
+          and sus.hosp_code = #{hospCode}
+    </select>
+
+    <!--    根据科室编码查找用户的所属科室-->
+    <select id="selectSysUser" resultType="java.lang.String">
+        select distinct name from sys_user where dept_code =#{code} and hosp_code=#{hospCode}
+    </select>
+
+    <select id="queryDeptByIdList" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        select * from base_dept
+        <where>
+            hosp_code= #{hospCode}
+            <if test="deptIdList !=null and deptIdList.size()>0">
+                and id in
+                <foreach collection="deptIdList" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDeptCodeByIds" resultType="java.lang.String">
+        select code from base_dept
+        <where>
+            hosp_code= #{hospCode}
+            <if test="deptIdList !=null and deptIdList.size()>0">
+                and id in
+                <foreach collection="deptIdList" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code,
+        mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+        type_identity) values
+        <foreach collection="insertList" item="item" index="index" open="" close="" separator=",">
+             (#{item.id}, #{item.hospCode}, #{item.typeCode}, #{item.nationCode}, #{item.code}, #{item.name},
+              #{item.wardCode}, #{item.phone}, #{item.personName}, #{item.upDeptCode},
+            #{item.mgDeptCode}, #{item.intro}, #{item.place}, #{item.remark}, #{item.pym}, #{item.wbm}, #{item.isValid}, #{item.crteId}, #{item.crteName},
+            #{item.crteTime}, #{item.typeIdentity})
+        </foreach>
+    </insert>
+    <select id="getDeptByTypeCode" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+       select
+            id,name as label,code as value
+        from base_dept where hosp_code =#{hospCode} and is_valid = '1'
+                         and id !=#{id}
+    </select>
+
+    <!--查询未上传的科室列表-->
+    <select id="queryBaseDeptByInsure" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        SELECT
+        a.id,
+        a.code,
+        a.name,
+        a.type_code,
+        a.nation_code,
+        a.intro,
+        a.phone,
+        a.person_name,
+        a.crte_time,
+        IFNULL(c.bed_num, 0) as bed_num,
+        SUM(IF(b.work_type_code like '10%', 1, 0)) as doctor_num,
+        SUM(IF(b.work_type_code like '20%', 1, 0)) as nurse_num,
+        SUM(IF(b.work_type_code like '30%', 1, 0)) as drug_num,
+        SUM(IF(b.work_type_code like '40%', 1, 0)) as medic_num
+        FROM
+        base_dept a
+        left JOIN sys_user b ON a.hosp_code = b.hosp_code and a.code = b.dept_code and b.is_in_job = '1'
+        left join (
+        SELECT hosp_code, dept_code, COUNT(dept_code) as bed_num from base_bed
+        WHERE is_valid = '1' GROUP BY hosp_code, dept_code
+        ) c on a.hosp_code = c.hosp_code and a.code = c.dept_code
+        WHERE a.hosp_code = #{hospCode}
+        <if test="isValid != null and isValid != ''">
+            and a.is_valid = #{isValid}
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            and a.is_upload = #{isUpload}
+        </if>
+        <if test="code != null and code != ''">
+            and a.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            and a.name = #{name}
+        </if>
+        GROUP BY a.id, b.dept_code
+        ORDER BY a.code
+    </select>
+</mapper>

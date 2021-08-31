@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.bb.dao.BaseBedItemDao">
+
+    <resultMap type="cn.hsa.module.base.bb.dto.BaseBedItemDTO" id="BaseBedItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bedCode" column="bed_code" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseBedItemMap">
+        select
+          id, hosp_code, bed_code, item_code, crte_id, crte_name, crte_time
+        from base_bed_item
+        where id = #{id} and hosp_code= #{hospCode}
+    </select>
+
+
+    <!--    &lt;!&ndash;通过实体作为筛选条件查询&ndash;&gt;-->
+        <select id="queryAllByBedCode" resultMap="BaseBedItemMap">
+            select
+              id, hosp_code, bed_code, item_code, crte_id, crte_name, crte_time
+            from base_bed_item
+            <where>
+                    and hosp_code = #{hospCode}
+                <if test="bedCode != null and bedCode != ''">
+                    and bed_code = #{bedCode}
+                </if>
+            </where>
+        </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultType="java.util.HashMap">
+        SELECT
+        b.id,
+        b.hosp_code,
+        b.item_code,
+        b.item_code AS itemCode,
+        b.hosp_code AS hospCode,
+        a.price,
+        a.unit_code AS unitCode,
+        a.spec,
+        a.itemName,
+        a.itemTypeCode,
+        a.typeCode,
+        a.out_dept_code,
+        a.in_dept_code,
+        a.inDeptName,
+        a.outDeptName,
+        a.id AS itemId
+        FROM
+        base_bed_item b
+        LEFT JOIN (
+        SELECT
+        id,
+        `name` AS itemName,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        hosp_code,
+        inDeptName,
+        outDeptName,
+        typeCode
+        FROM
+        (
+        SELECT
+        id,
+        `name`,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        out_dept_code,
+        in_dept_code,
+        hosp_code,(
+        SELECT NAME
+        FROM
+        base_dept
+        WHERE
+        CODE = out_dept_code
+        ) AS outDeptName,
+        ( SELECT NAME FROM base_dept WHERE CODE = in_dept_code ) AS inDeptName,
+        '3' AS typeCode
+        FROM
+        base_item
+        WHERE
+        is_valid = '1' UNION ALL
+        SELECT
+        id,
+        `name`,
+        CODE,
+        price,
+        unit_code,
+        spec,
+        type_code AS itemTypeCode,
+        '',
+        '',
+        hosp_code,
+        '',
+        '',
+        '2' AS typeCode
+        FROM
+        base_material
+        WHERE
+        is_valid = '1'
+        ) mAndi
+        ) a ON b.item_code = a.CODE
+        AND b.hosp_code = a.hosp_code
+        <where>
+                and b.hosp_code = #{hospCode}
+            <if test="bedCode != null and bedCode != ''">
+                and b.bed_code = #{bedCode}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into base_bed_item(id,hosp_code, bed_code, item_code, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{bedCode}, #{itemCode}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update base_bed_item
+        <set>
+                bed_code = #{bedCode},
+                item_code = #{itemCode},
+                crte_id = #{crteId},
+        </set>
+        where id = #{id} and hosp_code= #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from base_bed_item where id = #{id} and hosp_code= #{hospCode}
+    </delete>
+
+
+    <insert id="insertList" parameterType="list">
+        insert into base_bed_item
+        (id,hosp_code, bed_code, item_code, crte_id, crte_name)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.bedCode}, #{item.itemCode}, #{item.crteId}, #{item.crteName})
+        </foreach>
+    </insert>
+</mapper>

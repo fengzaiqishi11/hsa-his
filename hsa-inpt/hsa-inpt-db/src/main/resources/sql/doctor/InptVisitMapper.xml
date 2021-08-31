@@ -1,0 +1,2025 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.doctor.dao.InptVisitDAO">
+
+	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="profileId" column="profile_id" jdbcType="VARCHAR"/>
+		<result property="inProfile" column="in_profile" jdbcType="VARCHAR"/>
+		<result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+		<result property="age" column="age" jdbcType="INTEGER"/>
+		<result property="ageUnitCode" column="age_unit_code" jdbcType="VARCHAR"/>
+		<result property="birthday" column="birthday" jdbcType="OTHER"/>
+		<result property="nationalityCation" column="nationality_cation" jdbcType="VARCHAR"/>
+		<result property="occupationCode" column="occupation_code" jdbcType="VARCHAR"/>
+		<result property="educationCode" column="education_code" jdbcType="VARCHAR"/>
+		<result property="contactName" column="contact_name" jdbcType="VARCHAR"/>
+		<result property="contactRelaCode" column="contact_rela_code" jdbcType="VARCHAR"/>
+		<result property="contactAddress" column="contact_address" jdbcType="VARCHAR"/>
+		<result property="contactPhone" column="contact_phone" jdbcType="VARCHAR"/>
+		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+		<result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+		<result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+		<result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+		<result property="phone" column="phone" jdbcType="VARCHAR"/>
+		<result property="address" column="address" jdbcType="VARCHAR"/>
+		<result property="preferentialTypeId" column="preferential_type_id" jdbcType="VARCHAR"/>
+		<result property="patientCode" column="patient_code" jdbcType="VARCHAR"/>
+		<result property="receiveHospName" column="receive_hosp_name" jdbcType="VARCHAR"/>
+		<result property="bedId" column="bed_id" jdbcType="VARCHAR"/>
+		<result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+		<result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
+		<result property="dietType" column="diet_type" jdbcType="VARCHAR"/>
+		<result property="illnessCode" column="Illness_code" jdbcType="VARCHAR"/>
+		<result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+		<result property="inWardId" column="in_ward_id" jdbcType="VARCHAR"/>
+		<result property="inDeptId" column="in_dept_id" jdbcType="VARCHAR"/>
+		<result property="inDeptName" column="in_dept_name" jdbcType="VARCHAR"/>
+		<result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+		<result property="zzDoctorId" column="zz_doctor_id" jdbcType="VARCHAR"/>
+		<result property="zzDoctorName" column="zz_doctor_name" jdbcType="VARCHAR"/>
+		<result property="jzDoctorId" column="jz_doctor_id" jdbcType="VARCHAR"/>
+		<result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
+		<result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
+		<result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+		<result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
+		<result property="inModeCode" column="in_mode_code" jdbcType="VARCHAR"/>
+		<result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
+		<result property="inDiseaseName" column="in_disease_name" jdbcType="VARCHAR"/>
+		<result property="inDiseaseIcd10" column="in_disease_icd10" jdbcType="VARCHAR"/>
+		<result property="inSituationCode" column="in_situation_code" jdbcType="VARCHAR"/>
+		<result property="outptVisitNo" column="outpt_visit_no" jdbcType="VARCHAR"/>
+		<result property="outptDoctorId" column="outpt_doctor_id" jdbcType="VARCHAR"/>
+		<result property="outptDoctorName" column="outpt_doctor_name" jdbcType="VARCHAR"/>
+		<result property="outptDiseaseId" column="outpt_disease_id" jdbcType="VARCHAR"/>
+		<result property="outptDiseaseName" column="outpt_disease_name" jdbcType="VARCHAR"/>
+		<result property="outptDiseaseIcd10" column="outpt_disease_icd10" jdbcType="VARCHAR"/>
+		<result property="outWardId" column="out_ward_id" jdbcType="VARCHAR"/>
+		<result property="outDeptId" column="out_dept_id" jdbcType="VARCHAR"/>
+		<result property="outDeptName" column="out_dept_name" jdbcType="VARCHAR"/>
+		<result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+		<result property="outDiseaseId" column="out_disease_id" jdbcType="VARCHAR"/>
+		<result property="outDiseaseName" column="out_disease_name" jdbcType="VARCHAR"/>
+		<result property="outDiseaseIcd10" column="out_disease_icd10" jdbcType="VARCHAR"/>
+		<result property="outOperId" column="out_oper_id" jdbcType="VARCHAR"/>
+		<result property="outOperName" column="out_oper_name" jdbcType="VARCHAR"/>
+		<result property="outOperTime" column="out_oper_time" jdbcType="TIMESTAMP"/>
+		<result property="outSituationCode" column="out_situation_code" jdbcType="VARCHAR"/>
+		<result property="outRemark" column="out_remark" jdbcType="VARCHAR"/>
+		<result property="outModeCode" column="out_mode_code" jdbcType="VARCHAR"/>
+		<result property="isArchive" column="is_archive" jdbcType="VARCHAR"/>
+		<result property="archiveTime" column="archive_time" jdbcType="TIMESTAMP"/>
+		<result property="archiveId" column="archive_id" jdbcType="VARCHAR"/>
+		<result property="archiveName" column="archive_name" jdbcType="VARCHAR"/>
+		<result property="insureCode" column="insure_code" jdbcType="VARCHAR"/>
+		<result property="insureOrgCode" column="insure_org_code" jdbcType="VARCHAR"/>
+		<result property="insureNo" column="insure_no" jdbcType="VARCHAR"/>
+		<result property="insureBizCode" column="insure_biz_code" jdbcType="VARCHAR"/>
+		<result property="insureTreatCode" column="insure_treat_code" jdbcType="VARCHAR"/>
+		<result property="insurePatientId" column="insure_patient_id" jdbcType="VARCHAR"/>
+		<result property="insureRemark" column="insure_remark" jdbcType="VARCHAR"/>
+		<result property="totalAdvance" column="total_advance" jdbcType="NUMERIC"/>
+		<result property="totalCost" column="total_cost" jdbcType="NUMERIC"/>
+		<result property="totalBalance" column="total_balance" jdbcType="NUMERIC"/>
+		<result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+		<result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+		<result property="inTimestring" column="in_time" jdbcType="TIMESTAMP"/>
+		<result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="keyword" column="keyword" jdbcType="VARCHAR"/>
+		<result property="inDiagnoseId" column="inDiagnoseId" jdbcType="VARCHAR"/>
+		<result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+		<result property="costTime" column="cost_time" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" id="InptAdviceMap">
+		<result property="id" column="id" jdbcType="VARCHAR"/>
+		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+		<result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+		<result property="longStartTime" column="long_start_time" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+
+
+	<!--单个查询-->
+	<select id="getInptVisitById" resultMap="InptVisitMap">
+        select
+          id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday, nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address, contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code, receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id, in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no, outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id, out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id, out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time, archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code, insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+          (select name from base_dept where id = inpt_visit.in_ward_id and hosp_code = inpt_visit.hosp_code) as wardName
+        from inpt_visit
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </select>
+
+	<select id="queryInsureRegisterPage" resultMap="InptVisitMap">
+		select  b.medical_reg_no, a.*,c.disease_id as inDiagnoseId from inpt_visit a
+		left join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
+		left join inpt_diagnose c on (a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1' and c.type_code = '201')
+		where a.hosp_code = #{hospCode} and a.status_code in ('1','2','3','4','5','6')
+		<if test="isInsureRegister == '0'.toString() ">
+			and (b.id is null or (b.insure_settle_id is not null and b.is_half_settle ='1'))
+		</if>
+		<if test="isInsureRegister == '1'.toString() ">
+			and (b.id is not null or  2 > b.settle_count)
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+		</if>
+		<if test="keyword != null and keyword != ''">
+			AND concat(a.name,a.in_no,a.bed_name) LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		order by a.crte_time,b.crte_time desc
+	</select>
+
+	<!--分页查询-->
+	<select id="queryInptVisitPage" resultMap="InptVisitMap">
+		select
+		iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code, iv.age, iv.age_unit_code, iv.birthday,
+		iv.nationality_cation, iv.occupation_code, iv.education_code, iv.contact_name, iv.contact_rela_code, iv.contact_address,
+		iv.contact_phone, iv.nation_code, iv.cert_code, iv.cert_no, iv.marry_code, iv.phone, iv.address, iv.preferential_type_id, iv.patient_code,
+		iv.receive_hosp_name, iv.bed_id, iv.bed_name, iv.nursing_code, iv.diet_type, iv.Illness_code, iv.status_code, iv.in_ward_id, iv.in_dept_id,
+		iv.in_dept_name, iv.in_time, iv.zz_doctor_id, iv.zz_doctor_name, iv.jz_doctor_id, iv.jz_doctor_name, iv.zg_doctor_id, iv.zg_doctor_name,
+		iv.in_remark, iv.in_mode_code, iv.in_disease_id, iv.in_disease_name, iv.in_disease_icd10, iv.in_situation_code, iv.outpt_visit_no,
+		iv.outpt_doctor_id, iv.outpt_doctor_name, iv.outpt_disease_id, iv.outpt_disease_name, iv.outpt_disease_icd10, iv.out_ward_id,
+		iv.out_dept_id, iv.out_dept_name, iv.out_time, iv.out_disease_id, iv.out_disease_name, iv.out_disease_icd10, iv.out_oper_id,
+		iv.out_oper_name, iv.out_oper_time, iv.out_situation_code, iv.out_remark, iv.out_mode_code, iv.is_archive, iv.archive_time,
+		iv.archive_id, iv.archive_name, iv.insure_code, iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code,
+		iv.insure_patient_id, iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,bb.seq_no,
+		CONCAT(
+		iv.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		iv.gender_code),'-'),'/',
+		IFNULL(iv.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		iv.age_unit_code),'')
+		) AS keyword
+		from inpt_visit iv
+		left join
+		base_bed bb
+		on
+		iv.bed_id=bb.id
+		where iv.hosp_code = #{hospCode}
+		<if test="id != null and id != ''">
+			and iv.id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%')
+			or iv.in_no like concat('%',#{keyword},'%') or iv.bed_name like concat('%',#{keyword},'%'))
+		</if>
+
+		<!-- 入院开始时间 zhongming by 20201219 -->
+		<if test="startTime != null and startTime != ''">
+			and iv.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+		</if>
+
+		<!--        <if test="startTime != null and startTime != ''">-->
+		<!--            and out_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')-->
+		<!--        </if>-->
+		<!--        <if test="endTime != null and endTime != ''">-->
+		<!--            and out_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)-->
+		<!--        </if>-->
+		<!--		/*入院日期*/-->
+		<!--		<if test="startDate != null">-->
+		<!--			and in_time &gt;=#{startDate}-->
+		<!--		</if>-->
+		<!--		/*出院日期*/-->
+		<!--		<if test="endDate != null">-->
+		<!--			and in_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')-->
+		<!--		</if>-->
+		<if test="statusCode != null and statusCode != ''">
+			and iv.status_code = #{statusCode}
+		</if>
+		<if test="inDeptId != null and inDeptId != ''">
+			and iv.in_dept_id = #{inDeptId}
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and iv.in_time BETWEEN #{Stime} and #{Etime}
+		</if>
+		order by bb.seq_no asc
+	</select>
+
+	<!--分页查询-->
+	<select id="queryBabyInptVisitPage" resultMap="InptVisitMap">
+		(select
+		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
+		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
+		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
+		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
+		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
+		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
+		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
+		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,
+		CONCAT(
+		inpt_visit.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		inpt_visit.gender_code),'-'),'/',
+		IFNULL(inpt_visit.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		inpt_visit.age_unit_code),'')
+		) AS keyword
+		from inpt_visit
+		where hosp_code = #{hospCode}
+		<if test="id != null and id != ''">
+			and id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
+			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%')
+			or status_code like concat('%',#{keyword},'%'))
+
+		</if>
+
+		<!-- 入院开始时间 zhongming by 20201219 -->
+		<if test="startTime != null and startTime != ''">
+			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="statusCode != null and statusCode != ''">
+			and status_code = #{statusCode}
+		</if>
+		<!-- Name传过来的是科室ID-->
+		<if test="inDeptName != null and inDeptName != ''">
+			and in_dept_id = #{inDeptName}
+		</if>
+		<if test="patientCode != null and patientCode != ''">
+			and patient_code = #{patientCode}
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and in_time BETWEEN #{Stime} and #{Etime}
+		</if>)
+		union all
+		(select
+		pt.id, pt.hosp_code, pt.profile_id, pt.in_profile, pt.in_no, pt.name, pt.gender_code, pt.age, pt.age_unit_code, pt.birthday,
+		pt.nationality_cation, pt.occupation_code, pt.education_code, pt.contact_name, pt.contact_rela_code, pt.contact_address,
+		pt.contact_phone, pt.nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
+		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
+		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
+		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
+		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
+		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName,
+		CONCAT(
+		pt.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		pt.gender_code),'-'),'/',
+		IFNULL(pt.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		pt.age_unit_code),'')
+		) AS keyword
+		from inpt_visit pt join inpt_baby pb on pt.id = pb.visit_id
+		where pt.hosp_code = #{hospCode}
+		<if test="id != null and id != ''">
+			and pt.id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (pt.name like concat('%',#{keyword},'%') or pt.cert_no like concat('%',#{keyword},'%')
+			or pt.in_no like concat('%',#{keyword},'%') or pt.bed_name like concat('%',#{keyword},'%')
+			or pt.status_code like concat('%',#{keyword},'%'))
+		</if>
+		<!-- 入院开始时间 zhongming by 20201219 -->
+		<if test="startTime != null and startTime != ''">
+			and pt.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and pt.in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="statusCode != null and statusCode != ''">
+			and pt.status_code = #{statusCode}
+		</if>
+		<!-- Name传过来的是科室ID-->
+		<if test="inDeptName != null and inDeptName != ''">
+			and in_dept_id = #{inDeptName}
+		</if>
+		<if test="patientCode != null and patientCode != ''">
+			and patient_code = #{patientCode}
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and pt.in_time BETWEEN #{Stime} and #{Etime}
+		</if>)
+		order by crte_time desc,px asc
+	</select>
+
+	<!--根据金额预警线分页查询患者 住院催款用 谢星宇-->
+	<select id="queryInptVisitPageByMoney" resultMap="InptVisitMap">
+		select
+		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
+		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
+		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
+		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
+		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
+		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
+		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
+		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,
+		CONCAT(
+		inpt_visit.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		inpt_visit.gender_code),'-'),'/',
+		IFNULL(inpt_visit.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		inpt_visit.age_unit_code),'')
+		) AS keyword
+		from inpt_visit
+		where hosp_code = #{hospCode}
+		<if test="statusCodes != null and statusCodes.length>0">
+			and status_code not in
+			 <foreach collection="statusCodes" item="statusCode" open="(" close=")" separator=",">
+				 #{statusCode}
+			 </foreach>
+		</if>
+		<if test="id != null and id != ''">
+			and id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
+			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%'))
+		</if>
+		<if test="warningMoney != null and warningMoney != ''">
+			and total_balance &lt;= #{warningMoney}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and out_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and out_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+		</if>
+		/*入院日期*/
+		<if test="startDate != null">
+			and in_time &gt;=#{startDate}
+		</if>
+		/*出院日期*/
+		<if test="endDate != null">
+			and in_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+		</if>
+		<if test="statusCode != null and statusCode != ''">
+			and status_code = #{statusCode}
+		</if>
+		<if test="inDeptId != null and inDeptId != ''">
+			and in_dept_id = #{inDeptId}
+		</if>
+		<if test="inWardId != null and inWardId != ''">
+			and in_ward_id = #{inWardId}
+		</if>
+		<if test="patientCode != null and patientCode != ''">
+			and patient_code = #{patientCode}
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and in_time BETWEEN #{Stime} and #{Etime}
+		</if>
+		<if test="isOrderBy != null and isOrderBy != '' and 'Y'.toString() == isOrderBy ">
+			order by in_dept_name asc,bed_name asc,name asc,in_time desc,patient_code asc
+		</if>
+		<if test="isOrderBy == null or isOrderBy == ''">
+			order by crte_time desc
+		</if>
+
+	</select>
+
+	<!--分页查询  勿乱改-->
+	<select id="queryInptVisitPageS" resultMap="InptVisitMap">
+		select
+		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
+		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
+		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
+		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
+		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
+		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
+		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
+		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time
+		from inpt_visit
+		where hosp_code = #{hospCode}
+		and (status_code between 1 and 6)
+		<if test="id != null and id != ''">
+			and id = #{id}
+		</if>
+		/*开始日期*/
+		<if test="startDate != null">
+			<!--and crte_time &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')-->
+			and crte_time &gt;=#{startDate}
+		</if>
+		/*结束日期*/
+		<if test="endDate != null">
+			and crte_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
+			or in_no like concat('%',#{keyword},'%'))
+		</if>
+		order by crte_time desc
+	</select>
+	<update id="updateInsureSettleById">
+		update
+		insure_individual_settle
+		<set>
+			<if test="omsgid != null and omsgid != ''">
+				omsgid = #{omsgid,jdbcType=VARCHAR},
+			</if>
+			<if test="oinfno != null and oinfno != ''">
+				oinfno = #{oinfno,jdbcType=VARCHAR},
+			</if>
+			<if test="insureSettleId != null and insureSettleId != ''">
+				insureSettleId = #{insureSettleId,jdbcType=VARCHAR},
+			</if>
+			<if test="medicalRegNo != null and medicalRegNo != ''">
+				medicalRegNo = #{medicalRegNo,jdbcType=VARCHAR},
+			</if>
+			<if test="clrOptins != null and clrOptins != ''">
+				clr_optins = #{clrOptins,jdbcType=VARCHAR},
+			</if>
+			<if test="clrWay != null and clrWay != ''">
+				clr_way = #{clrWay,jdbcType=VARCHAR},
+			</if>
+			<if test="clrType != null and clrType != ''">
+				clr_type = #{clrType,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+
+	<!--单个新增-->
+	<insert id="insertInptVisit" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_visit(id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday, nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address, contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code, receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id, in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no, outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id, out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id, out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time, archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code, insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{profileId}, #{inProfile}, #{inNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{birthday}, #{nationalityCation}, #{occupationCode}, #{educationCode}, #{contactName}, #{contactRelaCode}, #{contactAddress}, #{contactPhone}, #{nationCode}, #{certCode}, #{certNo}, #{marryCode}, #{phone}, #{address}, #{preferentialTypeId}, #{patientCode}, #{receiveHospName}, #{bedId}, #{bedName}, #{nursingCode}, #{dietType}, #{illnessCode}, #{statusCode}, #{inWardId}, #{inDeptId}, #{inDeptName}, #{inTime}, #{zzDoctorId}, #{zzDoctorName}, #{jzDoctorId}, #{jzDoctorName}, #{zgDoctorId}, #{zgDoctorName}, #{inRemark}, #{inModeCode}, #{inDiseaseId}, #{inDiseaseName}, #{inDiseaseIcd10}, #{inSituationCode}, #{outptVisitNo}, #{outptDoctorId}, #{outptDoctorName}, #{outptDiseaseId}, #{outptDiseaseName}, #{outptDiseaseIcd10}, #{outWardId}, #{outDeptId}, #{outDeptName}, #{outTime}, #{outDiseaseId}, #{outDiseaseName}, #{outDiseaseIcd10}, #{outOperId}, #{outOperName}, #{outOperTime}, #{outSituationCode}, #{outRemark}, #{outModeCode}, #{isArchive}, #{archiveTime}, #{archiveId}, #{archiveName}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode}, #{insurePatientId}, #{insureRemark}, #{totalAdvance}, #{totalCost}, #{totalBalance}, #{crteId}, #{crteName},now())
+    </insert>
+
+	<!--单个修改-->
+	<update id="updateInptVisit">
+		update inpt_visit
+		<set>
+			<if test="profileId != null and profileId != ''">
+				profile_id = #{profileId},
+			</if>
+			<if test="inProfile != null and inProfile != ''">
+				in_profile = #{inProfile},
+			</if>
+			<if test="inNo != null and inNo != ''">
+				in_no = #{inNo},
+			</if>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				gender_code = #{genderCode},
+			</if>
+			<if test="age != null">
+				age = #{age},
+			</if>
+			<if test="ageUnitCode != null and ageUnitCode != ''">
+				age_unit_code = #{ageUnitCode},
+			</if>
+			<if test="birthday != null">
+				birthday = #{birthday},
+			</if>
+			<if test="nationalityCation != null and nationalityCation != ''">
+				nationality_cation = #{nationalityCation},
+			</if>
+			<if test="occupationCode != null and occupationCode != ''">
+				occupation_code = #{occupationCode},
+			</if>
+			<if test="educationCode != null and educationCode != ''">
+				education_code = #{educationCode},
+			</if>
+			<if test="contactName != null and contactName != ''">
+				contact_name = #{contactName},
+			</if>
+			<if test="contactRelaCode != null and contactRelaCode != ''">
+				contact_rela_code = #{contactRelaCode},
+			</if>
+			<if test="contactAddress != null and contactAddress != ''">
+				contact_address = #{contactAddress},
+			</if>
+			<if test="contactPhone != null and contactPhone != ''">
+				contact_phone = #{contactPhone},
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				nation_code = #{nationCode},
+			</if>
+			<if test="certCode != null and certCode != ''">
+				cert_code = #{certCode},
+			</if>
+			<if test="certNo != null and certNo != ''">
+				cert_no = #{certNo},
+			</if>
+			<if test="marryCode != null and marryCode != ''">
+				marry_code = #{marryCode},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="address != null and address != ''">
+				address = #{address},
+			</if>
+			<if test="preferentialTypeId != null and preferentialTypeId != ''">
+				preferential_type_id = #{preferentialTypeId},
+			</if>
+			<if test="patientCode != null and patientCode != ''">
+				patient_code = #{patientCode},
+			</if>
+			<if test="receiveHospName != null and receiveHospName != ''">
+				receive_hosp_name = #{receiveHospName},
+			</if>
+			<if test="bedId != null">
+				bed_id = #{bedId},
+			</if>
+			<if test="bedName != null">
+				bed_name = #{bedName},
+			</if>
+			<if test="nursingCode != null and nursingCode != ''">
+				nursing_code = #{nursingCode},
+			</if>
+			<if test="dietType != null and dietType != ''">
+				diet_type = #{dietType},
+			</if>
+			<if test="illnessCode != null and illnessCode != ''">
+				Illness_code = #{illnessCode},
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				status_code = #{statusCode},
+			</if>
+			<if test="inWardId != null and inWardId != ''">
+				in_ward_id = #{inWardId},
+			</if>
+			<if test="inDeptId != null and inDeptId != ''">
+				in_dept_id = #{inDeptId},
+			</if>
+			<if test="inDeptName != null and inDeptName != ''">
+				in_dept_name = #{inDeptName},
+			</if>
+			<if test="inTime != null">
+				in_time = #{inTime},
+			</if>
+			<if test="zzDoctorId != null and zzDoctorId != ''">
+				zz_doctor_id = #{zzDoctorId},
+			</if>
+			<if test="zzDoctorName != null and zzDoctorName != ''">
+				zz_doctor_name = #{zzDoctorName},
+			</if>
+			<if test="jzDoctorId != null and jzDoctorId != ''">
+				jz_doctor_id = #{jzDoctorId},
+			</if>
+			<if test="jzDoctorName != null and jzDoctorName != ''">
+				jz_doctor_name = #{jzDoctorName},
+			</if>
+			<if test="zgDoctorId != null and zgDoctorId != ''">
+				zg_doctor_id = #{zgDoctorId},
+			</if>
+			<if test="zgDoctorName != null and zgDoctorName != ''">
+				zg_doctor_name = #{zgDoctorName},
+			</if>
+			<if test="inRemark != null and inRemark != ''">
+				in_remark = #{inRemark},
+			</if>
+			<if test="inModeCode != null and inModeCode != ''">
+				in_mode_code = #{inModeCode},
+			</if>
+			<if test="inDiseaseId != null and inDiseaseId != ''">
+				in_disease_id = #{inDiseaseId},
+			</if>
+			<if test="inDiseaseName != null and inDiseaseName != ''">
+				in_disease_name = #{inDiseaseName},
+			</if>
+			<if test="inDiseaseIcd10 != null and inDiseaseIcd10 != ''">
+				in_disease_icd10 = #{inDiseaseIcd10},
+			</if>
+			<if test="inSituationCode != null and inSituationCode != ''">
+				in_situation_code = #{inSituationCode},
+			</if>
+			<if test="outptVisitNo != null and outptVisitNo != ''">
+				outpt_visit_no = #{outptVisitNo},
+			</if>
+			<if test="outptDoctorId != null and outptDoctorId != ''">
+				outpt_doctor_id = #{outptDoctorId},
+			</if>
+			<if test="outptDoctorName != null and outptDoctorName != ''">
+				outpt_doctor_name = #{outptDoctorName},
+			</if>
+			<if test="outptDiseaseId != null and outptDiseaseId != ''">
+				outpt_disease_id = #{outptDiseaseId},
+			</if>
+			<if test="outptDiseaseName != null and outptDiseaseName != ''">
+				outpt_disease_name = #{outptDiseaseName},
+			</if>
+			<if test="outptDiseaseIcd10 != null and outptDiseaseIcd10 != ''">
+				outpt_disease_icd10 = #{outptDiseaseIcd10},
+			</if>
+			<if test="outWardId != null and outWardId != ''">
+				out_ward_id = #{outWardId},
+			</if>
+			<if test="outDeptId != null and outDeptId != ''">
+				out_dept_id = #{outDeptId},
+			</if>
+			<if test="outDeptName != null and outDeptName != ''">
+				out_dept_name = #{outDeptName},
+			</if>
+			<if test="outTime != null">
+				out_time = #{outTime},
+			</if>
+			<if test="outDiseaseId != null and outDiseaseId != ''">
+				out_disease_id = #{outDiseaseId},
+			</if>
+			<if test="outDiseaseName != null and outDiseaseName != ''">
+				out_disease_name = #{outDiseaseName},
+			</if>
+			<if test="outDiseaseIcd10 != null and outDiseaseIcd10 != ''">
+				out_disease_icd10 = #{outDiseaseIcd10},
+			</if>
+			<if test="outOperId != null and outOperId != ''">
+				out_oper_id = #{outOperId},
+			</if>
+			<if test="outOperName != null and outOperName != ''">
+				out_oper_name = #{outOperName},
+			</if>
+			<if test="outOperTime != null">
+				out_oper_time = #{outOperTime},
+			</if>
+			<if test="outSituationCode != null and outSituationCode != ''">
+				out_situation_code = #{outSituationCode},
+			</if>
+			<if test="outRemark != null and outRemark != ''">
+				out_remark = #{outRemark},
+			</if>
+			<if test="outModeCode != null and outModeCode != ''">
+				out_mode_code = #{outModeCode},
+			</if>
+			<if test="isArchive != null and isArchive != ''">
+				is_archive = #{isArchive},
+			</if>
+			<if test="archiveTime != null">
+				archive_time = #{archiveTime},
+			</if>
+			<if test="archiveId != null and archiveId != ''">
+				archive_id = #{archiveId},
+			</if>
+			<if test="archiveName != null and archiveName != ''">
+				archive_name = #{archiveName},
+			</if>
+			<if test="insureCode != null and insureCode != ''">
+				insure_code = #{insureCode},
+			</if>
+			<if test="insureOrgCode != null and insureOrgCode != ''">
+				insure_org_code = #{insureOrgCode},
+			</if>
+			<if test="insureNo != null and insureNo != ''">
+				insure_no = #{insureNo},
+			</if>
+			<if test="insureBizCode != null and insureBizCode != ''">
+				insure_biz_code = #{insureBizCode},
+			</if>
+			<if test="insureTreatCode != null and insureTreatCode != ''">
+				insure_treat_code = #{insureTreatCode},
+			</if>
+			<if test="insurePatientId != null and insurePatientId != ''">
+				insure_patient_id = #{insurePatientId},
+			</if>
+			<if test="insureRemark != null and insureRemark != ''">
+				insure_remark = #{insureRemark},
+			</if>
+			<if test="totalAdvance != null">
+				total_advance = #{totalAdvance},
+			</if>
+			<if test="totalCost != null">
+				total_cost = #{totalCost},
+			</if>
+			<if test="totalBalance != null">
+				total_balance = #{totalBalance},
+			</if>
+			<if test="respNurseId != null and respNurseId != ''">
+				resp_nurse_id = #{respNurseId},
+			</if>
+			<if test="respNurseName != null and respNurseName != ''">
+				resp_nurse_name = #{respNurseName},
+			</if>
+			<if test="crteId != null and crteId != ''">
+				crte_id = #{crteId},
+			</if>
+			<if test="crteName != null and crteName != ''">
+				crte_name = #{crteName},
+			</if>
+			<if test="crteTime != null">
+				crte_time = #{crteTime},
+			</if>
+		</set>
+		where hosp_code = #{hospCode}
+		and id = #{id}
+	</update>
+
+	<!--查询门诊就诊表记录-->
+	<select id="queryOutptVisitAll" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+		select
+		a.id, a.hosp_code, a.profile_id, a.out_profile, a.register_id, a.register_no, a.name, a.gender_code, a.age,
+		a.age_unit_code,
+		a.birthday, a.marry_code, a.nation_code, a.cert_code, a.cert_no, a.phone, a.visit_no, a.visit_code,
+		a.patient_code,
+		a.preferential_type_id, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
+		a.insure_patient_id, a.insure_remark, a.doctor_id, a.doctor_name, a.dept_id, a.dept_name, a.visit_time,
+		a.remark, a.pym, a.wbm,
+		a.doctor_id as outpt_doctor_id, a.doctor_name as outpt_doctor_name,
+		a.is_visit, a.is_first_visit, a.tran_in_code, a.in_dept_id, a.in_disease_id, a.in_remark,a.advance_payment,
+		(select name from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseName,
+		(select nation_code from base_disease where id = a.in_disease_id and hosp_code = #{hospCode}) as inDiseaseCode,
+		<!-- 门诊诊断表中没有主诊断的情况下，查询门诊病历表中的诊断 luoyong 2021.8.4-->
+		<!--(select id from base_disease where hosp_code = #{hospCode}
+		and id in (
+		select disease_id from outpt_diagnose
+		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})
+		) as outptDiseaseId,
+		(select name from base_disease where hosp_code = #{hospCode} and id in (
+		select disease_id from outpt_diagnose
+		where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) as outptDiseaseName,-->
+		IFNULL(
+			(select id from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})),
+			(SELECT id from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code )))
+		) as outptDiseaseId,
+		IFNULL(
+			(select name from base_disease where hosp_code = #{hospCode} and id in (select disease_id from outpt_diagnose where visit_id = a.id and is_main = '1' and hosp_code = #{hospCode})) ,
+			(SELECT name from base_disease where hosp_code = #{hospCode} and id in ((SELECT SUBSTRING_INDEX(disease_id, ',', 1) from outpt_medical_record where a.id = visit_id and a.hosp_code = hosp_code)))
+		) as outptDiseaseName,
+		(select id from base_dept where code = (select ward_code from base_dept where id = a.in_dept_id and hosp_code = #{hospCode}) and hosp_code = #{hospCode}) as inWardId
+		from outpt_visit a
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="keyword != null and keyword != ''">
+				and (a.name like concat('%',#{keyword},'%') or
+				a.cert_no like concat('%',#{keyword},'%') or
+				a.visit_no like concat('%',#{keyword},'%'))
+			</if>
+			/*开始日期*/
+			<if test="startDate != null">
+				and a.in_cert_time &gt;=#{startDate}
+			</if>
+			/*结束日期*/
+			<if test="endDate != null">
+				and a.in_cert_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+			</if>
+			<if test="id != null and id != ''">
+				and a.id = #{id}
+			</if>
+			<if test="profileId != null and profileId != ''">
+				and a.profile_id = #{profileId}
+			</if>
+			<if test="outProfile != null and outProfile != ''">
+				and a.out_profile = #{outProfile}
+			</if>
+			<if test="registerId != null and registerId != ''">
+				and a.register_id = #{registerId}
+			</if>
+			<if test="registerNo != null and registerNo != ''">
+				and a.register_no = #{registerNo}
+			</if>
+			<if test="name != null and name != ''">
+				and a.name = #{name}
+			</if>
+			<if test="genderCode != null and genderCode != ''">
+				and a.gender_code = #{genderCode}
+			</if>
+			<if test="age != null">
+				and a.age = #{age}
+			</if>
+			<if test="ageUnitCode != null and ageUnitCode != ''">
+				and a.age_unit_code = #{ageUnitCode}
+			</if>
+			<if test="birthday != null">
+				and a.birthday = #{birthday}
+			</if>
+			<if test="marryCode != null and marryCode != ''">
+				and a.marry_code = #{marryCode}
+			</if>
+			<if test="nationCode != null and nationCode != ''">
+				and a.nation_code = #{nationCode}
+			</if>
+			<if test="certCode != null and certCode != ''">
+				and a.cert_code = #{certCode}
+			</if>
+			<if test="certNo != null and certNo != ''">
+				and a.cert_no = #{certNo}
+			</if>
+			<if test="phone != null and phone != ''">
+				and a.phone = #{phone}
+			</if>
+			<if test="visitNo != null and visitNo != ''">
+				and a.visit_no = #{visitNo}
+			</if>
+			<if test="visitCode != null and visitCode != ''">
+				and a.visit_code = #{visitCode}
+			</if>
+			<if test="patientCode != null and patientCode != ''">
+				and a.patient_code = #{patientCode}
+			</if>
+			<if test="preferentialTypeId != null and preferentialTypeId != ''">
+				and a.preferential_type_id = #{preferentialTypeId}
+			</if>
+			<if test="insureCode != null and insureCode != ''">
+				and a.insure_code = #{insureCode}
+			</if>
+			<if test="insureOrgCode != null and insureOrgCode != ''">
+				and a.insure_org_code = #{insureOrgCode}
+			</if>
+			<if test="insureNo != null and insureNo != ''">
+				and a.insure_no = #{insureNo}
+			</if>
+			<if test="insureBizCode != null and insureBizCode != ''">
+				and a.insure_biz_code = #{insureBizCode}
+			</if>
+			<if test="insureTreatCode != null and insureTreatCode != ''">
+				and a.insure_treat_code = #{insureTreatCode}
+			</if>
+			<if test="insurePatientId != null and insurePatientId != ''">
+				and a.insure_patient_id = #{insurePatientId}
+			</if>
+			<if test="insureRemark != null and insureRemark != ''">
+				and a.insure_remark = #{insureRemark}
+			</if>
+			<if test="doctorId != null and doctorId != ''">
+				and a.doctor_id = #{doctorId}
+			</if>
+			<if test="doctorName != null and doctorName != ''">
+				and a.doctor_name = #{doctorName}
+			</if>
+			<if test="deptId != null and deptId != ''">
+				and a.dept_id = #{deptId}
+			</if>
+			<if test="deptName != null and deptName != ''">
+				and a.dept_name = #{deptName}
+			</if>
+			<if test="visitTime != null">
+				and a.visit_time = #{visitTime}
+			</if>
+			<if test="remark != null and remark != ''">
+				and a.remark = #{remark}
+			</if>
+			<if test="pym != null and pym != ''">
+				and a.pym = #{pym}
+			</if>
+			<if test="wbm != null and wbm != ''">
+				and a.wbm = #{wbm}
+			</if>
+			<if test="isVisit != null and isVisit != ''">
+				and a.is_visit = #{isVisit}
+			</if>
+			<if test="isFirstVisit != null and isFirstVisit != ''">
+				and a.is_first_visit = #{isFirstVisit}
+			</if>
+			<if test="tranInCode != null and tranInCode != ''">
+				and a.tran_in_code = #{tranInCode}
+			</if>
+			<if test="inDiseaseId != null and inDiseaseId != ''">
+				and a.in_disease_id = #{inDiseaseId}
+			</if>
+			<if test="inRemark != null and inRemark != ''">
+				and a.in_remark = #{inRemark}
+			</if>
+			<if test="crteId != null and crteId != ''">
+				and a.crte_id = #{crteId}
+			</if>
+			<if test="crteName != null and crteName != ''">
+				and a.crte_name = #{crteName}
+			</if>
+			<if test="crteTime != null">
+				and a.crte_time = #{crteTime}
+			</if>
+		</where>
+		order by a.crte_time desc
+	</select>
+	<!--删除住院就诊表记录-->
+	<delete id="deleteById">
+        delete from inpt_visit where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+	<!-- 修改某个病人状态为作废 -->
+	<update id="invalidPatientStatus">
+		update inpt_visit set status_code = #{statusCode} where id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--通过医嘱ID获取住院病人信息-->
+	<select id="getVisitByAdviceId" resultMap="InptVisitMap">
+		select distinct a.* from inpt_visit a join inpt_advice b on a.id=b.visit_id where a.hosp_code=#{hospCode} and
+		b.hosp_code=#{hospCode}
+		<if test="adviceIds !=null and adviceIds.size()>0">
+			and b.id in
+			<foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+
+	<!--回写就诊表金额，余额-->
+	<!--<update id="updateInptVisitAmount" keyProperty="id" useGeneratedKeys="true">
+		<foreach collection="visitDTOList" item="item" separator=";">
+			update inpt_visit set total_cost=ifnull(total_cost,0)+#{item.totalCost},total_balance=ifnull(total_balance,0)-#{item.totalCost}
+			where id=#{item.id} and hosp_code=#{item.hospCode}
+		</foreach>
+	</update>-->
+
+	<update id="updateInptVisitAmount" keyProperty="id" useGeneratedKeys="true">
+		<foreach collection="visitDTOList" item="item" separator=";">
+			update inpt_visit a, (
+			select cost.visit_id, cost.hosp_code, sum(ifnull(reality_price,0)) realityPrice from inpt_cost cost where
+			cost.visit_id = #{item.id} and cost.hosp_code = #{item.hospCode} and (cost.baby_id is null or cost.baby_id = '')
+			)b set a.total_cost= b.realityPrice , a.total_balance= ifnull(a.total_advance,0) - b.realityPrice
+			where a.id=#{item.id} and a.hosp_code=#{item.hospCode} and a.id = b.visit_id and a.hosp_code = b.hosp_code
+		</foreach>
+	</update>
+
+	<!-- 出院结算查询 -->
+	<select id="queryInptVisitList" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+		select
+		CONCAT(
+		iv.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		iv.gender_code),'-'),'/',
+		IFNULL(iv.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		iv.age_unit_code),'')
+		) AS keyword,
+		iv.id,
+		iv.hosp_code,
+		iv.profile_id,
+		iv.in_profile,
+		iv.in_no,
+		iv.name,
+		iv.gender_code,
+		iv.age,
+		iv.age_unit_code,
+		iv.birthday,
+		iv.nationality_cation,
+		iv.occupation_code,
+		iv.education_code,
+		iv.contact_name,
+		iv.contact_rela_code,
+		iv.contact_address,
+		iv.contact_phone,
+		iv.nation_code,
+		iv.cert_code,
+		iv.cert_no,
+		iv.marry_code,
+		iv.phone,
+		iv.address,
+		iv.preferential_type_id,
+		iv.patient_code,
+		iv.receive_hosp_name,
+		iv.bed_id,
+		iv.bed_name,
+		iv.nursing_code,
+		iv.diet_type,
+		iv.Illness_code,
+		iv.status_code,
+		iv.in_ward_id,
+		iv.in_dept_id,
+		iv.in_dept_name,
+		iv.in_time,
+		iv.zz_doctor_id,
+		iv.zz_doctor_name,
+		iv.jz_doctor_id,
+		iv.jz_doctor_name,
+		iv.zg_doctor_id,
+		iv.zg_doctor_name,
+		iv.in_remark,
+		iv.in_mode_code,
+		iv.in_disease_id,
+		iv.in_disease_name,
+		iv.in_disease_icd10,
+		iv.in_situation_code,
+		iv.outpt_visit_no,
+		iv.outpt_doctor_id,
+		iv.outpt_doctor_name,
+		iv.outpt_disease_id,
+		iv.outpt_disease_name,
+		iv.outpt_disease_icd10,
+		iv.out_ward_id,
+		iv.out_dept_id,
+		iv.out_dept_name,
+		iv.out_time,
+		iv.out_disease_id,
+		iv.out_disease_name,
+		iv.out_disease_icd10,
+		iv.out_oper_id,
+		iv.out_oper_name,
+		iv.out_oper_time,
+		iv.out_situation_code,
+		iv.out_remark,
+		iv.out_mode_code,
+		iv.is_archive,
+		iv.archive_time,
+		iv.archive_id,
+		iv.archive_name,
+		iv.insure_code,
+		iv.insure_org_code,
+		iv.insure_no,
+		iv.insure_biz_code,
+		iv.insure_treat_code,
+		iv.insure_patient_id,
+		iv.insure_remark,
+		iv.total_advance,
+		iv.total_cost,
+		iv.total_balance,
+		iv.crte_id,
+		iv.crte_name,
+		iv.crte_time,
+		iiv.medical_reg_no
+		from
+		inpt_visit iv
+		left join insure_individual_visit iiv on iv.id = iiv.visit_id
+		where
+		iv.hosp_code = #{hospCode}
+
+		<if test="statusCode != null and statusCode != ''">
+		  <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+			  AND iv.status_code in ('2','5') and iiv.is_half_settle = '1' and  iiv.insure_settle_id is null
+		  </if>
+			<if test="isMidWaySettle != null and isMidWaySettle == '0'.toString()">
+				AND iv.status_code = #{statusCode} and (iiv.is_half_settle is null or iiv.is_half_settle!='1')
+			</if>
+		</if>
+		<if test="startDate != null">
+			AND iv.out_time >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[ AND iv.out_time <= #{endDate} ]]>
+		</if>
+		<if test="keyword != null and keyword != ''">
+			AND (iv.name like concat('%',#{keyword},'%')
+			OR iv.cert_no like concat('%',#{keyword},'%')
+			OR iv.in_no like concat('%',#{keyword},'%')
+			OR iv.phone like concat('%',#{keyword},'%'))
+		</if>
+		<if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+			and iv.patient_code &lt;&gt; '0'
+		</if>
+		<if test="midWayStartDate != null">
+			AND iv.in_time >= #{midWayStartDate}
+		</if>
+		<if test="midWayEndDate != null">
+			<![CDATA[ AND iv.in_time <= #{midWayEndDate} ]]>
+		</if>
+		order by iv.crte_time desc
+	</select>
+
+  <!-- 出院归属结算查询 -->
+  <select id="queryAttributionInptVisitList" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+    select distinct
+    CONCAT(
+    iv.name,'/',
+    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+    iv.gender_code),'-'),'/',
+    IFNULL(iv.age,'-'),
+    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+    iv.age_unit_code),'')
+    ) AS keyword,
+    iv.id,
+    iv.hosp_code,
+    iv.profile_id,
+    iv.in_profile,
+    iv.in_no,
+    iv.name,
+    iv.gender_code,
+    iv.age,
+    iv.age_unit_code,
+    iv.birthday,
+    iv.nationality_cation,
+    iv.occupation_code,
+    iv.education_code,
+    iv.contact_name,
+    iv.contact_rela_code,
+    iv.contact_address,
+    iv.contact_phone,
+    iv.nation_code,
+    iv.cert_code,
+    iv.cert_no,
+    iv.marry_code,
+    iv.phone,
+    iv.address,
+    iv.preferential_type_id,
+    iv.patient_code,
+    iv.receive_hosp_name,
+    iv.bed_id,
+    iv.bed_name,
+    iv.nursing_code,
+    iv.diet_type,
+    iv.Illness_code,
+    iv.status_code,
+    iv.in_ward_id,
+    iv.in_dept_id,
+    iv.in_dept_name,
+    iv.in_time,
+    iv.zz_doctor_id,
+    iv.zz_doctor_name,
+    iv.jz_doctor_id,
+    iv.jz_doctor_name,
+    iv.zg_doctor_id,
+    iv.zg_doctor_name,
+    iv.in_remark,
+    iv.in_mode_code,
+    iv.in_disease_id,
+    iv.in_disease_name,
+    iv.in_disease_icd10,
+    iv.in_situation_code,
+    iv.outpt_visit_no,
+    iv.outpt_doctor_id,
+    iv.outpt_doctor_name,
+    iv.outpt_disease_id,
+    iv.outpt_disease_name,
+    iv.outpt_disease_icd10,
+    iv.out_ward_id,
+    iv.out_dept_id,
+    iv.out_dept_name,
+    iv.out_time,
+    iv.out_disease_id,
+    iv.out_disease_name,
+    iv.out_disease_icd10,
+    iv.out_oper_id,
+    iv.out_oper_name,
+    iv.out_oper_time,
+    iv.out_situation_code,
+    iv.out_remark,
+    iv.out_mode_code,
+    iv.is_archive,
+    iv.archive_time,
+    iv.archive_id,
+    iv.archive_name,
+    iv.insure_code,
+    iv.insure_org_code,
+    iv.insure_no,
+    iv.insure_biz_code,
+    iv.insure_treat_code,
+    iv.insure_patient_id,
+    iv.insure_remark,
+    iv.total_advance,
+    iv.total_cost,
+    iv.total_balance,
+    iv.crte_id,
+    iv.crte_name,
+    iv.crte_time,
+    iiv.medical_reg_no
+    from
+    inpt_visit iv
+    left join insure_individual_visit iiv on iv.id = iiv.visit_id
+    <if test="attributionCode != null and attributionCode != ''">
+      join inpt_cost ic on ic.visit_id = iv.id and ic.attribution_code in('1','2','3')
+    </if>
+    where
+    iv.hosp_code = #{hospCode}
+    <if test="statusCode != null and statusCode != ''">
+      <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+        AND iv.status_code in ('2','5') and iiv.is_half_settle = '1' and  iiv.insure_settle_id is null
+      </if>
+      <if test="isMidWaySettle != null and isMidWaySettle == '0'.toString()">
+        AND iv.status_code = #{statusCode} and (iiv.is_half_settle is null or iiv.is_half_settle!='1')
+      </if>
+    </if>
+    <if test="startDate != null">
+      AND iv.out_time >= #{startDate}
+    </if>
+    <if test="endDate != null">
+      <![CDATA[ AND iv.out_time <= #{endDate} ]]>
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (iv.name like concat('%',#{keyword},'%')
+      OR iv.cert_no like concat('%',#{keyword},'%')
+      OR iv.in_no like concat('%',#{keyword},'%')
+      OR iv.phone like concat('%',#{keyword},'%'))
+    </if>
+    <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+      and iv.patient_code &lt;&gt; '0'
+    </if>
+    <if test="midWayStartDate != null">
+      AND iv.in_time >= #{midWayStartDate}
+    </if>
+    <if test="midWayEndDate != null">
+      <![CDATA[ AND iv.in_time <= #{midWayEndDate} ]]>
+    </if>
+    order by iv.crte_time desc
+  </select>
+
+  <!--转科修改-->
+	<update id="updateInptVisitZk">
+		update inpt_visit
+		<set>
+			bed_id = #{bedId},
+			bed_name = #{bedName},
+			status_code = #{statusCode},
+			in_ward_id = #{inWardId},
+			in_dept_id = #{inDeptId},
+			in_dept_name = #{inDeptName},
+			zz_doctor_id = #{zzDoctorId},
+			zz_doctor_name = #{zzDoctorName},
+			jz_doctor_id = #{jzDoctorId},
+			jz_doctor_name = #{jzDoctorName},
+			zg_doctor_id = #{zgDoctorId},
+			zg_doctor_name = #{zgDoctorName},
+		</set>
+		where hosp_code = #{hospCode}
+		and id = #{id}
+	</update>
+
+	<!--新增住院入院诊断信息 -->
+	<insert id="insertDiagnose" useGeneratedKeys="false">
+		insert into inpt_diagnose(
+		id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+		)
+		values
+		(#{id},#{hospCode},#{diseaseId},#{visitId},#{typeCode},#{isMain},#{crteId},#{crteName},now())
+	</insert>
+
+	<!--通过医嘱ID获取住院病人信息-->
+	<select id="getDeptCodeByDeptId" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+		select * from base_dept where hosp_code = #{hospCode} and id = #{id}
+	</select>
+
+	<!--通过医嘱ID获取住院病人信息-->
+	<select id="getUserInfoById" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+		select * from sys_user where hosp_code = #{hospCode} and id = #{id}
+	</select>
+
+	<!-- 插入医保个人就诊信息 -->
+	<insert id="insertInsureIndividualVisit" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        INSERT INTO insure_individual_visit (
+            id, hosp_code, visit_id, mib_id, insure_org_code, insure_reg_code, medicine_org_code, is_hospital,
+            visit_no, aac001, medical_reg_no, aka130, aka130_name, bka006, bka006_name, injury_borth_sn,
+            visit_icd_code, visit_icd_name, visit_time, visit_drpt_id, visit_drpt_name, visit_area_id, visit_area_name, visit_berth,
+            starting_price, shift_hosp_code, out_hosp_code, cause, remark, crte_id, crte_name, crte_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{visitId},
+            #{mibId},
+            #{insureOrgCode},
+            #{insureRegCode},
+            #{medicineOrgCode},
+            #{isHospital},
+            #{visitNo},
+            #{aac001},
+            #{medicalRegNo},
+            #{aka130},
+            #{aka130Name},
+            #{bka006},
+            #{bka006Name},
+            #{injuryBorthSn},
+            #{visitIcdCode},
+            #{visitIcdName},
+            #{visitTime},
+            #{visitDrptId},
+            #{visitDrptName},
+            #{visitAreaId},
+            #{visitAreaName},
+            #{visitBerth},
+            #{startingPrice},
+            #{shiftHospCode},
+            #{outHospCode},
+            #{cause},
+            #{remark},
+            #{crteId},
+            #{crteName},
+            #{crteTime}
+        )
+    </insert>
+
+	<!--通过就诊ID获取医保入院登记信息-->
+	<select id="getInsureIndividualVisitInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+			resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+		select a.*,b.card_iden as cardIden from insure_individual_visit a inner join insure_individual_basic b on (a.mib_id = b.id and a.hosp_code = b.hosp_code)
+		where a.hosp_code = #{hospCode} and a.visit_id = #{id}
+		<if test="medicalRegNo != null and medicalRegNo != ''">
+			and a.medical_reg_no = #{medicalRegNo}
+		</if>
+	</select>
+
+	<!-- 修改数据 -->
+	<update id="updateInsureIndividualVisit" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+		UPDATE insure_individual_visit
+		<set>
+			<if test="visitId != null">
+				visit_id = #{visitId},
+			</if>
+			<if test="mibId != null">
+				mib_id = #{mibId},
+			</if>
+			<if test="insureOrgCode != null">
+				insure_org_code = #{insureOrgCode},
+			</if>
+			<if test="insureRegCode != null">
+				insure_reg_code = #{insureRegCode},
+			</if>
+			<if test="medicineOrgCode != null">
+				medicine_org_code = #{medicineOrgCode},
+			</if>
+			<if test="isHospital != null">
+				is_hospital = #{isHospital},
+			</if>
+			<if test="visitNo != null">
+				visit_no = #{visitNo},
+			</if>
+			<if test="aac001 != null">
+				aac001 = #{aac001},
+			</if>
+			<if test="medicalRegNo != null">
+				medical_reg_no = #{medicalRegNo},
+			</if>
+			<if test="aka130 != null">
+				aka130 = #{aka130},
+			</if>
+			<if test="aka130Name != null">
+				aka130_name = #{aka130Name},
+			</if>
+			<if test="bka006 != null">
+				bka006 = #{bka006},
+			</if>
+			<if test="bka006Name != null">
+				bka006_name = #{bka006Name},
+			</if>
+			<if test="injuryBorthSn != null">
+				injury_borth_sn = #{injuryBorthSn},
+			</if>
+			<if test="visitIcdCode != null">
+				visit_icd_code = #{visitIcdCode},
+			</if>
+			<if test="visitIcdName != null">
+				visit_icd_name = #{visitIcdName},
+			</if>
+			<if test="visitTime != null">
+				visit_time = #{visitTime},
+			</if>
+			<if test="visitDrptId != null">
+				visit_drpt_id = #{visitDrptId},
+			</if>
+			<if test="visitDrptName != null">
+				visit_drpt_name = #{visitDrptName},
+			</if>
+			<if test="visitAreaId != null">
+				visit_area_id = #{visitAreaId},
+			</if>
+			<if test="visitAreaName != null">
+				visit_area_name = #{visitAreaName},
+			</if>
+			<if test="visitBerth != null">
+				visit_berth = #{visitBerth},
+			</if>
+			<if test="startingPrice != null">
+				starting_price = #{startingPrice},
+			</if>
+			<if test="shiftHospCode != null">
+				shift_hosp_code = #{shiftHospCode},
+			</if>
+			<if test="outHospCode != null">
+				out_hosp_code = #{outHospCode},
+			</if>
+			<if test="cause != null">
+				cause = #{cause},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="crteId != null">
+				crte_id = #{crteId},
+			</if>
+			<if test="crteName != null">
+				crte_name = #{crteName},
+			</if>
+			<if test="crteTime != null">
+				crte_time = #{crteTime}
+			</if>
+		</set>
+		WHERE id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--获取医保结算信息-->
+	<select id="getInsureIndividualSettleInfo" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO"
+			resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+		select * from insure_individual_settle where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{settleId} and is_hospital = #{isHospital}
+	</select>
+	<!--	根据就诊id查询 医保病人的就诊登记号，医疗机构编码-->
+	<select id="queryInptVisitById" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+		select
+			iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name,
+			iv.status_code,iv.insure_code,  iv.insure_org_code,  iv.insure_no,
+			iv.insure_biz_code, iv.insure_treat_code,iv.insure_patient_id,  iv.insure_remark,
+			iiv.medicine_org_code as medicineOrgCode ,iiv.medical_reg_no as medicalRegNo
+		from inpt_visit iv left join insure_individual_visit iiv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+		where iv.hosp_code = #{hospCode}
+		  and iv.id = #{id}
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertInsureIndividualSettle" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+		insert into insure_individual_settle
+		(id,
+		 hosp_code,
+		 visit_id,
+		 settle_id,
+		 is_hospital,
+		 visit_no,
+		 discharge_dn_code,
+		 insure_org_code,
+		 insure_reg_code,
+		 medicine_org_code,
+		 discharge_dn_name,
+		 discharged_date,
+		 discharged_case,
+		 settleway,
+		 total_price,
+		 insure_price,
+		 plan_price,
+		 serious_price,
+		 civil_price,
+		 retire_price,
+		 personal_price,
+		 person_price,
+		 hosp_price,
+		 before_settle,
+		 last_settle,
+		 rests_price,
+		 assign_price,
+		 starting_price,
+		 top_price,
+		 plan_account_price,
+		 portion_price,
+		 state,
+		 settle_state,
+		 costbatch,
+		 aka130,
+		 bka006,
+		 injury_borth_sn,
+		 is_account,
+		 remark,
+		 crte_id,
+		 crte_name,
+		 crte_time,
+		 insureSettleId,
+		 medicalRegNo,
+		 ext03,
+		 ext04,
+		 ext05,
+		 ext06,
+		 ext07,
+		 ext08,
+		 ext09,
+		 ext10,omsgid,oinfno,clr_type,clr_way,clr_optins,remote_msg_id
+		 )
+		values (#{id,jdbcType=VARCHAR},
+				#{hospCode,jdbcType=VARCHAR},
+				#{visitId,jdbcType=VARCHAR},
+				#{settleId,jdbcType=VARCHAR},
+				#{isHospital,jdbcType=VARCHAR},
+				#{visitNo,jdbcType=VARCHAR},
+				#{dischargeDnCode,jdbcType=VARCHAR},
+				#{insureOrgCode,jdbcType=VARCHAR},
+				#{insureRegCode,jdbcType=VARCHAR},
+				#{medicineOrgCode,jdbcType=VARCHAR},
+				#{dischargeDnName,jdbcType=VARCHAR},
+				#{dischargedDate,jdbcType=TIMESTAMP},
+				#{dischargedCase,jdbcType=VARCHAR},
+				#{settleway,jdbcType=VARCHAR},
+				#{totalPrice,jdbcType=DECIMAL},
+				#{insurePrice,jdbcType=DECIMAL},
+				#{planPrice,jdbcType=DECIMAL},
+				#{seriousPrice,jdbcType=DECIMAL},
+				#{civilPrice,jdbcType=DECIMAL},
+				#{retirePrice,jdbcType=DECIMAL},
+				#{personalPrice,jdbcType=DECIMAL},
+				#{personPrice,jdbcType=DECIMAL},
+				#{hospPrice,jdbcType=DECIMAL},
+				#{beforeSettle,jdbcType=DECIMAL},
+				#{lastSettle,jdbcType=DECIMAL},
+				#{restsPrice,jdbcType=DECIMAL},
+				#{assignPrice,jdbcType=DECIMAL},
+				#{startingPrice,jdbcType=DECIMAL},
+				#{topPrice,jdbcType=DECIMAL},
+				#{planAccountPrice,jdbcType=DECIMAL},
+				#{portionPrice,jdbcType=DECIMAL},
+				#{state,jdbcType=VARCHAR},
+				#{settleState,jdbcType=VARCHAR},
+				#{costbatch,jdbcType=VARCHAR},
+				#{aka130,jdbcType=VARCHAR},
+				#{bka006,jdbcType=VARCHAR},
+				#{injuryBorthSn,jdbcType=VARCHAR},
+				#{isAccount,jdbcType=VARCHAR},
+				#{remark,jdbcType=VARCHAR},
+				#{crteId,jdbcType=VARCHAR},
+				#{crteName,jdbcType=VARCHAR},
+				now(),
+				#{insureSettleId,jdbcType=VARCHAR},
+				#{medicalRegNo,jdbcType=VARCHAR},
+				#{ext03,jdbcType=VARCHAR},
+				#{ext04,jdbcType=VARCHAR},
+				#{ext05,jdbcType=VARCHAR},
+				#{ext06,jdbcType=VARCHAR},
+				#{ext07,jdbcType=VARCHAR},
+				#{ext08,jdbcType=VARCHAR},
+				#{ext09,jdbcType=VARCHAR},
+				#{ext10,jdbcType=VARCHAR},
+				#{omsgid,jdbcType=VARCHAR},
+				#{oinfno,jdbcType=VARCHAR},
+				#{clrType,jdbcType=VARCHAR},
+				#{clrWay,jdbcType=VARCHAR},
+				#{clrOptins,jdbcType=VARCHAR},
+				#{remoteMsgId,jdbcType=VARCHAR}
+				)
+	</insert>
+
+	<!-- 修改数据 -->
+	<update id="updateInsureIndividualSettle" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+		UPDATE insure_individual_settle
+		<set>
+			<if test="visitId != null ">
+				visit_id = #{visitId},
+			</if>
+			<if test="settleId != null">
+				settle_id = #{settleId},
+			</if>
+			<if test="isHospital != null">
+				is_hospital = #{isHospital},
+			</if>
+			<if test="visitNo != null">
+				visit_no = #{visitNo},
+			</if>
+			<if test="dischargeDnCode != null">
+				discharge_dn_code = #{dischargeDnCode},
+			</if>
+			<if test="insureOrgCode != null">
+				insure_org_code = #{insureOrgCode},
+			</if>
+			<if test="insureRegCode != null">
+				insure_reg_code = #{insureRegCode},
+			</if>
+			<if test="medicineOrgCode != null">
+				medicine_org_code = #{medicineOrgCode},
+			</if>
+			<if test="dischargeDnName != null">
+				discharge_dn_name = #{dischargeDnName},
+			</if>
+			<if test="dischargedDate != null">
+				discharged_date = #{dischargedDate},
+			</if>
+			<if test="dischargedCase != null">
+				discharged_case = #{dischargedCase},
+			</if>
+			<if test="settleway != null">
+				settleway = #{settleway},
+			</if>
+			<if test="totalPrice != null">
+				total_price = #{totalPrice},
+			</if>
+			<if test="insurePrice != null">
+				insure_price = #{insurePrice},
+			</if>
+			<if test="planPrice != null">
+				plan_price = #{planPrice},
+			</if>
+			<if test="seriousPrice != null">
+				serious_price = #{seriousPrice},
+			</if>
+			<if test="civilPrice != null">
+				civil_price = #{civilPrice},
+			</if>
+			<if test="retirePrice != null">
+				retire_price = #{retirePrice},
+			</if>
+			<if test="personalPrice != null">
+				personal_price = #{personalPrice},
+			</if>
+			<if test="personPrice != null">
+				person_price = #{personPrice},
+			</if>
+			<if test="hospPrice != null">
+				hosp_price = #{hospPrice},
+			</if>
+			<if test="beforeSettle != null">
+				before_settle = #{beforeSettle},
+			</if>
+			<if test="lastSettle != null">
+				last_settle = #{lastSettle},
+			</if>
+			<if test="restsPrice != null">
+				rests_price = #{restsPrice},
+			</if>
+			<if test="assignPrice != null">
+				assign_price = #{assignPrice},
+			</if>
+			<if test="startingPrice != null">
+				starting_price = #{startingPrice},
+			</if>
+			<if test="topPrice != null">
+				top_price = #{topPrice},
+			</if>
+			<if test="planAccountPrice != null">
+				plan_account_price = #{planAccountPrice},
+			</if>
+			<if test="portionPrice != null">
+				portion_price = #{portionPrice},
+			</if>
+			<if test="state != null">
+				state = #{state},
+			</if>
+			<if test="settleState != null">
+				settle_state = #{settleState},
+			</if>
+			<if test="costbatch != null">
+				costbatch = #{costbatch},
+			</if>
+			<if test="aka130 != null">
+				aka130 = #{aka130},
+			</if>
+			<if test="bka006 != null">
+				bka006 = #{bka006},
+			</if>
+			<if test="injuryBorthSn != null">
+				injury_borth_sn = #{injuryBorthSn},
+			</if>
+			<if test="isAccount != null">
+				is_account = #{isAccount},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="crteId != null">
+				crte_id = #{crteId},
+			</if>
+			<if test="crteName != null">
+				crte_name = #{crteName},
+			</if>
+			<if test="crteTime != null">
+				crte_time = #{crteTime},
+			</if>
+			<if test="insureSettleId != null">
+				insureSettleId = #{insureSettleId},
+			</if>
+			<if test="medicalRegNo != null">
+				medicalRegNo = #{medicalRegNo},
+			</if>
+			<if test="ext03 != null">
+				ext03 = #{ext03},
+			</if>
+			<if test="ext04 != null">
+				ext04 = #{ext04},
+			</if>
+			<if test="ext05 != null">
+				ext05 = #{ext05},
+			</if>
+
+			<if test="ext06 != null">
+				ext06 = #{ext06},
+			</if>
+			<if test="ext07 != null">
+				ext07 = #{ext07},
+			</if>
+			<if test="ext08 != null">
+				ext08 = #{ext08},
+			</if>
+			<if test="ext09 != null">
+				ext09 = #{ext09},
+			</if>
+			<if test="ext10 != null">
+				ext10 = #{ext10}
+			</if>
+		</set>
+		WHERE id = #{id} and hosp_code = #{hospCode}
+	</update>
+
+	<!--更新患者的合计费用-->
+	<!--<update id="updateTotalCost">
+		update inpt_visit
+		set
+			total_cost = ifnull(total_cost,0) + #{totalCost},
+			total_balance = ifnull(total_balance,0) - #{totalCost}
+		where hosp_code = #{hospCode}
+		and id = #{id}
+	</update>-->
+	<update id="updateTotalCost">
+		update inpt_visit a, (
+			select cost.visit_id, cost.hosp_code, sum(ifnull(reality_price,0)) realityPrice from inpt_cost cost where cost.visit_id = #{id} and cost.hosp_code = #{hospCode}  and (baby_id is null or baby_id = '')
+		)b  set a.total_cost= b.realityPrice , a.total_balance= ifnull(a.total_advance,0) - b.realityPrice
+		where a.id=#{id} and a.hosp_code=#{hospCode} and a.id = b.visit_id and a.hosp_code = b.hosp_code
+	</update>
+
+
+	<!--删除住院就诊表记录-->
+	<delete id="deleteInsureInptRegisterByParams"
+			parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        delete from insure_individual_visit where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+	<update id="updateInsureIndividualCostBySettleId" parameterType="java.lang.String">
+		update
+		insure_individual_cost
+		set
+			settle_id = null
+		where
+		settle_id = #{settleId}
+	</update>
+
+	<!--查询在院病人状态-->
+	<select id="queryPatients" parameterType="map" resultType="map">
+		SELECT
+		visit.in_no,-- 住院号
+		visit.NAME name,-- 姓名
+		visit.bed_name,-- 床位号
+		visit.gender_code,-- 性别
+		visit.age,-- 年龄
+		visit.patient_code,-- 病人类型
+		visit.preferential_type_id,    -- 优惠类型
+		DATE_FORMAT( visit.in_time, '%Y-%m-%d %H:%i:%s' ) AS in_time,-- 住院时间
+		TO_DAYS(ifnull(out_time,now()))- TO_DAYS( visit.in_time )+ 1 AS zyts,-- 住院天数            --出院时间为空采取当前时间
+		visit.in_remark,-- 入院备注
+		visit.out_remark,-- 出院备注
+		visit.in_disease_name,-- 住院诊断
+		visit.cert_no, -- 身份证号
+		visit.phone,-- 联系电话
+		visit.address,-- 地址
+		visit.total_cost,-- 总费用
+		visit.total_advance,-- 预交金累计
+		visit.total_balance,-- 预交金余额
+		cost.total_price,-- 住院费用
+		settle.hosp_jm_price as hosp_jm_price,-- 院内优惠
+		settle.mi_price as mi_price,-- 统筹支付费用
+		settle.self_price as self_je,-- 自费金额
+		visit.outpt_doctor_name,-- 门诊医生
+		visit.jz_doctor_name,-- 经治医生
+		visit.zg_doctor_name,-- 主管医生
+		visit.in_profile,-- 病案号
+		visit.in_dept_name,-- 入院科室
+		visit.out_disease_name,-- 出院诊断
+		cost.item_price as ypfy,-- 药品费用
+		cost.fyb,-- 药费比
+		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name = visit.name) as zycs, -- 住院次数
+		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,-- 出院时间
+		visit.status_code,-- 当前状态
+		visit.crte_name AS czr,-- 操作人
+		DATE_FORMAT( settle.settle_time, '%Y-%m-%d %H:%i:%s' ) AS jssj -- 结算时间
+
+		FROM
+		inpt_visit visit
+		LEFT JOIN (
+		SELECT
+		b.visit_id,
+		a.item_price,
+		b.total_price ,
+		CONCAT(FORMAT(a.item_price/b.total_price*100,2),'%') as fyb
+		FROM
+		( SELECT  visit_id,item_code, sum( total_price ) AS item_price FROM inpt_cost a WHERE item_code = '3' GROUP BY item_code, visit_id ) a
+		LEFT JOIN ( SELECT visit_id, sum( total_price ) AS total_price FROM inpt_cost a GROUP BY visit_id ) b ON a.visit_id = b.visit_id
+		) cost ON visit.id = cost.visit_id
+
+		LEFT JOIN (
+		SELECT
+		visit_id,
+		max(settle_time) as settle_time,
+		sum( total_price ) AS total_price,
+		sum( self_price ) AS self_price,
+		sum( mi_price ) AS mi_price,
+		sum( actual_price ) AS actual_price,
+		sum( hosp_jm_price ) AS hosp_jm_price
+		FROM
+		inpt_settle
+		GROUP BY
+		visit_id
+		) settle ON visit.id = settle.visit_id
+		WHERE
+		visit.hosp_code =#{hospCode}
+		<if test="keyword != null and keyword !=''">
+			and (visit.name like '%${keyword}%' or visit.in_profile like '%${keyword}%'  or visit.in_no like '%${keyword}%' )
+		</if>
+
+		<!--就诊科室-->
+		<if test="in_dept_id != null and in_dept_id !=''">
+			and visit.in_dept_id = #{in_dept_id}
+		</if>
+		<!--就诊病区-->
+		<if test="in_ward_id != null and in_ward_id !=''">
+			and visit.in_ward_id = #{in_ward_id}
+		</if>
+		<!--病人状态-->
+		<if test="status_code != null and status_code !=''">
+			and visit.status_code = #{status_code}
+		</if>
+		<!--病人类型 -->
+		<if test="patient_code != null and patient_code !=''">
+			and visit.patient_code = #{patient_code}
+		</if>
+		<!--入院开始时间-->
+		<if test="in_start_time != null and in_start_time !=''">
+			and  date(visit.in_time) &gt;= date(#{in_start_time})
+		</if>
+		<!--入院结束时间-->
+		<if test="in_end_time != null and in_end_time !=''">
+			and date(visit.in_time) &lt;= date(#{in_end_time})
+		</if>
+
+		<!--出院开始时间-->
+		<if test="out_start_time != null and out_start_time !=''">
+			and  date(visit.out_time) &gt;= date(#{out_start_time})
+		</if>
+		<!--出院结束时间-->
+		<if test="out_end_time != null and out_end_time !=''">
+			and date(visit.out_time) &lt;= date(#{out_end_time})
+		</if>
+
+		<!--结算开始时间-->
+		<if test="js_start_time != null and js_start_time !=''">
+			and  date(settle.settle_time) &gt;= date(#{js_start_time})
+		</if>
+		<!--结算结束时间-->
+		<if test="js_end_time != null and js_end_time !=''">
+			and date(settle.settle_time) &lt;= date(#{js_end_time})
+		</if>
+		order by visit.in_time desc
+	</select>
+
+	<!-- 查询住院患者是农合患者的患者信息 -->
+	<select id="selectNHPatientData" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">
+		select *
+
+		from inpt_visit
+		where hosp_code = #{hospCode}
+		<if test="ids != null and ids.size() > 0">
+			and id in
+			<foreach collection="ids" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="selectNHPatientCostData" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">
+		select *
+
+		from inpt_cost
+		where hosp_code = #{hospCode}
+		<if test="ids != null and ids.size() > 0">
+			and visit_id in
+			<foreach collection="ids" item="visitId" separator="," open="(" close=")">
+				#{visitId}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="saveNHInsureDrugItemData" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.* from (
+			select d.id as id, d.code as code, d.usual_name as usualName, d.spec as spec, d.price as price,
+			d.usual_pym as pym, d.usual_wbm as wbm,
+			(select c.name from sys_code_detail c where c.c_code = 'JXFL' and d.prep_code = c.value and c.hosp_code = d.hosp_code) as jx,
+			(select c.name from sys_code_detail c where c.c_code = 'DW' and d.in_unit_code = c.value and c.hosp_code = d.hosp_code) as dw
+			from base_drug d
+			where d.hosp_code = #{hospCode}
+
+			union all
+
+			select d.id as id, d.code as code, d.name as usualName, d.spec as spec, d.price as price,
+			d.name_pym as pym, d.name_wbm as wbm,
+			null as jx,
+			(select c.name from sys_code_detail c where c.c_code = 'DW' and d.unit_code = c.value and c.hosp_code = d.hosp_code) as dw
+			from base_item d
+			where d.hosp_code = #{hospCode}
+
+			union all
+
+			select d.id as id, d.code as code, d.name as usualName, d.spec as spec, d.price as price,
+			d.pym as pym, d.wbm as wbm,
+			null as jx,
+			(select c.name from sys_code_detail c where c.c_code = 'DW' and d.unit_code = c.value and c.hosp_code = d.hosp_code) as dw
+			from base_material d
+			where d.hosp_code = #{hospCode}
+		) a
+	</select>
+
+	<select id="saveMaterialData" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from base_material where hosp_code = #{hospCode}
+		AND id in
+
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+
+	</select>
+
+	<select id="saveDrugData" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from base_drug where hosp_code = #{hospCode}
+		AND id in
+
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="saveItemData" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from base_item where hosp_code = #{hospCode}
+		AND id in
+
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="getMinTimeCostByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultMap="InptCostMap">
+		select max(id), max(hosp_code), max(visit_id),min(cost_time) cost_time from inpt_cost  where visit_id = #{id} and hosp_code = #{hospCode}
+	</select>
+
+	<select id="getMinTimeInptAdviceByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultMap="InptAdviceMap">
+		select max(id),max(hosp_code),max(visit_id),min(long_start_time) long_start_time from inpt_advice  where visit_id = #{id}  and hosp_code = #{hospCode} and cancel_id is null
+	</select>
+
+	<!--分页查询-->
+	<select id="queryInptVisitAndZkPage" resultMap="InptVisitMap">
+		select
+		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
+		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
+		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
+		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
+		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
+		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
+		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
+		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,
+		CONCAT(
+		inpt_visit.name,'/',
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+		inpt_visit.gender_code),'-'),'/',
+		IFNULL(inpt_visit.age,'-'),
+		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		inpt_visit.age_unit_code),'')
+		) AS keyword
+		from inpt_visit
+		where hosp_code = #{hospCode}
+		<if test="id != null and id != ''">
+			and id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
+			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%'))
+		</if>
+
+		<!-- 入院开始时间 zhongming by 20201219 -->
+		<if test="startTime != null and startTime != ''">
+			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+		</if>
+		<if test="statusCode != null and statusCode != ''">
+			and status_code = #{statusCode}
+		</if>
+		<if test="inDeptId != null and inDeptId != ''">
+			and ( in_dept_id = #{inDeptId} or  id in (select visit_id from inpt_bed_change  where before_dept_id = #{inDeptId}) )
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and in_time BETWEEN #{Stime} and #{Etime}
+		</if>
+		order by crte_time desc
+	</select>
+	<select id="queryByCertNo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+		select
+		       status_code
+		from inpt_visit
+		where status_code='2'
+		<if test="hospCode != null and hospCode != ''">
+			and hosp_code = #{hospCode}
+		</if>
+		<if test="certNo != null and certNo != ''">
+			and cert_no = #{certNo}
+		</if>
+	</select>
+
+	<!--	修改病重类的字段-->
+	<update id="updateIllness">
+		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
+	</update>
+
+    <!--获取档案信息 liuliyun 20210803-->
+	<select id="getBaseProfileInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from base_profile_file
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
+    </select>
+
+</mapper>

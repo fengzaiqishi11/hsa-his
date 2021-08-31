@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.nationstandardItem.dao.NationStandardItemDAO">
+
+    <resultMap type="cn.hsa.module.center.nationstandardItem.entity.NationStandardItemDTO" id="NationStandardItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="intension" column="intension" jdbcType="VARCHAR"/>
+        <result property="except" column="except" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="NationStandardItemMap">
+        select id,
+               code,
+               name,
+               unit_code,
+               intension, except, remark, is_valid, crte_id, crte_name, crte_time
+        from nation_standard_item
+        where id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="NationStandardItemMap">
+        select
+        id, code, name, unit_code, intension, except, remark, is_valid, crte_id, crte_name, crte_time
+        from nation_standard_item
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                and unit_code = #{unitCode}
+            </if>
+            <if test="intension != null and intension != ''">
+                and intension = #{intension}
+            </if>
+            <if test="except != null and except != ''">
+                and except = #{except}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="provinceCode != null and provinceCode != ''">
+                and (province_code = #{provinceCode}  or province_code is null)
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( name like concat('%',#{keyword},'%')
+                or wbm like concat('%',#{keyword},'%')
+                or pym like concat('%',#{keyword},'%')
+                or code like concat('%',#{keyword},'%') )
+            </if>
+        </where>
+    </select>
+     <insert id="saveNationStandardItemBatch">
+         insert into  nation_standard_item
+             (id, code, `name`, unit_code, intension, `except`, remark, is_valid, crte_id, crte_name, crte_time)
+         values
+         <foreach collection="list" item="item" separator=",">
+            (
+                     #{item.id},
+                     #{item.code},
+                     #{item.name},
+                     #{item.unitCode},
+                     #{item.intension},
+                     #{item.except},
+                     #{item.remark},
+                     #{item.isValid},
+                     #{item.crteId},
+                     #{item.crteName},
+                     #{item.crteTime}
+                     )
+         </foreach>
+     </insert>
+    <insert id="saveNationStandardItem">
+     insert into  nation_standard_item
+         (id, code, `name`, unit_code, intension, `except`, remark, is_valid, crte_id, crte_name, crte_time)
+         values (#{id},#{code},#{name},#{unitCode},#{intension},#{except},#{remark},#{isValid},#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <update id="updateNationStandardItem">
+     update nation_standard_item
+         set
+             code=#{code},
+             `name`=#{name},
+             unit_code=#{unitCode},
+             intension=#{intension},
+             `except`=#{except},
+             remark=#{remark},
+             is_valid=#{isValid},
+             crte_id=#{crteId},
+             crte_name=#{crteName},
+             crte_time=#{crteTime}
+         where id = #{id}
+    </update>
+
+</mapper>

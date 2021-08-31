@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.stro.adjust.dao.StroAdjustDetailDao">
+
+    <resultMap type="cn.hsa.module.stro.adjust.dto.StroAdjustDetailDTO" id="StroAdjustDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="adjustId" column="adjust_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="beforePrice" column="before_price" jdbcType="NUMERIC"/>
+        <result property="afterPrice" column="after_price" jdbcType="NUMERIC"/>
+        <result property="buyPrice" column="buy_price" jdbcType="NUMERIC"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="INTEGER"/>
+        <result property="splitNum" column="split_num" jdbcType="INTEGER"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitBuyPrice" column="split_buy_price" jdbcType="NUMERIC"/>
+        <result property="splitBeforePrice" column="split_before_price" jdbcType="NUMERIC"/>
+        <result property="splitAfterPrice" column="split_after_price" jdbcType="NUMERIC"/>
+        <result property="materialCode" column="materialCode" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <!--单个查询-->
+    <select id="queryStroAdjustDetailDtoById" resultMap="StroAdjustDetailMap">
+        select
+          l.id, l.hosp_code, l.adjust_id, l.item_code,l.item_id,l.item_name, l.before_price, l.after_price, l.buy_price, l.num, l.unit_code, l.split_ratio, l.split_num, l.split_unit_code, l.split_buy_price, l.split_before_price, l.split_after_price
+        from stro_adjust_detail l
+        where l.hosp_code = #{hospCode} and l.id = #{id}
+    </select>
+
+    <!--根据单据id分页查询-->
+    <select id="queryStroAdjustDetailDtoPage" resultMap="StroAdjustDetailMap">
+        select
+        l.id, l.hosp_code, l.adjust_id, l.item_code,l.item_id,l.item_name, l.before_price, l.after_price, l.buy_price, l.num, l.unit_code, l.split_ratio, l.split_num, l.split_unit_code, l.split_buy_price, l.split_before_price, l.split_after_price,
+        case when l.item_code = '1' then (select bp.name from base_product bp where bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code)
+        when l.item_code = '2' then (select bp.name from base_product bp where bm.prod_code = bp.code and bm.hosp_code = bp.hosp_code) end prodName,
+        case when l.item_code='1' then bd.code when l.item_code='2' then bm.code end code,
+        case when l.item_code='1' then bd.spec when l.item_code='2' then bm.spec end spec,
+        case when l.item_code='2' then bm.model end model,
+        (l.num * after_price) as afterPriceAll,
+        (l.num * before_price) as beforePriceAll
+        from stro_adjust_detail l
+        left join base_drug bd on bd.id = l.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = l.item_id and bm.hosp_code = #{hospCode}
+        where l.hosp_code = #{hospCode}  and l.adjust_id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+
+    </select>
+
+    <!--批量新增-->
+    <insert id="insertStroAdjustDetailDTO" parameterType="cn.hsa.module.stro.adjust.dto.StroAdjustDTO">
+
+            insert into stro_adjust_detail(id,hosp_code, adjust_id, item_code, item_id, item_name, before_price, after_price, buy_price, num, unit_code, split_ratio, split_num, split_unit_code, split_buy_price, split_before_price, split_after_price)
+            values
+        <foreach collection="list" item="dto" index="index" separator=",">
+            (#{dto.id},#{dto.hospCode}, #{dto.adjustId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName}, #{dto.beforePrice}, #{dto.afterPrice}, #{dto.buyPrice}, #{dto.num}, #{dto.unitCode}, #{dto.splitRatio}, #{dto.splitNum}, #{dto.splitUnitCode}, #{dto.splitBuyPrice}, #{dto.splitBeforePrice}, #{dto.splitAfterPrice})
+
+        </foreach>
+    </insert>
+
+    <!--根据单据id删除-->
+    <delete id="deleteStroAdjustDetailDTO" parameterType="cn.hsa.module.stro.adjust.dto.StroAdjustDTO">
+        delete from stro_adjust_detail where hosp_code = #{hospCode} and adjust_id = #{id}
+    </delete>
+
+    <!--批量更新-->
+    <update id="updateStroAdjustDetailDTO">
+        <foreach collection="list"  item="dto" separator=";">
+            update stro_adjust_detail
+            <set>
+                <if test="hospCode != null and hospCode != ''">
+                    hosp_code = #{dto.hospCode},
+                </if>
+                <if test="adjustId != null and adjustId != ''">
+                    adjust_id = #{dto.adjustId},
+                </if>
+                <if test="itemCode != null and itemCode != ''">
+                    item_code = #{dto.itemCode},
+                </if>
+                <if test="itemId != null and itemId != ''">
+                    item_id = #{dto.itemId},
+                </if>
+                <if test="itemName != null and itemName != ''">
+                    item_name = #{dto.itemName},
+                </if>
+                <if test="beforePrice != null">
+                    before_price = #{dto.beforePrice},
+                </if>
+                <if test="afterPrice != null">
+                    after_price = #{dto.afterPrice},
+                </if>
+                <if test="buyPrice != null">
+                    buy_price = #{dto.buyPrice},
+                </if>
+                <if test="num != null">
+                    num = #{dto.num},
+                </if>
+                <if test="unitCode != null and unitCode != ''">
+                    unit_code = #{dto.unitCode},
+                </if>
+                <if test="splitRatio != null">
+                    split_ratio = #{dto.splitRatio},
+                </if>
+                <if test="splitNum != null">
+                    split_num = #{dto.splitNum},
+                </if>
+                <if test="splitUnitCode != null and splitUnitCode != ''">
+                    split_unit_code = #{dto.splitUnitCode},
+                </if>
+                <if test="splitBuyPrice != null">
+                    split_buy_price = #{dto.splitBuyPrice},
+                </if>
+                <if test="splitBeforePrice != null">
+                    split_before_price = #{dto.splitBeforePrice},
+                </if>
+                <if test="splitAfterPrice != null">
+                    split_after_price = #{dto.splitAfterPrice},
+                </if>
+            </set>
+            where #{dto.hospCode}
+            and id = #{dto.id}
+        </foreach>
+    </update>
+
+    <!--根据调价单id集合获得调价明细集合-->
+    <select id="queryStroAdjustDetailDTOs" resultMap="StroAdjustDetailMap">
+        select
+        d.id, d.hosp_code, d.adjust_id, d.item_code,
+        (select l.code from base_material l where l.hosp_code = d.hosp_code and l.id = d.item_id) materialCode,
+        d.item_id, d.item_name, d.before_price, d.after_price, d.buy_price, d.num, d.unit_code, d.split_ratio,
+        d.split_num, d.split_unit_code, d.split_buy_price, d.split_before_price, d.split_after_price
+        from stro_adjust_detail d,stro_adjust t
+        where d.hosp_code = t.hosp_code
+        and d.adjust_id = t.id
+        and d.hosp_code = #{hospCode}
+        and t.id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        order by t.crte_time asc
+    </select>
+
+
+    <!--获得库存明细数据-->
+    <select id="queryAdjustStroStockDetailDTOs" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        select
+        l.hosp_code,
+        t.biz_id AS bizId,
+        t.order_no,
+        l.item_code,
+        l.item_id,
+        l.item_name,
+        l.num as num,
+        l.unit_code,
+        l.buy_price,
+        l.after_price as sell_price,
+        l.after_price as new_price,
+        ( l.buy_price * l.num ) AS buy_price_all,
+        ( l.after_price * l.num ) AS sell_price_all,
+        l.split_ratio,
+        l.split_num,
+        l.split_after_price split_price,
+        l.split_after_price new_split_price,
+        l.split_unit_code,
+        #{auditId} as crteId,
+        #{auditName} as crteName
+        from stro_adjust_detail l,stro_adjust t
+        where l.hosp_code = t.hosp_code
+        and l.adjust_id = t.id
+        AND l.hosp_code = #{hospCode}
+        AND l.adjust_id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <!--调价更新库存零售总金额、拆零总金额 拆零单价-->
+    <update id="adjustUpdateStock">
+        <foreach collection="list"  item="dto" separator=";">
+            UPDATE stro_stock
+            SET sell_price_all = num * #{dto.afterPrice},
+            split_price = #{dto.splitAfterPrice}
+            WHERE
+            hosp_code = #{dto.hospCode}
+            AND item_id = #{dto.itemId}
+        </foreach>
+    </update>
+
+
+    <!--调价更新库存明细零售单价、零售总金额、拆零单价-->
+    <update id="adjustUpdateStockDetail">
+        <foreach collection="list"  item="dto" separator=";">
+            UPDATE stro_stock_detail
+            SET sell_price = #{dto.afterPrice},
+            sell_price_all = num * #{dto.afterPrice} ,
+            split_price = #{dto.splitAfterPrice}
+            WHERE
+            hosp_code = #{dto.hospCode}
+            AND item_id = #{dto.itemId}
+        </foreach>
+    </update>
+
+    <!--调价更新药品单价、拆零单价-->
+    <update id="adjustUpdateDrug">
+        <foreach collection="list"  item="dto" separator=";">
+            UPDATE base_drug
+            SET price = #{dto.afterPrice},
+            split_price = #{dto.splitAfterPrice}
+            WHERE
+            hosp_code = #{dto.hospCode}
+            AND id = #{dto.itemId}
+        </foreach>
+    </update>
+
+    <!--调价更新材料单价、拆零单价-->
+    <update id="adjustUpdateMaterial">
+      <foreach collection="list"  item="dto" separator=";">
+        UPDATE base_material
+        SET price = #{dto.afterPrice},
+        split_price = #{dto.splitAfterPrice}
+        WHERE
+        hosp_code = #{dto.hospCode}
+        AND id = #{dto.itemId}
+      </foreach>
+    </update>
+
+    <!--调价更新项目单价-->
+    <update id="adjustUpdateItem">
+        <foreach collection="list"  item="dto" separator=";">
+            UPDATE base_item
+            SET price = #{dto.afterPrice}
+            WHERE
+            hosp_code = #{dto.hospCode}
+            AND id = #{dto.drugId}
+        </foreach>
+    </update>
+
+    <select id="queryStockSumNum" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+        select s.item_id,sum(s.num) as num,sum(s.split_num) as splitNum,sum(s.buy_price_all) as buyPriceAll,sum(s.sell_price_all) as sellPriceAll
+        from stro_stock s where s.hosp_code = #{hospCode} and s.item_id = #{itemId}
+        group by s.item_id
+    </select>
+
+   <!--调价调价明细总数量-->
+   <update id="updateAdjustDetailNum" >
+     <foreach collection="list"  item="item" separator=";">
+       update stro_adjust_detail set num = #{item.num},
+       split_num = #{item.splitNum}
+       where
+       hosp_code = #{item.hospCode}
+       AND id = #{item.id}
+     </foreach>
+   </update>
+</mapper>

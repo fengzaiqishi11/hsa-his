@@ -1,0 +1,1196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO">
+
+    <!-- 实体DTO及数据库字段映射 -->
+    <resultMap id="insureIndividualVisitDtoMap" type="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR"/>
+        <result column="visit_id" property="visitId" jdbcType="VARCHAR"/>
+        <result column="mib_id" property="mibId" jdbcType="VARCHAR"/>
+        <result column="insure_org_code" property="insureOrgCode" jdbcType="VARCHAR"/>
+        <result column="insure_reg_code" property="insureRegCode" jdbcType="VARCHAR"/>
+        <result column="medicine_org_code" property="medicineOrgCode" jdbcType="VARCHAR"/>
+        <result column="is_hospital" property="isHospital" jdbcType="VARCHAR"/>
+        <result column="visit_no" property="visitNo" jdbcType="VARCHAR"/>
+        <result column="aac001" property="aac001" jdbcType="VARCHAR"/>
+        <result column="medical_reg_no" property="medicalRegNo" jdbcType="VARCHAR"/>
+        <result column="aka130" property="aka130" jdbcType="VARCHAR"/>
+        <result column="aka130_name" property="aka130Name" jdbcType="VARCHAR"/>
+        <result column="bka006" property="bka006" jdbcType="VARCHAR"/>
+        <result column="bka006_name" property="bka006Name" jdbcType="VARCHAR"/>
+        <result column="injury_borth_sn" property="injuryBorthSn" jdbcType="VARCHAR"/>
+        <result column="visit_icd_code" property="visitIcdCode" jdbcType="VARCHAR"/>
+        <result column="visit_icd_name" property="visitIcdName" jdbcType="VARCHAR"/>
+        <result column="visit_time" property="visitTime" jdbcType="TIMESTAMP"/>
+        <result column="visit_drpt_id" property="visitDrptId" jdbcType="VARCHAR"/>
+        <result column="visit_drpt_name" property="visitDrptName" jdbcType="VARCHAR"/>
+        <result column="visit_area_id" property="visitAreaId" jdbcType="VARCHAR"/>
+        <result column="visit_area_name" property="visitAreaName" jdbcType="VARCHAR"/>
+        <result column="visit_berth" property="visitBerth" jdbcType="VARCHAR"/>
+        <result column="starting_price" property="startingPrice" jdbcType="DECIMAL"/>
+        <result column="shift_hosp_code" property="shiftHospCode" jdbcType="VARCHAR"/>
+        <result column="out_hosp_code" property="outHospCode" jdbcType="VARCHAR"/>
+        <result column="cause" property="cause" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="is_ecqr" property="isEcqr" jdbcType="VARCHAR"/>
+        <result column="pay_ord_id" property="payOrdId" jdbcType="VARCHAR"/>
+        <result column="pay_token" property="payToken" jdbcType="VARCHAR"/>
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR"/>
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR"/>
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP"/>
+        <result column="akc252" property="akc252" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 表所有字段 -->
+    <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        visit_id,
+        mib_id,
+        insure_org_code,
+        insure_reg_code,
+        medicine_org_code,
+        is_hospital,
+        visit_no,
+        aac001,
+        medical_reg_no,
+        aka130,
+        aka130_name,
+        bka006,
+        bka006_name,
+        injury_borth_sn,
+        visit_icd_code,
+        visit_icd_name,
+        visit_time,
+        visit_drpt_id,
+        visit_drpt_name,
+        visit_area_id,
+        visit_area_name,
+        visit_berth,
+        starting_price,
+        shift_hosp_code,
+        out_hosp_code,
+        cause,
+        remark,
+        crte_id,
+        crte_name,
+        crte_time,
+        insuplc_admdvs,
+        mdtrt_cert_type,
+        mdtrt_cert_no,
+        iiv.pay_token,
+        iiv.pay_ord_id
+    </sql>
+
+    <!-- 表所有字段（别名） -->
+    <sql id="Base_ColumnAlias_List">
+        iiv.id,
+        iiv.hosp_code,
+        iiv.visit_id,
+        iiv.mib_id,
+        iiv.insure_org_code,
+        iiv.insure_reg_code,
+        iiv.medicine_org_code,
+        iiv.is_hospital,
+        iiv.visit_no,
+        iiv.aac001,
+        iiv.medical_reg_no,
+        iiv.aka130,
+        iiv.aka130_name,
+        iiv.bka006,
+        iiv.bka006_name,
+        iiv.injury_borth_sn,
+        iiv.visit_icd_code,
+        iiv.visit_icd_name,
+        iiv.visit_time,
+        iiv.visit_drpt_id,
+        iiv.visit_drpt_name,
+        iiv.visit_area_id,
+        iiv.visit_area_name,
+        iiv.visit_berth,
+        iiv.starting_price,
+        iiv.shift_hosp_code,
+        iiv.out_hosp_code,
+        iiv.cause,
+        iiv.remark,
+        iiv.crte_id,
+        iiv.crte_name,
+        iiv.crte_time,
+        iiv.insuplc_admdvs,
+        iiv.mdtrt_cert_type,
+        iiv.mdtrt_cert_no,
+        iiv.pay_token,
+        iiv.pay_ord_id
+    </sql>
+
+
+    <!-- 根据主键查询表信息 -->
+    <select id="selectByPrimaryKey" resultMap="insureIndividualVisitDtoMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        insure_individual_visit
+        where
+        id = #{id}
+    </select>
+
+    <!-- 新增表信息 -->
+    <insert id="insert" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        insert into insure_individual_visit
+        (id,
+         hosp_code,
+         visit_id,
+         mib_id,
+         insure_org_code,
+         insure_reg_code,
+         medicine_org_code,
+         is_hospital,
+         visit_no,
+         aac001,
+         medical_reg_no,
+         aka130,
+         aka130_name,
+         bka006,
+         bka006_name,
+         injury_borth_sn,
+         visit_icd_code,
+         visit_icd_name,
+         visit_time,
+         visit_drpt_id,
+         visit_drpt_name,
+         visit_area_id,
+         visit_area_name,
+         visit_berth,
+         starting_price,
+         shift_hosp_code,
+         out_hosp_code,
+         cause,
+         remark,
+         crte_id,
+         crte_name,
+         crte_time,
+         insuplc_admdvs,
+         mdtrt_cert_type,
+         mdtrt_cert_no,
+         oinfno,
+         omsgid)
+        values (#{id,jdbcType=VARCHAR},
+                #{hospCode,jdbcType=VARCHAR},
+                #{visitId,jdbcType=VARCHAR},
+                #{mibId,jdbcType=VARCHAR},
+                #{insureOrgCode,jdbcType=VARCHAR},
+                #{insureRegCode,jdbcType=VARCHAR},
+                #{medicineOrgCode,jdbcType=VARCHAR},
+                #{isHospital,jdbcType=VARCHAR},
+                #{visitNo,jdbcType=VARCHAR},
+                #{aac001,jdbcType=VARCHAR},
+                #{medicalRegNo,jdbcType=VARCHAR},
+                #{aka130,jdbcType=VARCHAR},
+                #{aka130Name,jdbcType=VARCHAR},
+                #{bka006,jdbcType=VARCHAR},
+                #{bka006Name,jdbcType=VARCHAR},
+                #{injuryBorthSn,jdbcType=VARCHAR},
+                #{visitIcdCode,jdbcType=VARCHAR},
+                #{visitIcdName,jdbcType=VARCHAR},
+                #{visitTime,jdbcType=TIMESTAMP},
+                #{visitDrptId,jdbcType=VARCHAR},
+                #{visitDrptName,jdbcType=VARCHAR},
+                #{visitAreaId,jdbcType=VARCHAR},
+                #{visitAreaName,jdbcType=VARCHAR},
+                #{visitBerth,jdbcType=VARCHAR},
+                #{startingPrice,jdbcType=DECIMAL},
+                #{shiftHospCode,jdbcType=VARCHAR},
+                #{outHospCode,jdbcType=VARCHAR},
+                #{cause,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR},
+                #{crteId,jdbcType=VARCHAR},
+                #{crteName,jdbcType=VARCHAR},
+                #{crteTime,jdbcType=TIMESTAMP},
+                #{insuplcAdmdvs,jdbcType=VARCHAR},
+                #{mdtrtCertType,jdbcType=VARCHAR},
+                #{mdtrtCertNo,jdbcType=VARCHAR},
+                #{oinfno,jdbcType=VARCHAR},
+                #{omsgid,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
+    <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualVisitDO">
+        insert into
+        insure_individual_visit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="mibId != null and mibId != ''">
+                mib_id,
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code,
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                insure_reg_code,
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                medicine_org_code,
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                is_hospital,
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no,
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                aac001,
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                medical_reg_no,
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130,
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                aka130_name,
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006,
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                bka006_name,
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn,
+            </if>
+            <if test="visitIcdCode != null and visitIcdCode != ''">
+                visit_icd_code,
+            </if>
+            <if test="visitIcdName != null and visitIcdName != ''">
+                visit_icd_name,
+            </if>
+            <if test="visitTime != null">
+                visit_time,
+            </if>
+            <if test="visitDrptId != null and visitDrptId != ''">
+                visit_drpt_id,
+            </if>
+            <if test="visitDrptName != null and visitDrptName != ''">
+                visit_drpt_name,
+            </if>
+            <if test="visitAreaId != null and visitAreaId != ''">
+                visit_area_id,
+            </if>
+            <if test="visitAreaName != null and visitAreaName != ''">
+                visit_area_name,
+            </if>
+            <if test="visitBerth != null and visitBerth != ''">
+                visit_berth,
+            </if>
+            <if test="startingPrice != null">
+                starting_price,
+            </if>
+            <if test="shiftHospCode != null and shiftHospCode != ''">
+                shift_hosp_code,
+            </if>
+            <if test="outHospCode != null and outHospCode != ''">
+                out_hosp_code,
+            </if>
+            <if test="cause != null and cause != ''">
+                cause,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id,
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name,
+            </if>
+            <if test="isEcqr != null and isEcqr != ''">
+                is_ecqr,
+            </if>
+            <if test="payOrdId != null and payOrdId != ''">
+                pay_ord_id,
+            </if>
+            <if test="payToken != null and payToken != ''">
+                pay_token,
+            </if>
+            <if test="crteTime != null">
+                crte_time,
+            </if>
+            <if test="accessoryDiagnosisName != null and accessoryDiagnosisName != ''">
+                accessory_diagnosis_name,
+            </if>
+            <if test="accessoryDiagnosisCode != null and accessoryDiagnosisCode != ''">
+                accessory_diagnosis_code,
+            </if>
+            <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+                insuplc_admdvs,
+            </if>
+            <if test="mdtrtCertType != null and mdtrtCertType != ''">
+                mdtrt_cert_type,
+            </if>
+            <if test="mdtrtCertNo != null and mdtrtCertNo != ''">
+                mdtrt_cert_no,
+            </if>
+            <if test="birctrlType != null and birctrlType != ''">
+                birctrl_type,
+            </if>
+            <if test="matnType != null and matnType != ''">
+                matn_type,
+            </if>
+            <if test="birctrlMatnDate != null">
+                birctrl_matn_date
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="mibId != null and mibId != ''">
+                #{mibId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                #{insureRegCode,jdbcType=VARCHAR},
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                #{medicineOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                #{isHospital,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                #{aac001,jdbcType=VARCHAR},
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                #{medicalRegNo,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                #{aka130Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                #{bka006Name,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="visitIcdCode != null and visitIcdCode != ''">
+                #{visitIcdCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitIcdName != null and visitIcdName != ''">
+                #{visitIcdName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitTime != null">
+                #{visitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="visitDrptId != null and visitDrptId != ''">
+                #{visitDrptId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitDrptName != null and visitDrptName != ''">
+                #{visitDrptName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitAreaId != null and visitAreaId != ''">
+                #{visitAreaId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitAreaName != null and visitAreaName != ''">
+                #{visitAreaName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitBerth != null and visitBerth != ''">
+                #{visitBerth,jdbcType=VARCHAR},
+            </if>
+            <if test="startingPrice != null">
+                #{startingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="shiftHospCode != null and shiftHospCode != ''">
+                #{shiftHospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="outHospCode != null and outHospCode != ''">
+                #{outHospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cause != null and cause != ''">
+                #{cause,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="isEcqr != null and isEcqr != ''">
+                #{isEcqr,jdbcType=VARCHAR},
+            </if>
+            <if test="payOrdId != null and payOrdId != ''">
+                #{payOrdId,jdbcType=VARCHAR},
+            </if>
+            <if test="payToken != null and payToken != ''">
+                #{payToken,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="accessoryDiagnosisName != null and accessoryDiagnosisName != ''">
+                #{accessoryDiagnosisName,jdbcType=VARCHAR},
+            </if>
+            <if test="accessoryDiagnosisCode != null and accessoryDiagnosisCode != ''">
+                #{accessoryDiagnosisCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+                #{insuplcAdmdvs,jdbcType=VARCHAR},
+            </if>
+            <if test="mdtrtCertType != null and mdtrtCertType != ''">
+                #{mdtrtCertType,jdbcType=VARCHAR},
+            </if>
+            <if test="mdtrtCertNo != null and mdtrtCertNo != ''">
+                #{mdtrtCertNo,jdbcType=VARCHAR},
+            </if>
+            <if test="birctrlType != null and birctrlType != ''">
+                #{birctrlType,jdbcType=VARCHAR},
+            </if>
+            <if test="matnType != null and matnType != ''">
+                #{matnType,jdbcType=VARCHAR},
+            </if>
+            <if test="birctrlMatnDate != null">
+                #{birctrlMatnDate}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改表信息 -->
+    <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualVisitDO">
+        update
+            insure_individual_visit
+        set hosp_code         = #{hospCode,jdbcType=VARCHAR},
+            visit_id          = #{visitId,jdbcType=VARCHAR},
+            mib_id            = #{mibId,jdbcType=VARCHAR},
+            insure_org_code   = #{insureOrgCode,jdbcType=VARCHAR},
+            insure_reg_code   = #{insureRegCode,jdbcType=VARCHAR},
+            medicine_org_code = #{medicineOrgCode,jdbcType=VARCHAR},
+            is_hospital       = #{isHospital,jdbcType=VARCHAR},
+            visit_no          = #{visitNo,jdbcType=VARCHAR},
+            aac001            = #{aac001,jdbcType=VARCHAR},
+            medical_reg_no    = #{medicalRegNo,jdbcType=VARCHAR},
+            aka130            = #{aka130,jdbcType=VARCHAR},
+            aka130_name       = #{aka130Name,jdbcType=VARCHAR},
+            bka006            = #{bka006,jdbcType=VARCHAR},
+            bka006_name       = #{bka006Name,jdbcType=VARCHAR},
+            injury_borth_sn   = #{injuryBorthSn,jdbcType=VARCHAR},
+            visit_icd_code    = #{visitIcdCode,jdbcType=VARCHAR},
+            visit_icd_name    = #{visitIcdName,jdbcType=VARCHAR},
+            visit_time        = #{visitTime,jdbcType=TIMESTAMP},
+            visit_drpt_id     = #{visitDrptId,jdbcType=VARCHAR},
+            visit_drpt_name   = #{visitDrptName,jdbcType=VARCHAR},
+            visit_area_id     = #{visitAreaId,jdbcType=VARCHAR},
+            visit_area_name   = #{visitAreaName,jdbcType=VARCHAR},
+            visit_berth       = #{visitBerth,jdbcType=VARCHAR},
+            starting_price    = #{startingPrice,jdbcType=DECIMAL},
+            shift_hosp_code   = #{shiftHospCode,jdbcType=VARCHAR},
+            out_hosp_code     = #{outHospCode,jdbcType=VARCHAR},
+            cause             = #{cause,jdbcType=VARCHAR},
+            remark            = #{remark,jdbcType=VARCHAR},
+            crte_id           = #{crteId,jdbcType=VARCHAR},
+            crte_name         = #{crteName,jdbcType=VARCHAR},
+            crte_time         = #{crteTime,jdbcType=TIMESTAMP},
+            insuplc_admdvs    = #{insuplcAdmdvs,jdbcType=VARCHAR},
+            mdtrt_cert_type   = #{bka895,jdbcType=VARCHAR},
+            mdtrt_cert_no     = #{bka896,jdbcType=VARCHAR}
+        where id = #{id}
+    </update>
+
+    <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualVisitDO">
+        update
+        insure_individual_visit
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="mibId != null and mibId != ''">
+                mib_id = #{mibId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code = #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                insure_reg_code = #{insureRegCode,jdbcType=VARCHAR},
+            </if>
+            <if test="medicineOrgCode != null and medicineOrgCode != ''">
+                medicine_org_code = #{medicineOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="isHospital != null and isHospital != ''">
+                is_hospital = #{isHospital,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="aac001 != null and aac001 != ''">
+                aac001 = #{aac001,jdbcType=VARCHAR},
+            </if>
+            <if test="medicalRegNo != null and medicalRegNo != ''">
+                medical_reg_no = #{medicalRegNo,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130 != null and aka130 != ''">
+                aka130 = #{aka130,jdbcType=VARCHAR},
+            </if>
+            <if test="aka130Name != null and aka130Name != ''">
+                aka130_name = #{aka130Name,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006 != null and bka006 != ''">
+                bka006 = #{bka006,jdbcType=VARCHAR},
+            </if>
+            <if test="bka006Name != null and bka006Name != ''">
+                bka006_name = #{bka006Name,jdbcType=VARCHAR},
+            </if>
+            <if test="injuryBorthSn != null and injuryBorthSn != ''">
+                injury_borth_sn = #{injuryBorthSn,jdbcType=VARCHAR},
+            </if>
+            <if test="visitIcdCode != null and visitIcdCode != ''">
+                visit_icd_code = #{visitIcdCode,jdbcType=VARCHAR},
+            </if>
+            <if test="visitIcdName != null and visitIcdName != ''">
+                visit_icd_name = #{visitIcdName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitTime != null">
+                visit_time = #{visitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="visitDrptId != null and visitDrptId != ''">
+                visit_drpt_id = #{visitDrptId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitDrptName != null and visitDrptName != ''">
+                visit_drpt_name = #{visitDrptName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitAreaId != null and visitAreaId != ''">
+                visit_area_id = #{visitAreaId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitAreaName != null and visitAreaName != ''">
+                visit_area_name = #{visitAreaName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitBerth != null and visitBerth != ''">
+                visit_berth = #{visitBerth,jdbcType=VARCHAR},
+            </if>
+            <if test="startingPrice != null">
+                starting_price = #{startingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="shiftHospCode != null and shiftHospCode != ''">
+                shift_hosp_code = #{shiftHospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="outHospCode != null and outHospCode != ''">
+                out_hosp_code = #{outHospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cause != null and cause != ''">
+                cause = #{cause,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payOrdId != null and payOrdId != ''">
+                pay_ord_id = #{payOrdId,jdbcType=VARCHAR},
+            </if>
+            <if test="payToken != null and payToken != ''">
+                pay_token = #{payToken,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where
+        visit_id = #{visitId} and hosp_code =#{hospCode}
+    </update>
+    <update id="updateInsureInidivdual" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        update
+        insure_individual_visit
+        <set>
+            <if test="pretFlag != null and pretFlag != ''">
+                pret_flag = #{pretFlag},
+            </if>
+            <if test="fetusCnt != null">
+                fetus_cnt = #{fetusCnt},
+            </if>
+            <if test="fetts != null">
+                fetts = #{fetts},
+            </if>
+            <if test="latechbFlag != null and latechbFlag != ''">
+                latechb_flag = #{latechbFlag,},
+            </if>
+            <if test="birctrlType != null and birctrlType != ''">
+                birctrl_type = #{birctrlType},
+            </if>
+            <if test="matnType != null and matnType != ''">
+                matn_type = #{matnType},
+            </if>
+            <if test="fpscNo != null and fpscNo != ''">
+                fpsc_no = #{fpscNo},
+            </if>
+            <if test="gesoVal != null">
+                geso_val = #{gesoVal},
+            </if>
+            <if test="birctrlMatnDate != null">
+                birctrl_matn_date = #{birctrlMatnDate},
+            </if>
+            <if test="isOut != null and isOut != ''">
+                is_out = #{isOut},
+            </if>
+            <if test="insureSettleId != null and insureSettleId != ''">
+                insure_settle_id = #{insureSettleId},
+            </if>
+            <if test="isHalfSettle != null and isHalfSettle != ''">
+                is_half_settle = #{isHalfSettle},
+            </if>
+            <if test="settleCount != null and settleCount != ''">
+                settle_count = #{settleCount}
+            </if>
+        </set>
+        where
+        visit_id = #{id} and hosp_code =#{hospCode} and medical_reg_no = #{medicalRegNo}
+    </update>
+    <update id="updateInsureSettleId">
+        update insure_individual_visit
+        set insure_settle_id =null
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and medical_reg_no = #{medicalRegNo}
+    </update>
+    <!-- 根据主键删除表信息 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE
+        FROM insure_individual_visit
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteByIds">
+        DELETE FROM insure_individual_visit WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findByCondition" resultMap="insureIndividualVisitDtoMap"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        SELECT
+        (select iib.baa301 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
+        as baa301,
+        (select iib.akc252 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
+        as akc252,
+        (select iib.card_iden from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code =
+        iib.hosp_code) as cardIden,
+        (select iv.out_dept_id from inpt_visit iv where iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code) as
+        outDeptId,
+        (select iv.out_dept_name from inpt_visit iv where iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code) as
+        outDeptName,
+        (select iib.aae140 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code =
+        iib.hosp_code) as aae140,iiv.is_out as isOut,
+        <include refid="Base_ColumnAlias_List"/>
+        FROM insure_individual_visit iiv
+        where
+        iiv.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            AND iiv.visit_id = #{visitId}
+        </if>
+        <if test="mibId != null and mibId != ''">
+            AND iiv.mib_id = #{mibId}
+        </if>
+        <if test="isOut != null and isOut != ''">
+            AND iiv.is_out = #{isOut}
+        </if>
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            AND iiv.medical_reg_no = #{medicalRegNo}
+        </if>
+    </select>
+
+    <select id="getByVisitNo" resultMap="insureIndividualVisitDtoMap"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        SELECT *
+        FROM insure_individual_visit iiv
+        where
+        iiv.hosp_code = #{hospCode}
+        <if test="visitNo != null and visitNo != ''">
+            AND iiv.visit_No = #{visitNo}
+        </if>
+    </select>
+
+    <select id="getInsureIndividualVisitById" parameterType="map"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        SELECT
+        iiv.*,
+        ov.doctor_id as doctorId ,ov.doctor_name as doctorName,iv.in_profile,
+        ov.phone as outPhone,ov.visit_time as visitTime,iib.aac004 as gend,iib.aac002,iib.bka035 ,iib.bka008,
+        iv.out_dept_id as outDeptId,iv.out_dept_name as outDeptName,iv.out_mode_code as outModeCode,
+        iv.phone as inptPhone ,iv.out_time as outTime ,iv.in_time as inTime,iv.in_disease_name as
+        inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,
+        iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
+        iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,
+        if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time,
+        '%Y-%m-%d' )) END)
+        = 0,1,(case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format(
+        iv.in_time, '%Y-%m-%d' )) END))
+        as hospitalDay,iiv.settle_count,iiv.is_half_settle
+        FROM
+        insure_individual_visit iiv
+        left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
+        left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+        left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
+        WHERE iiv.visit_id = #{id} and iiv.hosp_code =#{hospCode}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiv.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="inHalfSettleId != null and inHalfSettleId != ''">
+            and iiv.is_half_settle = #{inHalfSettleId}
+        </if>
+        <if test="limitFlag == '1'.toString()">
+            and iiv.insure_settle_id is null
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( iv.in_no like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryInsureIndividualVisitByIds" parameterType="map"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        SELECT
+        iiv.*,
+        ov.doctor_id as doctorId ,ov.doctor_name as doctorName,iv.in_profile,
+        ov.phone as outPhone,
+        iv.phone as inptPhone ,iv.out_time as outTime ,iv.in_time as inTime,iv.in_disease_name as
+        inDiseaseName,iv.out_disease_name as outDiseaseName,
+        iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
+        iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,
+        (case when iiv.is_hospital ='1' then timestampdiff(day,iv.in_time,iv.out_time) END) as hospitalDay
+        FROM
+        insure_individual_visit iiv
+        left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
+        left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+        left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
+        WHERE iiv.hosp_code =#{hospCode} and iiv.insure_settle_id is null and iiv.visit_id=#{id}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiv.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( iv.in_no like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+    <select id="selectInsureIndividualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select iiv.id,
+               iiv.hosp_code,
+               iiv.visit_id,
+               iiv.mib_id,
+               iiv.insure_org_code,
+               iiv.insure_reg_code,
+               iiv.medicine_org_code,
+               iiv.is_hospital,
+               iiv.visit_no,
+               iiv.aac001,
+               iiv.medical_reg_no,
+               iiv.aka130,
+               iiv.aka130_name,
+               iiv.bka006,
+               iiv.bka006_name,
+               iiv.injury_borth_sn,
+               iiv.visit_icd_code,
+               iiv.visit_icd_name,
+               iiv.visit_time,
+               iiv.visit_drpt_id,
+               iiv.visit_drpt_name,
+               iiv.visit_area_id,
+               iiv.visit_area_name,
+               iiv.visit_berth,
+               iiv.starting_price,
+               iiv.shift_hosp_code,
+               iiv.out_hosp_code,
+               iiv.cause,
+               iiv.remark,
+               iiv.crte_id,
+               iiv.crte_name,
+               iiv.crte_time,
+               iiv.accessory_diagnosis_code,
+               iiv.accessory_diagnosis_name,
+               r.crte_name registerCrteName,
+               r.crte_time registerTime,
+               r.doctor_name,
+               r.doctor_id
+        from insure_individual_visit iiv
+                 join outpt_register r on iiv.visit_id = r.visit_id and r.hosp_code = iiv.hosp_code
+        where iiv.hosp_code = #{hospCode}
+          and iiv.visit_id = #{visitId}
+
+    </select>
+    <delete id="deleteByVisitId" parameterType="java.lang.String">
+        delete
+        from insure_individual_visit
+        where visit_id = #{visitId}
+    </delete>
+
+    <select id="getOutptCostAndInsure" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO"
+            resultType="java.util.Map">
+        select o.*, m.insure_item_code, m.hosp_item_code, m.item_code as h_item_code
+        from outpt_cost o
+                 left join insure_item_match m on o.item_id = m.hosp_item_id and o.hosp_code = m.hosp_code
+                 left join insure_individual_visit v
+                           on m.insure_reg_code = v.insure_reg_code and v.hosp_code = o.hosp_code
+        where o.visit_id = #{id}
+          and o.hosp_code = #{hospCode}
+          and v.visit_id = o.id
+    </select>
+
+    <select id="selectCode" parameterType="java.util.Map" resultType="java.util.Map">
+        select c.mdtrtarea_admvs, v.insuplc_admdvs, v.aac001, v.medical_reg_no, v.insure_org_code
+        from insure_configuration c
+                 join insure_individual_visit v on c.hosp_code = v.hosp_code
+        where v.hosp_code = #{hospCode}
+          and v.visit_id = #{visitId}
+    </select>
+    <delete id="deleteInsureVisitById">
+        delete
+        from insure_individual_visit
+        where visit_id = #{visitId}
+          and hosp_code = #{hospCode}
+    </delete>
+    <!-- 根据主键查询表信息 -->
+    <select id="selectOutptRegisterById" resultType="java.util.HashMap" parameterType="java.util.Map">
+        select
+        id,
+        hosp_code,
+        visit_id,
+        register_no,
+        name,
+        gender_code,
+        age,
+        birthday,
+        cert_code,
+        cert_no,
+        phone,
+        source_bz_code,
+        visit_code,
+        source_tj_code,
+        source_tj_remark,
+        register_time,
+        cf_id,
+        cq_id,
+        dq_id,
+        dr_id,
+        dept_id,
+        dept_name,
+        doctor_id,
+        doctor_name,
+        is_cancel,
+        is_first_visit,
+        is_add,
+        crte_id,
+        crte_name,
+        crte_time
+        from
+        outpt_register
+        where
+        hosp_code = #{hospCode}
+        <if test="id !='' and id !=null ">
+            and id = #{id}
+        </if>
+        <if test="visitId !='' and visitId !=null ">
+            and visit_id = #{visitId}
+        </if>
+    </select>
+
+    <select id="selectSysUserByid" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT id,
+               hosp_code,
+               dept_code,
+               CODE,
+               PASSWORD,
+               is_in_job,
+               NAME,
+               age,
+               birthday,
+               gender_code,
+               nation_code,
+               native_place,
+               marry_code,
+               is_pm,
+               in_pm_date,
+               cert_code,
+               cert_no,
+               photo_image,
+               sign_image,
+               introduce,
+               speciality,
+               address,
+               email,
+               phone,
+               education_code,
+               major_code,
+               school,
+               school_date,
+               school_image,
+               work_date,
+               work_type_code,
+               duties_code,
+               prac_certi_no,
+               prac_certi_name,
+               durg_code,
+               antibacterial_code,
+               ph_code,
+               opeartion_code,
+               pswd_err_cnt,
+               last_login_time,
+               last_login_ip,
+               status_code,
+               pym,
+               wbm,
+               crte_id,
+               crte_name,
+               crte_time,
+               signature_path,
+               doctor_intro,
+               is_guide
+        FROM sys_user
+        WHERE hosp_code = #{hospCode}
+          AND id = #{id}
+    </select>
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select iiv.id, iiv.hosp_code,iiv.visit_id, mib_id, iiv.insure_org_code, iiv.insure_reg_code,
+        iiv.medicine_org_code, iiv.is_hospital, iiv.visit_no, iiv.aac001, medical_reg_no, iiv.aka130,
+        iiv.aka130_name, iiv.bka006, iiv.bka006_name, iiv.injury_borth_sn, iiv.visit_icd_code, iiv.visit_icd_name,
+        iiv.visit_time, iiv.visit_drpt_id, iiv.visit_drpt_name, iiv.visit_area_id, iiv.visit_area_name, iiv.visit_berth,
+        iiv.starting_price, iiv.shift_hosp_code, iiv.out_hosp_code, cause, iiv.remark, iiv.crte_id, iiv.crte_name,
+        iiv.crte_time,iis.settle_id as settleId,
+        ( case iiv.is_hospital when '1' then iv.name when '0' then ov.name end) as aac003,
+        is_ecqr, pay_ord_id, pay_token, accessory_diagnosis_name,iis.insureSettleId,
+        accessory_diagnosis_code, insuplc_admdvs, mdtrt_cert_type, mdtrt_cert_no, iiv.omsgid, iiv.oinfno
+        from insure_individual_visit iiv
+        left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
+        left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+        join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code and
+        iiv.medical_reg_no = iis.medicalRegNo
+        where iiv.hosp_code =#{hospCode} and iis.insureSettleId is not null and iis.state='0' and iis.settle_state='1'
+        <if test="keyWord != null and keyWord != ''">
+            and (
+            ov.name like concat('%',#{keyWord},'%')
+            or iiv.visit_no like concat('%',#{keyWord},'%')
+            or iv.name like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <!--业务类型选择-->
+        <if test="isHospital != null and isHospital != ''">
+            and iiv.is_hospital =#{isHospital}
+        </if>
+    </select>
+
+    <select id="queryAllInsureRegister" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO" parameterType="java.util.Map">
+        select DISTINCT b.*
+        from inpt_visit a
+        join insure_individual_visit b on (a.id = b.visit_id and a.hosp_code = b.hosp_code)
+        where a.hosp_code = #{hospCode}
+          and a.status_code in ('1', '2', '3', '4', '5', '6')
+    </select>
+    <select id="getMedicalRegNo" resultType="java.lang.String">
+        select medical_reg_no
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and insure_settle_id is null
+        order by crte_time desc
+        limit 1
+    </select>
+    <select id="selectInsureInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select id,
+        hosp_code,
+        visit_id,
+        mib_id,
+        insure_org_code,
+        insure_reg_code,
+        medicine_org_code,
+        is_hospital,
+        visit_no,
+        aac001,
+        medical_reg_no,
+        aka130,
+        aka130_name,
+        bka006,
+        bka006_name,
+        injury_borth_sn,
+        visit_icd_code,
+        visit_icd_name,
+        visit_time,
+        crte_id,
+        crte_name,
+        crte_time,
+        insuplc_admdvs,
+        mdtrt_cert_type,
+        mdtrt_cert_no,
+        omsgid,
+        oinfno,
+        is_out,
+        insure_settle_id,
+        settle_count,
+        is_half_settle
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+        and visit_id = #{visitId}
+        and insure_settle_id is null
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
+            and medical_reg_no = #{medicalRegNo}
+        </if>
+        order by crte_time desc
+        limit 1
+    </select>
+    <select id="selectIsHalfSettleInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select id,
+               hosp_code,
+               visit_id,
+               mib_id,
+               insure_org_code,
+               insure_reg_code,
+               medicine_org_code,
+               is_hospital,
+               visit_no,
+               aac001,
+               medical_reg_no,
+               aka130,
+               aka130_name,
+               bka006,
+               bka006_name,
+               injury_borth_sn,
+               visit_icd_code,
+               visit_icd_name,
+               visit_time,
+               visit_drpt_id,
+               visit_drpt_name,
+               visit_area_id,
+               visit_area_name,
+               visit_berth,
+               starting_price,
+               shift_hosp_code,
+               out_hosp_code,
+               cause,
+               remark,
+               crte_id,
+               crte_name,
+               crte_time,
+               is_ecqr,
+               pay_ord_id,
+               pay_token,
+               accessory_diagnosis_name,
+               accessory_diagnosis_code,
+               insuplc_admdvs,
+               mdtrt_cert_type,
+               mdtrt_cert_no,
+               omsgid,
+               oinfno,
+               pret_flag,
+               fetus_cnt,
+               birctrl_matn_date,
+               fetts,
+               geso_val,
+               latechb_flag,
+               birctrl_type,
+               fpsc_no,
+               matn_type,
+               is_out,
+               insure_settle_id,
+               settle_count,
+               is_half_settle
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and insure_settle_id is not null
+          and is_half_settle = '1'
+        order by crte_time desc
+        limit 1
+    </select>
+    <select id="queryLasterCounter" resultType="java.lang.Integer">
+        select settle_count
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and medical_reg_no = #{medicalRegNo}
+          and insure_settle_id is not null
+        order by crte_time desc
+        limit 1
+    </select>
+    <select id="queryInsureIndividualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select *
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and medical_reg_no = #{mdtrt_id}
+          and aac001 = #{psn_no}
+    </select>
+    <select id="queryAllInsureIndiviualVisit"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select id,
+               hosp_code,
+               visit_id,
+               mib_id,
+               insure_org_code,
+               insure_reg_code,
+               medicine_org_code,
+               is_hospital,
+               visit_no,
+               aac001,
+               medical_reg_no,
+               aka130,
+               aka130_name,
+               bka006,
+               bka006_name,
+               crte_id,
+               crte_name,
+               crte_time,
+               insuplc_admdvs,
+               mdtrt_cert_type,
+               mdtrt_cert_no,
+               is_out,
+               insure_settle_id,
+               settle_count,
+               is_half_settle
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{id}
+    </select>
+    <select id="selectMaxAndMinRegisterTime"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select max(crte_time) as maxRegister, min(crte_time) as minRegister
+        from insure_individual_visit
+        where hosp_code = #{hospCode}
+          and visit_id = #{id}
+        group by crte_time
+    </select>
+
+</mapper>

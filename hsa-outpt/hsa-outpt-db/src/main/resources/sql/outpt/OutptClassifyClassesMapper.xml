@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.outptclassifyclasses.dao.OutptClassifyClassesDAO">
+
+    <resultMap type="cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassifyClassesDTO" id="OutptClassifyClassesMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="csId" column="cs_id" jdbcType="VARCHAR"/>
+        <result property="cyId" column="cy_id" jdbcType="VARCHAR"/>
+        <result property="triageId" column="triage_id" jdbcType="VARCHAR"/>
+        <result property="triageCode" column="triage_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="weeks" column="weeks" jdbcType="VARCHAR"/>
+        <result property="registerNum" column="register_num" jdbcType="INTEGER"/>
+        <result property="isCall" column="is_call" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="triageName" column="triageName" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="classesName" column="classesName" jdbcType="VARCHAR"/>
+        <result property="classifyName" column="classifyName" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <resultMap type="cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassesDoctorDTO" id="OutptClassesDoctorMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="ccId" column="cc_id" jdbcType="VARCHAR"/>
+        <result property="doctorId" column="doctor_id" jdbcType="VARCHAR"/>
+        <result property="registerNum" column="register_num" jdbcType="INTEGER"/>
+        <result property="clinicId" column="clinic_id" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--通过id查询单个挂号类别排班记录-->
+    <select id="getClassifyClassesById" resultMap="OutptClassifyClassesMap">
+        select
+            id, hosp_code, cs_id, cy_id, triage_id, triage_code, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name, crte_time,
+            (select name from base_dept where dept_id = base_dept.id and base_dept.hosp_code = #{hospCode}) as deptName,
+            (select name from outpt_classify where cy_id = outpt_classify.id and outpt_classify.hosp_code = #{hospCode}) as classifyName,
+            (select name from outpt_classes where cs_id = outpt_classes.id and outpt_classes.hosp_code = #{hospCode}) as classesName
+        from outpt_classify_classes
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--查询所有挂号类别排班记录-->
+    <select id="queryClassifyClassesAll" resultMap="OutptClassifyClassesMap">
+        select
+        id, hosp_code, cs_id, cy_id, triage_id, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name, crte_time
+        from outpt_classify_classes
+        where  hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="deptCode != null and deptCode != ''">
+            and dept_id = #{deptCode}
+        </if>
+        <if test="csId != null and csId != ''">
+            and cs_id = #{csId}
+        </if>
+        <if test="cyId != null and cyId != ''">
+            and cy_id = #{cyId}
+        </if>
+        <if test="triageId != null and triageId != ''">
+            and triage_id = #{triageId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+        <if test="registerNum != null">
+            and register_num = #{registerNum}
+        </if>
+        <if test="isCall != null and isCall != ''">
+            and is_call = #{isCall}
+        </if>
+        <if test="isValid != null and isValid != ''">
+            and is_valid = #{isValid}
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and crte_id = #{crteId}
+        </if>
+        <if test="crteName != null and crteName != ''">
+            and crte_name = #{crteName}
+        </if>
+        <if test="crteTime != null">
+            and crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <select id="queryClassesDoctorAll" resultMap="OutptClassesDoctorMap">
+        select
+            id, hosp_code, cc_id, doctor_id, register_num, is_valid,(select name from sys_user where doctor_id = sys_user.id and sys_user.hosp_code = #{hospCode}) as doctorName,
+            (select cy_id from outpt_classify_classes where cc_id = outpt_classify_classes.id and outpt_classify_classes.hosp_code = #{hospCode})as cyId,
+            (select weeks from outpt_classify_classes where cc_id = outpt_classify_classes.id and outpt_classify_classes.hosp_code = #{hospCode})as weeks,
+            (select dept_id from outpt_classify_classes where cc_id = outpt_classify_classes.id and outpt_classify_classes.hosp_code = #{hospCode})as deptId,
+            (select name from outpt_classify where cyId = outpt_classify.id and outpt_classify.hosp_code = #{hospCode}) as classifyName,
+            (select name from base_dept where base_dept.id = deptId and base_dept.hosp_code = #{hospCode}) as deptName
+        from outpt_classes_doctor
+        where  hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--通过挂号类别排班的主键查询医生排班记录-->
+    <select id="queryClassesDoctorByClassifyClassesId" resultMap="OutptClassesDoctorMap">
+        select
+            id, hosp_code, cc_id, doctor_id, register_num, clinic_id, is_valid,(select name from sys_user where doctor_id = sys_user.id and sys_user.hosp_code = #{hospCode}) as doctorName
+        from outpt_classes_doctor
+        where
+            hosp_code = #{hospCode} and is_valid = '1'
+          and cc_id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件分页查询挂号类别排班记录-->
+    <select id="queryClassifyClassesPage" resultMap="OutptClassifyClassesMap">
+        select
+        id, hosp_code, cs_id, cy_id, triage_id, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name,
+        crte_time,
+        (select name from base_dept where triage_id = base_dept.id and base_dept.hosp_code = #{hospCode}) as triageName,
+        (select name from base_dept where dept_id = base_dept.id and base_dept.hosp_code = #{hospCode}) as deptName,
+        (select name from outpt_classes where cs_id = outpt_classes.id and outpt_classes.hosp_code = #{hospCode}) as classesName,
+        (select name from outpt_classify where cy_id = outpt_classify.id and outpt_classify.hosp_code = #{hospCode}) as classifyName
+        from outpt_classify_classes
+        <where>
+            and hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            and hosp_code = #{hospCode}
+            <if test="deptCode != null and deptCode != ''">
+                and dept_id = #{deptCode}
+            </if>
+            <if test="csId != null and csId != ''">
+                and cs_id = #{csId}
+            </if>
+            <if test="cyId != null and cyId != ''">
+                and cy_id = #{cyId}
+            </if>
+            <if test="triageId != null and triageId != ''">
+                and triage_id = #{triageId}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and dept_id = #{deptId}
+            </if>
+            <if test="registerNum != null">
+                and register_num = #{registerNum}
+            </if>
+            <if test="isCall != null and isCall != ''">
+                and is_call = #{isCall}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="weekList!= null">
+                and weeks in
+                <foreach collection="weekList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+    <select id="getFZFSCodeDetailByCode" resultType="java.util.Map" parameterType="map">
+        select `name`  ,`value` from sys_code_detail where c_code = #{code} and hosp_code =  #{hospCode}
+    </select>
+
+    <select id="getOutptClassifyClassesByCyIdAndCsIdAndWeeks" resultMap="OutptClassifyClassesMap">
+      select  id, hosp_code, cs_id, cy_id, triage_id, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name,
+        crte_time
+      from outpt_classify_classes
+      where  hosp_code = #{hospCode}
+        AND weeks = #{weeks}
+        AND cy_id = #{cyId}
+        AND is_valid = '1'
+        AND cs_id in
+        <foreach collection="ids" open="(" separator="," index="index" item="item" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="queryDoctorStartToEndTime" resultType="java.util.Map">
+        select c.start_date as startDate,
+        c.end_date as endDate,
+        c.name as classesName,
+        cc.id as ccId,
+        cc.cy_id as cyId,
+        cc.cs_id as csId,
+        cc.weeks as weeks
+        from outpt_classes_doctor cd
+        left join outpt_classify_classes cc on cd.cc_id = cc.id and cd.hosp_code = cc.hosp_code
+        left join outpt_classes c on cc.cs_id = c.id and cc.hosp_code = c.hosp_code
+        where cd.hosp_code = #{hospCode} and cd.doctor_id = #{doctorId} and cc.cy_id = #{cyId}
+        and cd.is_valid = '1' and cc.is_valid = '1'
+        <if test="ccId != null and ccId != ''  ">
+            and cc.id  != #{ccId}
+        </if>
+        and cc.weeks in
+        <foreach collection="weekList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="isClassifyClassesExist" resultType="java.lang.Integer">
+        select count(0) from outpt_classify_classes
+        where hosp_code = #{hospCode} and cy_id = #{cyId} and cs_id = #{csId} and weeks = #{weeks} and is_valid = #{isValid}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--新增多条挂号类别排班记录-->
+    <insert id="insertClassifyClasses" keyProperty="id" useGeneratedKeys="true">
+        insert into outpt_classify_classes(id,hosp_code, cs_id, cy_id, triage_id, triage_code, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.csId}, #{item.cyId}, #{item.triageId}, #{item.triageCode},#{item.deptId}, #{item.weeks}, #{item.registerNum}, #{item.isCall}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--新增多条医生排班记录-->
+    <insert id="insertClassesDoctor" keyProperty="id" useGeneratedKeys="true">
+        insert into outpt_classes_doctor(id,hosp_code, cc_id, doctor_id, register_num, is_valid, clinic_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.ccId}, #{item.doctorId}, #{item.registerNum}, '1',#{item.clinicId})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改多条医生排班-->
+    <update id="updateClassesDoctor">
+        <foreach collection="list"  item="item" separator=";">
+            update outpt_classes_doctor
+            <set>
+                <if test="item.ccId !=null and item.ccId != ''">
+                    cc_id = #{item.ccId},
+                </if>
+                <if test="item.doctorId !=null and item.doctorId != ''">
+                    doctor_id = #{item.doctorId},
+                </if>
+                <if test="item.registerNum !=null and item.registerNum != ''">
+                    register_num = #{item.registerNum},
+                </if>
+                <if test="item.clinicId !=null and item.clinicId != ''">
+                    clinic_id = #{item.clinicId},
+                </if>
+            </set>
+            where id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--通过主键修改挂号类别排班-->
+    <update id="updateClassifyClasses">
+        update outpt_classify_classes
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="csId != null and csId != ''">
+                cs_id = #{csId},
+            </if>
+            <if test="cyId != null and cyId != ''">
+                cy_id = #{cyId},
+            </if>
+            <if test="triageId != null and triageId != ''">
+                triage_id = #{triageId},
+            </if>
+            <if test="triageCode !=null and triageCode != ''">
+                triage_code = #{triageCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="weeks != null and weeks != ''">
+                weeks = #{weeks},
+            </if>
+            <if test="registerNum != null">
+                register_num = #{registerNum},
+            </if>
+            <if test="isCall != null and isCall != ''">
+                is_call = #{isCall},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除挂号类别排班-->
+    <update id="updateStatus">
+        update outpt_classify_classes
+        <set>
+            is_valid = #{isValid}
+        </set>
+        <where>
+            id in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and hosp_code = #{hospCode}
+        </where>
+    </update>
+
+    <update id="updateStatusDoctor">
+        update outpt_classes_doctor
+        <set>
+            is_valid = #{isValid}
+        </set>
+        where
+        hosp_code = #{hospCode}
+        and cc_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--通过医生排班的ccId删除-->
+    <update id="deleteClassesDoctorById">
+        update  outpt_classes_doctor
+        <set>
+            is_valid = #{isValid}
+        </set>
+        <where>
+            hosp_code = #{hospCode} and
+            id in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </where>
+    </update>
+
+</mapper>

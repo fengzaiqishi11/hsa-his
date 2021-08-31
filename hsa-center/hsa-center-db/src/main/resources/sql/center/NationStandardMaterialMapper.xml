@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.nationstandardmaterial.dao.NationStandardMaterialDAO">
+
+    <resultMap type="cn.hsa.module.center.nationstandardmaterial.entity.NationStandardMaterialDTO" id="NationStandardMaterialMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="typeCode1" column="type_code1" jdbcType="VARCHAR"/>
+        <result property="typeCode2" column="type_code2" jdbcType="VARCHAR"/>
+        <result property="typeCode3" column="type_code3" jdbcType="VARCHAR"/>
+        <result property="insuranceName" column="insurance_name" jdbcType="VARCHAR"/>
+        <result property="materialQuality" column="material_quality" jdbcType="VARCHAR"/>
+        <result property="features" column="features" jdbcType="VARCHAR"/>
+        <result property="regCertNo" column="reg_cert_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="prod" column="prod" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getById" resultMap="NationStandardMaterialMap">
+        select id,
+               code,
+               type_code1,
+               type_code2,
+               type_code3,
+               insurance_name,
+               material_quality,
+               features,
+               reg_cert_no,
+               name,
+               prod,
+               spec,
+               is_valid,
+               crte_id,
+               crte_name
+        from nation_standard_material
+        where id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="NationStandardMaterialMap">
+        select
+        id, code, type_code1, type_code2, type_code3, insurance_name, material_quality, features, reg_cert_no, name,
+        prod, spec, is_valid, crte_id, crte_name,wbm,pym
+        from nation_standard_material
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="typeCode1 != null and typeCode1 != ''">
+                and type_code1 = #{typeCode1}
+            </if>
+            <if test="typeCode2 != null and typeCode2 != ''">
+                and type_code2 = #{typeCode2}
+            </if>
+            <if test="typeCode3 != null and typeCode3 != ''">
+                and type_code3 = #{typeCode3}
+            </if>
+            <if test="insuranceName != null and insuranceName != ''">
+                and insurance_name = #{insuranceName}
+            </if>
+            <if test="materialQuality != null and materialQuality != ''">
+                and material_quality = #{materialQuality}
+            </if>
+            <if test="features != null and features != ''">
+                and features = #{features}
+            </if>
+            <if test="regCertNo != null and regCertNo != ''">
+                and reg_cert_no = #{regCertNo}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="prod != null and prod != ''">
+                and prod = #{prod}
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec = #{spec}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="provinceCode != null and provinceCode != ''">
+                and (province_code = #{provinceCode}  or province_code is null)
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( name like concat('%',#{keyword},'%')
+                    or insurance_name like concat('%',#{keyword},'%')
+                    or code like concat('%',#{keyword},'%')
+                    or wbm like concat('%',#{keyword},'%')
+                    or pym like concat('%',#{keyword},'%')
+                    or prod like concat('%',#{keyword},'%')  )
+            </if>
+        </where>
+    </select>
+    <insert id="saveBatch">
+        insert into nation_standard_material
+        (id,code,type_code1 ,type_code2,
+         type_code3 ,insurance_name ,material_quality ,
+         features ,reg_cert_no ,`name` ,prod ,spec ,
+         is_valid ,crte_id,crte_name)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ( #{item.id},#{item.code},#{item.typeCode1},
+             #{item.typeCode2},#{item.typeCode3},#{item.insuranceName},
+             #{item.materialQuality},#{item.features},#{item.regCertNo},
+             #{item.name},#{item.prod},#{item.spec},#{item.isValid},#{item.crteId},
+             #{item.crteName}
+            )
+        </foreach>
+
+    </insert>
+    <insert id="saveNationStandardMaterial">
+        insert into nation_standard_material
+        (id,code,type_code1 ,type_code2,
+        type_code3 ,insurance_name ,material_quality ,
+        features ,reg_cert_no ,`name` ,prod ,spec ,
+        is_valid ,crte_id,crte_name)
+        values
+        ( #{id},#{code},#{typeCode1},
+        #{typeCode2},#{typeCode3},#{insuranceName},
+        #{materialQuality},#{features},#{regCertNo},
+        #{name},#{prod},#{spec},#{isValid},#{crteId},
+        #{crteName}
+        )
+    </insert>
+
+    <update id="updateNationStandardMaterial">
+        update nation_standard_material
+
+        set code            = #{code},
+            type_code1      = #{typeCode1},
+            type_code2 =#{typeCode2},
+            type_code3= #{typeCode3},
+            insurance_name  =#{insuranceName},
+            material_quality=#{materialQuality},
+            features=#{features},
+            reg_cert_no     =#{regCertNo},
+            `name`= #{name},
+            prod=#{prod},
+            spec=#{spec},
+            is_valid=#{isValid},
+            crte_id=#{crteId},
+            crte_name=#{crteName}
+        where id = #{id}
+    </update>
+</mapper>

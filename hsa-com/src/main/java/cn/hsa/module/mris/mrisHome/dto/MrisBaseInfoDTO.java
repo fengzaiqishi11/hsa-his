@@ -1,0 +1,57 @@
+package cn.hsa.module.mris.mrisHome.dto;
+
+import cn.hsa.module.mris.mrisHome.entity.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * @Package_name: cn.hsa.module.mris.dto
+ * @class_name: MrisBaseInfoDTO
+ * @Description: 病案病人基本信息DTO
+ * @Author: LiaoJiGuang
+ * @Email: 847025096@qq.com
+ * @Date: 2020/9/21 15:49
+ * @Company: 创智和宇
+ **/
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+public class MrisBaseInfoDTO extends MrisBaseInfoDO implements Serializable {
+
+    // 档案ID
+    private String profileId;
+
+    // 医院名称
+    private String hospName;
+
+    // 医疗付费方式
+    private String payName;
+
+    // bka264
+    private String bka264;
+
+    // 病案费用实体类
+    private MrisCostDO mrisCostDO;
+
+    // 病案诊断实体类
+    private List<MrisDiagnoseDO> mrisDiagnoseDOList;
+
+    // 病案手术信息实体类
+    private List<MrisOperInfoDO> mrisOperInfoDOList;
+
+    // 病案转科信息
+    private List<MrisTurnDeptDO> mrisTurnDeptDOList;
+
+    private List<MrisBabyInfoDO> mrisBabyInfoDOList;
+
+    //数据来源  1:正面  2:反面  3:正反面
+    private String dataSource;
+    private String medicineOrgCode;
+    private String medicalRegNo;
+
+}
+

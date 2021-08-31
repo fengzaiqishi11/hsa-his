@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.inpt.patientcomprehensivequery.dao.PatientComprehensiveQueryDAO">
+
+    <!-- 病人综合查询——医嘱信息汇总 杨家洪-->
+    <select id="queryAdviceSummary" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no,
+        iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num,
+        end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code,
+        is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id,
+        exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name,
+        is_check, check_id, check_name, check_time, is_stop_check, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id,
+        stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
+        from inpt_advice where hosp_code = #{hospCode} and visit_id = #{visitId}
+        <if test="keyword != null and keyword != ''">
+            and content like concat('%',#{keyword},'%')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (baby_id is null or baby_id = '')
+        </if>
+    </select>
+
+    <!-- 病人综合查询——医嘱明细查询 杨家洪-->
+    <select id="queryAdviceSummaryDetail" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
+        select a.*,b.preferential_price,b.reality_price,(b.price * b.num) as valuationPrice from inpt_advice_detail a
+        left join inpt_cost b on b.source_id = a.id and b.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.ia_id = #{iaId} and a.visit_id = #{visitId}
+        <if test="babyId != null and babyId != '' ">
+            and b.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (b.baby_id is null or b.baby_id = '')
+        </if>
+    </select>
+
+    <!-- 病人综合查询——长期/临时医嘱信息 杨家洪-->
+    <select id="queryAdviceLongOrShort" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" >
+        SELECT a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no,
+               a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code, a.sign_code, a.start_exec_num,
+               a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code,
+               a.rate_id,  a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
+               a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
+               a.exec_id,a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time,a.cancel_id,a.cancel_name,a.cancel_time,
+               DATE_FORMAT((select max(exec_time) from inpt_advice_exec where advice_id=a.id and hosp_code=a.hosp_code),'%Y-%m-%d %H:%i') as execTimeNoM
+                ,(select max(exec_name) from inpt_advice_exec where advice_id=a.id and hosp_code=a.hosp_code) execName
+                , a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+               a.is_check, a.check_id, a.check_name, a.check_time, a.is_stop_check, a.stop_doctor_id, a.stop_doctor_name, a.stop_time,
+               DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,a.stop_check_id,
+               a.stop_check_name, a.stop_check_time, a.is_long, a.is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,
+               DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
+               b.bed_name,
+               b.in_no,
+               b.in_dept_name,
+               (select c.name from base_dept c where b.in_ward_id = c.id and c.hosp_code = #{hospCode}) as inWardName,
+               (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName,
+               case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode
+        from inpt_advice a left join inpt_visit b on b.id = a.visit_id and b.hosp_code = a.hosp_code
+        left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+        where a.is_long = #{isLong} and a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
+          and a.is_submit='1' and a.is_reject = '0'
+        order by a.long_start_time asc, a.crte_time, a.group_no, a.group_seq_no
+    </select>
+
+    <!--查询项目汇总 谢星宇-->
+    <select id="queryItemAndDrugAndMaterialAndAdvice" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        <!--药品归类-->
+        select
+        drug.good_name as name,
+        drug.code as code,
+        drug.spec as spec,
+        cost.numUnitCode as unitCode,
+        ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+        cost.price,
+        cost.num,
+        cost.realityPrice,
+        cost.valuationPrice,
+        cost.preferentialPrice,
+        cost.crteName,
+        ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+        cost.sourceDeptId,
+        cost.itemCode,
+        cost.itemId
+        from
+        base_drug drug inner join
+        (
+        select
+        max(inpt_cost.source_dept_id) as sourceDeptId,
+        max(inpt_cost.visit_id) as visitId,
+        max(inpt_cost.bfc_id) as bfcId,
+        inpt_cost.item_id as itemId,
+        inpt_cost.hosp_code,
+        max(inpt_cost.price) as price,
+        max(inpt_cost.crte_name) as crteName,
+        sum(inpt_cost.total_num ) as num,
+        max(inpt_cost.total_num_unit_code) as numUnitCode,
+        sum(inpt_cost.total_price ) as valuationPrice,
+        sum(inpt_cost.preferential_price ) as preferentialPrice,
+        sum(inpt_cost.reality_price ) as realityPrice,
+        max(inpt_cost.item_code) as itemCode
+        from
+        inpt_cost
+        where
+        hosp_code = #{hospCode}
+        and item_code  = '1'
+        and visit_id = #{visitId}
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and source_dept_id = #{sourceDeptId}
+        </if>
+        <if test='isAdviceItem =="Y"'>
+            and (iat_id is not null or iat_id != '')
+        </if>
+        <if test='isAdviceItem =="N"'>
+            and (iat_id is null or iat_id = '')
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (baby_id is null or baby_id = '')
+        </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
+        group by
+        itemId
+        ) cost
+        on
+        drug.id = cost.itemId  and drug.hosp_code = cost.hosp_code
+        where
+        drug.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and drug.good_name like concat('%',#{keyword},'%')
+        </if>
+        <!--项目归类-->
+        union
+        select
+        item.name as name,
+        item.code,
+        item.spec,
+        cost.numUnitCode as unitCode,
+        ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+        cost.price,
+        cost.num,
+        cost.realityPrice,
+        cost.valuationPrice,
+        cost.preferentialPrice,
+        cost.crteName,
+        ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+        cost.sourceDeptId,
+        cost.itemCode,
+        cost.itemId
+        from
+        base_item item inner join
+        (
+        select
+        max(inpt_cost.source_dept_id) as sourceDeptId,
+        max(inpt_cost.visit_id) as visitId,
+        max(inpt_cost.bfc_id) as bfcId,
+        inpt_cost.item_id as itemId,
+        inpt_cost.hosp_code,
+        max(inpt_cost.price) as price,
+        max(inpt_cost.crte_name) as crteName,
+        sum(inpt_cost.total_num ) as num,
+        max(inpt_cost.total_num_unit_code) as numUnitCode,
+        sum(inpt_cost.total_price ) as valuationPrice,
+        sum(inpt_cost.preferential_price ) as preferentialPrice,
+        sum(inpt_cost.reality_price ) as realityPrice,
+        max(inpt_cost.item_code) as itemCode
+        from
+        inpt_cost
+        where
+        hosp_code = #{hospCode}
+        and item_code  = '3'
+        and visit_id = #{visitId}
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and source_dept_id = #{sourceDeptId}
+        </if>
+        <if test='isAdviceItem =="Y"'>
+            and (iat_id is not null or iat_id != '')
+        </if>
+        <if test='isAdviceItem =="N"'>
+            and (iat_id is null or iat_id = '')
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (baby_id is null or baby_id = '')
+        </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
+        group by
+        itemId
+        ) cost
+        on
+        item.id = cost.itemId  and item.hosp_code = cost.hosp_code
+        where
+        item.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and item.name like concat('%',#{keyword},'%')
+        </if>
+        <!--材料归类-->
+        union
+        select
+        material.name as name,
+        material.code,
+        material.spec,
+        cost.numUnitCode as unitCode,
+        ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+        cost.price,
+        cost.num,
+        cost.realityPrice,
+        cost.valuationPrice,
+        cost.preferentialPrice,
+        cost.crteName,
+        ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+        cost.sourceDeptId,
+        cost.itemCode,
+        cost.itemId
+        from
+        base_material material inner join
+        (
+        select
+        max(inpt_cost.source_dept_id) as sourceDeptId,
+        max(inpt_cost.visit_id) as visitId,
+        max(inpt_cost.bfc_id) as bfcId,
+        inpt_cost.item_id as itemId,
+        inpt_cost.hosp_code,
+        max(inpt_cost.price) as price,
+        max(inpt_cost.crte_name) as crteName,
+        sum(inpt_cost.total_num ) as num,
+        max(inpt_cost.total_num_unit_code) as numUnitCode,
+        sum(inpt_cost.total_price ) as valuationPrice,
+        sum(inpt_cost.preferential_price ) as preferentialPrice,
+        sum(inpt_cost.reality_price ) as realityPrice,
+        max(inpt_cost.item_code) as itemCode
+        FROM
+        inpt_cost
+        where
+        hosp_code = #{hospCode}
+        and item_code  = '2'
+        and visit_id = #{visitId}
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and source_dept_id = #{sourceDeptId}
+        </if>
+        <if test='isAdviceItem =="Y"'>
+            and (iat_id is not null or iat_id != '')
+        </if>
+        <if test='isAdviceItem =="N"'>
+            and (iat_id is null or iat_id = '')
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (baby_id is null or baby_id = '')
+        </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
+        group by
+        itemId
+        ) cost
+        on
+        material.id = cost.itemId  and material.hosp_code = cost.hosp_code
+        where
+        material.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and material.name like concat('%',#{keyword},'%')
+        </if>
+        order by
+        bfcName
+    </select>
+
+
+    <select id="queryItemAndDrugAndMaterialDetail" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        select
+        a.id,
+        a.source_dept_id as sourceDeptId,
+        a.visit_id as visitId,
+        a.bfc_id as bfcId,
+        a.item_id as itemId,
+        a.item_name as name,
+        a.cost_time as costTime,
+        a.hosp_code,
+        a.price as price,
+        a.total_num_unit_code as numUnitCode,
+        a.crte_name as crteName,
+        a.total_num as num,
+        a.total_price as valuationPrice,
+        a.preferential_price as preferentialPrice,
+        a.reality_price as realityPrice,
+        ( select name from base_dept where id = a.source_dept_id and hosp_code = #{hospCode} ) as sourceDeptName,
+        a.item_code as itemCode
+        from inpt_cost a
+        where
+        hosp_code = #{hospCode}
+        and item_code  = #{itemCode}
+        and visit_id = #{visitId}
+        and item_id = #{itemId}
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and source_dept_id = #{sourceDeptId}
+        </if>
+        <if test='isAdviceItem =="Y"'>
+            and (iat_id is not null or iat_id != '')
+        </if>
+        <if test='isAdviceItem =="N"'>
+            and (iat_id is null or iat_id = '')
+        </if>
+        order by a.cost_time asc
+    </select>
+
+    <!-- 查询计费类别信息 谢星宇 -->
+    <select id="queryCostClassify" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        select
+            bfc.name as bfcName,
+            cost.bfc_id as bfcId,
+            sum(cost.total_price) as valuationPrice ,
+            sum(cost.preferential_price) as preferentialPrice,
+            sum(cost.reality_price) as realityPrice
+        from
+            inpt_cost cost
+                left join  base_finance_classify bfc on cost.bfc_id = bfc.id and bfc.hosp_code = cost.hosp_code
+        where
+            cost.hosp_code = #{hospCode}
+          and cost.visit_id = #{visitId}
+        <if test="babyId != null and babyId != '' ">
+            and cost.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (cost.baby_id is null or cost.baby_id = '')
+        </if>
+        group by bfcName,bfcId
+    </select>
+
+    <!-- 查询计费类别信息明细 谢星宇 -->
+    <select id="queryCostClassifyDetail" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        select
+        bfc.name as bfcName,
+        (case cost.item_code
+        when '1' then
+        ( select base_drug.spec from base_drug where base_drug.id = cost.item_id )
+        when '2' then
+        ( select base_material.spec from base_material where base_material.id = cost.item_id )
+        when '3' then
+        ( select base_item.spec from base_item where base_item.id = cost.item_id ) end
+        )
+        as spec,
+        (case cost.item_code
+        when '1' then
+        ( select base_drug.code from base_drug where base_drug.id = cost.item_id )
+        when '2' then
+        ( select base_material.code from base_material where base_material.id = cost.item_id )
+        when '3' then
+        ( select base_item.code from base_item where base_item.id = cost.item_id ) end
+        )
+        as code,
+        cost.total_num_unit_code as unitCode,
+        cost.item_name as name,
+        cost.total_num as num,
+        cost.price,
+        ( cost.total_price ) as valuationPrice,
+        cost.preferential_price as preferentialPrice,
+        cost.reality_price as realityPrice,
+        dept.name as sourceDeptName,
+        cost.status_code as statusCode,
+        cost.cost_time as costTime
+        from
+        inpt_cost cost
+        left join base_finance_classify bfc on cost.bfc_id = bfc.id
+        left join base_dept dept on cost.source_dept_id = dept.id
+        where
+        cost.hosp_code =#{hospCode,jdbcType=VARCHAR}
+        and cost.visit_id = #{visitId}
+        and cost.bfc_id = #{bfcId,jdbcType=VARCHAR}
+        <if test="keyword !=null and keyword!=''">
+            and cost.item_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        </if>
+        <if test="sourceDeptId !=null and sourceDeptId!=''">
+            and cost.source_dept_id =#{sourceDeptId,jdbcType=VARCHAR}
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and cost.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (cost.baby_id is null or cost.baby_id = '')
+        </if>
+    </select>
+
+    <!--费用汇总信息分页查询 谢星宇-->
+    <select id="queryCostAll" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        select
+            DATE_FORMAT(cost.cost_time, '%Y-%m-%d') as costTime,
+            bfc.name as bfcName,
+            bfc_id as bfcId,
+            sum(cost.total_price) as valuationPrice,
+            sum( cost.preferential_price ) as preferentialPrice,
+            sum( cost.reality_price ) as realityPrice
+        from
+            inpt_cost cost,
+            base_finance_classify bfc
+        where
+            cost.bfc_id = bfc.id and cost_time is not null  and cost_time != ''
+          and cost.visit_id = #{visitId}
+        <if test="babyId != null and babyId != '' ">
+            and cost.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (cost.baby_id is null or cost.baby_id = '')
+        </if>
+        group by
+            bfc.name,
+            cost.bfc_id,
+            DATE_FORMAT(cost.cost_time, '%Y-%m-%d')
+        order by
+            DATE_FORMAT(cost.cost_time, '%Y-%m-%d')
+    </select>
+    <!--费用汇总信息明细分页查询 谢星宇-->
+    <select id="queryCostAllDetail" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+        select
+        bfc.name as bfcName,
+        base_dept.name as sourceDeptName,
+        inpt_cost.item_name as name,
+        inpt_cost.total_num as num,
+        inpt_cost.total_num_unit_code as numUnitCode,
+        inpt_cost.price,
+        (inpt_cost.total_price) as valuationPrice,
+        inpt_cost.preferential_price as preferentialPrice,
+        inpt_cost.reality_price as realityPrice
+        from
+        inpt_cost
+        left join base_finance_classify bfc ON inpt_cost.bfc_id = bfc.id
+        left join base_dept ON base_dept.id = inpt_cost.source_dept_id
+        <where>
+            inpt_cost.bfc_id = #{bfcId} and inpt_cost.cost_time like concat(DATE_FORMAT(#{costTime}, '%Y-%m-%d'),'%')
+            and  inpt_cost.visit_id = #{visitId}
+            <if test="babyId != null and babyId != '' ">
+                and inpt_cost.baby_id =#{babyId}
+            </if>
+            <if test='queryBaby =="N"'>
+                and (inpt_cost.baby_id is null or inpt_cost.baby_id = '')
+            </if>
+        </where>
+    </select>
+
+    <!--    结算详细信息  张轩-->
+    <select id="querySettleInfo" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        SELECT
+        a.settle_no,
+        e.name,
+        e.age,
+        e.age_unit_code,
+        e.gender_code,
+        ( case when a.baby_id is null or <![CDATA[LENGTH(trim(a.baby_id)) < 1]]> then
+            (CONCAT(
+            e.name,'/',
+            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女'  end) , '/' ,
+            e.age ,
+            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天'  end )))
+          else (
+            CONCAT(
+            e.name,'/',
+            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女'  end) , '/' ,
+            e.age ,
+            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天'  end ), '/' ,
+            t1.name
+            ))
+          end
+        ) as patient_info,
+        a.type_code,
+        a.patient_code,
+        a.start_time,
+        a.end_time,
+        a.total_price,
+        a.reality_price,
+        a.out_settle_code,
+        a.actual_price,
+        a.trunc_price,
+        (select ifnull(sum(pp.price), 0) from inpt_pay pp where pp.settle_id = a.id ) as self_price,
+        (select ib.name from inpt_baby ib where ib.hosp_code = a.hosp_code and ib.id = a.baby_id) as babyName,
+        a.ap_total_price,
+        a.ap_offset_price,
+        a.settle_take_price,
+        a.settle_back_price,
+        a.settle_time,
+        a.is_settle,
+        a.status_code,
+        a.is_print,
+        a.mi_price,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        a.baby_id,
+        d.total_price as insurePayTotalPrice,
+        b.total_price as invoiceTotalPrice,
+        c.reality_price as preferentialPrice,
+        a.source_pay_code,
+        b.invoice_no,
+        f.hosp_price hospPrice,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf,
+        e.outpt_doctor_name,-- 门诊医生
+        e.jz_doctor_name,-- 经治医生
+        e.zg_doctor_name-- 主管医生
+        FROM
+        inpt_settle a
+        left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        left join inpt_settle_invoice_content c on c.settle_invoice_id = b.id and a.hosp_code = c.hosp_code
+        INNER JOIN inpt_visit e ON a.visit_id = e.id and a.hosp_code = e.hosp_code
+        left join inpt_insure_pay d on d.settle_id = a.id and a.hosp_code = d.hosp_code
+        left join insure_individual_settle f on a.id = f.settle_id  and a.hosp_code = f.hosp_code and a.status_code = f.state
+        left join inpt_baby t1 on a.baby_id = t1.id and a.hosp_code = t1.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        <if test="visitId != null and visitId != ''">
+            and a.visit_id = #{visitId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (e.name like concat('%',#{keyword},'%')
+            or b.invoice_no like concat('%',#{keyword},'%')
+            or a.settle_no like concat('%',#{keyword},'%'))
+        </if>
+        <if test="startTimeYMD != null and startTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(DATE_ADD(#{startTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="endTimeYMD != null and endTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and a.crte_id = #{crteId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and e.patient_code = #{patientCode}
+        </if>
+        <if test="babyId != null and babyId != '' ">
+            and a.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (a.baby_id is null or a.baby_id = '')
+        </if>
+        order by a.settle_no desc, a.crte_time desc
+    </select>
+
+    <!--    查询所有住院病人 -->
+    <select id="queryAllInptVisitInfo" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        SELECT
+        e.id as visitId,
+        a.settle_no,
+        e.name,
+        e.age,
+        e.age_unit_code,
+        e.gender_code,
+        a.type_code,
+        a.patient_code,
+        a.start_time,
+        a.end_time,
+        a.total_price,
+        a.reality_price,
+        a.out_settle_code,
+        a.actual_price,
+        a.trunc_price,
+        (select ifnull(sum(pp.price), 0) from inpt_pay pp where pp.settle_id = a.id ) as self_price,
+        a.ap_total_price,
+        a.ap_offset_price,
+        a.settle_take_price,
+        a.settle_back_price,
+        a.settle_time,
+        a.is_settle,
+        a.status_code,
+        a.is_print,
+        a.mi_price,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        d.total_price as insurePayTotalPrice,
+        b.total_price as invoiceTotalPrice,
+        c.reality_price as preferentialPrice,
+        a.source_pay_code,
+        b.invoice_no,
+        f.hosp_price hospPrice,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
+        FROM
+        inpt_visit e
+        left join inpt_settle a ON a.visit_id = e.id and a.hosp_code = e.hosp_code
+        left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        left join inpt_settle_invoice_content c on c.settle_invoice_id = b.id and a.hosp_code = c.hosp_code
+        left join inpt_insure_pay d on d.settle_id = a.id and a.hosp_code = d.hosp_code
+        left join insure_individual_settle f on a.id = f.settle_id  and a.hosp_code = f.hosp_code and a.status_code = f.state
+        where e.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and e.id = #{visitId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and e.name like concat('%',#{keyword},'%')
+            or b.invoice_no like concat('%',#{keyword},'%')
+            or a.settle_no like concat('%',#{keyword},'%')
+        </if>
+        <if test="startTimeYMD != null and startTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(DATE_ADD(#{startTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="endTimeYMD != null and endTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and a.crte_id = #{crteId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and e.patient_code = #{patientCode}
+        </if>
+        order by e.crte_time desc
+    </select>
+
+    <!--    查询在院病人 -->
+    <select id="queryInptVisitInfo" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        SELECT
+        e.id as visitId,
+        a.settle_no,
+        e.name,
+        e.age,
+        e.age_unit_code,
+        e.gender_code,
+        e.status_code brzt_Status_Code, -- 病人状态
+        a.type_code,
+        a.patient_code,
+        a.start_time,
+        a.end_time,
+        a.total_price,
+        a.reality_price,
+        a.out_settle_code,
+        a.actual_price,
+        a.trunc_price,
+        (select ifnull(sum(pp.price), 0) from inpt_pay pp where pp.settle_id = a.id ) as self_price,
+        a.ap_total_price,
+        a.ap_offset_price,
+        a.settle_take_price,
+        a.settle_back_price,
+        a.settle_time,
+        a.is_settle,
+        a.status_code,
+        a.is_print,
+        a.mi_price,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        d.total_price as insurePayTotalPrice,
+        b.total_price as invoiceTotalPrice,
+        c.reality_price as preferentialPrice,
+        a.source_pay_code,
+        b.invoice_no,
+        f.hosp_price hospPrice,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
+        (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
+        FROM
+        inpt_visit e
+        left join inpt_settle a ON a.visit_id = e.id and a.hosp_code = e.hosp_code
+        left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        left join inpt_settle_invoice_content c on c.settle_invoice_id = b.id and a.hosp_code = c.hosp_code
+        left join inpt_insure_pay d on d.settle_id = a.id and a.hosp_code = d.hosp_code
+        left join insure_individual_settle f on a.id = f.settle_id  and a.hosp_code = f.hosp_code and a.status_code = f.state
+        where e.hosp_code = #{hospCode}
+        and
+        e.status_code in ('1','2','3','4','5','6')
+        <if test="visitId != null and visitId != ''">
+            and e.id = #{visitId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and e.name like concat('%',#{keyword},'%')
+            or b.invoice_no like concat('%',#{keyword},'%')
+            or a.settle_no like concat('%',#{keyword},'%')
+        </if>
+        <if test="startTimeYMD != null and startTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(DATE_ADD(#{startTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="endTimeYMD != null and endTimeYMD != ''">
+            and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endTimeYMD},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and a.crte_id = #{crteId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and e.patient_code = #{patientCode}
+        </if>
+        order by e.crte_time desc
+    </select>
+
+    <!--    床位异动信息  张轩-->
+    <select id="queryBedChangeInfo" resultType="cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO" parameterType="cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO">
+        select visit_id,
+        change_code,
+        before_bed_name,
+        after_bed_name,
+        before_dept_name,
+        after_dept_name,
+        before_ward_name,
+        after_ward_name,
+        before_zz_doctor_name,
+        after_zz_doctor_name,
+        end_time,
+        crte_name,
+        crte_time
+        from inpt_bed_change
+        <where>
+            hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != '' ">
+                and visit_id = #{visitId}
+            </if>
+        </where>
+
+    </select>
+
+    <!--    结算票据信息  张轩-->
+    <select id="querySettleInvoice" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO" parameterType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        select
+        b.visit_id,
+        b.total_price,
+        b.reality_price,
+        b.trunc_price,
+        b.actual_price,
+        b.self_price,
+        b.mi_price,
+        b.hosp_jm_price,
+        b.type_code,
+        a.invoice_no,
+        a.total_price as invoiceTotalPrice,
+        a.print_time,
+        a.print_num
+        from inpt_settle_invoice a
+        inner join inpt_settle b on b.id = a.settle_id and a.hosp_code = b.hosp_code
+        <where>
+            a.hosp_code = #{hospCode}
+            <if test="visitId != null and visitId != '' ">
+                and a.visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != '' ">
+                and b.baby_id =#{babyId}
+            </if>
+            <if test='queryBaby =="N"'>
+                and (b.baby_id is null or b.baby_id = '')
+            </if>
+        </where>
+    </select>
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" id="InptVisitMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="stopTime" column="stop_time" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="checkName" column="check_name" jdbcType="VARCHAR"/>
+        <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
+        <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
+        <result property="bedName" column="bed_name" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+        <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
+        <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <select id="queryAdvice" resultMap="InptVisitMap">
+        select ia.crte_time,ia.stop_time,ia.content,ia.crte_name ,ia.check_name,ia.sign_code,ia.is_long,
+               iv.name,iv.gender_code,iv.in_no,iv.bed_name,
+               (select bd.name from base_dept bd where bd.id= iv.in_ward_id and bd.hosp_code = iv.hosp_code) as
+                   wardName,iv.in_ward_id,
+               iae.plan_exec_time,iae.exec_time,iae.exec_name,iae.second_exec_name
+        from inpt_advice ia
+                 left join inpt_advice_exec iae on ia.id = iae.advice_id and ia.hosp_code = iae.hosp_code
+                 left join inpt_visit iv on ia.visit_id=iv.id and iv.hosp_code= ia.hosp_code
+        where ia.hosp_code =#{hospCode}
+          and ia.is_long = #{yzlx}
+          and ia.visit_id = #{visitId}
+          and ia.is_submit='1'
+        <if test="babyId != null and babyId != '' ">
+            and ia.baby_id =#{babyId}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (ia.baby_id is null or ia.baby_id = '')
+        </if>
+        order by iae.exec_time desc
+    </select>
+    <resultMap type="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" id="DiagnoseMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="diseaseName" jdbcType="VARCHAR"/>
+        <result property="icd10" column="Icd10" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <select id="queryPatientDiagnose" resultMap="DiagnoseMap"
+            parameterType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,
+               (select jz_doctor_name from inpt_visit iv where iv.id = ind.visit_id and iv.hosp_code = ind.hosp_code)  jzDoctorName
+        from inpt_diagnose ind
+                 left join base_disease bd on ind.disease_id = bd.id and ind.hosp_code = bd.hosp_code
+        where ind.hosp_code=#{hospCode}
+          and ind.visit_id = #{visitId}
+        order by ind.crte_time desc
+    </select>
+
+    <select id="queryCostDetail"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select
+        id, hosp_code, visit_id, baby_id, iat_id, iatd_group_no, iatd_seq_no, advice_exec_id, source_code, source_id,
+        old_cost_id, source_dept_id, in_dept_id, bfc_id, item_code,
+        (case
+        when item_code ='1' then (select bd.code from base_drug bd where item_id = bd.id and bd.hosp_code =hosp_code )
+        when item_code='2' then (select bm.code from base_material bm where item_id =  bm.id  and bm.hosp_code = hosp_code )
+        when item_code = '4' then (select ba.code from base_advice ba where item_id = ba.id and ba.hosp_code = hosp_code)
+        else (select bi.code from base_item bi where item_id = bi.id and bi.hosp_code = hosp_code)
+        end
+        ) as hospItemCode,
+               item_id, item_name, price, num, spec, prep_code,
+        dosage, dosage_unit_code, usage_code, rate_id, speed_code, use_days, num_unit_code, total_num,
+        total_num_unit_code, herb_note_code, use_code, herb_num, total_price, preferential_price, reality_price,
+        back_num, back_code, doctor_id, doctor_name, dept_id, phar_id, is_dist, is_give, is_ok, ok_id, ok_name, ok_time,
+        settle_code, settle_id, is_check, check_id, check_name, check_time, zz_doctor_id, zz_doctor_name, jz_doctor_id,
+        jz_doctor_name, zg_doctor_id, zg_doctor_name, exec_id, exec_name, exec_time, exec_dept_id, plan_exec_time,
+        status_code, is_cost, cost_time, crte_id, crte_name, crte_time
+        from inpt_cost
+        <where>
+            hosp_code = #{hospCode} and visit_id = #{visitId}
+            <if test='isAdviceItem =="Y"'>
+                and (iat_id is not null or iat_id != '')
+            </if>
+            <if test='isAdviceItem =="N"'>
+                and (iat_id is null or iat_id = '')
+            </if>
+            <if test="sourceDeptId != null and sourceDeptId != ''">
+                and source_dept_id = #{sourceDeptId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and item_name like concat('%',#{keyword},'%')
+            </if>
+            <if test="babyId != null and babyId != '' ">
+                and baby_id =#{babyId}
+            </if>
+            <if test='queryBaby =="N"'>
+                and (baby_id is null or baby_id = '')
+            </if>
+        </where>
+        order by cost_time desc
+    </select>
+</mapper>

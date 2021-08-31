@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.user.dao.CenterUserDAO">
+
+    <resultMap type="cn.hsa.module.center.user.dto.CenterUserDTO" id="CenterUserMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="isInJob" column="is_in_job" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="genderCode" column="gender_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+        <result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
+        <result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
+        <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+        <result property="photoImage" column="photo_image" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="pswdErrCnt" column="pswd_err_cnt" jdbcType="INTEGER"/>
+        <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
+        <result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--根据id查询用户信息-->
+    <select id="queryById" resultMap="CenterUserMap" parameterType="string">
+        select
+          id, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, cert_code, cert_no, photo_image, address, email, phone, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time
+        from center_user
+        where id = #{id}
+    </select>
+
+    <!--根据code查询用户信息-->
+    <select id="queryByCode" resultMap="CenterUserMap" parameterType="string">
+        select
+          id, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, cert_code, cert_no, photo_image, address, email, phone, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time
+        from center_user
+        where code = #{code}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="CenterUserMap">
+        select
+        id, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code,
+        cert_code, cert_no, photo_image, address, email, phone, pswd_err_cnt, last_login_time, last_login_ip,
+        status_code, pym, wbm, crte_id, crte_name, crte_time
+        from center_user where 1=1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="isInJob != null and isInJob != ''">
+            and is_in_job = #{isInJob}
+        </if>
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+        <if test="pswdErrCnt != null">
+            and pswd_err_cnt = #{pswdErrCnt}
+        </if>
+        <if test="lastLoginTime != null">
+            and last_login_time = #{lastLoginTime}
+        </if>
+        <if test="lastLoginIp != null and lastLoginIp != ''">
+            and last_login_ip = #{lastLoginIp}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and status_code = #{statusCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( name like concat('%',#{keyword},'%')
+            or code like concat('%',#{keyword},'%')
+            or phone like concat('%',#{keyword},'%')
+            )
+        </if>
+        order by crte_time desc
+
+    </select>
+
+    <!--新增用户信息-->
+    <insert id="insert">
+        insert into center_user(id, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, cert_code, cert_no, photo_image, address, email, phone, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time)
+        values (#{id}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{certCode}, #{certNo}, #{photoImage}, #{address}, #{email}, #{phone}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改用户的信息-->
+    <update id="update">
+        update center_user set
+                code = #{code},
+                password = #{password},
+                is_in_job = #{isInJob},
+                name = #{name},
+                age = #{age},
+                birthday = #{birthday},
+                gender_code = #{genderCode},
+                nation_code = #{nationCode},
+                native_place = #{nativePlace},
+                marry_code = #{marryCode},
+                cert_code = #{certCode},
+                cert_no = #{certNo},
+                photo_image = #{photoImage},
+                address = #{address},
+                email = #{email},
+                phone = #{phone},
+                pswd_err_cnt = #{pswdErrCnt},
+                last_login_time = #{lastLoginTime},
+                last_login_ip = #{lastLoginIp},
+                status_code = #{statusCode},
+                pym = #{pym},
+                wbm = #{wbm},
+                crte_id = #{crteId},
+                crte_name = #{crteName},
+                crte_time = #{crteTime}
+        where id= #{id}
+    </update>
+
+    <!--通过主键修改用户的状态-->
+    <update id="updateUserState" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+        update center_user set
+        status_code = #{statusCode}
+        where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <!--    重置用户密码-->
+    <update id="updateResetPassword" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+        update center_user set password =#{password}
+        where id=#{id}
+    </update>
+    <!--    密码激活-->
+    <update id="updateActivePassword" parameterType="string">
+        update center_user set pswd_err_cnt = 0,status_code = '0'
+        where id=#{id}
+    </update>
+<!--    记录密码输入错误次数增加 -->
+    <update id="updatePswdErrCnt" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+        update center_user set pswd_err_cnt = #{pswdErrCnt}
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+    </update>
+
+    <!--查询用户的工号-->
+    <select id="queryCode" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO"  resultMap="CenterUserMap">
+        select * from center_user where 1=1
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+    </select>
+
+    <!--查询用户的状态-->
+    <select id="queryStatueCode" resultMap="CenterUserMap">
+        select * from center_user
+        where id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查询有效的用户-->
+    <select id="queryValidUser" resultMap="CenterUserMap">
+        select * from center_user where is_in_job='1'
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+
+    </select>
+
+    <!--根据用户编码获取菜单权限-->
+    <select id="queryByUserCode" resultType="cn.hsa.base.TreeMenuNode">
+          select e.code id,e.name label,ifnull(e.up_code,'-1') parentId,e.url url,'2' as isMenuOrBtn
+          from center_user a join center_user_role b on a.code=b.user_code
+          join center_role c on b.role_code=c.code
+          join center_role_menu d on c.code=d.role_code
+          join center_menu e on d.menu_code=e.code
+          where c.is_valid='1'
+          <if test="userCode!=null and userCode!=''">
+            and a.code=#{userCode}
+          </if>
+            order by e.seq_no
+    </select>
+    <!--    查询身份证号码是否重复-->
+    <select id="queryCertCode" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO" resultType="int">
+        select count(id) from center_user where 1=1
+        <if test="id!= null and id!=''">
+            and id !=#{id}
+        </if>
+        <if test="certNo !=null and  certNo !='' ">
+            and cert_no=#{certNo}
+        </if>
+    </select>
+
+    <!--用户修改密码-->
+    <update id="updatePassWord" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+     update center_user set
+     password = #{newPasswordByMd5}
+     where
+     id = #{id}
+    </update>
+</mapper>

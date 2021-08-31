@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.stro.stock.dao.CheckStockDAO">
+
+    <!-- 获得库存、占存数量、单位、拆零单位 -->
+    <select id="getStrockNumber" resultType="java.util.Map">
+        select ifnull(a.num,0) as strockNum,ifnull(a.stock_occupy,0) as stockOccupy,a.split_ratio as splitRatio,
+        a.unit_code as unitCode,a.split_unit_code as splitUnitCode
+        from stro_stock a
+        left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
+    </select>
+
+    <!--获得系统参数-->
+    <select id="getParameterValue" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select  a.id, a.hosp_code hospCode, a.name, a.code, a.remark, a.pym, a.wbm, a.value
+        from sys_parameter a
+        where  a.hosp_code = #{hospCode}  and code in
+        <foreach item="code" collection="code" separator="," open="(" close=")" index="">
+            #{code}
+        </foreach>
+    </select>
+    <!--获得未结算，但已开处方的数据-->
+    <select id="getOuptCostTotalNumber" resultType="java.math.BigDecimal">
+     SELECT IFNULL(sum( d.totalNum ),0) AS totalNum
+        FROM
+            (
+            SELECT
+            CASE
+                WHEN
+                    a.item_code = '1'
+                    AND a.num_unit_code = b.split_unit_code THEN
+                        a.total_num
+                        WHEN a.item_code = '1'
+                        AND a.num_unit_code = b.unit_code THEN
+                            a.total_num * b.split_ratio
+                            WHEN a.item_code = '2'
+                            AND a.num_unit_code = c.split_unit_code THEN
+                                a.total_num
+                                WHEN a.item_code = '2'
+                                AND a.num_unit_code = c.unit_code THEN
+                                    a.total_num * c.split_ratio ELSE 0
+                                END totalNum
+        FROM
+            outpt_cost a
+            LEFT JOIN base_drug b ON a.item_id = b.id
+            AND a.hosp_code = b.hosp_code
+            AND a.item_code = '1'
+            LEFT JOIN base_material c ON a.item_id = c.id
+            AND a.hosp_code = c.hosp_code
+            AND a.item_code = '2'
+        WHERE
+            a.hosp_code = #{hospCode}
+            AND settle_code = '0'
+            AND a.phar_id = #{pharId}
+            AND a.item_id = #{itemId}
+            AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="id != null and id !=''">
+                and a.opd_id != #{id}
+            </if>
+            <if test="opId != null and opId !=''">
+                and a.op_id != #{opId}
+            </if>
+            ) d
+
+    </select>
+
+    <!--获得已结算 但是未配药的数据-->
+    <select id="getOuptCostNoPrescribeNumber" resultType="java.math.BigDecimal">
+     SELECT
+      IFNULL(sum( d.totalNum ),0) AS totalNum
+        FROM
+            (
+            SELECT
+            CASE
+                WHEN
+                    a.item_code = '1'
+                    AND a.num_unit_code = b.split_unit_code THEN
+                        a.total_num
+                        WHEN a.item_code = '1'
+                        AND a.num_unit_code = b.unit_code THEN
+                            a.total_num * b.split_ratio
+                            WHEN a.item_code = '2'
+                            AND a.num_unit_code = c.split_unit_code THEN
+                                a.total_num
+                                WHEN a.item_code = '2'
+                                AND a.num_unit_code = c.unit_code THEN
+                                    a.total_num * c.split_ratio ELSE 0
+                                END totalNum
+        FROM
+            outpt_cost a
+            LEFT JOIN base_drug b ON a.item_id = b.id
+            inner join phar_out_receive e on e.status_code = '1'
+            inner join phar_out_receive_detail f on  a.id = f.cost_id  and e.id = f.or_id
+            AND a.hosp_code = b.hosp_code
+            AND a.item_code = '1'
+            LEFT JOIN base_material c ON a.item_id = c.id
+            AND a.hosp_code = c.hosp_code
+            AND a.item_code = '2'
+        WHERE
+           a.hosp_code = #{hospCode}
+            AND settle_code = '2'
+            AND a.phar_id = #{pharId}
+            AND a.item_id = #{itemId}
+            AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            ) d
+    </select>
+
+    <!--住院未核收 -->
+    <select id="getInptCostTotalNumber" resultType="java.math.BigDecimal">
+         SELECT IFNULL(sum( d.totalNum ),0) AS totalNum
+        FROM
+            (
+            SELECT
+            CASE
+                WHEN
+                    a.item_code = '1'
+                    AND a.total_num_unit_code = b.split_unit_code THEN
+                        a.total_num
+                        WHEN a.item_code = '1'
+                        AND a.total_num_unit_code = b.unit_code THEN
+                            a.total_num * b.split_ratio
+                            WHEN a.item_code = '2'
+                            AND a.total_num_unit_code = c.split_unit_code THEN
+                                a.total_num
+                                WHEN a.item_code = '2'
+                                AND a.total_num_unit_code = c.unit_code THEN
+                                    a.total_num * c.split_ratio ELSE 0
+                                END totalNum
+        FROM
+            inpt_advice a
+            LEFT JOIN base_drug b ON a.item_id = b.id
+            AND a.hosp_code = b.hosp_code
+            AND a.item_code = '1'
+            LEFT JOIN base_material c ON a.item_id = c.id
+            AND a.hosp_code = c.hosp_code
+            AND a.item_code = '2'
+        WHERE
+            a.hosp_code = #{hospCode}
+            AND a.is_check = '0'
+            AND a.phar_id = #{pharId}
+            AND a.item_id = #{itemId}
+            AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="id != null and id != ''">
+               and a.id != #{id}
+            </if>
+            ) d
+    </select>
+    <!--核收未配药-->
+    <select id="getInptCostNoPrescribeNumber" resultType="java.math.BigDecimal">
+             SELECT
+      IFNULL(sum( d.totalNum ),0) AS totalNum
+        FROM
+            (
+            SELECT
+            a.id,
+            CASE
+
+                WHEN
+                    a.item_code = '1'
+                    AND a.total_num_unit_code = b.split_unit_code THEN
+                        a.total_num
+                        WHEN a.item_code = '1'
+                        AND a.total_num_unit_code = b.unit_code THEN
+                            a.total_num * b.split_ratio
+                            WHEN a.item_code = '2'
+                            AND a.total_num_unit_code = c.split_unit_code THEN
+                                a.total_num
+                                WHEN a.item_code = '2'
+                                AND a.total_num_unit_code = c.unit_code THEN
+                                    a.total_num * c.split_ratio ELSE 0
+                                END totalNum
+        FROM
+            inpt_advice a
+            LEFT JOIN base_drug b ON a.item_id = b.id
+            inner join phar_in_wait_receive e on e.status_code in('0','1') and a.id = advice_id and a.item_id = e.item_id
+            AND a.hosp_code = b.hosp_code
+            AND a.item_code = '1'
+            LEFT JOIN base_material c ON a.item_id = c.id
+            AND a.hosp_code = c.hosp_code
+            AND a.item_code = '2'
+        WHERE
+           a.hosp_code = #{hospCode}
+            AND a.is_check = '1'
+            AND a.phar_id = #{pharId}
+            AND a.item_id = #{itemId}
+            AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            ) d
+    </select>
+    <!--获得执行周期（execInterval）、每日次数（dailyTimes）-->
+    <select id="getRateMessage" resultType="java.util.Map">
+        select exec_interval as execInterval,daily_times as dailyTimes
+        from base_rate
+         where
+        id = #{rateId} and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+
+</mapper>

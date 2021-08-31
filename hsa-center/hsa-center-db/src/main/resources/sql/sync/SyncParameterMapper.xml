@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sync.syncparameter.dao.SyncParameterDAO">
+
+    <resultMap type="cn.hsa.module.sync.syncparameter.dto.SyncParameterDTO" id="CenterParameterMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="isShow" column="is_show" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CenterParameterMap">
+        select
+        id, code, name, value, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time
+        from sync_parameter
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+        </where>
+    </select>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPage" resultMap="CenterParameterMap" parameterType="cn.hsa.module.center.parameter.dto.CenterParameterDTO">
+        select
+        id, code, name, value, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time
+        from sync_parameter
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%',#{keyword},'%') or code like concat('%',#{keyword},'%'))
+            </if>
+            and is_valid = '1' and is_show = '1'
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.center.parameter.dto.CenterParameterDTO">
+        insert into sync_parameter(id,code, name, value, remark, pym, wbm, is_valid, is_show, crte_id, crte_name)
+        values (#{id},#{code}, #{name}, #{value}, #{remark}, #{pym}, #{wbm}, '1', '1', #{crteId}, #{crteName})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="cn.hsa.module.center.parameter.dto.CenterParameterDTO">
+        update sync_parameter
+        <set>
+                code = #{code},
+                name = #{name},
+                value = #{value},
+                remark = #{remark}
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="delete">
+        delete from sync_parameter
+        where
+        <if test="ids != null and ids.size()>0">
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+
+<!--    判断编码是否存在-->
+    <select id="queryCodeIsExist" resultType="java.lang.Integer">
+        select count(code) from sync_parameter
+        where
+        code = #{code}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!--    判断参数名称是否存在-->
+    <select id="queryNameIsExist" resultType="java.lang.Integer">
+        select count(name) from center_parameter
+        where
+        name = #{name}
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
+
+</mapper>

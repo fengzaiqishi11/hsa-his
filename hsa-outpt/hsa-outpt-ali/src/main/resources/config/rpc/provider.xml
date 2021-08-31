@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hsf="http://www.taobao.com/hsf"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.taobao.com/hsf
+       http://www.taobao.com/hsf/hsf.xsd" default-autowire="byName">
+
+    <hsf:provider id="userInfoService" ref="userInfoService" interface="cn.hsa.xxx.api.service.UserInfoService"
+                  version="1.0.0"/>
+
+    <!-- 提供者可选配置 -->
+    <!--    serviceInterface   是  服务对外提供的接口  Class  java.lang.Object-->
+    <!--    serviceVersion     否  服务的版本号 String 1.0.0.DAILY-->
+    <!--    serviceGroup       否  服务的组名  String HSF-->
+    <!--    clientTimeout      否  该配置对接口中的所有方法生效，但是如果客户端通过 methodSpecials 属性对某方法配置了超时时间，则该方法的超时时间以客户端配置为准。其他方法不受影响，还是以服务端配置为准（单位 ms） int    -1-->
+    <!--    corePoolSize       否  单独针对这个服务设置最小活跃线程数，从公用线程池中划分出来  int    0-->
+    <!--    maxPoolSize            否  单独针对这个服务设置最大活跃线程数，从公用线程池中划分出来  int    0-->
+    <!--    delayedPublish     否  是否延迟发布 boolean    false-->
+    <!--    includeFilters     否  用户可选的自定义过滤器    String[]   空-->
+    <!--    enableTXC          否  是否开启分布式事务 GTS  boolean    false-->
+    <!--    serializeType      否  服务接口序列化类型，hessian 或者 java  String hessian-->
+    <!--    supportAsynCall        否  是否支持异步调用   String false-->
+
+    <bean id="mathService" class="cn.hsa.example.rpc.provider.service.impl.MathServiceImpl"/>
+    <hsf:provider id="mathService" ref="mathService" interface="cn.hsa.xxx.api.service.MathService" version="1.0.0"/>
+
+</beans>

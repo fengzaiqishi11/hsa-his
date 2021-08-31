@@ -105,6 +105,8 @@
     <dubbo:service interface="cn.hsa.module.emr.emrelementtemplate.service.EmrElementTemplateService" ref="emrElementTemplateService_provider"/>
     <!-- 电子病历子系统  医生个人另存病历模板维护 -->
     <dubbo:service interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" ref="emrDocTemplateService_provider"/>
+    <!-- 电子病历子系统  病历借阅生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrborrow.service.EmrBorrowService" ref="emrBorrowService_provider"/>
 
     <!-- 卫统数据上报 -->
     <dubbo:service interface="cn.hsa.module.upload.healthreport.service.HealthReportService" ref="healthReportService_provider"/>

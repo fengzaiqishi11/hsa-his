@@ -6,6 +6,8 @@ import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
 import cn.hsa.util.ExcelResolveService;
 
+import java.util.Map;
+
 /**
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
@@ -32,6 +34,10 @@ public interface NationStandardDrugZYService extends ExcelResolveService {
    **/
   WrapperResponse<NationStandardDrugZYDTO> getZYById(NationStandardDrugZYDTO nationStandardDrugZYDTO);
 
-
-
+  /**
+   * 保存国家标准中药信息
+   * @param map
+   * @return 是否成功
+   */
+  WrapperResponse<Boolean> saveNationStandardDrugZY(Map map);
 }

@@ -1520,7 +1520,7 @@
         select a.*
         from inpt_cost a join base_material b on a.hosp_code=b.hosp_code and a.source_id=b.id
         where a.item_code='2' and a.source_code='9' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode}
-        and b.id=#{materialId} and a.visit_id=#{visitId} and DATE_FORMAT(a.cost_time, '%Y-%m-%d')=#{checkTime}
+        and b.code=#{materialId} and a.visit_id=#{visitId} and DATE_FORMAT(a.cost_time, '%Y-%m-%d')=#{checkTime}
     </select>
 
     <select id="queryDTCosts" resultMap="InptCostMap">

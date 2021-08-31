@@ -339,6 +339,8 @@
     <dubbo:reference id="emrElementTemplateService_consumer" interface="cn.hsa.module.emr.emrelementtemplate.service.EmrElementTemplateService" check="false"/>
     <!-- 电子病历子系统   电子病历个人病历模板维护 -->
     <dubbo:reference id="emrDocTemplateService_consumer" interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" check="false"/>
+    <!-- 电子病历子系统   电子病历借阅 -->
+    <dubbo:reference id="emrBorrowService_consumer" interface="cn.hsa.module.emr.emrborrow.service.EmrBorrowService" check="false"/>
     <!-- ########################################### 电子病历子系统consumer end ############################################## -->
 
     <!-- ########################################### 手麻系统 start ########################################### -->

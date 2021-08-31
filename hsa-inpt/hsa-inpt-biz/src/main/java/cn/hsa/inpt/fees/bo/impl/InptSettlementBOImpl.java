@@ -132,7 +132,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     @Override
     public WrapperResponse queryInptvisitByPage(InptVisitDTO inptVisitDTO) {
         PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
-        return WrapperResponse.success(PageDTO.of(inptVisitDAO.queryInptVisitList(inptVisitDTO)));
+        if(StringUtils.isEmpty(inptVisitDTO.getAttributionCode())){
+          return WrapperResponse.success(PageDTO.of(inptVisitDAO.queryInptVisitList(inptVisitDTO)));
+        } else {
+          return WrapperResponse.success(PageDTO.of(inptVisitDAO.queryAttributionInptVisitList(inptVisitDTO)));
+        }
+
     }
 
     /**
@@ -205,7 +210,23 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
         }
         //《========新生婴儿试算========》
-
+        //《========归属结算试算========》
+        if("0".equals(inptVisitDTO.getAttributionCode()) || StringUtils.isEmpty(inptVisitDTO.getAttributionCode())) {
+          Map<String, Object> costParam = new HashMap<String, Object>();
+          costParam.put("hospCode", hospCode);//医院编码
+          costParam.put("visitId", id);//就诊id
+          String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
+          costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+          costParam.put("attributionFlag", "1");//就诊id
+          List<InptCostDO> inptAttributionCostDOList = inptCostDAO.queryIsExitAttributionCostList(costParam);
+          if (inptAttributionCostDOList!=null && inptAttributionCostDOList.size()>0){
+            InptCostDO inptCostDO=inptAttributionCostDOList.get(0);
+            if (inptCostDO.getSettleCode().equals("0")){
+              return WrapperResponse.fail("请先结算归属费用，再结算正常费用", null);
+            }
+          }
+        }
+        //《========归属结算试算========》
         String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
         redisUtils.del(key);
         if (StringUtils.isNotEmpty(redisUtils.get(key))) {
@@ -234,6 +255,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+            if(!StringUtils.isEmpty(inptVisitDTO.getAttributionCode())) {
+              costParam.put("attributionCode", inptVisitDTO.getAttributionCode());// 结算类型
+            }
             //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = new ArrayList<>();
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
@@ -611,6 +635,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String userName = param.get("userName").toString();
         String medicalRegNo = MapUtils.get(param,"medicalRegNo");
         String hospCode = (String) param.get("hospCode");//医院编码
+        String attributionCode = MapUtils.get(param,"attributionCode");
         String isMidWaySettle = MapUtils.get(param, "isMidWaySettle"); // 是否中途结算，1：是 0：否  中途结算不改变出院状态
         String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key))) return WrapperResponse.fail("当前患者正在结算，请稍后再试。", null);
@@ -649,6 +674,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
             String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+            costParam.put("attributionCode", attributionCode);//结算类型标志
             //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = new ArrayList<>();
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
@@ -882,11 +908,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             InptVisitDTO inptVisitDTO1 = new InptVisitDTO();
             inptVisitDTO1.setId(id);//id
             inptVisitDTO1.setHospCode(hospCode);//医院编码
-            if (isMidWaySettle != null && "0".equals(isMidWaySettle)) {
+            if (isMidWaySettle != null && "0".equals(isMidWaySettle) && (StringUtils.isEmpty(attributionCode) || "0".equals(attributionCode))) {
                 inptVisitDTO1.setStatusCode(Constants.BRZT.CY);//当前状态 = 出院状态
                 inptVisitDTO1.setTreatmentCode(inptVisitDTO.getTreatmentCode());
                 inptVisitDAO.updateInptVisit(inptVisitDTO1);
-
             }
             //医保结算
             String patientCode = inptVisitDTO.getPatientCode();

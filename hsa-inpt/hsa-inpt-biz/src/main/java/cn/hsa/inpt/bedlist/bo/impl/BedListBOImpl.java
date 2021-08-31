@@ -16,6 +16,8 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.longcost.bo.BedLongCostBO;
 import cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,9 @@ public class BedListBOImpl implements BedListBO {
 
     @Resource
     private InptCostDAO inptCostDAO;
+
+    @Resource
+    private SysParameterService sysParameterService;
 
     /**
      * @Method queryPage
@@ -456,7 +461,11 @@ public class BedListBOImpl implements BedListBO {
         if (ListUtils.isEmpty(itemList)) {
             return true;
         }
-
+        Map parameter = new HashMap();
+        parameter.put("hospCode",hospCode);
+        parameter.put("code","attribution_settlement");
+        WrapperResponse<SysParameterDTO> parameterByCode = sysParameterService.getParameterByCode(parameter);
+        String parameterValue = parameterByCode.getData().getValue();
         List<InptLongCostDTO> longCostDtoList = new ArrayList<>();
         for (BaseItemDTO dto : itemList) {
             InptLongCostDTO longCostDto = new InptLongCostDTO();
@@ -478,6 +487,10 @@ public class BedListBOImpl implements BedListBO {
             longCostDto.setCrteId(MapUtils.get(map, "userId"));
             longCostDto.setCrteName(MapUtils.get(map, "userName"));
             longCostDto.setCrteTime(new Date());
+            longCostDto.setAttributionCode("0");
+            if("1".equals(parameterValue)){
+              longCostDto.setAttributionCode("1");
+            }
             longCostDtoList.add(longCostDto);
         }
         // 新增床位长期费用记录

@@ -693,6 +693,7 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setCrteName(userName);
                 inptCostDTO.setCrteTime(inptLongCostDTO.getCrteTime()) ;
                 inptCostDTO.setIsWait("1") ;
+                inptCostDTO.setAttributionCode(inptLongCostDTO.getAttributionCode());
                 costDtoList.add(inptCostDTO);
                 startTime = DateUtils.dateAdd(startTime, 1);
             }

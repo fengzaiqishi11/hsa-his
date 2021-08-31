@@ -1318,9 +1318,11 @@
                 select
                 pp.id
                 from
-                outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
+                outpt_prescribe pp left join outpt_cost cc on pp.id = cc.op_id
                 where
-                pp.hosp_code = #{hospCode}
+                cc.hosp_code = #{hospCode}
+                and cc.visit_id = v.id
+                and pp.hosp_code = #{hospCode}
                 and pp.visit_id = v.id
                 and pp.is_settle = '0'
                 and pp.is_cancel = '0'

@@ -146,6 +146,18 @@ public interface InptVisitDAO {
     List<InptVisitDTO> queryInptVisitList(InptVisitDTO inptVisitDTO);
 
     /**
+    * @Menthod queryAttributionInptVisitList
+    * @Desrciption
+    *        查询可进行归属结算的患者
+    * @Param
+    * [inptVisitDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/8/23 15:57
+    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+    **/
+    List<InptVisitDTO> queryAttributionInptVisitList(InptVisitDTO inptVisitDTO);
+    /**
      * @Method updateInptVisitZk
      * @Desrciption 转科修改方法
        @params [inptVisitDTO]

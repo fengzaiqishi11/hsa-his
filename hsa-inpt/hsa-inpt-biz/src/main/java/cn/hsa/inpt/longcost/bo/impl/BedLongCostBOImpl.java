@@ -224,6 +224,8 @@ public class BedLongCostBOImpl implements BedLongCostBO {
             InptCostDTO costDTO = new InptCostDTO();
             // 主键
             costDTO.setId(SnowflakeUtils.getId());
+            // 费用类型
+            costDTO.setAttributionCode(dto.getAttributionCode());
             // 医院编码
             costDTO.setHospCode(dto.getHospCode());
             // 住院病人就诊ID

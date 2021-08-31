@@ -388,4 +388,7 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String isUnifiedPay;
     /** 人员编号，insure_individual_visit.aac001 **/
     private String psnNo;
+
+    // 费用条数
+    private BigDecimal costNumbers;
 }

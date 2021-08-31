@@ -2944,7 +2944,7 @@
             bd.code deptCode,
             bd.type_code drugstoreTypeCode
          from base_dept bd
-         where bd.hosp_code = #{hospCode} and bd.type_code in ('4','5','14')
+         where bd.hosp_code = #{hospCode} and bd.type_code in ('4','5','14') and  is_valid = #{isValid}
     </select>
 
     <update id="updateOutptPrescribeByIds" parameterType="java.util.Map">

@@ -144,10 +144,16 @@
     <!--新增长期费用表所有列-->
     <insert id="insertLongCost">
         insert into
-        inpt_long_cost(id, hosp_code, visit_id, baby_id, dept_id, item_id, item_name, price, num, unit_code, total_price, last_exec_time, start_time, end_time, source_type_code, source_id, is_cancel, cancel_id, cancel_name, cancel_time, cancel_remark, crte_id, crte_name, crte_time)
+        inpt_long_cost(id, hosp_code, visit_id, baby_id, dept_id, item_id, item_name, price, num, unit_code,
+         total_price, last_exec_time, start_time, end_time, source_type_code, source_id, is_cancel,
+          cancel_id, cancel_name, cancel_time, cancel_remark, crte_id, crte_name, crte_time,attribution_code)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.itemId}, #{item.itemName}, #{item.price}, #{item.num}, #{item.unitCode}, #{item.totalPrice}, #{item.lastExecTime}, #{item.startTime}, #{item.endTime}, #{item.sourceTypeCode}, #{item.sourceId}, #{item.isCancel}, #{item.cancelId}, #{item.cancelName}, #{item.cancelTime}, #{item.cancelRemark}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+            (#{item.id}, #{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.itemId},
+            #{item.itemName}, #{item.price}, #{item.num}, #{item.unitCode}, #{item.totalPrice},
+            #{item.lastExecTime}, #{item.startTime}, #{item.endTime}, #{item.sourceTypeCode}, #{item.sourceId},
+             #{item.isCancel}, #{item.cancelId}, #{item.cancelName}, #{item.cancelTime}, #{item.cancelRemark},
+              #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.attributionCode})
         </foreach>
 
     </insert>

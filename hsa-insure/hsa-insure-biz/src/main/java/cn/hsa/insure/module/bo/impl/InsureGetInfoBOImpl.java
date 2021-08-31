@@ -1006,6 +1006,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             // 住院诊断信息
             for (DiseInfoDTO diseInfoDTO : diseinfoList){
                 Map diseinfo = new HashMap();
+                //是主诊断但不是入院主诊断
                 if(diseInfoDTO.getIsMain().equals("1") && !"201".equals(diseInfoDTO.getTypeCode())){
                     diseInfoDTO.setIsMain("0");
                 }
@@ -1066,6 +1067,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return opspdiseinfoListMap;
     }
+
     /**
      * @Description: iteminfoListMap
      * @Param:
@@ -1126,10 +1128,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             othAmt = BigDecimalUtils.add(othAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert((BigDecimalUtils.subtract(feeSumamt,clabAmtSum)).toString()))));
                             fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(clabAmtSum.toString()))));
                         }
-                        if (item.containsKey("det_item_fee_sumamt") && MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()), 2));
-                        } else {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt")))));
+                        if((item.containsKey("det_item_fee_sumamt"))){
+                            if (MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
+                                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()), 2));
+                            } else {
+                                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()));
+                            }
                         }
                         medChrgitm = MapUtils.get(item, "med_chrgitm_type");
                     }

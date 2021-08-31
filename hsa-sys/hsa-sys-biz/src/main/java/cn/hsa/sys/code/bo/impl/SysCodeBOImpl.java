@@ -115,7 +115,9 @@ public class SysCodeBOImpl extends HsafBO implements SysCodeBO {
     public PageDTO queryCodeDetailPage(SysCodeDetailDTO sysCodeDetailDTO) {
         // 设置分页信息
         PageHelper.startPage(sysCodeDetailDTO.getPageNo(), sysCodeDetailDTO.getPageSize());
-
+        if(null == sysCodeDetailDTO.getCode()){
+            sysCodeDetailDTO.setCode("null");
+        }
         // 查询所有
         List<SysCodeDetailDTO> list = sysCodeDao.queryCodeDetailPage(sysCodeDetailDTO);
 

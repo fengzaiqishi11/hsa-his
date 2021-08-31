@@ -322,7 +322,7 @@
             order by item_039, group_no, group_seq_no asc
         </if>
         <if test="orderFlag == null">
-            order by group_no, group_seq_no ASC
+            order by item_001, crte_time ASC
         </if>
 
     </select>

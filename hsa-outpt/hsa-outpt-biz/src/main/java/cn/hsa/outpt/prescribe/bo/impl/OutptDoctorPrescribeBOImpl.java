@@ -329,6 +329,21 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      **/
     @Override
     public boolean updateVisitInHospital(OutptVisitDTO outptVisitDTO) {
+        // 门诊医生站直接开住院证需要判断就诊表就诊医生是否为空,如果为空需要更新就诊表的医生ID/医生姓名/就诊时间字段/就诊标识 luoyong 2021/08/27
+        Map<String, String> map = new HashMap<>();
+        map.put("id", outptVisitDTO.getId());
+        map.put("hospCode", outptVisitDTO.getHospCode());
+        OutptVisitDTO byVisitID = outptVisitDAO.queryByVisitID(map);
+        if (byVisitID == null) {
+            throw new RuntimeException("未查询到就诊记录");
+        }
+        if (StringUtils.isEmpty(byVisitID.getDoctorId()) || StringUtils.isEmpty(byVisitID.getDoctorName())) {
+            byVisitID.setDoctorId(outptVisitDTO.getDoctorId());
+            byVisitID.setDoctorName(outptVisitDTO.getDoctorName());
+            byVisitID.setVisitTime(DateUtils.getNow());
+            byVisitID.setIsVisit(Constants.SF.S);
+            outptVisitDAO.updateOutptVisit(byVisitID);
+        }
         return outptDoctorPrescribeDAO.updateVisitInHospital(outptVisitDTO) > 0;
     }
 

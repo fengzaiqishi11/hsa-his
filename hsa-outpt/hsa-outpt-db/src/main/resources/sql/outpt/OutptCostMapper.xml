@@ -1590,7 +1590,7 @@
         bm.split_ratio,
         bm.split_unit_code,
         bm.split_price,
-        bm.use_code AS usage_code,
+        '' AS usage_code,
         bm.reg_cert_no AS ndan,
         bm.pym AS good_pym,
         bm.wbm AS good_wbm,

@@ -92,6 +92,7 @@
 		<result property="keyword" column="keyword" jdbcType="VARCHAR"/>
 		<result property="inDiagnoseId" column="inDiagnoseId" jdbcType="VARCHAR"/>
 		<result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
+		<result property="costNumbers" column="costNumbers" jdbcType="NUMERIC"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
@@ -416,7 +417,8 @@
 		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
 		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
 		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select ifnull(sum(reality_price), 0) from inpt_cost where visit_id = inpt_visit.id and hosp_code = inpt_visit.hosp_code) as costNumbers
 		from inpt_visit
 		where hosp_code = #{hospCode}
 		and (status_code between 1 and 6)
@@ -2021,5 +2023,19 @@
         select * from base_profile_file
         where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
     </select>
+
+	<delete id="deleteInptAdviceAndLongCost" >
+        delete from inpt_advice where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_advice_detail where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_long_cost where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_bed_change where hosp_code = #{hospCode} and visit_id = #{id};
+    </delete>
+
+	<update id="updateBaseBed" >
+		update base_bed set visit_id = null where hosp_code = #{hospCode} and visit_id = #{id}
+	</update>
 
 </mapper>

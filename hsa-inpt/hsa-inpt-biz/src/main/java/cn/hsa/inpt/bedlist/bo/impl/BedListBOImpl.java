@@ -464,8 +464,11 @@ public class BedListBOImpl implements BedListBO {
         Map parameter = new HashMap();
         parameter.put("hospCode",hospCode);
         parameter.put("code","attribution_settlement");
+        String parameterValue = "0";
         WrapperResponse<SysParameterDTO> parameterByCode = sysParameterService.getParameterByCode(parameter);
-        String parameterValue = parameterByCode.getData().getValue();
+        if(parameterByCode.getData() != null) {
+           parameterValue = parameterByCode.getData().getValue();
+        }
         List<InptLongCostDTO> longCostDtoList = new ArrayList<>();
         for (BaseItemDTO dto : itemList) {
             InptLongCostDTO longCostDto = new InptLongCostDTO();

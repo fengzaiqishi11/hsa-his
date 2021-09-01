@@ -1000,7 +1000,7 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
+        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
         SELECT
         iv.name,
         iv.in_dept_id,

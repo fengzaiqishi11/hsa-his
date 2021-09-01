@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO;
 import cn.hsa.module.emr.emrborrow.service.EmrBorrowService;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -81,10 +82,9 @@ public class EmrBorrowController extends BaseController {
     @GetMapping("/queryEmrBorrowInfo")
     public WrapperResponse<EmrBorrowDTO> queryEmrBorrowInfo(EmrBorrowDTO emrBorrowDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
-        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
-            emrBorrowDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
-        }
-        emrBorrowDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("emrBorrowDTO", emrBorrowDTO);
+        map.put("hospCode", sysUserDTO.getHospCode());
         return emrBorrowService_consumer.getEmrBorrow(emrBorrowDTO);
     }
 
@@ -104,6 +104,25 @@ public class EmrBorrowController extends BaseController {
         map.put("emrBorrowDTO", emrBorrowDTO);
         map.put("hospCode", sysUserDTO.getHospCode());
         return emrBorrowService_consumer.queryEmrBorrowList(map);
+    }
+
+
+    /**
+     * @Description: 查询电子病历已归档病人
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/9/1 9:41
+     * @Return WrapperResponse<PageDTO>
+     */
+    @GetMapping("/queryArchivePatient")
+    public WrapperResponse<PageDTO> queryArchivePatient(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("inptVisitDTO", inptVisitDTO);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return emrBorrowService_consumer.queryArchivePatient(map);
     }
 
 

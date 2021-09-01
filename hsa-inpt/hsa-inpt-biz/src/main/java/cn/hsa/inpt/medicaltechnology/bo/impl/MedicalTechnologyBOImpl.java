@@ -48,7 +48,6 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 			medicalTechnologyDTO.setKeyword(null);
 		}
 		PageHelper.startPage(medicalTechnologyDTO.getPageNo(),medicalTechnologyDTO.getPageSize());
-
 		return PageDTO.of(medicalTechnologyDAO.getLISorPASSNeedConfirmCost(medicalTechnologyDTO));
 	}
 

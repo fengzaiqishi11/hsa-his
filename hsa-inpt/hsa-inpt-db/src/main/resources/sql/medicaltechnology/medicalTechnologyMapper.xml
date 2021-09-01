@@ -3,7 +3,7 @@
 <mapper namespace="cn.hsa.module.inpt.medicaltechnology.dao.MedicalTechnologyDAO">
 
     <select id="getLISorPASSNeedConfirmCost" parameterType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO" resultType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO" >
-        select a.*,ib.name as babyName,ib.gender_code as babyGenderCode from
+        select (a.price*a.num) as sumPrice,a.*,ib.name as babyName,ib.gender_code as babyGenderCode from
         (
         SELECT
         c.id AS costId,

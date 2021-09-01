@@ -410,11 +410,7 @@
     <!--更新住院天数 20210831 liuliyun-->
     <update id="updateInptVisitTotalDays">
         update inpt_visit
-        <set>
-            <if test="totalInDays != null and totalInDays != ''">
-                total_in_days = #{totalInDays},
-            </if>
-        </set>
+        set total_in_days = #{totalInDays}
         where hosp_code = #{hospCode}
         and id = #{id}
     </update>

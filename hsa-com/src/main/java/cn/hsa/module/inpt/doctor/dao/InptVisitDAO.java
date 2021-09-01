@@ -146,6 +146,18 @@ public interface InptVisitDAO {
     List<InptVisitDTO> queryInptVisitList(InptVisitDTO inptVisitDTO);
 
     /**
+    * @Menthod queryAttributionInptVisitList
+    * @Desrciption
+    *        查询可进行归属结算的患者
+    * @Param
+    * [inptVisitDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/8/23 15:57
+    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+    **/
+    List<InptVisitDTO> queryAttributionInptVisitList(InptVisitDTO inptVisitDTO);
+    /**
      * @Method updateInptVisitZk
      * @Desrciption 转科修改方法
        @params [inptVisitDTO]
@@ -413,4 +425,24 @@ public interface InptVisitDAO {
      * @Return: List<Map>
      **/
     List<Map> getBaseProfileInfo(Map map);
+
+    /**
+     * @Description: 安床了， 未产生任何费用时取消住院登记，需要删除医嘱记录与长期费用
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/31 16:57
+     * @Return
+     */
+    void deleteInptAdviceAndLongCost(InptVisitDTO inptVisitById);
+
+    /**
+     * @Description: 更新床位信息
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/31 17:42
+     * @Return
+     */
+    void updateBaseBed(InptVisitDTO inptVisitById);
 }

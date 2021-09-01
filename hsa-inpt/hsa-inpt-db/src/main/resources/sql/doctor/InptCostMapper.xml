@@ -678,7 +678,7 @@
         speed_code, use_days, num_unit_code, total_num, total_num_unit_code, herb_note_code, use_code, herb_num, total_price, preferential_price,
         reality_price, back_num, doctor_id, doctor_name, dept_id, phar_id, is_dist, is_give, back_code, is_ok, ok_id, ok_name, ok_time, settle_code, settle_id, is_check, check_id, check_name, check_time, zz_doctor_id,
          zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, exec_id, exec_name, exec_time, exec_dept_id,
-          plan_exec_time, status_code, is_cost, cost_time, crte_id, crte_name, crte_time, is_wait,distribute_all_detail_id,lmt_user_flag,lim_user_explain,is_reimburse)
+          plan_exec_time, status_code, is_cost, cost_time, crte_id, crte_name, crte_time, is_wait,distribute_all_detail_id,lmt_user_flag,lim_user_explain,is_reimburse,attribution_code)
         values
         <foreach collection="list" item="dto" index="index" separator="," >
             (#{dto.id}, #{dto.hospCode}, #{dto.visitId}, #{dto.babyId}, #{dto.iatId}, #{dto.iatdGroupNo}, #{dto.iatdSeqNo}, #{dto.adviceExecId}, #{dto.sourceCode},
@@ -689,7 +689,7 @@
               #{dto.isGive},#{dto.backCode}, #{dto.isOk}, #{dto.okId}, #{dto.okName}, #{dto.okTime}, #{dto.settleCode}, #{dto.settleId},
                #{dto.isCheck}, #{dto.checkId}, #{dto.checkName}, #{dto.checkTime}, #{dto.zzDoctorId}, #{dto.zzDoctorName}, #{dto.jzDoctorId}, #{dto.jzDoctorName},
                #{dto.zgDoctorId}, #{dto.zgDoctorName}, #{dto.execId}, #{dto.execName}, #{dto.execTime}, #{dto.execDeptId}, #{dto.planExecTime}, #{dto.statusCode}, #{dto.isCost}, #{dto.costTime},
-                #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.isWait},#{dto.distributeAllDetailId},#{dto.lmtUserFlag},#{dto.limUserExplain},#{dto.isReimburse})
+                #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.isWait},#{dto.distributeAllDetailId},#{dto.lmtUserFlag},#{dto.limUserExplain},#{dto.isReimburse},#{dto.attributionCode})
         </foreach>
     </insert>
 
@@ -1292,42 +1292,48 @@
         FROM
           inpt_cost ic
           LEFT JOIN base_finance_classify bfc
-            ON ic.`bfc_id` = bfc.`id` AND ic.`hosp_code` = #{hospCode} AND bfc.`hosp_code` = #{hospCode}
-            <if test="patientCode != null and patientCode gt 0">
-                left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id and ic.visit_id = iic.visit_id
-                and iic.insure_is_transmit = '1' and iic.insure_settle_id is null and iic.is_half_settle = '1'
-            </if>
-        WHERE ic.visit_id = #{id}
-        <if test="settleId != null and settleId != ''">
-            AND ic.settle_id = #{settleId}
-        </if>
-        <if test="settleCodes != null">
-            AND ic.settle_code in(
-            <foreach collection="settleCodes" item="settleCode" separator=",">
-                #{settleCode}
-            </foreach>
-            )
-        </if>
-        <if test="settleCode != null and settleCode != ''">
-            AND ic.settle_code = #{settleCode}
-        </if>
-        <if test="statusCode != null and statusCode != ''">
-            AND ic.status_code = #{statusCode}
-        </if>
-        <if test="backCode != null and backCode != ''">
-            AND back_code = #{backCode}
-        </if>
-        <if test="babyId != null and babyId != ''">
-            AND baby_id = #{babyId}
-        </if>
-        <if test="patientCode != null and patientCode gt 0">
-            AND DATE_FORMAT(ic.cost_time, '%Y-%m-%d') BETWEEN DATE_FORMAT(iic.fee_start_time , '%Y-%m-%d')AND DATE_FORMAT(iic.fee_end_time, '%Y-%m-%d' )
+          ON ic.`bfc_id` = bfc.`id` AND ic.`hosp_code` = #{hospCode} AND bfc.`hosp_code` = #{hospCode}
+          <if test="patientCode != null and patientCode gt 0">
+              left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id and ic.visit_id = iic.visit_id
+              and iic.insure_is_transmit = '1' and iic.insure_settle_id is null and iic.is_half_settle = '1'
+          </if>
+          WHERE ic.visit_id = #{id}
+          <if test="settleId != null and settleId != ''">
+              AND ic.settle_id = #{settleId}
+          </if>
+          <if test="settleCodes != null">
+              AND ic.settle_code in(
+              <foreach collection="settleCodes" item="settleCode" separator=",">
+                  #{settleCode}
+              </foreach>
+              )
+          </if>
+          <if test="settleCode != null and settleCode != ''">
+              AND ic.settle_code = #{settleCode}
+          </if>
+          <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+            AND ic.attribution_code = #{attributionCode}
+          </if>
+          <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+            AND (ic.attribution_code = '0' or ic.attribution_code is null or ic.attribution_code = '')
+          </if>
+          <if test="statusCode != null and statusCode != ''">
+              AND ic.status_code = #{statusCode}
+          </if>
+          <if test="backCode != null and backCode != ''">
+              AND back_code = #{backCode}
+          </if>
+          <if test="babyId != null and babyId != ''">
+              AND baby_id = #{babyId}
+          </if>
+          <if test="patientCode != null and patientCode gt 0">
+              AND DATE_FORMAT(ic.cost_time, '%Y-%m-%d') BETWEEN DATE_FORMAT(iic.fee_start_time , '%Y-%m-%d')AND DATE_FORMAT(iic.fee_end_time, '%Y-%m-%d' )
 
-        </if>
-        <if test='queryBaby =="N"'>
-            and (baby_id is null or baby_id = '')
-        </if>
-        GROUP BY bfc.id
+          </if>
+          <if test='queryBaby =="N"'>
+              and (baby_id is null or baby_id = '')
+          </if>
+          GROUP BY bfc.id
     </select>
 
     <!-- 查询费用信息 -->
@@ -1367,8 +1373,50 @@
         <if test="backCode != null and backCode != ''">
             AND back_code = #{backCode}
         </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+            AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+            AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
         order by cost_time ASC
     </select>
+
+    <!-- 查询是否存在归属费用信息 -->
+    <select id="queryIsExitAttributionCostList" parameterType="java.util.Map" resultMap="inptCostDOMap">
+      select
+      <include refid="Base_Column_List"/>
+      from
+      inpt_cost
+      where
+      hosp_code = #{hospCode}
+      <if test="visitId != null and visitId != ''">
+        AND visit_id = #{visitId}
+      </if>
+      <if test="statusCode != null and statusCode != ''">
+        AND status_code = #{statusCode}
+      </if>
+      <if test="settleCode != null and settleCode != ''">
+        AND settle_code = #{settleCode}
+      </if>
+      <if test="settleId != null and settleId != ''">
+        AND settle_id = #{settleId}
+      </if>
+      <if test="settleCodes != null">
+        AND settle_code IN (
+        <foreach collection="settleCodes" item="settleCode" separator=",">
+          #{settleCode}
+        </foreach>
+        )
+      </if>
+      <if test="backCode != null and backCode != ''">
+        AND back_code = #{backCode}
+      </if>
+      <if test="attributionFlag != null and attributionFlag != '' ">
+        AND attribution_code in ('1','2','3')
+      </if>
+      order by cost_time ASC
+  </select>
 
     <select id="queryCostList" resultMap="inptCostDOMap">
         select
@@ -1472,7 +1520,7 @@
         select a.*
         from inpt_cost a join base_material b on a.hosp_code=b.hosp_code and a.source_id=b.id
         where a.item_code='2' and a.source_code='9' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode}
-        and b.id=#{materialId} and a.visit_id=#{visitId} and DATE_FORMAT(a.cost_time, '%Y-%m-%d')=#{checkTime}
+        and b.code=#{materialId} and a.visit_id=#{visitId} and DATE_FORMAT(a.cost_time, '%Y-%m-%d')=#{checkTime}
     </select>
 
     <select id="queryDTCosts" resultMap="InptCostMap">
@@ -1676,6 +1724,12 @@
         <if test="backCode != null and backCode != ''">
             AND c.back_code = #{backCode}
         </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND c.attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+        AND (c.attribution_code = '0' or c.attribution_code is null or c.attribution_code = '')
+      </if>
         order by c.cost_time ASC
     </select>
 

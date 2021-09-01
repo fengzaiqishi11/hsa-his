@@ -250,6 +250,19 @@ public interface InptCostDAO {
     List<InptCostDO> queryInptCostList(Map<String, Object> param);
 
     /**
+    * @Menthod queryIsExitAttributionCostList
+    * @Desrciption 正常结算看是否存在归属结算费用
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/8/20 11:03
+    * @Return java.util.List<cn.hsa.module.inpt.doctor.entity.InptCostDO>
+    **/
+    List<InptCostDO> queryIsExitAttributionCostList(Map<String, Object> param);
+
+    /**
      * @param param 请求参数
      * @Menthod editInptCostByIds
      * @Desrciption 修改费用信息

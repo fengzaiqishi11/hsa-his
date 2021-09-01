@@ -92,6 +92,7 @@
 		<result property="keyword" column="keyword" jdbcType="VARCHAR"/>
 		<result property="inDiagnoseId" column="inDiagnoseId" jdbcType="VARCHAR"/>
 		<result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
+		<result property="costNumbers" column="costNumbers" jdbcType="NUMERIC"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
@@ -416,7 +417,8 @@
 		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
 		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
 		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		(select ifnull(sum(reality_price), 0) from inpt_cost where visit_id = inpt_visit.id and hosp_code = inpt_visit.hosp_code) as costNumbers
 		from inpt_visit
 		where hosp_code = #{hospCode}
 		and (status_code between 1 and 6)
@@ -1086,7 +1088,143 @@
 		order by iv.crte_time desc
 	</select>
 
-	<!--转科修改-->
+  <!-- 出院归属结算查询 -->
+  <select id="queryAttributionInptVisitList" resultMap="InptVisitMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+    select distinct
+    CONCAT(
+    iv.name,'/',
+    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+    iv.gender_code),'-'),'/',
+    IFNULL(iv.age,'-'),
+    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+    iv.age_unit_code),'')
+    ) AS keyword,
+    iv.id,
+    iv.hosp_code,
+    iv.profile_id,
+    iv.in_profile,
+    iv.in_no,
+    iv.name,
+    iv.gender_code,
+    iv.age,
+    iv.age_unit_code,
+    iv.birthday,
+    iv.nationality_cation,
+    iv.occupation_code,
+    iv.education_code,
+    iv.contact_name,
+    iv.contact_rela_code,
+    iv.contact_address,
+    iv.contact_phone,
+    iv.nation_code,
+    iv.cert_code,
+    iv.cert_no,
+    iv.marry_code,
+    iv.phone,
+    iv.address,
+    iv.preferential_type_id,
+    iv.patient_code,
+    iv.receive_hosp_name,
+    iv.bed_id,
+    iv.bed_name,
+    iv.nursing_code,
+    iv.diet_type,
+    iv.Illness_code,
+    iv.status_code,
+    iv.in_ward_id,
+    iv.in_dept_id,
+    iv.in_dept_name,
+    iv.in_time,
+    iv.zz_doctor_id,
+    iv.zz_doctor_name,
+    iv.jz_doctor_id,
+    iv.jz_doctor_name,
+    iv.zg_doctor_id,
+    iv.zg_doctor_name,
+    iv.in_remark,
+    iv.in_mode_code,
+    iv.in_disease_id,
+    iv.in_disease_name,
+    iv.in_disease_icd10,
+    iv.in_situation_code,
+    iv.outpt_visit_no,
+    iv.outpt_doctor_id,
+    iv.outpt_doctor_name,
+    iv.outpt_disease_id,
+    iv.outpt_disease_name,
+    iv.outpt_disease_icd10,
+    iv.out_ward_id,
+    iv.out_dept_id,
+    iv.out_dept_name,
+    iv.out_time,
+    iv.out_disease_id,
+    iv.out_disease_name,
+    iv.out_disease_icd10,
+    iv.out_oper_id,
+    iv.out_oper_name,
+    iv.out_oper_time,
+    iv.out_situation_code,
+    iv.out_remark,
+    iv.out_mode_code,
+    iv.is_archive,
+    iv.archive_time,
+    iv.archive_id,
+    iv.archive_name,
+    iv.insure_code,
+    iv.insure_org_code,
+    iv.insure_no,
+    iv.insure_biz_code,
+    iv.insure_treat_code,
+    iv.insure_patient_id,
+    iv.insure_remark,
+    iv.total_advance,
+    iv.total_cost,
+    iv.total_balance,
+    iv.crte_id,
+    iv.crte_name,
+    iv.crte_time,
+    iiv.medical_reg_no
+    from
+    inpt_visit iv
+    left join insure_individual_visit iiv on iv.id = iiv.visit_id
+    <if test="attributionCode != null and attributionCode != ''">
+      join inpt_cost ic on ic.visit_id = iv.id and ic.attribution_code in('1','2','3')
+    </if>
+    where
+    iv.hosp_code = #{hospCode}
+    <if test="statusCode != null and statusCode != ''">
+      <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+        AND iv.status_code in ('2','5') and iiv.is_half_settle = '1' and  iiv.insure_settle_id is null
+      </if>
+      <if test="isMidWaySettle != null and isMidWaySettle == '0'.toString()">
+        AND iv.status_code = #{statusCode} and (iiv.is_half_settle is null or iiv.is_half_settle!='1')
+      </if>
+    </if>
+    <if test="startDate != null">
+      AND iv.out_time >= #{startDate}
+    </if>
+    <if test="endDate != null">
+      <![CDATA[ AND iv.out_time <= #{endDate} ]]>
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (iv.name like concat('%',#{keyword},'%')
+      OR iv.cert_no like concat('%',#{keyword},'%')
+      OR iv.in_no like concat('%',#{keyword},'%')
+      OR iv.phone like concat('%',#{keyword},'%'))
+    </if>
+    <if test="isMidWaySettle != null and isMidWaySettle != '0'.toString()">
+      and iv.patient_code &lt;&gt; '0'
+    </if>
+    <if test="midWayStartDate != null">
+      AND iv.in_time >= #{midWayStartDate}
+    </if>
+    <if test="midWayEndDate != null">
+      <![CDATA[ AND iv.in_time <= #{midWayEndDate} ]]>
+    </if>
+    order by iv.crte_time desc
+  </select>
+
+  <!--转科修改-->
 	<update id="updateInptVisitZk">
 		update inpt_visit
 		<set>
@@ -1885,5 +2023,19 @@
         select * from base_profile_file
         where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo} limit 1
     </select>
+
+	<delete id="deleteInptAdviceAndLongCost" >
+        delete from inpt_advice where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_advice_detail where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_long_cost where hosp_code = #{hospCode} and visit_id = #{id};
+
+        delete from inpt_bed_change where hosp_code = #{hospCode} and visit_id = #{id};
+    </delete>
+
+	<update id="updateBaseBed" >
+		update base_bed set visit_id = null where hosp_code = #{hospCode} and visit_id = #{id}
+	</update>
 
 </mapper>

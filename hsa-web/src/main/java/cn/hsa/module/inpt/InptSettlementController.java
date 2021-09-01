@@ -48,7 +48,7 @@ public class InptSettlementController extends BaseController {
      * @Desrciption  查询可出院结算的用户信息
      * @param inptVisitDTO 查询条件
      * @Author Ou·Mr
-     * @Date 2020/9/25 10:47 
+     * @Date 2020/9/25 10:47
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @GetMapping("/queryInptvisitByPage")
@@ -76,11 +76,13 @@ public class InptSettlementController extends BaseController {
      * @Desrciption 查询预交金、费用信息
      * @param id 就诊id
      * @Author Ou·Mr
-     * @Date 2020/9/25 11:09 
+     * @Date 2020/9/25 11:09
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @GetMapping("/queryInptCostByList")
-    public WrapperResponse queryInptCostByList(@Param("id") String id, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode, HttpServletRequest req, HttpServletResponse res){        SysUserDTO sysUserDTO = getSession(req, res);
+    public WrapperResponse queryInptCostByList(@Param("id") String id, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode,
+                                               @Param("attributionCode") String attributionCode,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
             return WrapperResponse.fail("参数错误。",null);
         }
@@ -97,6 +99,9 @@ public class InptSettlementController extends BaseController {
         param.put("settleCodes",new String[]{Constants.JSZT.WJS,Constants.JSZT.YUJS});//结算状态 = 未结算、预结算
         param.put("backCode",Constants.TYZT.YFY);//退费状态 = 已发药
         param.put("queryBaby","N");
+        if(!StringUtils.isEmpty(attributionCode)) {
+          param.put("attributionCode",attributionCode);
+        }
         return inptSettlementService_consumer.queryInptCostByList(param);
     }
 
@@ -105,7 +110,7 @@ public class InptSettlementController extends BaseController {
      * @Desrciption  住院结算试算
      * @param inptVisitDTO 请求参数
      * @Author Ou·Mr
-     * @Date 2020/9/25 11:18 
+     * @Date 2020/9/25 11:18
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @PostMapping("/saveCostTrial")
@@ -151,7 +156,7 @@ public class InptSettlementController extends BaseController {
      * @Desrciption  住院结算操作
      * @param params 请求参数
      * @Author Ou·Mr
-     * @Date 2020/9/25 11:31 
+     * @Date 2020/9/25 11:31
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @PostMapping("/saveSettle")
@@ -172,6 +177,9 @@ public class InptSettlementController extends BaseController {
         params.put("userCode", sysUserDTO.getCode());
         params.put("userName", sysUserDTO.getName());
         params.put("treatmentCode",params.get("treatmentCode"));
+        if(StringUtils.isEmpty(MapUtils.get(params,"attributionCode"))){
+          params.remove("attributionCode");
+        }
         return inptSettlementService_consumer.saveSettle(params);
     }
 
@@ -250,7 +258,7 @@ public class InptSettlementController extends BaseController {
      * @Param params
      *
      * @Author fuhui
-     * @Date   2021/5/28 11:40 
+     * @Date   2021/5/28 11:40
      * @Return
      **/
     @PostMapping("/editDischargeInpt")

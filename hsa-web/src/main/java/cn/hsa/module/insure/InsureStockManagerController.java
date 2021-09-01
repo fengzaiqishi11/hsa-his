@@ -202,7 +202,9 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("hospCode", sysUserDTO.getHospCode());
+        String hospCode = sysUserDTO.getHospCode();
+        insureInventoryCheck.setHospCode(hospCode);
+        map.put("hospCode", hospCode);
         map.put("insureInventoryCheck",insureInventoryCheck);
         return insureStockManagerService_consumer.queryInsureInventoryCheckPage(map);
     }

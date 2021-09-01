@@ -596,4 +596,14 @@ public interface OutinDailyDAO {
      * @Return
      */
     List<Map<String, Object>> queryCardConsumePay(OutinDailyDTO outinDailyDTO);
+
+    /**
+     * @Description: 查询缴款支付表，预交金缴款表
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/8/26 17:42
+     * @Return
+     */
+    List<Map<String, Object>> queryOutinDailyPayAndAdvancePay(OutinDailyDTO dto);
 }

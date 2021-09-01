@@ -197,7 +197,9 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                     //执行科室
                     outptGroupNoList.get(i).setExecDeptId(outptGroupNoList.get(i-1).getExecDeptId());
                     //用药性质
-                    outptGroupNoList.get(i).setUseCode(outptGroupNoList.get(i-1).getUseCode());
+                    if(StringUtils.isEmpty(outptGroupNoList.get(i).getUseCode())){
+                        outptGroupNoList.get(i).setUseCode(outptGroupNoList.get(i-1).getUseCode());
+                    }
                     //使用天数
                     outptGroupNoList.get(i).setUseDays(outptGroupNoList.get(i-1).getUseDays());
                     // 用法

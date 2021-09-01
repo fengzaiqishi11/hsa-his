@@ -781,6 +781,15 @@ public interface Constant {
             public static final String UP_3506 = "3506"; // 商品销售退货
             public static final String UP_3507 = "3507"; // 商品信息删除
         }
+        // 招采
+        public static class ZC {
+            public static final String UP_8101 = "8101"; // 接口连通性测试
+            public static final String UP_8102 = "8102"; // 获取token
+
+            public static final String UP_8201 = "8201"; // 获取医院库房列表
+            public static final String UP_8202 = "8202"; // 药品获取挂网目录列表
+
+        }
     }
 
 }

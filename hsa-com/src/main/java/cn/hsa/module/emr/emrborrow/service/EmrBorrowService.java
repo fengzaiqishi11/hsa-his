@@ -65,4 +65,16 @@ public interface EmrBorrowService {
     @GetMapping("/service/emr/emrBorrow/queryEmrBorrowList")
     WrapperResponse<PageDTO> queryEmrBorrowList(Map map);
 
+
+    /**
+     * @Description: 查询电子病历已归档病人
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/9/1 9:41
+     * @Return
+     */
+    @GetMapping("/service/emr/emrBorrow/queryArchivePatient")
+    WrapperResponse<PageDTO> queryArchivePatient(Map map);
+
 }

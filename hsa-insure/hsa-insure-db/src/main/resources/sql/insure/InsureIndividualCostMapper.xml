@@ -532,6 +532,7 @@
         ic.back_num backNum,
         ic.back_code backCode,
         ic.doctor_id doctorId,
+        (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo,
         ic.doctor_name doctorName,
         ic.dept_id deptId,
         ic.status_code statusCode,
@@ -856,7 +857,8 @@
                iim.lmt_user_flag                                                                              lmtUserFlag,
                ic.is_reimburse                                                                                isReimburse,
                iim.manufacturer                                                                               manufacturer,
-               iim.tcmdrug_used_way                                                                           tcmdrugUsedWay
+               iim.tcmdrug_used_way                                                                           tcmdrugUsedWay,
+               (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM outpt_cost ic
                  JOIN insure_item_match iim
                       ON ic.`item_id` = iim.`hosp_item_id`
@@ -1057,6 +1059,7 @@
         from insure_individual_cost
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
+          and feedetl_sn is not null and medChrgitmType is not null
           and insure_settle_id = #{insureSettleId}
     </select>
     <select id="queryInptFeeCost" resultType="cn.hsa.module.inpt.doctor.entity.InptCostDO">

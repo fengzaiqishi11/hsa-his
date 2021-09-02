@@ -753,6 +753,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // TODO 封装医保入院登记入参
         SysUserDTO user = this.getUserInfo(inptVisitDTO.getHospCode(), inptVisitDTO.getCrteId());
 
+
         // 必填参数
         InsureInptRegisterDTO insureInptRegisterDTO = new InsureInptRegisterDTO();
         inptVisitDTO.setInsureOrgCode(insureIndividualBasicDTO.getAkb020());
@@ -891,7 +892,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
-
+            String pracCertiNo = inptVisitDto.getPracCertiNo();
+            if(StringUtils.isEmpty(pracCertiNo)){
+                throw  new AppException("该【"+inptVisitDTO.getZzDoctorName()+"】医生的医师编码没有维护,请先去用户管理里面维护");
+            }
+            inptVisitDTO.setPracCertiNo(inptVisitDto.getPracCertiNo());
             insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
             insureUnifiedPayParam.put("hospCode",inptVisitDTO.getHospCode());
             insureUnifiedPayParam.put("insureInptRegisterDTO",insureInptRegisterDTO);

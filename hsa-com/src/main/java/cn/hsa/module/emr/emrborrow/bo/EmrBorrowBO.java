@@ -3,6 +3,7 @@ package cn.hsa.module.emr.emrborrow.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO;
 import cn.hsa.module.emr.emrborrow.entity.EmrBorrowDO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 
 /**
  * @Package_name: cn.hsa.module.emr.emrborrow.bo
@@ -53,4 +54,14 @@ public interface EmrBorrowBO {
      * @Return
      */
     PageDTO queryEmrBorrowList(EmrBorrowDTO emrBorrowDTO);
+
+    /**
+     * @Description: 查询电子病历已归档病人
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/9/1 9：39
+     * @Return
+     */
+    PageDTO queryArchivePatient(InptVisitDTO inptVisitDTO);
 }

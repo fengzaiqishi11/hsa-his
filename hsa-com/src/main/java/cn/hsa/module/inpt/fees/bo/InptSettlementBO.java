@@ -131,4 +131,32 @@ public interface InptSettlementBO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     WrapperResponse saveBabySettle(Map param);
+
+
+    /**
+    * @Menthod saveAttributionCostTrial
+    * @Desrciption 归属结算试算
+    *
+    * @Param
+    * [inptVisitDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:30
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    WrapperResponse saveAttributionCostTrial(InptVisitDTO inptVisitDTO);
+
+
+    /**
+    * @Menthod saveAttributionSettle
+    * @Desrciption 归属结算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:30
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    WrapperResponse saveAttributionSettle(Map param);
 }

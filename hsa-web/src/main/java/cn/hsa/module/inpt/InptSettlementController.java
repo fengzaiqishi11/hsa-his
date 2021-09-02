@@ -374,4 +374,72 @@ public class InptSettlementController extends BaseController {
         param.put("queryBaby","Y");
         return inptSettlementService_consumer.queryInptCostByList(param);
     }
+
+
+
+    /**
+     * @Menthod saveAttributionCostTrial
+     * @Desrciption 归属结算试算
+     *
+     * @Param
+     * [inptVisitDTO, req, res]
+     *
+     * @Author jiahong.yang
+     * @Date   2021/9/1 9:15
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     **/
+    @PostMapping("/saveAttributionCostTrial")
+    public WrapperResponse saveAttributionCostTrial(@RequestBody InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+      SysUserDTO sysUserDTO = getSession(req, res);
+      if (StringUtils.isEmpty(inptVisitDTO.getId())){
+        return WrapperResponse.fail("参数错误。",null);
+      }
+      inptVisitDTO.setHospCode(sysUserDTO.getHospCode());//医院编码
+      inptVisitDTO.setCrteId(sysUserDTO.getId());//当前登录用户id
+      inptVisitDTO.setCrteName(sysUserDTO.getName());//当前登录用户名
+      inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());//当前登录用户所属科室id
+      inptVisitDTO.setInDeptName(sysUserDTO.getLoginBaseDeptDTO().getName());//当前登录用户所属科室名称
+      inptVisitDTO.setUserCode(sysUserDTO.getCode());
+      inptVisitDTO.setCode(sysUserDTO.getCode());
+      Map<String,Object> param = new HashMap<String,Object>();
+      param.put("hospCode", sysUserDTO.getHospCode());//医院编码
+      param.put("inptVisitDTO",inptVisitDTO);//请求参数
+      return inptSettlementService_consumer.saveAttributionCostTrial(param);
+    }
+
+    /**
+    * @Menthod saveAttributionSettle
+    * @Desrciption 归属结算
+    *
+    * @Param
+    * [params, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 9:14
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @PostMapping("/saveAttributionSettle")
+    public WrapperResponse saveAttributionSettle(@RequestBody Map<String,Object> params, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    //检验必要参数（id、结算id、支付方式）
+    if (!params.containsKey("id") || StringUtils.isEmpty((String) params.get("id")) || !params.containsKey("settleId")
+      || StringUtils.isEmpty((String) params.get("settleId")) || params.get("inptPay") == null || !params.containsKey("isInvoice")){
+      return WrapperResponse.fail("参数错误。",null);
+    }
+    List<InptPayDO> inptPayDOList = JSONArray.parseArray(JSON.toJSONString(params.get("inptPay")), InptPayDO.class);//支付方式信息
+    params.put("hospCode", sysUserDTO.getHospCode());//医院编码
+    params.put("userId", sysUserDTO.getId());//当前登录用户id
+    params.put("userName", sysUserDTO.getName());//当前登录用户名称
+    params.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());//当前用户科室id
+    params.put("deptName", sysUserDTO.getLoginBaseDeptDTO().getName());//当前用户科室名称
+    params.put("inptPayDOList",inptPayDOList);//支付方式
+    params.put("userCode", sysUserDTO.getCode());
+    params.put("userName", sysUserDTO.getName());
+    params.put("treatmentCode",params.get("treatmentCode"));
+    if(StringUtils.isEmpty(MapUtils.get(params,"attributionCode"))){
+      params.remove("attributionCode");
+    }
+    return inptSettlementService_consumer.saveAttributionSettle(params);
+  }
+
 }

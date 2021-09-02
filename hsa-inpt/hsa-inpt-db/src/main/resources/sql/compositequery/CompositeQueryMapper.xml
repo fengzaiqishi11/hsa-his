@@ -81,7 +81,7 @@
             id,
             type_code as typeCode,
             crte_time as crteTime,
-            (SELECT name FROM base_disease bd where bd.id = disease_id) as diseaseName,
+            (SELECT name FROM base_disease bd where bd.id = disease_id and bd.hosp_code = hosp_code) as diseaseName,
             is_main as isMain,
             crte_name as crteName
         FROM

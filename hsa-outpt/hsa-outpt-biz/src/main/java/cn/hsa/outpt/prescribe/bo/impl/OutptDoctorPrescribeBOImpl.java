@@ -3731,7 +3731,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 insureParamMap.put("hospCode", outptPrescribeDTO.getHospCode());
                 insureParamMap.put("id", outptPrescribeDTO.getVisitId());
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
-                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+//                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                if (insureIndividualVisitById == null) return null;
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人

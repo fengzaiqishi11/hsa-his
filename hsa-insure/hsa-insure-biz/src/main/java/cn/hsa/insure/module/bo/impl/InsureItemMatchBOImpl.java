@@ -1692,7 +1692,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     }
 
     private Boolean saveBatchList(List dataList, String type) {
-        int dataSize = dataList.size();
+        /*int dataSize = dataList.size();
         if (dataSize == 0) {
             return true;
         } else if (dataSize > 0 && dataSize <= 1000) {
@@ -1706,7 +1706,8 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
                     dataTemp = new ArrayList();
                 }
             }
-        }
+        }*/
+        this.insertItems(type,dataList);
         return true;
     }
 

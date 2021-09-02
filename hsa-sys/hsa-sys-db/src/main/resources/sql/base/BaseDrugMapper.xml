@@ -46,6 +46,7 @@
 		<result property="antibacterialCode" column="antibacterial_code" jdbcType="VARCHAR"/>
 		<result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
 		<result property="isBasic" column="is_basic" jdbcType="VARCHAR"/>
+		<result property="isPrescription" column="is_prescription" jdbcType="VARCHAR"/>
 		<result property="itemCode" column="itemCode" jdbcType="VARCHAR"/>
 		<result property="basicCode" column="basic_code" jdbcType="VARCHAR"/>
 		<result property="protonPump" column="proton_pump" jdbcType="VARCHAR"/>
@@ -88,7 +89,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select d.name from base_product d where d.code = a.prod_code) as prod_name,
@@ -118,7 +119,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select d.name from base_product d where d.code = a.prod_code) as prod_name,
@@ -149,7 +150,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		d.name as bfcName
@@ -287,6 +288,9 @@
 			<if test="isBasic != null and isBasic != ''">
 				and a.is_basic = #{isBasic}
 			</if>
+			<if test="isPrescription != null and isPrescription != ''">
+				and a.is_prescription = #{isPrescription}
+			</if>
 			<if test="basicCode != null and basicCode != ''">
 				and a.basic_code = #{basicCode}
 			</if>
@@ -332,7 +336,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,'1' as itemCode,
 		d.name as bfcName,
@@ -452,6 +456,9 @@
 			<if test="isBasic != null and isBasic != ''">
 				and a.is_basic = #{isBasic}
 			</if>
+			<if test="isPrescription != null and isPrescription != ''">
+				and a.is_prescription = #{isPrescription}
+			</if>
 			<if test="basicCode != null and basicCode != ''">
 				and a.basic_code = #{basicCode}
 			</if>
@@ -496,15 +503,15 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
-        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{isPrescription}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime})
     </insert>
 	<insert id="insertBatch">
         insert into base_drug
-        (id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
+        (id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
         values
 		<foreach collection="list" item="item" index="index" separator=",">
-        (#{item.id}, #{item.hospCode}, #{item.bfcCode}, #{item.typeCode}, #{item.bigTypeCode}, #{item.code}, #{item.usualName}, #{item.goodName}, #{item.spec}, #{item.prepCode}, #{item.dosage}, #{item.dosageUnitCode}, #{item.outUnitCode}, #{item.inUnitCode}, #{item.rateCode}, #{item.price}, #{item.unitCode}, #{item.lastBuyPrice}, #{item.lastSplitBuyPrice}, #{item.avgBuyPrice}, #{item.avgSellPrice}, #{item.splitRatio}, #{item.splitUnitCode}, #{item.splitPrice}, #{item.isOut}, #{item.isIn}, #{item.isLvp}, #{item.usageCode}, #{item.insureCode}, #{item.nationCode}, #{item.drugRemark}, #{item.drugImgPath}, #{item.maxDosage}, #{item.minDosage}, #{item.genderCode}, #{item.minAge}, #{item.maxAge}, #{item.ddd}, #{item.durgCode}, #{item.phCode}, #{item.antibacterialCode}, #{item.isSkin}, #{item.isBasic}, #{item.basicCode}, #{item.protonPump}, #{item.ndan}, #{item.prodCode}, #{item.usualPym}, #{item.usualWbm}, #{item.goodPym}, #{item.goodWbm}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        (#{item.id}, #{item.hospCode}, #{item.bfcCode}, #{item.typeCode}, #{item.bigTypeCode}, #{item.code}, #{item.usualName}, #{item.goodName}, #{item.spec}, #{item.prepCode}, #{item.dosage}, #{item.dosageUnitCode}, #{item.outUnitCode}, #{item.inUnitCode}, #{item.rateCode}, #{item.price}, #{item.unitCode}, #{item.lastBuyPrice}, #{item.lastSplitBuyPrice}, #{item.avgBuyPrice}, #{item.avgSellPrice}, #{item.splitRatio}, #{item.splitUnitCode}, #{item.splitPrice}, #{item.isOut}, #{item.isIn}, #{item.isLvp}, #{item.usageCode}, #{item.insureCode}, #{item.nationCode}, #{item.drugRemark}, #{item.drugImgPath}, #{item.maxDosage}, #{item.minDosage}, #{item.genderCode}, #{item.minAge}, #{item.maxAge}, #{item.ddd}, #{item.durgCode}, #{item.phCode}, #{item.antibacterialCode}, #{item.isSkin}, #{item.isBasic}, #{item.isPrescription}, #{item.basicCode}, #{item.protonPump}, #{item.ndan}, #{item.prodCode}, #{item.usualPym}, #{item.usualWbm}, #{item.goodPym}, #{item.goodWbm}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
 		</foreach>
 	</insert>
 	<insert id="insertInsureDrugMatch" parameterType="list">
@@ -600,6 +607,7 @@
 			antibacterial_code = #{antibacterialCode},
 			is_skin = #{isSkin},
 			is_basic = #{isBasic},
+			is_prescription = #{isPrescription},
 			basic_code = #{basicCode},
 			proton_pump = #{protonPump},
 			ndan = #{ndan},
@@ -650,7 +658,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select t.name from base_dept t where t.id = l.biz_id and t.hosp_code = l.hosp_code)bizName,
@@ -865,6 +873,9 @@
 				</if>
 				<if test="item.isBasic != null">
 					is_basic = #{item.isBasic},
+				</if>
+				<if test="item.isPrescription != null">
+					is_prescription = #{item.isPrescription},
 				</if>
 				<if test="item.basicCode != null">
 					basic_code = #{item.basicCode},

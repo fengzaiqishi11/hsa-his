@@ -204,47 +204,6 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         Integer pageSize =Integer.parseInt((String) paramMap.get("pageSize"));
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = statisticalReportDAO.queryOutptWorkLog(paramMap);
-        // 如果为空 那么直接返回null，走下面会报内存异常
-        if (ListUtils.isEmpty(list)){
-            return PageDTO.of(list);
-        }
-        //根据个人档案ids查询档案信息
-        List<String> proIds = new ArrayList<>();
-        for (Map<String, Object> map : list) {
-            if (StringUtils.isNotEmpty((String) map.get("profileId"))){
-                proIds.add((String) map.get("profileId"));
-            }
-        }
-//        paramMap.put("proIds", proIds);
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("hospCode", MapUtils.get(paramMap, "hospCode"));
-        temp.put("proIds", proIds);
-
-        List<OutptProfileFileDTO> profileFileDTOS = outptProfileFileService_consumer.getByIds(temp).getData();
-        if (!ListUtils.isEmpty(profileFileDTOS)) {
-            for (Map<String, Object> map : list) {
-                for (OutptProfileFileDTO profileFileDTO : profileFileDTOS) {
-                    if (StringUtils.isNotEmpty((String) map.get("profileId"))){
-                        if ((profileFileDTO.getId()).equals((String) map.get("profileId"))) {
-                            map.put("address", StringUtils.isEmpty(profileFileDTO.getNowAddress()) ? "" : profileFileDTO.getNowAddress());
-                        }
-                    }
-                }
-            }
-        }
-        /*//处理转换疾病ids
-        if (!ListUtils.isEmpty(list)) {
-            for (Map<String, Object> map : list) {
-                String diagnoseIds = (String) map.get("diagnoseIds");
-                if (StringUtils.isNotEmpty(diagnoseIds)) {
-                    List<String> diagnoseList = Arrays.asList(diagnoseIds.split(","));
-                    map.put("diagnoseList", diagnoseList);
-                }
-            }
-        }
-       Map<Object, List<Map<String, Object>>> listMap = list.stream().collect(Collectors.groupingBy(map -> map.get("id")));*/
-
-
         return PageDTO.of(list);
     }
 

@@ -116,7 +116,12 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
     @Override
     public WrapperResponse queryCostOrPayList(Map param) {
         //根据就诊id、结算id查询费用信息
-        List<Map<String,Object>> inptCostList = inptCostDAO.queryInptCostByBfc(param);
+        List<Map<String,Object>> inptCostList = new ArrayList<>();
+        if("1".equals(MapUtils.get(param,"flag"))){
+          inptCostList = inptCostDAO.queryNewInptCostByBfc(param);
+        } else {
+          inptCostList = inptCostDAO.queryInptCostByBfc(param);
+        }
         //根据就诊id查询预交金信息
         InptAdvancePayDTO inptAdvancePayDTO = new InptAdvancePayDTO();
         inptAdvancePayDTO.setHospCode((String) param.get("hospCode"));//医院编码
@@ -153,8 +158,10 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
             if (inptVisitDTO == null){throw new AppException("未找到患者信息。");}
             String isHalfSettle = "0"; // 是否中途结算 1:中途结算 0：出院结算
+            String settleCode = "0"; // 结算类型
             //查询结算信息
             InptSettleDO inptSettleDO = inptSettleDAO.selectByPrimaryKey(settleId);
+            settleCode = inptSettleDO.getTypeCode();
             // ==============取消结算，医保患者需要取消中途结算，必须从最近一次中途结算开始取消   start===============================
             if (Integer.valueOf(inptVisitDTO.getPatientCode()) > 0) { // 病人类型大于0表示患者为医保患者
                 Map<String, Object> selectMap = new HashMap<>();
@@ -281,7 +288,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             // costQueryParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
             costQueryParam.put("settleId",settleId);//结算id
             costQueryParam.put("settleCode",Constants.JSZT.YIJS);//结算状态 = 已结算
-            List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costQueryParam);
+            List<InptCostDO> inptCostDOList = inptCostDAO.queryNewInptCostList(costQueryParam);
             if (inptCostDOList != null && !inptCostDOList.isEmpty()){
                 List<String> ids = new ArrayList<String>(); //ids
                 inptCostDOList.stream().forEach(inptCostDO -> {
@@ -321,7 +328,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             if (isHalfSettle == null ) {
                 throw new AppException("无法区分取消出院结算还是取消中途结算，请联系管理员查看insure_individual_cost表中【是否中途结算】是否有值");
             }
-            if ("0".equals(isHalfSettle)) {
+            if ("0".equals(isHalfSettle) && !"3".equals(settleCode)) {
                 //判断患者是否是出院状态，如果是出院状态则修改为 预出院状态
                 if (Constants.BRZT.CY.equals(inptVisitDTO.getStatusCode())){
                     //修改参数

@@ -1251,6 +1251,12 @@ public class BedListBOImpl implements BedListBO {
         }
         // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
         insertDiagnose(inptVisitDTO);
+        // 20210831 计算住院天数更新到inpt_visit表
+        if (inptVisitDTO.getInTime()!=null&&inptVisitDTO.getOutTime()!=null){
+            int totalInDays = DateUtils.differentDays(inptVisitDTO.getInTime(),inptVisitDTO.getOutTime());
+            inptVisitDTO.setTotalInDays(totalInDays);
+            bedListDAO.updateInptVisitTotalDays(inptVisitDTO);
+        }
     }
     // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
     public void insertDiagnose(InptVisitDTO inptVisitDTO){

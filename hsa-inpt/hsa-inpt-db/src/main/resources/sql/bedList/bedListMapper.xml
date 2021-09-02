@@ -406,4 +406,17 @@
         select count(*) from inpt_diagnose where
         hosp_code =#{hospCode} and visit_id =#{visitId} and (type_code ='204' or type_code ='303') and  disease_id=#{diseaseId} and is_main ='1'
     </select>
+
+    <!--更新住院天数 20210831 liuliyun-->
+    <update id="updateInptVisitTotalDays">
+        update inpt_visit
+        <set>
+            <if test="totalInDays != null and totalInDays != ''">
+                total_in_days = #{totalInDays},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
 </mapper>

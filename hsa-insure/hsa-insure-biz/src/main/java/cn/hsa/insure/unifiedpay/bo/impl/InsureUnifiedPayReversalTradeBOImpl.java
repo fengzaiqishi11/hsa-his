@@ -2,6 +2,7 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
@@ -11,6 +12,7 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
@@ -46,6 +48,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
     @Resource
     InsureIndividualVisitDAO insureIndividualVisitDAO;
+
     @Resource
     private SysParameterService sysParameterService_consumer;
 
@@ -227,10 +230,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             map.put("endDate", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_D));
         }
 
+        // 是否退费，REFD_SETL_FLAG = 1 则只查询正常的
+        Map<String,Object> selectParamterCodeMap = new HashMap<>();
+        selectParamterCodeMap.put("hospCode",MapUtils.get(map,"hospCode"));
+        selectParamterCodeMap.put("code","REFD_SETL_FLAG");
+        WrapperResponse<SysParameterDTO> wr = sysParameterService_consumer.getParameterByCode(selectParamterCodeMap);
+        if (wr != null && wr.getData() != null && "1".equals(wr.getData().getValue()) ) {
+            map.put("state","0");
+        }
 
         // 根据条件查询所
         List<Map<String, Object>> list = insureReversalTradeDAO.queryDataWith3201(map);
-
 
         //根据险种类型 和 清算类别 ，获得对应的 费用结算明细
         map.put("list", list);
@@ -271,10 +281,19 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         Map dataMap = new HashMap();
         dataMap.put("insutype", MapUtils.get(parameterMap, "insutype"));//险种
         dataMap.put("clr_type", MapUtils.get(parameterMap, "clr_type"));//清算类别
-        dataMap.put("REFD_SETL_FLAG", MapUtils.get(parameterMap, "refdSetlFlag")); // 是否包含退费数据
-        dataMap.put("setl_optins", MapUtils.get(parameterMap, "clr_optins"));//结算经办机构
+        dataMap.put("REFD_SETL_FLAG", '0'); // 是否包含退费数据
+
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("未查询到医保配置信息！");
+        }
+        dataMap.put("setl_optins", insureConfigurationDTO.getMdtrtareaAdmvs());//结算经办机构 (统筹区规划)
         dataMap.put("stmt_begndate", MapUtils.get(parameterMap, "stmt_begndate"));//对账开始日期
         dataMap.put("stmt_enddate", MapUtils.get(parameterMap, "stmt_enddate"));//对账结束日期
+
 
         // 保留两位小数
         String medfeeSumamt = MapUtils.get(parameterMap, "medfee_sumamt").toString();
@@ -327,6 +346,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         selectDataListMap.put("hospCode", hospCode);
         selectDataListMap.put("insureRegCode", insureRegCode);
         selectDataListMap.put("refdSetlFlag", MapUtils.get(parameterMap, "refdSetlFlag"));
+
+        // 是否退费，REFD_SETL_FLAG = 1 则只查询正常的
+        Map<String,Object> selectParamterCodeMap = new HashMap<>();
+        selectParamterCodeMap.put("hospCode",hospCode);
+        selectParamterCodeMap.put("code","REFD_SETL_FLAG");
+        WrapperResponse<SysParameterDTO> wr = sysParameterService_consumer.getParameterByCode(selectParamterCodeMap);
+        if (wr != null && wr.getData() != null && "1".equals(wr.getData().getValue()) ) {
+            selectDataListMap.put("state","0");
+        }
+
+
         List<Map<String, Object>> datailList = insureReversalTradeDAO.queryDataWith3202(selectDataListMap);
         if (ListUtils.isEmpty(datailList)) {
             throw new AppException("对明细账失败：未获取到费用明细信息！");

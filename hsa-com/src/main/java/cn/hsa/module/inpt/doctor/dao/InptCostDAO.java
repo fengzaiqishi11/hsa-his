@@ -240,6 +240,19 @@ public interface InptCostDAO {
     List<Map<String, Object>> queryInptCostByBfc(Map param);
 
     /**
+    * @Menthod queryNewInptCostByBfc
+    * @Desrciption 不考虑归属结算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 16:38
+    * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+    **/
+    List<Map<String, Object>> queryNewInptCostByBfc(Map param);
+
+    /**
      * @param param 查询条件
      * @Menthod queryInptCostList
      * @Desrciption 查询费用信息
@@ -248,6 +261,33 @@ public interface InptCostDAO {
      * @Return java.util.List<cn.hsa.module.inpt.doctor.entity.InptCostDO>
      */
     List<InptCostDO> queryInptCostList(Map<String, Object> param);
+
+
+    /**
+    * @Menthod queryInptCostList
+    * @Desrciption 不需要判断归属结算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 16:15
+    * @Return java.util.List<cn.hsa.module.inpt.doctor.entity.InptCostDO>
+    **/
+    List<InptCostDO> queryNewInptCostList(Map<String, Object> param);
+
+    /**
+    * @Menthod queryIsExitAttributionCostList
+    * @Desrciption 正常结算看是否存在归属结算费用
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/8/20 11:03
+    * @Return java.util.List<cn.hsa.module.inpt.doctor.entity.InptCostDO>
+    **/
+    List<InptCostDO> queryIsExitAttributionCostList(Map<String, Object> param);
 
     /**
      * @param param 请求参数

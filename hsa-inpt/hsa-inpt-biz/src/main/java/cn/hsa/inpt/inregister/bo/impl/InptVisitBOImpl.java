@@ -310,9 +310,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("当前存在医嘱，无法取消入院登记");
         }
         InptVisitDTO inptVisitById = this.inptVisitDAO.getInptVisitById(inptVisitDTO);
-        if (StringUtils.isNotEmpty(inptVisitById.getBedId())) {
-            throw new AppException("当前已分配床位，无法取消入院登记");
-        }
+//        if (StringUtils.isNotEmpty(inptVisitById.getBedId())) {
+//            throw new AppException("当前已分配床位，无法取消入院登记");
+//        }
 
         boolean b = BigDecimalUtils.greaterZero(inptVisitById.getTotalCost());
         if (b) {
@@ -325,6 +325,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         inptVisitById.setStatusCode(Constants.BRZT.ZF);
         inptVisitDAO.invalidPatientStatus(inptVisitById);
+        // 费用为0时 取消住院登记，需要作废医嘱
+        if (inptVisitById.getId() == null || "".equals(inptVisitById.getId())) {
+            throw new AppException("取消住院登记时没有获取到当前患者就诊id，请联系管理员");
+        }
+        inptVisitDAO.deleteInptAdviceAndLongCost(inptVisitById);
+        inptVisitDAO.updateBaseBed(inptVisitById);
         return true;
     }
 

@@ -329,6 +329,21 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      **/
     @Override
     public boolean updateVisitInHospital(OutptVisitDTO outptVisitDTO) {
+        // 门诊医生站直接开住院证需要判断就诊表就诊医生是否为空,如果为空需要更新就诊表的医生ID/医生姓名/就诊时间字段/就诊标识 luoyong 2021/08/27
+        Map<String, String> map = new HashMap<>();
+        map.put("id", outptVisitDTO.getId());
+        map.put("hospCode", outptVisitDTO.getHospCode());
+        OutptVisitDTO byVisitID = outptVisitDAO.queryByVisitID(map);
+        if (byVisitID == null) {
+            throw new RuntimeException("未查询到就诊记录");
+        }
+        if (StringUtils.isEmpty(byVisitID.getDoctorId()) || StringUtils.isEmpty(byVisitID.getDoctorName())) {
+            byVisitID.setDoctorId(outptVisitDTO.getDoctorId());
+            byVisitID.setDoctorName(outptVisitDTO.getDoctorName());
+            byVisitID.setVisitTime(DateUtils.getNow());
+            byVisitID.setIsVisit(Constants.SF.S);
+            outptVisitDAO.updateOutptVisit(byVisitID);
+        }
         return outptDoctorPrescribeDAO.updateVisitInHospital(outptVisitDTO) > 0;
     }
 
@@ -1000,25 +1015,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //判断库存
         if ((Constants.YYXZ.CG.equals(outptPrescribeDetailsDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(outptPrescribeDetailsDTO.getUseCode()))
                 && (Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) || Constants.XMLB.CL.equals(outptPrescribeDetailsDTO.getItemCode()))) {
-            // add by zhangguorui
-            Map map = new HashMap();
-            map.put("hospCode", outptPrescribeDetailsDTO.getHospCode());
-            CheckStockDTO checkStockDTO = new CheckStockDTO();
-            BeanUtils.copyProperties(outptPrescribeDetailsDTO,checkStockDTO);
-            map.put("checkStockDTO", checkStockDTO);
-            // 调用门诊库存校验接口 获得 库存-占存-在途数量 等于可操作的数量
-            WrapperResponse<CheckStockRespDTO> checkResult = checkStockService_consumer.checkOutDrugOrMeterialStock(map);
-            CheckStockRespDTO checkStockRespDTO = checkResult.getData();
-            if ((ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO))
-                    || checkStockRespDTO.getResult().compareTo(new BigDecimal(0)) < 0)){
-                throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足," +
-                        "其中【库存数量 = " + checkStockRespDTO.getStrockSplitNum() + "】，" +
-                        "【占用库存 = " + checkStockRespDTO.getStockOccupy() + "】，" +
-                        "【未结算/未核收数量 = " + BigDecimalUtils.add(checkStockRespDTO.getTotalNumberNoCaculate(),
-                        checkStockRespDTO.getTotalNumberNoCheck()) + "】，" +
-                        "【未配药数量 =" + BigDecimalUtils.add(checkStockRespDTO.getPrescribeOuptNumber(),
-                        checkStockRespDTO.getPrescribeInptNumber()) + "】"
-                );
+            if ((ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO)))){
+                throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足,");
             }
         }
 
@@ -3733,7 +3731,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 insureParamMap.put("hospCode", outptPrescribeDTO.getHospCode());
                 insureParamMap.put("id", outptPrescribeDTO.getVisitId());
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
-                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+//                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                if (insureIndividualVisitById == null) return null;
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人

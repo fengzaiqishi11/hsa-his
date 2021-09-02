@@ -938,37 +938,45 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         sysParamMap.put("code", regCode);
         WrapperResponse<SysParameterDTO> wr = sysParameterService_consumer.getParameterByCode(sysParamMap);
         if (wr == null || wr.getData() == null || wr.getData().getValue() == null) {
-            throw new AppException("请配置系统参数(" + regCode + ")" );
+            throw new AppException("请配置系统参数(" + regCode + ")中的['calculation']！" );
         }
         String  calculation  =  JSONObject.parseObject(wr.getData().getValue()).getString("calculation");
-        /**
-         * 第一部分回参
-         */
-        paramMap.put("aka151",outDataMap.get("act_pay_dedc").toString()); //起付线费用 -----  实际支付起付线
-        paramMap.put("akb066",outDataMap.get("acct_pay").toString());//个人账户支付 --------- 个人账户支出
-        paramMap.put("akb067",outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
-        paramMap.put("akc264",outDataMap.get("medfee_sumamt").toString());//医疗总费用akc264 = bka831 + bka832+bka842 --------医疗费总额
-        paramMap.put("ake026",outDataMap.get("hifes_pay").toString());  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
-        paramMap.put("ake029",outDataMap.get("maf_pay").toString());//大额医疗费用补助基金支付 ---- 职工大额医疗费用补助基金支出
-        paramMap.put("ake035",outDataMap.get("cvlserv_pay").toString());//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
-        paramMap.put("ake039",outDataMap.get("hifp_pay").toString()); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
-        String fundPaySumamt = outDataMap.get("fund_pay_sumamt").toString(); // 基金支付总额
-        String bka832 = fundPaySumamt;
-        // 湖南省的 fundPaySumamt 字段不包括个人账户支付部分，广东省fundPaySumamt 字段包括，所以需区分！
+        paramMap.put("akc264",outDataMap.get("medfee_sumamt").toString()); // 医疗总费用
+        paramMap.put("bka825",outDataMap.get("fulamt_ownpay_amt").toString());// 全自费费用
+        paramMap.put("bka838",outDataMap.get("overlmt_selfpay").toString());// 超限价自费费用
+        paramMap.put("preselfpayAmt",outDataMap.get("preselfpay_amt").toString());// 先行自付金额
+        paramMap.put("inscpScpAmt",outDataMap.get("inscp_scp_amt").toString()); // 符合政策范围金额
+        paramMap.put("aka151",outDataMap.get("act_pay_dedc").toString());// 实际支付起付线
+        paramMap.put("ake039",outDataMap.get("hifp_pay").toString());// 基本医疗保险统筹基金支出
+        paramMap.put("poolPropSelfpay",outDataMap.get("pool_prop_selfpay").toString());// 基本医疗保险统筹基金支付比例
+        paramMap.put("ake035",outDataMap.get("cvlserv_pay").toString());// 公务员医疗补助资金支出
+        paramMap.put("ake026",outDataMap.get("hifes_pay").toString());// 企业补充医疗保险基金支出
+        paramMap.put("hifmiPay",outDataMap.get("hifmi_pay").toString());// 居民大病保险资金支出
+        paramMap.put("hifobPay",outDataMap.get("hifob_pay").toString()); // 职工大额医疗费用补助基金支出
+        paramMap.put("bka821",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
+        paramMap.put("bka840",outDataMap.get("oth_pay").toString());//其他基金支付
+        paramMap.put("psnPartAmt",outDataMap.get("psn_part_amt").toString());// 个人负担总金额
+        paramMap.put("akb066",outDataMap.get("acct_pay").toString());// 个人账户支出
+        paramMap.put("akb067",outDataMap.get("psn_cash_pay").toString()); // 个人现金支出
+        paramMap.put("bka842",outDataMap.get("hosp_part_amt").toString());// 医院负担金额
+        paramMap.put("balc",outDataMap.get("balc").toString());// 余额账户
+        paramMap.put("acctMulaidPay",outDataMap.get("acct_mulaid_pay").toString());// 个人账户共济支付金额
+        String hifmiPay = outDataMap.get("hifmi_pay").toString();
+        String hifobPay = outDataMap.get("hifob_pay").toString();
+        paramMap.put("ake029",BigDecimalUtils.add(hifmiPay,hifobPay).toString()); // 大额医疗费用支出
+
+        String bka832 = outDataMap.get("fund_pay_sumamt").toString(); // 基金支付总额
+        // 湖南省的 fundPaySumamt 字段不包括个人账户支付部分，珠海医保fundPaySumamt 字段包括，所以需区分！
         if (Constant.UnifiedPay.calculation.HN.equals(calculation)) {
-            bka832 = BigDecimalUtils.add(outDataMap.get("acct_pay").toString(),fundPaySumamt).toString();
+            bka832 = BigDecimalUtils.add(outDataMap.get("acct_pay").toString(),bka832).toString();
         }
-        paramMap.put("bka832",bka832);  // 基金支付总额 + 个人账户支付 = 实际医疗基金 + 刷卡金额
+        paramMap.put("bka832",bka832);
+
+        // 个人现金付款金额 = 医疗总费用 - 基金支付总额
+        paramMap.put("bka831",BigDecimalUtils.subtract(outDataMap.get("medfee_sumamt").toString(),bka832).toString());
         paramMap.put("bka801",null); //床位费超额金额
-        paramMap.put("bka821",null);//民政救助金支付
-        paramMap.put("bka825",outDataMap.get("fulamt_ownpay_amt").toString());//全自费费用     ---- 全自费金额
         paramMap.put("bka826",null);//部分自费费用
-        paramMap.put("bka831",BigDecimalUtils.subtract(outDataMap.get("medfee_sumamt").toString(),bka832).toString()); // 个人现金付款金额 = 医保费用总金额 -报销总金额 - 刷卡金额   // 个人负担总金额
-        paramMap.put("bka838",outDataMap.get("overlmt_selfpay").toString());//超共付段费用个人自付 ---  超限价自费费用
-        paramMap.put("bka839",outDataMap.get("oth_pay").toString());//其他支付
-        paramMap.put("bka840","");//其他基金支付 -------- 基金支付总额
         paramMap.put("bka841",null);//单位支付
-        paramMap.put("bka842",outDataMap.get("hosp_part_amt").toString());//医院垫付 ---- 医院负担金额
         paramMap.put("bka843",null);//特惠保
         paramMap.put("bka844",null);//医院减免
         paramMap.put("bka845",null);//政府兜底

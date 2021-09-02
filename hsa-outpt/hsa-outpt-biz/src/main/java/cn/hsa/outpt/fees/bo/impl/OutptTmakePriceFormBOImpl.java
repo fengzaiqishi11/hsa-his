@@ -1754,6 +1754,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      */
     @Override
     public WrapperResponse queryBaseDept(BaseDeptDrugStoreDTO baseDeptDrugStoreDTO) {
+        baseDeptDrugStoreDTO.setIsValid(Constants.SF.S);
         return WrapperResponse.success(outptCostDAO.queryBaseDept(baseDeptDrugStoreDTO));
     }
 

@@ -10,7 +10,9 @@ import cn.hsa.module.insure.stock.entity.InsureGoodBuy;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ import java.util.Map;
 @Service("insureRecruitPurchaseService_provider")
 public class InsureRecruitPurchaseServiceImpl extends HsafService implements InsureRecruitPurchaseService {
 
-
+    @Resource
     private InsureRecruitPurchaseBO insureRecruitPurchaseBO;
 
     /**
@@ -44,5 +46,83 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
     @Override
     public WrapperResponse<Map<String, Object>> queryCommoditySalesRecord(Map<String, Object> map) {
         return WrapperResponse.success(insureRecruitPurchaseBO.queryCommoditySalesRecord(map));
+    }
+
+    /**
+     * @Menthod: queryPersonList
+     * @Desrciption: 查询(门诊/住院)存在(销售/退货)(药品/材料)记录的人员列表
+     * @Param:
+     *      1.itemType-药品1，材料2
+     *      2.queryType-全院0，门诊1，住院2
+     *      3.keyword-搜索条件(姓名、证件号、就诊号/住院号、住院床号)
+     *      4.startDate-搜索开始日期
+     *      5.endDate-搜索结束日期
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-31 10:17
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.queryPersonList(MapUtils.get(map, "insureRecruitPurchaseDTO")));
+    }
+
+    /**
+     * @Menthod: queryItemList
+     * @Desrciption: 根据就诊id查询人员对应的药品/材料信息
+     * @Param:
+     *      1.visitId-就诊id
+     *      2.itemType-药品1，材料2
+     *      3.queryType-门诊1，住院2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-09-01 15:13
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryItemList(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.queryItemList(MapUtils.get(map, "insureRecruitPurchaseDTO")));
+    }
+
+    /**
+     * @Menthod:
+     * @Desrciption: 海南招采接口-药品销售列表查询【8503】
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-26 10:27
+     * @Return: list
+     **/
+    @Override
+    public WrapperResponse<List<Map<String, Object>>> queryDrugSells(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.queryDrugSells(MapUtils.get(map, "insureRecruitPurchaseDTO")));
+    }
+
+    /**
+     * @Menthod:
+     * @Desrciption: 海南招采接口-药品销售【8504】
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-26 10:27
+     * @Return: Boolean
+     **/
+    @Override
+    public WrapperResponse<Boolean> addDrugSells(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.addDrugSells(map));
+    }
+
+    /**
+     * @Menthod:
+     * @Desrciption: 海南招采接口-药品销售退货【8505】
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-26 10:27
+     * @Return: Boolean
+     **/
+    @Override
+    public WrapperResponse<Boolean> deleteDrugSells(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.deleteDrugSells(map));
     }
 }

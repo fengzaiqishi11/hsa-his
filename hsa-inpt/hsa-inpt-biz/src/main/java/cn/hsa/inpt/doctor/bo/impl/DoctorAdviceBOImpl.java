@@ -197,7 +197,9 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                     //执行科室
                     outptGroupNoList.get(i).setExecDeptId(outptGroupNoList.get(i-1).getExecDeptId());
                     //用药性质
-                    outptGroupNoList.get(i).setUseCode(outptGroupNoList.get(i-1).getUseCode());
+                    if(StringUtils.isEmpty(outptGroupNoList.get(i).getUseCode())){
+                        outptGroupNoList.get(i).setUseCode(outptGroupNoList.get(i-1).getUseCode());
+                    }
                     //使用天数
                     outptGroupNoList.get(i).setUseDays(outptGroupNoList.get(i-1).getUseDays());
                     // 用法
@@ -1306,7 +1308,8 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 insureParamMap.put("id", inptVisitDTO.getId());
                 insureParamMap.put("limitFlag", "1");
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
-                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+//                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                if (insureIndividualVisitById == null) return null;
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人

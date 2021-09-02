@@ -63,6 +63,7 @@ public class EmrArchiveLoggingBOImpl extends HsafBO implements EmrArchiveLogging
 				EmrArchiveLoggingDTO dto = new EmrArchiveLoggingDTO();
 				dto.setId(SnowflakeUtils.getId());
 				dto.setVisitId(visitid);
+				dto.setHospCode(emrArchiveLoggingDTO.getHospCode());
 				dto.setArchiveUserId(emrArchiveLoggingDTO.getArchiveUserId());
 				dto.setArchiveName(emrArchiveLoggingDTO.getArchiveName());
 				dto.setArchiveOption(emrArchiveLoggingDTO.getArchiveOption());
@@ -223,6 +224,7 @@ public class EmrArchiveLoggingBOImpl extends HsafBO implements EmrArchiveLogging
 				dto.setId(SnowflakeUtils.getId());
 				dto.setVisitId(archiveLoggingDTO.getVisitId());
 				dto.setArchiveUserId("-1");
+				dto.setHospCode(archiveLoggingDTO.getHospCode());
 				dto.setArchiveName("自动执行");
 				dto.setArchiveOption("电子病历自动归档");
 				dto.setArchiveState("1");

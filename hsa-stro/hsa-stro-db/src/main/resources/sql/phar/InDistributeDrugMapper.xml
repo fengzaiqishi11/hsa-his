@@ -133,7 +133,7 @@
     <select id="getInReviceDetailPage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
         select
         a.id,a.visit_id,a.item_name itemName,a.spec,(case a.item_code when '1' then (select prep_code from base_drug where id=a.item_id and a.item_code='1' and hosp_code=a.hosp_code) else '' end) prepCode,
-        a.price,a.split_price splitPrice,a.unit_code unitCode,a.item_code itemCode,a.item_id itemId,ifnull(a.num,0) num,ifnull(a.num*a.price,0) total,
+        a.price,a.split_price splitPrice,a.unit_code unitCode,a.item_code itemCode,a.item_id itemId,ifnull(a.num,0) num,a.total_price total,
         (select ifnull(sum(split_num),0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockNum,
         (select ifnull(stock_occupy,0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockOccupy,
         (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
@@ -144,7 +144,7 @@
         (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName
         from (
         select a.id,a.receive_id,a.item_name,a.spec,
-        a.price,max(a.split_price) split_price,a.unit_code,a.item_code,a.item_id,
+        a.price,max(a.split_price) split_price,a.unit_code,a.item_code,a.item_id,a.total_price,
         a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age
         ,sum(a.num) num,a.split_unit_code,ifnull(sum(a.split_num), 0) splitNum,a.split_ratio,a.dosage_unit_code
         from phar_in_receive_detail a
@@ -395,7 +395,7 @@
     <select id="queryVisitByReceiveOrder" resultType="java.lang.String">
       select distinct a.visit_id
       from phar_in_receive_detail a
-      join base_drug b on b.id = a.item_id and b.type_code = '2' and a.hosp_code = b.hosp_code
+      join base_drug b on b.id = a.item_id and b.big_type_code = '2' and a.hosp_code = b.hosp_code
       left join phar_in_receive c on c.id = a.receive_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
       where a.hosp_code = #{hospCode} and a.receive_id = #{id}
       and item_code = '1'
@@ -404,7 +404,7 @@
     <select id="queryVisitByDistributeOrder" resultType="java.lang.String">
         select distinct a.visit_id
         from phar_in_distribute_detail a
-        join base_drug b on b.id = a.item_id and b.type_code = '2' and a.hosp_code = b.hosp_code
+        join base_drug b on b.id = a.item_id and b.big_type_code = '2' and a.hosp_code = b.hosp_code
         left join phar_in_distribute c on c.id = a.distribute_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
         where a.hosp_code = #{hospCode} and a.distribute_id = #{id}
         and item_code = '1'
@@ -428,7 +428,7 @@
      </if>
    </select>
 
-    <!--根据就诊id和配药id查询医嘱信息-->
+    <!--根据就诊id和配药id查询医嘱11信息-->
     <select id="queryDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select a.*,pc.total_price as printTotalPrice from inpt_advice a
         join phar_in_receive_detail pc on pc.advice_id = a.id and pc.hosp_code = a.hosp_code

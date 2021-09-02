@@ -379,6 +379,9 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
      */
     private String isShared;
+
+    private String attributionCode; // 结算类型
+
     /**
      * 是否新医保，用于判断业务是否走统一支付平台
      */
@@ -387,4 +390,7 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String psnNo;
     private String pracCertiNo;  // 医师编码
     private List<String> diagnoseList;
+
+    // 费用条数
+    private BigDecimal costNumbers;
 }

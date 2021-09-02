@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrborrow.dao.emrBorrowDAO">
+
+        <resultMap type="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO" id="EmrBorrowMap">
+            <result property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+            <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+            <result property="borrowDoctor" column="borrow_doctor" jdbcType="VARCHAR"/>
+            <result property="borrowId" column="borrow_id" jdbcType="VARCHAR"/>
+            <result property="borrowInNo" column="borrow_in_no" jdbcType="VARCHAR"/>
+            <result property="borrowPatient" column="borrow_patient" jdbcType="VARCHAR"/>
+            <result property="borrowTime" column="borrow_time" jdbcType="TIMESTAMP"/>
+            <result property="borrowDuration" column="borrow_duration" jdbcType="INTEGER"/>
+            <result property="isReturn" column="is_return" jdbcType="VARCHAR"/>
+            <result property="revertTime" column="revert_time" jdbcType="TIMESTAMP"/>
+            <result property="revertName" column="revert_name" jdbcType="VARCHAR"/>
+            <result property="revertId" column="revert_id" jdbcType="VARCHAR"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+            <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+            <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        </resultMap>
+    <select id="queryEmrBorrowList" parameterType="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO" resultType="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO">
+        select a.id, a.hosp_code, a.dept_id, a.borrow_doctor, a.borrow_id,a.borrow_in_no, a.borrow_patient, a.borrow_time,
+        a.borrow_duration, a.is_return, a.revert_time, a.revert_name, a.revert_id, a.remark, a.crte_name, a.crte_id, a.crte_time, b.name as deptName
+        from emr_borrow_record a LEFT JOIN base_dept b on a.dept_id = b.id and a.hosp_code = b.hosp_code
+        where a.hosp_code =#{hospCode}
+        <if test="keyword !=null and keyword !=''">
+            and (a.borrow_doctor like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+            or  a.borrow_in_no like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+            or  a.borrow_patient like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+            )
+        </if>
+        <if test="borrowId != null and borrowId != ''">
+            and borrow_id = #{borrowId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id = #{deptId}
+        </if>
+        <if test="startDate != null and startDate !=''">
+            and  a.borrow_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate !=''">
+            and  a.borrow_time &lt;= #{endDate}
+        </if>
+        <if test="isReturn != null and isReturn != ''">
+            and a.is_return=#{isReturn}
+        </if>
+        order by a.borrow_time desc
+    </select>
+
+    <insert id="insert">
+     INSERT INTO emr_borrow_record ( id ,  hosp_code ,  dept_id ,  borrow_doctor ,  borrow_id ,  borrow_in_no ,  borrow_patient ,  borrow_time ,  borrow_duration ,  is_return ,  revert_time ,  revert_name ,  revert_id ,  remark ,  crte_name ,  crte_id ,  crte_time )
+     VALUES (#{id}, #{hospCode}, #{deptId}, #{borrowDoctor}, #{borrowId}, #{borrowInNo}, #{borrowPatient}, #{borrowTime}, #{borrowDuration}, #{isReturn}, #{revertTime}, #{revertName}, #{revertId}, #{remark}, #{crteName}, #{crteId}, #{crteTime});
+    </insert>
+
+    <update id="updateEmrBorrow" parameterType="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO">
+        UPDATE emr_borrow_record
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code=#{hospCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id=#{deptId},
+            </if>
+            <if test="borrowDoctor != null and borrowDoctor != ''">
+                borrow_doctor=#{borrowDoctor},
+            </if>
+            <if test="borrowId != null and borrowId != ''">
+                borrow_id=#{borrowId},
+            </if>
+            <if test="borrowInNo != null and borrowInNo != ''">
+                borrow_in_no=#{borrowInNo},
+            </if>
+            <if test="borrowPatient != null and borrowPatient != ''">
+                borrow_patient=#{borrowPatient},
+            </if>
+            <if test="borrowTime != null">
+                borrow_time=#{borrowTime},
+            </if>
+            <if test="borrowDuration != null and borrowDuration != ''">
+                borrow_duration=#{borrowDuration},
+            </if>
+            <if test="isReturn != null and isReturn != ''">
+                is_return=#{isReturn},
+            </if>
+            <if test="revertTime != null">
+                revert_time=#{revertTime},
+            </if>
+            <if test="revertName != null and revertName != ''">
+                revert_name=#{revertName},
+            </if>
+            <if test="revertId != null and revertId != ''">
+                revert_id=#{revertId},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark=#{remark},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name=#{crteName},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id=#{crteId},
+            </if>
+            <if test="crteTime != null">
+                crte_time=#{crteTime},
+            </if>
+        </set>
+        where hosp_code =#{hospCode} and id=#{id}
+    </update>
+
+    <select id="getEmrBorrowInfo" parameterType="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO" resultType="cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO">
+    select id,  hosp_code,  dept_id,  borrow_doctor,  borrow_id,  borrow_in_no,  borrow_patient,  borrow_time,
+       borrow_duration,  is_return,  revert_time,  revert_name,  revert_id,  remark,  crte_name,  crte_id,  crte_time
+     from  emr_borrow_record
+     where hosp_code =#{hospCode} and borrow_in_no =#{borrowInNo} and borrow_patient =#{borrowPatient} and is_return = '0'
+    </select>
+
+    <select id="queryArchivePatient" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select b.name,b.in_profile,b.age,b.in_no from inpt_visit b
+        LEFT JOIN emr_archive_logging c on b.id = c.visit_id and b.hosp_code = c.hosp_code
+        where b.hosp_code = #{hospCode} and c.archive_state = '1'
+    </select>
+
+
+</mapper>

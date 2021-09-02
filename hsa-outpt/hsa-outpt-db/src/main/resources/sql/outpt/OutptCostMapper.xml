@@ -1318,9 +1318,11 @@
                 select
                 pp.id
                 from
-                outpt_prescribe pp left join outpt_cost cc on pp.hosp_code = cc.hosp_code and pp.id = cc.op_id
+                outpt_prescribe pp left join outpt_cost cc on pp.id = cc.op_id
                 where
-                pp.hosp_code = #{hospCode}
+                cc.hosp_code = #{hospCode}
+                and cc.visit_id = v.id
+                and pp.hosp_code = #{hospCode}
                 and pp.visit_id = v.id
                 and pp.is_settle = '0'
                 and pp.is_cancel = '0'
@@ -1588,7 +1590,7 @@
         bm.split_ratio,
         bm.split_unit_code,
         bm.split_price,
-        bm.use_code AS usage_code,
+        '' AS usage_code,
         bm.reg_cert_no AS ndan,
         bm.pym AS good_pym,
         bm.wbm AS good_wbm,
@@ -2942,7 +2944,7 @@
             bd.code deptCode,
             bd.type_code drugstoreTypeCode
          from base_dept bd
-         where bd.hosp_code = #{hospCode} and bd.type_code in ('4','5','14')
+         where bd.hosp_code = #{hospCode} and bd.type_code in ('4','5','14') and  is_valid = #{isValid}
     </select>
 
     <update id="updateOutptPrescribeByIds" parameterType="java.util.Map">

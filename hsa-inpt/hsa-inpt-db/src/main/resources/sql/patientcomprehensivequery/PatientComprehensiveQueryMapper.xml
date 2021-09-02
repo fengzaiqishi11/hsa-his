@@ -125,6 +125,12 @@
         <if test='queryBaby =="N"'>
             and (baby_id is null or baby_id = '')
         </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
         group by
         itemId
         ) cost
@@ -190,6 +196,12 @@
         </if>
         <if test='queryBaby =="N"'>
             and (baby_id is null or baby_id = '')
+        </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
         </if>
         group by
         itemId
@@ -257,6 +269,12 @@
         <if test='queryBaby =="N"'>
             and (baby_id is null or baby_id = '')
         </if>
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          AND attribution_code = #{attributionCode}
+        </if>
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+        </if>
         group by
         itemId
         ) cost
@@ -274,23 +292,24 @@
 
     <select id="queryItemAndDrugAndMaterialDetail" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
         select
-        inpt_cost.source_dept_id as sourceDeptId,
-        inpt_cost.visit_id as visitId,
-        inpt_cost.bfc_id as bfcId,
-        inpt_cost.item_id as itemId,
-        inpt_cost.item_name as name,
-        inpt_cost.cost_time as costTime,
-        inpt_cost.hosp_code,
-        inpt_cost.price as price,
-        inpt_cost.total_num_unit_code as numUnitCode,
-        inpt_cost.crte_name as crteName,
-        inpt_cost.total_num as num,
-        inpt_cost.total_price as valuationPrice,
-        inpt_cost.preferential_price as preferentialPrice,
-        inpt_cost.reality_price as realityPrice,
-        ( select name from base_dept where id = inpt_cost.source_dept_id and hosp_code = #{hospCode} ) as sourceDeptName,
-        inpt_cost.item_code as itemCode
-        from inpt_cost
+        a.id,
+        a.source_dept_id as sourceDeptId,
+        a.visit_id as visitId,
+        a.bfc_id as bfcId,
+        a.item_id as itemId,
+        a.item_name as name,
+        a.cost_time as costTime,
+        a.hosp_code,
+        a.price as price,
+        a.total_num_unit_code as numUnitCode,
+        a.crte_name as crteName,
+        a.total_num as num,
+        a.total_price as valuationPrice,
+        a.preferential_price as preferentialPrice,
+        a.reality_price as realityPrice,
+        ( select name from base_dept where id = a.source_dept_id and hosp_code = #{hospCode} ) as sourceDeptName,
+        a.item_code as itemCode
+        from inpt_cost a
         where
         hosp_code = #{hospCode}
         and item_code  = #{itemCode}
@@ -305,7 +324,7 @@
         <if test='isAdviceItem =="N"'>
             and (iat_id is null or iat_id = '')
         </if>
-        order by inpt_cost.cost_time asc
+        order by a.cost_time asc
     </select>
 
     <!-- 查询计费类别信息 谢星宇 -->

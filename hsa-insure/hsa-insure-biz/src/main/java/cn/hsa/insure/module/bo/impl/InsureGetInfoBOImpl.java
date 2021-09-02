@@ -45,7 +45,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Resource
     private InsureUnifiedBaseBOImpl insureUnifiedBaseBOImpl;
 
-
     @Resource
     private SysParameterService sysParameterService_consumer;
 
@@ -897,16 +896,38 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     public List<Map> payInfoListMap(InsureSettleInfoDTO insureSettleInfoDTO,Map map){
         // 基金支付信息
         List<Map> payInfoListMap = new ArrayList<>();
-        List<Map<String, Object>> setldetailList = new ArrayList<>();
         Map<String, Object> stringObjectMap2 = insureUnifiedBaseBOImpl.querySettleDeInfo(map);
-        setldetailList = MapUtils.get(stringObjectMap2, "setldetail");
-        if (!ListUtils.isEmpty(setldetailList)) {
-            for(Map<String, Object> map1 : setldetailList){
-                Map payInfo = new HashMap();
-                payInfo.put("fund_pay_type",map1.get("fund_pay_type"));
-                payInfo.put("fund_payamt",map1.get("fund_payamt"));
-                payInfoListMap.add(payInfo);
+        List<Map<String, Object>> setldetailList = MapUtils.get(stringObjectMap2, "setldetail");
+
+        // 根据同一种类型分组
+        Map<Object, List<Object>> mapMap = new HashMap<>();
+        for (Map<String,Object> setldetailMap : setldetailList) {
+            List<Object>  newList = new ArrayList<>();
+            Object fundPayType = setldetailMap.get("fund_pay_type");
+            Object fundPayamt = setldetailMap.get("fund_payamt");
+            if (mapMap.containsKey(fundPayType)) {
+                mapMap.get(fundPayType).add(fundPayamt);
+            } else {
+                newList.add(fundPayamt);
+                mapMap.put(fundPayType, newList);
             }
+        }
+
+        // 迭代合并计算，保证唯一性
+        Iterator<Map.Entry<Object, List<Object>>> it = mapMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Object, List<Object>> entry = it.next();
+            Object key = entry.getKey();
+            List<Object> value = entry.getValue();
+            BigDecimal fundPayamt = BigDecimal.ZERO;
+            for (Object object : value) {
+                fundPayamt = fundPayamt.add(BigDecimalUtils.convert(object.toString()));
+            }
+
+            Map payInfo = new HashMap();
+            payInfo.put("fund_pay_type",key);
+            payInfo.put("fund_payamt",fundPayamt);
+            payInfoListMap.add(payInfo);
         }
         return payInfoListMap;
     }
@@ -1006,6 +1027,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             // 住院诊断信息
             for (DiseInfoDTO diseInfoDTO : diseinfoList){
                 Map diseinfo = new HashMap();
+                //是主诊断但不是入院主诊断
                 if(diseInfoDTO.getIsMain().equals("1") && !"201".equals(diseInfoDTO.getTypeCode())){
                     diseInfoDTO.setIsMain("0");
                 }
@@ -1066,6 +1088,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return opspdiseinfoListMap;
     }
+
     /**
      * @Description: iteminfoListMap
      * @Param:
@@ -1126,10 +1149,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             othAmt = BigDecimalUtils.add(othAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert((BigDecimalUtils.subtract(feeSumamt,clabAmtSum)).toString()))));
                             fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(clabAmtSum.toString()))));
                         }
-                        if (item.containsKey("det_item_fee_sumamt") && MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()), 2));
-                        } else {
-                            sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt")))));
+                        if((item.containsKey("det_item_fee_sumamt"))){
+                            if (MapUtils.get(item, "det_item_fee_sumamt").toString().indexOf(".") > 0) {
+                                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.scale(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()), 2));
+                            } else {
+                                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()));
+                            }
                         }
                         medChrgitm = MapUtils.get(item, "med_chrgitm_type");
                     }

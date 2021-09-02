@@ -86,4 +86,8 @@ public class PharOutReceiveDetailDTO extends PharOutReceiveDetailDO implements S
     private String typeCode;
 
     private String bigTypeCode;
+    /**
+     * 速度(SD)
+     */
+    private String speedCode;
 }

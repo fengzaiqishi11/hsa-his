@@ -295,4 +295,8 @@
         left join inpt_advice_detail c on a.opd_id = c.id and a.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode} and a.visit_id = #{id}
     </select>
+
+    <select id="selectOutptPatByVisitIdAndSettleId" resultType="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
+        select pay_code as payCode, price from outpt_pay where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{settleId}
+    </select>
 </mapper>

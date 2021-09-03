@@ -32,6 +32,9 @@
             or  a.borrow_patient like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
             )
         </if>
+        <if test="borrowId != null and borrowId != ''">
+            and borrow_id = #{borrowId}
+        </if>
         <if test="deptId != null and deptId != ''">
             and dept_id = #{deptId}
         </if>
@@ -44,6 +47,7 @@
         <if test="isReturn != null and isReturn != ''">
             and a.is_return=#{isReturn}
         </if>
+        order by a.borrow_time desc
     </select>
 
     <insert id="insert">
@@ -110,7 +114,14 @@
     select id,  hosp_code,  dept_id,  borrow_doctor,  borrow_id,  borrow_in_no,  borrow_patient,  borrow_time,
        borrow_duration,  is_return,  revert_time,  revert_name,  revert_id,  remark,  crte_name,  crte_id,  crte_time
      from  emr_borrow_record
-     where hosp_code =#{hospCode} and id =#{id}
+     where hosp_code =#{hospCode} and borrow_in_no =#{borrowInNo} and borrow_patient =#{borrowPatient} and is_return = '0'
     </select>
+
+    <select id="queryArchivePatient" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select b.name,b.in_profile,b.age,b.in_no from inpt_visit b
+        LEFT JOIN emr_archive_logging c on b.id = c.visit_id and b.hosp_code = c.hosp_code
+        where b.hosp_code = #{hospCode} and c.archive_state = '1'
+    </select>
+
 
 </mapper>

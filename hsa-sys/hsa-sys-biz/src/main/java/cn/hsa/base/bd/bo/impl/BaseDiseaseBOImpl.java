@@ -90,6 +90,7 @@ public class BaseDiseaseBOImpl extends HsafBO implements BaseDiseaseBO{
             baseDiseaseDTO.setIds(list);
         }
         baseDiseaseDTO.setTypeCode("");
+        baseDiseaseDTO.setIsValid(Constants.SF.S);
 
         //设置分页信息
         PageHelper.startPage(baseDiseaseDTO.getPageNo(), baseDiseaseDTO.getPageSize());

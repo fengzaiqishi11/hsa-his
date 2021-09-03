@@ -49,7 +49,7 @@ public class CostClassificationBOImpl extends HsafBO implements CostClassificati
   **/
   @Override
   public List<PatientCompreHensiveQueryDTO> queryCostByAdviceId(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO) {
-    List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOS = patientComprehensiveQueryDAO.queryItemAndDrugAndMaterialAndAdvice(patientCompreHensiveQueryDTO);
+    List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOS = costClassificationDAO.queryItemAndDrugAndMaterialAndAdvice(patientCompreHensiveQueryDTO);
     // 查询项目的明细费用
     for (PatientCompreHensiveQueryDTO item: patientCompreHensiveQueryDTOS){
       PatientCompreHensiveQueryDTO detail = new PatientCompreHensiveQueryDTO();
@@ -60,7 +60,7 @@ public class CostClassificationBOImpl extends HsafBO implements CostClassificati
       detail.setSourceDeptId(patientCompreHensiveQueryDTO.getSourceDeptId());
       detail.setIsAdviceItem(patientCompreHensiveQueryDTO.getIsAdviceItem());
       detail.setAttributionCode(patientCompreHensiveQueryDTO.getAttributionCode());
-      List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOS1 = patientComprehensiveQueryDAO.queryItemAndDrugAndMaterialDetail(detail);
+      List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOS1 = costClassificationDAO.queryItemAndDrugAndMaterialDetail(detail);
       item.setPatientCompreHensiveQueryDTOList(patientCompreHensiveQueryDTOS1);
     }
     return patientCompreHensiveQueryDTOS;

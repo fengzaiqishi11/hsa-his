@@ -310,9 +310,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("当前存在医嘱，无法取消入院登记");
         }
         InptVisitDTO inptVisitById = this.inptVisitDAO.getInptVisitById(inptVisitDTO);
-        if (StringUtils.isNotEmpty(inptVisitById.getBedId())) {
-            throw new AppException("当前已分配床位，无法取消入院登记");
-        }
+//        if (StringUtils.isNotEmpty(inptVisitById.getBedId())) {
+//            throw new AppException("当前已分配床位，无法取消入院登记");
+//        }
 
         boolean b = BigDecimalUtils.greaterZero(inptVisitById.getTotalCost());
         if (b) {
@@ -325,6 +325,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         inptVisitById.setStatusCode(Constants.BRZT.ZF);
         inptVisitDAO.invalidPatientStatus(inptVisitById);
+        // 费用为0时 取消住院登记，需要作废医嘱
+        if (inptVisitById.getId() == null || "".equals(inptVisitById.getId())) {
+            throw new AppException("取消住院登记时没有获取到当前患者就诊id，请联系管理员");
+        }
+        inptVisitDAO.deleteInptAdviceAndLongCost(inptVisitById);
+        inptVisitDAO.updateBaseBed(inptVisitById);
         return true;
     }
 
@@ -753,6 +759,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // TODO 封装医保入院登记入参
         SysUserDTO user = this.getUserInfo(inptVisitDTO.getHospCode(), inptVisitDTO.getCrteId());
 
+
         // 必填参数
         InsureInptRegisterDTO insureInptRegisterDTO = new InsureInptRegisterDTO();
         inptVisitDTO.setInsureOrgCode(insureIndividualBasicDTO.getAkb020());
@@ -891,7 +898,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
-
+            String pracCertiNo = inptVisitDto.getPracCertiNo();
+            if(StringUtils.isEmpty(pracCertiNo)){
+                throw  new AppException("该【"+inptVisitDTO.getZzDoctorName()+"】医生的医师编码没有维护,请先去用户管理里面维护");
+            }
+            inptVisitDTO.setPracCertiNo(inptVisitDto.getPracCertiNo());
             insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
             insureUnifiedPayParam.put("hospCode",inptVisitDTO.getHospCode());
             insureUnifiedPayParam.put("insureInptRegisterDTO",insureInptRegisterDTO);

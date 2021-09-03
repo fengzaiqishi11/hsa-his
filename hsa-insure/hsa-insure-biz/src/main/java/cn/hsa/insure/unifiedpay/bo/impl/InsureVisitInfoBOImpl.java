@@ -10,10 +10,7 @@ import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.HttpConnectUtil;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -27,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.insure.unifiedpay.bo.impl
@@ -193,9 +191,12 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			if(ListUtils.isEmpty(mapList)){
 				throw new AppException("未获取到该人员的慢特病备案查询信息");
 			}
+
+			mapList = mapList.stream().filter(filterMap -> StringUtils.isNotEmpty(MapUtils.get(filterMap, "enddate")) &&
+					DateUtils.dateCompare(DateUtils.parse(DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_D), DateUtils.Y_M_D),
+							DateUtils.parse(MapUtils.get(filterMap, "enddate"), DateUtils.Y_M_D)
+					)).collect(Collectors.toList());
 		}
-
-
 		// 需要将统一支付平台的个人信息返回数据转换格式
 		Map<String, Object> returnMap = new HashMap<>();
 		Map<String, Object> personinfoMap = new HashMap<>();

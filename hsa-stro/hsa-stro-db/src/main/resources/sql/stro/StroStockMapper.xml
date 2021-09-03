@@ -600,7 +600,7 @@
       stro_stock_detail a
       left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
       left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = "2"
-      where a.biz_id = #{bizId} and a.hosp_code = #{hospCode} and a.num > 0
+      where a.biz_id = #{bizId} and a.hosp_code = #{hospCode} and a.split_num > 0
       <if test="itemCode != null and itemCode !=''">
         and a.item_code = #{itemCode}
       </if>

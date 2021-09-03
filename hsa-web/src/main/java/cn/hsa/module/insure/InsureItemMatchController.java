@@ -91,11 +91,13 @@ public class InsureItemMatchController extends BaseController {
     @PostMapping("addItemMatch")
     public WrapperResponse<Boolean> addItemMatch(@RequestBody InsureItemMatchDTO insureItemMatchDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(insureItemMatchDTO.getInsureRegCode())) {
+            throw new AppException("医保机构编码不能为空！");
+        }
+
         insureItemMatchDTO.setHospCode(sysUserDTO.getHospCode());
         insureItemMatchDTO.setCrteId(sysUserDTO.getId());
-        // 操作员编码
         insureItemMatchDTO.setCode(sysUserDTO.getCode());
-        // 名称
         insureItemMatchDTO.setCrteName(sysUserDTO.getName());
         Map map = new HashMap<>();
         map.put("hospCode",sysUserDTO.getHospCode());

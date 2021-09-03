@@ -59,7 +59,7 @@
                 and id = #{id}
             </if>
             <if test="nationCode != null and nationCode != ''">
-                and nation_code = #{id}
+                and nation_code = #{nationCode}
             </if>
 
             <if test="hospCode != null and hospCode != ''">

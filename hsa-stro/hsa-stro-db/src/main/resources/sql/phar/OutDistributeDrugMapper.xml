@@ -167,7 +167,7 @@
         (select name from base_dept where id=b.phar_id and hosp_code=b.hosp_code) bizName,
         (select num from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=b.phar_id and hosp_code=a.hosp_code) stockNum,
         (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName,
-        opd.op_id opId,opd.group_no groupNo,opd.use_days useDays, b.assign_time assignTime, b.assign_user_name assignUserName,d.type_code typeCode,
+        opd.op_id opId,opd.group_no groupNo,opd.speed_code as speedCode, opd.use_days useDays, b.assign_time assignTime, b.assign_user_name assignUserName,d.type_code typeCode,
         br.name as rateName,e.big_type_code,
         br.daily_times as dailyTimes,
         d.herb_num as chineseDrugNum,
@@ -218,6 +218,7 @@
         br.daily_times as dailyTimes,
         br.remark as rateRemark,
         d.herb_num as chineseDrugNum,
+        opd.speed_code as speedCode,
         opd.group_no groupNo
         from phar_out_distribute_all_detail a
         join phar_out_distribute b on a.distribute_id=b.id

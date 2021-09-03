@@ -1,6 +1,7 @@
 package cn.hsa.module.emr.emrborrow.dao;
 
 import cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 
 import java.util.List;
 
@@ -54,4 +55,6 @@ public interface emrBorrowDAO {
      * @Return
      */
     List<EmrBorrowDTO> queryEmrBorrowList(EmrBorrowDTO emrBorrowDTO);
+
+    List<InptVisitDTO> queryArchivePatient(InptVisitDTO inptVisitDTO);
 }

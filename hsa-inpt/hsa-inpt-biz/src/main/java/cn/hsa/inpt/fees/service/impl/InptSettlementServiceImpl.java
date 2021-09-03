@@ -158,4 +158,38 @@ public class InptSettlementServiceImpl extends HsafService implements InptSettle
     public WrapperResponse saveBabySettle(Map param) {
         return inptSettlementBO.saveBabySettle(param);
     }
+
+
+
+    /**
+    * @Menthod saveAttributionCostTrial
+    * @Desrciption 归属结算试算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:29
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @Override
+    public WrapperResponse saveAttributionCostTrial(Map param) {
+      return inptSettlementBO.saveAttributionCostTrial(MapUtils.get(param,"inptVisitDTO"));
+    }
+
+    /**
+    * @Menthod saveAttributionSettle
+    * @Desrciption 归属结算试算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:30
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @Override
+    public WrapperResponse saveAttributionSettle(Map param) {
+      return inptSettlementBO.saveAttributionSettle(param);
+    }
 }

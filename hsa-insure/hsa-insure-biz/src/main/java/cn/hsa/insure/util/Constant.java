@@ -788,6 +788,9 @@ public interface Constant {
 
             public static final String UP_8201 = "8201"; // 获取医院库房列表
             public static final String UP_8202 = "8202"; // 药品获取挂网目录列表
+            public static final String UP_8503 = "8503"; // 药品销售列表查询
+            public static final String UP_8504 = "8504"; // 药品销售
+            public static final String UP_8505 = "8505"; // 药品销售退货
 
         }
     }

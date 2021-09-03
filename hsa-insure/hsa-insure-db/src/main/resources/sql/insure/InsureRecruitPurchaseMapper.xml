@@ -39,5 +39,240 @@
 
     </update>
 
+    <!--查询存在【药品/材料】销售/退货记录的人员列表-->
+    <select id="queryPersonList" parameterType="cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO" resultType="java.util.Map">
+        select
+            t1.queryType,
+            t1.visitId,
+            t1.hospCode,
+            t1.name,
+            t1.patientInfo,
+            t1.profileNo,
+            t1.visitNo,
+            t1.certCode,
+            t1.certNo,
+            t1.visitDeptName,
+            t1.visitDeptId,
+            t1.visitTime,
+            t1.bedName,
+            t1.patientCode
+        from (
+            SELECT
+                '1' as queryType,
+                c.id as visitId,
+                c.hosp_code as hospCode,
+                c.name,
+                CONCAT(
+                    c.name,
+                    '/',
+                    (case c.gender_code when '1' then '男' when '2' then '女' else '' end),
+                    '/',
+                    c.age,
+                    (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
+                ) as patientInfo,
+                c.out_profile as profileNo,
+                c.visit_no as visitNo,
+                c.cert_code as certCode,
+                c.cert_no certNo,
+                c.dept_id as visitDeptId,
+                c.dept_name as visitDeptName,
+                date_format(c.visit_time, '%Y-%m-%d') as visitTime,
+                '' as bedName,
+                c.patient_code as patientCode
+            FROM
+                outpt_cost a
+            /*LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id*/
+            LEFT JOIN outpt_visit c on a.hosp_code = c.hosp_code and a.visit_id = c.id
+            LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
+            WHERE a.hosp_code = #{hospCode}
+              and a.item_code = #{itemCode} /*药品/材料*/
+              and a.status_code = '0' /*正常状态*/
+              and a.settle_code = '2' /*已结算*/
+              and a.is_upload = '0' /*未上传*/
+              and c.is_visit = '1' /*已接诊*/
+              and d.audit_code = '1' /*医保项目已审核*/
+              and d.is_match = '1' /*医保项目已匹配*/
+              and d.is_trans = '1' /*医保项目已传输*/
+              and d.is_valid = '1' /*医保项目有效*/
+              and d.insure_reg_code = #{insureRegCode} /*医保机构编码*/
+            GROUP BY a.visit_id
 
+            UNION ALL
+
+            SELECT
+                '2' as queryType,
+                c.id as visitId,
+                c.hosp_code as hospCode,
+                c.name,
+                CONCAT(
+                    c.name,
+                    '/',
+                    (case c.gender_code when '1' then '男' when '2' then '女' else '' end),
+                    '/',
+                    c.age,
+                    (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
+                ) as patientInfo,
+                c.in_profile as profileNo,
+                c.in_no as visitNo,
+                c.cert_code as certCode,
+                c.cert_no certNo,
+                c.in_dept_id as visitDeptId,
+                c.in_dept_name as visitDeptName,
+                date_format(c.in_time, '%Y-%m-%d') as visitTime,
+                c.bed_name as bedName,
+                c.patient_code as patientCode
+            FROM
+                inpt_cost a
+            /*LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id*/
+            LEFT JOIN inpt_visit c on a.hosp_code = c.hosp_code and a.visit_id = c.id
+            LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
+            WHERE a.hosp_code = #{hospCode}
+              and a.item_code = #{itemCode} /*药品/材料*/
+              and a.status_code = '0' /*正常状态*/
+              and a.settle_code = '2' /*已结算*/
+              and a.is_upload = '0' /*未上传*/
+              and d.audit_code = '1' /*医保项目已审核*/
+              and d.is_match = '1' /*医保项目已匹配*/
+              and d.is_trans = '1' /*医保项目已传输*/
+              and d.is_valid = '1' /*医保项目有效*/
+              and d.insure_reg_code = #{insureRegCode} /*医保机构编码*/
+              and (c.status_code = '2' or c.status_code = '5' or c.status_code = '6' or c.status_code = '7') /*在院病人*/
+            GROUP BY a.visit_id
+        ) t1
+        where 1=1
+        <if test="keyword != null and keyword != ''">
+            /*页面搜索条件：姓名、床号、就诊号、证件号*/
+            and (t1.name like concat('%', #{keyword}, '%') or t1.bedName = #{keyword} or t1.visitNo = #{keyword} or t1.certNo = #{keyword})
+        </if>
+        <if test="queryType != null and queryType != '' and queryType != '0'.toString()">
+            and t1.queryType = #{queryType}
+        </if>
+        <if test="queryType == null or queryType == '' or queryType == '0'.toString()">
+            and t1.queryType in ('1', '2')
+        </if>
+        <if test="startDate != null and startDate != ''">
+          <![CDATA[
+            and t1.visitTime >= #{startDate}
+          ]]>
+        </if>
+        <if test="endDate != null and startDate != ''">
+          <![CDATA[
+            and t1.visitTime <= #{endDate}
+          ]]>
+        </if>
+        order by t1.queryType, t1.visitNo, t1.bedName, t1.visitTime
+    </select>
+
+    <!--根据就诊id查询【药品】销售列表-->
+    <select id="queryDrugList" parameterType="cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO" resultType="java.util.Map">
+        SELECT
+            '1' as queryType,
+            a.id,
+            a.hosp_code as hospCode,
+            a.visit_id as visitId,
+            b.code as itemCode,
+            a.item_name as itemName,
+            (select name from base_dept bd where a.hosp_code = bd.hosp_code and a.dept_id = bd.id) as deptName,
+            a.item_id as prodCode,
+            c.insure_item_code as fixmedinsHilistId,
+            c.insure_item_name as fixmedinsHilistName,
+            (SELECT cert_code from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertType,
+            (SELECT cert_no from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertno,
+            a.doctor_name as prscDrName,
+            iiv.medical_reg_no as mdtrtSn,
+            iiv.aac001 as psnNo,
+            d.cert_no as certno,
+            d.name as psnName,
+            a.total_num as selRetnCnt,
+            b.is_prescription as rxFlag,
+            b.split_ratio as splitRatio,
+            a.reality_price as finlTrnsPric,
+            DATE_FORMAT(e.settle_time, '%Y-%m-%d') as selRetnTime,
+            e.crte_name as selRetnOpterName
+        FROM
+            outpt_cost a
+        LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id
+        LEFT JOIN insure_item_match c on a.hosp_code = c.hosp_code and a.item_id = c.hosp_item_id
+        LEFT JOIN outpt_visit d on a.hosp_code = d.hosp_code and a.visit_id = d.id
+        LEFT JOIN outpt_settle e on a.hosp_code = e.hosp_code and a.settle_id = e.id
+        LEFT JOIN insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and a.visit_id = iiv.id
+        where a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId} /*就诊id*/
+          and c.insure_reg_code = #{insureRegCode} /*医保机构编码*/
+          and a.item_code = #{itemCode} /*项目类别为药品*/
+          and d.is_visit = '1' /*已就诊*/
+          and a.status_code = '0' /*正常状态*/
+          and a.settle_code = '2' /*已结算*/
+          and a.is_upload = '0' /*未上传*/
+          and c.audit_code = '1' /*医保项目已审核*/
+          and c.is_match = '1' /*医保项目已匹配*/
+          and c.is_trans = '1' /*医保项目已传输*/
+          and c.is_valid = '1' /*医保项目有效*/
+
+        UNION ALL
+
+        SELECT
+            '2' as queryType,
+            a.id,
+            a.hosp_code as hospCode,
+            a.visit_id as visitId,
+            b.code as itemCode,
+            a.item_name as itemName,
+            (select name from base_dept bd where a.hosp_code = bd.hosp_code and a.dept_id = bd.id) as deptName,
+            a.item_id as prodCode,
+            c.insure_item_code as fixmedinsHilistId,
+            c.insure_item_name as fixmedinsHilistName,
+            (SELECT cert_code from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertType,
+            (SELECT cert_no from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertno,
+            a.doctor_name as prscDrName,
+            iiv.medical_reg_no as mdtrtSn,
+            iiv.aac001 as psnNo,
+            d.cert_no as certno,
+            d.name as psnName,
+            a.total_num as selRetnCnt,
+            b.is_prescription as rxFlag,
+            b.split_ratio as splitRatio,
+            a.reality_price as finlTrnsPric,
+            DATE_FORMAT(e.settle_time, '%Y-%m-%d') as selRetnTime,
+            e.crte_name as selRetnOpterName
+        FROM
+            inpt_cost a
+        LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id
+        LEFT JOIN insure_item_match c on a.hosp_code = c.hosp_code and a.item_id = c.hosp_item_id
+        LEFT JOIN inpt_visit d on a.hosp_code = d.hosp_code and a.visit_id = d.id
+        LEFT JOIN inpt_settle e on a.hosp_code = e.hosp_code and a.settle_id = e.id
+        LEFT JOIN insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and a.visit_id = iiv.id
+        where a.hosp_code =  #{hospCode}
+          and a.visit_id = #{visitId} /*就诊id*/
+          and c.insure_reg_code = #{insureRegCode} /*医保机构编码*/
+          and a.item_code = #{itemCode} /*项目类别为药品*/
+          and (d.status_code = '2' or d.status_code = '5' or d.status_code = '6' or d.status_code = '7') /*排除无效在院状态*/
+          and a.status_code = '0' /*正常状态*/
+          and a.settle_code = '2' /*已结算*/
+          and a.is_upload = '0' /*未上传*/
+          and c.audit_code = '1' /*医保项目已审核*/
+          and c.is_match = '1' /*医保项目已匹配*/
+          and c.is_trans = '1' /*医保项目已传输*/
+          and c.is_valid = '1' /*医保项目有效*/
+    </select>
+
+    <!--更新费用表上传状态-->
+    <update id="updateCostIsUpload" parameterType="java.util.Map">
+        update outpt_cost
+        set is_upload = '1'
+        where hosp_code = #{hospCode}
+         and id in
+        <foreach collection="ids" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+        ;
+        update inpt_cost
+        set is_upload = '1'
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+        ;
+    </update>
 </mapper>

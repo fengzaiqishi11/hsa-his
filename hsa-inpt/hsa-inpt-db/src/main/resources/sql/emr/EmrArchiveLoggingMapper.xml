@@ -146,7 +146,7 @@
     </select>
     <!-- 查询出院7天-->
     <select id="getZYEmrFilePatientsNoArchived" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
-        select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name as bedName, e.archive_name, e.archive_option,
+        select v.id as visitId,v.hosp_code as hospCode, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name as bedName, e.archive_name, e.archive_option,
         e.archive_state, e.archive_time
         from inpt_visit v left join emr_archive_logging e on v.id = e.visit_id
         where v.hosp_code = #{hospCode}

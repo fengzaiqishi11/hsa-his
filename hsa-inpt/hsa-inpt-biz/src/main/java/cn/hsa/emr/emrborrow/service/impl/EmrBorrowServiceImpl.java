@@ -8,6 +8,7 @@ import cn.hsa.module.emr.emrborrow.bo.EmrBorrowBO;
 import cn.hsa.module.emr.emrborrow.dto.EmrBorrowDTO;
 import cn.hsa.module.emr.emrborrow.entity.EmrBorrowDO;
 import cn.hsa.module.emr.emrborrow.service.EmrBorrowService;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,5 +52,11 @@ public class EmrBorrowServiceImpl extends HsafService implements EmrBorrowServic
     public WrapperResponse<PageDTO> queryEmrBorrowList(Map map) {
         EmrBorrowDTO emrBorrowDTO = MapUtils.get(map,"emrBorrowDTO");
         return WrapperResponse.success(emrBorrowBO.queryEmrBorrowList(emrBorrowDTO));
+    }
+
+    @Override
+    public WrapperResponse<PageDTO> queryArchivePatient(Map map) {
+        InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
+        return WrapperResponse.success(emrBorrowBO.queryArchivePatient(inptVisitDTO));
     }
 }

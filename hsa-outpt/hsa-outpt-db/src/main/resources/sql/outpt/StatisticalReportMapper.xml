@@ -1661,7 +1661,7 @@
       and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
-    )tab where tab.num != 0 order by tab.crte_time desc
+    )tab where tab.num != 0 order by tab.code asc, tab.crte_time desc
 
   </select>
 
@@ -1724,7 +1724,7 @@
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 
-    )tab where num > 0 order by tab.crte_time desc
+    )tab where num > 0 order by tab.code asc, tab.crte_time desc
   </select>
 
 </mapper>

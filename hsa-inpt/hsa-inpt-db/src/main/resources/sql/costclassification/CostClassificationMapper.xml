@@ -300,10 +300,11 @@
       and (baby_id is null or baby_id = '')
     </if>
     <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
-      AND attribution_code = #{attributionCode}
+      and attribution_code = #{attributionCode}
     </if>
     <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
-      AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and a.id not in (select insure.cost_id from insure_individual_cost insure where insure.visit_id = #{visitId} and insure.item_id = #{itemId})
     </if>
     group by
     itemId
@@ -356,10 +357,11 @@
       and (a.iat_id is null or a.iat_id = '')
     </if>
     <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
-      AND attribution_code = #{attributionCode}
+      and attribution_code = #{attributionCode}
     </if>
     <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
-      AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and a.id not in (select insure.cost_id from insure_individual_cost insure where insure.visit_id = #{visitId} and insure.item_id = #{itemId})
     </if>
     order by a.cost_time asc
   </select>

@@ -7,7 +7,6 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
-import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bi.service.BaseItemService;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bmm.service.BaseMaterialService;
@@ -682,8 +681,17 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         String json = JSONObject.toJSONString(httpParam);
         logger.info("获取定点医药机构信息入参:" + json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问医保统一支付平台");
+        }
         logger.info("获取定点医药机构信息入参回参:" + resultJson);
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
         Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outputMap, "medinsinfo");
         return resultDataMap.get(0);

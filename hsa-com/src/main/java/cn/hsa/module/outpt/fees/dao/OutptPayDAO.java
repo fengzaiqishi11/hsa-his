@@ -148,4 +148,14 @@ public interface OutptPayDAO {
      * @Date: 2021-07-02
      */
     List<Map> queryInptMedicalApplyList(OutptVisitDTO outptVisitDTO);
+
+    /**
+     * @Description: 根据就诊id，结算id查询支付信息
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/9/1 15:32
+     * @Return
+     */
+    List<OutptPayDTO> selectOutptPatByVisitIdAndSettleId(Map selectMap);
 }

@@ -119,7 +119,7 @@
 
     <select id="queryAllmaterial" resultMap="StroStockMap">
         select
-        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num,
          a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,
          ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
@@ -261,7 +261,7 @@
         </where>
         union all
         select
-        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,a.unit_code,
+        a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,a.unit_code,
         ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code,
          ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
          b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
@@ -572,131 +572,62 @@
     </insert>
 
     <!--库存效期查询-->
-    <select id="queryValidityWarningPage" resultMap="StroStockMap">
-        (select
-        a.id,
-        a.hosp_code,
-        a.biz_id,
-        a.location_no,
-        a.item_code,
-        a.item_id,
-        a.item_name,
-        a.prep_code,
-        ifnull( a.num, 0 ) num,
-        a.unit_code,
-        ifnull( a.buy_price_all, 0 ) buy_price_all,
-        ifnull( a.sell_price_all, 0 ) sell_price_all,
-        ifnull( a.split_num, 0 ) split_num,
-        a.split_unit_code,
-        ifnull( a.stock_max, 0 ) stock_max,
-        ifnull( a.stock_min, 0 ) stock_min,
-        ifnull( a.stock_occupy, 0 ) stock_occupy,
-        ifnull( a.split_price, 0 ) split_price,
-        b.spec AS spec,
-        b.split_ratio AS split_ratio,
-        b.price AS buyPrice,
-        b.price AS sellPrice,
-        b.CODE,
-        l.batch_no,
-        l.expiry_date,
-        ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
-        FROM
-        stro_stock a,
-        stro_stock_detail l,
-        base_drug b
-        where a.hosp_code = l.hosp_code
-        and a.item_code = l.item_code
-        and a.biz_id = l.biz_id
-        and a.item_id = l.item_id
-        and a.hosp_code = b.hosp_code
-        and a.item_id = b.id
-        and a.item_code = '1'
-        and a.biz_id = #{bizId}
-        and a.hosp_code = #{hospCode}
-        and a.num > 0
-        <if test="itemCode != null and itemCode !=''">
-            and a.item_code = #{itemCode}
-        </if>
-        <if test="warDate != null">
-            and l.expiry_date &lt;= #{warDate}
-        </if>
-        <if test="itemName != null and itemName != ''">
-            and (
-            a.item_name like CONCAT('%',#{itemName},'%')
-            or b.usual_pym like CONCAT('%',#{itemName},'%')
-            or b.usual_wbm like CONCAT('%',#{itemName},'%')
-            or b.good_pym like CONCAT('%',#{itemName},'%')
-            or b.good_wbm like CONCAT('%',#{itemName},'%')
-            )
-        </if>)
-
-
-        union all
-
-        (select
-        a.id,
-        a.hosp_code,
-        a.biz_id,
-        a.location_no,
-        a.item_code,
-        a.item_id,
-        a.item_name,
-        a.prep_code,
-        ifnull( a.num, 0 ) num,
-        a.unit_code,
-        ifnull( a.buy_price_all, 0 ) buy_price_all,
-        ifnull( a.sell_price_all, 0 ) sell_price_all,
-        ifnull( a.split_num, 0 ) split_num,
-        a.split_unit_code,
-        ifnull( a.stock_max, 0 ) stock_max,
-        ifnull( a.stock_min, 0 ) stock_min,
-        ifnull( a.stock_occupy, 0 ) stock_occupy,
-        ifnull( a.split_price, 0 ) split_price,
-        b.spec AS spec,
-        b.split_ratio AS split_ratio,
-        b.price AS buyPrice,
-        b.price AS sellPrice,
-        b.CODE,
-        l.batch_no,
-        l.expiry_date,
-        ( SELECT NAME FROM base_product WHERE hosp_code = a.hosp_code AND CODE =  b.prod_code  ) AS prodName
-        FROM
-        stro_stock a,
-        stro_stock_detail l,
-        base_material b
-        where a.hosp_code = l.hosp_code
-        and a.item_code = l.item_code
-        and a.biz_id = l.biz_id
-        and a.item_id = l.item_id
-        and a.hosp_code = b.hosp_code
-        and a.item_id = b.id
-        and a.item_code = '2'
-        and a.biz_id = #{bizId}
-        and a.hosp_code = #{hospCode}
-        and a.num > 0
-        <if test="itemCode != null and itemCode !=''">
-            and a.item_code = #{itemCode}
-        </if>
-        <if test="warDate != null">
-            and l.expiry_date &lt;= #{warDate}
-        </if>
-        <if test="itemName != null and itemName != ''">
-            and (
-            a.item_name like CONCAT('%',#{itemName},'%')
-            or b.pym like CONCAT('%',#{itemName},'%')
-            or b.wbm like CONCAT('%',#{itemName},'%')
-            )
-        </if>)
-        <choose>
-            <when  test="isSort == 1">
-                order by expiry_date asc
-            </when>
-            <otherwise>
-                order by expiry_date desc
-            </otherwise>
-        </choose>
-
-    </select>
+    <select id="queryValidityWarningPage" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+      select
+      a.hosp_code,
+      a.item_code,
+      a.item_id,
+      a.item_name,
+      a.split_price,
+      a.split_ratio,
+      a.biz_id,
+      a.sell_price,
+      a.batch_no,
+      a.expiry_date,
+      max(a.buy_price) as buy_price,
+      max(a.unit_code) as unit_code,
+      max(a.split_unit_code) split_unit_code,
+      sum(a.num) num,
+      sum(a.split_num) split_num,
+      sum(buy_price_all) as buy_price_all,
+      sum(sell_price_all) as sell_price_all,
+      case when a.item_code = '1' then (select bp.name from base_product bp where bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code)
+      when a.item_code = '2' then (select bp.name from base_product bp where bm.prod_code = bp.code and bm.hosp_code = bp.hosp_code) end prodName,
+      case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+      case when a.item_code='1' then bd.spec when a.item_code='2' then bm.spec end spec,
+      case when a.item_code='1' then bd.prep_code when a.item_code='2' then '' end prep_code
+      from
+      stro_stock_detail a
+      left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
+      left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = "2"
+      where a.biz_id = #{bizId} and a.hosp_code = #{hospCode} and a.split_num > 0
+      <if test="itemCode != null and itemCode !=''">
+        and a.item_code = #{itemCode}
+      </if>
+      <if test="warDate != null">
+        and a.expiry_date &lt;= #{warDate}
+      </if>
+      <if test="itemName != null and itemName != ''">
+        and (
+        a.item_name like CONCAT('%',#{itemName},'%')
+        or bd.usual_pym like CONCAT('%',#{itemName},'%')
+        or bd.usual_wbm like CONCAT('%',#{itemName},'%')
+        or bd.good_pym like CONCAT('%',#{itemName},'%')
+        or bd.good_wbm like CONCAT('%',#{itemName},'%')
+        or bm.pym like CONCAT('%',#{itemName},'%')
+        or bm.wbm like CONCAT('%',#{itemName},'%')
+        )
+      </if>
+      group by a.item_id,a.batch_no,a.expiry_date,a.item_name,a.split_ratio,a.sell_price,a.hosp_code,a.item_code,a.biz_id
+      <choose>
+        <when  test="isSort == 1">
+          order by expiry_date asc
+        </when>
+        <otherwise>
+          order by expiry_date desc
+        </otherwise>
+      </choose>
+  </select>
 
     <!-- 根据项目id查询库存明细 -->
     <select id="queryStoclDetailByItemIds" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">

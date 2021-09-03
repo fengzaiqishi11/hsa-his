@@ -316,7 +316,7 @@
             (#{item.id},#{item.hospCode}, #{item.insureRegCode}, #{item.hospIllnessId},
             #{item.hospIllnessCode}, #{item.hospIllnessName}, #{item.insureIllnessId},
             #{item.insureIllnessCode}, #{item.insureIllnessName}, #{item.isMatch}, #{item.isTrans},
-            #{item.auditCode}, #{item.remark}, #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.downLoadType})
+            #{item.auditCode}, #{item.remark}, #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.typeCode})
         </foreach>
     </insert>
     <insert id="insertDiseaseMatch">

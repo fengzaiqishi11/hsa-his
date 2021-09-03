@@ -2,6 +2,7 @@ package cn.hsa.module.center.nationstandarddrug.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
+import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
 
 import java.util.Map;
 
@@ -17,24 +18,24 @@ import java.util.Map;
  **/
 public interface NationStandardDrugZYBO {
   /**
-  * @Menthod queryNationStandardDrugPage
-  * @Desrciption 分页查询所有国家标准药品
-  *
-  * @Param
-  * [nationStandardDrugDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/1/26 9:41
-  * @Return java.util.List<cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO>
-  **/
+   * @Menthod queryNationStandardDrugPage
+   * @Desrciption 分页查询所有国家标准药品
+   *
+   * @Param
+   * [nationStandardDrugDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/1/26 9:41
+   * @Return java.util.List<cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO>
+   **/
   PageDTO queryNationStandardDrugZYPage(NationStandardDrugZYDTO nationStandardDrugZYDTO);
 
 
   /**
-     * @Describe: 根据id查询国家标准药品信息(中药)
-     * @Author: luonianxin
-     * @Date: 2021/4/27 11:14
-  **/
+   * @Describe: 根据id查询国家标准药品信息(中药)
+   * @Author: luonianxin
+   * @Date: 2021/4/27 11:14
+   **/
   NationStandardDrugZYDTO getZYById(NationStandardDrugZYDTO nationStandardDrugZYDTO);
 
   /**
@@ -48,4 +49,6 @@ public interface NationStandardDrugZYBO {
    *                 key为resultList,value为List<List<String>> 的数据集合
    **/
   Boolean saveProcessedUploadDataBatch(Map<String,Object> dataMap);
+
+  Boolean saveNationStandardDrugZY(NationStandardDrugZYDO nationStandardDrugZYDO);
 }

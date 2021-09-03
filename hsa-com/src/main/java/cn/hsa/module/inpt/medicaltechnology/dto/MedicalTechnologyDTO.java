@@ -66,6 +66,8 @@ public class MedicalTechnologyDTO extends PageDO implements Serializable {
 
 	private BigDecimal price;
 
+	private BigDecimal sumPrice;
+
 	private BigDecimal num;
 
 	private String itemName;

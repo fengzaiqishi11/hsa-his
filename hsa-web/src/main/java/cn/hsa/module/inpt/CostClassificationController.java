@@ -45,7 +45,7 @@ public class CostClassificationController extends BaseController {
      * @Date   2021/8/19 14:49
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>>
      **/
-    @PostMapping("/costClassificationController")
+    @PostMapping("/queryCostByAdviceId")
     WrapperResponse<List<PatientCompreHensiveQueryDTO>> queryCostByAdviceId(@RequestBody PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO, HttpServletRequest req, HttpServletResponse res) {
       SysUserDTO sysUserDTO = getSession(req, res);
       patientCompreHensiveQueryDTO.setHospCode(sysUserDTO.getHospCode());

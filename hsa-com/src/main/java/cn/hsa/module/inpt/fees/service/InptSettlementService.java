@@ -145,4 +145,35 @@ public interface InptSettlementService {
      */
     @PostMapping("/service/inpt/inptSettlement/saveBabySettle")
     WrapperResponse saveBabySettle(Map param);
+
+
+    /**
+    * @Menthod saveAttributionCostTrial
+    * @Desrciption 归属结算试算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:27
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @PostMapping("/service/inpt/inptSettlement/saveAttributionCostTrial")
+    WrapperResponse saveAttributionCostTrial(Map param);
+
+    /**
+    * @Menthod saveAttributionSettle
+    * @Desrciption 归属结算结算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:28
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @PostMapping("/service/inpt/inptSettlement/saveAttributionSettle")
+    WrapperResponse saveAttributionSettle(Map param);
+
+
 }

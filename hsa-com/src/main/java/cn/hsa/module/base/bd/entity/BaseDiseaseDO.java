@@ -50,6 +50,10 @@ public class BaseDiseaseDO extends PageDO implements Serializable {
     */
     private String name;
     /**
+     * 疾病别名
+     */
+    private String usualName;
+    /**
     * 国家编码
     */
     private String nationCode;

@@ -872,9 +872,7 @@
         a.usage_code usageCode,a.rate_id rateId,a.use_days useDays,a.remark,
         a.total_num totalNum,a.total_num_unit_code totalNumUnitCode,a.speed_code speedCode,a.is_long isLong,a.is_stop isStop,a.is_reject isReject,a.is_check isCheck,
         a.price,a.total_price totalPrice,a.long_start_time longStartTime,a.content content,a.start_exec_num startExecNum,
-        <!--(concat(b.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=b.gender_code and e.c_code='XB'),'') ), '/',b.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=b.age_unit_code and hosp_code=b.hosp_code),'岁')))) visitInfo,-->
-        IF(
+          IF(
         a.baby_id ,
         CONCAT(ib.name, '/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = ib.gender_code AND e.c_code = 'XB' ), '' )), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
         concat(b.NAME,'/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = b.gender_code AND e.c_code = 'XB' ), '' )),'/', b.age,(ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = b.age_unit_code AND hosp_code = b.hosp_code ), '岁' )))

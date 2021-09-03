@@ -5,6 +5,7 @@ import cn.hsa.module.outpt.fees.dto.OutptPayDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ public interface OutptOutTmakePriceFormBO {
      * @Date 2020/9/06 10:46
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse 请求结果
      */
-    WrapperResponse updateOutptOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, OutptPayDTO outptPayDTO);
+    WrapperResponse updateOutptOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDTO> outptPayDOList);
 
     /**
      * @Menthod queryOutChargePage

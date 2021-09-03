@@ -536,11 +536,17 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
     }
 
     private String[] getDayOps(InptNurseThirdDTO inptNurseThirdDTO,List<InptNurseThirdDTO> inptNurseThirdDTOS,List<String> recordTimeList) {
+        // 出院时间，在院情况出院时间未当前时间
+        Date outTime = DateUtils.dateToDate(inptNurseThirdDTO.getOutTime());
         String dayOps [] = new String [7] ;
         for (int i = 0; i <7 ; i++) {
-            String timeSlot = DateUtils.format(inptNurseThirdDTOS.get(i*6).getTimeSlot(),"yyyy-MM-dd");
+            InptNurseThirdDTO nurseThirdDTO = inptNurseThirdDTOS.get(i * 6);
+            String timeSlot = DateUtils.format(nurseThirdDTO.getTimeSlot(),"yyyy-MM-dd");
             Date timeSlotDate = DateUtils.parse(timeSlot,"yyyy-MM-dd");
             if(ListUtils.isEmpty(recordTimeList)){
+                dayOps[i] = "";
+            }else if (DateUtils.differentDays(outTime, timeSlotDate) > 0){
+                // 记录时间大于出院时间默认为空
                 dayOps[i] = "";
             }else{
                 //查找出小于护理记录时间的手术时间

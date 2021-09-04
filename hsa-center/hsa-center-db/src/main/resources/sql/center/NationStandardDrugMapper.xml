@@ -89,101 +89,66 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryNationStandardDrugPage" resultMap="NationStandardDrugMap">
         select
-        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name
+        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
         from nation_standard_drug
-        <where>
-            <if test="id != null and id != ''">
-                and id = #{id}
-            </if>
-            <if test="dataSources != null and dataSources != ''">
-                and data_sources = #{dataSources}
-            </if>
-            <if test="code != null and code != ''">
-                and code = #{code}
-            </if>
-            <if test="registerName != null and registerName != ''">
-                and register_name = #{registerName}
-            </if>
-            <if test="goodName != null and goodName != ''">
-                and good_name = #{goodName}
-            </if>
-            <if test="registerPrep != null and registerPrep != ''">
-                and register_prep = #{registerPrep}
-            </if>
-            <if test="actualPrep != null and actualPrep != ''">
-                and actual_prep = #{actualPrep}
-            </if>
-            <if test="registerSpec != null and registerSpec != ''">
-                and register_spec = #{registerSpec}
-            </if>
-            <if test="actualSpec != null and actualSpec != ''">
-                and actual_spec = #{actualSpec}
-            </if>
-            <if test="packaging != null and packaging != ''">
-                and packaging = #{packaging}
-            </if>
-            <if test="splitRatio != null and splitRatio != ''">
-                and split_ratio = #{splitRatio}
-            </if>
-            <if test="unit != null and unit != ''">
-                and unit = #{unit}
-            </if>
-            <if test="splitUnit != null and splitUnit != ''">
-                and split_unit = #{splitUnit}
-            </if>
-            <if test="prod != null and prod != ''">
-                and prod = #{prod}
-            </if>
-            <if test="dan != null and dan != ''">
-                and dan = #{dan}
-            </if>
-            <if test="packagProd != null and packagProd != ''">
-                and packag_prod = #{packagProd}
-            </if>
-            <if test="marketStatus != null and marketStatus != ''">
-                and market_status = #{marketStatus}
-            </if>
-            <if test="insure != null and insure != ''">
-                and insure = #{insure}
-            </if>
-            <if test="ratioAtOne != null and ratioAtOne != ''">
-                and ratio_at_one = #{ratioAtOne}
-            </if>
-            <if test="codeNo != null and codeNo != ''">
-                and code_no = #{codeNo}
-            </if>
-            <if test="insuranceName != null and insuranceName != ''">
-                and insurance_name = #{insuranceName}
-            </if>
-            <if test="insurancePrep != null and insurancePrep != ''">
-                and insurance_prep = #{insurancePrep}
-            </if>
-            <if test="remark != null and remark != ''">
-                and remark = #{remark}
-            </if>
-            <if test="isValid != null and isValid != ''">
-                and is_valid = #{isValid}
-            </if>
-            <if test="crteId != null and crteId != ''">
-                and crte_id = #{crteId}
-            </if>
-            <if test="crteName != null and crteName != ''">
-                and crte_name = #{crteName}
-            </if>
-            <if test="keyword != null and keyword != ''">
-                and (prod like concat('%',#{keyword},'%')
-                or good_name like concat('%',#{keyword},'%')
-                or register_name like concat('%',#{keyword},'%')
-                or wbm like concat('%',#{keyword},'%')
-                or pym like concat('%',#{keyword},'%')
-                or code like concat('%',#{keyword},'%')
-                or dan like concat('%',#{keyword},'%'))
-                or prod like concat('%',#{keyword},'%')
-            </if>
+        where is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            AND  MATCH (prod) AGAINST ( #{keyword} IN BOOLEAN MODE)
+        </if>
+        <if test="provinceCode != null and provinceCode !=''">
+            AND ( province_code = #{provinceCode} or province_code is null)
+        </if>
+        <if test="keyword != null and keyword != ''">
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH ( good_name ) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
             <if test="provinceCode != null and provinceCode !=''">
                 AND ( province_code = #{provinceCode} or province_code is null)
             </if>
-        </where>
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH ( register_name ) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
+            <if test="provinceCode != null and provinceCode !=''">
+                AND ( province_code = #{provinceCode} or province_code is null)
+            </if>
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH ( wbm ) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
+            <if test="provinceCode != null and provinceCode !=''">
+                AND ( province_code = #{provinceCode} or province_code is null)
+            </if>
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH ( pym ) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
+            <if test="provinceCode != null and provinceCode !=''">
+                AND ( province_code = #{provinceCode} or province_code is null)
+            </if>
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH ( code ) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
+            <if test="provinceCode != null and provinceCode !=''">
+                AND ( province_code = #{provinceCode} or province_code is null)
+            </if>
+            union all
+            select id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            from nation_standard_drug
+            where MATCH (dan) AGAINST ( #{keyword} IN BOOLEAN MODE )
+            AND is_valid = '1'
+            <if test="provinceCode != null and provinceCode !=''">
+                AND ( province_code = #{provinceCode} or province_code is null)
+            </if>
+
+        </if>
     </select>
 
     <select id="queryNationStandardZYPage" resultMap="NationStandardDrugMap">

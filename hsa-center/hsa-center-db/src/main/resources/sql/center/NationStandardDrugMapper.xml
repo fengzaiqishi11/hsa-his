@@ -90,7 +90,7 @@
         select
         id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
         from nation_standard_drug
-        <where>
+        where  is_valid = #{isValid}
             <if test="id != null and id != ''">
                 and id = #{id}
             </if>
@@ -160,15 +160,6 @@
             <if test="remark != null and remark != ''">
                 and remark = #{remark}
             </if>
-            <if test="isValid != null and isValid != ''">
-                and is_valid = #{isValid}
-            </if>
-            <if test="crteId != null and crteId != ''">
-                and crte_id = #{crteId}
-            </if>
-            <if test="crteName != null and crteName != ''">
-                and crte_name = #{crteName}
-            </if>
             <if test="keyword != null and keyword != ''">
                 and (prod like concat('%',#{keyword},'%')
                 or good_name like concat('%',#{keyword},'%')
@@ -182,7 +173,6 @@
             <if test="provinceCode != null and provinceCode !=''">
                 AND ( province_code = #{provinceCode} or province_code is null)
             </if>
-        </where>
     </select>
 
     <select id="queryNationStandardZYPage" resultMap="NationStandardDrugMap">

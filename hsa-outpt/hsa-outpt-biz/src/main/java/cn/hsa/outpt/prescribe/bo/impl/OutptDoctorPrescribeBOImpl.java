@@ -3548,8 +3548,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptDiagnoseDTO.setDiseaseIds(diagnoseIds);
         //删除全部诊断
         outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
-        //新增全部诊断
-        outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        if(!ListUtils.isEmpty(outptDiagnoseDTO.getOutptDiagnoseDOList())) {
+          //新增全部诊断
+          outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        }
         // 更新处方诊断信息表
         outptDoctorPrescribeDAO.updatePrescribeDiagnose(outptDiagnoseDTO);
         return true;

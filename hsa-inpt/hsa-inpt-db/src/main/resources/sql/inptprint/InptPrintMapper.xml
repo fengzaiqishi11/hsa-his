@@ -585,95 +585,39 @@
         <if test="item.iaId != null">
           ia_id = #{item.iaId},
         </if>
-        <if test="item.orderNo != null">
-          order_no = #{item.orderNo},
-        </if>
-        <if test="item.groupNo != null">
-          group_no = #{item.groupNo},
-        </if>
-        <if test="item.groupSeqNo != null">
-          group_seq_no = #{item.groupSeqNo},
-        </if>
-        <if test="item.content != null">
-          content = #{item.content},
-        </if>
-        <if test="item.usageCode != null">
-          usage_code = #{item.usageCode},
-        </if>
-        <if test="item.rateId != null">
-          rate_id = #{item.rateId},
-        </if>
-        <if test="item.speedCode != null">
-          speed_code = #{item.speedCode},
-        </if>
-        <if test="item.isSkin != null">
-          is_skin = #{item.isSkin},
-        </if>
-        <if test="item.isPositive != null">
-          is_positive = #{item.isPositive},
-        </if>
-        <if test="item.execId != null">
-          exec_id = #{item.execId},
-        </if>
-        <if test="item.execName != null">
-          exec_name = #{item.execName},
-        </if>
-        <if test="item.secondExecId != null">
-          second_exec_id = #{item.secondExecId},
-        </if>
-        <if test="item.secondExecName != null">
-          second_exec_name = #{item.secondExecName},
-        </if>
-        <if test="item.lastExecTime != null">
-          last_exec_time = #{item.lastExecTime},
-        </if>
-        <if test="item.checkId != null">
-          check_id = #{item.checkId},
-        </if>
-        <if test="item.checkName != null">
-          check_name = #{item.checkName},
-        </if>
-        <if test="item.checkTime != null">
-          check_time = #{item.checkTime},
-        </if>
-        <if test="item.stopDoctorId != null">
-          stop_doctor_id = #{item.stopDoctorId},
-        </if>
-        <if test="item.stopDoctorName != null">
-          stop_doctor_name = #{item.stopDoctorName},
-        </if>
-        <if test="item.stopTime != null">
-          stop_time = #{item.stopTime},
-        </if>
-        <if test="item.stopCheckId != null">
-          stop_check_id = #{item.stopCheckId},
-        </if>
-        <if test="item.stopCheckName != null">
-          stop_check_name = #{item.stopCheckName},
-        </if>
-        <if test="item.stopCheckTime != null">
-          stop_check_time = #{item.stopCheckTime},
-        </if>
+        order_no = #{item.orderNo},
+        group_no = #{item.groupNo},
+        group_seq_no = #{item.groupSeqNo},
+        content = #{item.content},
+        usage_code = #{item.usageCode},
+        rate_id = #{item.rateId},
+        speed_code = #{item.speedCode},
+        is_skin = #{item.isSkin},
+        is_positive = #{item.isPositive},
+        exec_id = #{item.execId},
+        exec_name = #{item.execName},
+        second_exec_id = #{item.secondExecId},
+        second_exec_name = #{item.secondExecName},
+        last_exec_time = #{item.lastExecTime},
+        check_id = #{item.checkId},
+        check_name = #{item.checkName},
+        check_time = #{item.checkTime},
+        stop_doctor_id = #{item.stopDoctorId},
+        stop_doctor_name = #{item.stopDoctorName},
+        stop_time = #{item.stopTime},
+        stop_check_id = #{item.stopCheckId},
+        stop_check_name = #{item.stopCheckName},
+        stop_check_time = #{item.stopCheckTime},
+        long_start_time = #{item.longStartTime},
+        cancel_id = #{item.cancelId},
+        cancel_name = #{item.cancelName},
+        cancel_time = #{item.cancelTime},
+        skin_result_code = #{item.skinResultCode},
         <if test="item.isLong != null">
           is_long = #{item.isLong},
         </if>
-        <if test="item.longStartTime != null">
-          long_start_time = #{item.longStartTime},
-        </if>
         <if test="item.seqNo != null">
           seq_no = #{item.seqNo},
-        </if>
-        <if test="item.cancelId != null">
-          cancel_id = #{item.cancelId},
-        </if>
-        <if test="item.cancelName != null">
-          cancel_name = #{item.cancelName},
-        </if>
-        <if test="item.cancelTime != null">
-          cancel_time = #{item.cancelTime},
-        </if>
-        <if test="item.skinResultCode != null">
-          skin_result_code = #{item.skinResultCode},
         </if>
       </set>
       where id = #{item.id} and hosp_code = #{item.hospCode}

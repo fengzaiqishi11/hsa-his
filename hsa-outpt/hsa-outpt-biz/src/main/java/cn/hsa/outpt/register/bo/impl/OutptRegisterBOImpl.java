@@ -316,6 +316,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setBirthday(outptVisitDTO.getBirthday());
             outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
             outptProfileFileDTO.setNativeAddress(outptVisitDTO.getNativeAddress());
+            outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
             outptProfileFileDTO.setType("2");
             outptProfileFileDTO.setCrteId(docId);
             outptProfileFileDTO.setCrteName(docName);

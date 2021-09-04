@@ -269,8 +269,8 @@
 			and status_code = #{statusCode}
 		</if>
 		<!-- Name传过来的是科室ID-->
-		<if test="inDeptName != null and inDeptName != ''">
-			and in_dept_id = #{inDeptName}
+		<if test="inDeptId != null and inDeptId != ''">
+			and in_dept_id = #{inDeptId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
 			and patient_code = #{patientCode}
@@ -321,8 +321,8 @@
 			and pt.status_code = #{statusCode}
 		</if>
 		<!-- Name传过来的是科室ID-->
-		<if test="inDeptName != null and inDeptName != ''">
-			and in_dept_id = #{inDeptName}
+		<if test="inDeptId != null and inDeptId != ''">
+			and in_dept_id = #{inDeptId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
 			and patient_code = #{patientCode}

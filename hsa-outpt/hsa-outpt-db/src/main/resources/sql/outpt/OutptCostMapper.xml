@@ -3051,7 +3051,7 @@
 
     <!-- 查询已结算患者信息 -->
     <select id="queryOutptSettleVisitList" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultMap="OutptVisitResultMap">
-        SELECT
+         SELECT
         <if test="type != null and type !=''">
             CONCAT(
             ov.NAME,
@@ -3127,15 +3127,15 @@
         where
         ov.hosp_code = #{hospCode}
         AND os.hosp_code = #{hospCode}
-        AND ov.is_visit = '1'
         AND os.is_settle = '1'
         AND os.status_code = '0'
         <if test="startDate != null">
-            AND DATE_FORMAT(os.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            AND os.settle_time &gt;= #{startDate}
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(os.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            AND os.settle_time &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY )
         </if>
+        AND ov.is_visit = '1'
         <if test="keyword != null and keyword != ''">
             AND(
             ov.name LIKE CONCAT('%',#{keyword},'%')

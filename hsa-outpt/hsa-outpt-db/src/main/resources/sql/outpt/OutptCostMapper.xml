@@ -3056,22 +3056,11 @@
             CONCAT(
             ov.NAME,
             '/',
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'XB'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.gender_code),'-'),
+            (case ov.gender_code when '0' then '未知' when '1' then '男' when '2' then '女' when '9' then '未说明' else '-' end),
             '/',
             IFNULL(ov.age,'-'),
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'NLDW'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.age_unit_code),'')) keyword,
+            (case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
+           ) keyword,
         </if>
         ov.id,
         ov.hosp_code,

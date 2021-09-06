@@ -70,4 +70,8 @@ public class CheckStockDTO implements Serializable {
      * 所以编辑的时候忽略掉当前处方的所有药品数量
      */
     private String opId;
+    /**
+     * 项目名称（项目/材料）
+     */
+    private String itemName;
 }

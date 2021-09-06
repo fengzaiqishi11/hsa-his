@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.RedisUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.rpc.RpcException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,6 +38,8 @@ public class BaseController extends HsafController {
     public static final String SESSION_AUTH_CODE = "SESSION_AUTH_CODE";
     // 会话用户信息key
     public static final String SESSION_USER_INFO = "SESSION_USER_INFO";
+    @Resource
+    private RedisUtils redisUtils;
 
    /* *//**
      * 当前登录用户所属医院编码
@@ -104,13 +108,15 @@ public class BaseController extends HsafController {
     protected HttpSession session;*/
 
     public <T> T getSession(HttpServletRequest req, HttpServletResponse res) {
-        Object value = req.getSession().getAttribute(SESSION_USER_INFO);
+        Object value = redisUtils.get("SESSION_USER_INFO_"+req.getSession().getId());
+//        Object value = req.getSession().getAttribute(SESSION_USER_INFO);
         return (T)(value == null ? null : value);
     }
 
     protected void setSession(String name, Object value, int s, HttpServletRequest req, HttpServletResponse res) {
         req.getSession().setAttribute(name, value);
         req.getSession().setMaxInactiveInterval(s);
+        redisUtils.set(name+"_"+req.getSession().getId(), value, s);
     }
 
     /**
@@ -132,9 +138,11 @@ public class BaseController extends HsafController {
 
 
     protected <T> T getAndRemoveSession(HttpServletRequest req, HttpServletResponse res) {
-        Object value = req.getSession().getAttribute(SESSION_AUTH_CODE);
+//        Object value = req.getSession().getAttribute(SESSION_AUTH_CODE);
+        Object value = redisUtils.get("SESSION_AUTH_CODE_"+req.getSession().getId());
         if (value != null) {
             req.getSession().removeAttribute(SESSION_AUTH_CODE);
+            redisUtils.del("SESSION_AUTH_CODE_"+req.getSession().getId());
         }
         return (T)value;
     }

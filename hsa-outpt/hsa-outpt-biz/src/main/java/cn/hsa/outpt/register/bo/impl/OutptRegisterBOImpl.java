@@ -317,6 +317,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
             outptProfileFileDTO.setNativeAddress(outptVisitDTO.getNativeAddress());
             outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
+            outptProfileFileDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode());
+            outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
             outptProfileFileDTO.setType("2");
             outptProfileFileDTO.setCrteId(docId);
             outptProfileFileDTO.setCrteName(docName);
@@ -639,6 +641,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptRegisterDTO.setCrteTime(sysdate);
         outptRegisterDTO.setSourceBzCode("0");
         outptRegisterDTO.setVisitCode(outptVisitDTO.getVisitCode());
+        outptRegisterDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode()); // 病人来源途径(LYTJ)
+        outptRegisterDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark()); // 病人来源途径备注
 //        hisGh.setJhxm(hisMzbr.getXm());
 //        hisGh.setXm(hisMzbr.getXm());
 //        hisGh.setBrlx(hisMzbr.getBrlx());

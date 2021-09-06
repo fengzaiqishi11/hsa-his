@@ -1557,7 +1557,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("入院时间不能大于最小医嘱时间：" + DateUtils.format(minInptAdvice.getLongStartTime(),DateUtils.Y_M_DH_M_S));
         }
 
-
+        // add by 张国瑞； 修改之前 比对入院科室是否一致，如果当前病人 已经安床住院且前端传过来的入院科室不一致，那么抛出异常
+        String inDeptId = inptVisitDTO.getInDeptId();
+        String inDeptIdForDataBase = selectEntiey.getInDeptId();
+        if (!Constants.BRZT.DR.equals(selectEntiey.getStatusCode()) && inDeptId != null && !inDeptId.equals(inDeptIdForDataBase)){
+            throw new AppException("该病人不是待入, 不可修改入院科室");
+        }
         return Integer.toString(inptVisitDAO.updateInptVisit(inptVisitDTO));
     }
 

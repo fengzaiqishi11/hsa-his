@@ -3,14 +3,15 @@
 
 <mapper namespace="cn.hsa.module.stro.stock.dao.CheckStockDAO">
 
-    <!-- 获得库存、占存数量、单位、拆零单位 -->
+    <!-- 获得库存、占存数量、拆分比、单位、拆零单位 -->
     <select id="getStrockNumber" resultType="java.util.Map">
-        select ifnull(a.num,0) as strockNum,ifnull(a.stock_occupy,0) as stockOccupy,a.split_ratio as splitRatio,
+        select ifnull(a.num,0) as strockNum,ifnull(a.stock_occupy,0) as stockOccupy,ifnull(a.split_ratio,0) as splitRatio,
         a.unit_code as unitCode,a.split_unit_code as splitUnitCode
         from stro_stock a
-        left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
-        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
-        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
+        where a.hosp_code = #{hospCode} and a.item_id = #{itemId}
+        <if test="pharId != null and pharId != ''">
+           and a.biz_id = #{pharId}
+        </if>
     </select>
 
     <!--获得系统参数-->
@@ -54,7 +55,6 @@
         WHERE
             a.hosp_code = #{hospCode}
             AND settle_code = '0'
-            AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
             <if test="id != null and id !=''">
@@ -62,6 +62,9 @@
             </if>
             <if test="opId != null and opId !=''">
                 and a.op_id != #{opId}
+            </if>
+            <if test ="pharId != null and pharId!= ''">
+                AND a.phar_id = #{pharId}
             </if>
             ) d
 
@@ -102,9 +105,11 @@
         WHERE
            a.hosp_code = #{hospCode}
             AND settle_code = '2'
-            AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="pharId != null and pharId!= ''">
+                AND a.phar_id = #{pharId}
+            </if>
             ) d
     </select>
 
@@ -140,11 +145,13 @@
         WHERE
             a.hosp_code = #{hospCode}
             AND a.is_check = '0'
-            AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
             <if test="id != null and id != ''">
                and a.id != #{id}
+            </if>
+            <if test="pharId != null and pharId!= ''">
+                AND a.phar_id = #{pharId}
             </if>
             ) d
     </select>
@@ -184,9 +191,11 @@
         WHERE
            a.hosp_code = #{hospCode}
             AND a.is_check = '1'
-            AND a.phar_id = #{pharId}
             AND a.item_id = #{itemId}
             AND date_add( a.crte_time, INTERVAL #{wjsykc} HOUR ) > now()
+            <if test="pharId != null and pharId != ''">
+                AND a.phar_id = #{pharId}
+            </if>
             ) d
     </select>
     <!--获得执行周期（execInterval）、每日次数（dailyTimes）-->
@@ -195,6 +204,13 @@
         from base_rate
          where
         id = #{rateId} and hosp_code = #{hospCode} and is_valid = '1'
+    </select>
+
+    <!--获得科室名称-->
+    <select id="getDept" resultType="java.util.Map">
+        select name as deptName from base_dept
+        where hosp_code = #{hospCode}
+        and id = #{pharId}
     </select>
 
 

@@ -285,7 +285,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
             for (InptCostDO dto : inptCostDOList) {
                 if (dto.getIsOk().equals("0")) {
-                    throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+                    throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
                 }
             }
 
@@ -1538,7 +1538,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
             for (InptCostDO dto : inptCostDOList) {
                 if (dto.getIsOk().equals("0")) {
-                    throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+                    throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
                 }
             }
             //计算所有费用金额
@@ -1952,7 +1952,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         }
         for (InptCostDO dto : inptCostDOList) {
           if (dto.getIsOk().equals("0")) {
-            throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+            throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
           }
         }
 

@@ -28,6 +28,15 @@ public interface LisResultDAO {
      * @Date: 2021-07-09
      */
     int insertResult(@Param("list") List<Map> medicalResultDTOList);
+    
+    /** 
+    * @Description: 获取未上传的申请单的医嘱id
+    * @Param: 
+    * @return: 
+    * @Author: zhangxuan
+    * @Date: 2021-09-04
+    */ 
+    List<Map> queryNoResultLis();
 
     List<Map> queryAdvice(Map map);
 

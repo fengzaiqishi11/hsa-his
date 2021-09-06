@@ -500,9 +500,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         // 没有使用卡支付,全部其他方式支付
         if (BigDecimalUtils.isZero(settleCardPrice)) {
-            if (!BigDecimalUtils.equals(totalOldPriceAgain, moneyAgain)) {
+            /*if (!BigDecimalUtils.equals(totalOldPriceAgain, moneyAgain)) {
                 throw new AppException("退费自动重收(未使用一卡通)时，计算各支付方式支付金额出错,刷新重试");
-            }
+            }*/
             for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
                 OutptPayDO OutptPayDO = new OutptPayDTO();
                 OutptPayDO.setPrice((BigDecimal) entry.getValue());

@@ -685,7 +685,7 @@ public class OutptTmakePriceFormController extends BaseController {
      * @Date: 2021-06-29
      */
     @PostMapping("/lisData")
-    public WrapperResponse<Boolean> lisData(@RequestBody OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    public void lisData(@RequestBody OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
         outptVisitDTO.setHospCode(userDTO.getHospCode());
 
@@ -693,7 +693,7 @@ public class OutptTmakePriceFormController extends BaseController {
         map.put("outptVisitDTO",outptVisitDTO);
         map.put("hospCode",userDTO.getHospCode());
 
-        return outptTmakePriceFormService_consumer.lisData(map);
+        outptTmakePriceFormService_consumer.lisData(map);
 
     }
 }

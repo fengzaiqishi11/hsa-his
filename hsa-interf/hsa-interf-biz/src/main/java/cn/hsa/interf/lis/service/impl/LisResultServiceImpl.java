@@ -45,6 +45,18 @@ public class LisResultServiceImpl extends HsafBO implements LisResultService {
     }
 
     /**
+    * @Description: 查询没有结果的lis申请单
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-04
+    */
+    @Override
+    public Map queryNoResultLis(Map map){
+        return lisResultBO.queryNoResultLis(map);
+    }
+
+    /**
      * @Description: 医嘱目录信息
      * @Param: [map]
      * @return: java.util.Map

@@ -641,10 +641,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 	public List<Map<String, Object>> queryItemInfoByParams(OutinInvoiceDTO outinInvoiceDTO) {
 		List<Map<String, Object>> resultList = new ArrayList<>();
 
-		Map<String, Object> sysMap = new HashMap<>();
-		sysMap.put("hospCode", outinInvoiceDTO.getHospCode());
-		sysMap.put("code", "MZFP_HJSF_FDFS");
-		SysParameterDO sys = getSysParameter(outinInvoiceDTO.getHospCode(), "MZFP_HJSF_FDFS");
+		SysParameterDO sys = getSysParameter(outinInvoiceDTO.getHospCode(), "MZFP_FDFS");
 		// SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
 
 		// 挂号发票
@@ -652,11 +649,11 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			resultList = outinInvoiceDao.queryRegiestItemInfoByParams(outinInvoiceDTO);
 		} else if (Constants.PJLX.MZ.equals(outinInvoiceDTO.getInvoiceType())) { // 门诊发票
 			// 默认不分单，查询费用表
-			if (sys == null || sys.getValue() == null || "0".equals(sys.getValue())) {
+			if (sys == null || sys.getValue() == null || "1".equals(sys.getValue())) {
 				resultList = outinInvoiceDao.queryOutptItemInfoByParams(outinInvoiceDTO);
 			}
 			// 发票分单，查询发票财务分类表
-			if (sys != null && sys.getValue() != null && !"0".equals(sys.getValue())) {
+			if (sys != null && sys.getValue() != null && "2".equals(sys.getValue())) {
 				resultList = outinInvoiceDao.queryOutptsettleInvoiceConent(outinInvoiceDTO);
 			}
 			//

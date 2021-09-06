@@ -681,6 +681,15 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
 
 
     private String disposeGhjs(OutptRegisterSettleDto outptRegisterSettleDto, String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, String profileId, String cardNo, BigDecimal  price) {
+        // 获取最新发票号码
+        if (outptRegisterSettleDto.getCurrNo() != null && !"".equals(outptRegisterSettleDto.getCurrNo())) {
+            outptRegisterSettleDto.setHospCode(hospCode);
+            OutinInvoiceDTO invoiceNo = outptRegisterDAO.getMaxInvoiceNo(outptRegisterSettleDto);
+            if (invoiceNo != null && !"".equals(invoiceNo.getCurrNo())) {
+                outptRegisterSettleDto.setCurrNo(invoiceNo.getCurrNo());
+                outptRegisterSettleDto.setBillNo(invoiceNo.getCurrNo());  // 挂号结算表记录的发票号 = 发票记录表最新发票号，不再直接去页面的发票号
+            }
+        }
 
         // 处理支付方式数据
         // pos支付
@@ -1024,15 +1033,15 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
 
     private void disposeFpxx(OutptRegisterSettleDto outptRegisterSettleDto, String hospCode){
         // 取最新的发票号码
-        String invoiceNo = outptRegisterDAO.getMaxInvoiceNo(outptRegisterSettleDto);
+        OutinInvoiceDTO invoiceNo = outptRegisterDAO.getMaxInvoiceNo(outptRegisterSettleDto);
         Map queryMap = new HashMap();
         OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();
         outinInvoiceDTO.setId(outptRegisterSettleDto.getBillId());
         outinInvoiceDTO.setHospCode(hospCode);
         outinInvoiceDTO.setSettleId(outptRegisterSettleDto.getId());
         outinInvoiceDTO.setPrefix(outptRegisterSettleDto.getPrefix());
-        if (invoiceNo != null && !"".equals(invoiceNo)) {
-            outinInvoiceDTO.setCurrNo(invoiceNo);
+        if (invoiceNo != null && !"".equals(invoiceNo.getCurrNo())) {
+            outinInvoiceDTO.setCurrNo(invoiceNo.getCurrNo());
         } else {
             outinInvoiceDTO.setCurrNo(outptRegisterSettleDto.getCurrNo());
         }

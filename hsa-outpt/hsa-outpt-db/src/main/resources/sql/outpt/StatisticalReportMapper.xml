@@ -921,6 +921,7 @@
         t1.profile_id as profileId,
         t1.dept_id,
         t1.doctor_id,
+        t1.now_address as nowAddress,
         t1.diagnose_ids AS diagnoseIds,
         (SELECT bd.name FROM base_disease bd WHERE bd.id = t1.diagnose_ids and bd.hosp_code = t1.hosp_code) AS
         diagnoseName,
@@ -945,6 +946,7 @@
         a.dept_id,
         a.doctor_id,
         a.doctor_name,
+        a.now_address,
         a.dept_name AS visit_dept_name,
         ifnull(a.is_first_visit,'0') as is_first_visit,
         a.profile_id,
@@ -1000,7 +1002,7 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
+        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
         SELECT
         iv.name,
         iv.in_dept_id,
@@ -1659,7 +1661,7 @@
       and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
-    )tab where tab.num != 0 order by tab.crte_time desc
+    )tab where tab.num != 0 order by tab.code asc, tab.crte_time desc
 
   </select>
 
@@ -1722,7 +1724,7 @@
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 
-    )tab where num > 0 order by tab.crte_time desc
+    )tab where num > 0 order by tab.code asc, tab.crte_time desc
   </select>
 
 </mapper>

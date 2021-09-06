@@ -13,6 +13,7 @@ import groovy.util.logging.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,8 +50,8 @@ public class OutptOutTmakePriceFormServiceImpl extends HsafService implements Ou
         OutptSettleDTO outptSettleDTO = MapUtils.get(param,"outptSettleDTO");
 
         // 支付信息
-        OutptPayDTO outptPayDTO = MapUtils.get(param,"outptPayDTO");
-        return outptOutTmakePriceFormBO.updateOutptOutFee(outptVisitDTO,outptSettleDTO,outptPayDTO);
+        List<OutptPayDTO> outptPayDOList = MapUtils.get(param,"outptPayDOList");
+        return outptOutTmakePriceFormBO.updateOutptOutFee(outptVisitDTO,outptSettleDTO,outptPayDOList);
     }
 
     /**

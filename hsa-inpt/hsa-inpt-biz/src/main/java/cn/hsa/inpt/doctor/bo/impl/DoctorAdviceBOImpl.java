@@ -1308,7 +1308,8 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 insureParamMap.put("id", inptVisitDTO.getId());
                 insureParamMap.put("limitFlag", "1");
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
-                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+//                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                if (insureIndividualVisitById == null) return null;
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人

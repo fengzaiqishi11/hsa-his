@@ -7,10 +7,7 @@ import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugZYDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -112,5 +109,23 @@ public class NationStandardDrugZYBOImpl implements NationStandardDrugZYBO {
             throw new AppException("EXCEL数据格式错误，导入失败");
         }
         return true;
+    }
+
+    @Override
+    public Boolean saveNationStandardDrugZY(NationStandardDrugZYDO nationStandardDrugZYDO) {
+        if(null == nationStandardDrugZYDO)
+        {
+            throw new AppException("参数不能为空！");
+        }
+        nationStandardDrugZYDO.setPym(PinYinUtils.toFullPY(nationStandardDrugZYDO.getGoodName()));
+        nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugZYDO.getGoodName()));
+        if(StringUtils.isEmpty(nationStandardDrugZYDO.getId())){
+            nationStandardDrugZYDO.setId(SnowflakeUtils.getId());
+            nationStandardDrugZYDO.setCrteTime(DateUtils.format(new Date(),DateUtils.Y_M_DH_M_S));
+            nationStandardDrugZYDO.setCrteName("管理员");
+            nationStandardDrugZYDO.setCrteId("8888");
+            return nationStandardDrugZYDAO.saveNationStandardDrugZY(nationStandardDrugZYDO) > 0;
+        }
+        return nationStandardDrugZYDAO.updateNationStandardDrugZY(nationStandardDrugZYDO) > 0;
     }
 }

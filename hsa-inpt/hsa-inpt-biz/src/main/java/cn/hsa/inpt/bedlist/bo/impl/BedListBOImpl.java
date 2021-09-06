@@ -464,8 +464,11 @@ public class BedListBOImpl implements BedListBO {
         Map parameter = new HashMap();
         parameter.put("hospCode",hospCode);
         parameter.put("code","attribution_settlement");
+        String parameterValue = "0";
         WrapperResponse<SysParameterDTO> parameterByCode = sysParameterService.getParameterByCode(parameter);
-        String parameterValue = parameterByCode.getData().getValue();
+        if(parameterByCode.getData() != null) {
+           parameterValue = parameterByCode.getData().getValue();
+        }
         List<InptLongCostDTO> longCostDtoList = new ArrayList<>();
         for (BaseItemDTO dto : itemList) {
             InptLongCostDTO longCostDto = new InptLongCostDTO();
@@ -1248,6 +1251,12 @@ public class BedListBOImpl implements BedListBO {
         }
         // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
         insertDiagnose(inptVisitDTO);
+        // 20210831 计算住院天数更新到inpt_visit表
+        if (inptVisitDTO.getInTime()!=null&&inptVisitDTO.getOutTime()!=null){
+            int totalInDays = DateUtils.differentDays(inptVisitDTO.getInTime(),inptVisitDTO.getOutTime());
+            inptVisitDTO.setTotalInDays(totalInDays);
+            bedListDAO.updateInptVisitTotalDays(inptVisitDTO);
+        }
     }
     // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
     public void insertDiagnose(InptVisitDTO inptVisitDTO){

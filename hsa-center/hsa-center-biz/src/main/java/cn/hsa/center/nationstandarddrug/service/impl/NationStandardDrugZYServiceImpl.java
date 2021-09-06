@@ -8,8 +8,10 @@ import cn.hsa.module.center.nationstandarddrug.bo.NationStandardDrugBO;
 import cn.hsa.module.center.nationstandarddrug.bo.NationStandardDrugZYBO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
+import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
 import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugZYService;
+import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,24 +34,36 @@ public class NationStandardDrugZYServiceImpl extends HsafService implements Nati
 
 
   /**
-     * @Describe: 获取国家标准药品信息（中药）
-     * @Author: luonianxin
-     * @Date: 2021/4/27 17:43
-  **/
+   * @Describe: 获取国家标准药品信息（中药）
+   * @Author: luonianxin
+   * @Date: 2021/4/27 17:43
+   **/
   @Override
   public WrapperResponse<PageDTO> queryNationStandardDrugZYPage(NationStandardDrugZYDTO nationStandardDrugZYDTO) {
     return WrapperResponse.success(nationStandardDrugZYBO.queryNationStandardDrugZYPage(nationStandardDrugZYDTO));
   }
 
   /**
-     * @Describe: 分页获取国家标准药品信息（中药）
-     * @Author: luonianxin
-     * @Email: nianxin.luo@powersi.com
-     * @Date: 2021/4/27 17:44
-  **/
+   * @Describe: 分页获取国家标准药品信息（中药）
+   * @Author: luonianxin
+   * @Email: nianxin.luo@powersi.com
+   * @Date: 2021/4/27 17:44
+   **/
   @Override
   public WrapperResponse<NationStandardDrugZYDTO> getZYById(NationStandardDrugZYDTO nationStandardDrugZYDTO) {
     return WrapperResponse.success(nationStandardDrugZYBO.getZYById(nationStandardDrugZYDTO));
+  }
+
+  /**
+   * 保存国家标准中药信息
+   *
+   * @param map
+   * @return 是否成功
+   */
+  @Override
+  public WrapperResponse<Boolean> saveNationStandardDrugZY(Map map) {
+    NationStandardDrugZYDO nationStandardDrugZYDO = MapUtils.get(map,"nationStandardDrugZYDO");
+    return WrapperResponse.success(nationStandardDrugZYBO.saveNationStandardDrugZY(nationStandardDrugZYDO));
   }
 
   @Override

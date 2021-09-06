@@ -13,6 +13,7 @@ import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -92,7 +93,7 @@ public class OutptOutTmakePriceFormController extends BaseController {
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setOutptCostDTOList(outptCostDTOList);
 
-        OutptPayDTO outptPayDTO = JSON.parseObject(JSON.toJSONString(param.get("outptPayDTO")),OutptPayDTO.class);
+        List<OutptPayDTO> outptPayDOList = JSONArray.parseArray(JSON.toJSONString(param.get("outptPayDTO")),OutptPayDTO.class);
         OutptSettleDTO outptSettleDTO = JSON.parseObject(JSON.toJSONString(param.get("outptSettleDTO")),OutptSettleDTO.class);
 
         SysUserDTO userDTO = getSession(req, res) ;
@@ -106,14 +107,12 @@ public class OutptOutTmakePriceFormController extends BaseController {
                 userDTO.getLoginBaseDeptDTO().getId());//当前登录用户操作科室ID
         outptVisitDTO.setCode(userDTO.getCode());
         outptVisitDTO.setId(outptSettleDTO.getVisitId());
-        outptPayDTO.setHospCode(userDTO.getHospCode());
-
 
         Map params = new HashMap();
         params.put("hospCode",userDTO.getHospCode());
         params.put("outptSettleDTO",outptSettleDTO);
         params.put("outptVisitDTO",outptVisitDTO);
-        params.put("outptPayDTO",outptPayDTO);
+        params.put("outptPayDOList",outptPayDOList);
         return outptOutTmakePriceFormService_consumer.updateOutptOutFee(params);
     }
 

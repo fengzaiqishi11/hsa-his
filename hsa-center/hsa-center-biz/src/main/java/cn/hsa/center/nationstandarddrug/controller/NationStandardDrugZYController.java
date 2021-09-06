@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
+import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
 import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugZYService;
 import cn.hsa.util.ExcelXlsReader;
@@ -14,16 +15,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
-   * @Package_name: cn.hsa.center.nationstandarddrug.controller
-   * @Class_name: NationStandardDrugController
-   * @Describe: 国家药品标准信息控制层
-   * @Author: luonianxin
-   * @Email: nianxin.luo@powersi.com
-   * @Date: 2021/4/27 11:04
-   * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
-**/
+ * @Package_name: cn.hsa.center.nationstandarddrug.controller
+ * @Class_name: NationStandardDrugController
+ * @Describe: 国家药品标准信息控制层
+ * @Author: luonianxin
+ * @Email: nianxin.luo@powersi.com
+ * @Date: 2021/4/27 11:04
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
 @RestController
 @RequestMapping("/center/nationStandardDrugZY")
 public class NationStandardDrugZYController extends CenterBaseController {
@@ -32,28 +35,40 @@ public class NationStandardDrugZYController extends CenterBaseController {
     private NationStandardDrugZYService nationStandardDrugZYService;
 
     /**
-       * @Package_name: cn.hsa.center.nationstandarddrug.controller
-       * @Class_name: NationStandardDrugController
-       * @Describe: 分页查询国家标准药品信息（中药）
-       * @Author: luonianxin
-       * @Email: nianxin.luo@powersi.com
-       * @Date: 2021/4/27 17:51
-       * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
-    **/
+     * @Package_name: cn.hsa.center.nationstandarddrug.controller
+     * @Class_name: NationStandardDrugController
+     * @Describe: 分页查询国家标准药品信息（中药）
+     * @Author: luonianxin
+     * @Email: nianxin.luo@powersi.com
+     * @Date: 2021/4/27 17:51
+     * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+     **/
     @GetMapping("/getZYPage")
     WrapperResponse<PageDTO> queryNationStandardDrugZYPage(NationStandardDrugZYDTO nationStandardDrugZYDTO){
         return nationStandardDrugZYService.queryNationStandardDrugZYPage(nationStandardDrugZYDTO) ;
     }
 
     /**
-       * @Describe: 通过中药查询国家标准药品信息（中药s）
-       * @Author: luonianxin
-       * @Email: nianxin.luo@powersi.com
-       * @Date: 2021/4/27 17:54
-    **/
+     * @Describe: 通过中药查询国家标准药品信息（中药s）
+     * @Author: luonianxin
+     * @Email: nianxin.luo@powersi.com
+     * @Date: 2021/4/27 17:54
+     **/
     @GetMapping("/getZYById")
     WrapperResponse<NationStandardDrugZYDTO> getZYById(NationStandardDrugZYDTO nationStandardDrugZYDTO){
         return nationStandardDrugZYService.getZYById(nationStandardDrugZYDTO);
+    }
+
+    /**
+     *   保存国家标准中药品信息
+     * @param nationStandardDrugZYDO
+     * @return
+     */
+    @PostMapping("/saveNationStandardDrugZY")
+    WrapperResponse<Boolean> saveNationStandardDrugZY(@RequestBody NationStandardDrugZYDO nationStandardDrugZYDO){
+        Map map = new HashMap<>(4);
+        map.put("nationStandardDrugZYDO",nationStandardDrugZYDO);
+        return nationStandardDrugZYService.saveNationStandardDrugZY(map);
     }
 
     /**

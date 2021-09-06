@@ -9,10 +9,7 @@ import cn.hsa.module.center.nationstandarddrug.bo.NationStandardDrugBO;
 import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -40,16 +37,16 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
   private NationStandardDrugDAO nationStandardDrugDAO;
 
   /**
-  * @Menthod queryNationStandardDrugPage
-  * @Desrciption 分页查询所有国家标准药品
-  *
-  * @Param
-  * [nationStandardDrugDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/1/26 9:47
-  * @Return java.util.List<cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO>
-  **/
+   * @Menthod queryNationStandardDrugPage
+   * @Desrciption 分页查询所有国家标准药品
+   *
+   * @Param
+   * [nationStandardDrugDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/1/26 9:47
+   * @Return java.util.List<cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO>
+   **/
   @Override
   public PageDTO queryNationStandardDrugPage(NationStandardDrugDTO nationStandardDrugDTO) {
     List<NationStandardDrugDTO> nationStandardDrugDTOS = new ArrayList<>();
@@ -57,18 +54,18 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
     if(StringUtils.isEmpty(nationStandardDrugDTO.getFlag())){
       return null;
     } else if("1".equals(nationStandardDrugDTO.getFlag()) || "0".equals(nationStandardDrugDTO.getFlag())) {
-       nationStandardDrugDTOS = nationStandardDrugDAO.queryNationStandardDrugPage(nationStandardDrugDTO);
+      nationStandardDrugDTOS = nationStandardDrugDAO.queryNationStandardDrugPage(nationStandardDrugDTO);
     } else {
-       nationStandardDrugDTOS = nationStandardDrugDAO.queryNationStandardZYPage(nationStandardDrugDTO);
+      nationStandardDrugDTOS = nationStandardDrugDAO.queryNationStandardZYPage(nationStandardDrugDTO);
     }
     return PageDTO.of(nationStandardDrugDTOS);
   }
 
   /**
 
-     * @Describe: 根据id查询国家标准药品信息
-     * @Author: luonianxin
-  **/
+   * @Describe: 根据id查询国家标准药品信息
+   * @Author: luonianxin
+   **/
   @Override
   public NationStandardDrugDTO getById(NationStandardDrugDTO nationStandardDrugDTO) {
     return nationStandardDrugDAO.getById(nationStandardDrugDTO);
@@ -160,5 +157,32 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
       throw new AppException("EXCEL数据格式错误，导入失败");
     }
     return true;
+  }
+
+  /**
+   * 新增国家标准药品信息
+   *
+   * @param nationStandardDrugDO
+   * @return 受影响的行数
+   */
+  @Override
+  public Boolean saveNationStandardDrug(NationStandardDrugDO nationStandardDrugDO) {
+    nationStandardDrugDO.setPym(PinYinUtils.toFullPY(nationStandardDrugDO.getGoodName()));
+    nationStandardDrugDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugDO.getGoodName()));
+
+    return nationStandardDrugDAO.saveNationStandardDrug(nationStandardDrugDO) > 0;
+  }
+
+  /**
+   * 更新国家标准药品信息
+   *
+   * @param nationStandardDrugDO
+   * @return 受影响的行数
+   */
+  @Override
+  public Boolean updateNationStandardDrug(NationStandardDrugDO nationStandardDrugDO) {
+    nationStandardDrugDO.setPym(PinYinUtils.toFullPY(nationStandardDrugDO.getGoodName()));
+    nationStandardDrugDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugDO.getGoodName()));
+    return nationStandardDrugDAO.updateNationStandardDrug(nationStandardDrugDO) > 0;
   }
 }

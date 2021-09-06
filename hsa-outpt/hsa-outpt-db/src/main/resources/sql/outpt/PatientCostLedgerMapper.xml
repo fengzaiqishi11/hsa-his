@@ -468,16 +468,16 @@
     </select>
     <!--按科室病人费用查询报表统计-->
     <select id="queryCostByDept" resultType="java.util.Map">
-      select
-         a.out_dept_id as outDeptId,
-         max(a.out_dept_name) as outDeptName,
-         count(0) as peopleNum,
-         sum(a.total_cost) as totalCost,
-         sum(b.settle_take_price) as settleTakePriceAll,
-         sum(b.settle_back_price) as settleBackPriceAll
-         from inpt_visit a left join inpt_settle b on a.id = b.visit_id and a.hosp_code = b.hosp_code
-         where a.hosp_code = #{hospCode} and a.status_code = #{statusCode}
-         group by a.out_dept_id
+        select
+            a.out_dept_id as outDeptId,
+            max(a.out_dept_name) as outDeptName,
+            count(0) as peopleNum,
+            sum(a.total_cost) as totalCost,
+            sum(b.settle_take_price) as settleTakePriceAll,
+            sum(b.settle_back_price) as settleBackPriceAll
+        from inpt_visit a left join inpt_settle b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode} and a.status_code = #{statusCode}
+        group by a.out_dept_id
     </select>
     <!--药库实时进销存报表/按零售价-->
     <select id="queryStroInvoicingLedger" resultType="java.util.Map" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO">
@@ -907,7 +907,7 @@
         <if test="endDate != null">
             and DATE_FORMAT(c.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
-         group by c.crte_id
+        group by c.crte_id
         ) settledAdvancePay,
         sum(a.ap_total_price) as unSettledAdvancePay
 
@@ -1340,7 +1340,9 @@
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
-        </if> GROUP BY  t.bizCode,
+        </if>
+
+        GROUP BY  t.bizCode,
         t.item_type,
         t.item_id,
         t.bfc_id ,
@@ -1381,6 +1383,22 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
+        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
+            and t.bizCode IN
+            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bfcId != null and bfcId != ''">
+            and t.bfc_id = #{bfcId}
+        </if>
+        <if test="userId != null and userId != ''">
+            and t.doctor_id = #{userId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and t.item_name  like '%${keyword}%'
+        </if>
+
         ORDER BY t.bizCode ,t.visit_id
     </select>
 
@@ -1390,8 +1408,17 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
+        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
+            and t.bizCode IN
+            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
         <if test="userId != null and userId != ''">
             and t.doctor_id = #{userId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and t.item_name  like '%${keyword}%'
         </if>
     </select>
 
@@ -1439,182 +1466,191 @@
     <select id="queryHospitalItemReportInfoGroupTwoSum" resultType="java.util.LinkedHashMap">
         select sum(reality_price) as 'reality_priceSum',sum(num) as 'numSum' from (
         <include refid="MzZyItemPatientSql"></include>
-        ) e
+        ) t
         where 1=1
+        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
+            and t.bizCode IN
+            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and t.item_name  like '%${keyword}%'
+        </if>
     </select>
 
     <sql id="MzZyItemPatientSql">
-    <if test="queryType == 'all'.toString() or queryType == 'ZY'.toString()">
-        SELECT
-        'ZY' bizCode,
-        '住院' item_type,
-        a.in_no,
-        a.name,
-        a.gender_code,
-        a.age,
-        a.patient_code,
-        a.in_time as visit_time,
-        a.in_time as in_time,
-        a.out_time as out_time,
-        b.cost_time as settle_time,
-        b.item_id,
-        b.bfc_id ,
-        e.name as bfc_name,
-        b.item_code ,
-        b.item_name,
-        b.spec,
-        b.total_num_unit_code AS num_unit_code,
-        b.price,
-        b.doctor_id,
-        b.doctor_name,
-        b.visit_id,
-        b.dept_id,
-        d.name as dept_name,
-        b.reality_price,
-        b.total_num AS num
-        FROM
-        inpt_cost b join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
-        left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
-        join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
-        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
-        WHERE 1=1
-        /*开始日期*/
-        <if test="startDate != null and startDate != ''">
-            and b.cost_time &gt;= #{startDate}
-        </if>
-        /*结束日期*/
-        <if test="endDate != null and endDate != ''">
-            and b.cost_time &lt;= #{endDate}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and b.item_name  like concat( #{keyword },'%')
-        </if>
-        <if test="sumCode != null and sumCode == '3'.toString()">
-            and b.doctor_id = #{userId}
-        </if>
-        <if test="sumCode != null and sumCode == '1'.toString()">
-            <if test="deptId != null and deptId != ''">
-                and b.dept_id = #{deptId}
+        <if test="queryType == 'all'.toString() or queryType == 'ZY'.toString()">
+            SELECT
+            'ZY' bizCode,
+            '住院' item_type,
+            a.in_no,
+            a.name,
+            a.gender_code,
+            a.age,
+            a.patient_code,
+            a.in_time as visit_time,
+            a.in_time as in_time,
+            a.out_time as out_time,
+            b.cost_time as settle_time,
+            b.item_id,
+            b.bfc_id ,
+            e.name as bfc_name,
+            b.item_code ,
+            b.item_name,
+            b.spec,
+            b.total_num_unit_code AS num_unit_code,
+            b.price,
+            b.doctor_id,
+            b.doctor_name,
+            b.visit_id,
+            b.dept_id,
+            d.name as dept_name,
+            b.reality_price,
+            b.total_num AS num
+            FROM
+            inpt_cost b join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+            left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
+            join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
+            join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            WHERE 1=1
+            /*开始日期*/
+            <if test="startDate != null and startDate != ''">
+                and b.cost_time &gt;= #{startDate}
             </if>
-            <if test="userId != null and userId != ''">
+            /*结束日期*/
+            <if test="endDate != null and endDate != ''">
+                and b.cost_time &lt;= #{endDate}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="sumCode != null and sumCode == '3'.toString()">
                 and b.doctor_id = #{userId}
             </if>
-            <if test="insureCode != null and insureCode != ''">
-                and a.patient_code = #{insureCode}
+            <if test="sumCode != null and sumCode == '1'.toString()">
+                <if test="deptId != null and deptId != ''">
+                    and b.dept_id = #{deptId}
+                </if>
+                <if test="userId != null and userId != ''">
+                    and b.doctor_id = #{userId}
+                </if>
+                <if test="insureCode != null and insureCode != ''">
+                    and a.patient_code = #{insureCode}
+                </if>
+                <if test="name != null and name != ''">
+                    and a.name  like  concat('%',#{ name },'%')
+                </if>
             </if>
-            <if test="name != null and name != ''">
-                and a.name  like  concat('%',#{ name },'%')
-            </if>
-        </if>
-        <if test="sumCode != null and sumCode = '4'.toString()">
-            <if test="bfcId != null and bfcId != ''">
-                and b.bfc_id = #{bfcId}
-            </if>
-        </if>
-    </if>
-    <if test="queryType == 'all'.toString()">
-        UNION ALL
-    </if>
-    <if test="queryType == 'all'.toString() or queryType == 'MZ'.toString()">
-        SELECT
-        'MZ' as bizCode,
-        '门诊' as  item_type,
-        a.visit_no as in_no,
-        a.name,
-        a.gender_code,
-        a.age,
-        a.patient_code,
-        a.visit_time as visit_time,
-        null as in_time,
-        null as out_time,
-        b.crte_time as settle_time,
-        b.item_id,
-        b.bfc_id ,
-        e.name as bfc_name,
-        b.item_code ,
-        b.item_name,
-        b.spec,
-        b.num_unit_code,
-        b.price,
-        b.doctor_id,
-        b.doctor_name,
-        b.visit_id,
-        b.dept_id,
-        d.name as dept_name,
-        b.reality_price ,
-        if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
-        FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
-        left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
-        join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
-        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
-        WHERE 1=1
-        /*开始日期*/
-        <if test="startDate != null and startDate != ''">
-            and b.crte_time &gt;= #{startDate}
-        </if>
-        /*结束日期*/
-        <if test="endDate != null and endDate != ''">
-            and b.crte_time  &lt;= #{endDate}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and b.item_name  like concat( #{keyword },'%')
-        </if>
-        <if test="sumCode != null and sumCode == '3'.toString()">
-          <if test="userId != null and userId != ''">
-            and b.doctor_id = #{userId}
-          </if>
-        </if>
-        UNION ALL
-        SELECT
-        'MZ' as bizCode,
-        '挂号' as  item_type,
-        a.visit_no as in_no,
-        a.name,
-        a.gender_code,
-        a.age,
-        a.patient_code,
-        a.visit_time as visit_time,
-        null as in_time,
-        null as out_time,
-        c.crte_time as settle_time,
-        b.item_id,
-        b.bfc_id ,
-        e.name as bfc_name,
-        b.item_code ,
-        b.item_name,
-        b.spec,
-        b.unit_code,
-        b.price,
-        b.crte_id as doctor_id,
-        b.crte_name as doctor_name,
-        b.visit_id,
-        a.dept_id,
-        d.name as dept_name,
-        b.reality_price,
-        if (b.reality_price &lt; 0,-b.num,b.num) AS num
-        FROM
-        outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
-        left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
-        join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
-        join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
-        where 1=1
-        /*开始日期*/
-        <if test="startDate != null and startDate != ''">
-            and b.crte_time  &gt;= #{startDate}
-        </if>
-        /*结束日期*/
-        <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= #{endDate}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and b.item_name  like concat( #{keyword },'%')
-        </if>
-        <if test="sumCode != null and sumCode == '3'.toString()">
-            <if test="userId != null and userId != ''">
-                and b.crte_id = #{userId}
+            <if test="sumCode != null and sumCode = '4'.toString()">
+                <if test="bfcId != null and bfcId != ''">
+                    and b.bfc_id = #{bfcId}
+                </if>
             </if>
         </if>
-    </if>
+        <if test="queryType == 'all'.toString()">
+            UNION ALL
+        </if>
+        <if test="queryType == 'all'.toString() or queryType == 'MZ'.toString()">
+            SELECT
+            'MZ' as bizCode,
+            '门诊' as  item_type,
+            a.visit_no as in_no,
+            a.name,
+            a.gender_code,
+            a.age,
+            a.patient_code,
+            a.visit_time as visit_time,
+            null as in_time,
+            null as out_time,
+            b.crte_time as settle_time,
+            b.item_id,
+            b.bfc_id ,
+            e.name as bfc_name,
+            b.item_code ,
+            b.item_name,
+            b.spec,
+            b.num_unit_code,
+            b.price,
+            b.doctor_id,
+            b.doctor_name,
+            b.visit_id,
+            b.dept_id,
+            d.name as dept_name,
+            b.reality_price ,
+            if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
+            FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+            left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
+            join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
+            join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            WHERE 1=1
+            /*开始日期*/
+            <if test="startDate != null and startDate != ''">
+                and b.crte_time &gt;= #{startDate}
+            </if>
+            /*结束日期*/
+            <if test="endDate != null and endDate != ''">
+                and b.crte_time  &lt;= #{endDate}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="sumCode != null and sumCode == '3'.toString()">
+                <if test="userId != null and userId != ''">
+                    and b.doctor_id = #{userId}
+                </if>
+            </if>
+            UNION ALL
+            SELECT
+            'MZ' as bizCode,
+            '挂号' as  item_type,
+            a.visit_no as in_no,
+            a.name,
+            a.gender_code,
+            a.age,
+            a.patient_code,
+            a.visit_time as visit_time,
+            null as in_time,
+            null as out_time,
+            c.crte_time as settle_time,
+            b.item_id,
+            b.bfc_id ,
+            e.name as bfc_name,
+            b.item_code ,
+            b.item_name,
+            b.spec,
+            b.unit_code,
+            b.price,
+            b.crte_id as doctor_id,
+            b.crte_name as doctor_name,
+            b.visit_id,
+            a.dept_id,
+            d.name as dept_name,
+            b.reality_price,
+            if (b.reality_price &lt; 0,-b.num,b.num) AS num
+            FROM
+            outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
+            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+            join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
+            join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            where 1=1
+            /*开始日期*/
+            <if test="startDate != null and startDate != ''">
+                and b.crte_time  &gt;= #{startDate}
+            </if>
+            /*结束日期*/
+            <if test="endDate != null and endDate != ''">
+                and b.crte_time &lt;= #{endDate}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="sumCode != null and sumCode == '3'.toString()">
+                <if test="userId != null and userId != ''">
+                    and b.crte_id = #{userId}
+                </if>
+            </if>
+        </if>
     </sql>
     <!--门诊住院项目使用量统计查询,按业务类型、开方医生、项目、就诊病人分组-->
     <select id="queryHospitalItemReportInfoGroupOne" resultType="java.util.LinkedHashMap">
@@ -1645,7 +1681,7 @@
         sum( t.reality_price ) AS reality_price,
         sum( t.num ) AS num
         from (
-            <include refid="MzZyItemPatientSql"/>
+        <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
         <if test="tyepCodeList != null and tyepCodeList.size() > 0">
@@ -1696,6 +1732,28 @@
         <include refid="MzZyItemPatientSql"/>
         ) t
         where 1=1
+
+        <if test="tyepCodeList != null and tyepCodeList.size() > 0">
+            and t.bizCode IN
+            <foreach collection="tyepCodeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and t.dept_id = #{deptId}
+        </if>
+        <if test="userId != null and userId != ''">
+            and t.doctor_id = #{userId}
+        </if>
+        <if test="insureCode != null and insureCode != ''">
+            and t.patient_code = #{insureCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and t.item_name  like '%${keyword}%'
+        </if>
+        <if test="name != null and name != ''">
+            and t.name  like '%${name}%'
+        </if>
     </select>
 
     <!--门诊科室/医生收入统计-->
@@ -2967,15 +3025,15 @@
     <!--当前时间段住院收入分类统计查询-->
     <select id="queryCurrentInptIncomeClassify" resultType="java.util.Map">
         SELECT
-        t.bfc_id,
-        (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
-        sum(reality_price) reality_price
+            t.bfc_id,
+            (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
+            sum(reality_price) reality_price
         FROM
-        inpt_cost t
+            inpt_cost t
         WHERE
-        date(t.cost_time) &gt;= date(#{startDate})
-        and date(t.cost_time) &lt;= date(#{endDate})
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= date(#{startDate})
+          and date(t.cost_time) &lt;= date(#{endDate})
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -2986,11 +3044,11 @@
             (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
             sum(reality_price) reality_price
         FROM
-        inpt_cost t
+            inpt_cost t
         WHERE
-        date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 year), '%Y-%m-%d')
-        and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 year),INTERVAL 1 DAY),'%Y-%m-%d')
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 year), '%Y-%m-%d')
+          and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 year),INTERVAL 1 DAY),'%Y-%m-%d')
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -3001,11 +3059,11 @@
             (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
             sum(reality_price) reality_price
         FROM
-        inpt_cost t
+            inpt_cost t
         WHERE
-        date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 month), '%Y-%m-%d')
-        and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 month),INTERVAL 1 DAY),'%Y-%m-%d')
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 month), '%Y-%m-%d')
+          and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 month),INTERVAL 1 DAY),'%Y-%m-%d')
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -3016,11 +3074,11 @@
             (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
             sum(reality_price) reality_price
         FROM
-        outpt_cost t
+            outpt_cost t
         WHERE
-       date(t.cost_time) &gt;= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
-        and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= DATE_FORMAT( #{startDate}, '%Y-%m-%d' )
+          and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -3031,11 +3089,11 @@
             (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
             sum(reality_price) reality_price
         FROM
-        outpt_cost t
+            outpt_cost t
         WHERE
-        date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 year), '%Y-%m-%d')
-        and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 year),INTERVAL 1 DAY),'%Y-%m-%d')
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 year), '%Y-%m-%d')
+          and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 year),INTERVAL 1 DAY),'%Y-%m-%d')
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -3046,11 +3104,11 @@
             (select y.`name` from base_finance_classify y where y.hosp_code = t.hosp_code and y.id = t.bfc_id) bfc_name,
             sum(reality_price) reality_price
         FROM
-        outpt_cost t
+            outpt_cost t
         WHERE
-        date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 month), '%Y-%m-%d')
-        and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 month),INTERVAL 1 DAY),'%Y-%m-%d')
-        and t.hosp_code = #{hospCode}
+            date(t.cost_time) &gt;= DATE_FORMAT(DATE_SUB(#{startDate},INTERVAL 1 month), '%Y-%m-%d')
+          and date(t.cost_time) &lt;= DATE_FORMAT(DATE_ADD(DATE_SUB(#{endDate},INTERVAL 1 month),INTERVAL 1 DAY),'%Y-%m-%d')
+          and t.hosp_code = #{hospCode}
         group by t.hosp_code,t.bfc_id
     </select>
 
@@ -5006,23 +5064,23 @@
     <sql id="getOutRegisterCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from outpt_register_settle settle
-        join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <!-- 门诊计算表-->
     <sql id="getOutPtCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from outpt_settle settle
-        join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <sql id="getInptCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from inpt_settle settle
-        join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <select id="queryIncomeClassifyInfo" resultType="java.util.Map">
@@ -5175,24 +5233,24 @@
     <sql id="getOutRegisterCostBig">
         select b.up_code,sum(a.reality_price) reality_price
         from outpt_register_settle settle
-        join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <!-- 按计费大类类别统计 门诊计算表-->
     <sql id="getOutPtCostBig">
         select b.up_code, sum(a.reality_price) reality_price
         from outpt_settle settle
-        join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <!-- 按计费大类类别统计 住院计算表-->
     <sql id="getInptCostBig">
         select b.up_code, sum(a.reality_price) reality_price
         from inpt_settle settle
-        join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
-        join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                 join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <!-- //按计费类别大类统计 -->
@@ -5346,15 +5404,15 @@
 
     <select id="queryChargPatirntCostLedgerHeader" resultType="map">
         select * from (
-            select a.bfc_id,a.hosp_code from outpt_cost a
-            where a.status_code = '2'
-            union
-            select b.bfc_id,a.hosp_code from outpt_register_settle a
-            join outpt_register_detail b on a.register_id = b.register_id and a.status_code = b.status_code
-            union
-            select a.bfc_id,a.hosp_code from inpt_cost a
-            where a.status_code = '2'
-        )a join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
+                          select a.bfc_id,a.hosp_code from outpt_cost a
+                          where a.status_code = '2'
+                          union
+                          select b.bfc_id,a.hosp_code from outpt_register_settle a
+                                                               join outpt_register_detail b on a.register_id = b.register_id and a.status_code = b.status_code
+                          union
+                          select a.bfc_id,a.hosp_code from inpt_cost a
+                          where a.status_code = '2'
+                      )a join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </select>
 
     <select id="queryChargPatirntCostLedger" resultType="map">
@@ -5696,47 +5754,47 @@
     <!--门诊领药统计查询-->
     <select id="queryOutMedicationGet" resultType="java.util.LinkedHashMap">
         select A.* from (
-            select
-            max(a.item_name) as itemName,
-            sum(a.num) as num,
-            sum(a.split_num) as splitNum,
-            sum(a.total_price) as totalPrice,
-            max(a.price) as price,
-            max(a.split_price) as splitPrice,
-            case max(a.item_code) when '1' then max(bd.spec) when '2' then max(bm.spec) end spec,
-            case max(a.item_code) when '1' then max(bd.code) when '2' then max(bm.code) end code,
-            max(a.unit_code) as unitCode,
-            max(a.split_unit_code) as splitUnitCode,
-            max(date(b.crte_time)) as creTime,
-            (select name from base_dept where id = b.dept_id) as deptName
-            from phar_out_distribute_all_detail a
-            left join phar_out_distribute b on a.distribute_id = b.id
-            left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
-            left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = '2'
-            where a.hosp_code = #{hospCode}
-            <if test="deptId != null and deptId != ''">
-                and b.dept_id = #{deptId}
-            </if>
-            /*开始日期*/
-            <if test="startTime != null">
-                and a.crte_time &gt;= #{startTime}
-            </if>
-            /*结束日期*/
-            <if test="endTime != null">
-                and a.crte_time &lt;= #{endTime}
-            </if>
-            <if test="keyword != null and keyword != ''">
-                and (
-                a.item_name like concat('%',#{keyword},'%')
-                or bd.usual_name like concat('%',#{keyword},'%')
-                or bd.good_pym like concat('%',#{keyword},'%')
-                or bd.good_wbm like concat('%',#{keyword},'%')
-                or bd.usual_pym like concat('%',#{keyword},'%')
-                or bd.usual_wbm like concat('%',#{keyword},'%')
-                )
-            </if>
-            group by b.dept_id, a.item_id
-            ) A where A.splitNum != 0
+        select
+        max(a.item_name) as itemName,
+        sum(a.num) as num,
+        sum(a.split_num) as splitNum,
+        sum(a.total_price) as totalPrice,
+        max(a.price) as price,
+        max(a.split_price) as splitPrice,
+        case max(a.item_code) when '1' then max(bd.spec) when '2' then max(bm.spec) end spec,
+        case max(a.item_code) when '1' then max(bd.code) when '2' then max(bm.code) end code,
+        max(a.unit_code) as unitCode,
+        max(a.split_unit_code) as splitUnitCode,
+        max(date(b.crte_time)) as creTime,
+        (select name from base_dept where id = b.dept_id) as deptName
+        from phar_out_distribute_all_detail a
+        left join phar_out_distribute b on a.distribute_id = b.id
+        left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
+        left join base_material bm on a.item_id = bm.id and a.hosp_code = bm.hosp_code and a.item_code = '2'
+        where a.hosp_code = #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and b.dept_id = #{deptId}
+        </if>
+        /*开始日期*/
+        <if test="startTime != null">
+            and a.crte_time &gt;= #{startTime}
+        </if>
+        /*结束日期*/
+        <if test="endTime != null">
+            and a.crte_time &lt;= #{endTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+            a.item_name like concat('%',#{keyword},'%')
+            or bd.usual_name like concat('%',#{keyword},'%')
+            or bd.good_pym like concat('%',#{keyword},'%')
+            or bd.good_wbm like concat('%',#{keyword},'%')
+            or bd.usual_pym like concat('%',#{keyword},'%')
+            or bd.usual_wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        group by b.dept_id, a.item_id
+        ) A where A.splitNum != 0
     </select>
 
     <!--在院病人实况查询（在院/出院） 20210805 liuliyun-->
@@ -5864,11 +5922,11 @@
     <!--门诊医疗标题-->
     <select id="getMedicalCostMzTitle" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select
-        a.bfc_id,c.name as bfcName
+            a.bfc_id,c.name as bfcName
         from outpt_cost a
-        left join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code and b.status_code = '0'
-        join base_finance_classify c on a.bfc_id = c.id and a.hosp_code = c.hosp_code
-        join outpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
+                 left join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code and b.status_code = '0'
+                 join base_finance_classify c on a.bfc_id = c.id and a.hosp_code = c.hosp_code
+                 join outpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
         where a.hosp_code = #{hospCode}
         group by a.bfc_id,c.name
     </select>

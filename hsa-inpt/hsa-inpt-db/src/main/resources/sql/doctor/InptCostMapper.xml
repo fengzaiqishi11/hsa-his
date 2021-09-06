@@ -1336,6 +1336,54 @@
           GROUP BY bfc.id
     </select>
 
+    <!-- 根据财务分类统计住院费用金额 -->
+    <select id="queryNewInptCostByBfc" parameterType="java.util.Map" resultType="java.util.Map">
+    SELECT
+    bfc.name bfc,
+    SUM(ic.total_price) totalPrice,
+    SUM(ic.preferential_price) preferentialPrice,
+    SUM(ic.reality_price) realityPrice
+    FROM
+    inpt_cost ic
+    LEFT JOIN base_finance_classify bfc
+    ON ic.`bfc_id` = bfc.`id` AND ic.`hosp_code` = #{hospCode} AND bfc.`hosp_code` = #{hospCode}
+    <if test="patientCode != null and patientCode gt 0">
+      left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id and ic.visit_id = iic.visit_id
+      and iic.insure_is_transmit = '1' and iic.insure_settle_id is null and iic.is_half_settle = '1'
+    </if>
+    WHERE ic.visit_id = #{id}
+    <if test="settleId != null and settleId != ''">
+      AND ic.settle_id = #{settleId}
+    </if>
+    <if test="settleCodes != null">
+      AND ic.settle_code in(
+      <foreach collection="settleCodes" item="settleCode" separator=",">
+        #{settleCode}
+      </foreach>
+      )
+    </if>
+    <if test="settleCode != null and settleCode != ''">
+      AND ic.settle_code = #{settleCode}
+    </if>
+    <if test="statusCode != null and statusCode != ''">
+      AND ic.status_code = #{statusCode}
+    </if>
+    <if test="backCode != null and backCode != ''">
+      AND back_code = #{backCode}
+    </if>
+    <if test="babyId != null and babyId != ''">
+      AND baby_id = #{babyId}
+    </if>
+    <if test="patientCode != null and patientCode gt 0">
+      AND DATE_FORMAT(ic.cost_time, '%Y-%m-%d') BETWEEN DATE_FORMAT(iic.fee_start_time , '%Y-%m-%d')AND DATE_FORMAT(iic.fee_end_time, '%Y-%m-%d' )
+
+    </if>
+    <if test='queryBaby =="N"'>
+      and (baby_id is null or baby_id = '')
+    </if>
+    GROUP BY bfc.id
+  </select>
+
     <!-- 查询费用信息 -->
     <select id="queryInptCostList" parameterType="java.util.Map" resultMap="inptCostDOMap">
         select
@@ -1380,6 +1428,46 @@
             AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
         </if>
         order by cost_time ASC
+    </select>
+
+    <!-- 查询费用信息 -->
+    <select id="queryNewInptCostList" parameterType="java.util.Map" resultMap="inptCostDOMap">
+      select
+      <include refid="Base_Column_List"/>
+      from
+      inpt_cost
+      where
+      hosp_code = #{hospCode}
+      <if test="visitId != null and visitId != ''">
+        AND visit_id = #{visitId}
+      </if>
+      <if test="babyIds != null and babyIds != ''">
+        AND baby_id IN (
+        <foreach collection="babyIds" item="babyId" separator=",">
+          #{babyId}
+        </foreach>
+        )
+      </if>
+      <if test="statusCode != null and statusCode != ''">
+        AND status_code = #{statusCode}
+      </if>
+      <if test="settleCode != null and settleCode != ''">
+        AND settle_code = #{settleCode}
+      </if>
+      <if test="settleId != null and settleId != ''">
+        AND settle_id = #{settleId}
+      </if>
+      <if test="settleCodes != null">
+        AND settle_code IN (
+        <foreach collection="settleCodes" item="settleCode" separator=",">
+          #{settleCode}
+        </foreach>
+        )
+      </if>
+      <if test="backCode != null and backCode != ''">
+        AND back_code = #{backCode}
+      </if>
+      order by cost_time ASC
     </select>
 
     <!-- 查询是否存在归属费用信息 -->

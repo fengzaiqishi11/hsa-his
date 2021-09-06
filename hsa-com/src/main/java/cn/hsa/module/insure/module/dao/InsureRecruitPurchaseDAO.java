@@ -1,6 +1,9 @@
 package cn.hsa.module.insure.module.dao;
 
 
+import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,4 +77,12 @@ public interface InsureRecruitPurchaseDAO {
      */
     Map<String,Object> insertCommoditySalesReturnRecord(Map<String,Object> map);
 
+    // 查询存在【药品/材料】销售/退货记录的人员列表
+    List<Map<String, Object>> queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+
+    // 根据就诊id查询【门诊药品】销售列表
+    List<Map<String, Object>> queryDrugList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+
+    // 更新费用表中上传状态
+    int updateCostIsUpload(Map<String, Object> map);
 }

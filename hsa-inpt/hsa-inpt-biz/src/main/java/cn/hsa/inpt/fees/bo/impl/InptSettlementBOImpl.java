@@ -564,6 +564,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptSettleDO.setBabyId(null);//婴儿id
             inptSettleDO.setSettleNo(settleNo);//结算单号
             inptSettleDO.setTypeCode(Constants.JSLX.CYJS);//结算类型 = 出院结算
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+              inptSettleDO.setTypeCode(Constants.JSLX.ZTJS);//结算类型 = 出院结算
+            }
             inptSettleDO.setPatientCode(inptVisitDTO1.getPatientCode());//病人类型
             inptSettleDO.setStartTime(minDate);//开始时间
             inptSettleDO.setEndTime(maxDate);//结束时间
@@ -1868,5 +1871,425 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         } finally {
             redisUtils.del(key);
         }
+    }
+
+
+    /**
+    * @Menthod saveAttributionCostTrial
+    * @Desrciption 归属结算试算
+    *
+    * @Param
+    * [inptVisitDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:32
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @Override
+    @Async
+    public synchronized WrapperResponse saveAttributionCostTrial(InptVisitDTO inptVisitDTO) {
+      String id = inptVisitDTO.getId();//就诊id
+      String code = inptVisitDTO.getCode();
+      String hospCode = inptVisitDTO.getHospCode();//医院编码
+      String treatmentCode = inptVisitDTO.getTreatmentCode();
+      String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
+      String medicalRegNo = inptVisitDTO.getMedicalRegNo();
+      String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
+      redisUtils.del(key);
+      if (StringUtils.isNotEmpty(redisUtils.get(key))) {
+        return WrapperResponse.fail("当前患者正在试算，请稍后再试。", null);
+      }
+      try {
+        redisUtils.set(key, id);//保存值
+        //删除试算脏数据（inpt_settle、insure_individual_settle）
+        Map<String, String> delParam = new HashMap<String, String>();
+        delParam.put("hospCode", hospCode);//医院编码
+        delParam.put("visitId", id);//就诊id
+        delParam.put("isSettle", Constants.SF.F);//是否结算 = 否
+        delParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+        inptSettleDAO.deleteByVisitId(delParam);
+        String settleId = SnowflakeUtils.getId();//结算id
+        //获取个人信息
+        InptVisitDTO inptVisitDTO1 = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        inptVisitDTO1.setUserCode(inptVisitDTO.getUserCode());
+        if (inptVisitDTO1 == null) {
+          throw new AppException("未找到该患者。");
+        }
+        //获取患者所有费用信息
+        Map<String, Object> costParam = new HashMap<String, Object>();
+        costParam.put("hospCode", hospCode);//医院编码
+        costParam.put("visitId", id);//就诊id
+        //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+        String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
+        costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+        if(!StringUtils.isEmpty(inptVisitDTO.getAttributionCode())) {
+          costParam.put("attributionCode", inptVisitDTO.getAttributionCode());// 结算类型
+        }
+        //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+        List<InptCostDO> inptCostDOList = new ArrayList<>();
+        // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+          costParam.put("isMidWaySettle", isMidWaySettle);
+          inptCostDOList = inptCostDAO.queryMidWaySettleInptCostList(costParam);
+        } else {
+          inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+        }
+        // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
+        //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
+        if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
+          throw new AppException("该医保病人费用已经正常结算");
+        }
+        for (InptCostDO dto : inptCostDOList) {
+          if (dto.getIsOk().equals("0")) {
+            throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+          }
+        }
+
+        //计算所有费用金额
+        BigDecimal totalPrice = new BigDecimal(0);//总费用
+        BigDecimal preferentialPrice = new BigDecimal(0);//单据优惠
+        BigDecimal miPrice = new BigDecimal(0);//合同单位金额
+        BigDecimal realityPrice = new BigDecimal(0);//单据应缴
+        BigDecimal payPrice = new BigDecimal(0);//预交款
+        BigDecimal subsequentPrice = new BigDecimal(0);//补收
+        BigDecimal refundPrice = new BigDecimal(0);//退款
+        for (InptCostDO inptCostDO : inptCostDOList) {
+          if (inptCostDO.getTotalPrice() != null) {
+            totalPrice = BigDecimalUtils.add(totalPrice, inptCostDO.getTotalPrice());//总费用
+          }
+          if (inptCostDO.getPreferentialPrice() != null) {
+            preferentialPrice = BigDecimalUtils.add(preferentialPrice, inptCostDO.getPreferentialPrice());//单据优惠
+          }
+          if (inptCostDO.getRealityPrice() != null) {
+            realityPrice = BigDecimalUtils.add(realityPrice, inptCostDO.getRealityPrice());//单据应缴
+          }
+        }
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", hospCode);
+        isInsureUnifiedMap.put("code", "UNIFIED_PAY");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        String settleNo = getOrderNo(hospCode, Constants.ORDERRULE.ZY); // 获取结算单号
+        //医保病人
+        Map<String, String> inptInsureResult = new HashMap<String, String>();
+        String patientCode = inptVisitDTO1.getPatientCode();
+        Integer intPatientCode = Integer.valueOf(patientCode);
+        //计算补收金额、退款金额
+        //归属结算补收金额（不用预交金）: 优惠总金额  = 还需补收的金额
+        subsequentPrice =  realityPrice;
+        //舍入金额
+        BigDecimal truncPrice = new BigDecimal(0);
+        //退款
+        if (BigDecimalUtils.lessZero(subsequentPrice)) {
+          refundPrice = subsequentPrice;
+          subsequentPrice = new BigDecimal(0);
+        } else {
+          //根据医院配置舍入金额
+          SysParameterDO sysParameterDO = getSysParameter(hospCode, Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
+          truncPrice = BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice); //舍入费用
+        }
+        Date now = new Date(); //当前时间
+        Date minDate = null;
+        Date maxDate = null;
+        if (!inptCostDOList.isEmpty()) {
+          minDate = inptCostDOList.get(0).getCostTime(); //费用开始时间
+          maxDate = inptCostDOList.get(inptCostDOList.size() - 1).getCostTime(); //费用结束时间
+        }
+        //封装结算信息
+        InptSettleDO inptSettleDO = new InptSettleDO();
+        inptSettleDO.setId(settleId);//结算id
+        inptSettleDO.setHospCode(hospCode);//医院编码
+        inptSettleDO.setVisitId(id);//就诊id
+        inptSettleDO.setBabyId(null);//婴儿id
+        inptSettleDO.setSettleNo(settleNo);//结算单号
+        inptSettleDO.setTypeCode(Constants.JSLX.QTJS);//结算类型 = 归属结算（其他结算）
+        inptSettleDO.setPatientCode(inptVisitDTO1.getPatientCode());//病人类型
+        inptSettleDO.setStartTime(minDate);//开始时间
+        inptSettleDO.setEndTime(maxDate);//结束时间
+        inptSettleDO.setTotalPrice(totalPrice);//总费用
+        inptSettleDO.setRealityPrice(realityPrice);//优惠后总金额
+        inptSettleDO.setTruncPrice(truncPrice);//舍入金额
+        inptSettleDO.setActualPrice(new BigDecimal(0));//实收金额
+        inptSettleDO.setSelfPrice(subsequentPrice);//个人支付
+        inptSettleDO.setMiPrice(miPrice);//统筹支付
+        inptSettleDO.setApTotalPrice(payPrice);//预交金合计
+        inptSettleDO.setApOffsetPrice(payPrice);//预交金冲抵
+        inptSettleDO.setSettleTakePrice(subsequentPrice);//结算补收
+        inptSettleDO.setSettleBackPrice(refundPrice.negate());//结算退款
+        inptSettleDO.setSettleBackCode(Constants.ZFFS.XJ);//退款方式默认现金
+        inptSettleDO.setIsSettle(Constants.SF.F);//是否结算 = 否
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+          inptSettleDO.setSettleTime(maxDate);// 中途结算的结算时间取最大时间
+        } else {
+          inptSettleDO.setSettleTime(now);//结算时间
+        }
+        inptSettleDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志 = 正常
+        inptSettleDO.setRedId(null);//冲红id
+        inptSettleDO.setIsPrint(Constants.SF.F);//是否打印 = 否
+        inptSettleDO.setHospDfPrice(new BigDecimal(0));//医院垫付金额
+        inptSettleDO.setHospJmPrice(new BigDecimal(0));//医院减免金额
+        inptSettleDO.setOutSettleCode(null);//TODO 出院结算方式 (待确认)
+        inptSettleDO.setDailySettleId(null);//日结缴款id
+        inptSettleDO.setSourcePayCode(null);//TODO 支付来源方式（待确认）
+        inptSettleDO.setOrderNo(null);//支付订单号
+        inptSettleDO.setCrteId(inptVisitDTO.getCrteId());//创建人id
+        inptSettleDO.setCrteName(inptVisitDTO.getCrteName());//创建人姓名
+        inptSettleDO.setCrteTime(now);//创建时间
+        inptSettleDAO.insert(inptSettleDO);
+
+        //封装返回前端需要的参数
+        JSONObject result = new JSONObject();
+        result.put("totalPrice", totalPrice);//总费用
+        result.put("preferentialPrice", preferentialPrice);//单据优惠
+        result.put("realityPrice", realityPrice);//单据应缴
+        result.put("miPrice", miPrice);//合同单位金额
+        result.put("payPrice", payPrice);//预交款
+        result.put("subsequentPrice", subsequentPrice);//补收
+        result.put("refundPrice", refundPrice);//退款
+        result.put("truncPrice", truncPrice);//舍入金额
+        result.put("settleId", settleId);//结算id
+        result.put("payinfo", inptInsureResult);//统筹支付信息
+        result.put("settleNo", settleNo); // 结算单号
+        return WrapperResponse.success("试算成功。", result);
+      } catch (RuntimeException e) {
+        throw e;
+      } finally {
+        redisUtils.del(key);
+      }
+    }
+
+
+    /**
+    * @Menthod saveAttributionSettle
+    * @Desrciption 归属结算
+    *
+    * @Param
+    * [param]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/1 14:32
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+    **/
+    @Override
+    public synchronized WrapperResponse saveAttributionSettle(Map param) {
+      String treatmentCode = MapUtils.get(param, "treatmentCode");
+      String id = (String) param.get("id");//就诊id
+      String code = param.get("userCode").toString();
+      String userName = param.get("userName").toString();
+      String medicalRegNo = MapUtils.get(param,"medicalRegNo");
+      String hospCode = (String) param.get("hospCode");//医院编码
+      String attributionCode = MapUtils.get(param,"attributionCode");
+      String isMidWaySettle = MapUtils.get(param, "isMidWaySettle"); // 是否中途结算，1：是 0：否  中途结算不改变出院状态
+      String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
+      if (StringUtils.isNotEmpty(redisUtils.get(key))) return WrapperResponse.fail("当前患者正在结算，请稍后再试。", null);
+      try {
+        redisUtils.set(key, id);
+        Boolean isInvoice = (Boolean) param.get("isInvoice");//是否使用发票
+        String userId = (String) param.get("userId");//当前登录用户id
+        OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();//发票段信息
+        //校验是否使用发票，是否存在发票段（没有返回错误信息，页面给出选择发票段信息）
+        if (isInvoice) {
+          outinInvoiceDTO.setHospCode(hospCode);//医院编码
+          outinInvoiceDTO.setUseId(userId);//发票使用人id
+          List<String> typeCode = new ArrayList<String>();//票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
+          Collections.addAll(typeCode, Constants.PJLX.TY, Constants.PJLX.ZY);
+          outinInvoiceDTO.setTypeCodeList(typeCode);//0、全院通用；4、住院
+          outinInvoiceDTO.setStatusCode(Constants.PJSYZT.ZY);//使用状态 = 在用状态
+          //校验是否有在用状态的发票段，有就返回在用的发票信outinInvoiceDTO.setStatusCode(Constants.PJSYZT.ZY);//使用状态 = 在用状态
+          Map<String, Object> map = new HashMap<String, Object>();
+          map.put("hospCode", hospCode);
+          map.put("outinInvoiceDTO", outinInvoiceDTO);
+          List<OutinInvoiceDTO> outinInvoiceDTOS = outinInvoiceService_consumer.updateForOutinInvoiceQuery(map).getData();
+          if (outinInvoiceDTOS == null || outinInvoiceDTOS.size() != 1) {
+            //没有发票信息
+            return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+          }
+          outinInvoiceDTO = outinInvoiceDTOS.get(0);
+        }
+        String settleId = (String) param.get("settleId");//结算id
+        //根据结算id查询本次结算信息
+        InptSettleDO inptSettleDO = inptSettleDAO.selectByPrimaryKey(settleId);
+        if (inptSettleDO == null) return WrapperResponse.fail("未找到结算记录信息，请重新试算。", null);
+        //校验费用信息
+        Map<String, Object> costParam = new HashMap<String, Object>();
+        costParam.put("hospCode", hospCode);//医院编码
+        costParam.put("visitId", id);//就诊id
+        //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+        String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
+        costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+        costParam.put("attributionCode", attributionCode);//结算类型标志
+        //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+        List<InptCostDO> inptCostDOList = new ArrayList<>();
+        // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
+        if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+          costParam.put("isMidWaySettle", isMidWaySettle);
+          inptCostDOList = inptCostDAO.queryMidWaySettleInptCostList(costParam);
+        } else {
+          inptCostDOList = inptCostDAO.queryInptCostList(costParam);
+        }
+        //获取当前患者信息参数
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(hospCode);//医院编码
+        inptVisitDTO.setId(id);//就诊id
+        inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        if (inptVisitDTO == null) {
+          return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
+        }
+        if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO.getPatientCode())) {
+          throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
+        }
+        BigDecimal realityPrice = new BigDecimal(0);//优惠后总费用
+        String[] costIds = new String[inptCostDOList.size()];
+        List<InptCostSettleDO> inptCostSettleDOList = new ArrayList<InptCostSettleDO>();
+        int costIndex = 0;
+        for (InptCostDO inptCostDO : inptCostDOList) {
+          if (inptCostDO.getRealityPrice() != null) {
+            realityPrice = BigDecimalUtils.add(realityPrice, inptCostDO.getRealityPrice());
+            costIds[costIndex++] = inptCostDO.getId();
+            InptCostSettleDO inptCostSettleDO = new InptCostSettleDO();
+            inptCostSettleDO.setId(SnowflakeUtils.getId());//id
+            inptCostSettleDO.setHospCode(hospCode);//医院编码
+            inptCostSettleDO.setVisitId(id);//就诊id
+            inptCostSettleDO.setBabyId(inptCostDO.getBabyId());//babyID
+            inptCostSettleDO.setCostId(inptCostDO.getId());//费用id
+            inptCostSettleDO.setSettleId(settleId);//结算id
+            inptCostSettleDO.setRealityPrice(inptCostDO.getRealityPrice()); // 优惠后金额
+            inptCostSettleDOList.add(inptCostSettleDO);
+          }
+        }
+        //校验费用是否一致
+        if (!BigDecimalUtils.equals(realityPrice, inptSettleDO.getRealityPrice())) {
+          throw new AppException("费用发生改变，请重新试算。");
+        }
+        BigDecimal selfPrice = inptSettleDO.getSelfPrice();//个人支付金额
+
+        //计算支付金额
+        List<InptPayDO> inptPayDOList = (List<InptPayDO>) param.get("inptPayDOList");//支付方式
+        BigDecimal actualPrice = new BigDecimal(0);//实收金额
+        // 第三方支付金额
+        BigDecimal thirdPartyPrice = new BigDecimal(0);
+        List<InptPayDO> inptPayParam = new ArrayList<InptPayDO>();
+        for (InptPayDO inptPayDO : inptPayDOList) {
+          //TODO 后续考虑支付手续费
+          if (StringUtils.isNotEmpty(inptPayDO.getPayCode()) && inptPayDO.getPrice() != null) {
+            // 支付方式中第三方支付费用总和
+            if (!inptPayDO.getPayCode().equals(Constants.ZFFS.XJ)) {
+              thirdPartyPrice = BigDecimalUtils.add(thirdPartyPrice, inptPayDO.getPrice());
+            }
+            actualPrice = BigDecimalUtils.add(actualPrice, inptPayDO.getPrice());
+            inptPayDO.setId(SnowflakeUtils.getId());//id
+            inptPayDO.setHospCode(hospCode);//医院编码
+            inptPayDO.setSettleId(settleId);//结算id
+            inptPayDO.setVisitId(id);//就诊id
+            inptPayDO.setServicePrice(inptPayDO.getServicePrice() == null ? new BigDecimal(0) : inptPayDO.getServicePrice());//手术费
+            inptPayParam.add(inptPayDO);
+          }
+        }
+        //判断支付金额是否小于需支付金额
+        int greater = BigDecimalUtils.compareTo(selfPrice, actualPrice);
+        if (greater > 0) {
+          throw new AppException("实收金额不能小于需支付金额。");
+        }
+        // ====================================================================
+        // 官红强  2021年1月19日15:16:23 1、如果正常收钱有找零，需要将现金支付金额减去找零金额后再保存，（前提要校验收收费金额还是退费金额）
+        // 应收金额大于0，退款金额小于0，说明是收款
+        if (BigDecimalUtils.greaterZero(selfPrice) && BigDecimalUtils.isZero(inptSettleDO.getSettleBackPrice())) {
+          // 应收金额小于实际付款金额，则需要将现金支付金额减去多余的金额
+          if (greater < 0) {
+            // 如果第三方支付金额总和大于应收金额，则不允许保存
+            if (BigDecimalUtils.compareTo(thirdPartyPrice, selfPrice) > 0) {
+              throw new AppException("第三方支付金额总和不能大于应收金额。");
+            }
+            BigDecimal dif = BigDecimalUtils.subtract(selfPrice, actualPrice);
+            for (int i = 0; i < inptPayParam.size(); i++) {
+              // 支付方式为现金的支付方式
+              if (inptPayParam.get(i).getPayCode().equals(Constants.ZFFS.XJ)) {
+                // 现金支付金额减去多收的金额
+                inptPayParam.get(i).setPrice(BigDecimalUtils.add(inptPayParam.get(i).getPrice(), dif));
+              }
+            }
+          }
+        }
+        // 官红强  2021年1月19日15:16:23 2、如果预交金额大于实际使用金额，说明有退款，则需要保存退款的负金额记录
+        if (BigDecimalUtils.greaterZero(inptSettleDO.getSettleBackPrice())) {
+          // 退款支持多路径退，需要校验输入的退款总和不能大于应退金额(即输入金额总和=应退金额)
+          if (!BigDecimalUtils.equals(actualPrice, inptSettleDO.getSettleBackPrice())) {
+            throw new AppException("各种支付方式输入的金额总和必须等于应退金额");
+          } else {
+            for (int i = 0; i < inptPayParam.size(); i++) {
+              // 将输入的退款金额取反
+              inptPayParam.get(i).setPrice(BigDecimalUtils.negate(inptPayParam.get(i).getPrice()));
+            }
+          }
+          inptPayDAO.batchInsert(inptPayParam);
+        }
+        // =======================官红强 注释=============================================
+        //保存结算费用关联信息
+        if (!inptCostSettleDOList.isEmpty()) {
+          inptCostSettleDAO.batchInsert(inptCostSettleDOList);
+        }
+        //修改费用状态
+        if (!inptCostDOList.isEmpty()) {
+          Map<String, Object> inptCostParam = new HashMap<String, Object>();
+          inptCostParam.put("settleId", settleId);//结算id
+          inptCostParam.put("settleCode", Constants.JSZT.YIJS);//结算状态 = 已结算
+          inptCostParam.put("hospCode", hospCode);//医院编码
+          inptCostParam.put("ids", costIds);//费用id
+          inptCostDAO.editInptCostByIds(inptCostParam);
+        }
+
+        //修改结算表状态
+        InptSettleDO inptSettleDO1 = new InptSettleDO();
+        inptSettleDO1.setId(settleId);//结算id
+        inptSettleDO1.setIsSettle(Constants.SF.S);//是否结算 = 是
+        inptSettleDO1.setSourcePayCode("0"); // 0：his 1：微信 2：支付宝 3：自助机
+        inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO1);
+
+        //判断是否需要发票
+        if (isInvoice) { //true:打印发票生成发票信息
+          Map<String, Object> map = new HashMap<String, Object>();
+          outinInvoiceDTO.setSettleId(settleId);//结算id
+          map.put("hospCode", hospCode);
+          map.put("outinInvoiceDTO", outinInvoiceDTO);
+          OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService_consumer.updateInvoiceStatus(map).getData();
+          //保存inpt_settle_invoice住院结算发票情况表
+          InptSettleInvoiceDO inptSettleInvoiceDO = new InptSettleInvoiceDO();
+          String inptSettleInvoiceId = SnowflakeUtils.getId();
+          inptSettleInvoiceDO.setId(inptSettleInvoiceId);//id
+          inptSettleInvoiceDO.setHospCode(hospCode);//医院编码
+          inptSettleInvoiceDO.setSettleId(settleId);//结算id
+          inptSettleInvoiceDO.setVisitId(id);//就诊id
+          inptSettleInvoiceDO.setInvoiceId(outinInvoiceDTO.getId());//发票id
+          inptSettleInvoiceDO.setInvoiceDetailId(outinInvoiceDetailDO.getId());//发票明细id
+          inptSettleInvoiceDO.setInvoiceNo(String.valueOf(outinInvoiceDetailDO.getInvoiceNo()));//发票号码
+          inptSettleInvoiceDO.setTotalPrice(realityPrice);//发票总金额
+          inptSettleInvoiceDO.setPrintId(null);//发票打印人id
+          inptSettleInvoiceDO.setPrintName(null);//发票打印人姓名
+          inptSettleInvoiceDO.setPrintTime(null);//发票打印时间
+          inptSettleInvoiceDO.setPrintNum(0);//打印次数
+          inptSettleInvoiceDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志代码（ZTBZ）
+          inptSettleInvoiceDO.setRedId(null);//冲红id
+          inptSettleInvoiceDAO.insertSelective(inptSettleInvoiceDO);//保存住院结算发票情况表
+
+          //保存inpt_settle_invoice_content住院结算发票内容表
+          InptSettleInvoiceContentDO inptSettleInvoiceContentDO = new InptSettleInvoiceContentDO();
+          inptSettleInvoiceContentDO.setId(SnowflakeUtils.getId());//id
+          inptSettleInvoiceContentDO.setHospCode(hospCode);//医院编码
+          inptSettleInvoiceContentDO.setSettleInvoiceId(inptSettleInvoiceId);//结算发票ID（inpt_settle_invoice）
+          inptSettleInvoiceContentDO.setInCode(null);//住院发票代码
+          inptSettleInvoiceContentDO.setInName(null);//住院发票名称
+          inptSettleInvoiceContentDO.setRealityPrice(realityPrice);//优惠后总金额
+          inptSettleInvoiceContentDAO.insertSelective(inptSettleInvoiceContentDO);//保存住院结算发票内容表
+        }
+        // 官红强修改， 2021年1月19日14:50:34 如果个人自付为0，意味着有预交金额退款，此时不再写一遍支付信息,如果自付与预交刚好相等，需要写一次记录（即自付为0，退款为0）
+        if (!inptPayParam.isEmpty() && (!BigDecimalUtils.isZero(selfPrice) || BigDecimalUtils.isZero(inptSettleDO.getSettleBackPrice()))) {
+          //保存inpt_pay 住院结算支付方式表
+          inptPayDAO.batchInsert(inptPayParam);
+        }
+        return WrapperResponse.success("支付成功。", null);
+      } catch (RuntimeException e) {
+        throw e;
+      } finally {
+        redisUtils.del(key);
+      }
     }
 }

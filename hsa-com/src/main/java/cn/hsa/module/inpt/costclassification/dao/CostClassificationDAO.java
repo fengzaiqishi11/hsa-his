@@ -30,4 +30,31 @@ public interface CostClassificationDAO {
   * @Return java.lang.Boolean
   **/
   int updateCostAttributionCode(InptCostDTO inptCostDTO);
+
+  /**
+  * @Menthod queryItemAndDrugAndMaterialAndAdvice
+  * @Desrciption 查询项目汇总
+  *
+  * @Param
+  * [patientCompreHensiveQueryDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/8/31 16:49
+  * @Return java.util.List<cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO>
+  **/
+  List<PatientCompreHensiveQueryDTO> queryItemAndDrugAndMaterialAndAdvice(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO);
+
+  /**
+  * @Menthod queryItemAndDrugAndMaterialDetail
+  * @Desrciption 查询项目费用明细
+  *
+  * @Param
+  * [patientCompreHensiveQueryDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/8/31 16:50
+  * @Return java.util.List<cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO>
+  **/
+  List<PatientCompreHensiveQueryDTO> queryItemAndDrugAndMaterialDetail(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO);
+
 }

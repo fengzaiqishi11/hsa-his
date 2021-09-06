@@ -386,4 +386,6 @@ public class InptVisitDO extends PageDO implements Serializable {
      * 担保金额
      */
     private BigDecimal guaranteeBalance;
+
+    private Integer totalInDays; // 住院天数
 }

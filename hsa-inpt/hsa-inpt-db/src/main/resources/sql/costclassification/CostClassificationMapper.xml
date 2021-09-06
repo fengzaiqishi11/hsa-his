@@ -93,4 +93,276 @@
       #{item}
     </foreach>
   </update>
+
+
+  <!--查询项目汇总-->
+  <select id="queryItemAndDrugAndMaterialAndAdvice" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+    <!--药品归类-->
+    select
+    drug.good_name as name,
+    drug.code as code,
+    drug.spec as spec,
+    cost.numUnitCode as unitCode,
+    ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+    cost.price,
+    cost.num,
+    cost.realityPrice,
+    cost.valuationPrice,
+    cost.preferentialPrice,
+    cost.crteName,
+    ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+    cost.sourceDeptId,
+    cost.itemCode,
+    cost.itemId
+    from
+    base_drug drug inner join
+    (
+    select
+    max(inpt_cost.source_dept_id) as sourceDeptId,
+    max(inpt_cost.visit_id) as visitId,
+    max(inpt_cost.bfc_id) as bfcId,
+    inpt_cost.item_id as itemId,
+    inpt_cost.hosp_code,
+    max(inpt_cost.price) as price,
+    max(inpt_cost.crte_name) as crteName,
+    sum(inpt_cost.total_num ) as num,
+    max(inpt_cost.total_num_unit_code) as numUnitCode,
+    sum(inpt_cost.total_price ) as valuationPrice,
+    sum(inpt_cost.preferential_price ) as preferentialPrice,
+    sum(inpt_cost.reality_price ) as realityPrice,
+    max(inpt_cost.item_code) as itemCode
+    from
+    inpt_cost
+    where
+    hosp_code = #{hospCode}
+    and item_code  = '1'
+    and visit_id = #{visitId}
+    and status_code = '0'
+    <if test="sourceDeptId != null and sourceDeptId !=''">
+      and source_dept_id = #{sourceDeptId}
+    </if>
+    <if test='isAdviceItem =="Y"'>
+      and (iat_id is not null or iat_id != '')
+    </if>
+    <if test='isAdviceItem =="N"'>
+      and (iat_id is null or iat_id = '')
+    </if>
+    <if test="babyId != null and babyId != '' ">
+      and baby_id =#{babyId}
+    </if>
+    <if test='queryBaby =="N"'>
+      and (baby_id is null or baby_id = '')
+    </if>
+    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+      AND attribution_code = #{attributionCode}
+    </if>
+    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+      AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+    </if>
+    group by
+    itemId
+    ) cost
+    on
+    drug.id = cost.itemId  and drug.hosp_code = cost.hosp_code
+    where
+    drug.hosp_code = #{hospCode}
+    <if test="keyword != null and keyword != ''">
+      and drug.good_name like concat('%',#{keyword},'%')
+    </if>
+    <!--项目归类-->
+    union
+    select
+    item.name as name,
+    item.code,
+    item.spec,
+    cost.numUnitCode as unitCode,
+    ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+    cost.price,
+    cost.num,
+    cost.realityPrice,
+    cost.valuationPrice,
+    cost.preferentialPrice,
+    cost.crteName,
+    ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+    cost.sourceDeptId,
+    cost.itemCode,
+    cost.itemId
+    from
+    base_item item inner join
+    (
+    select
+    max(inpt_cost.source_dept_id) as sourceDeptId,
+    max(inpt_cost.visit_id) as visitId,
+    max(inpt_cost.bfc_id) as bfcId,
+    inpt_cost.item_id as itemId,
+    inpt_cost.hosp_code,
+    max(inpt_cost.price) as price,
+    max(inpt_cost.crte_name) as crteName,
+    sum(inpt_cost.total_num ) as num,
+    max(inpt_cost.total_num_unit_code) as numUnitCode,
+    sum(inpt_cost.total_price ) as valuationPrice,
+    sum(inpt_cost.preferential_price ) as preferentialPrice,
+    sum(inpt_cost.reality_price ) as realityPrice,
+    max(inpt_cost.item_code) as itemCode
+    from
+    inpt_cost
+    where
+    hosp_code = #{hospCode}
+    and item_code  = '3'
+    and visit_id = #{visitId}
+    and status_code = '0'
+    <if test="sourceDeptId != null and sourceDeptId !=''">
+      and source_dept_id = #{sourceDeptId}
+    </if>
+    <if test='isAdviceItem =="Y"'>
+      and (iat_id is not null or iat_id != '')
+    </if>
+    <if test='isAdviceItem =="N"'>
+      and (iat_id is null or iat_id = '')
+    </if>
+    <if test="babyId != null and babyId != '' ">
+      and baby_id =#{babyId}
+    </if>
+    <if test='queryBaby =="N"'>
+      and (baby_id is null or baby_id = '')
+    </if>
+    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+      AND attribution_code = #{attributionCode}
+    </if>
+    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+      AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
+    </if>
+    group by
+    itemId
+    ) cost
+    on
+    item.id = cost.itemId  and item.hosp_code = cost.hosp_code
+    where
+    item.hosp_code = #{hospCode}
+    <if test="keyword != null and keyword != ''">
+      and item.name like concat('%',#{keyword},'%')
+    </if>
+    <!--材料归类-->
+    union
+    select
+    material.name as name,
+    material.code,
+    material.spec,
+    cost.numUnitCode as unitCode,
+    ( select name from base_finance_classify where id = cost.bfcId and hosp_code = #{hospCode} ) as bfcName,
+    cost.price,
+    cost.num,
+    cost.realityPrice,
+    cost.valuationPrice,
+    cost.preferentialPrice,
+    cost.crteName,
+    ( select name from base_dept where id = cost.sourceDeptId and hosp_code = #{hospCode} ) as sourceDeptName,
+    cost.sourceDeptId,
+    cost.itemCode,
+    cost.itemId
+    from
+    base_material material inner join
+    (
+    select
+    max(inpt_cost.source_dept_id) as sourceDeptId,
+    max(inpt_cost.visit_id) as visitId,
+    max(inpt_cost.bfc_id) as bfcId,
+    inpt_cost.item_id as itemId,
+    inpt_cost.hosp_code,
+    max(inpt_cost.price) as price,
+    max(inpt_cost.crte_name) as crteName,
+    sum(inpt_cost.total_num ) as num,
+    max(inpt_cost.total_num_unit_code) as numUnitCode,
+    sum(inpt_cost.total_price ) as valuationPrice,
+    sum(inpt_cost.preferential_price ) as preferentialPrice,
+    sum(inpt_cost.reality_price ) as realityPrice,
+    max(inpt_cost.item_code) as itemCode
+    FROM
+    inpt_cost
+    where
+    hosp_code = #{hospCode}
+    and item_code  = '2'
+    and visit_id = #{visitId}
+    and status_code = '0'
+    <if test="sourceDeptId != null and sourceDeptId !=''">
+      and source_dept_id = #{sourceDeptId}
+    </if>
+    <if test='isAdviceItem =="Y"'>
+      and (iat_id is not null or iat_id != '')
+    </if>
+    <if test='isAdviceItem =="N"'>
+      and (iat_id is null or iat_id = '')
+    </if>
+    <if test="babyId != null and babyId != '' ">
+      and baby_id =#{babyId}
+    </if>
+    <if test='queryBaby =="N"'>
+      and (baby_id is null or baby_id = '')
+    </if>
+    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+      and attribution_code = #{attributionCode}
+    </if>
+    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and a.id not in (select insure.cost_id from insure_individual_cost insure where insure.visit_id = #{visitId} and insure.item_id = #{itemId})
+    </if>
+    group by
+    itemId
+    ) cost
+    on
+    material.id = cost.itemId  and material.hosp_code = cost.hosp_code
+    where
+    material.hosp_code = #{hospCode}
+    <if test="keyword != null and keyword != ''">
+      and material.name like concat('%',#{keyword},'%')
+    </if>
+    order by
+    bfcName
+  </select>
+
+  <!--查询项目费用明细-->
+  <select id="queryItemAndDrugAndMaterialDetail" parameterType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO">
+    select
+    a.id,
+    a.source_dept_id as sourceDeptId,
+    a.visit_id as visitId,
+    a.bfc_id as bfcId,
+    a.item_id as itemId,
+    a.item_name as name,
+    a.cost_time as costTime,
+    a.hosp_code,
+    a.price as price,
+    a.total_num_unit_code as numUnitCode,
+    a.crte_name as crteName,
+    a.total_num as num,
+    a.total_price as valuationPrice,
+    a.preferential_price as preferentialPrice,
+    a.reality_price as realityPrice,
+    ( select name from base_dept where id = a.source_dept_id and hosp_code = #{hospCode} ) as sourceDeptName,
+    a.item_code as itemCode
+    from inpt_cost a
+    where
+    a.hosp_code = #{hospCode}
+    and a.item_code  = #{itemCode}
+    and a.visit_id = #{visitId}
+    and a.item_id = #{itemId}
+    and a.status_code = '0'
+    <if test="sourceDeptId != null and sourceDeptId !=''">
+      and a.source_dept_id = #{sourceDeptId}
+    </if>
+    <if test='isAdviceItem =="Y"'>
+      and (a.iat_id is not null or a.iat_id != '')
+    </if>
+    <if test='isAdviceItem =="N"'>
+      and (a.iat_id is null or a.iat_id = '')
+    </if>
+    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+      and attribution_code = #{attributionCode}
+    </if>
+    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and a.id not in (select insure.cost_id from insure_individual_cost insure where insure.visit_id = #{visitId} and insure.item_id = #{itemId})
+    </if>
+    order by a.cost_time asc
+  </select>
 </mapper>

@@ -2,21 +2,21 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
-import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
-import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -26,16 +26,13 @@ import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.server.upgrade.UpgradeSnapShotV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import scala.App;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -178,7 +175,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     public Map<String, Object> queryVisitInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         Map<String, Object> paramMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
@@ -387,10 +383,14 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             }
             setlinfoMap.put("emp_name", insureIndividualBasicDTO.getBka008());
             setlinfoMap.put("certno", insureIndividualBasicDTO.getAac002());
-            setlinfoMap.put("brdy", DateUtils.format(MapUtils.get(setlinfoMap, "birthday"), DateUtils.Y_M_D));
+            if(MapUtils.get(setlinfoMap, "birthday") !=null){
+                setlinfoMap.put("brdy", DateUtils.format(MapUtils.get(setlinfoMap, "birthday"), DateUtils.Y_M_D));
+            }
+            if(individualSettleDTO.getCrteTime() !=null){
+                setlinfoMap.put("setl_time", DateUtils.format(individualSettleDTO.getCrteTime(), DateUtils.Y_M_DH_M_S));
+            }
             setlinfoMap.put("insutype", insureIndividualBasicDTO.getAae140());
             setlinfoMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
-            setlinfoMap.put("setl_time", DateUtils.format(individualSettleDTO.getCrteTime(), DateUtils.Y_M_DH_M_S));
             setlinfoMap.put("gend", insureIndividualBasicDTO.getAac004()); // act_pay_dedc
             if (null == MapUtils.get(setlinfoMap, "insure_price")) {
                 setlinfoMap.put("hifp_pay", 0.00); // 起付线
@@ -414,6 +414,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         }
         List<Map<String, Object>> groupListMap = new ArrayList<>();
         if (!ListUtils.isEmpty(feeDetailMapList)) {
+            feeDetailMapList = feeDetailMapList.stream().filter(item->!"".equals(MapUtils.get(item,"med_chrgitm_type"))).collect(Collectors.toList());
             Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
             Map<String, Object> pMap = null;
             for (String key : groupMap.keySet()) {
@@ -427,9 +428,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                     List<Map<String, Object>> listMap = groupMap.get(key);
                     for (Map<String, Object> item : listMap) {
                         DecimalFormat df1 = new DecimalFormat("0.00");
-                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                        fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-                        preselfpayAmt = BigDecimalUtils.add(preselfpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt").toString()))));
+                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") ==null?"":MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") ==null ?"":MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                        preselfpayAmt = BigDecimalUtils.add(preselfpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt") ==null ?"":MapUtils.get(item, "preselfpay_amt").toString()))));
                     }
                     pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
                     pMap.put("fulamtOwnpayAmt", fulamtOwnpayAmt);
@@ -1196,5 +1197,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         }
         return insureConfigurationDTO;
     }
+
 
 }

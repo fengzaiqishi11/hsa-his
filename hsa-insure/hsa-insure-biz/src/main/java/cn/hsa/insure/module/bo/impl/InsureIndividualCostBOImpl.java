@@ -6,8 +6,6 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.RequestInsure;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.inpt.InptFunction;
-import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
-import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InptService;
@@ -28,7 +26,6 @@ import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import scala.App;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -171,16 +168,26 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         InsureConfigurationDTO insureConfigurationDTO = configurationDTOList.get(0);
         // 获取该医保配置是否走统一支付平台，1走，0/null不走
         String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
-
-        //判断是否有传输费用信息
+        SysParameterDTO sysParameterDTO =null;
+        if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
+            Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+            isInsureUnifiedMap.put("hospCode", hospCode);
+            isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
+            sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        }
         Map<String, String> insureCostParam = new HashMap<String, String>();
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())){
+            insureCostParam.put("queryBaby", "Y");// 医保机构编码
+        }else{
+            insureCostParam.put("queryBaby", "N");// 医保机构编码
+        }
+        //判断是否有传输费用信息
         insureCostParam.put("hospCode", hospCode);//医院编码
         insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId", visitId);//就诊id
         insureCostParam.put("isMatch", Constants.SF.S);//是否匹配 = 是
         insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
-        insureCostParam.put("queryBaby", "N");// 医保机构编码
         insureCostParam.put("isHalfSettle", isHalfSettle);// 是否中途结算
         insureCostParam.put("feeStartDate", feeStartDate);
         insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算

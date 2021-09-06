@@ -1323,8 +1323,21 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
     @Override
     public PageDTO queryBabyPatientInfoPage(InptVisitDTO inptVisitDTO) {
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
-        List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryBabyInptVisitPage(inptVisitDTO);
-        return PageDTO.of(inptVisitDTOS);
+        //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
+        SysParameterDTO sysParameterDTO =null;
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", inptVisitDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
+        sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        // 开启大人婴儿合并结算
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())){
+            List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryMergeInptVisitPage(inptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
+        }else {
+            List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryBabyInptVisitPage(inptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        }
     }
 
     @Override

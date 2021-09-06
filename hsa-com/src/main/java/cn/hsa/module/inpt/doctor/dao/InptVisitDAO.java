@@ -445,4 +445,15 @@ public interface InptVisitDAO {
      * @Return
      */
     void updateBaseBed(InptVisitDTO inptVisitById);
+
+
+    /**
+     * @Method queryMergeInptVisitPage
+     * @Desrciption 合并结算分页查询
+     * @param inptVisitDTO
+     * @Author liuliyun
+     * @Date   2021/09/04 17:18
+     * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+     **/
+    List<InptVisitDTO> queryMergeInptVisitPage(InptVisitDTO inptVisitDTO);
 }

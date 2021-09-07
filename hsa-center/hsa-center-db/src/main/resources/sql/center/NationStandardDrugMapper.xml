@@ -33,54 +33,26 @@
     <insert id="saveNationStandardDrugBatch">
         insert into nation_standard_drug
         (
-        id, data_sources, code, register_name, good_name, register_prep, actual_prep,
-        register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod,
-        dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name,
-        insurance_prep, remark, is_valid, crte_id, crte_name,province_code
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.id},#{item.dataSources},#{item.code},#{item.registerName},#{item.goodName},#{item.registerPrep},#{item.actualPrep},
-            #{item.registerSpec},#{item.actualSpec},#{item.packaging},#{item.splitRatio},#{item.unit},#{item.splitUnit},#{item.prod},
-            #{item.dan},#{item.packagProd},#{item.marketStatus},#{item.insure},#{item.ratioAtOne},#{item.codeNo},#{item.insuranceName},
-            #{item.insurancePrep},#{item.remark},#{item.isValid},#{item.crteId},#{item.crteName},#{item.provinceCode}
-            )
-        </foreach>
-    </insert>
-
-    <insert id="saveNationStandardDrug">
-        insert into nation_standard_drug
-        (
             id, data_sources, code, register_name, good_name, register_prep, actual_prep,
             register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod,
             dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name,
-            insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+            insurance_prep, remark, is_valid, crte_id, crte_name
         )
         values
+        <foreach collection="list" item="item" separator=",">
         (
-            #{id},#{dataSources},#{code},#{registerName},#{goodName},#{registerPrep},#{actualPrep},
-            #{registerSpec},#{actualSpec},#{packaging},#{splitRatio},#{unit},#{splitUnit},#{prod},
-            #{dan},#{packagProd},#{marketStatus},#{insure},#{ratioAtOne},#{codeNo},#{insuranceName},
-            #{insurancePrep},#{remark},#{isValid},#{crteId},#{crteName},#{provinceCode}
+            #{item.id},#{item.dataSources},#{item.code},#{item.registerName},#{item.goodName},#{item.registerPrep},#{item.actualPrep},
+            #{item.registerSpec},#{item.actualSpec},#{item.packaging},#{item.splitRatio},#{item.unit},#{item.splitUnit},#{item.prod},
+            #{item.dan},#{item.packagProd},#{item.marketStatus},#{item.insure},#{item.ratioAtOne},#{item.codeNo},#{item.insuranceName},
+            #{item.insurancePrep},#{item.remark},#{item.isValid},#{item.crteId},#{item.crteName}
         )
+    </foreach>
     </insert>
-
-    <update id="updateNationStandardDrug">
-        update nation_standard_drug set
-                                        data_sources=#{dataSources},code=#{code},register_name=#{registerName},good_name=#{goodName},register_prep=#{registerPrep},actual_prep=#{actualPrep},
-                                        register_spec=#{registerSpec},actual_spec=#{actualSpec},packaging=#{packaging},split_ratio=#{splitRatio},unit=#{unit},split_unit=#{splitUnit},prod=#{prod},
-                                        dan=#{dan},packag_prod=#{packagProd},market_status=#{marketStatus},insure=#{insure},ratio_at_one=#{ratioAtOne},code_no=#{codeNo},insurance_name=#{insuranceName},
-                                        insurance_prep=#{insurancePrep},remark=#{remark},is_valid=#{isValid},crte_id=#{crteId},crte_name=#{crteName},province_code=#{provinceCode}
-        where id = #{id}
-    </update>
-
-    <!-- 查询中心端码表 -->
 
     <!--查询单个-->
     <select id="getById" resultMap="NationStandardDrugMap">
         select
-            id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+          id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name
         from nation_standard_drug
         where id = #{id}
     </select>
@@ -88,9 +60,9 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryNationStandardDrugPage" resultMap="NationStandardDrugMap">
         select
-        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
+        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name
         from nation_standard_drug
-        where  is_valid = #{isValid}
+        <where>
             <if test="id != null and id != ''">
                 and id = #{id}
             </if>
@@ -160,6 +132,15 @@
             <if test="remark != null and remark != ''">
                 and remark = #{remark}
             </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
             <if test="keyword != null and keyword != ''">
                 and (prod like concat('%',#{keyword},'%')
                 or good_name like concat('%',#{keyword},'%')
@@ -173,6 +154,7 @@
             <if test="provinceCode != null and provinceCode !=''">
                 AND ( province_code = #{provinceCode} or province_code is null)
             </if>
+        </where>
     </select>
 
     <select id="queryNationStandardZYPage" resultMap="NationStandardDrugMap">

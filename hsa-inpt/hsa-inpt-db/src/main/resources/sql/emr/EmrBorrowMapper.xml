@@ -121,6 +121,12 @@
         select b.name,b.in_profile,b.age,b.in_no from inpt_visit b
         LEFT JOIN emr_archive_logging c on b.id = c.visit_id and b.hosp_code = c.hosp_code
         where b.hosp_code = #{hospCode} and c.archive_state = '1'
+        <if test="keyword !=null and keyword !=''">
+            and b.name like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="inDeptId !=null and inDeptId != ''">
+            and b.in_dept_id = #{inDeptId}
+        </if>
     </select>
 
 

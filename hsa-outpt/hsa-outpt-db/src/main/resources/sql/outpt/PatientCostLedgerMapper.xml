@@ -642,13 +642,15 @@
         sum(if((a.outin_code='23' or a.outin_code='25'),a.sell_price * a.num,0)) outSalesPriAll,    /**门诊销售总金额**/
         sum(if((a.outin_code='23' or a.outin_code='25'),a.num,0)) outSalesNum,                  /**门诊销售总数量**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.sell_price * a.num,0)) inSalesPriAll,     /**住院销售总金额**/
-        sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum                   /**住院销售总数量**/
+        sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum,                   /**住院销售总数量**/
+        sum(if( a.outin_code='4',a.sell_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
+        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum                  /**药房出库科室总数量**/
         FROM
         stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where a.hosp_code = #{hospCode}
-        and a.outin_code in ( '7', '8', '20', '23', '25','6', '27', '28','24' )
+        and a.outin_code in ( '7', '8', '20', '23', '25','6', '27', '28','24','4' )
         and a.biz_id in (select p.id from base_dept p where p.type_code in ("4","5") and p.hosp_code = #{hospCode})
         <if test="drugType != null and drugType != ''">
             and b.type_code = #{drugType}
@@ -705,13 +707,15 @@
         sum(if((a.outin_code='23' or a.outin_code='25'),a.buy_price * a.num,0)) outSalesPriAll,    /**门诊销售总金额**/
         sum(if((a.outin_code='23' or a.outin_code='25'),a.num,0)) outSalesNum,                  /**门诊销售总数量**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0)) inSalesPriAll,     /**住院销售总金额**/
-        sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum                   /**住院销售总数量**/
+        sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum,                   /**住院销售总数量**/
+        sum(if( a.outin_code='4',a.sell_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
+        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum                  /**药房出库科室总数量**/
         FROM
         stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where a.hosp_code = #{hospCode}
-        and a.outin_code in ( '7', '8', '20', '23', '25','6','27','28' )
+        and a.outin_code in ( '7', '8', '20', '23', '25','6','27','28','4' )
         and a.biz_id in (select p.id from base_dept p where p.type_code in ("4","5") and p.hosp_code = #{hospCode})
         <if test="drugType != null and drugType != ''">
             and b.type_code = #{drugType}
@@ -5043,11 +5047,10 @@
 
         <!-- 住院 -->
         <if test="type == null or type == '' or type == '2'.toString() ">
-            select ifnull(a.dept_id,a.source_dept_id) dept_id, a.hosp_code, a.bfc_id, a.total_price, ics.reality_price, a.preferential_price
+            select ifnull(a.dept_id,a.source_dept_id) dept_id, a.hosp_code, a.bfc_id, a.total_price, a.reality_price, a.preferential_price
             from inpt_settle settle
             join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
-            join inpt_cost_settle ics on a.id=ics.cost_id
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
                 and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')

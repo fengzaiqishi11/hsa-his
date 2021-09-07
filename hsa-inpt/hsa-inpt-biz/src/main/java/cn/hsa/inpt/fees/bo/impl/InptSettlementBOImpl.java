@@ -180,32 +180,43 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String treatmentCode = inptVisitDTO.getTreatmentCode();
         String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
         String medicalRegNo = inptVisitDTO.getMedicalRegNo();
+        // 获取系统参数 是否开启大人婴儿合并结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", hospCode);
+        isMergeParam.put("code", "BABY_INSURE_FEE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
         //《========新生婴儿试算========》
-        InptBabyDTO inptBabyDTO=new InptBabyDTO();
-        inptBabyDTO.setVisitId(id);
-        inptBabyDTO.setHospCode(hospCode);
-        //inptBabyDTO.setId(id);
-        List<InptBabyDTO> inptBabyDTOS=inptBabyDAO.findByCondition(inptBabyDTO);
-        InptBabyDTO babyDTO=null;
-        if (inptBabyDTOS!=null&&inptBabyDTOS.size()>0) {
-            String babyIds[] = new String[inptBabyDTOS.size()];
-            for (int i=0;i<inptBabyDTOS.size();i++){
-                babyIds[i]=inptBabyDTOS.get(i).getId();
-            }
-            Map<String, Object> costParam = new HashMap<String, Object>();
-            costParam.put("hospCode", hospCode);//医院编码
-            costParam.put("visitId", id);//就诊id
-            costParam.put("babyIds",babyIds);
-            //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
-            String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
-            costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
-            //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
-            //获取婴儿费用信息
-            List<InptCostDO> inptBabyCostDOList = inptCostDAO.queryInptCostList(costParam);
-            if (inptBabyCostDOList!=null&&inptBabyCostDOList.size()>0){
-                InptCostDO inptCostDO=inptBabyCostDOList.get(0);
-                if (inptCostDO.getSettleCode().equals("0")){
-                    return WrapperResponse.fail("请先结算婴儿费用，再结算大人费用", null);
+        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())){
+            // 开启合并结算
+        }else {
+            // 大人婴儿费用单独结算
+            InptBabyDTO inptBabyDTO=new InptBabyDTO();
+            inptBabyDTO.setVisitId(id);
+            inptBabyDTO.setHospCode(hospCode);
+            //inptBabyDTO.setId(id);
+            List<InptBabyDTO> inptBabyDTOS=inptBabyDAO.findByCondition(inptBabyDTO);
+            InptBabyDTO babyDTO=null;
+            if (inptBabyDTOS!=null&&inptBabyDTOS.size()>0) {
+                String babyIds[] = new String[inptBabyDTOS.size()];
+                for (int i=0;i<inptBabyDTOS.size();i++){
+                    babyIds[i]=inptBabyDTOS.get(i).getId();
+                }
+                Map<String, Object> costParam = new HashMap<String, Object>();
+                costParam.put("hospCode", hospCode);//医院编码
+                costParam.put("visitId", id);//就诊id
+                costParam.put("babyIds",babyIds);
+                //costParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+                String[] settleCodes = {Constants.JSZT.WJS, Constants.JSZT.YUJS};
+                costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
+                //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
+                //获取婴儿费用信息
+                List<InptCostDO> inptBabyCostDOList = inptCostDAO.queryInptCostList(costParam);
+                if (inptBabyCostDOList!=null&&inptBabyCostDOList.size()>0){
+                    InptCostDO inptCostDO=inptBabyCostDOList.get(0);
+                    if (inptCostDO.getSettleCode().equals("0")){
+                        return WrapperResponse.fail("请先结算婴儿费用，再结算大人费用", null);
+                    }
                 }
             }
         }
@@ -274,7 +285,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
             for (InptCostDO dto : inptCostDOList) {
                 if (dto.getIsOk().equals("0")) {
-                    throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+                    throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
                 }
             }
 
@@ -1527,7 +1538,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
             for (InptCostDO dto : inptCostDOList) {
                 if (dto.getIsOk().equals("0")) {
-                    throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+                    throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
                 }
             }
             //计算所有费用金额
@@ -1941,7 +1952,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         }
         for (InptCostDO dto : inptCostDOList) {
           if (dto.getIsOk().equals("0")) {
-            throw new AppException("该患者有还未确费的LIS或PASS检查，请先确费。");
+            throw new AppException("该患者有还未确费的费用，包括LIS或PACS检查，请先确费。");
           }
         }
 

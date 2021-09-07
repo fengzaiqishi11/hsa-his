@@ -162,7 +162,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // 部分退: 获取未退项目
             if (compNum == 1) {
                 costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName));
-                moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(outptCostDTO.getPrice(), lastNum));
+                BigDecimal rePrice = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(), outptCostDTO.getTotalNum());
+                moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(rePrice, lastNum));
             }
             backNumSum = BigDecimalUtils.add(backNumSum,outptCostDTO.getBackNum());
         }
@@ -500,9 +501,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         // 没有使用卡支付,全部其他方式支付
         if (BigDecimalUtils.isZero(settleCardPrice)) {
-            /*if (!BigDecimalUtils.equals(totalOldPriceAgain, moneyAgain)) {
-                throw new AppException("退费自动重收(未使用一卡通)时，计算各支付方式支付金额出错,刷新重试");
-            }*/
+//            if (!BigDecimalUtils.equals(totalOldPriceAgain, BigDecimalUtils.subtract(moneyAgain, outptSettleDo.getTruncPrice() == null? new BigDecimal(0): outptSettleDo.getTruncPrice()))) {
+//                throw new AppException("退费自动重收(未使用一卡通)时，计算各支付方式支付金额出错,刷新重试");
+//            }
             for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
                 OutptPayDO OutptPayDO = new OutptPayDTO();
                 OutptPayDO.setPrice((BigDecimal) entry.getValue());

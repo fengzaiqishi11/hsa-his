@@ -86,7 +86,12 @@
             LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
             WHERE a.hosp_code = #{hospCode}
               and a.item_code = #{itemCode} /*药品/材料*/
-              and a.status_code = '0' /*正常状态*/
+            <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
+                and a.status_code = '0' /*正常状态*/
+            </if>
+            <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
+                and a.status_code = '2' /*冲红状态*/
+            </if>
               and a.settle_code = '2' /*已结算*/
               and a.is_upload = '0' /*未上传*/
               and c.is_visit = '1' /*已接诊*/
@@ -128,7 +133,12 @@
             LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
             WHERE a.hosp_code = #{hospCode}
               and a.item_code = #{itemCode} /*药品/材料*/
-              and a.status_code = '0' /*正常状态*/
+            <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
+                and a.status_code = '0' /*正常状态*/
+            </if>
+            <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
+                and a.status_code = '2' /*冲红状态*/
+            </if>
               and a.settle_code = '2' /*已结算*/
               and a.is_upload = '0' /*未上传*/
               and d.audit_code = '1' /*医保项目已审核*/
@@ -201,7 +211,12 @@
           and c.insure_reg_code = #{insureRegCode} /*医保机构编码*/
           and a.item_code = #{itemCode} /*项目类别为药品*/
           and d.is_visit = '1' /*已就诊*/
-          and a.status_code = '0' /*正常状态*/
+        <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
+            and a.status_code = '0' /*正常状态*/
+        </if>
+        <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
+            and a.status_code = '2' /*冲红状态*/
+        </if>
           and a.settle_code = '2' /*已结算*/
           and a.is_upload = '0' /*未上传*/
           and c.audit_code = '1' /*医保项目已审核*/
@@ -247,7 +262,12 @@
           and c.insure_reg_code = #{insureRegCode} /*医保机构编码*/
           and a.item_code = #{itemCode} /*项目类别为药品*/
           and (d.status_code = '2' or d.status_code = '5' or d.status_code = '6' or d.status_code = '7') /*排除无效在院状态*/
-          and a.status_code = '0' /*正常状态*/
+        <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
+            and a.status_code = '0' /*正常状态*/
+        </if>
+        <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
+            and a.status_code = '2' /*冲红状态*/
+        </if>
           and a.settle_code = '2' /*已结算*/
           and a.is_upload = '0' /*未上传*/
           and c.audit_code = '1' /*医保项目已审核*/

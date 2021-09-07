@@ -4,8 +4,7 @@
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryPage" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
-        select * from
-        (SELECT
+        SELECT
         max(a.id) as id,
         d.id as opId,
         b.id as opdId,
@@ -36,7 +35,7 @@
         e.is_positive,
         e.skin_result_code,
         f.daily_times,
-        if((select is_print from outpt_prescribe_exec where b.id = opd_id and a.hosp_code = hosp_code limit 1) = '0','0','1') as isPrint
+        MAX(ope.is_print) as is_print
         FROM
         outpt_infusion_register a
         inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
@@ -44,6 +43,7 @@
         inner JOIN outpt_prescribe d on b.op_id = d.id and a.hosp_code = d.hosp_code
         left JOIN base_rate f on b.rate_id = f.id and a.hosp_code = f.hosp_code
         left JOIN outpt_skin_result e on b.visit_id = e.visit_id and a.hosp_code = e.hosp_code and b.id = e.opd_id
+        LEFT JOIN outpt_prescribe_exec ope on b.hosp_code = ope.hosp_code and b.visit_id = ope.visit_id and b.id = ope.opd_id
         where a.hosp_code = #{hospCode}
         and d.is_settle = '1' and d.is_cancel = '0'
         <if test="keyword != null and keyword != ''">
@@ -64,22 +64,33 @@
             and b.is_skin = #{skinPrintFlag}
         </if>
         <if test="startTime != null and startTime != ''">
-            and a.crte_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+          <![CDATA[
+            and DATE_FORMAT(a.crte_time, '%Y-%m-%d') >=  DATE_FORMAT(#{startTime},'%Y-%m-%d')
+          ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            and a.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+          <![CDATA[
+            and DATE_FORMAT(a.crte_time, '%Y-%m-%d') <=  DATE_FORMAT(#{endTime},'%Y-%m-%d')
+          ]]>
+        </if>
+        <!--数据共享标志为1，需根据单据类型判断打印状态-->
+        <if test="isShared != null and isShared == '1'.toString()">
+            <!--护理单据对应、未打印的-->
+            <if test="printSign != null and printSign == '0'.toString()">
+                and (!JSON_CONTAINS(ope.is_print, JSON_OBJECT(#{typeCode}, '1')) or ope.is_print = #{printSign})
+            </if>
+            <!--护理单据对应、已打印的-->
+            <if test="printSign != null and printSign == '1'.toString()">
+                and (JSON_CONTAINS(ope.is_print, JSON_OBJECT(#{typeCode}, #{printSign})))
+            </if>
+        </if>
+        <!--数据共享标志为0，直接根据打印标志拍段打印状态-->
+        <if test="isShared != null and isShared == '0'.toString()">
+            and ope.is_print = #{printSign}
         </if>
         group by b.id
         <!--根据处方同顺序排序-->
-        order by a.id asc, d.id asc, b.id asc, d.crte_time DESC, a.crte_time DESC, b.group_no asc , b.group_seq_no asc) tab
-        <!--order by a.crte_time desc,b.group_no asc ,b.group_seq_no asc)tab-->
-        where 1=1
-        <if test="printSign != null and printSign != ''">
-            and isPrint = #{printSign}
-        </if>
-        <!--根据处方同顺序排序-->
-        ORDER BY id asc, opId asc, opdId asc, registerTime DESC, groupNo asc, groupSeqNo asc
-        <!--order by registerTime desc,groupNo asc ,groupSeqNo asc-->
+        order by a.id asc, d.id asc, b.id asc, d.crte_time DESC, a.crte_time DESC, b.group_no asc , b.group_seq_no asc
     </select>
 
     <select id="queryByIds" parameterType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">

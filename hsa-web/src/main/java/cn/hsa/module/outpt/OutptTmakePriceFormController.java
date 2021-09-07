@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -18,6 +19,7 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import org.omg.CORBA.portable.ApplicationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -247,7 +249,7 @@ public class OutptTmakePriceFormController extends BaseController {
         outptVisitDTO.getOutptCostDTOList().stream().forEach(outptCostDTO -> {
             if(StringUtils.isEmpty(outptCostDTO.getItemId()) || StringUtils.isEmpty(outptCostDTO.getItemCode())
                     || outptCostDTO.getTotalNum() == null ||  outptCostDTO.getTotalNum().compareTo(new BigDecimal(0)) <= 0){
-                throw new RuntimeException("参数错误");
+                throw new AppException("费用总数量不能为空");
             }
         });
         SysUserDTO userDTO = getSession(req, res) ;
@@ -508,7 +510,7 @@ public class OutptTmakePriceFormController extends BaseController {
         outptVisitDTO.getOutptCostDTOList().stream().forEach(outptCostDTO -> {
             if(StringUtils.isEmpty(outptCostDTO.getItemId()) || StringUtils.isEmpty(outptCostDTO.getItemCode())
                     || outptCostDTO.getTotalNum() == null ||  outptCostDTO.getTotalNum().compareTo(new BigDecimal(0)) <= 0){
-                throw new RuntimeException("参数错误");
+                throw new RuntimeException("费用总数量不能为空");
             }
         });
         SysUserDTO userDTO = getSession(req, res) ;
@@ -546,6 +548,9 @@ public class OutptTmakePriceFormController extends BaseController {
      */
     @PostMapping("/getOutptCostDTOForPreferential")
     public WrapperResponse<OutptCostDTO> getOutptCostDTOForPreferential(@RequestBody OutptCostDTO outptCostDTO,HttpServletRequest req, HttpServletResponse res) {
+        if (outptCostDTO.getTotalNum() == null) {
+            throw new AppException("计算当前费用优惠后金额时，未获取到费用总数量，请填总数量");
+        }
 
         Map<String, Object> map = new HashMap<>();
         SysUserDTO userDTO = getSession(req, res) ;

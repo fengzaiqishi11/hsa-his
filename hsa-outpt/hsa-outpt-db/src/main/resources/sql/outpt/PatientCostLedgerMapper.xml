@@ -3827,7 +3827,7 @@
         where id = b.in_disease_id)) as disease_name
         from inpt_settle settle
         join inpt_cost a on settle.id = a.settle_id and a.hosp_code = settle.hosp_code
-        join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        join inpt_visit b on a.hosp_code = b.hosp_code and settle.visit_id = b.id
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
             and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')

@@ -645,6 +645,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setVisitCode(outptRegisterDTO.getVisitCode());
         //病人类型代码
         outptVisitDTO.setPatientCode(outptRegisterDTO.getPatientCode());
+        //病人来源途径
+        outptVisitDTO.setSourceTjCode(outptRegisterDTO.getSourceTjCode());
+        //病人来源途径备注
+        outptVisitDTO.setSourceTjRemark(outptRegisterDTO.getSourceTjRemark());
         //优惠类别ID
         outptVisitDTO.setPreferentialTypeId(outptRegisterDTO.getPreferentialTypeId());
         //就诊医生ID
@@ -3137,6 +3141,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
+        outptProfileFileDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode());
+        outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
         outptProfileFileDTO.setType("1");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);

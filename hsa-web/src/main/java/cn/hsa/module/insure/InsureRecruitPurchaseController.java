@@ -117,6 +117,9 @@ public class InsureRecruitPurchaseController extends BaseController {
         if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getInsureRegCode())) {
             throw new RuntimeException("未选择医保机构编码，请选择");
         }
+        if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getSellType())) {
+            throw new RuntimeException("未选择业务类型，销售1或者退货2");
+        }
         SysUserDTO sysUserDTO = getSession(req, res);
         insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         Map<String, Object> map = new HashMap<String, Object>();

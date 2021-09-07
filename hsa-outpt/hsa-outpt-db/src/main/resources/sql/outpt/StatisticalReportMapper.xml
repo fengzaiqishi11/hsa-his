@@ -1018,7 +1018,9 @@
         ma.type_code,
         ia.baby_id,
         ia.hosp_code as hosp_code,
-        ia.total_num as num
+        ia.total_num as num,
+        ma.visit_id,
+        ma.opd_id
         FROM
         medic_apply ma,
         inpt_advice ia,
@@ -1069,35 +1071,31 @@
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
         '' AS bed_name,
-        (SELECT NAME FROM
-        base_disease WHERE
-        id = ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) FROM outpt_prescribe WHERE id = oc.op_id )
-        ) AS  in_disease_name,
+        '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        oc.total_price as price,
+        '-1' as price,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
         '' as baby_id,
         ov.hosp_code as hosp_code,
-        oc.total_num as num
+        '-1' as num,
+        ma.visit_id,
+        ma.opd_id
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
         outpt_visit ov,
-        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price, source_code ,op_id from outpt_cost
-        where status_code='0' group by visit_id,opd_id ,hosp_code,total_num) oc,base_advice bd
+        base_advice bd
         WHERE
         ma.visit_id = ov.id
         and ma.hosp_code = ov.hosp_code
-        and ma.visit_id = oc.visit_id
-        and ma.hosp_code = oc.hosp_code
-        and ma.opd_id = oc.opd_id
         and ma.opd_id = pd.id
+        and ma.hosp_code = pd.hosp_code
         and pd.item_id = bd.id
-        and pd.id = oc.opd_id
-        and is_inpt = '0'
+        AND bd.hosp_code = pd.hosp_code
+        and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
         and ma.type_code =  #{typeCode}
         <if test="typeCode != null and typeCode != ''">
@@ -1200,35 +1198,31 @@
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
         '' AS bed_name,
-        (SELECT NAME FROM
-        base_disease WHERE
-        id = ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) FROM outpt_prescribe WHERE id = oc.op_id )
-        ) AS  in_disease_name,
+        '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        oc.total_price as price,
+        '-1' as price,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
         '' as baby_id,
         ov.hosp_code as hosp_code,
-        oc.total_num as num
+        '-1' as num,
+        ma.visit_id,
+        ma.opd_id
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
         outpt_visit ov,
-        (select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price, source_code ,op_id from outpt_cost
-        where status_code='0' group by visit_id,opd_id ,hosp_code,total_num) oc,base_advice bd
+        base_advice bd
         WHERE
         ma.visit_id = ov.id
         and ma.hosp_code = ov.hosp_code
-        and ma.visit_id = oc.visit_id
-        and ma.hosp_code = oc.hosp_code
-        and ma.opd_id = oc.opd_id
         and ma.opd_id = pd.id
+        and ma.hosp_code = pd.hosp_code
         and pd.item_id = bd.id
-        and pd.id = oc.opd_id
-        and is_inpt = '0'
+        AND bd.hosp_code = pd.hosp_code
+        and ma.is_inpt = '0'
         AND ma.type_code = #{typeCode}
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
@@ -1263,7 +1257,35 @@
         AND a.technology_code  = scd2.value
     </select>
 
+    <!-- 根据处方、医嘱id查询费用数量信息 -->
+    <select id="queryMedicalFeeAndCountInfo" resultType="map" parameterType="map">
+        select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price, source_code ,op_id from outpt_cost
+        where
+            hosp_code = #{hospCode}
+          and visit_id in
+              <foreach collection="visitIdList" item="item" open="(" separator="," close=")">
+                  #{item}
+              </foreach>
+          and opd_id in
+              <foreach collection="opdIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+              </foreach>
+          AND status_code='0'
+        group by hosp_code, visit_id,opd_id ,total_num
+    </select>
 
+    <!-- 查询门诊疾病信息 -->
+    <select id="queryDiseaeNameByOpIds" resultType="java.util.Map" parameterType="map">
+        SELECT bd.NAME as diseaseName,op.id as opId FROM
+            base_disease bd ,
+        ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) as bdId ,id FROM outpt_prescribe
+            WHERE id in
+                  <foreach collection="opIdList" item="item" open="(" separator="," close=")">
+                      #{item}
+                  </foreach>
+        GROUP BY id) op
+        where bd.id = op.bdId  and bd.hosp_code = #{hospCode}
+    </select>
 
 
     <!--抗菌类门诊发药统计-->

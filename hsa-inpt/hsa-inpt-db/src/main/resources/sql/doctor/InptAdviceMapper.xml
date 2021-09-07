@@ -1033,7 +1033,6 @@
         LEFT JOIN base_rate e ON a.rate_id = e.id
         WHERE 1=1 AND
         a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}
-        AND d.id is not null
         <if test="isCheck != null and isCheck != ''">
             AND d.is_check = #{isCheck}
         </if>
@@ -1047,7 +1046,7 @@
             AND b.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != ''">
-            DATE_FORMAT(b.in_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            b.in_time &lt;= DATE_ADD(#{endTime},INTERVAL 1 DAY)
         </if>
         <if test="newExecStatus == 1">
             AND (a.check_id is not null and a.check_id != '')

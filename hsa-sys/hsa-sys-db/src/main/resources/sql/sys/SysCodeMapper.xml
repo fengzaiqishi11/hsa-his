@@ -99,7 +99,7 @@
     <!--通过实体作为筛选条件查询值域代码值-->
     <select id="queryCodeDetailPage" resultMap="detailResultMap" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
         select a.id,a.c_code,a.name,a.VALUE,a.seq_no,a.pym,a.wbm,a.up_value,a.is_end,a.is_valid,a.remark,a.is_end isEnd,
-        a.crte_id,a.crte_name,a.crte_time,(select name from sys_code_detail where c_code=a.c_code and value=a.up_value and hosp_code=a.hosp_code) upValueName
+        a.crte_id,a.crte_name,a.crte_time,up_name as upValueName
         from sys_code_detail a
         where
         1=1 and a.is_valid='1' and a.hosp_code=#{hospCode}

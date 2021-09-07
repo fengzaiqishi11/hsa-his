@@ -159,4 +159,8 @@ public class OutptInfusionRegisterDTO extends OutptInfusionRegisterDO {
     private String isPositive; //是否阳性
 
     private String skinResultCode; // 皮试结果编码
+    /**
+     * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
+     */
+    private String isShared;
 }

@@ -228,13 +228,15 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
 
     private PageDTO getPageDTO(Map<String, Object> paramMap, List<Map<String, Object>> resultData) {
         fillPriceSumData(resultData, MapUtils.get(paramMap,"hospCode"));
-        List list = resultData.stream().filter(map -> !"-1".equals(map.get("num"))).collect(Collectors.toList());
+        resultData.stream().map(map -> {
+            if(map.get("num").equals("-1")){
+                map.put("num",0);
+                map.put("singlePrice",0);
+                map.put("price",0);
+            }
+            return map;
+        }).collect(Collectors.toList());
         PageDTO result = PageDTO.of(resultData);
-        if(!(resultData.size() == list.size())){
-            Integer numOfFiltered = resultData.size() - list.size();
-            result.setTotal(Long.parseLong(String.valueOf(result.getTotal().intValue() - numOfFiltered)));
-            result.setResult(list);
-        }
         return result;
     }
 

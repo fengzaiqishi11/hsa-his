@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.drawMedicine.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,20 @@ public interface DrawMedicineService {
     **/
     @GetMapping("/service/inpt/drawMedicine/saveBeforehandDrawMedicine")
     WrapperResponse<Boolean> saveBeforehandDrawMedicine(Map map);
+
+    /**
+    * @Menthod checkDrawMedicineStock
+    * @Desrciption 预配药的时候校验库存
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/7 10:36
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<PharInWaitReceiveDTO>
+    **/
+    @GetMapping("/service/inpt/drawMedicine/checkDrawMedicineStock")
+    WrapperResponse<PharInWaitReceiveDTO> checkDrawMedicineStock(Map map);
 
     /**
      * @Method getApplyDetailsList

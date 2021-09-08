@@ -28,6 +28,9 @@ public interface DrawMedicineBO {
     **/
     Boolean saveBeforehandDrawMedicine(Map map);
 
+
+  PharInWaitReceiveDTO checkDrawMedicineStock(Map map);
+
     /**
      * @Method getApplyDetailsList
      * @Desrciption 查询领药明细数据

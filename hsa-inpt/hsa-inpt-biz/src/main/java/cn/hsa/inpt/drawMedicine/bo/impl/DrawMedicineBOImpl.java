@@ -28,11 +28,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
-import scala.App;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -330,6 +330,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       List<PharInWaitReceiveDTO> lyList = new ArrayList<>();
       //筛选一个单据符合条件的待领药品到lyList
       filterWaitReceive(orderReceiveDTO, waitReceiveListAll, lyList);
+      AtomicInteger itemNum = new AtomicInteger();
+      HashMap itemMap = new HashMap();
       lyList.forEach(dto -> {
       //校验库存
       if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
@@ -341,10 +343,14 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
           inptAdviceDTO.setUnitCode(dto.getUnitCode());
           //判断库存
           if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
+            itemNum.getAndIncrement();
             check.setCheckFlag(true);
-            message.append("【");
-            message.append(dto.getItemName());
-            message.append("】,");
+            if(itemNum.get() <= 4 && !itemMap.containsKey(dto.getId())) {
+              itemMap.put(dto.getId(),dto.getItemName());
+              message.append("【");
+              message.append(dto.getItemName());
+              message.append("】,");
+            }
           }
         }
       });

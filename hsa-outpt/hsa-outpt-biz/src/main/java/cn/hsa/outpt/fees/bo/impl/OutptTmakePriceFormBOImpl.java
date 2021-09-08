@@ -1,18 +1,5 @@
 package cn.hsa.outpt.fees.bo.impl;
 
-import cn.hsa.datasource.DynamicDataSourceContextHolder;
-import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
-import cn.hsa.module.insure.module.service.InsureIndividualCostService;
-import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
-import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
-import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
-import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
-import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
-import cn.hsa.module.outpt.fees.entity.*;
-
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -33,6 +20,9 @@ import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
+import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
+import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
+import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.outpt.fees.bo.OutptTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dao.*;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -53,7 +43,6 @@ import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
-import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
@@ -731,13 +720,18 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     private Map<String, Object> saveOutptSettleMoney_YB(OutptVisitDTO outptVisitDTO, String id, List<OutptCostDTO> outptCostDTOList,
                                                         BigDecimal realityPrice, BigDecimal totalPrice, String settleId) {
         Map<String, Object> resultMap = new HashMap<>();
+        HashMap visitMap = new HashMap();
         //根据医院编码、医保注册编码查询医保配置信息
         String hospCode = outptVisitDTO.getHospCode();
+        visitMap.put("id",id);
+        visitMap.put("hospCode",hospCode);
+        InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(visitMap);
+
         JSONObject insure = JSONObject.parseObject(outptVisitDTO.getInsure());
         Map<String, String> info = (Map<String, String>) insure.get("info");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);//医院编码
-        insureConfigurationDTO.setRegCode(info.get("regCode"));//医保注册编码
+        insureConfigurationDTO.setRegCode(insureIndividualVisitById.getInsureRegCode());//医保注册编码
         insureConfigurationDTO.setIsValid(Constants.SF.S);//是否有效
         Map conditionMap = new HashMap();
         conditionMap.put("hospCode", hospCode);
@@ -751,7 +745,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         insureIndividualVisitDTO.setHospCode(hospCode);
         insureIndividualVisitDTO.setVisitId(id);
-        HashMap visitMap = new HashMap();
         visitMap.put("hospCode", hospCode);
         visitMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         if (insureIndividualVisitService_consumer.findByCondition(visitMap) == null) {
@@ -1153,11 +1146,19 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         } finally {
             redisUtils.del(key);//删除结算key
         }
+
+        SysParameterDO sys = getSysParameter(hospCode, "MZFP_FDFS");
+        String SFFD = "1";
+        if (sys != null && !"".equals(sys.getValue())) {
+            SFFD = sys.getValue();
+        }
+
         JSONObject result = new JSONObject();
         result.put("outptVisit", outptVisitDTO);//个人信息
         result.put("outinInvoice", outinInvoiceList);//费用统计信息
         result.put("outinInvoiceDTO", outinInvoiceDTO);//费用统计信息
         result.put("settleNo", settleNo);
+        result.put("SFFD", SFFD);
         return WrapperResponse.success("支付成功。", result);
     }
 

@@ -3051,27 +3051,16 @@
 
     <!-- 查询已结算患者信息 -->
     <select id="queryOutptSettleVisitList" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultMap="OutptVisitResultMap">
-        SELECT
+         SELECT
         <if test="type != null and type !=''">
             CONCAT(
             ov.NAME,
             '/',
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'XB'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.gender_code),'-'),
+            (case ov.gender_code when '0' then '未知' when '1' then '男' when '2' then '女' when '9' then '未说明' else '-' end),
             '/',
             IFNULL(ov.age,'-'),
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'NLDW'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.age_unit_code),'')) keyword,
+            (case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
+           ) keyword,
         </if>
         ov.id,
         ov.hosp_code,
@@ -3127,15 +3116,15 @@
         where
         ov.hosp_code = #{hospCode}
         AND os.hosp_code = #{hospCode}
-        AND ov.is_visit = '1'
         AND os.is_settle = '1'
         AND os.status_code = '0'
         <if test="startDate != null">
-            AND DATE_FORMAT(os.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            AND os.settle_time &gt;= #{startDate}
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(os.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            AND os.settle_time &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY )
         </if>
+        AND ov.is_visit = '1'
         <if test="keyword != null and keyword != ''">
             AND(
             ov.name LIKE CONCAT('%',#{keyword},'%')

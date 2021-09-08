@@ -199,6 +199,10 @@ public class BaseDrugDO extends PageDO implements Serializable {
      */
     private String isBasic;
     /**
+     * 是否处方药：0否、1是（SF）
+     */
+    private String isPrescription;
+    /**
      * 基药代码（JY）
      */
     private String basicCode;

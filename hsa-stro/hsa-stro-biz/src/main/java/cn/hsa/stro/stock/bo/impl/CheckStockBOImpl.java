@@ -50,14 +50,21 @@ public class CheckStockBOImpl implements CheckStockBO {
         checkOutParam(checkStockDTO);
         // 获得库存、占存数量、库存单位、库存拆零单位
         Map<String, BigDecimal> strockMap = checkStockDAO.getStrockNumber(checkStockDTO);
+        // 查不出数据说明该配药药房下面没有这个材料
+        if (MapUtils.isEmpty(strockMap)) {
+            // 查询配药科室
+            Map<String, String> deptMap = checkStockDAO.getDept(checkStockDTO);
+            String deptName = "";
+            if (!MapUtils.isEmpty(deptMap)){
+                deptName = deptMap.get("deptName");
+                throw new AppException( deptName +"下面" + checkStockDTO.getItemName() + "的库存不足");
+            }
+            throw new AppException("发药药房下面" + checkStockDTO.getItemName() + "的库存不足");
+        }
         // 拆分比
         BigDecimal splitRatio = MapUtils.get(strockMap, "splitRatio");
         // 库存数量
         BigDecimal strockNum = MapUtils.get(strockMap, "strockNum");
-        // 库存单位
-        String unitCode = MapUtils.get(strockMap, "unitCode");
-        // 库存拆零单位
-        String splitUnitCode = MapUtils.get(strockMap, "splitUnitCode");
         // 库存拆零数量
         BigDecimal strockSplitNum = BigDecimalUtils.multiply(strockNum, splitRatio);
         // 获得占用库存
@@ -90,24 +97,26 @@ public class CheckStockBOImpl implements CheckStockBO {
                 .setScale(2, BigDecimal.ROUND_HALF_UP);
         BigDecimal result = BigDecimalUtils.subtractMany(strockSplitNum, stockOccupy,
                 totalNumberNoCaculate, totalNumberNoCheck, prescribeOuptNumber, prescribeInptNumber);
-      BigDecimal dailyTimes = new BigDecimal(0);
-      BigDecimal execInterval = new BigDecimal(0);
-      if(StringUtils.isNotEmpty(checkStockDTO.getRateId())){
-          // 通过频率Id 获得每日次数、执行周期
-          Map<String, BigDecimal> rateMap = checkStockDAO.getRateMessage(checkStockDTO);
-          // 每日次数
-           dailyTimes = MapUtils.get(rateMap, "dailyTimes");
-          // 执行周期
-           execInterval = MapUtils.get(rateMap, "execInterval");
+        BigDecimal dailyTimes = new BigDecimal(0);
+        BigDecimal execInterval = new BigDecimal(0);
+        if (StringUtils.isNotEmpty(checkStockDTO.getRateId())) {
+            // 通过频率Id 获得每日次数、执行周期
+            Map<String, BigDecimal> rateMap = checkStockDAO.getRateMessage(checkStockDTO);
+            if (!MapUtils.isEmpty(rateMap)) { // 防止空指针
+                // 每日次数
+                dailyTimes = MapUtils.get(rateMap, "dailyTimes");
+                // 执行周期
+                execInterval = MapUtils.get(rateMap, "execInterval");
+            }
         }
         // 频率 = 每日次数/执行周期
         BigDecimal rate = new BigDecimal(1);
-        if (!BigDecimalUtils.isZero(dailyTimes) && !BigDecimalUtils.isZero(execInterval)){
+        if (!BigDecimalUtils.isZero(dailyTimes) && !BigDecimalUtils.isZero(execInterval)) {
             rate = BigDecimalUtils.divide(dailyTimes, execInterval);
         }
         // 执行天数
-        BigDecimal userDay = new BigDecimal(1);;
-        if (checkStockDTO.getUseDays() != 0 && null != checkStockDTO.getUseDays()){
+        BigDecimal userDay = new BigDecimal(1);
+        if (checkStockDTO.getUseDays() != 0 && null != checkStockDTO.getUseDays()) {
             userDay = new BigDecimal(checkStockDTO.getUseDays());
         }
         // 计算所需总数量，需要使用频率*总量*天数 获得总数量

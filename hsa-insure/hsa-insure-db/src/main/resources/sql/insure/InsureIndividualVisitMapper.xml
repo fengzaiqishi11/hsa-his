@@ -751,6 +751,10 @@
         iv.out_dept_id as outDeptId,iv.out_dept_name as outDeptName,iv.out_mode_code as outModeCode,
         iv.phone as inptPhone ,iv.out_time as outTime ,iv.in_time as inTime,iv.in_disease_name as
         inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,
+        (IF(iiv.is_hospital ='1', (select su.prac_certi_no from sys_user su where su.hosp_code = iv.hosp_code and su.id
+        = iv.zz_doctor_id ), (select su.prac_certi_no from sys_user su where su.hosp_code = ov.hosp_code and su.id =
+        ov.doctor_id )) )
+        as pracCertiNo,
         iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
         iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,
         if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time,
@@ -1192,5 +1196,9 @@
           and visit_id = #{id}
         group by crte_time
     </select>
+    <select id="queryDoctorPracCertiNo" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        select * from sys_user where id =#{doctorId} and  hosp_code =#{hospCode}
+    </select>
+
 
 </mapper>

@@ -1306,10 +1306,10 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 }
                 RT_0404.append(m.get("name")).append("：").append(m.get("total_price")).append("元");
             });
-            // 预交金结算
-            RT_0404.append("，").append("预交金结算：" + TMP_0102.getYjjsTotalPrice() + "元");
-            // 预交金补退
-            RT_0404.append("，").append("预交金补退：" + TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()) + "元");
+//            // 预交金结算
+//            RT_0404.append("，").append("预交金结算：" + TMP_0102.getYjjsTotalPrice() + "元");
+//            // 预交金补退
+//            RT_0404.append("，").append("预交金补退：" + TMP_0102.getYjjsTotalPrice().subtract(TMP_0102.getYjcdTotalPrice()) + "元");
             resultMap.put("RT_0404", RT_0404);
 
             // 发票

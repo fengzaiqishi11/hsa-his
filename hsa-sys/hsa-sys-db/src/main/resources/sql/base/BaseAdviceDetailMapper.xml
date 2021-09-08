@@ -62,38 +62,55 @@
     <!-- 查询出医院的项目和有库存的材料信息（typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码） -->
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode,a.code as itemCode,a.use_code,
-        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName
         FROM
-        ( select id,`name`,type_code as itemTypeCode,price,unit_code,unit_code as splitUnitCode, spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
+        ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
         '3' as type_code,
         (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
-        (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName
+        (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName,
+        b.name as inDeptName,c.name as outDeptName
         from base_item m
-        where is_valid = '1' and hosp_code = #{hospCode} and is_supp_curtain = '1' and is_in = '1'
+        left join base_dept b on m.in_dept_code = b.`code` and m.hosp_code = b.hosp_code
+        left join base_dept c on m.out_dept_code = c.`code` and m.hosp_code = c.hosp_code
+        where m.is_valid = '1' and m.hosp_code = #{hospCode} and m.is_supp_curtain = '1'
+            and m.is_in = '1'
         <if test="keyword != null and keyword != ''">
-            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%'))
+            and  (m.name like concat('%',#{keyword},'%') or m.name_pym like concat('%',#{keyword},'%')
+                  or m.name_wbm like concat('%',#{keyword},'%'))
         </if>
         UNION ALL
-        select l.id,l.`name`,l.type_code as itemTypeCode,l.price,l.unit_code,l.split_unit_code as splitUnitCode,l.spec,'','',l.hosp_code,l.code,l.use_code,
-        '2' as type_code,
-        (select d.id from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcId,
-        (select d.name from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcName
-        from base_material l,
-        stro_stock k
-        WHERE
-        l.hosp_code = k.hosp_code
-        AND l.id = k.item_id
-        -- AND k.num > 0
-        AND l.is_valid = '1'
-        AND l.hosp_code = #{hospCode}
-        and l.is_supp_curtain = '1'
+        select a.id,a.`name`,a.type_code as itemTypeCode,a.price,a.unit_code,
+        a.split_unit_code as splitUnitCode,a.spec,'','',a.hosp_code,a.code,a.use_code,
+        '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName
+        from base_material a
+        left join(
+        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
+        '3',c.id,'0')) cyf,
+        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code,
+        a.name as inDeptName,
+        c.name as outDeptName
+        from base_dept a
+        join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+        join base_dept c on c.hosp_code = b.hosp_code
+        <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+        </if>
+        where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
+        )b on 1 = 1
+        <if test="pharId != null and pharId != ''">
+            join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code and stock.biz_id = #{pharId}
+        </if>
+        left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+        left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_valid = '1'
         <if test="keyword != null and keyword != ''">
-            and  (l.name like concat('%',#{keyword},'%') or l.pym like concat('%',#{keyword},'%') or l.wbm like concat('%',#{keyword},'%'))
+            and  (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
         </if>
         )  a
-        left join base_dept b on a.in_dept_code = b.`code` and a.hosp_code = b.hosp_code
-        left join base_dept c on a.out_dept_code = c.`code` and a.hosp_code = c.hosp_code
-        where a.hosp_code = #{hospCode}
+        where 1=1
     </select>
 
     <!--查询单个-->

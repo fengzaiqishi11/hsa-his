@@ -1161,7 +1161,7 @@
         GROUP BY a.id
     </select>
 
-    <select id="getMaxInvoiceNo" resultType="java.lang.String">
-        select curr_no from outin_invoice where id = #{billId} and hosp_code = #{hospCode}
+    <select id="getMaxInvoiceNo" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select * from outin_invoice where id = #{billId} and hosp_code = #{hospCode}
     </select>
 </mapper>

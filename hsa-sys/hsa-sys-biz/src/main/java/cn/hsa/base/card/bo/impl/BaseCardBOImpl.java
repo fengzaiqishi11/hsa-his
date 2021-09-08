@@ -24,6 +24,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Package_name: cn.hsa.base.card.bo.impl
@@ -167,6 +169,16 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         param.put("hospCode",cardRechargeChangeDO.getHospCode());
         param.put("profileId",cardRechargeChangeDO.getProfileId());
         param.put("id",cardRechargeChangeDO.getCardId());
+        if (cardRechargeChangeDO.getPrice()!=null) {
+            if (BigDecimalUtils.lessZero(cardRechargeChangeDO.getPrice())) {
+                throw new AppException("充值金额不能为负数");
+            }
+            Pattern p=Pattern.compile("^\\d+(\\.\\d{1,2})?$");
+            Matcher m=p.matcher(cardRechargeChangeDO.getPrice()+"");
+            if (!m.matches()){
+                throw new AppException("充值金额最多输入两位小数");
+            }
+        }
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
             cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());

@@ -759,6 +759,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // TODO 封装医保入院登记入参
         SysUserDTO user = this.getUserInfo(inptVisitDTO.getHospCode(), inptVisitDTO.getCrteId());
 
+
         // 必填参数
         InsureInptRegisterDTO insureInptRegisterDTO = new InsureInptRegisterDTO();
         inptVisitDTO.setInsureOrgCode(insureIndividualBasicDTO.getAkb020());
@@ -897,7 +898,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
-
+            String pracCertiNo = inptVisitDto.getPracCertiNo();
+            if(StringUtils.isEmpty(pracCertiNo)){
+                throw  new AppException("该【"+inptVisitDTO.getZzDoctorName()+"】医生的医师编码没有维护,请先去用户管理里面维护");
+            }
+            inptVisitDTO.setPracCertiNo(inptVisitDto.getPracCertiNo());
             insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
             insureUnifiedPayParam.put("hospCode",inptVisitDTO.getHospCode());
             insureUnifiedPayParam.put("insureInptRegisterDTO",insureInptRegisterDTO);
@@ -1552,7 +1557,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("入院时间不能大于最小医嘱时间：" + DateUtils.format(minInptAdvice.getLongStartTime(),DateUtils.Y_M_DH_M_S));
         }
 
-
+        // add by 张国瑞； 修改之前 比对入院科室是否一致，如果当前病人 已经安床住院且前端传过来的入院科室不一致，那么抛出异常
+        String inDeptId = inptVisitDTO.getInDeptId();
+        String inDeptIdForDataBase = selectEntiey.getInDeptId();
+        if (!Constants.BRZT.DR.equals(selectEntiey.getStatusCode()) && inDeptId != null && !inDeptId.equals(inDeptIdForDataBase)){
+            throw new AppException("该病人不是待入, 不可修改入院科室");
+        }
         return Integer.toString(inptVisitDAO.updateInptVisit(inptVisitDTO));
     }
 

@@ -645,6 +645,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setVisitCode(outptRegisterDTO.getVisitCode());
         //病人类型代码
         outptVisitDTO.setPatientCode(outptRegisterDTO.getPatientCode());
+        //病人来源途径
+        outptVisitDTO.setSourceTjCode(outptRegisterDTO.getSourceTjCode());
+        //病人来源途径备注
+        outptVisitDTO.setSourceTjRemark(outptRegisterDTO.getSourceTjRemark());
         //优惠类别ID
         outptVisitDTO.setPreferentialTypeId(outptRegisterDTO.getPreferentialTypeId());
         //就诊医生ID
@@ -3137,6 +3141,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
+        outptProfileFileDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode());
+        outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
         outptProfileFileDTO.setType("1");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
@@ -3548,8 +3554,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptDiagnoseDTO.setDiseaseIds(diagnoseIds);
         //删除全部诊断
         outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
-        //新增全部诊断
-        outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        if(!ListUtils.isEmpty(outptDiagnoseDTO.getOutptDiagnoseDOList())) {
+          //新增全部诊断
+          outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        }
         // 更新处方诊断信息表
         outptDoctorPrescribeDAO.updatePrescribeDiagnose(outptDiagnoseDTO);
         return true;
@@ -3731,7 +3739,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 insureParamMap.put("hospCode", outptPrescribeDTO.getHospCode());
                 insureParamMap.put("id", outptPrescribeDTO.getVisitId());
                 InsureIndividualVisitDTO insureIndividualVisitById = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureParamMap);
-                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+//                if (insureIndividualVisitById == null) throw new RuntimeException("医保病人请先进行医保登记");
+                if (insureIndividualVisitById == null) return null;
                 insureRegCode = insureIndividualVisitById.getInsureRegCode();
 
             } else if (Integer.parseInt(patientCode) == 0 ) { // 自费病人

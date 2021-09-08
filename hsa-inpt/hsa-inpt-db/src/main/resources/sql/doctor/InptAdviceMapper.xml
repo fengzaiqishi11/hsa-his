@@ -1027,9 +1027,9 @@
         e.name as rateName
         FROM
         inpt_visit b
-        LEFT JOIN inpt_advice a ON a.visit_id = b.id
+        LEFT JOIN inpt_advice a ON b.hosp_code = a.hosp_code and a.visit_id = b.id
         LEFT JOIN base_dept c ON a.exec_dept_id = c.id
-        LEFT JOIN inpt_cost d ON a.id = d.iat_id
+        LEFT JOIN inpt_cost d ON b.hosp_code = d.hosp_code and d.visit_id = b.id and a.id = d.iat_id
         LEFT JOIN base_rate e ON a.rate_id = e.id
         WHERE 1=1 AND
         a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}

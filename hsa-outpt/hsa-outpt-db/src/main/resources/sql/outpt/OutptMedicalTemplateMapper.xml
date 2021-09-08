@@ -59,7 +59,9 @@
           a.audit_code, a.audit_id, a.audit_name, a.audit_time,a.chief_complaint, a.present_illness, a.past_history,
           a.oneself_history, a.family_history, a.allergy_history, a.vaccination_history, a.auxiliary_inspect, a.disease_analysis,
           a.handle_suggestion, a.temperature, a.min_blood_pressure, a.max_blood_pressure, a.breath, a.height, a.blood_sugar, a.pulse,
-          a.weight, a.bmi, a.entrust, a.crte_id, a.crte_name, a.crte_time,a.disease_id,c.name diseaseName,remarke
+          a.weight, a.bmi, a.entrust, a.crte_id, a.crte_name, a.crte_time,a.disease_id,
+          (select GROUP_CONCAT(d.name) from base_disease d where FIND_IN_SET(d.id,a.disease_id) group by a.disease_id) as diseaseName,
+          remarke
         from outpt_medical_template a
         left join base_disease c on a.disease_id = c.id and c.hosp_code = a.hosp_code
         where a.hosp_code = #{hospCode}

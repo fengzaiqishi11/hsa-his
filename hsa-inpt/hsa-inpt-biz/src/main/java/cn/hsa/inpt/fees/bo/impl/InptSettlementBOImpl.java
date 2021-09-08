@@ -1947,8 +1947,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         }
         // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
         //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
-        if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
-          throw new AppException("该医保病人费用已经正常结算");
+        if (inptCostDOList.isEmpty()) {
+          throw new AppException("没有费用需要结算");
         }
         for (InptCostDO dto : inptCostDOList) {
           if (dto.getIsOk().equals("0")) {

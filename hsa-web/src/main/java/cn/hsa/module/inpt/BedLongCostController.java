@@ -4,9 +4,11 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
+import cn.hsa.module.inpt.longcost.service.BedLongCostService;
 import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -42,6 +44,9 @@ public class BedLongCostController extends BaseController {
     @Resource
     private MedicalAdviceService medicalAdviceService_consumer;
 
+    @Resource
+    private BedLongCostService bedLongCostService ;
+
     /**
      * @Method: longCost
      * @Description: 长期费用滚动入口
@@ -58,12 +63,13 @@ public class BedLongCostController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         WrapperResponse<Boolean> response = WrapperResponse.success(true);
         logger.info("====================["+sysUserDTO.getHospCode()+"]长期费用开始:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+
+        Map map = new HashMap();
         try {
-            Map map = new HashMap();
             MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
             medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
             medicalAdviceDTO.setCheckTime(DateUtils.getNow());
-            medicalAdviceDTO.setCheckName("护士站医嘱核收长期费用手动执行");
+            medicalAdviceDTO.setCheckName("护士站长期医嘱费用手动执行");
             medicalAdviceDTO.setCheckId("-1");
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
@@ -72,8 +78,25 @@ public class BedLongCostController extends BaseController {
             e.printStackTrace();
             logger.info("["+sysUserDTO.getHospCode()+"]"+e.getMessage());
         } finally {
-            logger.info("====================["+sysUserDTO.getHospCode()+"]长期费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+            logger.info("====================["+sysUserDTO.getHospCode()+"]长期医嘱费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         }
+
+        try {
+            map.clear();
+            map.put("isAuto", Constants.SF.S);
+            map.put("userId", "-1");
+            map.put("userName", "护士站长期床位费用手动执行");
+            map.put("hospCode", sysUserDTO.getHospCode());
+            // 滚动医院长期床位费用
+            bedLongCostService.saveBedLongCost(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("["+sysUserDTO.getHospCode()+"]"+e.getMessage());
+        } finally {
+            logger.info("====================["+sysUserDTO.getHospCode()+"]长期床位费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+        }
+
+
         return response;
     }
 }

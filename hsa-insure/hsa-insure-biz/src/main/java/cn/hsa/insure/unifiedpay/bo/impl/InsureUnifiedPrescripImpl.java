@@ -40,11 +40,11 @@ public class InsureUnifiedPrescripImpl extends HsafBO implements InsureUnifiedPr
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
 
-    @Resource
-    private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+    /*@Resource
+    private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;*/
 
-    @Resource
-    private SysParameterDAO sysParameterDAO;
+    /*@Resource
+    private SysParameterDAO sysParameterDAO;*/
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -72,7 +72,7 @@ public class InsureUnifiedPrescripImpl extends HsafBO implements InsureUnifiedPr
         Map<String,Object> selectPreMap = new HashMap<>();
         selectPreMap.put("hospCode",hospCode);
         selectPreMap.put("visitId",visitId);
-        List<Map<String, Object>> outptDoctorPrescribeList = outptDoctorPrescribeDAO.getPrescribe(selectPreMap);
+        List<Map<String, Object>> outptDoctorPrescribeList = null;// outptDoctorPrescribeDAO.getPrescribe(selectPreMap);
         if (ListUtils.isEmpty(outptDoctorPrescribeList)) {
             throw new AppException(API_ERROR + "【7101_处方信息为空！】");
         }
@@ -399,13 +399,13 @@ public class InsureUnifiedPrescripImpl extends HsafBO implements InsureUnifiedPr
         String typeCode = MapUtils.get(prescribeMap,"type_code"); // 处方类别
 
         String code = "MZCF_YXTS_PT";
-        SysParameterDTO sysParameterDTO_PT = sysParameterDAO.getParameterByCode(hospCode,code);
+        SysParameterDTO sysParameterDTO_PT = null;//sysParameterDAO.getParameterByCode(hospCode,code);
         if (sysParameterDTO_PT == null) {
             throw new AppException(API_ERROR + "【7101_未维护普通门诊处方有效天数系统参数（MZCF_YXTS_PT）！】");
         }
 
         code = "MZCF_YXTS_JZ";
-        SysParameterDTO sysParameterDTO_JZ = sysParameterDAO.getParameterByCode(hospCode,code);
+        SysParameterDTO sysParameterDTO_JZ = null;//sysParameterDAO.getParameterByCode(hospCode,code);
         if (sysParameterDTO_JZ == null) {
             throw new AppException(API_ERROR + "【7101_未维护急诊处方有效天数系统参数（MZCF_YXTS_JZ）！】");
         }

@@ -1148,7 +1148,9 @@
         ma.type_code,
         ia.baby_id,
         ia.hosp_code as hosp_code,
-        ia.total_num as num
+        ia.total_num as num,
+        ma.visit_id,
+        ma.opd_id
         FROM
         medic_apply ma,
         inpt_advice ia,

@@ -471,7 +471,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageNo = (String) paramMap.get("pageNo");
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
-        Long start = System.currentTimeMillis();
         List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
         List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
         List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
@@ -487,8 +486,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             });
             return data;
         }).collect(Collectors.toList());
-        Long end = System.currentTimeMillis();
-        System.err.println("====原数据库关联查询耗时:=== "+ (end-start)+" ms");
         return PageDTO.of(finalResult);
     }
 

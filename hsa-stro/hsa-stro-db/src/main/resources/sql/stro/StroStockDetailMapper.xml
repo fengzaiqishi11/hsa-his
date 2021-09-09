@@ -58,7 +58,7 @@
           select
           min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
           as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
-          sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+          sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, max(a.expiry_date)
           as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
           min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
           '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
@@ -187,7 +187,7 @@
         select
         min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
         as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
-        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, max(a.expiry_date)
         as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
@@ -292,7 +292,7 @@
         select
         min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
         as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
-        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, max(a.expiry_date)
         as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
@@ -354,7 +354,7 @@
         select
         min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
         as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
-        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, min(a.expiry_date)
+        sum(a.buy_price_all)as buy_price_all , sum(a.sell_price_all) as sell_price_all , a.batch_no, max(a.expiry_date)
         as expiry_date , sum(a.split_num)as split_num, min(a.split_unit_code)as split_unit_code,
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,

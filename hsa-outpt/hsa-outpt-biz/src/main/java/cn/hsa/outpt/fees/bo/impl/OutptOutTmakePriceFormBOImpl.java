@@ -118,7 +118,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
      */
     @Override
     @Async
-    public synchronized WrapperResponse updateOutptOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, OutptPayDTO outptPayDTO) {
+    public synchronized WrapperResponse updateOutptOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDTO> tkOutptPayDTOList) {
         // TODO 必要入参获取 [就诊ID：visitId , 医院编码：hospCode , 结算ID：settleId , 费用列表信息：allCostDTOList]
         Map selectMap = new HashMap<>();
         String visitId = outptSettleDTO.getVisitId();
@@ -162,7 +162,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             // 部分退: 获取未退项目
             if (compNum == 1) {
                 costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName));
-                moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(outptCostDTO.getPrice(), lastNum));
+                BigDecimal rePrice = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(), outptCostDTO.getTotalNum());
+                moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(rePrice, lastNum));
             }
             backNumSum = BigDecimalUtils.add(backNumSum,outptCostDTO.getBackNum());
         }
@@ -431,17 +432,84 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         visitDTO.setCrteId(crteId);
         visitDTO.setCrteName(crteName);
 
+        // 2021年9月1日15:25:54 在院支付方式上扣除费用  1、先查询原支付方式 ===========官红强==start===========================================================================
+        List<OutptPayDTO> oldOutptPayList = outptPayDAO.selectOutptPatByVisitIdAndSettleId(selectMap);
+
+        Map<String, Object> oldOutptPayMap = new HashMap<>();
+        if (!ListUtils.isEmpty(oldOutptPayList)) {
+            for (OutptPayDTO dto : oldOutptPayList) {
+                oldOutptPayMap.put(dto.getPayCode(), dto.getPrice());
+            }
+        }
+
+        Map<String, Object> tkMap = new HashMap<>();  // 将页面的退款支付信息转换为map
+        for (OutptPayDTO outptPayDto : tkOutptPayDTOList) {
+            tkMap.put(outptPayDto.getPayCode(), outptPayDto.getPrice());
+        }
+        BigDecimal otherPayCodePrice = new BigDecimal(0); // 需要其他支付方式扣除的金额
+        for (Map.Entry<String, Object> entry : tkMap.entrySet()) {
+            String tkPayCode = entry.getKey(); // 支付类型
+            BigDecimal tkPrice = (BigDecimal) entry.getValue();  // 支付金额
+            if (oldOutptPayMap.containsKey(tkPayCode)) {
+                BigDecimal oldPrice = (BigDecimal) oldOutptPayMap.get(tkPayCode);  // 原支付方式的支付金额
+                // 当前支付方式的退款金额与原支付方式支付金额相等
+                if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
+                    oldOutptPayMap.remove(tkPayCode);
+                    continue;
+                }
+                // 当前支付方式的退款金额 大于 原支付方式支付金额
+                if (BigDecimalUtils.greater(tkPrice, oldPrice)) {
+                    otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, BigDecimalUtils.subtract(tkPrice, oldPrice));
+                    oldOutptPayMap.remove(tkPayCode);
+                } else {
+                    oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
+                }
+            } else {
+                otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, tkPrice);
+            }
+        }
+        // 原支付方式对应的金额小于现支付方式的金额，缺的金额需要从其他支付方式扣除
+        if (BigDecimalUtils.greaterZero(otherPayCodePrice)) {
+            for (int i = 1; i < 8; i++) {
+                if (oldOutptPayMap.containsKey(i+"")) {
+                    BigDecimal oldPrice2 = (BigDecimal) oldOutptPayMap.get(i+"");
+                    // 如果需要补充扣除的支付金额 = 某个原支付金额剩余的金额，直接扣除原支付金额
+                    if (BigDecimalUtils.equals(otherPayCodePrice, oldPrice2)) {
+                        otherPayCodePrice = new BigDecimal(0);
+                        oldOutptPayMap.remove(i+"");
+                        break;
+                    }
+                    // 需要补充扣除的费用大于当前支付方式金额  eg： 还需要扣20元 但现金只剩10元， 那么现金扣完10元，剩余的10元从下一个支付方式扣除
+                    if (BigDecimalUtils.greater(otherPayCodePrice, oldPrice2)) {
+                        otherPayCodePrice = BigDecimalUtils.subtract(otherPayCodePrice, oldPrice2);
+                        oldOutptPayMap.remove(i+"");
+                    } else {
+                        oldOutptPayMap.put(i+"", BigDecimalUtils.subtract(oldPrice2, otherPayCodePrice));
+                        break;
+                    }
+                }
+            }
+        }
+        BigDecimal totalOldPriceAgain = new BigDecimal(0);
+        for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+            totalOldPriceAgain = BigDecimalUtils.add(totalOldPriceAgain, (BigDecimal) entry.getValue());
+        }
+        // 2021年9月1日15:58:15 ==============================================官红强==end==============================================================
 
         // 划价收费接口支付接口调用(支付方式默认为现金)
         List<OutptPayDO> outptPayDOlist = new ArrayList();
-        OutptPayDO OutptPayDO = new OutptPayDTO();
-        OutptPayDO.setPrice(new BigDecimal(0));
-        OutptPayDO.setPayCode("1");
 
         // 没有使用卡支付,全部其他方式支付
         if (BigDecimalUtils.isZero(settleCardPrice)) {
-            OutptPayDO.setPrice(moneyAgain);
-            outptPayDOlist.add(OutptPayDO);
+//            if (!BigDecimalUtils.equals(totalOldPriceAgain, BigDecimalUtils.subtract(moneyAgain, outptSettleDo.getTruncPrice() == null? new BigDecimal(0): outptSettleDo.getTruncPrice()))) {
+//                throw new AppException("退费自动重收(未使用一卡通)时，计算各支付方式支付金额出错,刷新重试");
+//            }
+            for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+                OutptPayDO OutptPayDO = new OutptPayDTO();
+                OutptPayDO.setPrice((BigDecimal) entry.getValue());
+                OutptPayDO.setPayCode(entry.getKey());
+                outptPayDOlist.add(OutptPayDO);
+            }
             // 设置一卡通卡号与卡支付金额
             visitDTO.setCardNo(null);
             visitDTO.setCardPrice(null);
@@ -464,8 +532,15 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 visitDTO.setCardPrice(null);
                 visitDTO.setProfileId(null);
             }
-            OutptPayDO.setPrice(moneyAgain);
-            outptPayDOlist.add(OutptPayDO);
+            if (!BigDecimalUtils.equals(BigDecimalUtils.add(totalOldPriceAgain, outptSettleDo.getTruncPrice()), moneyAgain)) {
+                throw new AppException("退费失败，自动重收时，计算一卡通与其他支付方式支付金额出错,请前往划价收费界面手动结算");
+            }
+            for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+                OutptPayDO OutptPayDO = new OutptPayDTO();
+                OutptPayDO.setPrice((BigDecimal) entry.getValue());
+                OutptPayDO.setPayCode(entry.getKey());
+                outptPayDOlist.add(OutptPayDO);
+            }
         }
         //  全部卡支付，退费自动收时其他支付方式为空
         if (BigDecimalUtils.equals(settleCardPrice, settleSelfPrice)) {

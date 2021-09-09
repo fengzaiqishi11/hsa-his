@@ -433,53 +433,54 @@
     <!--<select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.util.Map">-->
     <select id="queryAll" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
         SELECT
-        id,
-        bed_id,
-        bed_name,
-        name,
-        gender_code,
-        age,
-        age_unit_code,
-        status_code,
-        in_no,
-        in_dept_id,
-        in_dept_name,
-        in_time,
-        in_disease_id,
-        in_disease_name,
-        out_time,
-        total_advance,
-        total_cost,
-        total_balance,
-        zz_doctor_name,
-        outpt_visit_no,
-        in_disease_icd10,
-        in_ward_id,
-        Illness_code,
-        outpt_visit_no
+            a.id,
+            a.bed_id,
+            a.bed_name,
+            a.name,
+            a.gender_code,
+            a.age,
+            a.age_unit_code,
+            a.status_code,
+            a.in_no,
+            a.in_dept_id,
+            a.in_dept_name,
+            a.in_time,
+            a.in_disease_id,
+            a.in_disease_name,
+            a.out_time,
+            a.total_advance,
+            a.total_cost,
+            a.total_balance,
+            a.zz_doctor_name,
+            a.outpt_visit_no,
+            a.in_disease_icd10,
+            a.in_ward_id,
+            a.Illness_code,
+            a.outpt_visit_no
         FROM
-        inpt_visit
+            inpt_visit a
+        LEFT JOIN base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
         WHERE
-        hosp_code = #{hospCode}
+            a.hosp_code = #{hospCode}
         <if test="statusCode != null and statusCode != ''">
-            and status_code = #{statusCode}
+            and a.status_code = #{statusCode}
         </if>
         <if test="inDeptId != null and inDeptId != ''">
-            and in_dept_id = #{inDeptId}
+            and a.in_dept_id = #{inDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (name like CONCAT('%',#{keyword},'%')
-             or bed_name like CONCAT('%',#{keyword},'%')
-             or in_no like CONCAT('%', #{keyword}, '%')
-            or in_dept_name like CONCAT('%', #{keyword}, '%'))
+            and (a.name like CONCAT('%',#{keyword},'%')
+             or a.bed_name like CONCAT('%',#{keyword},'%')
+             or a.in_no like CONCAT('%', #{keyword}, '%')
+            or a.in_dept_name like CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="startTime != null and startTime != ''">
-            and in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+            and a.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
         </if>
         <if test="endTime != null and endTime != ''">
-            and in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+            and a.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
-        order by in_time desc
+        order by b.seq_no asc
     </select>
 
     <!--查询所有住院病人,预交金缴纳情况-->
@@ -535,10 +536,16 @@
             or iv.in_dept_name like CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="startTime != null and startTime != ''">
-            and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+            <!--and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')-->
+          <![CDATA[
+            and DATE_FORMAT(iv.in_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+          ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+            <!--and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)-->
+          <![CDATA[
+            and DATE_FORMAT(iv.in_time, '%Y-%m-%d %H:%i:%s') <= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+          ]]>
         </if>
         <if test="isSettle != null and isSettle != ''">
             and iap.is_settle =#{isSettle}

@@ -7,6 +7,7 @@ import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.outpt.report.bo.StatisticalReportBO;
 import cn.hsa.module.outpt.report.dao.StatisticalReportDAO;
+import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -204,47 +205,6 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         Integer pageSize =Integer.parseInt((String) paramMap.get("pageSize"));
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = statisticalReportDAO.queryOutptWorkLog(paramMap);
-        // 如果为空 那么直接返回null，走下面会报内存异常
-        if (ListUtils.isEmpty(list)){
-            return PageDTO.of(list);
-        }
-        //根据个人档案ids查询档案信息
-        List<String> proIds = new ArrayList<>();
-        for (Map<String, Object> map : list) {
-            if (StringUtils.isNotEmpty((String) map.get("profileId"))){
-                proIds.add((String) map.get("profileId"));
-            }
-        }
-//        paramMap.put("proIds", proIds);
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("hospCode", MapUtils.get(paramMap, "hospCode"));
-        temp.put("proIds", proIds);
-
-        List<OutptProfileFileDTO> profileFileDTOS = outptProfileFileService_consumer.getByIds(temp).getData();
-        if (!ListUtils.isEmpty(profileFileDTOS)) {
-            for (Map<String, Object> map : list) {
-                for (OutptProfileFileDTO profileFileDTO : profileFileDTOS) {
-                    if (StringUtils.isNotEmpty((String) map.get("profileId"))){
-                        if ((profileFileDTO.getId()).equals((String) map.get("profileId"))) {
-                            map.put("address", StringUtils.isEmpty(profileFileDTO.getNowAddress()) ? "" : profileFileDTO.getNowAddress());
-                        }
-                    }
-                }
-            }
-        }
-        /*//处理转换疾病ids
-        if (!ListUtils.isEmpty(list)) {
-            for (Map<String, Object> map : list) {
-                String diagnoseIds = (String) map.get("diagnoseIds");
-                if (StringUtils.isNotEmpty(diagnoseIds)) {
-                    List<String> diagnoseList = Arrays.asList(diagnoseIds.split(","));
-                    map.put("diagnoseList", diagnoseList);
-                }
-            }
-        }
-       Map<Object, List<Map<String, Object>>> listMap = list.stream().collect(Collectors.groupingBy(map -> map.get("id")));*/
-
-
         return PageDTO.of(list);
     }
 
@@ -253,7 +213,8 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageNo = Integer.parseInt((String)paramMap.get("pageNo"));
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
-        return  PageDTO.of(statisticalReportDAO.lisStatistics(paramMap));
+        List<Map<String, Object>> resultData = statisticalReportDAO.lisStatistics(paramMap);
+        return getPageDTO(paramMap, resultData);
     }
 
     @Override
@@ -261,9 +222,90 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageNo = Integer.parseInt((String)paramMap.get("pageNo"));
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
-        return PageDTO.of(statisticalReportDAO.passStatistics(paramMap));
+        List<Map<String, Object>> resultData = statisticalReportDAO.passStatistics(paramMap);
+        return getPageDTO(paramMap, resultData);
     }
 
+    private PageDTO getPageDTO(Map<String, Object> paramMap, List<Map<String, Object>> resultData) {
+        fillPriceSumData(resultData, MapUtils.get(paramMap,"hospCode"));
+        resultData.stream().map(map -> {
+            if(map.get("num").equals("-1")){
+                map.put("num",0);
+                map.put("singlePrice",0);
+                map.put("price",0);
+            }
+            return map;
+        }).collect(Collectors.toList());
+        PageDTO result = PageDTO.of(resultData);
+        return result;
+    }
+
+    /**
+     *  填充门诊类型数据的价格，数量，疾病名称信息
+     * @param resultData 查询出的数据
+     * @param hospCode 医院编码
+     */
+    private void fillPriceSumData(List<Map<String,Object>> resultData,String hospCode){
+        List<Map<String, Object>> outptList = resultData.stream().filter(map -> "-1".equals(map.get("num"))).collect(Collectors.toList());
+        List<String> visitIdList = new ArrayList<>();
+        List<String> opdIdList = new ArrayList<>();
+        List<String> opIdList = new ArrayList<>();
+        if(!ListUtils.isEmpty(outptList)){
+            outptList.stream().map( map -> {
+                visitIdList.add(MapUtils.get(map,"visit_id"));
+                opdIdList.add(MapUtils.get(map,"opd_id"));
+                return map;
+            }).collect(Collectors.toList());
+            Map m = new HashMap(5);
+            m.put("visitIdList",visitIdList);
+            m.put("opdIdList",opdIdList);
+            m.put("hospCode",hospCode);
+            List<Map<String,Object>> medicalInfoList = statisticalReportDAO.queryMedicalFeeAndCountInfo(m);
+            medicalInfoList.stream().map( map -> {
+                opIdList.add(MapUtils.get(map,"op_id"));
+                resultData.stream().map(data ->{
+                    if(map.get("visit_id").equals(data.get("visit_id")) &&
+                            map.get("opd_id").equals(data.get("opd_id"))){
+                        data.put("price",map.get("total_price")) ;
+                        data.put("num",map.get("total_num")) ;
+                    }
+                    return data;
+                }).collect(Collectors.toList());
+                return map;
+            }).collect(Collectors.toList());
+            // 计算单价
+            resultData.stream().map(data ->{
+                data.put("singlePrice", BigDecimalUtils.divide(String.valueOf(data.get("price")),
+                        String.valueOf(data.get("num")))) ;
+                System.err.println(data);
+                return data;
+            }).collect(Collectors.toList());
+
+            m.put("opIdList",opIdList);
+            List<Map<String, String>> diseaseNameMapList = statisticalReportDAO.queryDiseaeNameByOpIds(m);
+
+            medicalInfoList.stream().map( map -> {
+                diseaseNameMapList.stream().map(diseaseInfo -> {
+                    if(map.get("op_id").equals(diseaseInfo.get("opId"))){
+                        map.put("in_disease_name",diseaseInfo.get("diseaseName"));
+                    }
+                    return diseaseInfo;
+                }).collect(Collectors.toList());
+                return map;
+            }).collect(Collectors.toList());
+            // 设置诊断疾病名称
+            resultData.stream().map(data -> {
+                medicalInfoList.stream().map(medicalInfo ->{
+                    if(data.get("visit_id").equals(medicalInfo.get("visit_id")) &&
+                            data.get("opd_id").equals(medicalInfo.get("opd_id"))){
+                        data.put("in_disease_name",medicalInfo.get("in_disease_name"));
+                    }
+                    return medicalInfo;
+                }).collect(Collectors.toList());
+                return data;
+            }).collect(Collectors.toList());
+        }
+    }
 
     /**抗菌类门诊、住院发药信息统计
      * @Method queryAntibiosisDrug

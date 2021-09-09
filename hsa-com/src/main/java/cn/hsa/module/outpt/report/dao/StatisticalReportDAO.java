@@ -1,5 +1,7 @@
 package cn.hsa.module.outpt.report.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +73,23 @@ public interface StatisticalReportDAO {
 
     List<Map<String, Object>> passStatistics(Map<String, Object> paramMap);
 
+    /**
+     *  查询门诊类型病人的，医技数量,总价格等信息
+     * @param paramMap hospCode 医院编码
+     *                 visitIdList 就诊ID列表
+     *                 opdIdList 处方明细ID列表
+     * @return
+     */
+    List<Map<String, Object>> queryMedicalFeeAndCountInfo(Map<String, Object> paramMap);
+
+    /****
+     *  根据处方id查询疾病名称
+     * @param params 传入sql的参数
+     *              opIdList 处方id列表
+     *               hospCode 医院编码
+     * @return 处方对应疾病名称与处方ID的map列表
+     */
+    List<Map<String, String>>  queryDiseaeNameByOpIds(Map<String,Object> params);
 
     /**抗菌类门诊发药统计
      * @Method queryOutAntibiosisDrug

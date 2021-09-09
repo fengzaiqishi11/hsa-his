@@ -135,12 +135,12 @@
       <if test='queryBaby =="N"'>
         and (baby_id is null or baby_id = '')
       </if>
-      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
-        AND attribution_code = #{attributionCode}
+      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId} and b.hosp_code = #{hospCode})
       </if>
-      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
-        AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
-        and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId and b.hosp_code = #{hospCode})
+      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
+        and attribution_code = #{attributionCode}
       </if>
       group by itemId
     ) cost on drug.id = cost.itemId  and drug.hosp_code = cost.hosp_code
@@ -188,15 +188,14 @@
       <if test='queryBaby =="N"'>
         and (baby_id is null or baby_id = '')
       </if>
-      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
+      and (attribution_code = '0' or attribution_code is null or attribution_code = '')
+      and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId} and b.hosp_code = #{hospCode})
+    </if>
+      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
         AND attribution_code = #{attributionCode}
       </if>
-      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
-        AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
-        and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId and b.hosp_code = #{hospCode})
-      </if>
-      group by
-      itemId
+      group by itemId
     ) cost on item.id = cost.itemId  and item.hosp_code = cost.hosp_code
     where
     item.hosp_code = #{hospCode}
@@ -241,12 +240,12 @@
       <if test='queryBaby =="N"'>
         and (baby_id is null or baby_id = '')
       </if>
-      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
-        and attribution_code = #{attributionCode}
-      </if>
-      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+      <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
         and (attribution_code = '0' or attribution_code is null or attribution_code = '')
-        and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId and b.hosp_code = #{hospCode})
+        and inpt_cost.id not in (select b.cost_id from insure_individual_cost b where b.visit_id = #{visitId} and b.hosp_code = #{hospCode})
+      </if>
+      <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
+        and attribution_code = #{attributionCode}
       </if>
       group by itemId
     ) cost on material.id = cost.itemId  and material.hosp_code = cost.hosp_code
@@ -293,15 +292,15 @@
     <if test='isAdviceItem =="N"'>
       and (a.iat_id is null or a.iat_id = '')
     </if>
-    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+    <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
       and attribution_code = #{attributionCode}
     </if>
-    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+    <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
       and (attribution_code = '0' or attribution_code is null or attribution_code = '')
       and a.id not in
       (select insure.cost_id
        from insure_individual_cost insure
-       join insure_item_match iia on iia.insure_item_code = insure.item_code and iia.hosp_code = insure.hosp_code and iia.item_id = #{itemId}
+       join insure_item_match iia on iia.insure_item_code = insure.item_code and iia.hosp_code = insure.hosp_code and iia.hosp_item_id = #{itemId}
        where insure.visit_id = #{visitId} and insure.hosp_code = #{hospCode})
     </if>
     order by a.cost_time asc

@@ -335,12 +335,29 @@ public interface InptVisitDAO {
     /**
      * @Menthod queryPatients
      * @Desrciption  在院病人信息查询
+     *      in_no,-- 住院号,name,-- 姓名,patient_code,-- 病人类型,preferential_type_id, -- 优惠类型
+     * 		bed_name,-- 床位号,gender_code,-- 性别,age,-- 年龄,in_time,-- 住院时间
+     * 		zyts,-- 住院天数（出院时间为空采取当前时间）,in_remark,-- 入院备注,out_remark,-- 出院备注
+     * 		in_disease_name,-- 住院诊断,cert_no, -- 身份证号,phone,-- 联系电话,address,-- 地址,total_cost,-- 总费用
+     * 		total_advance,-- 预交金累计,total_balance,-- 预交金余额,total_price,-- 住院费用,hosp_jm_price,-- 院内优惠
+     * 		mi_price,-- 统筹支付费用,self_je,-- 自费金额,outpt_doctor_name,-- 门诊医生,jz_doctor_name,-- 经治医生
+     * 		zg_doctor_name,-- 主管医生,in_profile,-- 病案号,in_dept_name,-- 入院科室,out_disease_name,-- 出院诊断, ypfy,-- 药品费用
+     * 		fyb,-- 药费比,zycs, -- 住院次数,out_time,-- 出院时间,status_code,-- 当前状态,czr,-- 操作人,jssj -- 结算时间
+     *
      * @param paramMap
      * @Author pengbo
      * @Date   2021/3/5 14:45
-     * @return PageDTO
+     * @return List<Map<String, Object>> 病人数据
      **/
     List<Map<String, Object>> queryPatients(Map<String, Object> paramMap);
+
+    /**
+     *  根据病人就诊id查询病人总费用信息与药品费用占比等信息
+     * @param  visitIdList 就诊id列表
+     *                 hospCode 医院编码
+     * @return 根据就诊id分组后病人总费用数据
+     */
+    List<Map<String, Object>> queryPatientsCostsByVisitIds(@Param("hospCode") String hospCode, @Param("visitIdList") List<String> visitIdList);
 
     /**
      * @Description: 查询住院患者是农合医保的患者信息

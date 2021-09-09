@@ -1751,58 +1751,49 @@
 	<!--查询在院病人状态-->
 	<select id="queryPatients" parameterType="map" resultType="map">
 		SELECT
-		visit.in_no,-- 住院号
-		visit.NAME name,-- 姓名
-		visit.bed_name,-- 床位号
-		visit.gender_code,-- 性别
-		visit.age,-- 年龄
-		visit.patient_code,-- 病人类型
-		visit.preferential_type_id,    -- 优惠类型
-		DATE_FORMAT( visit.in_time, '%Y-%m-%d %H:%i:%s' ) AS in_time,-- 住院时间
-		TO_DAYS(ifnull(out_time,now()))- TO_DAYS( visit.in_time )+ 1 AS zyts,-- 住院天数            --出院时间为空采取当前时间
-		visit.in_remark,-- 入院备注
-		visit.out_remark,-- 出院备注
-		visit.in_disease_name,-- 住院诊断
-		visit.cert_no, -- 身份证号
-		visit.phone,-- 联系电话
-		visit.address,-- 地址
-		visit.total_cost,-- 总费用
-		visit.total_advance,-- 预交金累计
-		visit.total_balance,-- 预交金余额
-		cost.total_price,-- 住院费用
-		settle.hosp_jm_price as hosp_jm_price,-- 院内优惠
-		settle.mi_price as mi_price,-- 统筹支付费用
-		settle.self_price as self_je,-- 自费金额
-		visit.outpt_doctor_name,-- 门诊医生
-		visit.jz_doctor_name,-- 经治医生
-		visit.zg_doctor_name,-- 主管医生
-		visit.in_profile,-- 病案号
-		visit.in_dept_name,-- 入院科室
-		visit.out_disease_name,-- 出院诊断
-		cost.item_price as ypfy,-- 药品费用
-		cost.fyb,-- 药费比
-		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name = visit.name) as zycs, -- 住院次数
-		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,-- 出院时间
-		visit.status_code,-- 当前状态
-		visit.crte_name AS czr,-- 操作人
-		DATE_FORMAT( settle.settle_time, '%Y-%m-%d %H:%i:%s' ) AS jssj -- 结算时间
+		visit.id,
+		visit.in_no,
+		visit.NAME name,
+		visit.bed_name,
+		visit.gender_code,
+		visit.age,
+		visit.patient_code,
+		visit.preferential_type_id,
+		DATE_FORMAT( visit.in_time, '%Y-%m-%d %H:%i:%s' ) AS in_time,
+		TO_DAYS(ifnull(out_time,now()))- TO_DAYS( visit.in_time )+ 1 AS zyts,
+		visit.in_remark,
+		visit.out_remark,
+		visit.in_disease_name,
+		visit.cert_no,
+		visit.phone,
+		visit.address,
+		visit.total_cost,
+		visit.total_advance,
+		visit.total_balance,
+		0 total_price,
+		settle.hosp_jm_price as hosp_jm_price,
+		settle.mi_price as mi_price,
+		settle.self_price as self_je,
+		visit.outpt_doctor_name,
+		visit.jz_doctor_name,
+		visit.zg_doctor_name,
+		visit.in_profile,
+		visit.in_dept_name,
+		visit.out_disease_name,
+		0 as ypfy,
+		0 fyb,
+		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name = visit.name) as zycs,
+		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
+		visit.status_code,
+		visit.crte_name AS czr,
+		DATE_FORMAT( settle.settle_time, '%Y-%m-%d %H:%i:%s' ) AS jssj
 
 		FROM
 		inpt_visit visit
 		LEFT JOIN (
 		SELECT
-		b.visit_id,
-		a.item_price,
-		b.total_price ,
-		CONCAT(FORMAT(a.item_price/b.total_price*100,2),'%') as fyb
-		FROM
-		( SELECT  visit_id,item_code, sum( total_price ) AS item_price FROM inpt_cost a WHERE item_code = '3' GROUP BY item_code, visit_id ) a
-		LEFT JOIN ( SELECT visit_id, sum( total_price ) AS total_price FROM inpt_cost a GROUP BY visit_id ) b ON a.visit_id = b.visit_id
-		) cost ON visit.id = cost.visit_id
-
-		LEFT JOIN (
-		SELECT
 		visit_id,
+		hosp_code,
 		max(settle_time) as settle_time,
 		sum( total_price ) AS total_price,
 		sum( self_price ) AS self_price,
@@ -1812,12 +1803,14 @@
 		FROM
 		inpt_settle
 		GROUP BY
-		visit_id
-		) settle ON visit.id = settle.visit_id
+		hosp_code,visit_id
+		) settle ON visit.hosp_code = settle.hosp_code and visit.id = settle.visit_id
 		WHERE
 		visit.hosp_code =#{hospCode}
 		<if test="keyword != null and keyword !=''">
-			and (visit.name like '%${keyword}%' or visit.in_profile like '%${keyword}%'  or visit.in_no like '%${keyword}%' )
+			and (visit.name like concat('%',#{keyword},'%')
+			         or visit.in_profile like concat('%',#{keyword},'%')
+			         or visit.in_no like concat('%',#{keyword},'%'))
 		</if>
 
 		<!--就诊科室-->
@@ -1838,20 +1831,20 @@
 		</if>
 		<!--入院开始时间-->
 		<if test="in_start_time != null and in_start_time !=''">
-			and  date(visit.in_time) &gt;= date(#{in_start_time})
+			and  visit.in_time &gt;= date(#{in_start_time})
 		</if>
 		<!--入院结束时间-->
 		<if test="in_end_time != null and in_end_time !=''">
-			and date(visit.in_time) &lt;= date(#{in_end_time})
+			and visit.in_time &lt; DATE_ADD(#{in_end_time},INTERVAL 1 DAY)
 		</if>
 
 		<!--出院开始时间-->
 		<if test="out_start_time != null and out_start_time !=''">
-			and  date(visit.out_time) &gt;= date(#{out_start_time})
+			and  visit.out_time &gt;= date(#{out_start_time})
 		</if>
 		<!--出院结束时间-->
 		<if test="out_end_time != null and out_end_time !=''">
-			and date(visit.out_time) &lt;= date(#{out_end_time})
+			and visit.out_time &lt; DATE_ADD(#{out_end_time},INTERVAL 1 DAY)
 		</if>
 
 		<!--结算开始时间-->
@@ -1863,6 +1856,27 @@
 			and date(settle.settle_time) &lt;= date(#{js_end_time})
 		</if>
 		order by visit.in_time desc
+	</select>
+
+	<!-- 查询病人总费用,药品费用占比 -->
+	<select id="queryPatientsCostsByVisitIds"  resultType="map">
+		SELECT
+			a.visit_id,
+			a.item_price,
+			a.total_price,
+			CONCAT( FORMAT( a.item_price / a.total_price * 100, 2 ), '%' ) AS fyb
+		FROM
+			( SELECT visit_id, hosp_code,
+					 sum(
+							 case
+								 when item_code ='3' then ifnull(total_price,0)
+								 else 0 end
+						 )as item_price,sum( total_price ) AS total_price
+			  FROM inpt_cost  where hosp_code=#{hospCode} and visit_id in
+				<foreach collection="visitIdList" open="(" separator="," close=")" item="item">
+					#{item}
+				</foreach>
+			GROUP BY hosp_code, visit_id )a
 	</select>
 
 	<!-- 查询住院患者是农合患者的患者信息 -->

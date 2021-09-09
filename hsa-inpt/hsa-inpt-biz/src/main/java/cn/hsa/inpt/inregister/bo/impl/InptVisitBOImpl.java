@@ -471,7 +471,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageNo = (String) paramMap.get("pageNo");
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
+        Long start = System.currentTimeMillis();
         List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
+        Long end = System.currentTimeMillis();
+        System.err.println("====原数据库关联查询耗时:=== "+ (end-start)+" ms");
         return PageDTO.of(inptVisitDTOS);
     }
 

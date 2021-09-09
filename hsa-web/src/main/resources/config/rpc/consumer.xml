@@ -467,5 +467,7 @@
     <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
 
     <dubbo:reference id="insureRecruitPurchaseService_consumer" interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" check="false"/>
+
+    <dubbo:reference id="insureUnifiedClinicalService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService" check="false"/>
 </beans>
 

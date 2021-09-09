@@ -111,11 +111,14 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         outptDiagnoseDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         outptDiagnoseDTO.setInsureRegCode(insureIndividualVisitDTO.getInsureRegCode());
         unifiedPayMap.put("outptDiagnoseDTO", outptDiagnoseDTO);
+
         OutptVisitDTO outptVisitDTO = MapUtils.get(unifiedPayMap, "outptVisitDTO");
         SysUserDTO  sysUserDTO = insureIndividualVisitDAO.queryDoctorPracCertiNo(outptVisitDTO);
         String doctorName = sysUserDTO.getName();
         String doctorId = sysUserDTO.getPracCertiNo();
-
+        if(StringUtils.isEmpty(doctorId)){
+            throw new AppException("该" +doctorName+"医生的医师国家码没有维护,请去用户管理里面维护");
+        }
         OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
         outptPrescribeDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         outptPrescribeDTO.setHospCode(hospCode);

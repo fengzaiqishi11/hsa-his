@@ -892,7 +892,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //保存处方明细
         outptDoctorPrescribeDAO.insertPrescribeDetail(outptPrescribeDetailsDTOList);
         //保存处方明细执行
-        outptDoctorPrescribeDAO.insertPrescribeDetailExt(outptPrescribeDetailsExtDTOList);
+        if (!ListUtils.isEmpty(outptPrescribeDetailsExtDTOList)) {
+            outptDoctorPrescribeDAO.insertPrescribeDetailExt(outptPrescribeDetailsExtDTOList);
+        }
         //诊断信息保存
         if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
             //保存处方诊断

@@ -6,7 +6,9 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.RequestInsure;
 import cn.hsa.module.insure.module.bo.InsureConfigurationBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.insure.module.insureConfiguration.bo.impl
@@ -32,6 +35,9 @@ public class InsureConfigurationBOImpl extends HsafBO implements InsureConfigura
 
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
+
+    @Resource
+    private InsureIndividualVisitDAO individualVisitDAO;
 
     @Resource
     RequestInsure requestInsure;
@@ -148,6 +154,34 @@ public class InsureConfigurationBOImpl extends HsafBO implements InsureConfigura
     @Override
     public InsureConfigurationDTO queryInsureIndividualConfig(InsureConfigurationDTO insureConfigurationDTO) {
         return insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+    }
+
+    /**
+     * @param map
+     * @Method queryIsUnifiedById
+     * @Desrciption 通过患者的就诊id, 查询登记时对应的医保机构是否走新老医保
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/8 19:27
+     * @Return
+     */
+    @Override
+    public Boolean queryIsUnifiedById(Map<String, Object> map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = individualVisitDAO.queryInsureVisitInfo(map);
+        if(insureIndividualVisitDTO !=null){
+            InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+            insureConfigurationDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+            insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
+            insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
+            insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+            if(insureConfigurationDTO !=null && "1".equals(insureConfigurationDTO.getIsUnifiedPay())){
+                return true;
+            }else{
+                return  false;
+            }
+        }else{
+            return false;
+        }
     }
 
 }

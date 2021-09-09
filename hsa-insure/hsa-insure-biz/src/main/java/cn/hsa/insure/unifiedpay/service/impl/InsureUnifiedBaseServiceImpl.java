@@ -323,4 +323,18 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
         return  WrapperResponse.success(insureUnifiedBaseBO.deleteUnifiedDeptInfo(map));
     }
 
+    /**
+     * @param map
+     * @Method queryInform
+     * @Desrciption 告知单查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/6 15:35
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> queryInform(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.queryInform(map));
+    }
+
 }

@@ -872,9 +872,7 @@
         a.usage_code usageCode,a.rate_id rateId,a.use_days useDays,a.remark,
         a.total_num totalNum,a.total_num_unit_code totalNumUnitCode,a.speed_code speedCode,a.is_long isLong,a.is_stop isStop,a.is_reject isReject,a.is_check isCheck,
         a.price,a.total_price totalPrice,a.long_start_time longStartTime,a.content content,a.start_exec_num startExecNum,
-        <!--(concat(b.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=b.gender_code and e.c_code='XB'),'') ), '/',b.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=b.age_unit_code and hosp_code=b.hosp_code),'岁')))) visitInfo,-->
-        IF(
+          IF(
         a.baby_id ,
         CONCAT(ib.name, '/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = ib.gender_code AND e.c_code = 'XB' ), '' )), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
         concat(b.NAME,'/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = b.gender_code AND e.c_code = 'XB' ), '' )),'/', b.age,(ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = b.age_unit_code AND hosp_code = b.hosp_code ), '岁' )))
@@ -1029,13 +1027,12 @@
         e.name as rateName
         FROM
         inpt_visit b
-        LEFT JOIN inpt_advice a ON a.visit_id = b.id
+        LEFT JOIN inpt_advice a ON b.hosp_code = a.hosp_code and a.visit_id = b.id
         LEFT JOIN base_dept c ON a.exec_dept_id = c.id
-        LEFT JOIN inpt_cost d ON a.id = d.iat_id
+        LEFT JOIN inpt_cost d ON b.hosp_code = d.hosp_code and d.visit_id = b.id and a.id = d.iat_id
         LEFT JOIN base_rate e ON a.rate_id = e.id
         WHERE 1=1 AND
         a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}
-        AND d.id is not null
         <if test="isCheck != null and isCheck != ''">
             AND d.is_check = #{isCheck}
         </if>
@@ -1049,7 +1046,7 @@
             AND b.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != ''">
-            DATE_FORMAT(b.in_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            b.in_time &lt;= DATE_ADD(#{endTime},INTERVAL 1 DAY)
         </if>
         <if test="newExecStatus == 1">
             AND (a.check_id is not null and a.check_id != '')

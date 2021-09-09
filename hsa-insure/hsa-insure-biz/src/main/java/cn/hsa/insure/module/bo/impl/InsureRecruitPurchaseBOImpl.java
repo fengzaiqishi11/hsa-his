@@ -131,11 +131,15 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     public PageDTO queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO) {
         String itemType = insureRecruitPurchaseDTO.getItemType();
         String insureRegCode = insureRecruitPurchaseDTO.getInsureRegCode();
+        String sellType = insureRecruitPurchaseDTO.getSellType();
         if (StringUtils.isEmpty(itemType)) {
             throw new RuntimeException("未选择业务类型，药品1或者材料2");
         }
         if (StringUtils.isEmpty(insureRegCode)) {
             throw new RuntimeException("未选择医保机构编码，请选择");
+        }
+        if (StringUtils.isEmpty(sellType)) {
+            throw new RuntimeException("未选择业务类型，销售1或者退货2");
         }
         if ("1".equals(itemType)) {
             // 查询存在【药品】销售/退货记录的人员列表
@@ -246,14 +250,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         Map<String, Object> resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8504, data);
 
         // 费用ids，用于更新上传状态
-        List<String> ids = dataList.stream().map(map1 -> (String)MapUtils.get(map1, "id")).collect(Collectors.toList());
-        // 更新费用表上传状态
-        if (!ListUtils.isEmpty(ids)) {
-            map.put("ids", ids);
-            insureRecruitPurchaseDAO.updateCostIsUpload(map);
-        }
-
-        return true;
+        return this.updateCostIsUpload(dataList) > 0;
     }
 
 
@@ -269,7 +266,22 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean deleteDrugSells(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        return null;
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
+
+        // 封装入参
+        Map<String, Object> inptMap = new HashMap<String, Object>();
+        inptMap.put("accessToken", ""); //调用凭证Token
+        inptMap.put("retInfo", dataList); //销售信息
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("data", inptMap);
+
+        // 调用海南招采公共接口
+        Map<String, Object> resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8505, data);
+
+        // 费用ids，用于更新上传状态
+        return this.updateCostIsUpload(dataList) > 0;
     }
 
     // 获取医保配置信息
@@ -279,6 +291,20 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         insureConfigurationDTO.setRegCode(insureRegCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         return insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+    }
+
+    // 更新门诊/住院费用表上传标志
+    private int updateCostIsUpload(List<Map<String, Object>> dataList) {
+        Map<String, Object> map = new HashMap<>();
+        // 费用ids，用于更新上传状态
+        List<String> ids = dataList.stream().map(map1 -> (String)MapUtils.get(map1, "id")).collect(Collectors.toList());
+        // 更新费用表上传状态
+        int num = 0;
+        if (!ListUtils.isEmpty(ids)) {
+            map.put("ids", ids);
+            num = insureRecruitPurchaseDAO.updateCostIsUpload(map);
+        }
+        return num;
     }
 
     /**

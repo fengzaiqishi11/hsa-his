@@ -61,5 +61,7 @@ public class InsureUnifiedRemoteDO extends PageDO implements Serializable {
     private String aka130Name; // 业务类型
     private String bka006Name; // 待遇类型
     private String visitIcdName; // 就诊疾病名称
+    private String  startDate; // 提取开始时间
+    private String endDate; // 提取结束时间
 
 }

@@ -88,4 +88,6 @@ public class PharInWaitReceiveDTO extends PharInWaitReceiveDO implements Seriali
     private String orderNo;//单据号
 
     private String adviceDosage;  // 医嘱剂量
+
+    private Boolean checkFlag;
 }

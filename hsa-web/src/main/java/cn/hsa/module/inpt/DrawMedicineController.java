@@ -60,6 +60,32 @@ public class DrawMedicineController extends BaseController {
         return pageDTOWrapperResponse;
     }
 
+
+    /**
+    * @Menthod checkDrawMedicineStock
+    * @Desrciption 预配药的时候校验库存
+    *
+    * @Param
+    * [id, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/7 10:35
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @GetMapping(value = "/checkDrawMedicineStock")
+    @NoRepeatSubmit
+    WrapperResponse<PharInWaitReceiveDTO> checkDrawMedicineStock(String id, HttpServletRequest req, HttpServletResponse res){
+      SysUserDTO sysUserDTO = getSession(req, res);
+      Map map = new HashMap<>();
+      map.put("hospCode", sysUserDTO.getHospCode());
+      map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
+      map.put("crteId", sysUserDTO.getId());
+      map.put("crteName", sysUserDTO.getName());
+      map.put("id", id);
+      WrapperResponse<PharInWaitReceiveDTO> pageDTOWrapperResponse = drawMedicineService.checkDrawMedicineStock(map);
+      return pageDTOWrapperResponse;
+    }
+
     /**
      * @Method getApplyDetailsList
      * @Desrciption 查询领药明细数据

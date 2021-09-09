@@ -192,7 +192,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 				throw new AppException("未获取到该人员的慢特病备案查询信息");
 			}
 
-			mapList = mapList.stream().filter(filterMap -> StringUtils.isNotEmpty(MapUtils.get(filterMap, "enddate")) &&
+			mapList = mapList.stream().filter(filterMap -> StringUtils.isEmpty(MapUtils.get(filterMap, "enddate")) ||
 					DateUtils.dateCompare(DateUtils.parse(DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_D), DateUtils.Y_M_D),
 							DateUtils.parse(MapUtils.get(filterMap, "enddate"), DateUtils.Y_M_D)
 					)).collect(Collectors.toList());

@@ -47,20 +47,18 @@ public class LisResultController extends BaseController {
     }
 
     /**
-     * @Description: 查找没有lis结果的就诊人的就诊号（）
+     * @Description: 查找没有lis结果的就诊人的医嘱id处方号（）
      * @Param: [outptVisitDTOList]
      * @return: java.util.List<cn.hsa.module.medic.apply.dto.MedicalApplyDTO>
      * @Author: zhangxuan
      * @Date: 2021-07-06
      */
-//    @PostMapping("queryNoResult")
-//    public List<MedicalApplyDTO> queryNoResult(){
-//
-//        Map map = new HashMap();
-//        map.put("hospCode", hospCode);
-//
-//        return lisResultService.queryNoResult(map);
-//    }
+    @PostMapping("queryNoResult")
+    public Map queryNoResult(){
+        Map map = new HashMap();
+        map.put("hospCode","1000001");
+        return lisResultService.queryNoResultLis(map);
+    }
 
     /**
      * @Description: lis结果数据存库

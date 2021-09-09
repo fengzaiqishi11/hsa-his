@@ -282,5 +282,16 @@ public interface InsureIndividualVisitDAO {
     InsureIndividualVisitDTO selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
 
     SysUserDTO queryDoctorPracCertiNo(OutptVisitDTO outptVisitDTO);
+
+    /**
+     * @Method queryInsureVisitInfo
+     * @Desrciption  通过就诊id，医院编码查询医保登记信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/8 19:34
+     * @Return
+    **/
+    InsureIndividualVisitDTO queryInsureVisitInfo(Map<String, Object> map);
 }
 

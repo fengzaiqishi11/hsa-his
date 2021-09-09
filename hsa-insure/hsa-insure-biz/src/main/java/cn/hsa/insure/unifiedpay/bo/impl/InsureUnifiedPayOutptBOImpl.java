@@ -111,6 +111,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         outptDiagnoseDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         outptDiagnoseDTO.setInsureRegCode(insureIndividualVisitDTO.getInsureRegCode());
         unifiedPayMap.put("outptDiagnoseDTO", outptDiagnoseDTO);
+
         OutptVisitDTO outptVisitDTO = MapUtils.get(unifiedPayMap, "outptVisitDTO");
         SysUserDTO  sysUserDTO = insureIndividualVisitDAO.queryDoctorPracCertiNo(outptVisitDTO);
         String doctorName = sysUserDTO.getName();

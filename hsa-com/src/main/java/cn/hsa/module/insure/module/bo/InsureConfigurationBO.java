@@ -6,6 +6,7 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import org.dom4j.DocumentException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InsureConfigurationBO {
 
@@ -81,4 +82,15 @@ public interface InsureConfigurationBO {
      * @Return
      */
     InsureConfigurationDTO queryInsureIndividualConfig(InsureConfigurationDTO insureConfigurationDTO);
+
+    /**
+     * @param map
+     * @Method queryIsUnifiedById
+     * @Desrciption 通过患者的就诊id, 查询登记时对应的医保机构是否走新老医保
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/8 19:27
+     * @Return
+     */
+    Boolean queryIsUnifiedById(Map<String, Object> map);
 }

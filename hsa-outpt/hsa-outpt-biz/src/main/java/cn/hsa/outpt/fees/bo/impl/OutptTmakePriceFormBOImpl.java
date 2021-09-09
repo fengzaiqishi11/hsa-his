@@ -3375,7 +3375,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
         individualSettleDTO.setHospCode(hospCode);
         individualSettleDTO.setVisitId(visitId);
-        individualSettleDTO.setState(Constants.SF.S);
+        individualSettleDTO.setState(Constants.SF.F);
         individualSettleDTO.setSettleState(Constants.SF.S);
         individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
         if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){

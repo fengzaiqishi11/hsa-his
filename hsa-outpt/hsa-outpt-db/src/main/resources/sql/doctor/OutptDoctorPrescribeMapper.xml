@@ -480,7 +480,9 @@
             preferential_type_id = #{preferentialTypeId},
             visit_code = #{visitCode},
             remark = #{remark},
-            now_address = #{nowAddress}
+            now_address = #{nowAddress},
+            source_tj_code = #{sourceTjCode},
+            source_tj_remark = #{sourceTjRemark}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 

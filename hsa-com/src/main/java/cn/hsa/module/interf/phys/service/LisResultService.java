@@ -30,6 +30,16 @@ public interface LisResultService {
     Map insertLisResult(Map map);
 
     /**
+    * @Description: 查询没有结果的lis申请单
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-04
+    */
+    @PostMapping("/service/lis/queryNoResultLis")
+    Map queryNoResultLis(Map map);
+
+    /**
      * @Description: 医嘱目录信息
      * @Param: [map]
      * @return: java.util.Map

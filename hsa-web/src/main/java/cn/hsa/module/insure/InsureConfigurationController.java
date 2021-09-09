@@ -125,5 +125,21 @@ public class InsureConfigurationController extends BaseController {
         return insureConfigurationService_consumer.delete(map);
     }
 
+    /**
+     * @Method queryIsUnifiedById
+     * @Desrciption  通过患者的就诊id,查询登记时对应的医保机构是否走新老医保
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/8 19:27
+     * @Return
+    **/
+    @PostMapping("/queryIsUnifiedById")
+    public WrapperResponse<Boolean> queryIsUnifiedById(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureConfigurationService_consumer.queryIsUnifiedById(map);
+    }
+
 
 }

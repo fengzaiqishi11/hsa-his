@@ -363,7 +363,7 @@
                     and (baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
                 </if>
 				    )
-				SCD ON  scd.record_time = SJ.time_slot
+				SCD ON  SCD.record_time = SJ.time_slot
 
     ORDER BY SJ.time_slot,SCD.visit_id
     </select>

@@ -2,7 +2,6 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedRemoteBO;
@@ -10,8 +9,6 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dao.InsureUnifiedRemoteDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
-import cn.hsa.module.insure.module.dto.InsureItemDTO;
 import cn.hsa.module.insure.module.entity.InsureUnifiedRemoteDO;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
@@ -375,6 +372,17 @@ public class InsureUnifiedRemoteBOImpl extends HsafBO implements InsureUnifiedRe
      */
     @Override
     public PageDTO queryPage(InsureUnifiedRemoteDO insureUnifiedRemoteDO) {
+
+        String startDate = insureUnifiedRemoteDO.getStartDate();
+        String endDate = insureUnifiedRemoteDO.getEndDate();
+        if(StringUtils.isNotEmpty(startDate)){
+           startDate = startDate.substring(0,7);
+        }
+        if(StringUtils.isNotEmpty(endDate)){
+            endDate = endDate.substring(0,7);
+        }
+        insureUnifiedRemoteDO.setStartDate(startDate);
+        insureUnifiedRemoteDO.setEndDate(endDate);
         PageHelper.startPage(insureUnifiedRemoteDO.getPageNo(), insureUnifiedRemoteDO.getPageSize());
         List<InsureUnifiedRemoteDO> insureUnifiedRemoteDOList = insureUnifiedRemoteDAO.queryPage(insureUnifiedRemoteDO);
         return PageDTO.of(insureUnifiedRemoteDOList);

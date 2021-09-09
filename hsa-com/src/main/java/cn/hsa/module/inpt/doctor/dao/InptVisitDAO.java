@@ -353,11 +353,11 @@ public interface InptVisitDAO {
 
     /**
      *  根据病人就诊id查询病人总费用信息与药品费用占比等信息
-     * @param paramMap visitIdList 就诊id列表
+     * @param  visitIdList 就诊id列表
      *                 hospCode 医院编码
      * @return 根据就诊id分组后病人总费用数据
      */
-    List<Map<String, Object>> queryPatientsCostsByVisitIds(Map<String, Object> paramMap);
+    List<Map<String, Object>> queryPatientsCostsByVisitIds(@Param("hospCode") String hospCode, @Param("visitIdList") List<String> visitIdList);
 
     /**
      * @Description: 查询住院患者是农合医保的患者信息

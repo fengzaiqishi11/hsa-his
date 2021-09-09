@@ -1751,6 +1751,7 @@
 	<!--查询在院病人状态-->
 	<select id="queryPatients" parameterType="map" resultType="map">
 		SELECT
+		visit.id,
 		visit.in_no,
 		visit.NAME name,
 		visit.bed_name,
@@ -1769,7 +1770,7 @@
 		visit.total_cost,
 		visit.total_advance,
 		visit.total_balance,
-		cost.total_price,
+		0 total_price,
 		settle.hosp_jm_price as hosp_jm_price,
 		settle.mi_price as mi_price,
 		settle.self_price as self_je,
@@ -1779,8 +1780,8 @@
 		visit.in_profile,
 		visit.in_dept_name,
 		visit.out_disease_name,
-		cost.item_price as ypfy,
-		cost.fyb,
+		0 as ypfy,
+		0 fyb,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name = visit.name) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
@@ -1789,22 +1790,6 @@
 
 		FROM
 		inpt_visit visit
-		LEFT JOIN (
-		SELECT
-		a.visit_id,
-		a.item_price,
-		a.total_price ,
-		CONCAT(FORMAT(a.item_price/a.total_price*100,2),'%') as fyb
-		FROM
-		(SELECT visit_id,
-		sum(
-		case
-		when item_code ='3' then ifnull(total_price,0)
-		else 0 end
-		)as item_price,sum( total_price ) AS total_price
-		FROM inpt_cost   GROUP BY  visit_id) a
-		) cost ON visit.id = cost.visit_id
-
 		LEFT JOIN (
 		SELECT
 		visit_id,
@@ -1874,7 +1859,7 @@
 	</select>
 
 	<!-- 查询病人总费用,药品费用占比 -->
-	<select id="queryPatientsCostsByVisitIds" parameterType="map" resultType="map">
+	<select id="queryPatientsCostsByVisitIds"  resultType="map">
 		SELECT
 			a.visit_id,
 			a.item_price,
@@ -1888,7 +1873,7 @@
 								 else 0 end
 						 )as item_price,sum( total_price ) AS total_price
 			  FROM inpt_cost  where hosp_code=#{hospCode} and visit_id in
-				<foreach collection="visitIdList" open="(" separator="," close="," item="item">
+				<foreach collection="visitIdList" open="(" separator="," close=")" item="item">
 					#{item}
 				</foreach>
 			GROUP BY hosp_code, visit_id )a

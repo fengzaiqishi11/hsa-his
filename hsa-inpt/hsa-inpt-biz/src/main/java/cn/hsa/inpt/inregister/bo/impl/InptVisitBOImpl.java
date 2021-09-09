@@ -473,9 +473,23 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
         Long start = System.currentTimeMillis();
         List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
+        List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
+        List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
+        List<Map<String, Object>> finalResult = inptVisitDTOS.stream().map(data -> {
+            patientCostDataList.stream().map(costsData ->{
+                if(data.get("id").equals(costsData.get("visit_id")))
+                {
+                    data.put("ypfy",costsData.get("item_price"));
+                    data.put("total_price",costsData.get("total_price"));
+                    data.put("fyb",costsData.get("fyb"));
+                }
+                return costsData;
+            });
+            return data;
+        }).collect(Collectors.toList());
         Long end = System.currentTimeMillis();
         System.err.println("====原数据库关联查询耗时:=== "+ (end-start)+" ms");
-        return PageDTO.of(inptVisitDTOS);
+        return PageDTO.of(finalResult);
     }
 
     /**

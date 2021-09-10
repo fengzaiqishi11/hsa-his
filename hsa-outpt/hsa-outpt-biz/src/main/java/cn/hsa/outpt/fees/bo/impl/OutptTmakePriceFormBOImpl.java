@@ -29,10 +29,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
-import cn.hsa.module.outpt.fees.entity.OutptInsurePayDO;
-import cn.hsa.module.outpt.fees.entity.OutptPayDO;
-import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
-import cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO;
+import cn.hsa.module.outpt.fees.entity.*;
 import cn.hsa.module.outpt.outinInvoice.dao.OutinInvoiceDAO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
@@ -229,6 +226,26 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         String visitId = (String) param.get("visitId");//患者id
         String isPhys = (String) param.get("isPhys") == null ? "" : (String) param.get("isPhys");//是否为体检信息
         String preferentialTypeId = (String) param.get("preferentialTypeId");//优惠类型id
+        // 获取系统参数 是否开启分处方结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", hospCode);
+        isMergeParam.put("code", "SF_DIVIDED_PRRESCIBE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        //《========处方id========》
+        List<String> opIds = new ArrayList<>();// 处方id集合  liuliyun 20210903
+        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())) {
+            if (param.containsKey("opIds") && StringUtils.isNotEmpty((String) param.get("opIds"))) {
+                String ids = (String) param.get("opIds");
+                String opIdList[] = ids.split(",");
+                if (opIdList != null && opIdList.length > 0) {
+                    for (int a = 0; a < opIdList.length; a++) {
+                        opIds.add(opIdList[a]);
+                    }
+                }
+            }
+        }
+        //《========处方id========》
         //获取费用数据
         //为了区分查询体检和其他收费数据,添加个前端传递参数isPhys
         param.put("sourceCode", isPhys.equals("1") ? Constants.FYLYFS.QTFY : Constants.FYLYFS.ZJHJSF);//划价收费费用
@@ -238,6 +255,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptVisitDTO.setId(visitId);
         outptVisitDTO.setPreferentialTypeId(preferentialTypeId);
         outptVisitDTO.setOutptCostDTOList(outptCostDTOList);
+        // 是否分处方结算
+        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())) {
+            if (opIds != null && opIds.size() > 0) {
+                outptVisitDTO.setOpIds(opIds);  // 处方id集合 liuliyun 20210907
+            }
+        }
         // 官红强修改，2021年1月26日19:55:07  查询患者费用信息时，不计算优惠金额，
         // outptCostDTOList = verifyCouponPrice(outptVisitDTO,0);
         outptCostDTOList = customVerifyCouponPrice(outptVisitDTO, 0);
@@ -2187,6 +2210,17 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         opParam.put("settleCodes", settleCodes);
         opParam.put("statusCode", Constants.ZTBZ.ZC);
         opParam.put("visitId", id);
+        // 获取系统参数 是否开启分处方结算 0: 不开启分处方结算;  1: 开启分处方结算
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", hospCode);
+        isMergeParam.put("code", "SF_DIVIDED_PRRESCIBE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+            List<String> opIds = outptVisitDTO.getOpIds(); // 处方id集合
+            if (opIds != null && opIds.size() > 0) {
+                opParam.put("opIds", opIds);
+            }
+        }
         //查询处方费用
         List<OutptCostDTO> opCostList = outptCostDAO.queryOutptCostSourceidNotNUll(opParam);
         //查询其他费用
@@ -3415,6 +3449,17 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("statusCode",Constants.SF.F);  // 正常
         map.put("settleCode",Constants.JSZT.YIJS); // 未结算，预结算
         map.put("isHospital",Constants.SF.F);
+        // 获取系统参数 是否开启分处方结算 0: 不开启分处方结算;  1: 开启分处方结算
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", hospCode);
+        isMergeParam.put("code", "SF_DIVIDED_PRRESCIBE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+            List<String> opIds = outptVisitDTO.getOpIds(); // 处方id集合
+            if (opIds != null && opIds.size() > 0) {
+                map.put("opIds", opIds);
+            }
+        }
         List<OutptCostDTO> outptCostList = outptCostDAO.queryOutptCost(map);
 //        List<OutptCostDTO> outptCostList =  outptCostDAO.queryIsSubmitOutptCost(map);
         BigDecimal outptTotalFee = new BigDecimal(0.00);
@@ -3654,5 +3699,37 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             insureIndividualCostService_consumer.insertInsureCost(outptCostMap);
         }
         return map;
+    }
+
+
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03 10:50
+     * @Return PageDTO
+     **/
+    @Override
+    public PageDTO queryPatientPrescribeNoSettle(Map map) {
+        OutptPrescribeDO outptPrescribeDO =MapUtils.get(map,"outptPrescribeDO");
+        PageHelper.startPage(outptPrescribeDO.getPageNo(),outptPrescribeDO.getPageSize());
+        List<OutptPrescribeDO> prescribeDOS = outptCostDAO.queryPatientPrescribeNoSettle(outptPrescribeDO);
+        return PageDTO.of(prescribeDOS);
+    }
+
+    /**
+     * @Method queryOutptPrescribeCostList
+     * @Desrciption  根据处方id查询处方费用
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/06 09:07
+     * @Return List<OutptCostDTO>
+     **/
+    @Override
+    public List<OutptCostDTO> queryOutptPrescribeCostList(Map map) {
+        map.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
+        map.put("settleCodes", new String[]{Constants.JSZT.WJS, Constants.JSZT.YUJS});//结算状态代码：未结算,预结算
+        return outptCostDAO.queryOutptPrescribeCostList(map);
     }
 }

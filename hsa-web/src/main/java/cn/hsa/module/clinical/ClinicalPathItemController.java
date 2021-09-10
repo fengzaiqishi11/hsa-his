@@ -49,7 +49,22 @@ public class ClinicalPathItemController extends BaseController {
         map.put("queryDTO",queryDTO);
         return clinicalPathItemService_consumer.queryAll(map);
     }
-
+    /**
+     * @Description: 通过id 查询临床路径项目
+     * @Param: [req, res]
+     * @Author: zhangguorui
+     * @Date: 2021/9/9
+     */
+    @GetMapping("/queryPathItemById")
+    public WrapperResponse<ClinicalPathItemDTO> queryPathItemById(ClinicalPathItemDTO queryDTO,
+                                                  HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        queryDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("queryDTO",queryDTO);
+        return clinicalPathItemService_consumer.queryPathItemById(map);
+    }
     /**
      * @Meth:updateOrAddPathItem
      * @Description: 修改或者添加临床项目路径
@@ -65,6 +80,8 @@ public class ClinicalPathItemController extends BaseController {
 
         SysUserDTO sysUserDTO = getSession(req, res);
         clinicalPathItemDTO.setHospCode(sysUserDTO.getHospCode());
+        clinicalPathItemDTO.setCrteName(sysUserDTO.getName());
+        clinicalPathItemDTO.setCrteId(sysUserDTO.getId());
         Map map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("clinicalPathItemDTO",clinicalPathItemDTO);
@@ -79,7 +96,7 @@ public class ClinicalPathItemController extends BaseController {
      * @Author: zhangguorui
      * @Date: 2021/9/9
     */
-    @DeleteMapping("deletePathItemBatch")
+    @PostMapping("/deletePathItemBatch")
     public WrapperResponse<Boolean> deletePathItemBatch(@RequestBody ClinicalPathItemDTO clinicalPathItemDTO,
                                                         HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);

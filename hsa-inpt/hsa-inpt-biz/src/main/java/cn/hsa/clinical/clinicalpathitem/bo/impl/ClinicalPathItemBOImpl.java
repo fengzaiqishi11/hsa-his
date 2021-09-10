@@ -46,6 +46,11 @@ public class ClinicalPathItemBOImpl implements ClinicalPathItemBO {
     @Override
     public Boolean updateOrAddPathItem(ClinicalPathItemDTO clinicalPathItemDTO) {
         Optional.ofNullable(clinicalPathItemDTO.getHospCode()).orElseThrow(() -> new AppException("医院编码不能为空"));
+        // 校验项目编码
+        int i = clinicalPathItemDAO.queryByCode(clinicalPathItemDTO);
+        if (i > 0) {
+            throw new AppException("项目编码不能重复");
+        }
         if (StringUtils.isEmpty(clinicalPathItemDTO.getId())) { // id为空 说明为添加
             // 生成主键
             String id = SnowflakeUtils.getId();
@@ -56,21 +61,16 @@ public class ClinicalPathItemBOImpl implements ClinicalPathItemBO {
             }
             // 生成五笔码
             if (StringUtils.isEmpty(clinicalPathItemDTO.getWbm())) {
-                clinicalPathItemDTO.setWbm(PinYinUtils.toFirstPY(clinicalPathItemDTO.getName()));
+                clinicalPathItemDTO.setWbm(WuBiUtils.getWBCode(clinicalPathItemDTO.getName()));
             }
+            // 创建时间
             clinicalPathItemDTO.setCrteTime(DateUtils.getNow());
             // 插入数据库
             return clinicalPathItemDAO.insert(clinicalPathItemDTO) > 0;
         } else {
             Optional.ofNullable(clinicalPathItemDTO.getId()).orElseThrow(() -> new AppException("无法保存,主键为空"));
-            // 校验编码是否重复
-            int i = clinicalPathItemDAO.queryByCode(clinicalPathItemDTO);
-            if (i > 0) {
-                throw new AppException("项目编码不能重复");
-            } else {
-                // 编辑
-                return clinicalPathItemDAO.updateById(clinicalPathItemDTO) > 0;
-            }
+            // 编辑
+            return clinicalPathItemDAO.updateById(clinicalPathItemDTO) > 0;
         }
     }
 
@@ -89,5 +89,19 @@ public class ClinicalPathItemBOImpl implements ClinicalPathItemBO {
             throw new AppException("请选中要删除的数据");
         }
         return clinicalPathItemDAO.deletePathItemBatch(clinicalPathItemDTO) > 0;
+    }
+    /**
+     * @Description: 根据id临床路径项目
+     * @Param: [map]
+     * @Author: zhangguorui
+     * @Date: 2021/9/9
+     */
+    @Override
+    public ClinicalPathItemDTO queryPathItemById(ClinicalPathItemDTO clinicalPathItemDTO) {
+        Optional.ofNullable(clinicalPathItemDTO.getHospCode()).orElseThrow(() -> new AppException("医院编码不能为空"));
+        Optional.ofNullable(clinicalPathItemDTO.getId()).orElseThrow(() -> new AppException("项目id不能为空"));
+        ClinicalPathItemDTO resultClinicalPathItemDTO = clinicalPathItemDAO.queryPathItemById(clinicalPathItemDTO);
+        Optional.ofNullable(resultClinicalPathItemDTO).orElseThrow(() -> new AppException("查询不到数据"));
+        return resultClinicalPathItemDTO;
     }
 }

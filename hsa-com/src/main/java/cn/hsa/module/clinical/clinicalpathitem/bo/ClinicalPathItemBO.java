@@ -18,4 +18,6 @@ public interface ClinicalPathItemBO {
     Boolean updateOrAddPathItem(ClinicalPathItemDTO clinicalPathItemDTO);
 
     Boolean deletePathItemBatch(ClinicalPathItemDTO clinicalPathItemDTO);
+
+    ClinicalPathItemDTO queryPathItemById(ClinicalPathItemDTO queryDTO);
 }

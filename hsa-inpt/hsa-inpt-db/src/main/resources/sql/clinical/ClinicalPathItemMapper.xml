@@ -5,7 +5,7 @@
     <insert id="insert">
         insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time)
         values
-        (#{Id},#{hospCode},#{code},#{name},#{itemType},#{pym},#{wbm},#{remarke},#{crteId},#{crteName},#{crteTime})
+        (#{id},#{hospCode},#{code},#{name},#{itemType},#{pym},#{wbm},#{remarke},#{crteId},#{crteName},#{crteTime})
     </insert>
 
     <!--修改数据-->
@@ -35,7 +35,7 @@
     </update>
     <!-- 删除临床项目 -->
     <delete id="deletePathItemBatch">
-        delete clinical_path_item where
+        delete from clinical_path_item where
         hosp_code = #{hospCode}
         and
         id in
@@ -59,16 +59,27 @@
             or wbm like concat('%', #{keyword}, '%'))
         </if>
         <if test="startTime != null and startTime != ''">
-           and crte_time &gt;= startTime
+           and crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-           and crte_time &lt;= endTime
+           and crte_time &lt;= #{endTime}
         </if>
     </select>
     <!--查看项目编码是否存在-->
     <select id="queryByCode" resultType="java.lang.Integer">
         select count(code) from clinical_path_item where hosp_code = #{hospCode}
-        and code = #{code} and id != #{id}
+        and code = #{code}
+        <if test="id != null and id != '' ">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!-- 通过id 查询临床路径项目-->
+    <select id="queryPathItemById"
+            resultType="cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO">
+        select id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time
+        from clinical_path_item
+        where hosp_code = #{hospCode} and id = #{id}
     </select>
 </mapper>
 

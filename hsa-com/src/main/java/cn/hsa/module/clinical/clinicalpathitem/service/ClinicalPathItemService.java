@@ -46,4 +46,12 @@ public interface ClinicalPathItemService {
      */
     @PostMapping("/service/clinical/clinicalPathItem/deletePathItemBatch")
     WrapperResponse<Boolean> deletePathItemBatch(Map map);
+    /**
+     * @Description: 根据id查询 临床路径项目
+     * @Param: [map]
+     * @Author: zhangguorui
+     * @Date: 2021/9/9
+     */
+    @GetMapping("/service/clinical/clinicalPathItem/queryPathItemById")
+    WrapperResponse<ClinicalPathItemDTO> queryPathItemById(Map map);
 }

@@ -9,6 +9,7 @@ import cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -46,5 +47,15 @@ public class ClinicalPathItemServiceImpl implements ClinicalPathItemService {
     @Override
     public WrapperResponse<Boolean> deletePathItemBatch(Map map) {
         return WrapperResponse.success(clinicalPathItemBO.deletePathItemBatch(MapUtils.get(map,"clinicalPathItemDTO")));
+    }
+    /**
+     * @Description: 根据ic查询 临床路径项目
+     * @Param: [map]
+     * @Author: zhangguorui
+     * @Date: 2021/9/9
+     */
+    @Override
+    public WrapperResponse<ClinicalPathItemDTO> queryPathItemById(Map map) {
+        return WrapperResponse.success(clinicalPathItemBO.queryPathItemById(MapUtils.get(map,"queryDTO")));
     }
 }

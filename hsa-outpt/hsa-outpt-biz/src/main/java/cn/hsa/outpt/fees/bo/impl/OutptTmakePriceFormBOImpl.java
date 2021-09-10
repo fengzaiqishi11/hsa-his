@@ -751,6 +751,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             throw new AppException("请先进行医保登记");
         }
 
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
+
         //医保试算
         Map<String, Object> outptCostUploadAndTrialParam = new HashMap<String, Object>();
         outptCostUploadAndTrialParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
@@ -775,11 +777,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          * 如果调用医保的费用传输成功，试算失败时，捕获异常。调用费用传输取消接口
          *
          */
-        Map<String, Object> map = new HashMap<>();
+       /* Map<String, Object> map = new HashMap<>();
         map.put("hospCode", outptVisitDTO.getHospCode());
         map.put("code", "UNIFIED_PAY");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
+//        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             // 直接切换统一支付平台
             Map<String, Object> unifiedPayMap = new HashMap<>();
             unifiedPayMap.put("outptVisitDTO", outptVisitDTO);
@@ -1487,14 +1490,16 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          * 医保结算
          *
          */
+        String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", outptVisitDTO.getHospCode());
-        map.put("code", "UNIFIED_PAY");
+//        map.put("code", "UNIFIED_PAY");
         map.put("visitId",visitId);
         map.put("id",visitId);
         String insureSettleId ="";
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
+//        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+//        if (sys != null && Constants.SF.S.equals(sys.getValue())) {  // 调用统一支付平台
+        if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             try{
                 Map<String, Object> insureOutptResult = insureUnifiedPayOutptService_consumer.UP_2207(outptCostUploadAndTrialParam);
                 Map<String, String> payinfo = (Map<String, String>) insureOutptResult.get("payinfo");

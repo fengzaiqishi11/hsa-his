@@ -1532,7 +1532,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
             //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
-            //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
+            if (inptCostDOList.isEmpty()){
+                throw new AppException("该患者没有产生费用信息。");
+            }
             if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
             }

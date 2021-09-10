@@ -6,6 +6,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import com.github.pagehelper.Page;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -338,4 +339,25 @@ public interface OutptTmakePriceFormService {
      * @Date: 2021-06-29
      */
     WrapperResponse<Boolean> lisData(Map map);
+
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03
+     * @Return PageDTO
+     **/
+    WrapperResponse<PageDTO> queryPatientPrescribeNoSettle(Map map);
+
+
+    /**
+     * @Method queryOutptPrescribeCostList
+     * @Desrciption  查询处方费用
+     * @Param  java.util.Map
+     * @Author liuliyun
+     * @Date  2021/09/03 10:51
+     * @Return  WrapperResponse<List<OutptCostDTO>>
+     **/
+    WrapperResponse<List<OutptCostDTO>> queryOutptPrescribeCostList(Map map);
 }

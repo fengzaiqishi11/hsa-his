@@ -603,10 +603,10 @@
                 and date(ic.cost_time) &lt;= STR_TO_DATE(#{feeEndDate},'%Y-%m-%d')
             </if>
         </if>
-        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
           AND ic.attribution_code = #{attributionCode}
         </if>
-        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
         AND (ic.attribution_code = '0' or ic.attribution_code is null or ic.attribution_code = '')
       </if>
         order by ic.total_price desc
@@ -1200,9 +1200,7 @@
         join inpt_visit iv on (iv.id = b.visit_id and iv.hosp_code = b.hosp_code)
         WHERE
         b.visit_id = #{id}
-        <if test="isUnified == '0'.toString()">
-            and iim.insure_reg_code = #{orgCode}
-        </if>
+          and iim.insure_reg_code = #{orgCode}
         AND (
         iim.is_trans = '0'
         OR b.item_id &lt;&gt; ifnull(iim.hosp_item_id,''))

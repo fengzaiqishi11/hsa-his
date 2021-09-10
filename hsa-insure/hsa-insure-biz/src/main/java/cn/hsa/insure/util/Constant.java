@@ -4,7 +4,6 @@ import cn.hsa.module.insure.module.entity.InsureDictDO;
 import cn.hsa.util.SnowflakeUtils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.insure.util
@@ -726,6 +725,7 @@ public interface Constant {
             public static final String UP_5402 = "5402"; // 报告明细信息查询
             public static final String UP_5364 = "5364"; // 门诊两病备案查询
 
+            public static final String UP_5264= "5264"; // 告知单查询
 
             public static final String UP_3401 = "3401"; // 科室信息上传
             public static final String UP_3401A = "3401A"; // 批量科室信息上传

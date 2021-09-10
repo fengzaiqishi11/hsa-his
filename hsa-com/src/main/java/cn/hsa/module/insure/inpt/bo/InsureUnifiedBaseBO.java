@@ -241,4 +241,15 @@ public interface InsureUnifiedBaseBO {
      * @Return
      */
     Map<String, Object>  deleteUnifiedDeptInfo(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method queryInform
+     * @Desrciption 告知单查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/6 15:35
+     * @Return
+     */
+    Map<String, Object>  queryInform(Map<String, Object> map);
 }

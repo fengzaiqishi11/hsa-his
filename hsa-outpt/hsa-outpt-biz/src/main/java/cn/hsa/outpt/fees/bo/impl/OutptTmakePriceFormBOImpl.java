@@ -1146,11 +1146,19 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         } finally {
             redisUtils.del(key);//删除结算key
         }
+
+        SysParameterDO sys = getSysParameter(hospCode, "MZFP_FDFS");
+        String SFFD = "1";
+        if (sys != null && !"".equals(sys.getValue())) {
+            SFFD = sys.getValue();
+        }
+
         JSONObject result = new JSONObject();
         result.put("outptVisit", outptVisitDTO);//个人信息
         result.put("outinInvoice", outinInvoiceList);//费用统计信息
         result.put("outinInvoiceDTO", outinInvoiceDTO);//费用统计信息
         result.put("settleNo", settleNo);
+        result.put("SFFD", SFFD);
         return WrapperResponse.success("支付成功。", result);
     }
 
@@ -3375,7 +3383,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
         individualSettleDTO.setHospCode(hospCode);
         individualSettleDTO.setVisitId(visitId);
-        individualSettleDTO.setState(Constants.SF.S);
+        individualSettleDTO.setState(Constants.SF.F);
         individualSettleDTO.setSettleState(Constants.SF.S);
         individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
         if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){

@@ -80,7 +80,7 @@ public class InptSettlementController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @GetMapping("/queryInptCostByList")
-    public WrapperResponse queryInptCostByList(@Param("id") String id, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode,
+    public WrapperResponse queryInptCostByList(@Param("id") String id,@Param("isMergeSettle") String isMergeSettle, @Param("isMidWaySettle") String isMidWaySettle, @Param("patientCode") String patientCode,
                                                @Param("attributionCode") String attributionCode,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         if (StringUtils.isEmpty(id)){
@@ -98,7 +98,12 @@ public class InptSettlementController extends BaseController {
         param.put("statusCode",Constants.ZTBZ.ZC);//状态标志
         param.put("settleCodes",new String[]{Constants.JSZT.WJS,Constants.JSZT.YUJS});//结算状态 = 未结算、预结算
         param.put("backCode",Constants.TYZT.YFY);//退费状态 = 已发药
-        param.put("queryBaby","N");
+        // 20210904 是否开启大人婴儿合并结算 liuliyun
+        if (isMergeSettle!=null&&"1".equals(isMergeSettle)) {
+            param.put("queryBaby", "");
+        } else {
+            param.put("queryBaby", "N");
+        }
         if(!StringUtils.isEmpty(attributionCode)) {
           param.put("attributionCode",attributionCode);
         }

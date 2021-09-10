@@ -108,15 +108,32 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
             resultMap.put("crteId", "lis");
             resultMap.put("crteName", "lis");
 
-            stringList.add(MapUtils.get(resultMap,"pid"));
+            stringList.add(MapUtils.get(resultMap,"id"));
         }
         List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
         lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
         // 新增结果
         int num = lisResultDAO.insertResult(medicalResultDTOList);
+        // 更新申请单状态
+//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
 
         return map;
+    }
+
+    /** 
+    * @Description: 获取没有结果的申请单的医嘱id
+    * @Param: 
+    * @return: 
+    * @Author: zhangxuan
+    * @Date: 2021-09-04
+    */ 
+    @Override
+    public Map queryNoResultLis(Map map){
+        List<Map> mapList = lisResultDAO.queryNoResultLis();
+        Map newMap = new HashMap();
+        newMap.put("result",mapList);
+        return newMap;
     }
 
     /**

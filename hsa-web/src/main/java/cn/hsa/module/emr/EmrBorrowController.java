@@ -119,6 +119,9 @@ public class EmrBorrowController extends BaseController {
     public WrapperResponse<PageDTO> queryArchivePatient(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
         Map map = new HashMap();
         map.put("inptVisitDTO", inptVisitDTO);
         map.put("hospCode", sysUserDTO.getHospCode());

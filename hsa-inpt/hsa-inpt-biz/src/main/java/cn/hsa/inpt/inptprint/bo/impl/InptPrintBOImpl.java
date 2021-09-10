@@ -11,6 +11,8 @@ import cn.hsa.module.inpt.inptprint.bo.InptPrintBO;
 import cn.hsa.module.inpt.inptprint.dao.InptPrintDAO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +45,9 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   @Resource
   private InptVisitDAO inptVisitDAO;
 
+  @Resource
+  SysParameterService sysParameterService_consumer;
+
 
   /**
   * @Menthod queryInptCostList
@@ -57,6 +62,18 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   **/
   @Override
   public Map queryInptCostListPrint(InptCostDTO inptCostDTO) {
+    //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
+    SysParameterDTO sysParameterDTO =null;
+    Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+    isInsureUnifiedMap.put("hospCode", inptCostDTO.getHospCode());
+    isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
+    sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+    // 开启大人婴儿合并结算
+    if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+      inptCostDTO.setQueryBaby("");
+      inptCostDTO.setBabyId("");
+    }
+    //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
     List<InptCostDTO> inptCostDTOS = inptPrintDAO.queryInptCostListPrint(inptCostDTO);
     Map<String, List<InptCostDTO>> collect = new TreeMap<>();
     if(ListUtils.isEmpty(inptCostDTOS)){

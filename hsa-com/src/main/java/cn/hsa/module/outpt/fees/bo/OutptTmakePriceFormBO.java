@@ -328,4 +328,24 @@ public interface OutptTmakePriceFormBO {
      * @Date: 2021-06-29
      */
     Boolean lisData(Map map);
+
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03 10:45
+     * @Return PageDTO
+     **/
+    PageDTO queryPatientPrescribeNoSettle(Map map);
+
+    /**
+     * @Method queryOutptPrescribeCostList
+     * @Desrciption  根据处方id查询处方费用list
+     * @Param  java.util.Map
+     * @Author liuliyun
+     * @Date  2021/09/03 10:58
+     * @Return OutptCostDTO
+     **/
+    List<OutptCostDTO> queryOutptPrescribeCostList(Map map);
 }

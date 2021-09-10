@@ -260,10 +260,10 @@
 
 		<!-- 入院开始时间 zhongming by 20201219 -->
 		<if test="startTime != null and startTime != ''">
-			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+			and in_time >= #{startTime}
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+			and in_time &lt;= #{endTime}
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and status_code = #{statusCode}
@@ -312,10 +312,10 @@
 		</if>
 		<!-- 入院开始时间 zhongming by 20201219 -->
 		<if test="startTime != null and startTime != ''">
-			and pt.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+			and pt.in_time >= #{startTime}
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and pt.in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+			and pt.in_time &lt;= #{endTime}
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and pt.status_code = #{statusCode}
@@ -2099,10 +2099,10 @@
 
 		<!-- 入院开始时间 zhongming by 20201219 -->
 		<if test="startTime != null and startTime != ''">
-			and in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+			and in_time >= #{startTime}
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+			and in_time &lt;= #{endTime}
 		</if>
 		<if test="statusCode != null and statusCode != ''">
 			and status_code = #{statusCode}

@@ -333,7 +333,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     /**
      * @Method: buildMedic
      * @Description:
-     * CXGL_BBLX_SHOW：需收取静脉采血医技分类代码
+         * CXGL_BBLX_SHOW：需收取静脉采血医技分类代码
      * MZSF_JMCX_MLID:自动带入的静脉采血医嘱目录编码
      * 容器费用:医嘱目录配置容器类容->码表备注配置容器具体费用项目
      * 如何判断是否收取采血费和容器费:根据费用表费用来源ID,时间查询费用表
@@ -425,6 +425,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                  */
                 if (Constants.YZLB.YZLB3.equals(adviceDTO.getTypeCode()) && !StringUtils.isEmpty(baseAdvice.getContainerCode())
                         && !StringUtils.isEmpty(baseAdvice.getSpecimenCode()) && !StringUtils.isEmpty(baseAdvice.getTechnologyCode())) {
+                    // 判断医技代码是否包含在 (需收取静脉采血医技分类代码)参数中
+                    boolean isContainsInBloodParameters = Arrays.asList(codeArray).contains(baseAdvice.getTechnologyCode());
                     for (BaseAdviceDTO baseAdviceDTO:baseAdviceDTOList) {
                         if (StringUtils.isEmpty(baseAdviceDTO.getContainerCode())
                                 || StringUtils.isEmpty(baseAdviceDTO.getSpecimenCode()) || StringUtils.isEmpty(baseAdviceDTO.getTechnologyCode())) {
@@ -440,8 +442,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                                         DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), cxfBaseItem.getId());
                                 if (ListUtils.isEmpty(cxCostDTOList)) {
                                     //判断该医嘱目录的医技分类是否包含在参数里面
-                                    if (codeArray!=null && codeArray.length>0 &&
-                                            !(Arrays.stream(codeArray).filter(code->code.equals(baseAdvice.getTechnologyCode())).collect(Collectors.toList()).size()>0)) {
+                                    if (codeArray!=null && codeArray.length>0 && isContainsInBloodParameters) {
                                         saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
                                     }
                                 }
@@ -463,8 +464,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     //不合管的医嘱,费用入库
                     if (!flag) {
                         //判断该医嘱目录的医技分类是否包含在参数里面,采血费
-                        if (codeArray!=null && codeArray.length>0 && cxfBaseItem!=null &&
-                                !(Arrays.stream(codeArray).filter(code->code.equals(baseAdvice.getTechnologyCode())).collect(Collectors.toList()).size()>0)) {
+                        if (codeArray!=null && codeArray.length>0 && cxfBaseItem!=null && isContainsInBloodParameters) {
                             saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
                         }
                         //容器费
@@ -1755,14 +1755,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     }
 
     /**
-     * @Method: getBaseAssistCalcDTO
-     * @Description: 根据用法找到辅助计费
+     *
+     * 根据用法找到辅助计费
      * 优先级
      * 1.指定科室、指定项目
      * 2.不指定科室、指定项目
      * 3.指定科室、不指定项目
      * 4.不指定科室、不指定项目
      * 5.返回最新的一条记录
+     * @Method: getBaseAssistCalcDTO
      * @Param: [inptAdviceDTO, usageCode, wayCode]
      * @Author: youxianlin
      * @Email: 254580179@qq.com

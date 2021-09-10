@@ -1,5 +1,6 @@
 package cn.hsa.module.outpt.register.dao;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO;
 import cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto;
@@ -206,5 +207,5 @@ public interface OutptRegisterDAO {
      * @Date 2021/8/25 12:06
      * @Return
      */
-    String getMaxInvoiceNo(OutptRegisterSettleDto outptRegisterSettleDto);
+    OutinInvoiceDTO getMaxInvoiceNo(OutptRegisterSettleDto outptRegisterSettleDto);
 }

@@ -1135,6 +1135,63 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return resultMap;
     }
 
+    /**
+     * @param map
+     * @Method queryInform
+     * @Desrciption 告知单查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/6 15:35
+     * @Return
+     */
+    @Override
+    public Map<String, Object> queryInform(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String medicalRegNo = MapUtils.get(map,"medicalRegNo");
+        String visitId =MapUtils.get(map,"visitId");
+        map.put("code", "HOSP_INSURE_CODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        String orgCode = "";
+        if (sysParameterDTO != null) {
+            orgCode = sysParameterDTO.getValue(); // 获取医疗机构编码
+        }
+        else {
+            throw new AppException("请先配置系统默认的医疗机构编码参数");
+        }
+
+        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+        individualSettleDTO.setHospCode(hospCode);
+        individualSettleDTO.setState(Constants.SF.F);
+        individualSettleDTO.setSettleState(Constants.SF.S);
+        individualSettleDTO.setVisitId(visitId);
+        individualSettleDTO.setMedicalRegNo(medicalRegNo);
+        individualSettleDTO = insureIndividualSettleDAO.querySettle(individualSettleDTO);
+        if(individualSettleDTO == null){
+            throw new AppException("该医保患者没有正常的结算信息");
+        }
+        if(StringUtils.isEmpty(MapUtils.get(map, "psnNo"))){
+            throw new AppException("调用告知单接口查询的个人电脑号入参不能为空");
+        }
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        // 46000000000000002000377361  MapUtils.get(map, "psnNo"))
+        dataMap.put("psn_no",  MapUtils.get(map, "psnNo"));
+        if(StringUtils.isEmpty(MapUtils.get(map, "begntime"))){
+            throw new AppException("告知单查询的结算开始日期不能为空");
+        }
+        dataMap.put("begn_date", MapUtils.get(map, "begntime"));
+        if(StringUtils.isEmpty(MapUtils.get(map, "endtime"))){
+            throw new AppException("告知单查询的结算结束日期不能为空");
+        }
+        dataMap.put("end_date", MapUtils.get(map, "endtime"));
+        paramMap.put("data", dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_5264, paramMap);
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "result");
+        map.put("resultDataMap", resultDataMap);
+        return map;
+    }
+
 
     /**
      * @Method commonInsureUnified

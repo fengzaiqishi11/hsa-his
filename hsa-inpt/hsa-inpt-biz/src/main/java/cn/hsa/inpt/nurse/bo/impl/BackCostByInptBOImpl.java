@@ -212,7 +212,14 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
                 totalCost = BigDecimalUtils.add(totalCost, dto.getBackAmount());
             }
             dto.setStatusCode(Constants.ZTBZ.BCH);//状态标志 被冲红
-            dto.setIsOk(Constants.SF.F); //是否确费 未确费
+            // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   start =======================================
+            if ("1".equals(dto.getIsDist()) && ("1".equals(dto.getItemCode()) || "2".equals(dto.getItemCode())) ) {
+                dto.setIsOk(Constants.SF.F); //是否确费 未确费
+            } else {
+                dto.setIsOk(Constants.SF.S); //是否确费 确费
+            }
+            // dto.setIsOk(Constants.SF.F); //是否确费 未确费
+            // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   end =======================================
 
             InptCostDTO redDto = DeepCopy.deepCopy(dto);//深度复制
             redDto.setIsOk(Constants.SF.S); //是否确费 未确费

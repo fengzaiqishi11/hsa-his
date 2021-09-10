@@ -796,6 +796,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     mrisDiagnoseDO.setDiseaseName2("主要诊断");
                 } else if ("0".equals(mrisDiagnoseDO.getDiseaseCode2())){
                     mrisDiagnoseDO.setDiseaseName2("其他诊断");
+                } else {
+                    mrisDiagnoseDO.setDiseaseName2("");
                 }
                 mrisDiagnoseDO.setId(SnowflakeUtils.getId());
                 mrisDiagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());

@@ -245,4 +245,15 @@ public interface InsureUnifiedBaseService {
      * @Return
      **/
     WrapperResponse<Map<String, Object>> deleteUnifiedDeptInfo(Map<String, Object> map);
+
+    /**
+     * @Method queryInform
+     * @Desrciption  告知单查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/6 15:35
+     * @Return
+    **/
+    WrapperResponse<Map<String, Object>> queryInform(Map<String, Object> map);
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathstage.dao.ClinicalPathStageDAO">
+
+    <!-- 查询临床路径阶段 -->
+    <select id="queryClinicalPathStage"
+            resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
+        select id,hosp_code,list_id,code,name,describe,min_time,max_time,time_unit,sort_no,remarke,is_operation_day,crte_id,crte_name,crte_time
+            from clinical_path_stage
+            where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="">
+
+            </if>
+    </select>
+
+</mapper>
+

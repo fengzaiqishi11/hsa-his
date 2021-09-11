@@ -8,9 +8,7 @@ import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
 import cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -56,4 +54,47 @@ public class ClinicalPathStageController extends BaseController {
         return clinicalPathStageService_consumer.queryClinicalPathStage(map);
     }
 
+    /**
+     * @Meth: addOrupdateClinicalPathStage
+     * @Description:  根据路径目录ID 添加或者编辑路径阶段
+     * @Param:
+     * @return:
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+    */
+    @PostMapping("/addOrUpdateClinicalPathStage")
+    public WrapperResponse<Boolean> addOrUpdateClinicalPathStage(@RequestBody ClinicalPathStageDTO clinicalPathStageDTO,
+                                                                 HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        String hospCode = sysUserDTO.getHospCode();
+        clinicalPathStageDTO.setHospCode(hospCode);
+        clinicalPathStageDTO.setCrteId(sysUserDTO.getId());
+        clinicalPathStageDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap<>();
+        map.put("hospCode",hospCode);
+        map.put("clinicalPathStageDTO",clinicalPathStageDTO);
+        return clinicalPathStageService_consumer.addOrUpdateClinicalPathStage(map);
+    }
+
+    /**
+     * @Meth: deleteClinicalPathStage
+     * @Description: 删除路径阶段描述
+     * @Param: [clinicalPathStageDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    @PostMapping("/deleteClinicalPathStage")
+    public WrapperResponse<Boolean> deleteClinicalPathStage(@RequestBody ClinicalPathStageDTO clinicalPathStageDTO,
+                                                            HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        String hospCode = sysUserDTO.getHospCode();
+        clinicalPathStageDTO.setHospCode(hospCode);
+        clinicalPathStageDTO.setCrteId(sysUserDTO.getId());
+        clinicalPathStageDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap<>();
+        map.put("hospCode",hospCode);
+        map.put("clinicalPathStageDTO",clinicalPathStageDTO);
+        return clinicalPathStageService_consumer.deleteClinicalPathStage(map);
+    }
 }

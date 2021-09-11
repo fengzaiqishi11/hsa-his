@@ -22,5 +22,33 @@ public interface ClinicalPathStageDAO {
      * @Date: 2021/9/10
      */
     List<ClinicalPathStageDTO> queryClinicalPathStage(ClinicalPathStageDTO clinicalPathStageDTO);
+
+    /**
+     * @Meth: insert
+     * @Description: 添加操作
+     * @Param: [clinicalPathStageDTO]
+     * @return: int
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    int insert(ClinicalPathStageDTO clinicalPathStageDTO);
+    /**
+     * @Meth:updateById
+     * @Description: 通过Id编辑
+     * @Param: [clinicalPathStageDTO]
+     * @return: int
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    int updateById(ClinicalPathStageDTO clinicalPathStageDTO);
+    /**
+     * @Meth: deleteClinicalPathStage
+     * @Description: 通过id 目录id删除
+     * @Param: [clinicalPathStageDTO]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    int deleteClinicalPathStage(ClinicalPathStageDTO clinicalPathStageDTO);
 }
 

@@ -19,6 +19,13 @@ public class ClinicalPathStageDTO extends ClinicalPathStageDO implements Seriali
      * 关键字
      */
     private String keyword;
-
-
+    /**
+     * 开始时间
+     */
+    private String startTime;
+    /**
+     * 结束时间
+     */
+    private String endTime;
+    
 }

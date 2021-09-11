@@ -31,4 +31,29 @@ public class ClinicalPathStageServiceImpl implements ClinicalPathStageService {
     public WrapperResponse<PageDTO> queryClinicalPathStage(Map map) {
         return WrapperResponse.success(clinicalPathStageBO.queryClinicalPathStage(MapUtils.get(map,"clinicalPathStageDTO")));
     }
+
+    /**
+     * @Meth:addOrupdateClinicalPathStage
+     * @Description:  根据路径目录ID 添加或者编辑路径阶段
+     * @Param:
+     * @return:
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    @Override
+    public WrapperResponse<Boolean> addOrUpdateClinicalPathStage(Map map) {
+        return WrapperResponse.success(clinicalPathStageBO.addOrUpdateClinicalPathStage(MapUtils.get(map,"clinicalPathStageDTO")));
+    }
+    /**
+     * @Meth: deleteClinicalPathStage
+     * @Description: 删除阶段路径描述
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/11
+     */
+    @Override
+    public WrapperResponse<Boolean> deleteClinicalPathStage(Map map) {
+        return WrapperResponse.success(clinicalPathStageBO.deleteClinicalPathStage(MapUtils.get(map,"clinicalPathStageDTO")));
+    }
 }

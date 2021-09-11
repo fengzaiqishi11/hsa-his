@@ -465,6 +465,7 @@
     <dubbo:reference id="insureStockManagerService_consumer" interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" check="false"/>
     <!-- 医保输血记录服务 -->
     <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
+    <dubbo:reference id="insureReckonService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureReckonService" check="false"/>
 
     <dubbo:reference id="insureRecruitPurchaseService_consumer" interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" check="false"/>
 </beans>

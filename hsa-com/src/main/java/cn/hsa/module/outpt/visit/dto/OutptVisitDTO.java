@@ -235,4 +235,11 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String settleEndTime;
 
     private String isSettle;
+
+    /**
+     * 处方id集合
+     */
+    private List<String> opIds;
+
+    private String opIdList;
 }

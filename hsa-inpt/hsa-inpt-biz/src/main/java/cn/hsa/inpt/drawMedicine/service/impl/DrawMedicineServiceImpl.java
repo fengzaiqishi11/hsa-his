@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.drawMedicine.bo.DrawMedicineBO;
 import cn.hsa.module.inpt.drawMedicine.service.DrawMedicineService;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,23 @@ public class DrawMedicineServiceImpl implements DrawMedicineService {
     }
 
     /**
+    * @Menthod checkDrawMedicineStock
+    * @Desrciption 预配药的时候校验库存
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/7 10:36
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @Override
+    public WrapperResponse<PharInWaitReceiveDTO> checkDrawMedicineStock(Map map) {
+      return WrapperResponse.success(drawMedicineBO.checkDrawMedicineStock(map));
+    }
+
+
+  /**
      * @Method getApplyDetailsList
      * @Desrciption 查询领药明细数据
      * @params [map]

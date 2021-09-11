@@ -91,4 +91,15 @@ public interface InsureConfigurationService {
      * @Return
     **/
     WrapperResponse<InsureConfigurationDTO> queryInsureIndividualConfig(Map<String,Object>map);
+
+    /**
+     * @Method queryIsUnifiedById
+     * @Desrciption  通过患者的就诊id,查询登记时对应的医保机构是否走新老医保
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/8 19:27
+     * @Return
+     **/
+    WrapperResponse<Boolean> queryIsUnifiedById(Map<String, Object> map);
 }

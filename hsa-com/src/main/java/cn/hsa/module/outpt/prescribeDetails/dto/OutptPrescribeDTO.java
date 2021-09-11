@@ -88,5 +88,9 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
     private BigDecimal zfje;
     // 开方时间
     private String prescribeTime;
+    /**
+     * 配药打印处方单患者信息
+     */
+    private Map<String, Object> singlePatInfo;
 }
 

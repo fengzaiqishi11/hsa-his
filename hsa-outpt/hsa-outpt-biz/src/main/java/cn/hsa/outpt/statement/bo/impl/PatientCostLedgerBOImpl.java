@@ -376,6 +376,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         tableMap.put("label", "总金额");
         tableMap.put("prop", "reality_price");
         tableMap.put("showSummary", true);
+        tableMap.put("type", "money");
         tableMap.put("toFixed", "2");
         listTableConfig.add(tableMap);
         for (OutptCostDTO outptCostDTO : outptCostDTOList) {
@@ -384,6 +385,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             tableMap.put("label", outptCostDTO.getBfcName());
             tableMap.put("prop", outptCostDTO.getBfcId() + "aa");
             tableMap.put("showSummary", true);
+            tableMap.put("type", "money");
             tableMap.put("toFixed", "2");
             listTableConfig.add(tableMap);
         }

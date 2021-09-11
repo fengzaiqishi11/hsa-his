@@ -111,11 +111,14 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         outptDiagnoseDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         outptDiagnoseDTO.setInsureRegCode(insureIndividualVisitDTO.getInsureRegCode());
         unifiedPayMap.put("outptDiagnoseDTO", outptDiagnoseDTO);
+
         OutptVisitDTO outptVisitDTO = MapUtils.get(unifiedPayMap, "outptVisitDTO");
         SysUserDTO  sysUserDTO = insureIndividualVisitDAO.queryDoctorPracCertiNo(outptVisitDTO);
         String doctorName = sysUserDTO.getName();
         String doctorId = sysUserDTO.getPracCertiNo();
-
+        if(StringUtils.isEmpty(doctorId)){
+            throw new AppException("该" +doctorName+"医生的医师国家码没有维护,请去用户管理里面维护");
+        }
         OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
         outptPrescribeDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         outptPrescribeDTO.setHospCode(hospCode);
@@ -730,7 +733,9 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("akb067", outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
         paramMap.put("akc264", outDataMap.get("medfee_sumamt").toString());//医疗总费用akc264 = bka831 + bka832+bka842 --------医疗费总额
         paramMap.put("ake026", ake026);  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
-        paramMap.put("ake029", ake029);//大额医疗费用补助基金支付 ---- 职工大额医疗费用补助基金支出
+        String hifmiPay = outDataMap.get("hifmi_pay").toString();
+        String hifobPay = outDataMap.get("hifob_pay").toString();
+        paramMap.put("ake029", BigDecimalUtils.add(hifmiPay,hifobPay).toString());//大额医疗费用补助基金支付 ---- 职工大额医疗费用补助基金支出
         paramMap.put("ake035", ake035);//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
         paramMap.put("ake039", ake039); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
         paramMap.put("bka801", null); //床位费超额金额

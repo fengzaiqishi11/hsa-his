@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.bo.PatientCostLedgerBO;
@@ -12,6 +13,7 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,6 +87,9 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
   @Override
   public WrapperResponse<PageDTO> queryStroInvoicingLedger(Map map) {
     StroInvoicingDTO stroInvoicingDTO = MapUtils.get(map, "stroInvoicingDTO");
+    if(StringUtils.isEmpty(stroInvoicingDTO.getBizId())) {
+      throw new AppException("请先选择库位");
+    }
     return WrapperResponse.success(patientCostLedgerBO.queryStroInvoicingLedger(stroInvoicingDTO));
   }
 

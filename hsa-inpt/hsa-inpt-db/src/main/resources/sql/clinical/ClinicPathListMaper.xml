@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathlist.dao.ClinicPathListDAO">
+
+    <resultMap type="cn.hsa.module.clinical.clinicalpathlist.dto.ClinicPathListDTO" id="ClinicPathListMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+        <result property="sortNo" column="sort_no" jdbcType="VARCHAR"/>
+        <result property="diagnoseIds" column="diagnose_ids" jdbcType="VARCHAR"/>
+        <result property="minInptDay" column="min_inpt_day" jdbcType="VARCHAR"/>
+        <result property="maxInptDay" column="max_inpt_day" jdbcType="VARCHAR"/>
+        <result property="minPrice" column="min_price" jdbcType="VARCHAR"/>
+        <result property="maxPrice" column="max_price" jdbcType="VARCHAR"/>
+        <result property="isFreeEntry" column="is_free_entry" jdbcType="VARCHAR"/>
+        <result property="printColunm" column="print_colunm" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="remarke" column="remarke" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="auditCode" column="audit_code" jdbcType="VARCHAR"/>
+        <result property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+        <result property="auditName" column="audit_name" jdbcType="VARCHAR"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getClinicPathById" resultMap="ClinicPathListMap">
+        select
+          id, hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+        from clinic_path_list
+        where id = #{id}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryClinicPathAll" resultMap="ClinicPathListMap">
+        select
+          id, hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+        from clinic_path_list
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and type_code = #{typeCode}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and dept_id = #{deptId}
+            </if>
+            <if test="deptName != null and deptName != ''">
+                and dept_name = #{deptName}
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                and sort_no = #{sortNo}
+            </if>
+            <if test="diagnoseIds != null and diagnoseIds != ''">
+                and diagnose_ids = #{diagnoseIds}
+            </if>
+            <if test="minInptDay != null and minInptDay != ''">
+                and min_inpt_day = #{minInptDay}
+            </if>
+            <if test="maxInptDay != null and maxInptDay != ''">
+                and max_inpt_day = #{maxInptDay}
+            </if>
+            <if test="minPrice != null and minPrice != ''">
+                and min_price = #{minPrice}
+            </if>
+            <if test="maxPrice != null and maxPrice != ''">
+                and max_price = #{maxPrice}
+            </if>
+            <if test="isFreeEntry != null and isFreeEntry != ''">
+                and is_free_entry = #{isFreeEntry}
+            </if>
+            <if test="printColunm != null and printColunm != ''">
+                and print_colunm = #{printColunm}
+            </if>
+            <if test="pym != null and pym != ''">
+                and pym = #{pym}
+            </if>
+            <if test="wbm != null and wbm != ''">
+                and wbm = #{wbm}
+            </if>
+            <if test="remarke != null and remarke != ''">
+                and remarke = #{remarke}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="auditId != null and auditId != ''">
+                and audit_id = #{auditId}
+            </if>
+            <if test="auditName != null and auditName != ''">
+                and audit_name = #{auditName}
+            </if>
+            <if test="auditTime != null">
+                and audit_time = #{auditTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertClinicPath" keyProperty="id" useGeneratedKeys="true">
+        insert into clinic_path_list(id,hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time)
+        values (#{id},#{hospCode}, #{code}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{sortNo}, #{diagnoseIds}, #{minInptDay}, #{maxInptDay}, #{minPrice}, #{maxPrice}, #{isFreeEntry}, #{printColunm}, #{pym}, #{wbm}, #{remarke}, #{crteId}, #{crteName}, #{crteTime}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateClinicPath">
+        update clinic_path_list
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code = #{typeCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName},
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                sort_no = #{sortNo},
+            </if>
+            <if test="diagnoseIds != null and diagnoseIds != ''">
+                diagnose_ids = #{diagnoseIds},
+            </if>
+            <if test="minInptDay != null and minInptDay != ''">
+                min_inpt_day = #{minInptDay},
+            </if>
+            <if test="maxInptDay != null and maxInptDay != ''">
+                max_inpt_day = #{maxInptDay},
+            </if>
+            <if test="minPrice != null and minPrice != ''">
+                min_price = #{minPrice},
+            </if>
+            <if test="maxPrice != null and maxPrice != ''">
+                max_price = #{maxPrice},
+            </if>
+            <if test="isFreeEntry != null and isFreeEntry != ''">
+                is_free_entry = #{isFreeEntry},
+            </if>
+            <if test="printColunm != null and printColunm != ''">
+                print_colunm = #{printColunm},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm},
+            </if>
+            <if test="remarke != null and remarke != ''">
+                remarke = #{remarke},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                audit_code = #{auditCode},
+            </if>
+            <if test="auditId != null and auditId != ''">
+                audit_id = #{auditId},
+            </if>
+            <if test="auditName != null and auditName != ''">
+                audit_name = #{auditName},
+            </if>
+            <if test="auditTime != null">
+                audit_time = #{auditTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteClinicPathById">
+        delete from clinic_path_list where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+</mapper>

@@ -57,6 +57,12 @@ public class OutptExecutionCardPrintBOImpl extends HsafBO implements OutptExecut
         if (StringUtils.isEmpty(typeCode)){
             throw new RuntimeException("请选择需要打印的执行卡单据类型");
         }
+        // 由于输液瓶贴、静脉输液卡、输液一览卡、留观输液瓶贴为同一组数据，需根据不同的打印单据类型过滤打印状态，增加一个是否共享（isShared）字段来区分
+        if (StringUtils.isNotEmpty(typeCode) && ("1".equals(typeCode) || "2".equals(typeCode) || "3".equals(typeCode) || "4".equals(typeCode))){
+            outptInfusionRegisterDTO.setIsShared(Constants.SF.S);
+        } else {
+            outptInfusionRegisterDTO.setIsShared(Constants.SF.F);
+        }
         //根据执行卡单据类型查询码表对应的用药类型List
         Map map1 = new HashMap<>();
         SysCodeDetailDTO sysCodeDetailDTO = new SysCodeDetailDTO();
@@ -88,55 +94,6 @@ public class OutptExecutionCardPrintBOImpl extends HsafBO implements OutptExecut
         //根据条件查询所得
         List<OutptInfusionRegisterDTO> outptInfusionRegisterDTOS = outptExecutionCardPrintDAO.queryPage(outptInfusionRegisterDTO);
         return PageDTO.of(outptInfusionRegisterDTOS);
-      /*  List<OutptInfusionRegisterDTO> list = new ArrayList<>();
-
-//        return PageDTO.of(outptInfusionRegisterDTOS);
-        if ("1".equals(typeCode) || "2".equals(typeCode) || "3".equals(typeCode) || "4".equals(typeCode) || "5".equals(typeCode) ){
-            //根据打印类型、是否打印标志过滤数据
-            if (!ListUtils.isEmpty(outptInfusionRegisterDTOS)){
-                for (OutptInfusionRegisterDTO outptInfusionRegisterDTO1 : outptInfusionRegisterDTOS) {
-                    String print = outptInfusionRegisterDTO1.getIsPrint();
-                    if ("0".equals(print)){
-                        Map<String, String> m = new HashMap<>();
-                        m.put(typeCode, print);
-                        print = JSON.toJSONString(m);
-                    } else if ("1".equals(print)){
-                        Map<String, String> m = new HashMap<>();
-                        m.put(typeCode, print);
-                        print = JSON.toJSONString(m);
-                    }
-                    Map<String,String> map = (Map<String, String>) JSON.parse(print); //{'1':'1'}  2 {"1":"1","2":"1"}
-
-                    if ("0".equals(outptInfusionRegisterDTO.getPrintFlag())){
-                        //未打印
-                        if (StringUtils.isEmpty(map.get(typeCode))){
-                            list.add(outptInfusionRegisterDTO1);
-                        } else if (outptInfusionRegisterDTO.getPrintFlag().equals(map.get(typeCode)) && StringUtils.isNotEmpty(map.get(typeCode))){
-                            list.add(outptInfusionRegisterDTO1);
-                        }
-                    } else {
-                        //已打印
-                        if (outptInfusionRegisterDTO.getPrintFlag().equals(map.get(typeCode)) && StringUtils.isNotEmpty(map.get(typeCode))){
-                            list.add(outptInfusionRegisterDTO1);
-                        }
-                    }
-                }
-            }
-        } else {
-            //其他单据类型
-            if (!ListUtils.isEmpty(outptInfusionRegisterDTOS)){
-                for (OutptInfusionRegisterDTO outptInfusionRegisterDTO1 : outptInfusionRegisterDTOS) {
-                    if ("0".equals(outptInfusionRegisterDTO.getIsPrint()) && outptInfusionRegisterDTO.getIsPrint().equals(outptInfusionRegisterDTO1.getIsPrint())){
-                        //未打印
-                        list.add(outptInfusionRegisterDTO1);
-                    }else if ("1".equals(outptInfusionRegisterDTO.getIsPrint()) && outptInfusionRegisterDTO.getIsPrint().equals(outptInfusionRegisterDTO1.getIsPrint())){
-                        list.add(outptInfusionRegisterDTO1);
-                    }
-
-                }
-            }
-        }
-        return PageDTO.of(list);*/
     }
     /**
      * @Method update

@@ -82,4 +82,14 @@ public interface CheckStockDAO {
      * @Return java.util.Map<java.lang.String,java.math.BigDecimal>
      */
     Map<String, BigDecimal> getRateMessage(CheckStockDTO checkStockDTO);
+    /**
+     * @Method getRateMessage
+     * @Desrciption 获得科室名称
+     * @Param [checkStockDTO]
+     * @Author zhangguorui
+     * @Date   2021/9/4 10:00
+     * @Return java.util.Map<java.lang.String,java.math.BigDecimal>
+     */
+    Map<String, String> getDept(CheckStockDTO checkStockDTO);
+
 }

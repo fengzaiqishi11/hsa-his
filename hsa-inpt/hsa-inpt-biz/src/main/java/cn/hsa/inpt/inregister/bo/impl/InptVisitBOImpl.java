@@ -852,7 +852,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureInptRegisterDTO.setAab001(""); // 单位电脑号
         insureInptRegisterDTO.setAab019(""); // 单位类型
         insureInptRegisterDTO.setAab999(""); // 单位管理码
-        insureInptRegisterDTO.setAac002(""); // 个人保障号
+        insureInptRegisterDTO.setCardIden(insureIndividualBasicDTO.getCardIden());// 卡识别码
+        insureInptRegisterDTO.setAac002(insureIndividualBasicDTO.getAac002()); // 证件号码
         insureInptRegisterDTO.setAac148(""); // 补助类型
         insureInptRegisterDTO.setAae140(""); // 险种编码
         insureInptRegisterDTO.setBaa027(""); // 人员所属中心

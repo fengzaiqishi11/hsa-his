@@ -128,6 +128,9 @@
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径目录维护 -->
     <dubbo:service interface="cn.hsa.module.clinical.clinicalpathlist.service.ClinicPathListService" ref="clinicPathListService_provider"/>
+    <!-- 临床路径目录维护 -->
+    <dubbo:service interface="cn.hsa.module.clinical.clinicalpathstagedetail.service.ClinicPathStageDetailService" ref="clinicPathStageDetailService_provider"/>
+  <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径项目维护 -->
     <dubbo:service interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" ref="clinicalPathItemService_provider"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->

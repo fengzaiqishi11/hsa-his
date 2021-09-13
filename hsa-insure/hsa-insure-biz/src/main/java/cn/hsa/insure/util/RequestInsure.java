@@ -40,7 +40,7 @@ public class RequestInsure {
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
 
-    private static int timeOut = 60 * 60 * 24 - 500;
+    private static int timeOut = 60 * 60 - 500;
 
     private static final String producerTopicKey = "_insure_producer";
     private static final String consumerTopicKey = "_insure_consumer";

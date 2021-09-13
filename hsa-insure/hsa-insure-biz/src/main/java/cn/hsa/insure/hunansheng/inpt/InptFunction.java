@@ -1072,8 +1072,8 @@ public class InptFunction {
             costItem.put("item_name",item.get("insureItemName"));//中心药品项目名称
             costItem.put("drug_standard_code",item.get("pqccItemId"));//药品本位码
             costItem.put("model",item.get("prepCode"));//剂型
-            costItem.put("factory",null);//厂家
-            costItem.put("standard",item.get("spec"));//规格
+            costItem.put("factory","");//厂家
+            costItem.put("standard","");//规格
             String now = DateUtils.format((Date) item.get("costTime"),DateUtils.Y_M_DH_M_S);
             costItem.put("fee_date",now);//费用发生时间(格式：YYYY-MM-DD HH24:MI:SS(24小时))
             costItem.put("unit","");//计量单位
@@ -1089,7 +1089,7 @@ public class InptFunction {
             costItem.put("remark","");//备注（用法用量等说明）
             costItem.put("make_flag","");//非工伤费用标志（1：工伤住院业务使用，表示录入的费用为非工伤费用，非工伤费用全部现金支付。该标志用于识别工伤住院期间发生非工伤的医疗费）
             if(Constants.ZTBZ.CH.equals(item.get("statusCode"))) {
-                costItem.put("opp_serial_fee", "1"+SnowflakeUtils.getId().substring(12)+(int)(Math.random()*10));//对应费用序列号
+                costItem.put("opp_serial_fee", item.get("oldCostId"));//对应费用序列号
             }else{
                 costItem.put("opp_serial_fee","");//对应费用序列号（如果收费则为空，如果是退费则必须为对应收费的serial_fee）
             }

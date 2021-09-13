@@ -148,6 +148,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             throw new AppException("退费失败：未找到结算信息");
         }
 
+        // 2021-9-10 14:21:58  官红强  门诊退费时，如果退了医技，需要将医技申请表数据删除  start===============================
+        List<OutptCostDTO> deleteMedicApplyList = new ArrayList<>();
+        // 2021-9-10 14:21:58  官红强  门诊退费时，如果退了医技，需要将医技申请表数据删除  end  ===============================
+
         // TODO 回退数量异常判断 - 回退总数量
         BigDecimal backNumSum = BigDecimal.ZERO;
         BigDecimal moneyAgain = new BigDecimal(0);
@@ -164,14 +168,18 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName));
                 BigDecimal rePrice = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(), outptCostDTO.getTotalNum());
                 moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(rePrice, lastNum));
+            } else { // 全退的记录下来，关于医技的需要更新状态（已退费）
+                deleteMedicApplyList.add(outptCostDTO);
             }
             backNumSum = BigDecimalUtils.add(backNumSum,outptCostDTO.getBackNum());
         }
         if (BigDecimalUtils.compareTo(backNumSum, BigDecimal.ZERO) <= 0) {
             throw new AppException("退费数量不能全为零");
         }
-
-        // TODO 总金额核对
+        // 退费的项目需要更新医技申请状态
+        if (!ListUtils.isEmpty(deleteMedicApplyList)) {
+            outptCostDAO.updateMedicApply(visitId, hospCode, "05", deleteMedicApplyList);
+        }
 
         // TODO costDTOList 为空表示全退，否则表示部分退(否:false，是:true)
         Boolean isAllOut = false;

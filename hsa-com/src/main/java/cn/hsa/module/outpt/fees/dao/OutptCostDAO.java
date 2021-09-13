@@ -313,7 +313,7 @@ public interface OutptCostDAO {
     /**
      * @Menthod queryPharOutDistributeDetail
      * @Desrciption 获取发药明细表信息
-     * @param selecMap
+     * @param
      * @Author lijiguang
      * @Date 2020/9/08 10:50
      * @Return List<PharOutDistributeDetailDTO>
@@ -609,4 +609,15 @@ public interface OutptCostDAO {
      * @Return
      **/
     List<OutptPrescribeDO> queryPatientPrescribeNoSettle(OutptPrescribeDO outptPrescribeDO);
+
+	/**
+	 * @Description: 门诊退费后需要更新医技申请状态
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/9/10 14:51
+	 * @Return
+	 */
+	void updateMedicApply(String visitId, String hospCode, String documentSta, @Param("list") List<OutptCostDTO> deleteMedicApplyList);
+
 }

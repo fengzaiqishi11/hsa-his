@@ -993,6 +993,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 return WrapperResponse.fail("费用数量不正确，请刷新浏览器再试", null);
             }
 
+            // 更新医技申请单状态
+            if (!ListUtils.isEmpty(outptCostDTOList)) {
+                outptCostDAO.updateMedicApply(visitId, hospCode, "02", outptCostDTOList);
+            }
+
             /* 生成领药申请单，校验库存、领药申请单明细 */
             Map<String, Object> queryParam = new HashMap<String, Object>();
             queryParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码

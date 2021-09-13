@@ -261,4 +261,5 @@ public interface OutDistributeDrugDAO {
     **/
     List<Map> getPrescribeDetailPrint(OutptPrescribeDTO outptPrescribeDTO);
 
+    Map<String, Object> queryVistitInfo(OutptPrescribeDTO visitParam);
 }

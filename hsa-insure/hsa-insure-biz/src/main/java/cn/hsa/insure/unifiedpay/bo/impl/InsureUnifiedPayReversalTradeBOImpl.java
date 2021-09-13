@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
+import cn.hsa.module.insure.outpt.dto.InsureReckonDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -480,13 +481,4 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         return resultMap;
     }
-
-    public static void main(String args[]) {
-        String  medfeeSumamt = "10.1254";
-        DecimalFormat df1 = new DecimalFormat("0.00");
-        String a = df1.format(BigDecimalUtils.convert(medfeeSumamt)); //医疗费总额
-        System.out.println(a);
-    }
-
-
 }

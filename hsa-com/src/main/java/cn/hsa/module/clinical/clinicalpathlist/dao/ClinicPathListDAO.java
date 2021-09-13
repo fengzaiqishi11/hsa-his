@@ -12,14 +12,16 @@ import java.util.List;
  */
 public interface ClinicPathListDAO {
 
-    ClinicPathListDTO getClinicPathById(String id);
+    ClinicPathListDTO getClinicPathById(ClinicPathListDTO clinicPathList);
 
     List<ClinicPathListDTO> queryClinicPathAll(ClinicPathListDTO clinicPathList);
+
+    ClinicPathListDTO getMaxSortNo(ClinicPathListDTO clinicPathList);
 
     int insertClinicPath(ClinicPathListDTO clinicPathList);
 
     int updateClinicPath(ClinicPathListDTO clinicPathList);
 
-    int deleteClinicPathById(ClinicPathListDTO clinicPathList);
+    int updateClinicPathAuditCode(ClinicPathListDTO clinicPathList);
 
 }

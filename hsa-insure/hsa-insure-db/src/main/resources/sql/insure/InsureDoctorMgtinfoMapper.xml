@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDoctorMgtinfoDAO">
+    <!-- 字段映射 -->
+    <resultMap id="insureDoctorMgtinfoMap" type="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="insure_reg_code" property="insureRegCode" jdbcType="VARCHAR" />
+        <result column="insure_doctor_id" property="insureDoctorId" jdbcType="VARCHAR" />
+        <result column="dr_codg" property="drCodg" jdbcType="VARCHAR" />
+        <result column="hi_serv_type" property="hiServType" jdbcType="VARCHAR" />
+        <result column="hi_serv_name" property="hiServName" jdbcType="VARCHAR" />
+        <result column="hi_serv_stas" property="hiServStas" jdbcType="VARCHAR" />
+        <result column="begndate" property="begndate" jdbcType="TIMESTAMP" />
+        <result column="enddate" property="enddate" jdbcType="TIMESTAMP" />
+        <result column="memo" property="memo" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表查询字段 -->
+    <sql id="allColumns">
+        id, hosp_code, insure_reg_code, insure_doctor_id, dr_codg, hi_serv_type, hi_serv_name, hi_serv_stas,
+        begndate, enddate, memo, crte_id, crte_name, crte_time
+    </sql>
+
+    <!-- 查询所有数据 -->
+    <select id="findInsureDoctorMgtinfoAll" resultMap="insureDoctorMgtinfoMap">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_mgtinfo
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryInsureDoctorMgtinfoPage" resultMap="insureDoctorMgtinfoMap" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_mgtinfo WHERE 1 = 1
+         AND hosp_code = #{hospCode}
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND insure_reg_code LIKE CONCAT('%', #{insureRegCode}, '%')
+        </if>
+        <if test="insureDoctorId != null and insureDoctorId != ''">
+            AND insure_doctor_id LIKE CONCAT('%', #{insureDoctorId}, '%')
+        </if>
+        <if test="drCodg != null and drCodg != ''">
+            AND dr_codg LIKE CONCAT('%', #{drCodg}, '%')
+        </if>
+        <if test="hiServType != null and hiServType != ''">
+            AND hi_serv_type LIKE CONCAT('%', #{hiServType}, '%')
+        </if>
+        <if test="hiServName != null and hiServName != ''">
+            AND hi_serv_name LIKE CONCAT('%', #{hiServName}, '%')
+        </if>
+        <if test="hiServStas != null and hiServStas != ''">
+            AND hi_serv_stas LIKE CONCAT('%', #{hiServStas}, '%')
+        </if>
+        <if test="begndate != null">
+            AND begndate = #{begndate}
+        </if>
+        <if test="enddate != null">
+            AND enddate = #{enddate}
+        </if>
+        <if test="memo != null and memo != ''">
+            AND memo LIKE CONCAT('%', #{memo}, '%')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id LIKE CONCAT('%', #{crteId}, '%')
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name LIKE CONCAT('%', #{crteName}, '%')
+        </if>
+        <if test="crteTimr != null">
+            AND crte_timr = #{crteTimr}
+        </if>
+    </select>
+
+    <!-- 根据主键删除数据 -->
+    <select id="getInsureDoctorMgtinfoById" resultMap="insureDoctorMgtinfoMap" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        SELECT FROM insure_doctor_mgtinfo WHERE id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据主键查询数据 -->
+    <select id="findInsureDoctorMgtinfoByIds" resultMap="insureDoctorMgtinfoMap" parameterType="list">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_mgtinfo WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insertInsureDoctorMgtinfo" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        INSERT INTO insure_doctor_mgtinfo (
+            id, hosp_code, insure_reg_code, insure_doctor_id, dr_codg, hi_serv_type, hi_serv_name, hi_serv_stas,
+            begndate, enddate, memo, crte_id, crte_name, crte_timr
+        ) VALUES (
+                     #{id},
+                     #{hospCode},
+                     #{insureRegCode},
+                     #{insureDoctorId},
+                     #{drCodg},
+                     #{hiServType},
+                     #{hiServName},
+                     #{hiServStas},
+                     #{begndate},
+                     #{enddate},
+                     #{memo},
+                     #{crteId},
+                     #{crteName},
+                     #{crteTimr}
+                 )
+    </insert>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertInsureDoctorMgtinfos" parameterType="list">
+        INSERT INTO insure_doctor_mgtinfo (
+        id, hosp_code, insure_reg_code, insure_doctor_id, dr_codg, hi_serv_type, hi_serv_name, hi_serv_stas,
+        begndate, enddate, memo, crte_id, crte_name, crte_timr
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.insureDoctorId},
+            #{item.drCodg},
+            #{item.hiServType},
+            #{item.hiServName},
+            #{item.hiServStas},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.memo},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTimr}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateInsureDoctorMgtinfoById" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        UPDATE insure_doctor_mgtinfo
+        <set>
+            <if test="insureRegCode != null">
+                insure_reg_code = #{insureRegCode},
+            </if>
+            <if test="insureDoctorId != null">
+                insure_doctor_id = #{insureDoctorId},
+            </if>
+            <if test="drCodg != null">
+                dr_codg = #{drCodg},
+            </if>
+            <if test="hiServType != null">
+                hi_serv_type = #{hiServType},
+            </if>
+            <if test="hiServName != null">
+                hi_serv_name = #{hiServName},
+            </if>
+            <if test="hiServStas != null">
+                hi_serv_stas = #{hiServStas},
+            </if>
+            <if test="begndate != null">
+                begndate = #{begndate},
+            </if>
+            <if test="enddate != null">
+                enddate = #{enddate},
+            </if>
+            <if test="memo != null">
+                memo = #{memo},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTimr != null">
+                crte_timr = #{crteTimr}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 批量修改数据 -->
+    <update id="updateInsureDoctorMgtinfos" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE insure_doctor_mgtinfo
+            <set>
+                <if test="item.hospCode != null">
+                    hosp_code = #{item.hospCode},
+                </if>
+                <if test="item.insureRegCode != null">
+                    insure_reg_code = #{item.insureRegCode},
+                </if>
+                <if test="item.insureDoctorId != null">
+                    insure_doctor_id = #{item.insureDoctorId},
+                </if>
+                <if test="item.drCodg != null">
+                    dr_codg = #{item.drCodg},
+                </if>
+                <if test="item.hiServType != null">
+                    hi_serv_type = #{item.hiServType},
+                </if>
+                <if test="item.hiServName != null">
+                    hi_serv_name = #{item.hiServName},
+                </if>
+                <if test="item.hiServStas != null">
+                    hi_serv_stas = #{item.hiServStas},
+                </if>
+                <if test="item.begndate != null">
+                    begndate = #{item.begndate},
+                </if>
+                <if test="item.enddate != null">
+                    enddate = #{item.enddate},
+                </if>
+                <if test="item.memo != null">
+                    memo = #{item.memo},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTimr != null">
+                    crte_timr = #{item.crteTimr}
+                </if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <!-- 根据主键删除数据 -->
+    <delete id="deleteInsureDoctorMgtinfoById" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorMgtinfoDO">
+        DELETE FROM insure_doctor_mgtinfo WHERE id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteInsureDoctorMgtinfoByIds" parameterType="list">
+        DELETE FROM insure_doctor_mgtinfo WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

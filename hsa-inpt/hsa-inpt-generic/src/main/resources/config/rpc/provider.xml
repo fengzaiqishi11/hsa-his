@@ -133,5 +133,7 @@
   <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径项目维护 -->
     <dubbo:service interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" ref="clinicalPathItemService_provider"/>
+    <!-- 临床路径阶段描述 -->
+    <dubbo:service interface="cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService" ref="clinicalPathStageService_provider"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>

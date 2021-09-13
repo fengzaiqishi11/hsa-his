@@ -632,6 +632,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptRegisterDTO.setName(outptVisitDTO.getName());
         outptRegisterDTO.setGenderCode(outptVisitDTO.getGenderCode());
         outptRegisterDTO.setAge(outptVisitDTO.getAge());
+        outptRegisterDTO.setBirthday(outptVisitDTO.getBirthday());
         outptRegisterDTO.setCertCode(outptVisitDTO.getCertCode());
         outptRegisterDTO.setCertNo(outptVisitDTO.getCertNo());
         outptRegisterDTO.setPhone(outptVisitDTO.getPhone());

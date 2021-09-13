@@ -471,6 +471,10 @@
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径目录维护 -->
     <dubbo:reference id="clinicPathListService_consumer" interface="cn.hsa.module.clinical.clinicalpathlist.service.ClinicPathListService" check="false"/>
+    <!--临床路径项目维护-->
+    <dubbo:reference id="clinicalPathItemService_consumer" interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" check="false"/>
+    <!--临床路径阶段描述-->
+    <dubbo:reference id="clinicalPathStageService_consumer" interface="cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService" check="false"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

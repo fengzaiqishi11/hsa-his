@@ -165,9 +165,11 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
         b.setHospCode(baseItemDTO.getHospCode());
         try {
             b.setNationCode(baseItemDTO.getNationCode());
-            if (!StringUtils.isEmpty(b.getNationCode()) && baseItemDAO.isCodeExist(b) > 0) {
+            // 禅道bug4063号，要求将国家编码唯一性去除 luoyong 2021.9.13
+            // 比如陪床费和床位费两个项目，国家项目编码中是没有陪床费的项目的，这时需要新增一个陪床费项目也是对应床位费的国家编码就回提示国家编码重复
+            /*if (!StringUtils.isEmpty(b.getNationCode()) && baseItemDAO.isCodeExist(b) > 0) {
                 throw new AppException("国家编码重复");
-            }
+            }*/
         } catch (NullPointerException e) {
             throw new AppException("国家编码为空");
         }

@@ -247,6 +247,9 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
      */
     private void fillPriceSumData(List<Map<String,Object>> resultData,String hospCode){
         List<Map<String, Object>> outptList = resultData.stream().filter(map -> "-1".equals(map.get("num"))).collect(Collectors.toList());
+        if(outptList.isEmpty()){
+            return;
+        }
         List<String> visitIdList = new ArrayList<>();
         List<String> opdIdList = new ArrayList<>();
         List<String> opIdList = new ArrayList<>();
@@ -282,6 +285,9 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
             }).collect(Collectors.toList());
 
             m.put("opIdList",opIdList);
+            if(opdIdList.isEmpty()){
+                return;
+            }
             List<Map<String, String>> diseaseNameMapList = statisticalReportDAO.queryDiseaeNameByOpIds(m);
 
             medicalInfoList.stream().map( map -> {

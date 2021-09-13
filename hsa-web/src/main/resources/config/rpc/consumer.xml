@@ -465,12 +465,17 @@
     <dubbo:reference id="insureStockManagerService_consumer" interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" check="false"/>
     <!-- 医保输血记录服务 -->
     <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
+    <dubbo:reference id="insureReckonService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureReckonService" check="false"/>
 
     <dubbo:reference id="insureRecruitPurchaseService_consumer" interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" check="false"/>
 
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径目录维护 -->
     <dubbo:reference id="clinicPathListService_consumer" interface="cn.hsa.module.clinical.clinicalpathlist.service.ClinicPathListService" check="false"/>
+    <!-- 临床路径目录维护 -->
+    <dubbo:reference id="clinicPathStageDetailService_consumer" interface="cn.hsa.module.clinical.clinicalpathstagedetail.service.ClinicPathStageDetailService" check="false"/>
+    <!--临床路径项目维护-->
+    <dubbo:reference id="clinicalPathItemService_consumer" interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" check="false"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

@@ -589,4 +589,24 @@ public interface OutptCostDAO {
      * @Return
     **/
     List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, String> insureCostParam);
+
+    /**
+     * @Method queryOutptPrescribeCost
+     * @Desrciption  根据处方id查询处方费用
+     * @Param java.util.Map     *
+     * @Author liuliyun
+     * @Date   2021/09/03 10:09
+     * @Return
+     **/
+    List<OutptCostDTO> queryOutptPrescribeCostList(Map<String, Object> map);
+
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方
+     * @Param java.util.Map
+     * @Author liuliyun
+     * @Date   2021/09/03 10:30
+     * @Return
+     **/
+    List<OutptPrescribeDO> queryPatientPrescribeNoSettle(OutptPrescribeDO outptPrescribeDO);
 }

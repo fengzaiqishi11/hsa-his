@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -27,5 +28,15 @@ public class ClinicalPathStageDTO extends ClinicalPathStageDO implements Seriali
      * 结束时间
      */
     private String endTime;
-    
+
+    /**
+     * 是否查询 顺序号
+     */
+    private String isFlag;
+
+    /**
+     * 删除的id集合
+     */
+    private List<String> ids;
+
 }

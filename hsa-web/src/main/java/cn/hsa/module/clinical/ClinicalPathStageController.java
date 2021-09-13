@@ -97,4 +97,25 @@ public class ClinicalPathStageController extends BaseController {
         map.put("clinicalPathStageDTO",clinicalPathStageDTO);
         return clinicalPathStageService_consumer.deleteClinicalPathStage(map);
     }
+    /**
+     * @Meth: queryClinicalPathStageById
+     * @Description: 通过id查询临床路径阶段描述
+     * @Param: [clinicalPathStageDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/13
+     */
+    @GetMapping("/queryClinicalPathStageById")
+    public WrapperResponse<ClinicalPathStageDTO> queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO,
+                                                                            HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        String hospCode = sysUserDTO.getHospCode();
+        clinicalPathStageDTO.setHospCode(hospCode);
+        clinicalPathStageDTO.setCrteId(sysUserDTO.getId());
+        clinicalPathStageDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap<>();
+        map.put("hospCode",hospCode);
+        map.put("clinicalPathStageDTO",clinicalPathStageDTO);
+        return clinicalPathStageService_consumer.queryClinicalPathStageById(map);
+    }
 }

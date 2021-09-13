@@ -50,5 +50,23 @@ public interface ClinicalPathStageDAO {
      * @Date: 2021/9/11
      */
     int deleteClinicalPathStage(ClinicalPathStageDTO clinicalPathStageDTO);
+    /**
+     * @Meth: getMaxSortNo
+     * @Description: 获得最大的序列号
+     * @Param: [clinicalPathStageDTO]
+     * @return: cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/13
+     */
+    ClinicalPathStageDTO getMaxSortNo(ClinicalPathStageDTO clinicalPathStageDTO);
+    /**
+     * @Meth: queryClinicalPathStageById
+     * @Description: 根据Id查询
+     * @Param: [clinicalPathStageDTO]
+     * @return: cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/13
+     */
+    ClinicalPathStageDTO queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO);
 }
 

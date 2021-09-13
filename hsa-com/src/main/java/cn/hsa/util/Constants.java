@@ -190,6 +190,8 @@ public interface Constants {
         public static final String TXM = "49";// 条形码
         public static final String YSYZ = "105";//医生站医嘱
         public static final String LCLJML = "119";//临床路径目录
+        public static final String LCLJXM ="121";//临床路径项目
+        public static final String LCLJJDMS ="122";//临床路径阶段描述
     }
 
     /**

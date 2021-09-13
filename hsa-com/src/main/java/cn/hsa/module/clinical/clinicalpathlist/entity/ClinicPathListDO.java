@@ -1,7 +1,6 @@
 package cn.hsa.module.clinical.clinicalpathlist.entity;
 
 import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ClinicPathListDO extends PageDO implements Serializable {
 
   private static final long serialVersionUID = -4198533375777100742L;

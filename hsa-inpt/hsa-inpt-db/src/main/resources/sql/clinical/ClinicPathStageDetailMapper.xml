@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathstagedetail.dao.ClinicPathStageDetailDAO">
+
+    <resultMap type="cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO" id="ClinicPathStageDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="listId" column="list_id" jdbcType="VARCHAR"/>
+        <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="itemType" column="item_type" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemSupplyType" column="item_supply_type" jdbcType="VARCHAR"/>
+        <result property="isMust" column="is_must" jdbcType="VARCHAR"/>
+        <result property="classify" column="classify" jdbcType="VARCHAR"/>
+        <result property="sortNo" column="sort_no" jdbcType="VARCHAR"/>
+        <result property="remarke" column="remarke" jdbcType="VARCHAR"/>
+        <result property="isOperationDay" column="is_operation_day" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getClinicPathStageDetailById" resultMap="ClinicPathStageDetailMap">
+        select
+          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
+        from clinic_path_stage_detail
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllClinicPathStageDetail" resultMap="ClinicPathStageDetailMap">
+        select
+          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
+        from clinic_path_stage_detail
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="listId != null and listId != ''">
+                and list_id = #{listId}
+            </if>
+            <if test="stageId != null and stageId != ''">
+                and stage_id = #{stageId}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="itemType != null and itemType != ''">
+                and item_type = #{itemType}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and item_id = #{itemId}
+            </if>
+            <if test="itemSupplyType != null and itemSupplyType != ''">
+                and item_supply_type = #{itemSupplyType}
+            </if>
+            <if test="isMust != null and isMust != ''">
+                and is_must = #{isMust}
+            </if>
+            <if test="classify != null and classify != ''">
+                and classify = #{classify}
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                and sort_no = #{sortNo}
+            </if>
+            <if test="remarke != null and remarke != ''">
+                and remarke = #{remarke}
+            </if>
+            <if test="isOperationDay != null and isOperationDay != ''">
+                and is_operation_day = #{isOperationDay}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertClinicPathStageDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into clinic_path_stage_detail(id,hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{listId}, #{stageId}, #{code}, #{itemType}, #{itemId}, #{itemSupplyType}, #{isMust}, #{classify}, #{sortNo}, #{remarke}, #{isOperationDay}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateClinicPathStageDetail">
+        update clinic_path_stage_detail
+        set
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="listId != null and listId != ''">
+                list_id = #{listId},
+            </if>
+            <if test="stageId != null and stageId != ''">
+                stage_id = #{stageId},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="itemType != null and itemType != ''">
+                item_type = #{itemType},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemSupplyType != null and itemSupplyType != ''">
+                item_supply_type = #{itemSupplyType},
+            </if>
+            <if test="isMust != null and isMust != ''">
+                is_must = #{isMust},
+            </if>
+            <if test="classify != null and classify != ''">
+                classify = #{classify},
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                sort_no = #{sortNo},
+            </if>
+            <if test="remarke != null and remarke != ''">
+                remarke = #{remarke},
+            </if>
+            <if test="isOperationDay != null and isOperationDay != ''">
+                is_operation_day = #{isOperationDay},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteClinicPathStageDetailById">
+        delete from clinic_path_stage_detail where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+</mapper>

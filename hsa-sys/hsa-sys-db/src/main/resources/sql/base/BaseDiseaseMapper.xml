@@ -79,7 +79,7 @@
 				and crte_time = #{crteTime}
 			</if>
 			<if test="keyword !=null and keyword != ''">
-				and (code like concat('%',#{keyword},'%')
+				anqueryOutptDeptIncomed (code like concat('%',#{keyword},'%')
 				or name like concat('%',#{keyword},'%')
 				or usual_name like concat('%',#{keyword},'%')
 				or wbm like concat('%',#{keyword},'%')

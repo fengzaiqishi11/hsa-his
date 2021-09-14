@@ -469,6 +469,8 @@
 
     <dubbo:reference id="insureRecruitPurchaseService_consumer" interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" check="false"/>
 
+    <dubbo:reference id="insureUnifiedClinicalService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService" check="false"/>
+
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径目录维护 -->
     <dubbo:reference id="clinicPathListService_consumer" interface="cn.hsa.module.clinical.clinicalpathlist.service.ClinicPathListService" check="false"/>

@@ -45,6 +45,31 @@ public class LisResultServiceImpl extends HsafBO implements LisResultService {
     }
 
     /**
+     * @Description: lis结果数据存库
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangxuan
+     * @Date: 2021-09-09
+     */
+    @Override
+    public Map insertDXLisResult(Map map) {
+        return lisResultBO.insertDXLisResult(map);
+    }
+
+    /**
+    * @Description: 查询无结果的申请单的医嘱id
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-11
+    */
+    @Override
+    public List<String> queryDXNoResult(Map map){
+        return lisResultBO.queryDXNoResult(map);
+    }
+
+
+    /**
     * @Description: 查询没有结果的lis申请单
     * @Param:
     * @return:

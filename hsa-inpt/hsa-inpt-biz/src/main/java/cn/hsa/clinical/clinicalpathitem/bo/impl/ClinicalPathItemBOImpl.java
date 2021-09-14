@@ -1,7 +1,9 @@
 package cn.hsa.clinical.clinicalpathitem.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.clinical.clinicalpathitem.bo.ClinicalPathItemBO;
 import cn.hsa.module.clinical.clinicalpathitem.dao.ClinicalPathItemDAO;
 import cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO;
@@ -12,6 +14,7 @@ import org.apache.zookeeper.Op;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +23,8 @@ import java.util.Optional;
 public class ClinicalPathItemBOImpl implements ClinicalPathItemBO {
     @Resource
     private ClinicalPathItemDAO clinicalPathItemDAO;
-
+    @Resource
+    private BaseOrderRuleService baseOrderRuleService;
     /**
      * @Description: 查询满足条件的临床路径
      * @Param: [queryDTO]
@@ -63,6 +67,15 @@ public class ClinicalPathItemBOImpl implements ClinicalPathItemBO {
             if (StringUtils.isEmpty(clinicalPathItemDTO.getWbm())) {
                 clinicalPathItemDTO.setWbm(WuBiUtils.getWBCode(clinicalPathItemDTO.getName()));
             }
+            HashMap map = new HashMap();
+            map.put("hospCode",clinicalPathItemDTO.getHospCode());
+            map.put("typeCode", Constants.ORDERRULE.LCLJXM);
+            WrapperResponse<String> orderNo = baseOrderRuleService.getOrderNo(map);
+            if(StringUtils.isEmpty(orderNo.getData())) {
+                throw new AppException("系统没有临床路径项目描述单号规则");
+            }
+            // 新增赋值编码
+            clinicalPathItemDTO.setCode(orderNo.getData());
             // 创建时间
             clinicalPathItemDTO.setCrteTime(DateUtils.getNow());
             // 插入数据库

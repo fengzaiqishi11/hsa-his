@@ -99,4 +99,6 @@ public interface InptAdvancePayDAO {
      * @Return int 受影响行数
      */
     int editAdvancePayByIds(Map param);
+
+    int queryIsSettleByVisit(InptAdvancePayDTO inptAdvancePayDTO);
 }

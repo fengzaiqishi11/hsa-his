@@ -72,4 +72,9 @@ public class ClinicalPathItemDO extends PageDO implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 
+    /**
+     * 是否有效
+     */
+    private String isValid;
+
 }

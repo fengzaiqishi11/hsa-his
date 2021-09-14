@@ -1,7 +1,6 @@
 package cn.hsa.interf.lis.controller;
 
 import cn.hsa.base.BaseController;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.interf.phys.service.LisResultService;
 import cn.hsa.util.MapUtils;
@@ -47,7 +46,7 @@ public class LisResultController extends BaseController {
     }
 
     /**
-     * @Description: 查找没有lis结果的就诊人的医嘱id处方号（）
+     * @Description: 查找没有lis结果的就诊人的医嘱id处方号（康德）
      * @Param: [outptVisitDTOList]
      * @return: java.util.List<cn.hsa.module.medic.apply.dto.MedicalApplyDTO>
      * @Author: zhangxuan
@@ -61,7 +60,7 @@ public class LisResultController extends BaseController {
     }
 
     /**
-     * @Description: lis结果数据存库
+     * @Description: lis结果数据存库 （康德）
      * @Param: [map]
      * @return: java.lang.Boolean
      * @Author: zhangxuan
@@ -73,6 +72,35 @@ public class LisResultController extends BaseController {
         map.put("hospCode",MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
         return lisResultService.insertLisResult(map);
 
+    }
+    /**
+    * @Description: lis数据存库（常德德兴）
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-09
+    */
+    @PostMapping("insertDXLisResult")
+    public Map insertDXLisResult(@RequestBody Map map){
+        List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
+        map.put("hospCode",MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
+        return lisResultService.insertDXLisResult(map);
+
+    }
+    /**
+    * @Description: 查询没有结果的lis申请单的医嘱id（德星）
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-11
+    */
+    @PostMapping("queryDXNoResult")
+    public Map queryDXNoResult(@RequestBody Map map){
+        map.put("hospCode",MapUtils.get(map,"hospCode"));
+        List<String> list = lisResultService.queryDXNoResult(map);
+        Map result = new HashMap();
+        result.put("list",list);
+        return result;
     }
 
     /**

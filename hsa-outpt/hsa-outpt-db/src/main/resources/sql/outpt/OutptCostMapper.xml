@@ -3388,4 +3388,11 @@
        </if>
     </select>
 
+    <update id="updateMedicApply" parameterType="list">
+        update medic_apply set document_sta = #{documentSta} where visit_id = #{visitId} and hosp_code = #{hospCode} and cost_id in
+        <foreach collection="list" separator="," item="item" open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
 </mapper>

@@ -32,4 +32,6 @@ public interface ClinicalPathStageBO {
      * @Date: 2021/9/11
      */
     Boolean deleteClinicalPathStage(ClinicalPathStageDTO clinicalPathStageDTO);
+
+    ClinicalPathStageDTO queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO);
 }

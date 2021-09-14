@@ -3,6 +3,7 @@ package cn.hsa.module.clinical.clinicalpathstage.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,4 +52,7 @@ public interface ClinicalPathStageService {
      */
     @PostMapping("/service/clinical/clinicalPathStage/deleteClinicalPathStage")
     WrapperResponse<Boolean> deleteClinicalPathStage(Map map);
+
+    @GetMapping("/service/clinical/clinicalPathStage/deleteClinicalPathStage")
+    WrapperResponse<ClinicalPathStageDTO> queryClinicalPathStageById(Map map);
 }

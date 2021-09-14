@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.clinical.clinicalpathitem.bo.ClinicalPathItemBO;
 import cn.hsa.module.clinical.clinicalpathstage.bo.ClinicalPathStageBO;
+import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
 import cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -55,5 +56,10 @@ public class ClinicalPathStageServiceImpl implements ClinicalPathStageService {
     @Override
     public WrapperResponse<Boolean> deleteClinicalPathStage(Map map) {
         return WrapperResponse.success(clinicalPathStageBO.deleteClinicalPathStage(MapUtils.get(map,"clinicalPathStageDTO")));
+    }
+
+    @Override
+    public WrapperResponse<ClinicalPathStageDTO> queryClinicalPathStageById(Map map) {
+        return WrapperResponse.success(clinicalPathStageBO.queryClinicalPathStageById(MapUtils.get(map,"clinicalPathStageDTO")));
     }
 }

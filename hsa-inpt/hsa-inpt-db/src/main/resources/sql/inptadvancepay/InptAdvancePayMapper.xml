@@ -302,4 +302,8 @@
         </foreach>
         )
     </update>
+
+    <select id="queryIsSettleByVisit" parameterType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO" resultType="java.lang.Integer">
+        SELECT COUNT(is_settle) from inpt_advance_pay WHERE hosp_code = #{hospCode} and visit_id = #{visitId} and is_settle = '1'
+    </select>
 </mapper>

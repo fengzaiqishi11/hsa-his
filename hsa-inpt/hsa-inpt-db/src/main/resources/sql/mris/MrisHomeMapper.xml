@@ -25,6 +25,7 @@
         <if test="endTime != null and endTime != '' ">
             and out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
+        order by in_time desc
     </select>
 
     <!--分页查询已出院患者信息(珠海)-->

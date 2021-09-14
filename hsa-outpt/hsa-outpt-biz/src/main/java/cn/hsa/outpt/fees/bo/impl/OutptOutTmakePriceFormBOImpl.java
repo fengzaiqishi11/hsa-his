@@ -20,14 +20,11 @@ import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
-import cn.hsa.module.outpt.register.entity.OutptRegisterDO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
-import cn.hsa.module.outpt.visit.entity.OutptVisitDO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
@@ -1450,6 +1447,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 outptCostDTO.setTotalPrice(BigDecimalUtils.negate(outptCostDTO.getTotalPrice()));
                 outptCostDTO.setPreferentialPrice(BigDecimalUtils.negate(outptCostDTO.getPreferentialPrice()));
                 outptCostDTO.setRealityPrice(BigDecimalUtils.negate(outptCostDTO.getRealityPrice()));
+                // 数量置反
+                outptCostDTO.setNum(BigDecimalUtils.negate(outptCostDTO.getNum()));
+                outptCostDTO.setTotalNum(BigDecimalUtils.negate(outptCostDTO.getTotalNum()));
 
                 // 创建信息
                 outptCostDTO.setCrteId(outptVisitDTO.getCrteId());

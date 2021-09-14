@@ -510,4 +510,22 @@
         where a.op_id = #{id} and a.hosp_code = #{hospCode}
         and a.id in (select DISTINCT b.opd_id from phar_out_receive_detail b where b.hosp_code = #{hospCode} and b.or_id = #{orId})
     </select>
+
+    <select id="queryVistitInfo" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        select
+            a.name,
+            a.age,
+            a.age_unit_code as ageUnitCode,
+            a.gender_code as genderCode,
+            a.phone,
+            a.patient_code as patientCode,
+            a.remark,
+            a.insure_no as insureNo,
+            a.out_profile as outProfile,
+            a.out_profile as outProfile,
+            a.now_address as nowAddress
+        from outpt_visit a
+        where a.id = #{visitId}
+          and a.hosp_code = #{hospCode}
+    </select>
 </mapper>

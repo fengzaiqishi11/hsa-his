@@ -582,6 +582,9 @@
             AND od.hosp_code = iv.hosp_code
             AND od.id = iap.daily_settle_id
             AND iap.visit_id = iv.id
+            <if test="payCode != null and payCode != ''">
+                and iap.pay_code = #{payCode}
+            </if>
         ORDER BY
             iap.crte_time DESC
     </select>
@@ -686,7 +689,7 @@
             left join (
                 select a.pay_code, sum(total_price) as total_price from (
                     SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
-                    WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
+                    WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode} GROUP BY odp.pay_code
                     union all
                     select pay_code, total_price from outin_daily_advance_pay where hosp_code = #{hospCode} AND daily_no = #{dailyNo} and type_code = #{typeCode}
                 ) a

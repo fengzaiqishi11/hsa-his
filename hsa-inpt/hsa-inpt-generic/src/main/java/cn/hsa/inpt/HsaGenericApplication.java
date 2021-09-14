@@ -19,6 +19,7 @@ import org.springframework.context.annotation.ImportResource;
 @EnableCaching
 @ImportResource("classpath*:config/spring.xml")
 @MapperScan({"cn.hsa.module.inpt.*.dao"})
+@MapperScan({"cn.hsa.module.clinical.*.dao"})
 @MapperScan({"cn.hsa.module.oper.*.dao"})
 @MapperScan({"cn.hsa.module.emr.*.dao"})
 @MapperScan({"cn.hsa.module.mris.*.dao"})

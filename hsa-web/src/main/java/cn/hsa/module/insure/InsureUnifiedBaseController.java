@@ -7,7 +7,6 @@ import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -279,6 +278,23 @@ public class InsureUnifiedBaseController extends BaseController {
         return insureUnifiedBaseService_consumer.querySpecialRecord(map);
     }
 
+
+    /**
+     * @Method querySpecialRecord
+     * @Desrciption 告知单查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/4/23 12:47
+     * @Return
+     **/
+    @PostMapping("/queryInform")
+    public WrapperResponse<Map<String,Object>> queryInform(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedBaseService_consumer.queryInform(map);
+    }
+
     /**
      * @Method queryPage
      * @Desrciption  分页查询医保就诊信息(病人已经结算)
@@ -373,4 +389,6 @@ public class InsureUnifiedBaseController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.deleteUnifiedDeptInfo(map);
     }
+
+
 }

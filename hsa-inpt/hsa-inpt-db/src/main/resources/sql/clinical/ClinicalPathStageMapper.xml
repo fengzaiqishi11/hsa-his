@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathstage.dao.ClinicalPathStageDAO">
+
+    <!-- 新增 -->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into
+        clinical_path_stage(id,hosp_code,list_id,`code`,`name`,`describe`,min_time,max_time,time_unit,sort_no,remarke,is_operation_day,crte_id,crte_name,crte_time)
+        values
+        (#{id},#{hospCode},#{listId},#{code},#{name},#{describe},#{minTime},#{maxTime},#{timeUnit},#{sortNo},#{remarke},#{isOperationDay},#{crteId},#{crteName},#{crteTime})
+    </insert>
+    <!-- 编辑 -->
+    <update id="updateById">
+        update clinical_path_stage
+        <set>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="name != null and name !=''">
+                `name` = #{name},
+            </if>
+            <if test="describe != null">
+                `describe` = #{describe},
+            </if>
+            <if test="minTime != null">
+                min_time = #{minTime},
+            </if>
+            <if test="maxTime != null">
+                max_time = #{maxTime},
+            </if>
+            <if test="timeUnit != null">
+                time_unit = #{timeUnit},
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                sort_no = #{sortNo},
+            </if>
+            <if test="remarke != null">
+                remarke = #{remarke},
+            </if>
+            <if test="isOperationDay != null and isOperationDay != ''">
+                is_operation_day = #{isOperationDay}
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id} and list_id = #{listId}
+    </update>
+
+    <!-- 通过id 目录id 删除 -->
+    <delete id="deleteClinicalPathStage">
+        delete from clinical_path_stage where hosp_code = #{hospCode}  and list_id = #{listId}
+        and id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 查询临床路径阶段 -->
+    <select id="queryClinicalPathStage"
+            resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
+        select id,hosp_code,list_id,`code`,`name`,`describe`,min_time,max_time,time_unit,sort_no,remarke,is_operation_day,crte_id,crte_name,crte_time
+            from clinical_path_stage
+            where hosp_code = #{hospCode}
+            <if test="listId != null and listId != ''">
+                and list_id = #{listId}
+            </if>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and name like concat('%',#{keyword},'%')
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and crte_time >= #{startTime}
+            </if>
+            <if test="endTime != null and endTime !=''">
+                and crte_time &lt;= #{endTime}
+            </if>
+            <if test="isOperationDay != null and isOperationDay !=''">
+                and is_operation_day = #{isOperationDay}
+            </if>
+            order by sort_no
+    </select>
+    <!--查询最大的序列号-->
+    <select id="getMaxSortNo" resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
+        select sort_no from clinical_path_stage
+        where hosp_code = #{hospCode}
+        order by sort_no desc limit 1
+    </select>
+    <!--根据id查询-->
+    <select id="queryClinicalPathStageById"
+            resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
+        select id,hosp_code,list_id,`code`,`name`,`describe`,min_time,max_time,time_unit,sort_no,remarke,is_operation_day,crte_id,crte_name,crte_time
+            from clinical_path_stage
+            where hosp_code = #{hospCode}
+            <if test="listId != null and listId != ''">
+                and list_id = #{listId}
+            </if>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+    </select>
+
+</mapper>
+

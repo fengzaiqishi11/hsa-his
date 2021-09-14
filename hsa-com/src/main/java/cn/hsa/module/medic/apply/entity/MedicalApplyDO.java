@@ -2,7 +2,6 @@ package cn.hsa.module.medic.apply.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -90,4 +89,6 @@ public class MedicalApplyDO extends PageDO implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date collBloodTime;
 
+    // 费用id
+    private String costId;
 }

@@ -1311,10 +1311,10 @@
           <if test="settleCode != null and settleCode != ''">
               AND ic.settle_code = #{settleCode}
           </if>
-          <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+          <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
             AND ic.attribution_code = #{attributionCode}
           </if>
-          <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+          <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
             AND (ic.attribution_code = '0' or ic.attribution_code is null or ic.attribution_code = '')
           </if>
           <if test="statusCode != null and statusCode != ''">
@@ -1421,10 +1421,10 @@
         <if test="backCode != null and backCode != ''">
             AND back_code = #{backCode}
         </if>
-        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
             AND attribution_code = #{attributionCode}
         </if>
-        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
             AND (attribution_code = '0' or attribution_code is null or attribution_code = '')
         </if>
         order by cost_time ASC
@@ -1812,10 +1812,10 @@
         <if test="backCode != null and backCode != ''">
             AND c.back_code = #{backCode}
         </if>
-        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'">
+        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
           AND c.attribution_code = #{attributionCode}
         </if>
-        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'">
+        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
         AND (c.attribution_code = '0' or c.attribution_code is null or c.attribution_code = '')
       </if>
         order by c.cost_time ASC

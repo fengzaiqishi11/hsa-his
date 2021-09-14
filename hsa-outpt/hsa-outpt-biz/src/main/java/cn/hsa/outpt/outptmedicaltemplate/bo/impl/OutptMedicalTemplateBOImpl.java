@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.outpt.outptmedicaltemplate.bo.impl
@@ -200,6 +201,7 @@ public class OutptMedicalTemplateBOImpl extends HsafBO implements OutptMedicalTe
   public List<OutptMedicalTemplateDTO> changeDisease (List<OutptMedicalTemplateDTO> list ,String hospCode){
     for(OutptMedicalTemplateDTO outptMedicalTemplateDTO : list){
       String diseaseIds = outptMedicalTemplateDTO.getDiseaseId();
+      String diseaseName = "";
       if(StringUtils.isNotEmpty(diseaseIds)){
         BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
         baseDiseaseDTO.setHospCode(hospCode);
@@ -208,6 +210,7 @@ public class OutptMedicalTemplateBOImpl extends HsafBO implements OutptMedicalTe
         map.put("hospCode",hospCode);
         map.put("baseDiseaseDTO",baseDiseaseDTO);
         List<BaseDiseaseDTO> baseDiseaseDTOS =   baseDiseaseService_consumer.getDiseaseByIds(map);
+        diseaseName = baseDiseaseDTOS.stream().map(BaseDiseaseDTO::getName).collect(Collectors.joining(","));
         List<Map<String, Object>> diseaseList = new ArrayList<>();
         Map<String, Object>  diseaseMap = null ;
         for(BaseDiseaseDTO a :baseDiseaseDTOS){
@@ -217,6 +220,7 @@ public class OutptMedicalTemplateBOImpl extends HsafBO implements OutptMedicalTe
           diseaseList.add(diseaseMap);
         }
         outptMedicalTemplateDTO.setDiseaseIds(diseaseList);
+        outptMedicalTemplateDTO.setDiseaseName(diseaseName);
       }
     }
     return list;

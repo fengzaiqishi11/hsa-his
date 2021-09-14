@@ -379,12 +379,12 @@
         max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
         max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
         max(ma.bar_code ) bar_code,
-        max(ba.technology_code) technology_code
+        max(ba.technology_code) technology_code,
+        '' as bed_name
         from 	medic_apply ma
         JOIN outpt_prescribe_detail opd ON
-        Convert(ma.opd_id USING utf8) COLLATE utf8_unicode_ci = opd.id
-        AND
-        Convert(ma.hosp_code USING utf8) COLLATE utf8_unicode_ci= opd.hosp_code
+        ma.opd_id  = opd.id
+        AND ma.hosp_code = opd.hosp_code
         JOIN base_advice ba ON opd.item_id = ba.id
         AND opd.hosp_code = ba.hosp_code
         JOIN outpt_visit ov ON ma.visit_id = ov.id
@@ -417,6 +417,9 @@
         <if test="printStatus != null and printStatus == '2'.toString()">
             and ma.print_time is not null
         </if>
+        <if test="isValid != null and '' != isValid">
+            and op.is_cancel = #{isValid}
+        </if>
         <if test="statList != null">
             and (document_sta is null or document_sta in
            <foreach collection="statList" item="item" open="(" separator="," close=")">
@@ -442,7 +445,8 @@
         max(iv.age_unit_code) age_unit_code,
         max(ma.crte_time) crte_time,
         max(ma.bar_code) bar_code,
-        max(ba.technology_code) technology_code
+        max(ba.technology_code) technology_code,
+        max(iv.bed_name) bed_name
         FROM
 
         medic_apply ma

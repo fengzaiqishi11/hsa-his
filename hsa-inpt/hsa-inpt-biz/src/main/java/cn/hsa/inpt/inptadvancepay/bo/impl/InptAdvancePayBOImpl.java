@@ -116,6 +116,10 @@ public class InptAdvancePayBOImpl extends HsafBO implements InptAdvancePayBO {
         if (BigDecimalUtils.compareTo(inptAdvancePayDTO.getPrice(),BigDecimal.valueOf(0))<= 0 ){
             throw new AppException("预交金必须大于0");
         }
+        // 查询患者是否已结算
+       if (inptAdvancePayDAO.queryIsSettleByVisit(inptAdvancePayDTO) > 0 ) {
+           throw new RuntimeException("该患者已经结算，无法进行预交金充值");
+       }
         setDefaultValue(inptAdvancePayDTO);
         inptAdvancePayDAO.insert(inptAdvancePayDTO);
         updateTotalAdvance(inptAdvancePayDTO.getVisitId(),inptAdvancePayDTO.getHospCode());

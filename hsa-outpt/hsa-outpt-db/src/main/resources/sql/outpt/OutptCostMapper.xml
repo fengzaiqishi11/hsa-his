@@ -258,6 +258,7 @@
         <result property="settleId" column="settleId" jdbcType="VARCHAR"/>
         <result property="settleNo" column="settleNo" jdbcType="VARCHAR"/>
         <result property="medicalRegNo" column="medicalRegNo" jdbcType="VARCHAR"/>
+        <result property="opIdList" column="opIds" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -2989,6 +2990,13 @@
         <if test="statusCode != null and statusCode != ''">
             AND oc.status_code = #{statusCode}
         </if>
+        <if test="opIds != null and opIds.size >0">
+            AND oc.op_id IN (
+            <foreach collection="opIds" item="opId" separator=",">
+                #{opId}
+            </foreach>
+            )
+        </if>
     </select>
 
     <!-- 查询非处方、非划价收费费用 -->
@@ -3051,27 +3059,16 @@
 
     <!-- 查询已结算患者信息 -->
     <select id="queryOutptSettleVisitList" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultMap="OutptVisitResultMap">
-        SELECT
+         SELECT
         <if test="type != null and type !=''">
             CONCAT(
             ov.NAME,
             '/',
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'XB'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.gender_code),'-'),
+            (case ov.gender_code when '0' then '未知' when '1' then '男' when '2' then '女' when '9' then '未说明' else '-' end),
             '/',
             IFNULL(ov.age,'-'),
-            IFNULL((SELECT
-            s.name
-            FROM
-            sys_code_detail s
-            WHERE s.c_code = 'NLDW'
-            AND s.hosp_code = #{hospCode}
-            AND s.value = ov.age_unit_code),'')) keyword,
+            (case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
+           ) keyword,
         </if>
         ov.id,
         ov.hosp_code,
@@ -3127,15 +3124,15 @@
         where
         ov.hosp_code = #{hospCode}
         AND os.hosp_code = #{hospCode}
-        AND ov.is_visit = '1'
         AND os.is_settle = '1'
         AND os.status_code = '0'
         <if test="startDate != null">
-            AND DATE_FORMAT(os.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            AND os.settle_time &gt;= #{startDate}
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(os.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            AND os.settle_time &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY )
         </if>
+        AND ov.is_visit = '1'
         <if test="keyword != null and keyword != ''">
             AND(
             ov.name LIKE CONCAT('%',#{keyword},'%')
@@ -3211,6 +3208,13 @@
             oc.hosp_code = #{hospCode}
           AND oc.visit_id = #{visitId}
           and oc.status_code =#{statusCode} and oc.settle_code !=#{settleCode}
+        <if test="opIds != null and opIds.size >0">
+            AND oc.op_id IN (
+            <foreach collection="opIds" item="opId" separator=",">
+                #{opId}
+            </foreach>
+            )
+        </if>
     </select>
     <select id="queryPrescribeList" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" parameterType="java.util.Map">
         select
@@ -3335,6 +3339,60 @@
             a.is_cost = '1',
             a.cost_time = now()
         where a.id = b.source_id and a.hosp_code = b.hosp_code
+    </update>
+
+    <!--20210903 liuliyun 根据处方id查询处方费用信息-->
+    <select id="queryOutptPrescribeCostList" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        select
+        <include refid="Base_ColumnAlias_List"/>, d.name as xmlbname, oc.reality_price as lastrealityprice, d.value as xmlbcode
+        from
+        outpt_cost oc
+        LEFT JOIN
+        outpt_prescribe op
+        on oc.op_id = op.id
+        AND op.hosp_code = #{hospCode}
+        left join sys_code_detail d on oc.item_code = d.value and oc.hosp_code = d.hosp_code AND d.c_code = 'XMLB'
+        where
+        oc.hosp_code = #{hospCode}
+        AND oc.source_code ='0'
+        AND op.is_settle = '0'
+        AND op.is_cancel = '0'
+        AND op.is_submit = '1'
+        AND oc.visit_id = #{visitId}
+        <if test="settleCodes != null">
+            AND oc.settle_code IN (
+            <foreach collection="settleCodes" item="settleCode" separator=",">
+                #{settleCode}
+            </foreach>
+            )
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND oc.status_code = #{statusCode}
+        </if>
+        <if test="opId != null and opId != ''">
+            AND oc.op_id = #{opId}
+        </if>
+    </select>
+
+
+    <!--20210903 liuliyun 查询已提交未结算处方 -->
+    <select id="queryPatientPrescribeNoSettle" resultType="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO" parameterType="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO">
+       select * from outpt_prescribe
+       where hosp_code = #{hospCode}
+       and visit_id = #{visitId}
+       and is_cancel ='0'
+       and is_settle ='0'
+       and is_submit ='1'
+       <if test="orderNo !=null and orderNo !=''">
+           and order_no LIKE CONCAT('%',#{orderNo},'%')
+       </if>
+    </select>
+
+    <update id="updateMedicApply" parameterType="list">
+        update medic_apply set document_sta = #{documentSta} where visit_id = #{visitId} and hosp_code = #{hospCode} and cost_id in
+        <foreach collection="list" separator="," item="item" open="(" close=")">
+            #{item.id}
+        </foreach>
     </update>
 
 </mapper>

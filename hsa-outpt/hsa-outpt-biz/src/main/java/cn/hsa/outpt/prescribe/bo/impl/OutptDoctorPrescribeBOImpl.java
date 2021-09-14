@@ -26,7 +26,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
-import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
+import cn.hsa.module.outpt.fees.dao.*;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.prescribe.bo.OutptDoctorPrescribeBO;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
@@ -45,18 +45,14 @@ import cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO;
 import cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
-import cn.hsa.module.stro.stock.dto.CheckStockDTO;
-import cn.hsa.module.stro.stock.dto.CheckStockRespDTO;
 import cn.hsa.module.stro.stock.service.CheckStockService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -65,7 +61,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.hsa.util.TreeUtils.getChidldrenIds;
-import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
 
 
 /**
@@ -645,6 +640,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setVisitCode(outptRegisterDTO.getVisitCode());
         //病人类型代码
         outptVisitDTO.setPatientCode(outptRegisterDTO.getPatientCode());
+        //病人来源途径
+        outptVisitDTO.setSourceTjCode(outptRegisterDTO.getSourceTjCode());
+        //病人来源途径备注
+        outptVisitDTO.setSourceTjRemark(outptRegisterDTO.getSourceTjRemark());
         //优惠类别ID
         outptVisitDTO.setPreferentialTypeId(outptRegisterDTO.getPreferentialTypeId());
         //就诊医生ID
@@ -880,7 +879,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //手术
         this.buildOperInfo(outptPrescribeDTOList, outptVisitDTO);
         //医技申请
-        this.buildMedicApply(outptPrescribeDTOList, outptVisitDTO);
+        this.buildMedicApply(outptPrescribeDTOList, outptVisitDTO, outptCostDTOList);
         // 回填申请ID
        // this.backFillMedicApplyID(outptPrescribeDTOList,outptCostDTOList);
         //保存处方
@@ -888,7 +887,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //保存处方明细
         outptDoctorPrescribeDAO.insertPrescribeDetail(outptPrescribeDetailsDTOList);
         //保存处方明细执行
-        outptDoctorPrescribeDAO.insertPrescribeDetailExt(outptPrescribeDetailsExtDTOList);
+        if (!ListUtils.isEmpty(outptPrescribeDetailsExtDTOList)) {
+            outptDoctorPrescribeDAO.insertPrescribeDetailExt(outptPrescribeDetailsExtDTOList);
+        }
         //诊断信息保存
         if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
             //保存处方诊断
@@ -1855,7 +1856,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      * @param outptVisitDTO
      * @return
      */
-    public void buildMedicApply(List<OutptPrescribeDTO> outptPrescribeDTOList, OutptVisitDTO outptVisitDTO) {
+    public void buildMedicApply(List<OutptPrescribeDTO> outptPrescribeDTOList, OutptVisitDTO outptVisitDTO, List<OutptCostDTO> outptCostDTOList) {
         List<MedicalApplyDTO> medicalApplyDTOList = new ArrayList<>();
         List<MedicalApplyDetailDTO> medicalApplyDetailDTOList = new ArrayList<>();
         for(OutptPrescribeDTO outptPrescribeDTO : outptPrescribeDTOList){
@@ -1886,6 +1887,18 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                     medicalApplyDTO.setContent(outptPrescribeDetailsDTO.getContent());
                     medicalApplyDTO.setMedicType(outptPrescribeDTO.getTypeCode());
                     medicalApplyDTO.setIsMerge(Constants.SF.F);
+                    medicalApplyDTO.setDocumentSta("01");  // 医技单据状态， 01 保存
+
+                    // 2021年9月10日10:34:41 官红强 门诊医技申请单添加费用id    start==========================================
+                    if (!ListUtils.isEmpty(outptCostDTOList)) {
+                        for (OutptCostDTO dto : outptCostDTOList) {
+                            if (dto.getOpdId() != null && !"".equals(dto.getOpdId()) && dto.getOpdId().equals(outptPrescribeDetailsDTO.getId())) {
+                                medicalApplyDTO.setCostId(dto.getId());
+                            }
+                        }
+                    }
+                    // 2021年9月10日10:34:41 官红强 门诊医技申请单添加费用id    end============================================
+
                     // 条形码
                         String barCode = getOrderNo(outptPrescribeDetailsDTO.getHospCode(), Constants.ORDERRULE.TXM );
                         if (StringUtils.isEmpty(barCode)) {
@@ -3137,6 +3150,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setNowAddress(outptVisitDTO.getNowAddress());
+        outptProfileFileDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode());
+        outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
         outptProfileFileDTO.setType("1");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
@@ -3548,8 +3563,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptDiagnoseDTO.setDiseaseIds(diagnoseIds);
         //删除全部诊断
         outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
-        //新增全部诊断
-        outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        if(!ListUtils.isEmpty(outptDiagnoseDTO.getOutptDiagnoseDOList())) {
+          //新增全部诊断
+          outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTO.getOutptDiagnoseDOList());
+        }
         // 更新处方诊断信息表
         outptDoctorPrescribeDAO.updatePrescribeDiagnose(outptDiagnoseDTO);
         return true;

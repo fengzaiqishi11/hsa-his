@@ -1484,7 +1484,7 @@
         (select v.dept_name from outpt_visit v where v.id = s.visit_id) as deptName,
         (select v.gender_code from outpt_visit v where v.id = s.visit_id) as sex,
         s.settle_time, s.crte_name as crteName, bfc.name as bfcName, bfc.code as bfcCode, s.self_price as selfPrice, s.mi_price as miPrice,
-        scd.name as fpglName, scd.value as fpglKey
+        scd.name as fpglName, scd.value as fpglKey, s.total_price as outptTotalFee
         from outpt_settle s join outpt_cost c on c.settle_id = s.id
         join sys_code_detail d on c.item_code = d.value and d.hosp_code = #{hospCode} and d.c_code = 'XMLB'
         join base_finance_classify bfc on bfc.id = c.bfc_id and bfc.hosp_code = c.hosp_code
@@ -1513,7 +1513,7 @@
         select c.*, d.name as xmName, v.name as patientName, v.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode,
          s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
          s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
-         scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo,
+         scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo, s.total_price as outptTotalFee,
          case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays
         from inpt_settle s join inpt_cost c on c.settle_id = s.id
         left join inpt_visit v on v.id = s.visit_id and v.hosp_code = s.hosp_code

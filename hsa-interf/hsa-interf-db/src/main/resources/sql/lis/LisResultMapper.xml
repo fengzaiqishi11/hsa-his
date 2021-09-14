@@ -20,9 +20,18 @@
         </foreach>
     </insert>
 
-    <select id="queryNoResult">
+    <select id="queryNoResult" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
         select visit_id from medic_apply where result_id is null and crte_time > DATE_SUB(now(), INTERVAL #{days} DAY)
     </select>
+
+    <select id="queryNoResultLis" resultType="java.util.Map">
+        select opd_id from medic_apply where report_time is null
+    </select>
+
+    <select id="queryDXNoResult" resultType="java.lang.String">
+        select opd_id from medic_apply where report_time is null
+    </select>
+
 
     <insert id="insertResult" keyProperty="" useGeneratedKeys="true">
         insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
@@ -31,7 +40,7 @@
         crte_name, crte_time, apply_no)
         values
         <foreach collection="list" item="entity" separator=",">
-            (#{entity.id}, #{entity.hospCode}, #{entity.in_no}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.in_no}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
             #{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.result_type}, #{entity.result},
             #{entity.testitem_name}, #{entity.reportte_text}, #{entity.pic_url}, #{entity.isPositive},
             #{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
@@ -40,12 +49,36 @@
         </foreach>
     </insert>
 
+    <insert id="insertDXResult" keyProperty="" useGeneratedKeys="true">
+        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        crte_name, crte_time, apply_no)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
+            #{entity.testitem_name}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
+            #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
+            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
+        </foreach>
+    </insert>
+
     <delete id="deleteResult">
-        delete from medic_result where visit_id in
+        delete from medic_result where advice_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
           #{entity}
         </foreach>
     </delete>
+
+    <update id="updateApplyStatus">
+        update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s')
+        where advice_id in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+            #{entity}
+        </foreach>
+    </update>
     <select id="queryAdvice" resultType="java.util.Map">
         select * from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode}
     </select>

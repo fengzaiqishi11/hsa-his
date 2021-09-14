@@ -480,7 +480,9 @@
             preferential_type_id = #{preferentialTypeId},
             visit_code = #{visitCode},
             remark = #{remark},
-            now_address = #{nowAddress}
+            now_address = #{nowAddress},
+            source_tj_code = #{sourceTjCode},
+            source_tj_remark = #{sourceTjRemark}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -1874,7 +1876,7 @@
                 from outpt_cost a
                 left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
                 left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
-                where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_sub(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
+                where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_add(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
 
                 union all
                 select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
@@ -1949,7 +1951,7 @@
     <!-- 添加处方医技申请 -->
     <insert id="insertMedicalApply" parameterType="java.util.List" useGeneratedKeys="false">
         insert into medic_apply(
-            id, hosp_code, apply_no, type_code, visit_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
+            id, hosp_code, apply_no, type_code, visit_id, cost_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
             apply_time, imp_dept_id, bar_code, print_time, print_times, rporter, is_allergy, result_id,is_positive, document_sta,
             opd_id, content, medic_type, is_merge, merge_id, remark, report_time, crte_id, crte_name, crte_time
         )
@@ -1961,6 +1963,7 @@
             #{item.applyNo},
             #{item.typeCode},
             #{item.visitId},
+            #{item.costId},
             #{item.inNo},
             #{item.orderNo},
             #{item.isInpt},

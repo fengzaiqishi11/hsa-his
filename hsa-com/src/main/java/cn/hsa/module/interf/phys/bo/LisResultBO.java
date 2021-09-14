@@ -26,6 +26,33 @@ public interface LisResultBO {
     Map insertLisResult(Map map);
 
     /**
+     * @Description: lis结果数据存库
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangxuan
+     * @Date: 2021-09-09
+     */
+    Map insertDXLisResult(Map map);
+
+    /**
+    * @Description: 查询无结果的申请单的医嘱id
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-11
+    */
+    List<String> queryDXNoResult(Map map);
+    
+    /** 
+    * @Description: 查询没有结果的lis申请单
+    * @Param: 
+    * @return: 
+    * @Author: zhangxuan
+    * @Date: 2021-09-04
+    */ 
+    Map queryNoResultLis(Map map);
+
+    /**
      * @Description: 医嘱目录信息
      * @Param: [map]
      * @return: java.util.Map

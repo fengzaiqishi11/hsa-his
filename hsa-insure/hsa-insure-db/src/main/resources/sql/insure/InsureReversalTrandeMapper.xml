@@ -151,7 +151,7 @@
             sum(e.person_price) as person_price,
             t.medicine_org_code fixmedins_code,
             sum(e.total_price) as medfee_sumamt,
-            (sum(e.insure_price) -  sum(e.personal_price)) as fund_pay_sumamt,
+            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
             sum(e.personal_price) as acct_pay,
             count(1) as fixmedins_setl_cnt
         FROM
@@ -185,6 +185,37 @@
         group by c.aae140,t.is_hospital,e.clr_type,t.medicine_org_code
     </select>
 
+    <select id="getHisReckonInfo" resultType="java.util.Map">
+        SELECT
+        max(e.insure_reg_code) as insureRegCode,
+        t.medicine_org_code fixmedins_code,
+        e.clr_type,
+        e.clr_way,
+        e.clr_optins,
+        sum(e.person_price) as person_price,
+        sum(e.total_price) as medfee_sumamt,
+        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+        sum(e.personal_price) as acct_pay,
+        count(1) as fixmedins_setl_cnt
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND e.settle_state = '1'
+        and e.insureSettleId is not null
+        and date(e.crte_time) &gt;= date(#{startDate})
+        and date(e.crte_time) &lt;= date(#{endDate})
+        and e.clr_type = #{clrType}
+        and e.clr_way = #{clrWay}
+        and e.insure_reg_code = #{insureRegCode}
+        <if test="state != null and state != ''">
+            and e.state = '0'
+        </if>
+        group by e.clr_type,e.clr_way,t.medicine_org_code
+    </select>
+
 
 
     <!--医药机构费用结算对明细账查询-->
@@ -207,7 +238,7 @@
             e.clr_optins,
             t.insure_reg_code as setl_optins,
             e.total_price as medfee_sumamt,
-            (e.insure_price - e.personal_price) as fund_pay_sumamt,
+            (e.total_price - e.personal_price - e.person_price) as fund_pay_sumamt,
             e.personal_price as acct_pay
         FROM
         insure_individual_settle e,

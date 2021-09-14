@@ -8,6 +8,7 @@
 		<result property="code" column="code" jdbcType="VARCHAR"/>
 		<result property="attachCode" column="attach_code" jdbcType="VARCHAR"/>
 		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="usualName" column="usual_name" jdbcType="VARCHAR"/>
 		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
 		<result property="isAdd" column="is_add" jdbcType="VARCHAR"/>
 		<result property="pym" column="pym" jdbcType="VARCHAR"/>
@@ -32,7 +33,7 @@
 
 	<select id="getById" resultMap="BaseDiseaseMap">
 		select
-		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
 		crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no
 		from base_disease
 		<where>
@@ -45,7 +46,7 @@
 
 	<select id="queryPage" resultMap="BaseDiseaseMap">
 		select
-		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
 		crte_name, crte_time,ifnull(seq_no,14836248) as seq_no
 		from base_disease
 		<where>
@@ -78,8 +79,9 @@
 				and crte_time = #{crteTime}
 			</if>
 			<if test="keyword !=null and keyword != ''">
-				and (code like concat('%',#{keyword},'%')
+				anqueryOutptDeptIncomed (code like concat('%',#{keyword},'%')
 				or name like concat('%',#{keyword},'%')
+				or usual_name like concat('%',#{keyword},'%')
 				or wbm like concat('%',#{keyword},'%')
 				or pym like concat('%',#{keyword},'%'))
 			</if>
@@ -114,7 +116,7 @@
 
 	<select id="queryAll" resultMap="BaseDiseaseMap">
 		select
-		id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
 		crte_name, crte_time
 		from base_disease
 		<where>
@@ -155,6 +157,7 @@
 			<if test="keyword !=null and keyword != ''">
 				and (code like concat('%',#{keyword},'%')
 				or name like concat('%',#{keyword},'%')
+				or usual_name like concat('%',#{keyword},'%')
 				or wbm like concat('%',#{keyword},'%')
 				or pym like concat('%',#{keyword},'%'))
 			</if>
@@ -173,8 +176,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no)
-        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo})
+        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no)
+        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{usualName}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo})
     </insert>
 
 	<!--新增疾病规则-->
@@ -203,6 +206,7 @@
 			code = #{code},
 			attach_code = #{attachCode},
 			name = #{name},
+			usual_name = #{usualName},
 			nation_code = #{nationCode},
 			is_add = #{isAdd},
 			pym = #{pym},
@@ -265,7 +269,7 @@
 
     <select id="getDiseaseByIds" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO">
         select
-        id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+        id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
         crte_name, crte_time
         from base_disease
         <where>
@@ -365,7 +369,7 @@
 			a.crte_time
 	</select>
     <select id="queryUnifiedPage" resultType="cn.hsa.module.base.bd.dto.BaseDiseaseDTO">
-		select a.id, a.hosp_code, a.type_code, a.code, a.name, a.attach_code,
+		select a.id, a.hosp_code, a.type_code, a.code, a.name, a.usual_name, a.attach_code,
 			   a.nation_code, a.is_add, a.pym,a.wbm, a.is_valid,
 			   a.crte_id, a.crte_name, a.crte_time from base_disease a
 		left join insure_disease_match  b on a.id = b.hosp_illness_id where b.hosp_illness_id is null
@@ -381,7 +385,7 @@
 
     <select id="queryAllInfectious" resultMap="BaseDiseaseMap">
         select
-        id, hosp_code, type_code, code, attach_code, name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+        id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
         crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days
         from base_disease
         where hosp_code = #{hospCode} and is_infectious='1'

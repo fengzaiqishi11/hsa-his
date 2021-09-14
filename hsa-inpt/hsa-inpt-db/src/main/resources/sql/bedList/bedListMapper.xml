@@ -83,13 +83,14 @@
         <result property="criticalValueCode" column="criticalValueCode" jdbcType="VARCHAR"/>
         <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
         <result property="isOutHosp" column="isOutHosp" jdbcType="VARCHAR"/>
+        <result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 根据医院编码、住院就诊ID查询人员在床信息 updated by zhongming 20201221 -->
     <select id="queryPage" resultMap="InptVisitMap">
         select iv.*, bb.name as bbBedName, bb.status_code as bbStatusCode, bb.id as bbId,
         c.id as diseaseId, c.name as diseaseName, c.nation_code as diseaseIcd10,
-        iv.critical_value_code as criticalValueCode,iv.patient_code, d.name wardName
+        iv.critical_value_code as criticalValueCode,iv.patient_code, d.name wardName, iv.nursing_code
         from base_bed bb
         left join inpt_visit iv on bb.visit_id = iv.id and bb.hosp_code = iv.hosp_code
         left join (
@@ -370,7 +371,7 @@
         FROM
             base_dept a
         WHERE
-            a.hosp_code = #{hospCode}
+            a.hosp_code = #{hospCode} and a.is_valid = '1'
             AND EXISTS ( SELECT 1 FROM base_dept b WHERE b.type_code = '15' AND b.id = #{wardId} and a.ward_code = b.code )
     </select>
 

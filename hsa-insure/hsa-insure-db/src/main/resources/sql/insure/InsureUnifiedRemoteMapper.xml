@@ -57,5 +57,15 @@
             iib.aac003 like concat('%',#{keyword},'%')
             )
         </if>
+        <if test="isFlag != null and isFlag != ''">
+            and iur.IS_FLAG = #{isFlag}
+        </if>
+        <if test="startDate != null and startDate != '' ">
+            and str_to_date(concat(iur.TRT_YEAR,"-",iur.TRT_MONTH),'%Y-%m') &gt;= str_to_date(#{startDate},'%Y-%m')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and str_to_date(concat(iur.TRT_YEAR,"-",iur.TRT_MONTH),'%Y-%m') &lt;= str_to_date(#{endDate},'%Y-%m')
+        </if>
     </select>
 </mapper>

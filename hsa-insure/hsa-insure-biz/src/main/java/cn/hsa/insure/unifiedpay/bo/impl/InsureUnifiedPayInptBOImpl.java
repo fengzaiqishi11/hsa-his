@@ -259,6 +259,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 Map<String, Object> objectMap = new HashMap<>();
                 String pracCertiNo = MapUtils.get(item,"pracCertiNo");
                 String doctorName = MapUtils.get(item,"doctorName");
+                if(StringUtils.isEmpty(pracCertiNo)){
+                    throw new AppException("该" +doctorName+"医生的医师国家码没有维护,请去用户管理里面维护");
+                }
                 count++;
                 String feedetlSn = MapUtils.get(item,"id");
                 // 湖南省医保费用流水只能传15位  且费用明细流水号必须为非0的数字
@@ -1301,6 +1304,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
         mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
+        mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
+        mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
+        mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
+
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureDoctorInfoDAO">
+    <!-- 字段映射 -->
+    <resultMap id="insureDoctorInfoMap" type="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="insure_reg_code" property="insureRegCode" jdbcType="VARCHAR" />
+        <result column="dr_codg" property="drCodg" jdbcType="VARCHAR" />
+        <result column="dr_name" property="drName" jdbcType="VARCHAR" />
+        <result column="prac_dr_id" property="pracDrId" jdbcType="VARCHAR" />
+        <result column="dr_prac_type" property="drPracType" jdbcType="VARCHAR" />
+        <result column="dr_pro_tech_duty" property="drProTechDuty" jdbcType="VARCHAR" />
+        <result column="dr_prac_scp_code" property="drPracScpCode" jdbcType="VARCHAR" />
+        <result column="pro_code" property="proCode" jdbcType="VARCHAR" />
+        <result column="dcl_prof_flag" property="dclProfFlag" jdbcType="VARCHAR" />
+        <result column="practice_code" property="practiceCode" jdbcType="VARCHAR" />
+        <result column="dr_profttl_code" property="drProfttlCode" jdbcType="VARCHAR" />
+        <result column="psn_itro" property="psnItro" jdbcType="VARCHAR" />
+        <result column="mul_prac_flag" property="mulPracFlag" jdbcType="VARCHAR" />
+        <result column="main_pracins_flag" property="mainPracinsFlag" jdbcType="VARCHAR" />
+        <result column="hosp_dept_code" property="hospDeptCode" jdbcType="VARCHAR" />
+        <result column="bind_flag" property="bindFlag" jdbcType="VARCHAR" />
+        <result column="siprof_flag" property="siprofFlag" jdbcType="VARCHAR" />
+        <result column="loclprof_flag" property="loclprofFlag" jdbcType="VARCHAR" />
+        <result column="hi_dr_flag" property="hiDrFlag" jdbcType="VARCHAR" />
+        <result column="cert_type" property="certType" jdbcType="VARCHAR" />
+        <result column="certno" property="certno" jdbcType="VARCHAR" />
+        <result column="memo" property="memo" jdbcType="VARCHAR" />
+        <result column="is_upload" property="isUpload" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表查询字段 -->
+    <sql id="allColumns">
+        id, hosp_code, insure_reg_code, dr_codg, dr_name, prac_dr_id, dr_prac_type, dr_pro_tech_duty,
+        dr_prac_scp_code, pro_code, dcl_prof_flag, practice_code, dr_profttl_code, psn_itro, mul_prac_flag, main_pracins_flag,
+        hosp_dept_code, bind_flag, siprof_flag, loclprof_flag, hi_dr_flag, cert_type, certno, memo,
+        is_upload, crte_id, crte_name, crte_time
+    </sql>
+
+    <!-- 查询所有数据 -->
+    <select id="findInsureDoctorInfoAll" resultMap="insureDoctorInfoMap">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_info
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryInsureDoctorInfoPage" resultMap="insureDoctorInfoMap" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_info WHERE 1 = 1
+         AND hosp_code = #{hospCode}
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="drCodg != null and drCodg != ''">
+            AND dr_codg LIKE CONCAT('%', #{drCodg}, '%')
+        </if>
+        <if test="drName != null and drName != ''">
+            AND dr_name LIKE CONCAT('%', #{drName}, '%')
+        </if>
+        <if test="pracDrId != null and pracDrId != ''">
+            AND prac_dr_id LIKE CONCAT('%', #{pracDrId}, '%')
+        </if>
+        <if test="drPracType != null and drPracType != ''">
+            AND dr_prac_type LIKE CONCAT('%', #{drPracType}, '%')
+        </if>
+        <if test="drProTechDuty != null and drProTechDuty != ''">
+            AND dr_pro_tech_duty LIKE CONCAT('%', #{drProTechDuty}, '%')
+        </if>
+        <if test="drPracScpCode != null and drPracScpCode != ''">
+            AND dr_prac_scp_code LIKE CONCAT('%', #{drPracScpCode}, '%')
+        </if>
+        <if test="proCode != null and proCode != ''">
+            AND pro_code LIKE CONCAT('%', #{proCode}, '%')
+        </if>
+        <if test="dclProfFlag != null and dclProfFlag != ''">
+            AND dcl_prof_flag LIKE CONCAT('%', #{dclProfFlag}, '%')
+        </if>
+        <if test="practiceCode != null and practiceCode != ''">
+            AND practice_code LIKE CONCAT('%', #{practiceCode}, '%')
+        </if>
+        <if test="drProfttlCode != null and drProfttlCode != ''">
+            AND dr_profttl_code LIKE CONCAT('%', #{drProfttlCode}, '%')
+        </if>
+        <if test="psnItro != null and psnItro != ''">
+            AND psn_itro LIKE CONCAT('%', #{psnItro}, '%')
+        </if>
+        <if test="mulPracFlag != null and mulPracFlag != ''">
+            AND mul_prac_flag LIKE CONCAT('%', #{mulPracFlag}, '%')
+        </if>
+        <if test="mainPracinsFlag != null and mainPracinsFlag != ''">
+            AND main_pracins_flag LIKE CONCAT('%', #{mainPracinsFlag}, '%')
+        </if>
+        <if test="hospDeptCode != null and hospDeptCode != ''">
+            AND hosp_dept_code LIKE CONCAT('%', #{hospDeptCode}, '%')
+        </if>
+        <if test="bindFlag != null and bindFlag != ''">
+            AND bind_flag LIKE CONCAT('%', #{bindFlag}, '%')
+        </if>
+        <if test="siprofFlag != null and siprofFlag != ''">
+            AND siprof_flag LIKE CONCAT('%', #{siprofFlag}, '%')
+        </if>
+        <if test="loclprofFlag != null and loclprofFlag != ''">
+            AND loclprof_flag LIKE CONCAT('%', #{loclprofFlag}, '%')
+        </if>
+        <if test="hiDrFlag != null and hiDrFlag != ''">
+            AND hi_dr_flag LIKE CONCAT('%', #{hiDrFlag}, '%')
+        </if>
+        <if test="certType != null and certType != ''">
+            AND cert_type LIKE CONCAT('%', #{certType}, '%')
+        </if>
+        <if test="certno != null and certno != ''">
+            AND certno LIKE CONCAT('%', #{certno}, '%')
+        </if>
+        <if test="memo != null and memo != ''">
+            AND memo LIKE CONCAT('%', #{memo}, '%')
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            AND is_upload LIKE CONCAT('%', #{isUpload}, '%')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id LIKE CONCAT('%', #{crteId}, '%')
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name LIKE CONCAT('%', #{crteName}, '%')
+        </if>
+        <if test="crteTime != null">
+            AND crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <!-- 根据主键查询数据 -->
+    <select id="getInsureDoctorInfoById" resultMap="insureDoctorInfoMap" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        SELECT FROM insure_doctor_info WHERE id = #{id} and hosp_code = #{hosp_code}
+    </select>
+
+    <!-- 根据主键查询数据 -->
+    <select id="findInsureDoctorInfoByIds" resultMap="insureDoctorInfoMap" parameterType="list">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_doctor_info WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insertInsureDoctorInfo" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        INSERT INTO insure_doctor_info (
+            id, hosp_code, insure_reg_code, dr_codg, dr_name, prac_dr_id, dr_prac_type, dr_pro_tech_duty,
+            dr_prac_scp_code, pro_code, dcl_prof_flag, practice_code, dr_profttl_code, psn_itro, mul_prac_flag, main_pracins_flag,
+            hosp_dept_code, bind_flag, siprof_flag, loclprof_flag, hi_dr_flag, cert_type, certno, memo,
+            is_upload, crte_id, crte_name, crte_time
+        ) VALUES (
+                     #{id},
+                     #{hospCode},
+                     #{insureRegCode},
+                     #{drCodg},
+                     #{drName},
+                     #{pracDrId},
+                     #{drPracType},
+                     #{drProTechDuty},
+                     #{drPracScpCode},
+                     #{proCode},
+                     #{dclProfFlag},
+                     #{practiceCode},
+                     #{drProfttlCode},
+                     #{psnItro},
+                     #{mulPracFlag},
+                     #{mainPracinsFlag},
+                     #{hospDeptCode},
+                     #{bindFlag},
+                     #{siprofFlag},
+                     #{loclprofFlag},
+                     #{hiDrFlag},
+                     #{certType},
+                     #{certno},
+                     #{memo},
+                     #{isUpload},
+                     #{crteId},
+                     #{crteName},
+                     #{crteTime}
+                 )
+    </insert>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertInsureDoctorInfos" parameterType="list">
+        INSERT INTO insure_doctor_info (
+        id, hosp_code, insure_reg_code, dr_codg, dr_name, prac_dr_id, dr_prac_type, dr_pro_tech_duty,
+        dr_prac_scp_code, pro_code, dcl_prof_flag, practice_code, dr_profttl_code, psn_itro, mul_prac_flag, main_pracins_flag,
+        hosp_dept_code, bind_flag, siprof_flag, loclprof_flag, hi_dr_flag, cert_type, certno, memo,
+        is_upload, crte_id, crte_name, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.drCodg},
+            #{item.drName},
+            #{item.pracDrId},
+            #{item.drPracType},
+            #{item.drProTechDuty},
+            #{item.drPracScpCode},
+            #{item.proCode},
+            #{item.dclProfFlag},
+            #{item.practiceCode},
+            #{item.drProfttlCode},
+            #{item.psnItro},
+            #{item.mulPracFlag},
+            #{item.mainPracinsFlag},
+            #{item.hospDeptCode},
+            #{item.bindFlag},
+            #{item.siprofFlag},
+            #{item.loclprofFlag},
+            #{item.hiDrFlag},
+            #{item.certType},
+            #{item.certno},
+            #{item.memo},
+            #{item.isUpload},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateInsureDoctorInfoById" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        UPDATE insure_doctor_info
+        <set>
+            <if test="insureRegCode != null">
+                insure_reg_code = #{insureRegCode},
+            </if>
+            <if test="drCodg != null">
+                dr_codg = #{drCodg},
+            </if>
+            <if test="drName != null">
+                dr_name = #{drName},
+            </if>
+            <if test="pracDrId != null">
+                prac_dr_id = #{pracDrId},
+            </if>
+            <if test="drPracType != null">
+                dr_prac_type = #{drPracType},
+            </if>
+            <if test="drProTechDuty != null">
+                dr_pro_tech_duty = #{drProTechDuty},
+            </if>
+            <if test="drPracScpCode != null">
+                dr_prac_scp_code = #{drPracScpCode},
+            </if>
+            <if test="proCode != null">
+                pro_code = #{proCode},
+            </if>
+            <if test="dclProfFlag != null">
+                dcl_prof_flag = #{dclProfFlag},
+            </if>
+            <if test="practiceCode != null">
+                practice_code = #{practiceCode},
+            </if>
+            <if test="drProfttlCode != null">
+                dr_profttl_code = #{drProfttlCode},
+            </if>
+            <if test="psnItro != null">
+                psn_itro = #{psnItro},
+            </if>
+            <if test="mulPracFlag != null">
+                mul_prac_flag = #{mulPracFlag},
+            </if>
+            <if test="mainPracinsFlag != null">
+                main_pracins_flag = #{mainPracinsFlag},
+            </if>
+            <if test="hospDeptCode != null">
+                hosp_dept_code = #{hospDeptCode},
+            </if>
+            <if test="bindFlag != null">
+                bind_flag = #{bindFlag},
+            </if>
+            <if test="siprofFlag != null">
+                siprof_flag = #{siprofFlag},
+            </if>
+            <if test="loclprofFlag != null">
+                loclprof_flag = #{loclprofFlag},
+            </if>
+            <if test="hiDrFlag != null">
+                hi_dr_flag = #{hiDrFlag},
+            </if>
+            <if test="certType != null">
+                cert_type = #{certType},
+            </if>
+            <if test="certno != null">
+                certno = #{certno},
+            </if>
+            <if test="memo != null">
+                memo = #{memo},
+            </if>
+            <if test="isUpload != null">
+                is_upload = #{isUpload},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 批量修改数据 -->
+    <update id="updateInsureDoctorInfos" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE insure_doctor_info
+            <set>
+                <if test="item.insureRegCode != null">
+                    insure_reg_code = #{item.insureRegCode},
+                </if>
+                <if test="item.drCodg != null">
+                    dr_codg = #{item.drCodg},
+                </if>
+                <if test="item.drName != null">
+                    dr_name = #{item.drName},
+                </if>
+                <if test="item.pracDrId != null">
+                    prac_dr_id = #{item.pracDrId},
+                </if>
+                <if test="item.drPracType != null">
+                    dr_prac_type = #{item.drPracType},
+                </if>
+                <if test="item.drProTechDuty != null">
+                    dr_pro_tech_duty = #{item.drProTechDuty},
+                </if>
+                <if test="item.drPracScpCode != null">
+                    dr_prac_scp_code = #{item.drPracScpCode},
+                </if>
+                <if test="item.proCode != null">
+                    pro_code = #{item.proCode},
+                </if>
+                <if test="item.dclProfFlag != null">
+                    dcl_prof_flag = #{item.dclProfFlag},
+                </if>
+                <if test="item.practiceCode != null">
+                    practice_code = #{item.practiceCode},
+                </if>
+                <if test="item.drProfttlCode != null">
+                    dr_profttl_code = #{item.drProfttlCode},
+                </if>
+                <if test="item.psnItro != null">
+                    psn_itro = #{item.psnItro},
+                </if>
+                <if test="item.mulPracFlag != null">
+                    mul_prac_flag = #{item.mulPracFlag},
+                </if>
+                <if test="item.mainPracinsFlag != null">
+                    main_pracins_flag = #{item.mainPracinsFlag},
+                </if>
+                <if test="item.hospDeptCode != null">
+                    hosp_dept_code = #{item.hospDeptCode},
+                </if>
+                <if test="item.bindFlag != null">
+                    bind_flag = #{item.bindFlag},
+                </if>
+                <if test="item.siprofFlag != null">
+                    siprof_flag = #{item.siprofFlag},
+                </if>
+                <if test="item.loclprofFlag != null">
+                    loclprof_flag = #{item.loclprofFlag},
+                </if>
+                <if test="item.hiDrFlag != null">
+                    hi_dr_flag = #{item.hiDrFlag},
+                </if>
+                <if test="item.certType != null">
+                    cert_type = #{item.certType},
+                </if>
+                <if test="item.certno != null">
+                    certno = #{item.certno},
+                </if>
+                <if test="item.memo != null">
+                    memo = #{item.memo},
+                </if>
+                <if test="item.isUpload != null">
+                    is_upload = #{item.isUpload},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!-- 根据主键删除数据 -->
+    <delete id="deleteInsureDoctorInfoById" parameterType="cn.hsa.module.insure.module.entity.InsureDoctorInfoDO">
+        DELETE FROM insure_doctor_info WHERE id = #{id} and hosp_code = #{hosp_code}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteInsureDoctorInfoByIds" parameterType="list">
+        DELETE FROM insure_doctor_info WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

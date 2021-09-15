@@ -270,7 +270,7 @@
             and e.clr_type = #{clrType}
         </if>
         <if test="state != null and state != ''">
-            and e.state = #{state}
+            and e.state = '0'
         </if>
     </select>
 

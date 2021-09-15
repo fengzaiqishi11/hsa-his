@@ -33,4 +33,7 @@ public class OutinDailyDTO extends OutinDailyDO implements Serializable {
 
     //查询类型(all：表示查询所有    除all之外的表示查询权限内的数据)
     private String queryType;
+
+    // 支付方式
+    private String payCode;
 }

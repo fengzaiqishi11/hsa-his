@@ -29,6 +29,7 @@
         <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="provinceCode" column="province_code" jdbcType="VARCHAR"/>
     </resultMap>
     <insert id="saveNationStandardDrugBatch">
         insert into nation_standard_drug

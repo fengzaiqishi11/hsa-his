@@ -966,6 +966,7 @@
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from inpt_settle a
         join inpt_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
+        join sys_code_detail c on c.c_code = 'ZFFS' and p.pay_code = c.value and p.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">

@@ -18,4 +18,8 @@ public class InsureDoctorInfoDTO extends InsureDoctorInfoDO implements Serializa
 
     private List<InsureDoctorMgtinfoDO> insureDoctorMgtinfos;
 
+    private String crteId;
+
+    private String crteName;
+
 }

@@ -98,4 +98,47 @@ public class InsureDoctorInfoServiceImpl extends HsafService implements InsureDo
     public WrapperResponse<InsureDoctorInfoDTO> getInsureDoctorInfoById(Map map) {
         return WrapperResponse.success(insureDoctorInfoBO.getInsureDoctorInfoById(MapUtils.get(map,"insureDoctorInfoDTO")));
     }
+
+    /**
+     * @param map
+     * @Method UpdateToInsureUpload
+     * @Desrciption 医师信息上传
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     */
+    @Override
+    public WrapperResponse<Boolean> updateToInsureUpload(Map map) {
+        return WrapperResponse.success(insureDoctorInfoBO.updateToInsureUpload(MapUtils.get(map,"insureDoctorInfoDTO")));
+
+    }
+
+    /**
+     * @param map
+     * @Method updateToInsureEdit
+     * @Desrciption 医师信息变更
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     */
+    @Override
+    public WrapperResponse<Boolean> updateToInsureEdit(Map map) {
+        return WrapperResponse.success(insureDoctorInfoBO.updateToInsureEdit(MapUtils.get(map,"insureDoctorInfoDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method updateToInsureDelete
+     * @Desrciption 医师信息撤销
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     */
+    @Override
+    public WrapperResponse<Boolean> updateToInsureDelete(Map map) {
+        return WrapperResponse.success(insureDoctorInfoBO.updateToInsureDelete(MapUtils.get(map,"insureDoctorInfoDTO")));
+    }
 }

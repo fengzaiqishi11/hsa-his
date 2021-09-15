@@ -70,5 +70,6 @@
     <dubbo:service interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" ref="insureNurseRecordService_provider"/>
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" ref="insureRecruitPurchaseService_provider"/>
     <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureReckonService" ref="insureReckonService_provider"/>
-
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDoctorInfoService" ref="insureDoctorInfoService_provider"/>
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDoctorMgtinfoService" ref="insureDoctorMgtinfoService_provider"/>
 </beans>

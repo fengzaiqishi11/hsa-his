@@ -67,4 +67,34 @@ public interface InsureDoctorInfoService {
      */
     @PostMapping("/service/insure/InsureDoctorInfo/getInsureDoctorInfoById")
     WrapperResponse<InsureDoctorInfoDTO> getInsureDoctorInfoById(Map map);
+
+    /**
+     * @Method UpdateToInsureUpload
+     * @Desrciption  医师信息上传
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date   2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     **/
+    WrapperResponse<Boolean> updateToInsureUpload(Map map);
+
+    /**
+     * @Method updateToInsureEdit
+     * @Desrciption  医师信息变更
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date   2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     **/
+    WrapperResponse<Boolean> updateToInsureEdit(Map map);
+
+    /**
+     * @Method updateToInsureDelete
+     * @Desrciption  医师信息撤销
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date   2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     **/
+    WrapperResponse<Boolean> updateToInsureDelete(Map map);
 }

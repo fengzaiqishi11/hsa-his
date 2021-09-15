@@ -59,4 +59,36 @@ public interface InsureDoctorInfoBO {
      * @return InsureDoctorInfoDTO
      */
     InsureDoctorInfoDTO getInsureDoctorInfoById(InsureDoctorInfoDTO insureDoctorInfoDTO);
+    /**
+     * @param insureDoctorInfoDTO
+     * @Method UpdateToInsureUpload
+     * @Desrciption 医师信息上传
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return Boolean
+     */
+    Boolean updateToInsureUpload(InsureDoctorInfoDTO insureDoctorInfoDTO);
+
+    /**
+     * @param insureDoctorInfoDTO
+     * @Method UpdateToInsureUpload
+     * @Desrciption 医师信息变更
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return Boolean
+     */
+    Boolean updateToInsureEdit(InsureDoctorInfoDTO insureDoctorInfoDTO);
+
+    /**
+     * @param insureDoctorInfoDTO
+     * @Method updateToInsureDelete
+     * @Desrciption 医师信息撤销
+     * @Param insureDoctorInfoDTO
+     * @Author 廖继广
+     * @Date 2021-09-13 16:50
+     * @Return insureDoctorInfoDTO
+     */
+    Boolean updateToInsureDelete(InsureDoctorInfoDTO insureDoctorInfoDTO);
 }

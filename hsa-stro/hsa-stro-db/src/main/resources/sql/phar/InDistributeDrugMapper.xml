@@ -165,42 +165,60 @@
 
     <!--住院发药-取药明细单打印-->
     <select id="getInReviceDetail" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
-        select
-        a.item_name itemName,a.spec,
-        a.price,a.unit_code unitCode,a.item_code itemCode,a.item_id itemId,ifnull(a.num,0) num,ifnull(a.num*a.price,0) total,
-        ifnull(a.dosage,0) dosage,a.visit_id visitId,
-        (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
-        (select in_no from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) inNo,
-        (case a.item_code when '1' then (select code from base_drug where id=a.item_id and a.item_code='1' and hosp_code=a.hosp_code)
-            else (select code from base_material where id=a.item_id and a.item_code='2' and hosp_code=a.hosp_code) end) code,
-        (select location_no from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) locationNo,
-        (select name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) name,ifnull(a.dosage,0) dosage,a.dosage_unit_code dosageUnitCode,
-        (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
-         (select name from base_rate where id=a.rate_id and hosp_code=a.hosp_code) as rateName,
-        a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,
-         a.is_long isLong,a.crte_id crteId,a.crte_name crteName,a.usage_code usageCode,
-         a.in_disease_name inDiseaseName,a.patient_code patientCode
-        from (
-            select a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,
-            a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age
-            ,ifnull(a.num,0) num,a.split_unit_code,ifnull(a.split_num, 0) splitNum,a.dosage_unit_code,
-            ifnull(d.is_long,'') is_long,d.crte_id,d.crte_name,d.rate_id,d.usage_code,c.in_disease_name,c.patient_code
-            from phar_in_receive_detail a
-            join phar_in_receive b on a.receive_id=b.id and a.hosp_code = b.hosp_code
-            join inpt_visit c on a.visit_id=c.id and a.hosp_code = c.hosp_code
-            left join inpt_advice d on a.advice_id = d.id and a.hosp_code = d.hosp_code
-            where a.hosp_code=#{hospCode}
-            <if test="receiveId!=null and receiveId!=''">
-                and a.receive_id=#{receiveId}
-            </if>
-            <if test="windowId!=null and windowId!=''">
-                and b.window_id=#{windowId}
-            </if>
---             group by a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,
---             a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age,a.split_unit_code,a.split_ratio,a.dosage_unit_code,
---             d.is_long,d.crte_id,d.crte_name,d.rate_id,d.usage_code,c.in_disease_name,c.patient_code
-        ) a
+        SELECT
+        a.receive_id,
+        a.item_name AS itemName,
+        a.spec,
+        a.price,
+        a.unit_code AS unitCode,
+        a.item_code AS itemCode,
+        a.item_id AS itemId,
+        a.hosp_code,
+        b.phar_id,
+        a.visit_id AS visitId,
+        ifnull(a.num,0) num,
+        ifnull(a.num*a.price,0) total,
+        c.bed_name AS bedName,
+        c.in_no AS inNo,
+        (case a.item_code when '1' then (select code from base_drug where  hosp_code=a.hosp_code and id=a.item_id )
+        else (select code from base_material where id=a.item_id and a.item_code='2' and hosp_code=a.hosp_code) end) code,
+
+        ifnull(a.dosage,0) AS dosage,
+        ifnull( a.num, 0 ) num,
+        a.split_unit_code AS splitUnitCode,
+        ifnull( a.split_num, 0 ) AS splitNum,
+        a.dosage_unit_code AS dosageUnitCode,
+        ifnull(d.is_long, '' )  AS isLong,
+        d.crte_id AS  crteId,
+        d.crte_name AS crteName,
+        d.rate_id,
+        br.`name` as rateName,
+        stock.location_no AS locationNo,
+        c.`name`,
+        d.usage_code AS usageCode,
+        c.in_disease_name AS inDiseaseName,
+        c.patient_code AS patientCode,
+        (concat(c.name, '/',(case c.gender_code when '0' then '未知' when '1' then '男' when '2' then '女' when '9' then '未说明' else '-' end),
+        '/',c.age,
+        (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end))) patientInfo
+        FROM
+        phar_in_receive_detail a
+        JOIN phar_in_receive b ON a.hosp_code =b.hosp_code AND  a.receive_id = b.id
+        JOIN inpt_visit c ON a.hosp_code = c.hosp_code AND a.visit_id = c.id
+        AND a.hosp_code = c.hosp_code
+        LEFT JOIN inpt_advice d ON a.advice_id = d.id
+        AND a.hosp_code = d.hosp_code
+        left join base_rate br on d.rate_id = br.id
+        left join stro_stock stock ON stock.hosp_code=a.hosp_code AND stock.item_code=a.item_code and stock.item_id=a.item_id and stock.biz_id=b.phar_id
+
+        WHERE
+        a.hosp_code = #{hospCode}
+        <if test="receiveId!=null and receiveId!=''">
+            and a.receive_id=#{receiveId}
+        </if>
+        <if test="windowId!=null and windowId!=''">
+            and b.window_id=#{windowId}
+        </if>
         order by patientInfo
     </select>
 

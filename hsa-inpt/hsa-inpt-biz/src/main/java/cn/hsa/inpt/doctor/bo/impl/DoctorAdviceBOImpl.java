@@ -906,6 +906,10 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
      * @return
      */
     public boolean checkAdvice(String flag, InptAdviceDTO inptAdviceDTO){
+
+        String iatIds = Optional.ofNullable(inptAdviceDTO.getIatIds()).orElseThrow(
+                () -> {throw new AppException("医嘱id集合不能为空！");});
+        inptAdviceDTO.setIatIdList(Arrays.asList(iatIds.split(",")));
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         checkInptAdviceList = inptAdviceDTOList.stream().filter(s-> Constants.SF.F.equals(s.getIsCheck())).collect(Collectors.toList());

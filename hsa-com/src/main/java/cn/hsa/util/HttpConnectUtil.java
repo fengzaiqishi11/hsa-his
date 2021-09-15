@@ -306,7 +306,7 @@ public class HttpConnectUtil {
             //获取URLConnection对象对应的输入流
             InputStream is = conn.getInputStream();
             //构造一个字符流缓存
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF8"));
             String str = "";
             while ((str = br.readLine()) != null) {
                 rest.append(str);

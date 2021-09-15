@@ -1006,9 +1006,8 @@
           and iis.settle_state='1'
         <if test="keyWord != null and keyWord != ''">
             and (
-            ov.name like concat('%',#{keyWord},'%')
+            iib.aac003 like concat('%',#{keyWord},'%')
             or iiv.visit_no like concat('%',#{keyWord},'%')
-            or iv.name like concat('%',#{keyWord},'%')
             )
         </if>
         <!--业务类型选择-->

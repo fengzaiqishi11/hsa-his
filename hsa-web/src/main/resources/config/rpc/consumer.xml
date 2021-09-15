@@ -385,6 +385,11 @@
     <dubbo:reference id="insureUnifiedRemoteService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" check="false"/>
     <!--护理生命记录-统一支付平台-->
     <dubbo:reference id="insureNurseRecordService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" check="false"/>
+    <!--医师上传-统一支付平台-->
+    <dubbo:reference id="insureDoctorInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureDoctorInfoService" check="false"/>
+
+    <dubbo:reference id="insureDoctorMgtinfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureDoctorMgtinfoService" check="false"/>
+
     <!-- ########################################### 医保接口 end ############################################## -->
 
 

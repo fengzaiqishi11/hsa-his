@@ -379,7 +379,8 @@
         max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
         max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
         max(ma.bar_code ) bar_code,
-        max(ba.technology_code) technology_code
+        max(ba.technology_code) technology_code,
+        '' as bed_name
         from 	medic_apply ma
         JOIN outpt_prescribe_detail opd ON
         ma.opd_id  = opd.id
@@ -444,7 +445,8 @@
         max(iv.age_unit_code) age_unit_code,
         max(ma.crte_time) crte_time,
         max(ma.bar_code) bar_code,
-        max(ba.technology_code) technology_code
+        max(ba.technology_code) technology_code,
+        max(iv.bed_name) bed_name
         FROM
 
         medic_apply ma

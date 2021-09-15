@@ -1090,7 +1090,7 @@ public class InptFunction {
             costItem.put("make_flag","");//非工伤费用标志（1：工伤住院业务使用，表示录入的费用为非工伤费用，非工伤费用全部现金支付。该标志用于识别工伤住院期间发生非工伤的医疗费）
             if(Constants.ZTBZ.CH.equals(item.get("statusCode"))) {
                 // costItem.put("opp_serial_fee", "1"+SnowflakeUtils.getId().substring(12)+(int)(Math.random()*10));//对应费用序列号
-                costItem.put("opp_serial_fee", item.get("oldCostId"));
+                costItem.put("opp_serial_fee", item.get("oldCostId"));//对应费用序列号
             }else{
                 costItem.put("opp_serial_fee","");//对应费用序列号（如果收费则为空，如果是退费则必须为对应收费的serial_fee）
             }

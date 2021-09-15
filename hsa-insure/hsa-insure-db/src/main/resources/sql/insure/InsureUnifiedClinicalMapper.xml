@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedClinicalDAO">
+    <insert id="insertNoStructReportRecord">
+    insert into insure_nostruct_report
+        (id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag,
+        appy_no, file_name, file_formate, exam_test_rpot, vali_flag, is_trans)
+        values (#{id},#{hospCode},#{visitId},#{mdtrtId},#{psnNo},
+        #{otpIptFlag},#{examTestFlag},#{appyNo},#{fileName},#{fileFormate},#{examTestRpot},#{valiFlag},
+                #{isTrans})
+    </insert>
+    <insert id="insertPathologicalReportRecord">
+        insert into insure_pathological_report
+            (id, hosp_code, mdtrt_id, psn_no, palg_no, frozen_no, cma_date, rpot_date, cma_matl, clnc_dise, exam_fnd,
+              sabc, palg_diag, rpot_doc, vali_flag, is_trans)
+              values (#{id},#{hospCode},#{mdtrtId},#{psnNo},#{palgNo},#{frozenNo},#{cmaDate}
+              ,#{rpotDate},#{cmaMatl},#{clncDise},#{examFnd},#{sabc},#{palgDiag},#{rpoDoc},#{valFlag},#{isTrans})
+    </insert>
+    <insert id="insertBacterialReportRecord">
+        insert into insure_bacterial_report
+            (id, hosp_code, visit_id, mdtrt_sn, psn_no, appy_no, rpotc_no,
+             germ_code, germ_name, coly_cntg, clte_medm, clte_time, clte_cond, exam_rslt,
+             fnd_way, exam_org_name, vali_flag, is_trans)
+        values (#{id},#{hospCode},#{visitId},#{mdtrtSn},#{psnNo},#{appyNo},#{rpotcNo},#{germCode}
+               ,#{germName},#{colyCntg},#{clteMedm},#{clteTime},#{clteCond},#{examRslt},
+                #{fndWay},#{examOrgName},#{valFlag},#{isTrans})
+    </insert>
+    <insert id="insertDrugSensitivityReportRecord">
+        insert into insure_drugsensitive_report
+        (id, hosp_code, visit_id, mdtrt_sn, psn_no, appy_no, rpotc_no, germ_code,
+         germ_name, sstb_code, sstb_name, reta_rslt_code, reta_rslt_name,
+         ref_val, exam_mtd, exam_rslt, exam_org_name, vali_flag, is_trans)
+        values (#{id},#{hospCode},#{visitId},#{mdtrtSn},#{psnNo},#{appyNo},#{rpotcNo},#{germCode}
+                   ,#{germName},#{sstbCode},#{sstbName},#{retaRsltCode},#{retaRsltName},#{refVal},
+                #{examMtd},#{examRslt},#{examOrgName},#{valFlag},#{isTrans})
+    </insert>
+    <select id="queryAllNoStructReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsureNoStructReportDO">
+        select id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag, appy_no, file_name,
+               file_formate, exam_test_rpot, vali_flag, is_trans
+        from insure_nostruct_report where hosp_code =#{hospCode} and is_trans='0' and visit_id =#{visitId}
+    </select>
+    <select id="queryAllPathologicalReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsurePathologicalReportDO">
+        select id, hosp_code, mdtrt_id, psn_no, palg_no, frozen_no, cma_date,
+               rpot_date, cma_matl,
+               clnc_dise, exam_fnd, sabc, palg_diag, rpot_doc, vali_flag, is_trans
+        from insure_pathological_report where hosp_code =#{hospCode} and is_trans='0' and visit_id =#{visitId}
+    </select>
+    <select id="queryAllBacterialReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsureBactreailReportDO">
+        select id, hosp_code, visit_id, mdtrt_sn, psn_no, appy_no, rpotc_no,
+               germ_code, germ_name, coly_cntg, clte_medm, clte_time, clte_cond,
+               exam_rslt, fnd_way, exam_org_name, vali_flag, is_trans
+        from insure_bacterial_report  where hosp_code =#{hospCode} and is_trans='0' and visit_id =#{visitId}
+    </select>
+    <select id="queryAllDrugSensitivityReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsureDrugSensitiveReportDO">
+        select id, hosp_code, visit_id, mdtrt_sn, psn_no, appy_no, rpotc_no,
+               germ_code, germ_name, sstb_code, sstb_name, reta_rslt_code, reta_rslt_name,
+               ref_val, exam_mtd, exam_rslt, exam_org_name, vali_flag, is_trans
+        from insure_drugsensitive_report  where hosp_code =#{hospCode} and is_trans='0'and visit_id =#{visitId}
+    </select>
+    <select id="queryPageNoStructReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsureNoStructReportDO">
+        select id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag, appy_no, file_name,
+               file_formate, exam_test_rpot, vali_flag, is_trans
+        from insure_nostruct_report where hosp_code =#{hospCode} and visit_id =#{visitId}
+    </select>
+    <select id="queryPagePathologicalReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsurePathologicalReportDO">
+        select id, hosp_code, mdtrt_id, psn_no, palg_no, frozen_no, cma_date,
+               rpot_date, cma_matl,
+               clnc_dise, exam_fnd, sabc, palg_diag, rpot_doc, vali_flag, is_trans
+        from insure_pathological_report where hosp_code =#{hospCode} and visit_id =#{visitId}
+    </select>
+    <select id="queryPageBacterialReportRecord"
+            resultType="cn.hsa.module.insure.module.entity.InsureBactreailReportDO">
+        select id, hosp_code, visit_id, mdtrt_sn, psn_no, appy_no, rpotc_no, germ_code,
+               germ_name, coly_cntg, clte_medm,
+               clte_time, clte_cond, exam_rslt, fnd_way, exam_org_name, vali_flag, is_trans
+        from insure_bacterial_report where hosp_code =#{hospCode} and visit_id =#{visitId}
+    </select>
+</mapper>

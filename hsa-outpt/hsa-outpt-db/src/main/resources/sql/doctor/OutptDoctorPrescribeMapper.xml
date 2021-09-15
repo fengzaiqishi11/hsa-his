@@ -1951,7 +1951,7 @@
     <!-- 添加处方医技申请 -->
     <insert id="insertMedicalApply" parameterType="java.util.List" useGeneratedKeys="false">
         insert into medic_apply(
-            id, hosp_code, apply_no, type_code, visit_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
+            id, hosp_code, apply_no, type_code, visit_id, cost_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
             apply_time, imp_dept_id, bar_code, print_time, print_times, rporter, is_allergy, result_id,is_positive, document_sta,
             opd_id, content, medic_type, is_merge, merge_id, remark, report_time, crte_id, crte_name, crte_time
         )
@@ -1963,6 +1963,7 @@
             #{item.applyNo},
             #{item.typeCode},
             #{item.visitId},
+            #{item.costId},
             #{item.inNo},
             #{item.orderNo},
             #{item.isInpt},

@@ -147,7 +147,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         SysParameterDTO sysParameterDTO = this.getSysParameter(code, inptVisitDTO.getHospCode());
         if ("1".equals(printType)) {
             // 输液瓶贴
-            if (StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
                 adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
             } else {
                 // 瓶贴多条 不分组

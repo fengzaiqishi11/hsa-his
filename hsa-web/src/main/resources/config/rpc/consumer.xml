@@ -385,6 +385,11 @@
     <dubbo:reference id="insureUnifiedRemoteService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" check="false"/>
     <!--护理生命记录-统一支付平台-->
     <dubbo:reference id="insureNurseRecordService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureNurseRecordService" check="false"/>
+    <!--医师上传-统一支付平台-->
+    <dubbo:reference id="insureDoctorInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureDoctorInfoService" check="false"/>
+
+    <dubbo:reference id="insureDoctorMgtinfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureDoctorMgtinfoService" check="false"/>
+
     <!-- ########################################### 医保接口 end ############################################## -->
 
 
@@ -465,12 +470,21 @@
     <dubbo:reference id="insureStockManagerService_consumer" interface="cn.hsa.module.insure.stock.service.InsureStockManagerService" check="false"/>
     <!-- 医保输血记录服务 -->
     <dubbo:reference id="insureInptTransfusionRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsureInptTransfusionRecordService" check="false"/>
+    <dubbo:reference id="insureReckonService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureReckonService" check="false"/>
 
     <dubbo:reference id="insureRecruitPurchaseService_consumer" interface="cn.hsa.module.insure.module.service.InsureRecruitPurchaseService" check="false"/>
+
+    <dubbo:reference id="insureUnifiedClinicalService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService" check="false"/>
 
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
     <!-- 临床路径目录维护 -->
     <dubbo:reference id="clinicPathListService_consumer" interface="cn.hsa.module.clinical.clinicalpathlist.service.ClinicPathListService" check="false"/>
+    <!-- 临床路径目录维护 -->
+    <dubbo:reference id="clinicPathStageDetailService_consumer" interface="cn.hsa.module.clinical.clinicalpathstagedetail.service.ClinicPathStageDetailService" check="false"/>
+    <!--临床路径项目维护-->
+    <dubbo:reference id="clinicalPathItemService_consumer" interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" check="false"/>
+    <!--临床路径阶段描述-->
+    <dubbo:reference id="clinicalPathStageService_consumer" interface="cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService" check="false"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

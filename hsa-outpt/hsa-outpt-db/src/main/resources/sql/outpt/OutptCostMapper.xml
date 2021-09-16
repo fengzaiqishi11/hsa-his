@@ -258,6 +258,7 @@
         <result property="settleId" column="settleId" jdbcType="VARCHAR"/>
         <result property="settleNo" column="settleNo" jdbcType="VARCHAR"/>
         <result property="medicalRegNo" column="medicalRegNo" jdbcType="VARCHAR"/>
+        <result property="opIdList" column="opIds" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -2989,6 +2990,13 @@
         <if test="statusCode != null and statusCode != ''">
             AND oc.status_code = #{statusCode}
         </if>
+        <if test="opIds != null and opIds.size >0">
+            AND oc.op_id IN (
+            <foreach collection="opIds" item="opId" separator=",">
+                #{opId}
+            </foreach>
+            )
+        </if>
     </select>
 
     <!-- 查询非处方、非划价收费费用 -->
@@ -3200,6 +3208,13 @@
             oc.hosp_code = #{hospCode}
           AND oc.visit_id = #{visitId}
           and oc.status_code =#{statusCode} and oc.settle_code !=#{settleCode}
+        <if test="opIds != null and opIds.size >0">
+            AND oc.op_id IN (
+            <foreach collection="opIds" item="opId" separator=",">
+                #{opId}
+            </foreach>
+            )
+        </if>
     </select>
     <select id="queryPrescribeList" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" parameterType="java.util.Map">
         select
@@ -3324,6 +3339,60 @@
             a.is_cost = '1',
             a.cost_time = now()
         where a.id = b.source_id and a.hosp_code = b.hosp_code
+    </update>
+
+    <!--20210903 liuliyun 根据处方id查询处方费用信息-->
+    <select id="queryOutptPrescribeCostList" parameterType="java.util.Map" resultMap="outptCostDtoMap">
+        select
+        <include refid="Base_ColumnAlias_List"/>, d.name as xmlbname, oc.reality_price as lastrealityprice, d.value as xmlbcode
+        from
+        outpt_cost oc
+        LEFT JOIN
+        outpt_prescribe op
+        on oc.op_id = op.id
+        AND op.hosp_code = #{hospCode}
+        left join sys_code_detail d on oc.item_code = d.value and oc.hosp_code = d.hosp_code AND d.c_code = 'XMLB'
+        where
+        oc.hosp_code = #{hospCode}
+        AND oc.source_code ='0'
+        AND op.is_settle = '0'
+        AND op.is_cancel = '0'
+        AND op.is_submit = '1'
+        AND oc.visit_id = #{visitId}
+        <if test="settleCodes != null">
+            AND oc.settle_code IN (
+            <foreach collection="settleCodes" item="settleCode" separator=",">
+                #{settleCode}
+            </foreach>
+            )
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND oc.status_code = #{statusCode}
+        </if>
+        <if test="opId != null and opId != ''">
+            AND oc.op_id = #{opId}
+        </if>
+    </select>
+
+
+    <!--20210903 liuliyun 查询已提交未结算处方 -->
+    <select id="queryPatientPrescribeNoSettle" resultType="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO" parameterType="cn.hsa.module.outpt.fees.entity.OutptPrescribeDO">
+       select * from outpt_prescribe
+       where hosp_code = #{hospCode}
+       and visit_id = #{visitId}
+       and is_cancel ='0'
+       and is_settle ='0'
+       and is_submit ='1'
+       <if test="orderNo !=null and orderNo !=''">
+           and order_no LIKE CONCAT('%',#{orderNo},'%')
+       </if>
+    </select>
+
+    <update id="updateMedicApply" parameterType="list">
+        update medic_apply set document_sta = #{documentSta} where visit_id = #{visitId} and hosp_code = #{hospCode} and cost_id in
+        <foreach collection="list" separator="," item="item" open="(" close=")">
+            #{item.id}
+        </foreach>
     </update>
 
 </mapper>

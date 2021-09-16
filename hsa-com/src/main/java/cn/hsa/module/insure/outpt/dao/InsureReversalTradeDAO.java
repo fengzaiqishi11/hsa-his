@@ -66,5 +66,7 @@ public interface InsureReversalTradeDAO {
     **/
     List<Map<String,Object>> queryDataWith3202(Map<String,Object> map);
 
+    Map<String,Object> getHisReckonInfo(Map<String,Object> map);
+
 
 }

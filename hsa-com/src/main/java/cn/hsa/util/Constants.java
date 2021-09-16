@@ -53,7 +53,7 @@ public interface Constants {
      * @Menthod SF
      * @Desrciption 是否（常量定义）
      * @Author Ou·Mr
-     * @Date 2020/8/26 11:03 
+     * @Date 2020/8/26 11:03
      */
     class SF{
         public static final String S = "1"; //是
@@ -152,7 +152,7 @@ public interface Constants {
      * @Menthod ORDERRULE
      * @Desrciption  单据规则（常量定义）
      * @Author Ou·Mr
-     * @Date 2020/8/27 19:13 
+     * @Date 2020/8/27 19:13
      */
     class ORDERRULE{
         public static final String CG = "01";//采购单号生成规则
@@ -189,6 +189,9 @@ public interface Constants {
         public static final String YJ = "48";//医技
         public static final String TXM = "49";// 条形码
         public static final String YSYZ = "105";//医生站医嘱
+        public static final String LCLJML = "119";//临床路径目录
+        public static final String LCLJXM ="121";//临床路径项目
+        public static final String LCLJJDMS ="122";//临床路径阶段描述
     }
 
     /**
@@ -260,7 +263,7 @@ public interface Constants {
     /**
      * @Desrciption 划价收费redis key值（用于做划价收费结算，防止同一患者同时做同一操作）
      * @Author Ou·Mr
-     * @Date 2020/8/28 9:07 
+     * @Date 2020/8/28 9:07
      */
     String OUTPT_FEES_REDIS_KEY = "outpt_fees";
 
@@ -274,14 +277,14 @@ public interface Constants {
     /**
      * @Desrciption 医院优惠配置代码key
      * @Author Ou·Mr
-     * @Date 2020/8/28 15:41 
+     * @Date 2020/8/28 15:41
      */
     String HOSPCODE_DISCOUNTS_KEY = "JG_SF_SRFS";
 
     /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
      * @Author Ou·Mr
-     * @Date 2020/8/31 15:47 
+     * @Date 2020/8/31 15:47
      */
     class PJLX{
         public static final String TY = "0"; //全院通用
@@ -318,7 +321,7 @@ public interface Constants {
     /**
      * @Desrciption 同步代码（中心平台使用）
      * @Author Ou·Mr
-     * @Date 2020/9/2 9:04 
+     * @Date 2020/9/2 9:04
      */
     class SYNCCODE{
         public static final String QL = "1"; //全量
@@ -655,7 +658,7 @@ public interface Constants {
     /**
      * @Desrciption 费用优惠类型
      * @Author Ou·Mr
-     * @Date 2020/11/11 15:01 
+     * @Date 2020/11/11 15:01
      */
     class PREFERENTIALTYPE{
         public static final String MZ = "0";//门诊

@@ -371,7 +371,7 @@
         FROM
             base_dept a
         WHERE
-            a.hosp_code = #{hospCode}
+            a.hosp_code = #{hospCode} and a.is_valid = '1'
             AND EXISTS ( SELECT 1 FROM base_dept b WHERE b.type_code = '15' AND b.id = #{wardId} and a.ward_code = b.code )
     </select>
 

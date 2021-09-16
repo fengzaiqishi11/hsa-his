@@ -688,8 +688,8 @@
          select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
             left join (
                 select a.pay_code, sum(total_price) as total_price from (
-                    SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
-                    WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode} GROUP BY odp.pay_code
+                    SELECT odp.pay_code, odp.total_price FROM outin_daily_pay odp
+                    WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
                     union all
                     select pay_code, total_price from outin_daily_advance_pay where hosp_code = #{hospCode} AND daily_no = #{dailyNo} and type_code = #{typeCode}
                 ) a

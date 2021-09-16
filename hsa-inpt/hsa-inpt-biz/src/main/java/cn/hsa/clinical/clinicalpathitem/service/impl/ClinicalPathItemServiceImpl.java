@@ -58,4 +58,17 @@ public class ClinicalPathItemServiceImpl implements ClinicalPathItemService {
     public WrapperResponse<ClinicalPathItemDTO> queryPathItemById(Map map) {
         return WrapperResponse.success(clinicalPathItemBO.queryPathItemById(MapUtils.get(map,"queryDTO")));
     }
+
+    /**
+     * @Meth: insertBatchByExcelUpload
+     * @Description: 根据excel文件批量导入
+     * @Param: [file, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/15
+     */
+    @Override
+    public WrapperResponse<Boolean> insertBatchByExcelUpload(Map map) {
+        return WrapperResponse.success(clinicalPathItemBO.insertBatchByExcelUpload(MapUtils.get(map,"clinicalPathItemDTO")));
+    }
 }

@@ -305,7 +305,6 @@ public class BaseDrugController extends BaseController {
         // 省份代码
         String provinceCode = sysParameterDTO.getValue();
         nationStandardMaterialDTO.setProvinceCode(provinceCode);
-        nationStandardMaterialDTO.setFlag("1");
         return nationStandardDrugService_consumer.queryNationStandardDrugPage(nationStandardMaterialDTO);
     }
 

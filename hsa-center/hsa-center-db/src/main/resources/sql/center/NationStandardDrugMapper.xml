@@ -167,7 +167,6 @@
                      or wbm like concat('%',#{keyword},'%')
                      or pym like concat('%',#{keyword},'%')
             or code like concat('%',#{keyword},'%')
-            or dan like concat('%',#{keyword},'%')
                 )
         </if>
     </select>

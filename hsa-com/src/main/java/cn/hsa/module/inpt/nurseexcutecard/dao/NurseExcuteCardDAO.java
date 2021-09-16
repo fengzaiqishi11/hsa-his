@@ -31,6 +31,7 @@ public interface NurseExcuteCardDAO {
      **/
     List<InptAdviceDTO> queryDocterAdvice(InptVisitDTO inptVisitDTO);
 
+    List<InptAdviceDTO> queryDocterAdviceMany(InptVisitDTO inptVisitDTO);
 
     /**
      * @Method: updatePrintFlag()

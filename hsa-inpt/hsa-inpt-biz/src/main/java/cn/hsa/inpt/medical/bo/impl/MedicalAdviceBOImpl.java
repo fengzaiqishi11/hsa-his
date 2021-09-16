@@ -1874,7 +1874,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             parmMap.put("hospCode",inptAdviceDetailDTO.getHospCode());
             parmMap.put("outptPrescribeDetailsDTO",outptPrescribeDetailsDTO);
             drugDTO = outptDoctorPrescribeService_consumer.getBaseDrug(parmMap).getData();
-
+            if(drugDTO == null){
+                throw new RuntimeException("医嘱【" + adviceDTO.getItemName() + "】未获取到有效药品,检查药品信息!");
+            }
             // 没有配置默认 1：单次向上取整
             if(StringUtils.isEmpty(drugDTO.getTruncCode()) || "1".equals(drugDTO.getTruncCode())){
                 inptAdviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(inptAdviceDetailDTO.getNum().doubleValue())));

@@ -195,8 +195,8 @@ public class OperInfoRecordBOImpl extends HsafBO implements OperInfoRecordBO {
         String updateStatusCode = operInfoRecordDTO.getUpdateStatusCode();
 
         if (!StringUtils.isEmpty(updateStatusCode)&& !StringUtils.isEmpty(statusCode)){
-            // statusCode 0 未申请 1已申请 2已安排 3已完成
-            //updateStatusCode 0取消手术 1 申请登记 2取消登记 3手术安排 4 取消安排 5完成登记
+            /* statusCode  已申请	1 ,已安排	2 ,已完成	3 ,已记账	4 ,已开医嘱但未审核 -2 **/
+                 //updateStatusCode 0取消手术 1 申请登记 2取消登记 3手术安排 4 取消安排 5完成登记
             switch (updateStatusCode){
                 case "0":
                     if (!"0".equals(statusCode)){

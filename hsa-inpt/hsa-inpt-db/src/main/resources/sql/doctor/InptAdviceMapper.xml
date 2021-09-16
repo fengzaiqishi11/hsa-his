@@ -470,7 +470,10 @@
             end_exec_num = #{endExecNum},
             stop_time = #{stopTime}
         where hosp_code = #{hospCode}
-        and find_in_set(id,#{iatIds})
+        and id in
+         <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+             #{item}
+         </foreach>
     </update>
 
     <!--批量更新医嘱预停时间-->
@@ -1242,11 +1245,15 @@
         stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time, is_stop_check, cancel_id, cancel_name, cancel_time
         from inpt_advice
         where hosp_code = #{hospCode}
+        and visit_id = #{visitId}
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
-        <if test="iatIds !='' and iatIds != null">
-            and find_in_set(id,#{iatIds})
+        <if test="iatIdList != null">
+          and id in
+          <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+              #{item}
+          </foreach>
         </if>
         <if test="ids != null and ids.size() > 0">
             and id in

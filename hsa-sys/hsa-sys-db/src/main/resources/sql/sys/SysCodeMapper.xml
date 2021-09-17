@@ -163,8 +163,8 @@
 
     <!--新增值域代码-->
     <insert id="insertCodeDetail">
-        insert into sys_code_detail(id,hosp_code,c_code,name,value,remark,seq_no,pym,wbm,up_value,is_end,is_valid,crte_id,crte_name,crte_time)
-        values (#{id},#{hospCode},#{code},#{name},#{value},#{remark},#{seqNo},#{pym},#{wbm},#{upValue},#{isEnd},'1',#{crteId},#{crteName},#{crteTime})
+        insert into sys_code_detail(id,hosp_code,c_code,name,value,remark,seq_no,pym,wbm,up_value,up_name,is_end,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{hospCode},#{code},#{name},#{value},#{remark},#{seqNo},#{pym},#{wbm},#{upValue},#{upName},#{isEnd},'1',#{crteId},#{crteName},#{crteTime})
     </insert>
 
     <!--更新值域代码-->
@@ -200,7 +200,7 @@
     <update id="updateCodeDetail" keyProperty="id" useGeneratedKeys="true">
         update sys_code_detail
         <set>
-            name=#{name},value=#{value},remark=#{remark},is_end=#{isEnd},up_value=#{upValue},
+            name=#{name},value=#{value},remark=#{remark},is_end=#{isEnd},up_value=#{upValue},up_name=#{upName},
             <if test="pym!=null and pym!=''">
                 pym=#{pym},
             </if>

@@ -118,11 +118,20 @@
     <select id="queryStockInDetail" resultMap="stroOutinMap_detail" parameterType="cn.hsa.module.phar.pharapply.dto.StroOutDTO">
         select id, hosp_code, out_id, item_code, item_id, item_name, spec, num, unit_code, dosage, dosage_unit_code,
         buy_price, sell_price, buy_price_all, sell_price_all, split_ratio,
-        split_num, split_price, split_unit_code, batch_no, expiry_date
-        from stro_out_detail
-        where hosp_code=#{hospCode}
+        split_num, split_price, split_unit_code, batch_no, expiry_date,
+        (select name
+                    from base_product
+                    where hosp_code = a.hosp_code
+                    and code = (
+                        select prod_code from base_drug where hosp_code = a.hosp_code and id = a.item_id
+                        union all
+                        select prod_code from base_material where hosp_code = a.hosp_code and id = a.item_id
+                    )
+        )as productName
+        from stro_out_detail a
+        where a.hosp_code=#{hospCode}
         <if test="outId !=null and outId !='' ">
-            and out_id=#{outId}
+            and a.out_id=#{outId}
         </if>
     </select>
 

@@ -10,8 +10,8 @@
        使用springProperty才可使用application.yml中的值 可以设置默认值
     -->
 
-    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-insure/"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-insure-generic"/>
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-xxl-job-executor/"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-xxl-job-executor"/>
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

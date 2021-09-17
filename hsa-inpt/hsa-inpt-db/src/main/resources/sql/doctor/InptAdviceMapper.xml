@@ -482,7 +482,10 @@
         set
             plan_stop_time = #{planStopTime}
         where hosp_code = #{hospCode}
-        and find_in_set(id,#{iatIds})
+        and id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
 
@@ -1616,7 +1619,10 @@
             cancel_name = #{cancelName},
             cancel_time = now()
         where hosp_code = #{hospCode}
-        and find_in_set(id,#{iatIds})
+        and id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
     <!-- 查询费用 -->

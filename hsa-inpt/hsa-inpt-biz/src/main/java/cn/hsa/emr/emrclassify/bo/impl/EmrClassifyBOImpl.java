@@ -14,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.emr.emrclassify.bo.impl
@@ -254,4 +251,8 @@ public class EmrClassifyBOImpl extends HsafBO implements EmrClassifyBO {
             }
         }
 
+    @Override
+    public List<EmrClassifyDTO> getEmrClassifyCode(Map map) {
+        return emrClassifyDAO.getEmrClassifyCode(map);
+    }
 }

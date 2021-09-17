@@ -107,4 +107,9 @@ public class EmrClassifyServiceImpl implements EmrClassifyServcie {
     public WrapperResponse<Integer> getMaxCode(Map map) {
         return WrapperResponse.success(emrClassifyBO.getMaxCode(MapUtils.get(map,"emrClassifyDTO")));
     }
+
+    @Override
+    public WrapperResponse<List<EmrClassifyDTO>> getEmrClassifyCode(Map map) {
+        return WrapperResponse.success(emrClassifyBO.getEmrClassifyCode(map));
+    }
 }

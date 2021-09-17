@@ -301,7 +301,7 @@
       left join base_bed bd on iv.bed_id = bd.id and iv.hosp_code = bd.hosp_code and bd.hosp_code = #{hospCode}
       left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
       left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
-      left join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
+      join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
       left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
       where ia.hosp_code=#{hospCode}
       and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))

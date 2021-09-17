@@ -305,7 +305,7 @@
         <if test="babyId == null or babyId == ''">
             and (a.baby_id is null or LENGTH(TRIM(a.baby_id)) &lt; 1)
         </if>
-        order by a.long_start_time asc, a.group_no asc, a.group_seq_no asc
+        order by a.long_start_time asc, a.id asc
     </select>
 
     <!--批量新增医嘱主表-->

@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.emr.emrpatient.bo.EmrPatientBO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
+import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatient.service.EmrPatientService;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -383,5 +384,32 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 	public WrapperResponse<Boolean> uploadEmr(Map map) {
 		InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
 		return WrapperResponse.success(emrPatientBO.uploadEmrInfo(inptVisitDTO));
+	}
+
+	/**
+	 * @Description: 记录病人病历打印次数
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/10 11:08
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> insertEmrPrint(Map map) {
+		EmrPatientPrintDO emrPatientPrintDO = MapUtils.get(map, "emrPatientPrintDO");
+		return WrapperResponse.success(emrPatientBO.insertEmrPrint(emrPatientPrintDO));
+	}
+
+	/**
+	 * @Description: 查询病历报表
+	 * @Param: map
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/13 15：15
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<PageDTO> queryPatientEmrReportForm(Map map) {
+		return WrapperResponse.success(emrPatientBO.queryPatientEmrReportForm(map));
 	}
 }

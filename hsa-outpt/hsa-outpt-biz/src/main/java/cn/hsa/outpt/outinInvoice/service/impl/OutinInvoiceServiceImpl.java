@@ -9,6 +9,7 @@ import cn.hsa.module.outpt.outinInvoice.bo.OutinInvoiceBO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.service.OutinInvoiceService;
 import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
@@ -342,6 +343,11 @@ public class OutinInvoiceServiceImpl extends HsafService implements OutinInvoice
     public WrapperResponse<Boolean> updateOutinInvoice(Map map) {
         Boolean flag = outinInvoiceBO.updateOutinInvoice(map);
         return WrapperResponse.success(flag);
+    }
+
+    @Override
+    public WrapperResponse<Map<String, List<OutinPartInvoiceDO>>> queryPartInvoice(Map map) {
+        return WrapperResponse.success(outinInvoiceBO.queryPartInvoice(MapUtils.get(map,"outinInvoiceDTO")));
     }
 
 

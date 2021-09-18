@@ -19,130 +19,151 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="getClinicPathStageDetailById" resultMap="ClinicPathStageDetailMap">
         select
           id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
-        from clinic_path_stage_detail
+        from clinical_path_stage_detail
         where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="getMaxSortNo" resultMap="ClinicPathStageDetailMap">
+      select
+          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
+        from clinical_path_stage_detail
+        where hosp_code = #{hospCode}
+      order by sort_no desc limit 1
     </select>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryAllClinicPathStageDetail" resultMap="ClinicPathStageDetailMap">
         select
-          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
-        from clinic_path_stage_detail
-        where hosp_code = #{hospCode}
+          a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
+      a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName
+        from clinical_path_stage_detail a
+        join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode}
             <if test="id != null and id != ''">
-                and id = #{id}
+                and a.id = #{id}
             </if>
             <if test="listId != null and listId != ''">
-                and list_id = #{listId}
+                and a.list_id = #{listId}
             </if>
             <if test="stageId != null and stageId != ''">
-                and stage_id = #{stageId}
+                and a.stage_id = #{stageId}
             </if>
             <if test="code != null and code != ''">
-                and code = #{code}
+                and a.code = #{code}
             </if>
             <if test="itemType != null and itemType != ''">
-                and item_type = #{itemType}
+                and a.item_type = #{itemType}
             </if>
             <if test="itemId != null and itemId != ''">
-                and item_id = #{itemId}
+                and a.item_id = #{itemId}
             </if>
             <if test="itemSupplyType != null and itemSupplyType != ''">
-                and item_supply_type = #{itemSupplyType}
+                and a.item_supply_type = #{itemSupplyType}
             </if>
             <if test="isMust != null and isMust != ''">
-                and is_must = #{isMust}
+                and a.is_must = #{isMust}
             </if>
             <if test="classify != null and classify != ''">
-                and classify = #{classify}
+                and a.classify = #{classify}
             </if>
             <if test="sortNo != null and sortNo != ''">
-                and sort_no = #{sortNo}
+                and a.sort_no = #{sortNo}
             </if>
             <if test="remarke != null and remarke != ''">
-                and remarke = #{remarke}
+                and a.remarke = #{remarke}
             </if>
             <if test="isOperationDay != null and isOperationDay != ''">
-                and is_operation_day = #{isOperationDay}
+                and a.is_operation_day = #{isOperationDay}
             </if>
             <if test="crteId != null and crteId != ''">
-                and crte_id = #{crteId}
+                and a.crte_id = #{crteId}
             </if>
             <if test="crteName != null and crteName != ''">
-                and crte_name = #{crteName}
+                and a.crte_name = #{crteName}
             </if>
             <if test="crteTime != null">
-                and crte_time = #{crteTime}
+                and a.crte_time = #{crteTime}
             </if>
+            order by a.sort_no
     </select>
 
     <!--新增所有列-->
     <insert id="insertClinicPathStageDetail" keyProperty="id" useGeneratedKeys="true">
-        insert into clinic_path_stage_detail(id,hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time)
+        insert into clinical_path_stage_detail(id,hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time)
         values (#{id},#{hospCode}, #{listId}, #{stageId}, #{code}, #{itemType}, #{itemId}, #{itemSupplyType}, #{isMust}, #{classify}, #{sortNo}, #{remarke}, #{isOperationDay}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
     <!--通过主键修改数据-->
     <update id="updateClinicPathStageDetail">
-        update clinic_path_stage_detail
+        update clinical_path_stage_detail
         set
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode},
-            </if>
-            <if test="listId != null and listId != ''">
+            <if test="listId != null">
                 list_id = #{listId},
             </if>
-            <if test="stageId != null and stageId != ''">
+            <if test="stageId != null">
                 stage_id = #{stageId},
             </if>
-            <if test="code != null and code != ''">
+            <if test="code != null">
                 code = #{code},
             </if>
-            <if test="itemType != null and itemType != ''">
+            <if test="itemType != null">
                 item_type = #{itemType},
             </if>
-            <if test="itemId != null and itemId != ''">
+            <if test="itemId != null">
                 item_id = #{itemId},
             </if>
-            <if test="itemSupplyType != null and itemSupplyType != ''">
+            <if test="itemSupplyType != null">
                 item_supply_type = #{itemSupplyType},
             </if>
-            <if test="isMust != null and isMust != ''">
+            <if test="isMust != null">
                 is_must = #{isMust},
             </if>
-            <if test="classify != null and classify != ''">
+            <if test="classify != null">
                 classify = #{classify},
             </if>
-            <if test="sortNo != null and sortNo != ''">
+            <if test="sortNo != null">
                 sort_no = #{sortNo},
             </if>
-            <if test="remarke != null and remarke != ''">
+            <if test="remarke != null">
                 remarke = #{remarke},
             </if>
-            <if test="isOperationDay != null and isOperationDay != ''">
+            <if test="isOperationDay != null">
                 is_operation_day = #{isOperationDay},
             </if>
-            <if test="crteId != null and crteId != ''">
+            <if test="crteId != null">
                 crte_id = #{crteId},
             </if>
-            <if test="crteName != null and crteName != ''">
+            <if test="crteName != null">
                 crte_name = #{crteName},
             </if>
             <if test="crteTime != null">
-                crte_time = #{crteTime},
+                crte_time = #{crteTime}
             </if>
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!--通过主键删除-->
     <delete id="deleteClinicPathStageDetailById">
-        delete from clinic_path_stage_detail where id = #{id} and hosp_code = #{hospCode}
+        delete from clinical_path_stage_detail where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
     </delete>
+
+    <select id="queryClinicalPathTree" resultType="cn.hsa.base.TreeMenuNode">
+       (select id,name as label,'-1' as parentId,code from clinical_path_list
+       where hosp_code = #{hospCode} and audit_code = '1' order by sort_no limit 10000000)
+       union
+       (select id,name as label,list_id as parentId,code from clinical_path_stage
+       where hosp_code = #{hospCode} order by sort_no limit 10000000)
+    </select>
 
 </mapper>

@@ -6,6 +6,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 
 import java.util.List;
 import java.util.Map;
@@ -241,4 +242,16 @@ public interface OutinInvoiceBO {
      * @Return
      */
 	Boolean updateOutinInvoice(Map map);
+
+
+    /**
+     * @Description: 查询分单发票list
+     * @Param:  outinInvoiceDTO
+     * @Author: liuliyun
+     * @Email: liuliyun@powersi.com
+     * @Date 2021/9/16 15:31
+     * @Return
+     */
+    Map<String, List<OutinPartInvoiceDO>> queryPartInvoice(OutinInvoiceDTO outinInvoiceDTO);
+
 }

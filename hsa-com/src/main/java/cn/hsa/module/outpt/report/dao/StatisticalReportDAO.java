@@ -196,4 +196,13 @@ public interface StatisticalReportDAO {
      * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      **/
     List<Map<String, Object>> queryOnlyInSumAntibiosisDrug(Map<String, Object> paramMap);
+    /**
+     * @Meth:queryOutSumAntibiosisDrugDetail
+     * @Description:
+     * @Param: [paramMap]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2021/9/16
+     */
+    List<Map<String, Object>> queryOutSumAntibiosisDrugDetail(Map<String, Object> paramMap);
 }

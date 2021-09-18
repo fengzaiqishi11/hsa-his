@@ -7,6 +7,7 @@ import cn.hsa.module.outpt.fees.entity.OutptSettleInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -544,4 +545,6 @@ public interface OutinInvoiceDAO {
 	 * @Return
 	 */
 	List<Map<String, Object>> queryOutptsettleInvoiceConent(OutinInvoiceDTO outinInvoiceDTO);
+
+    List<OutinPartInvoiceDO> queryPartInvoicePrint(OutinInvoiceDTO outinInvoiceDTO);
 }

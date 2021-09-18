@@ -299,21 +299,21 @@
     from inpt_advice ia inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
       left join base_bed bd on iv.bed_id = bd.id and iv.hosp_code = bd.hosp_code and bd.hosp_code = #{hospCode}
-      <if test="keyword !=null and keyword != ''">
-        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
-        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
-      </if>
       left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
       left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
       join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
-      <if test="queryDate !=null and queryDate != ''">
-          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
-          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
-      </if>
       left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
       where ia.hosp_code=#{hospCode}
       and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
       and ia.is_check='1'
+      <if test="keyword !=null and keyword != ''">
+          and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+          or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+      </if>
+      <if test="queryDate !=null and queryDate != ''">
+          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
+          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
+      </if>
       <!--数据共享标志为1，需根据单据类型判断打印状态-->
       <if test="isShared != null and isShared == '1'.toString()">
           <!--护理单据对应、未打印的-->
@@ -397,21 +397,21 @@
         from inpt_advice ia
         inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId} and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
         left join base_bed bd on iv.bed_id = bd.id and iv.hosp_code = bd.hosp_code and bd.hosp_code = #{hospCode}
-        <if test="keyword !=null and keyword != ''">
-            and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
-            or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
-        </if>
         left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
         left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
-        join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
-        <if test="queryDate !=null and queryDate != ''">
-            AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
-            AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
-        </if>
+        left join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
         left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
         where ia.hosp_code=#{hospCode}
         and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
         and ia.is_check='1'
+        <if test="keyword !=null and keyword != ''">
+            and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+            or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+        </if>
+        <if test="queryDate !=null and queryDate != ''">
+            AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
+            AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
+        </if>
         <!--数据共享标志为1，需根据单据类型判断打印状态-->
         <if test="isShared != null and isShared == '1'.toString()">
             <!--护理单据对应、未打印的-->
@@ -457,6 +457,7 @@
         <if test="typeCode !=null and typeCode !=''">
             and ia.type_code=#{typeCode}
         </if>
+        group by iae.id
         order by bd.seq_no, iae.plan_exec_time asc, ia.group_no asc,ia.group_seq_no asc
     </select>
 

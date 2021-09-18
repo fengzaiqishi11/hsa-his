@@ -141,4 +141,12 @@ public class EmrClassifyController extends BaseController {
         map.put("emrClassifyDTO", emrClassifyDTO);
         return emrClassifyServcie_consumer.getMaxCode(map);
     }
+
+    @GetMapping("getEmrClassifyCode")
+    public WrapperResponse<List<EmrClassifyDTO>> getEmrClassifyCode(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return emrClassifyServcie_consumer.getEmrClassifyCode(map);
+    }
 }

@@ -175,4 +175,13 @@ public interface StroInBO {
   * @Return java.util.List<cn.hsa.module.stro.stroin.dto.StroInDetailDTO>
   **/
   List<StroInDetailDTO> queryStroinDetail(StroInDetailDTO stroInDetailDTO);
+  /**
+   * @Meth: queryStroinDetailForExprot
+   * @Description: 查询明细 为了批量导出
+   * @Param: [stroInDetailDTO]
+   * @return: java.util.List<cn.hsa.module.stro.stroin.dto.StroInDetailDTO>
+   * @Author: zhangguorui
+   * @Date: 2021/9/17
+   */
+  List<StroInDetailDTO> queryStroinDetailForExprot(StroInDetailDTO stroInDetailDTO);
 }

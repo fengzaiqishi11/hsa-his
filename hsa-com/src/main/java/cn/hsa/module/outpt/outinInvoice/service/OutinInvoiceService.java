@@ -6,6 +6,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -266,4 +267,16 @@ public interface OutinInvoiceService {
      */
     @PostMapping("/service/outpt/outinInvoice/updateOutinInvoice")
 	WrapperResponse<Boolean> updateOutinInvoice(Map map);
+
+
+    /**
+     * @Menthod queryPartInvoice
+     * @Desrciption   获取分单发票list
+     * @Param outinInvoiceDTO
+     * @Author liuliyun
+     * @Date   2021/09/16
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<List<Map<String, Object>>>
+     **/
+    @GetMapping("/service/outpt/outinInvoice/queryPartInvoice")
+    WrapperResponse<Map<String, List<OutinPartInvoiceDO>>> queryPartInvoice(Map map);
 }

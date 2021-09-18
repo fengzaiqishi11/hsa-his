@@ -1,6 +1,7 @@
 package cn.hsa.module.clinical.clinicalpathitem.dao;
 
 import cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -62,4 +63,13 @@ public interface ClinicalPathItemDAO {
      * @Date: 2021/9/10
     */
     ClinicalPathItemDTO queryPathItemById(ClinicalPathItemDTO clinicalPathItemDTO);
+    /**
+     * @Meth: insertBatchByExcelUpload
+     * @Description: 批量插入
+     * @Param: [insertLists]
+     * @return: int
+     * @Author: zhangguorui
+     * @Date: 2021/9/15
+     */
+    int insertBatchByExcelUpload(@Param("insertLists") List<ClinicalPathItemDTO> insertLists);
 }

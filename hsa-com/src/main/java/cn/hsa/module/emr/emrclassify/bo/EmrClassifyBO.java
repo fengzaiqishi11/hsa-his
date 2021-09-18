@@ -5,6 +5,7 @@ import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.emr.emrclassify.bo
@@ -81,4 +82,14 @@ public interface EmrClassifyBO {
      * @Return java.lang.String
      **/
     Integer getMaxCode(EmrClassifyDTO emrClassifyDTO);
+
+    /**
+     * @Method getEmrClassifyCode
+     * @Desrciption 获取病历顶级分类
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/9/13 10:52
+     * @Return List<EmrClassifyDTO>
+     **/
+    List<EmrClassifyDTO> getEmrClassifyCode(Map map);
 }

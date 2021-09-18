@@ -204,4 +204,17 @@ public class StroInServiceImpl extends HsafService implements StroInService {
     return WrapperResponse.success(stroInBO.queryStroinDetail(MapUtils.get(map,"stroInDetailDTO")));
   }
 
+  /**
+   * @Meth: queryStroinDetailForExprot
+   * @Description: 批量查询明细数据
+   * @Param: [map]
+   * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.stro.stroin.dto.StroInDetailDTO>>
+   * @Author: zhangguorui
+   * @Date: 2021/9/17
+   */
+  @Override
+  public WrapperResponse<List<StroInDetailDTO>> queryStroinDetailForExprot(Map map) {
+    return WrapperResponse.success(stroInBO.queryStroinDetailForExprot(MapUtils.get(map,"stroInDetailDTO")));
+  }
+
 }

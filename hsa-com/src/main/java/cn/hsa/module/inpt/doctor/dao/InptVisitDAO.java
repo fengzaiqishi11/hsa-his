@@ -1,12 +1,14 @@
 package cn.hsa.module.inpt.doctor.dao;
 
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
@@ -473,4 +475,14 @@ public interface InptVisitDAO {
      * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
      **/
     List<InptVisitDTO> queryMergeInptVisitPage(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Method getBaseDrug
+     * @Desrciption 获取药品信息
+     * @param outptPrescribeDetailsDTO
+     * @Author zengfeng,luonianxin
+     * @Date   2021/09/18 15:34
+     * @Return BaseDrugDTO
+     **/
+    BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 }

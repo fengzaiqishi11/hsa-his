@@ -321,4 +321,19 @@
 			where t.classinfo_code = #{code} and t.hosp_code = #{hospCode} and e.hosp_code = #{hospCode} and t.dept_id is null and e.type_code = '5' and e.is_require = '1'
 	</select>
 
+
+	<!-- 根据医院编码查找病历顶级分类 liuliyun 2021/9/13 -->
+	<select id="getEmrClassifyCode" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO">
+	SELECT 	id,	hosp_code,CODE,NAME,up_code,page_print_code,type_code,doc_code,gender_code,pym,wbm,seq,
+	is_del_nullline,is_common,is_end,is_valid,is_unique,is_page_print,is_audit,is_hosp,dept_id,crte_id,	crte_name,crte_time,record_time_code,valid_time
+    FROM
+	emr_classify
+    WHERE up_code = 'EMR'
+    AND type_code = '2'
+    AND is_valid = '1'
+    AND is_end = '0'
+    AND (dept_id = '' OR dept_id IS NULL)
+    and hosp_code =#{hospCode}
+   </select>
+
 </mapper>

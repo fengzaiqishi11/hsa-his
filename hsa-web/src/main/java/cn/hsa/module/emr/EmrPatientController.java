@@ -9,6 +9,8 @@ import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
+import cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO;
+import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatient.service.EmrPatientService;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -585,5 +587,43 @@ public class EmrPatientController extends BaseController {
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("inptVisitDTO", inptVisitDTO);
 		return emrPatientService_consumer.uploadEmr(map);
+	}
+
+	/**
+	 * @Description: 记录病历打印次数
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/10 11：03
+	 * @Return
+	 */
+	@PostMapping("/insertEmrPrint")
+	public WrapperResponse<Boolean> insertEmrPrint(@RequestBody EmrPatientPrintDO emrPatientPrintDO, HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		emrPatientPrintDO.setHospCode(sysUserDTO.getHospCode());
+		emrPatientPrintDO.setPrintId(sysUserDTO.getId());
+		emrPatientPrintDO.setPrintName(sysUserDTO.getName());
+		Map map = new HashMap();
+		map.put("hospCode", sysUserDTO.getHospCode());
+		map.put("emrPatientPrintDO", emrPatientPrintDO);
+		return emrPatientService_consumer.insertEmrPrint(map);
+	}
+
+	/**
+	 * @Description: 查询病历报表
+	 * @Param: map
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/13 15：15
+	 * @Return
+	 */
+	@GetMapping("/queryPatientEmrReportForm")
+	public WrapperResponse<PageDTO> queryPatientEmrReportForm(EmrPatientReportFormDTO reportFormDTO, HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		reportFormDTO.setHospCode(sysUserDTO.getHospCode());
+		Map map= new HashMap();
+		map.put("hospCode", sysUserDTO.getHospCode());
+		map.put("reportFormDTO",reportFormDTO);
+		return emrPatientService_consumer.queryPatientEmrReportForm(map);
 	}
 }

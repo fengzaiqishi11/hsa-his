@@ -3,6 +3,7 @@ package cn.hsa.module.emr.emrpatient.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
+import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -264,4 +265,8 @@ public interface EmrPatientBO {
 	List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO);
 
 	Boolean uploadEmrInfo(InptVisitDTO inptVisitDTO);
+
+	Boolean insertEmrPrint(EmrPatientPrintDO emrPatientPrintDO);
+
+	PageDTO queryPatientEmrReportForm(Map map);
 }

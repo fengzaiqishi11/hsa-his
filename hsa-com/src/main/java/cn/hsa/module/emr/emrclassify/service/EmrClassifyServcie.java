@@ -4,6 +4,7 @@ package cn.hsa.module.emr.emrclassify.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.emr.emrclassify.bo.EmrClassifyBO;
 import cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,4 +86,15 @@ public interface EmrClassifyServcie {
 
     @GetMapping("/service/emr/emrClassify/getMaxCode")
     WrapperResponse<Integer> getMaxCode(Map map);
+
+    /**
+     * @Method getEmrClassifyCode
+     * @Desrciption 获取病历顶级分类
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/9/13 10:47
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<EmrClassifyDTO>>
+     **/
+    @GetMapping("/service/emr/emrClassify/getEmrClassifyCode")
+    WrapperResponse<List<EmrClassifyDTO>> getEmrClassifyCode(Map map);
 }

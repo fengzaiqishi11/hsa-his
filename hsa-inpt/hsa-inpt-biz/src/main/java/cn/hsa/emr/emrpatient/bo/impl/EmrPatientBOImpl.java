@@ -16,6 +16,8 @@ import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
 import cn.hsa.module.emr.emrpatient.bo.EmrPatientBO;
 import cn.hsa.module.emr.emrpatient.dao.EmrPatientDAO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
+import cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO;
+import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatienthtml.dao.EmrPatientHtmlDAO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.emr.emrpatientrecord.dao.EmrPatientRecordDAO;
@@ -1058,6 +1060,43 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 			throw new AppException("该病人还没写电子病历，不能进行上传");
 		}
 		return true;
+	}
+
+	@Override
+	public Boolean insertEmrPrint(EmrPatientPrintDO emrPatientPrintDO) {
+		if (emrPatientPrintDO!=null){
+			emrPatientPrintDO.setId(SnowflakeUtils.getId());
+			emrPatientPrintDO.setPrintTime(new Date());
+		}
+		if (emrPatientDAO.insertEmrPirnt(emrPatientPrintDO)>0){
+			Integer num = emrPatientDAO.getPrintNum(emrPatientPrintDO);
+			if (num==null){
+				num = 1;
+			}
+			EmrPatientDTO emrPatientDTO =new EmrPatientDTO();
+			emrPatientDTO.setHospCode(emrPatientPrintDO.getHospCode());
+			emrPatientDTO.setId(emrPatientPrintDO.getEmrId());
+			emrPatientDTO.setVisitId(emrPatientPrintDO.getVisitId());
+			emrPatientDTO.setPrintNum(num);
+			emrPatientDAO.updatePatientEmrPrintNum(emrPatientDTO);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @Description: 查询病历报表
+	 * @Param: map
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/13 15：10
+	 * @Return
+	 */
+	@Override
+	public PageDTO queryPatientEmrReportForm(Map map) {
+		EmrPatientReportFormDTO reportFormDTO= (EmrPatientReportFormDTO) MapUtils.get(map,"reportFormDTO");
+		PageHelper.startPage(reportFormDTO.getPageNo(), reportFormDTO.getPageSize());
+		return PageDTO.of(emrPatientDAO.queryPatientEmrReportForm(reportFormDTO));
 	}
 
 }

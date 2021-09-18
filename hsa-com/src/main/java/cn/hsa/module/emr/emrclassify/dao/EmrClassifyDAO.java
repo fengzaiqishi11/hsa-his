@@ -136,4 +136,15 @@ public interface EmrClassifyDAO {
      * @Return
      */
     List<EmrElementDTO> getEmrClassifyRecordCode(EmrClassifyDTO emrClassifyDTO);
+
+
+    /**
+     * @Description: 根据医院编码获取电子病历顶级分类
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2021/9/13 10:55
+     * @Return  List<EmrClassifyDTO>
+     */
+    List<EmrClassifyDTO> getEmrClassifyCode(Map map);
 }

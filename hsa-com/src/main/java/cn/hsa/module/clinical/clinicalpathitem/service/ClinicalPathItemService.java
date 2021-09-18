@@ -54,4 +54,15 @@ public interface ClinicalPathItemService {
      */
     @GetMapping("/service/clinical/clinicalPathItem/queryPathItemById")
     WrapperResponse<ClinicalPathItemDTO> queryPathItemById(Map map);
+
+    /**
+     * @Meth: insertBatchByExcelUpload
+     * @Description: 根据excel文件批量导入
+     * @Param: [file, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/15
+     */
+    @PostMapping("/service/clinical/clinicalPathItem/insertBatchByExcelUpload")
+    WrapperResponse<Boolean> insertBatchByExcelUpload(Map map);
 }

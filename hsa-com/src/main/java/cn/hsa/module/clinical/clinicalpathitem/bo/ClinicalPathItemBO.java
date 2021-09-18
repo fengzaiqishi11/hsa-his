@@ -2,6 +2,7 @@ package cn.hsa.module.clinical.clinicalpathitem.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface ClinicalPathItemBO {
     Boolean deletePathItemBatch(ClinicalPathItemDTO clinicalPathItemDTO);
 
     ClinicalPathItemDTO queryPathItemById(ClinicalPathItemDTO queryDTO);
+
+    Boolean insertBatchByExcelUpload(ClinicalPathItemDTO clinicalPathItemDTO);
 }

@@ -1,6 +1,7 @@
 package cn.hsa.clinical.clinicalpathstagedetail.service.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
@@ -8,6 +9,7 @@ import cn.hsa.module.clinical.clinicalpathstagedetail.bo.ClinicPathStageDetailBO
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.clinicalpathstagedetail.service.ClinicPathStageDetailService;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.TreeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +35,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
   private ClinicPathStageDetailBO clinicPathStageDetailBO;
   /**
   * @Menthod getClinicPathStageDetailById
-  * @Desrciption
+  * @Desrciption  查询单个路径阶段明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -50,7 +52,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
 
   /**
   * @Menthod queryClinicPathStageDetailAll
-  * @Desrciption
+  * @Desrciption 查询所有路径阶段明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -67,7 +69,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
 
   /**
   * @Menthod queryClinicPathStageDetailPage
-  * @Desrciption
+  * @Desrciption 分页查询路径阶段明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -84,7 +86,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
 
   /**
   * @Menthod insertClinicPathStageDetail
-  * @Desrciption
+  * @Desrciption 新增路径阶段明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -101,7 +103,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
 
   /**
   * @Menthod updateClinicPathStageDetail
-  * @Desrciption
+  * @Desrciption 修改路径阶段明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -118,7 +120,7 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
 
   /**
   * @Menthod deleteClinicPathStageDetailById
-  * @Desrciption
+  * @Desrciption 删除路径明细
   *
   * @Param
   * [clinicPathStageDetailDTO]
@@ -131,5 +133,24 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
   public WrapperResponse<Boolean> deleteClinicPathStageDetailById(Map map) {
     ClinicPathStageDetailDTO clinicPathStageDetailDTO = MapUtils.get(map,"clinicPathStageDetailDTO");
     return WrapperResponse.success(clinicPathStageDetailBO.deleteClinicPathStageDetailById(clinicPathStageDetailDTO));
+  }
+
+  /**
+  * @Menthod queryClinicalPathTree
+  * @Desrciption  查询路径阶段树
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/9/13 15:47
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.base.TreeMenuNode>>
+  **/
+  @Override
+  public WrapperResponse<List<TreeMenuNode>> queryClinicalPathTree(Map map) {
+    ClinicPathStageDetailDTO clinicPathStageDetailDTO = MapUtils.get(map,"clinicPathStageDetailDTO");
+    List<TreeMenuNode> treeMenuNodeList = clinicPathStageDetailBO.queryClinicalPathTree(clinicPathStageDetailDTO);
+    List<TreeMenuNode> treeMenuNodes = TreeUtils.buildByRecursive(treeMenuNodeList, "-2");
+    return WrapperResponse.success(treeMenuNodes);
   }
 }

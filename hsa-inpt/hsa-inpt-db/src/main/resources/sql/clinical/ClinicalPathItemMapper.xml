@@ -3,9 +3,19 @@
 <mapper namespace="cn.hsa.module.clinical.clinicalpathitem.dao.ClinicalPathItemDAO">
     <!--插入数据-->
     <insert id="insert">
-        insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time)
+        insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time,is_valid)
         values
-        (#{id},#{hospCode},#{code},#{name},#{itemType},#{pym},#{wbm},#{remarke},#{crteId},#{crteName},#{crteTime})
+        (#{id},#{hospCode},#{code},#{name},#{itemType},#{pym},#{wbm},#{remarke},#{crteId},#{crteName},#{crteTime},#{isValid})
+    </insert>
+    <!-- 批量插入 -->
+    <insert id="insertBatchByExcelUpload">
+          insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,
+          remarke,crte_id,crte_name,crte_time,is_valid)
+        values
+          <foreach collection="insertLists" item="item" separator=",">
+              (#{item.id},#{item.hospCode},#{item.code},#{item.name},#{item.itemType},#{item.pym},#{item.wbm},
+              #{item.remarke},#{item.crteId},#{item.crteName},#{item.crteTime},#{item.isValid})
+          </foreach>
     </insert>
 
     <!--修改数据-->
@@ -33,19 +43,19 @@
         </set>
         where hosp_code = #{hospCode} and id = #{id}
     </update>
-    <!-- 删除临床项目 -->
-    <delete id="deletePathItemBatch">
-        delete from clinical_path_item where
+    <!-- 删除临床项目 2021/9/15修改为update 作废或者启用 -->
+    <update id="deletePathItemBatch">
+        update clinical_path_item set is_valid = #{isValid} where
         hosp_code = #{hospCode}
         and
         id in
         <foreach collection="ids" open="(" separator="," close=")" item="item">
             #{item}
         </foreach>
-    </delete>
+    </update>
     <!-- 查询项目路径 -->
     <select id="queryAll" resultType="cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO">
-        select id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time
+        select id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time,is_valid
         from clinical_path_item
         where hosp_code = #{hospCode}
         <if test="itemType != null and itemType != ''">
@@ -64,6 +74,10 @@
         <if test="endTime != null and endTime != ''">
            and crte_time &lt;= #{endTime}
         </if>
+        <if test="isValid != null and isValid != ''">
+           and is_valid = #{isValid}
+        </if>
+        order by code asc
     </select>
     <!--查看项目编码是否存在-->
     <select id="queryByCode" resultType="java.lang.Integer">

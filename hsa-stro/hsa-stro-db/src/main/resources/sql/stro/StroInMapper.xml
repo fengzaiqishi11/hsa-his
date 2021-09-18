@@ -534,4 +534,38 @@
      where hosp_code = #{hospCode} and item_code =#{itemCode} and item_id = #{itemId}
      group by item_id
    </select>
+  <!--查询入库数据为了供应商名称-->
+  <select id="queryStroInPageForExprot" resultType="cn.hsa.module.stro.stroin.dto.StroInDTO">
+    select
+    id,
+    (select b.name from base_supplier b where b.id = supplier_id and b.hosp_code = #{hospCode}) as name
+    from stro_in
+    where
+    hosp_code = #{hospCode}
+    <if test="inIds != null and inIds.size() > 0">
+      and id in
+      <foreach collection="inIds" item="id" separator="," open="(" close=")">
+        #{id}
+      </foreach>
+    </if>
+  </select>
+  <!-- 查询多个明细 为了批量导出-->
+  <select id="queryStroinDetailForExprot" resultType="cn.hsa.module.stro.stroin.dto.StroInDetailDTO">
+    select
+    a.id, a.hosp_code, a.in_id, a.item_code, a.item_id, a.item_name, a.spec, a.num, a.unit_code, a.dosage, a.dosage_unit_code, a.buy_price, a.sell_price, a.buy_price_all, a.sell_price_all, a.split_ratio, a.split_num, a.split_price, a.split_unit_code, a.batch_no, a.expiry_date,a.ndan,
+    a.prod_code,
+    (select p.name from base_product p where p.hosp_code = #{hospCode} and a.prod_code = p.code) as prodName,
+    case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+    case when a.item_code='2' then bm.model end model
+    from stro_in_detail a
+    left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+    left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+    where
+    a.hosp_code = #{hospCode}
+    and a.in_id in
+    <foreach collection="inIds" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    order by in_id
+  </select>
 </mapper>

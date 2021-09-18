@@ -7,6 +7,7 @@ import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import com.github.pagehelper.Page;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -294,4 +295,27 @@ public interface EmrPatientService {
 	 */
 	@PostMapping("/service/emr/emrPatient/uploadEmr")
 	WrapperResponse<Boolean> uploadEmr(Map map);
+
+
+	/**
+	 * @Description: 记录病人病历打印次数
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/10 9:10
+	 * @Return
+	 */
+	@PostMapping("/service/emr/emrPatient/insertEmrPrint")
+	WrapperResponse<Boolean> insertEmrPrint(Map map);
+
+	/**
+	 * @Description: 查询病历报表
+	 * @Param: map
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/9/13 15：07
+	 * @Return
+	 */
+	@PostMapping("/service/emr/emrPatient/queryPatientEmrReportForm")
+	WrapperResponse<PageDTO> queryPatientEmrReportForm(Map map);
 }

@@ -159,8 +159,20 @@
 
     <!--通过主键删除-->
     <update id="updateClinicPathAuditCode">
-        update clinical_path_list set audit_code = #{auditCode} where hosp_code = #{hospCode}
-          and id in
+        update clinical_path_list
+        <set>
+          audit_code = #{auditCode},
+          <if test="auditId != null || auditId != ''">
+            audit_id = #{auditId},
+          </if>
+          <if test="auditName != null || auditName != ''">
+            audit_name = #{auditName},
+          </if>
+          <if test="auditTime != null">
+            audit_time = #{auditTime},
+          </if>
+        </set>
+        where hosp_code = #{hospCode} and id in
           <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
           </foreach>

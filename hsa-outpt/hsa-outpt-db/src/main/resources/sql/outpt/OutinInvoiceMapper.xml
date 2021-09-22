@@ -819,6 +819,7 @@
             a.num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.unit_code as unitCode, -- 单位
+            a.unit_code as numUnitCode, -- 单位
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额
@@ -849,6 +850,7 @@
             a.total_num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.dosage_unit_code as unitCode, -- 单位
+            a.unm_unit_code as numUnitCode,
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额
@@ -973,6 +975,7 @@
             a.total_num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.dosage_unit_code as unitCode, -- 单位
+            a.num_unit_code as unmUnitCode,
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额

@@ -432,7 +432,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal bka821 = BigDecimalUtils.convert(inptInsureResult.get("bka821"));//民政救助金支付
                 BigDecimal bka825 = BigDecimalUtils.convert(inptInsureResult.get("bka825"));//全自费费用
                 BigDecimal bka826 = BigDecimalUtils.convert(inptInsureResult.get("bka826"));//部分自费费用
-                BigDecimal bka831 = BigDecimalUtils.convert(inptInsureResult.get("bka831"));//个人自付bka831 = akb067 + akb066
+                BigDecimal bka831 = BigDecimalUtils.convert(inptInsureResult.get("bka831"));//个人自付bka831 = akb067
                 BigDecimal bka838 = BigDecimalUtils.convert(inptInsureResult.get("bka838"));//超共付段费用个人自付
                 BigDecimal bka839 = BigDecimalUtils.convert(inptInsureResult.get("bka839"));//其他支付
                 BigDecimal bka840 = BigDecimalUtils.convert(inptInsureResult.get("bka840"));//其他基金支付

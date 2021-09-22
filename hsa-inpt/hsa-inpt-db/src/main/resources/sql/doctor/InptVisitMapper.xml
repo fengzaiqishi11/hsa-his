@@ -89,6 +89,7 @@
 		<result property="inTimestring" column="in_time" jdbcType="TIMESTAMP"/>
 		<result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
 		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+		<result property="settleTime" column="settle_time" jdbcType="TIMESTAMP"/>
 		<result property="keyword" column="keyword" jdbcType="VARCHAR"/>
 		<result property="inDiagnoseId" column="inDiagnoseId" jdbcType="VARCHAR"/>
 		<result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
@@ -226,17 +227,17 @@
 	<!--分页查询-->
 	<select id="queryBabyInptVisitPage" resultMap="InptVisitMap">
 		(select
-		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
-		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
-		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
-		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
-		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
-		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
-		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
-		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
-		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
-		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		v.id, v.hosp_code, v.profile_id, v.in_profile, v.in_no, v.name, v.gender_code, v.age, v.age_unit_code, v.birthday,
+		v.nationality_cation, v.occupation_code, v.education_code, v.contact_name, v.contact_rela_code, v.contact_address,
+		v.contact_phone, v.nation_code, v.cert_code, v.cert_no, v.marry_code, v.phone, v.address, v.preferential_type_id, v.patient_code,
+		v.receive_hosp_name, v.bed_id, v.bed_name, v.nursing_code, v.diet_type, v.Illness_code, v.status_code, v.in_ward_id, v.in_dept_id,
+		v.in_dept_name, v.in_time, v.zz_doctor_id, v.zz_doctor_name, v.jz_doctor_id, v.jz_doctor_name, v.zg_doctor_id, v.zg_doctor_name,
+		v.in_remark, v.in_mode_code, v.in_disease_id, v.in_disease_name, v.in_disease_icd10, v.in_situation_code, v.outpt_visit_no,
+		v.outpt_doctor_id, v.outpt_doctor_name, v.outpt_disease_id, v.outpt_disease_name, v.outpt_disease_icd10, v.out_ward_id,
+		v.out_dept_id, v.out_dept_name, v.out_time, v.out_disease_id, v.out_disease_name, v.out_disease_icd10, v.out_oper_id,
+		v.out_oper_name, v.out_oper_time, v.out_situation_code, v.out_remark, v.out_mode_code, v.is_archive, v.archive_time,
+		v.archive_id, v.archive_name, v.insure_code, v.insure_org_code, v.insure_no, v.insure_biz_code, v.insure_treat_code,
+		v.insure_patient_id, v.insure_remark, v.total_advance, v.total_cost, v.total_balance, v.crte_id, v.crte_name, v.crte_time, s.settle_time,
 		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,
 		CONCAT(
 		inpt_visit.name,'/',
@@ -246,37 +247,48 @@
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		inpt_visit.age_unit_code),'')
 		) AS keyword
-		from inpt_visit
-		where hosp_code = #{hospCode}
+		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
-			and id = #{id}
+			and v.id = #{id}
 		</if>
 		<if test="keyword != null and keyword != ''">
-			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
-			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%')
-			or status_code like concat('%',#{keyword},'%'))
+			and (v.name like concat('%',#{keyword},'%') or v.cert_no like concat('%',#{keyword},'%')
+			or v.in_no like concat('%',#{keyword},'%') or v.bed_name like concat('%',#{keyword},'%')
+			or v.status_code like concat('%',#{keyword},'%'))
 
 		</if>
 
-		<!-- 入院开始时间 zhongming by 20201219 -->
-		<if test="startTime != null and startTime != ''">
-			and in_time >= #{startTime}
+		<if test="timeFlag != null and timeFlag == '1'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and v.in_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and v.in_time &lt;= #{endTime}
+			</if>
 		</if>
-		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= #{endTime}
+		<if test="timeFlag != null and timeFlag == '2'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and s.settle_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and s.settle_time &lt;= #{endTime}
+			</if>
 		</if>
 		<if test="statusCode != null and statusCode != ''">
-			and status_code = #{statusCode}
+			and v.status_code = #{statusCode}
 		</if>
 		<!-- Name传过来的是科室ID-->
 		<if test="inDeptId != null and inDeptId != ''">
-			and in_dept_id = #{inDeptId}
+			and v.in_dept_id = #{inDeptId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
-			and patient_code = #{patientCode}
+			and v.patient_code = #{patientCode}
 		</if>
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
-			and in_time BETWEEN #{Stime} and #{Etime}
+			and v.in_time BETWEEN #{Stime} and #{Etime}
 		</if>)
 		union all
 		(select
@@ -290,7 +302,7 @@
 		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
 		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
 		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time, s.settle_time,
 		(select name from base_dept where in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName,
 		CONCAT(
 		pt.name,'/',
@@ -301,6 +313,7 @@
 		pt.age_unit_code),'')
 		) AS keyword
 		from inpt_visit pt join inpt_baby pb on pt.id = pb.visit_id
+		left join inpt_settle s on s.hsop_code = pt.hosp_code and pt.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		where pt.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and pt.id = #{id}
@@ -310,13 +323,26 @@
 			or pt.in_no like concat('%',#{keyword},'%') or pt.bed_name like concat('%',#{keyword},'%')
 			or pt.status_code like concat('%',#{keyword},'%'))
 		</if>
-		<!-- 入院开始时间 zhongming by 20201219 -->
-		<if test="startTime != null and startTime != ''">
-			and pt.in_time >= #{startTime}
+		<if test="timeFlag != null and timeFlag == '1'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and pt.in_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and pt.in_time &lt;= #{endTime}
+			</if>
 		</if>
-		<if test="endTime != null and endTime != ''">
-			and pt.in_time &lt;= #{endTime}
+		<if test="timeFlag != null and timeFlag == '2'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and s.settle_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and s.settle_time &lt;= #{endTime}
+			</if>
 		</if>
+
+
 		<if test="statusCode != null and statusCode != ''">
 			and pt.status_code = #{statusCode}
 		</if>
@@ -2063,19 +2089,19 @@
 	<!--查询全部病人信息  liuliyun 2021/09/04-->
 	<select id="queryMergeInptVisitPage" resultMap="InptVisitMap">
 		select
-		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
-		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
-		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
-		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
-		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
-		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
-		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
-		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
-		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
-		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance,
+		v.id, v.hosp_code, v.profile_id, v.in_profile, v.in_no, v.name, v.gender_code, v.age, v.age_unit_code, v.birthday,
+		v.nationality_cation, v.occupation_code, v.education_code, v.contact_name, v.contact_rela_code, v.contact_address,
+		v.contact_phone, v.nation_code, v.cert_code, v.cert_no, v.marry_code, v.phone, v.address, v.preferential_type_id, v.patient_code,
+		v.receive_hosp_name, v.bed_id, v.bed_name, v.nursing_code, v.diet_type, v.Illness_code, v.status_code, v.in_ward_id, v.in_dept_id,
+		v.in_dept_name, v.in_time, v.zz_doctor_id, v.zz_doctor_name, v.jz_doctor_id, v.jz_doctor_name, v.zg_doctor_id, v.zg_doctor_name,
+		v.in_remark, v.in_mode_code, v.in_disease_id, v.in_disease_name, v.in_disease_icd10, v.in_situation_code, v.outpt_visit_no,
+		v.outpt_doctor_id, v.outpt_doctor_name, v.outpt_disease_id, v.outpt_disease_name, v.outpt_disease_icd10, v.out_ward_id,
+		v.out_dept_id, v.out_dept_name, v.out_time, v.out_disease_id, v.out_disease_name, v.out_disease_icd10, v.out_oper_id,
+		v.out_oper_name, v.out_oper_time, v.out_situation_code, v.out_remark, v.out_mode_code, v.is_archive, v.archive_time,
+		v.archive_id, v.archive_name, v.insure_code, v.insure_org_code, v.insure_no, v.insure_biz_code, v.insure_treat_code,
+		v.insure_patient_id, v.insure_remark, v.total_advance, s.settle_time,
 		(select sum(reality_price) from inpt_cost b where b.visit_id = v.id and v.hosp_code = b.hosp_code ) as total_cost,
-		total_balance, crte_id, crte_name, crte_time,
+		v.total_balance, v.crte_id, v.crte_name, v.crte_time,
 		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,
 		CONCAT(
 		v.name,
@@ -2085,39 +2111,51 @@
 		IFNULL(v.age,'-'),
 		(case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
 		) AS keyword
-		from inpt_visit v
-		where hosp_code = #{hospCode}
+		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
-			and id = #{id}
+			and v.id = #{id}
 		</if>
 		<if test="keyword != null and keyword != ''">
-			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
-			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%')
-			or status_code like concat('%',#{keyword},'%'))
+			and (v.name like concat('%',#{keyword},'%') or v.cert_no like concat('%',#{keyword},'%')
+			or v.in_no like concat('%',#{keyword},'%') or v.bed_name like concat('%',#{keyword},'%')
+			or v.status_code like concat('%',#{keyword},'%'))
 
 		</if>
 
-		<!-- 入院开始时间 zhongming by 20201219 -->
-		<if test="startTime != null and startTime != ''">
-			and in_time >= #{startTime}
+		<if test="timeFlag != null and timeFlag == '1'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and v.in_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and v.in_time &lt;= #{endTime}
+			</if>
 		</if>
-		<if test="endTime != null and endTime != ''">
-			and in_time &lt;= #{endTime}
+		<if test="timeFlag != null and timeFlag == '2'.toString()">
+			<!-- 入院开始时间 zhongming by 20201219 -->
+			<if test="startTime != null and startTime != ''">
+				and s.settle_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and s.settle_time &lt;= #{endTime}
+			</if>
 		</if>
+
 		<if test="statusCode != null and statusCode != ''">
-			and status_code = #{statusCode}
+			and v.status_code = #{statusCode}
 		</if>
 		<!-- Name传过来的是科室ID-->
 		<if test="inDeptId != null and inDeptId != ''">
-			and in_dept_id = #{inDeptId}
+			and v.in_dept_id = #{inDeptId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
-			and patient_code = #{patientCode}
+			and v.patient_code = #{patientCode}
 		</if>
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
-			and in_time BETWEEN #{Stime} and #{Etime}
+			and v.in_time BETWEEN #{Stime} and #{Etime}
 		</if>
-		order by crte_time desc,px asc
+		order by v.crte_time desc, px asc
 	</select>
 
 </mapper>

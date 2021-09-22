@@ -259,6 +259,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             unifiedMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
             unifiedMap.put("inptVisitDTO", inptVisitDTO);
             unifiedMap.put("count", count);
+            unifiedMap.put("queryBaby",MapUtils.get(insureCostParam,"queryBaby"));
             unifiedMap.put("hospCode", hospCode);
             resultDataMap = insureUnifiedPayInptService.UP_2301(unifiedMap).getData();
 

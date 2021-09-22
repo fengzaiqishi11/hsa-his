@@ -2157,5 +2157,13 @@
 		</if>
 		order by v.crte_time desc, px asc
 	</select>
-
+	<!-- 获取药品信息 -->
+	<select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+		select a.*, b.trunc_code truncCode, c.id bfcId
+		from base_drug a
+				 left join base_special_calc b on a.code = b.drug_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
+				 left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
+				 left join base_dept d on b.dept_code = d.code and b.hosp_code = d.hosp_code and d.id = #{loginDeptId}
+		where a.id = #{itemId} and a.hosp_code = #{hospCode}
+	</select>
 </mapper>

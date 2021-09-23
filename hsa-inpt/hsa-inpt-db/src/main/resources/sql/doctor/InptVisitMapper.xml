@@ -1898,10 +1898,14 @@
 								 when item_code ='3' then ifnull(total_price,0)
 								 else 0 end
 						 )as item_price,sum( total_price ) AS total_price
-			  FROM inpt_cost  where hosp_code=#{hospCode} and visit_id in
-				<foreach collection="visitIdList" open="(" separator="," close=")" item="item">
-					#{item}
-				</foreach>
+			  FROM inpt_cost
+			  where hosp_code=#{hospCode}
+			  <if test="visitIdList != null and visitIdList.size() > 0">
+				  and visit_id in
+				  <foreach collection="visitIdList" open="(" separator="," close=")" item="item">
+					  #{item}
+				  </foreach>
+			  </if>
 			GROUP BY hosp_code, visit_id )a
 	</select>
 

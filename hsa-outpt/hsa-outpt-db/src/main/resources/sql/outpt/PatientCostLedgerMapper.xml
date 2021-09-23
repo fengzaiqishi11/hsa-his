@@ -3591,6 +3591,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3615,6 +3624,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3636,6 +3654,15 @@
         </if>
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(a.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and a.crte_id = #{crteId}
         </if>
     </select>
 

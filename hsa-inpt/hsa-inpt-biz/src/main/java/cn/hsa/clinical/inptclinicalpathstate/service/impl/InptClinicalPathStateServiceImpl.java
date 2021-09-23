@@ -29,6 +29,6 @@ public class InptClinicalPathStateServiceImpl implements InptClinicalPathStateSe
      */
     @Override
     public WrapperResponse<PageDTO> queryClinicalPathStageDetail(Map map) {
-        return WrapperResponse.success(inptClinicalPathStateBO.queryClinicalPathStageDetail(MapUtils.get(map,"clinicPathStageDetailDTO")));
+        return WrapperResponse.success(inptClinicalPathStateBO.queryClinicalPathStageDetail(MapUtils.get(map,"inptClinicalPathStateDTO")));
     }
 }

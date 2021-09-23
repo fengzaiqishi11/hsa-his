@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
+import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
@@ -43,13 +44,13 @@ public class InptClinicalPathStateController extends BaseController {
      * @Date: 2021/9/23
      */
     @GetMapping("/queryClinicalPathStageDetail")
-    public WrapperResponse<PageDTO> queryClinicalPathStageDetail(ClinicPathStageDetailDTO clinicPathStageDetailDTO,
+    public WrapperResponse<PageDTO> queryClinicalPathStageDetail(InptClinicalPathStateDTO inptClinicalPathStateDTO,
                                                                  HttpServletRequest req, HttpServletResponse res){
         Map map = new HashMap();
         SysUserDTO sysUserDTO = getSession(req, res);
-        clinicPathStageDetailDTO.setHospCode(sysUserDTO.getHospCode());
+        inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("clinicPathStageDetailDTO",clinicPathStageDetailDTO);
+        map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
         return inptClinicalPathStateService_consumer.queryClinicalPathStageDetail(map);
     }
 

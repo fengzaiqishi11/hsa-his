@@ -424,7 +424,8 @@
                 iv.bed_name,
                 iv.name,
                 iv.in_profile,
-                iv.in_no
+                iv.in_no,
+                bb.seq_no
             FROM
                 (
                     SELECT
@@ -518,6 +519,7 @@
                     ) T ON 1 = 1
                 ) sj
             LEFT JOIN inpt_visit iv ON 1 = 1
+            left join base_bed bb on iv.hosp_code = bb.hosp_code and iv.bed_id = bb.id
             WHERE iv.hosp_code = #{hospCode}
             AND iv.status_code = '2'
             <if test="deptId != null and deptId != ''">
@@ -535,6 +537,7 @@
             ORDER BY iv.in_time DESC
             ) info
         LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time and it.baby_id is null
+        order by info.seq_no
     </select>
 
     <!--根据三测单节点时间点查询科室下在院病人的【婴儿】列表-->
@@ -570,7 +573,8 @@
                 iv.bed_name,
                 iv.name,
                 iv.in_profile,
-                iv.in_no
+                iv.in_no,
+                bb.seq_no
             FROM
                 (
                 SELECT
@@ -665,6 +669,7 @@
             ) sj
             JOIN inpt_visit iv ON 1 = 1
             RIGHT JOIN inpt_baby ib on iv.hosp_code = ib.hosp_code and iv.id = ib.visit_id
+            join base_bed bb on iv.hosp_code = bb.hosp_code and iv.bed_id = bb.id
             WHERE iv.hosp_code = #{hospCode}
               AND iv.status_code = '2'
             <if test="deptId != null and deptId != ''">
@@ -688,6 +693,7 @@
             ORDER BY iv.in_time DESC
             ) info
         LEFT JOIN inpt_nurse_third  it ON info.visit_id = it.visit_id AND info.hosp_code = it.hosp_code AND info.time_slot = it.record_time and info.baby_id = it.baby_id
+        order by info.seq_no
     </select>
 
     <!--根据就诊id查询出患者在院期间所有护理三测单记录-->

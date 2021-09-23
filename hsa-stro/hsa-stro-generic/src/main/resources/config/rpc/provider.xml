@@ -39,10 +39,6 @@
 
     <!-- 退库确认 -->
     <dubbo:service interface="cn.hsa.module.stro.backstroconfirm.service.BackStroConfirmService" ref="backStroConfirmService_provider"/>
-    <!--药房入库查询与确认-->
-    <dubbo:service interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" ref="stockInQueryService_provider"/>
-    <!--药房领药申请-->
-    <dubbo:service interface="cn.hsa.module.phar.pharapply.service.PharApplyService" ref="pharApplyService_provider"/>
 
     <!-- 门诊退药 -->
     <dubbo:service interface="cn.hsa.module.phar.pharoutbackdrug.service.OutBackDrugService" ref="outBackDrugService_provider"/>

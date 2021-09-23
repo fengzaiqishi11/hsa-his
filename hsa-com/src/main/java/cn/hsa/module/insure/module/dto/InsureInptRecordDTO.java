@@ -26,6 +26,7 @@ import java.util.Date;
 public class InsureInptRecordDTO extends InsureInptRecordDO {
     private String keyword;
     private String hospName;
+    private String isHospital;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date begntime;

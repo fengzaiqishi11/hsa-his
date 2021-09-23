@@ -536,7 +536,7 @@
                         ov.dept_name AS dept_name,
                         osi.invoice_no AS invoice_no,
                         DATE_FORMAT(os.settle_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
-                        round(os.actual_price, 2) AS total_price,
+                        ifnull(round(osi.total_price, 2), round(os.actual_price, 2)) AS total_price,
                         os.crte_name AS crte_name,
                         os.status_code as status_code
                     FROM
@@ -618,7 +618,6 @@
             AND od.hosp_code = iap.hosp_code
             AND od.hosp_code = iv.hosp_code
             and od.id = iss.daily_settle_id
-            and od.id = iap.daily_settle_id
             AND iss.id = iap.settle_id
             AND iss.visit_id = iv.id
         ORDER BY

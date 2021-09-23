@@ -2248,4 +2248,10 @@
             </if>
         </foreach>
     </update>
+
+
+    <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        select * from outpt_cost where hosp_code = #{hospCode} and op_id = #{id} and status_code = '0'
+    </select>
+
 </mapper>

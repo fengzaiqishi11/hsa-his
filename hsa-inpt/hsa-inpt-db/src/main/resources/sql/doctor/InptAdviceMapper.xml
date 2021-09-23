@@ -243,7 +243,7 @@
         a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
         (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum
-        from inpt_visit a
+        from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
         where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
         <if test="id != null and id != ''">
             and a.id = #{id}
@@ -255,7 +255,7 @@
         <if test='zgbrQuery =="1"'>
             and a.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by a.crte_time desc
+        order by b.seq_no asc
     </select>
 
     <!--查询住院就诊医嘱信息-->
@@ -305,7 +305,7 @@
         <if test="babyId == null or babyId == ''">
             and (a.baby_id is null or LENGTH(TRIM(a.baby_id)) &lt; 1)
         </if>
-        order by a.long_start_time asc, a.group_no asc, a.group_seq_no asc
+        order by a.long_start_time asc, a.id asc
     </select>
 
     <!--批量新增医嘱主表-->
@@ -482,7 +482,10 @@
         set
             plan_stop_time = #{planStopTime}
         where hosp_code = #{hospCode}
-        and find_in_set(id,#{iatIds})
+        and id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
 
@@ -1616,7 +1619,10 @@
             cancel_name = #{cancelName},
             cancel_time = now()
         where hosp_code = #{hospCode}
-        and find_in_set(id,#{iatIds})
+        and id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
     <!-- 查询费用 -->

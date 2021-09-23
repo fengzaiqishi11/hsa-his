@@ -2571,11 +2571,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and sid.crte_time &gt;=#{startDate}
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and sid.crte_time &lt;= #{endDate}
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2584,7 +2584,10 @@
                 #{id}
             </foreach>
         </if>
-
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  sid.item_name like '%${ypxm}%'
+        </if>
         /*科室*/
         <if test="ksids != null and ksids.size()>0">
             and bs.id in
@@ -2863,11 +2866,15 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         group by a.item_id
     </select>
@@ -2901,11 +2908,15 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
         </if>
         group by a.item_id,a.batch_no
     </select>
@@ -3046,6 +3057,10 @@
         <if test="endDate != null and endDate !='' ">
             and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
+        </if>
     </select>
 
     <select id="queryStroTakeStock" resultType="java.util.Map">
@@ -3080,10 +3095,14 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
         </if>
 
     </select>
@@ -3572,6 +3591,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3596,6 +3624,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3617,6 +3654,15 @@
         </if>
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(a.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and a.crte_id = #{crteId}
         </if>
     </select>
 

@@ -140,6 +140,9 @@ public class ClinicPathListController extends BaseController {
       SysUserDTO sysUserDTO = getSession(req, res);
       HashMap map = new HashMap();
       clinicPathListDTO.setHospCode(sysUserDTO.getHospCode());
+      clinicPathListDTO.setAuditId(sysUserDTO.getId());
+      clinicPathListDTO.setAuditName(sysUserDTO.getName());
+      clinicPathListDTO.setAuditTime(DateUtils.getNow());
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("clinicPathListDTO",clinicPathListDTO);
       return clinicPathListService_consumer.updateClinicPathAuditCode(map);

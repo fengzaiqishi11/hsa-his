@@ -4,18 +4,25 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO;
 import cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.UploadByExcel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @Package_name: cn.hsa.module.clinical
@@ -105,5 +112,31 @@ public class ClinicalPathItemController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("clinicalPathItemDTO",clinicalPathItemDTO);
         return clinicalPathItemService_consumer.deletePathItemBatch(map);
+    }
+    /**
+     * @Meth: insertBatchByExcelUpload
+     * @Description: 根据excel文件批量导入
+     * @Param: [file, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/15
+     */
+    @PostMapping("/insertBatchByExcelUpload")
+    public WrapperResponse<Boolean> insertBatchByExcelUpload(@RequestParam MultipartFile file,
+                                                             HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        Map map = new HashMap();
+        ClinicalPathItemDTO clinicalPathItemDTO = new ClinicalPathItemDTO();
+        clinicalPathItemDTO.setHospCode(sysUserDTO.getHospCode());
+        Optional.ofNullable(file).orElseThrow(() -> new AppException("传入的文件不能为空"));
+        Map<String, Object> resultMap = UploadByExcel.readExcel(file);
+        clinicalPathItemDTO.setResultMap(resultMap);
+        clinicalPathItemDTO.setCrteName(sysUserDTO.getName());
+        clinicalPathItemDTO.setCrteId(sysUserDTO.getCrteId());
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("clinicalPathItemDTO", clinicalPathItemDTO);
+        map.put("crteName", sysUserDTO.getName());
+        map.put("crteId", sysUserDTO.getId());
+        return clinicalPathItemService_consumer.insertBatchByExcelUpload(map);
     }
 }

@@ -819,6 +819,7 @@
             a.num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.unit_code as unitCode, -- 单位
+            a.unit_code as numUnitCode, -- 单位
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额
@@ -849,6 +850,7 @@
             a.total_num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.dosage_unit_code as unitCode, -- 单位
+            a.unm_unit_code as numUnitCode,
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额
@@ -973,6 +975,7 @@
             a.total_num as num, -- 数量
             a.item_code as itemCode, -- 项目编码
             a.dosage_unit_code as unitCode, -- 单位
+            a.num_unit_code as unmUnitCode,
             a.price as price, -- 单价
             a.preferential_price as preferentialPrice, -- 优惠金额
             a.reality_price as realityPrice, -- 实收总金额
@@ -1695,5 +1698,13 @@
 
     <select id="selectKYFPs" parameterType="cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO" resultType="java.lang.Integer">
         select count(*) from outin_invoice where use_id = #{useId} and hosp_code = #{hospCode} and status_code = '2' and type_code = #{typeCode}
+    </select>
+    
+    <select id="queryPartInvoicePrint" resultType="cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        from outpt_settle_invoice s
+        left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
+        left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+        where s.hosp_code = #{hospCode} and s.settle_id = #{settleId}
     </select>
 </mapper>

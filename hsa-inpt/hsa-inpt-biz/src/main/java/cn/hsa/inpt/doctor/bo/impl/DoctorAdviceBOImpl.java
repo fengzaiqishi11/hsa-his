@@ -1029,6 +1029,9 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
      **/
     @Override
     public Boolean updateBatchInptAdviceCancel(InptAdviceDTO inptAdviceDTO) {
+        if(StringUtils.isNotEmpty(inptAdviceDTO.getIatIds())){
+            inptAdviceDTO.setIatIdList(Arrays.asList(inptAdviceDTO.getIatIds().split(",")));
+        }
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         //长期医嘱

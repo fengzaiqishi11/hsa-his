@@ -187,15 +187,15 @@
         </if>
         join  insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
         left join insure_inpt_record iir on iir.hosp_code = iiv.hosp_code and iir.visit_id = iiv.visit_id
-        and iiv.hosp_code = #{hospCode}
+        where 1=1 and  iiv.hosp_code = #{hospCode}
         <if test="isHospital == '1'.toString()">
             <if test="keyword !=null and keyword != ''">
-                and (iv.name like '%${keyword}%')
+                and iv.name like concat('%',#{keyword},'%')
             </if>
         </if>
         <if test="isHospital == '0'.toString()">
             <if test="keyword !=null and keyword != ''">
-                and (ov.name like '%${keyword}%')
+                and ov.name like concat('%',#{keyword},'%')
             </if>
         </if>
         order by iir.crte_time desc

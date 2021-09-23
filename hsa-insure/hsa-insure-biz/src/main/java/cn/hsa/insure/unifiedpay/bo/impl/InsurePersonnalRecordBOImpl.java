@@ -367,6 +367,9 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
      */
     @Override
     public PageDTO queryPageInptRecord(InsureInptRecordDTO insureInptRecordDTO) {
+        if(StringUtils.isEmpty(insureInptRecordDTO.getIsHospital())){
+            insureInptRecordDTO.setIsHospital(Constants.SF.F);
+        }
         PageHelper.startPage(insureInptRecordDTO.getPageNo(), insureInptRecordDTO.getPageSize());
         List<InsureInptRecordDTO> recordDTOList = insureDiseaseRecordDAO.queryPageInptRecord(insureInptRecordDTO);
         return PageDTO.of(recordDTOList);

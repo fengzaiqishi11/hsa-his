@@ -104,7 +104,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureCostParam.put("isMatch", Constants.SF.S);//是否匹配 = 是
         insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
-        insureCostParam.put("queryBaby", "N");// 医保机构编码
+        insureCostParam.put("queryBaby", MapUtils.get(map,"queryBaby"));// 医保机构编码
         insureCostParam.put("isHalfSettle", isHalfSettle);// 是否中途结算
         insureCostParam.put("feeStartDate", feeStartDate);
         insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算

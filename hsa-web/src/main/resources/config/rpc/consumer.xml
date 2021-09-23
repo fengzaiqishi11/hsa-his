@@ -487,6 +487,10 @@
     <dubbo:reference id="clinicalPathStageService_consumer" interface="cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService" check="false"/>
     <!--临床路径明细关联医院项目-->
     <dubbo:reference id="clinicalPathStageDetailItem_consumer" interface="cn.hsa.module.clinical.clinicalpathstagedetailitem.service.ClinicalPathStageDetailItemService" check="false"/>
+    <!--病人阶段病情记录-->
+    <dubbo:reference id="inptClinicalPathStageService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" check="false"/>
+    <!--临床路径病人记录-->
+    <dubbo:reference id="inptClinicalPathStateService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService" check="false"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

@@ -40,7 +40,7 @@
         crte_name, crte_time, apply_no)
         values
         <foreach collection="list" item="entity" separator=",">
-            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.in_no}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
             #{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.result_type}, #{entity.result},
             #{entity.testitem_name}, #{entity.reportte_text}, #{entity.pic_url}, #{entity.isPositive},
             #{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
@@ -56,7 +56,7 @@
         crte_name, crte_time, apply_no)
         values
         <foreach collection="list" item="entity" separator=",">
-            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
             #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
             #{entity.testitem_name}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
             #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
@@ -74,7 +74,7 @@
 
     <update id="updateApplyStatus">
         update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s')
-        where advice_id in
+        where opd_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
             #{entity}
         </foreach>

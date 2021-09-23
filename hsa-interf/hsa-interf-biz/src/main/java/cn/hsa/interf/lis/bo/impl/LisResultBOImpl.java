@@ -145,7 +145,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         // 新增结果
         int num = lisResultDAO.insertDXResult(medicalResultDTOList);
         // 更新申请单状态
-//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+        int applyStatus = lisResultDAO.updateApplyStatus(collect);
 
         return map;
     }

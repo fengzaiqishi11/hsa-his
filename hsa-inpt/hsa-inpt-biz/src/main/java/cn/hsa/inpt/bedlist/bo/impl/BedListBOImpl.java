@@ -55,6 +55,9 @@ public class BedListBOImpl implements BedListBO {
     @Resource
     private SysParameterService sysParameterService;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * @Method queryPage
      * @Desrciption 分页查询床位信息
@@ -118,50 +121,62 @@ public class BedListBOImpl implements BedListBO {
     public Boolean saveBedChange(Map map) {
         // 异动类型
         String changeCode = MapUtils.getEmptyErr(map, "changeCode", "床位异动失败：异动类型不能为空");
-        switch (changeCode) {
-            // 安床
-            case Constants.YDLX.AC:
-                handleAc(map);
-                break;
-            // 包床
-            case Constants.YDLX.BC:
-                handleBc(map);
-                break;
-            // 包床取消
-            case Constants.YDLX.BCQX:
-                handleBcqx(map);
-                break;
-            // 换床
-            case Constants.YDLX.HC:
-                handleHc(map);
-                break;
-            // 转科
-            case Constants.YDLX.ZK:
-                handleZk(map);
-                break;
-            // 预出院
-            case Constants.YDLX.YCY:
-                handleYcy(map);
-                break;
-            // 出院召回
-            case Constants.YDLX.CYZH:
-                // 召回类型
-                String handleCode = MapUtils.getEmptyErr(map, "handleCode", "出院召回失败：召回类型不能为空");
-                // 合法性校验
-                if (!StringUtils.inString(handleCode, "0", "1")) {
-                    throw new AppException("出院召回失败：召回类型不合法");
-                }
-                // 继续住院
-                if ("0".equals(handleCode)) {
-                    handleCyzh_Jxzy(map);
-                }
-                // 召回费用
-                else {
-                    handleCyzh_Zhfy(map);
-                }
-                break;
-            default:
-                throw new AppException("床位异动失败：异动类型参数不匹配");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String visitId = MapUtils.get(map, "visitId");
+        String key =new StringBuilder(hospCode + visitId + changeCode).toString();
+        if (StringUtils.isNotEmpty(redisUtils.get(key))) {
+            throw new AppException("当前患者正在操作，稍后刷新界面再试");
+        }
+        try {
+            // 使用redis锁病人，并设置自动过期时间10秒，防止异常情况redis不会自动清除的问题
+            redisUtils.set(key, visitId, 10);
+            switch (changeCode) {
+                // 安床
+                case Constants.YDLX.AC:
+                    handleAc(map);
+                    break;
+                // 包床
+                case Constants.YDLX.BC:
+                    handleBc(map);
+                    break;
+                // 包床取消
+                case Constants.YDLX.BCQX:
+                    handleBcqx(map);
+                    break;
+                // 换床
+                case Constants.YDLX.HC:
+                    handleHc(map);
+                    break;
+                // 转科
+                case Constants.YDLX.ZK:
+                    handleZk(map);
+                    break;
+                // 预出院
+                case Constants.YDLX.YCY:
+                    handleYcy(map);
+                    break;
+                // 出院召回
+                case Constants.YDLX.CYZH:
+                    // 召回类型
+                    String handleCode = MapUtils.getEmptyErr(map, "handleCode", "出院召回失败：召回类型不能为空");
+                    // 合法性校验
+                    if (!StringUtils.inString(handleCode, "0", "1")) {
+                        throw new AppException("出院召回失败：召回类型不合法");
+                    }
+                    // 继续住院
+                    if ("0".equals(handleCode)) {
+                        handleCyzh_Jxzy(map);
+                    }
+                    // 召回费用
+                    else {
+                        handleCyzh_Zhfy(map);
+                    }
+                    break;
+                default:
+                    throw new AppException("床位异动失败：异动类型参数不匹配");
+            }
+        } finally {
+            redisUtils.del(key);//删除结算key
         }
         return true;
     }

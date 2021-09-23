@@ -585,7 +585,7 @@
             <![CDATA[
                 and a.record_time >= #{startDate}
             ]]>
-        </if>) f
+        </if> GROUP BY a.id ) f
         order by f.name,f.deptId,f.recordTime desc
     </select>
 </mapper>

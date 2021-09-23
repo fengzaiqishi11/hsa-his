@@ -1,5 +1,6 @@
 package cn.hsa.module.clinical.inptclinicalpathstate.entity;
 
+import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class InptClinicalPathStateDO extends PageDTO implements Serializable {
+public class InptClinicalPathStateDO extends PageDO implements Serializable {
     private static final long serialVersionUID = -29683798207572817L;
     /**
      * 主键

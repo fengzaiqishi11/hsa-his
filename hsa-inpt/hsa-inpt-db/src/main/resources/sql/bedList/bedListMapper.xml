@@ -129,6 +129,18 @@
             select 1 from inpt_advice ia where bb.hosp_code = ia.hosp_code and ia.visit_id = iv.id and sign_code = '1'
             )
         </if>
+        <if test="doctorType != null and doctorType == '1'.toString()">
+            and iv.zg_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '2'.toString()">
+            and iv.zz_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '3'.toString()">
+            and iv.jz_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '4'.toString()">
+            and iv.resp_nurse_id = #{crteId}
+        </if>
         order by bb.seq_no, bb.crte_time
     </select>
 

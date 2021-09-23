@@ -1870,10 +1870,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             outptPrescribeDetailsDTO.setItemId(inptAdviceDetailDTO.getItemId());
             outptPrescribeDetailsDTO.setLoginDeptId(adviceDTO.getInDeptId());
 
-            Map parmMap = new HashMap();
-            parmMap.put("hospCode",inptAdviceDetailDTO.getHospCode());
-            parmMap.put("outptPrescribeDetailsDTO",outptPrescribeDetailsDTO);
-            drugDTO = outptDoctorPrescribeService_consumer.getBaseDrug(parmMap).getData();
+            drugDTO = inptVisitDAO.getBaseDrug(outptPrescribeDetailsDTO);
             if(drugDTO == null){
                 throw new RuntimeException("医嘱【" + adviceDTO.getItemName() + "】未获取到有效药品,检查药品信息!");
             }
@@ -2407,7 +2404,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (ListUtils.isEmpty(inptAdviceDetailDTOList)) {
             return;
         }
-
         for(InptAdviceDetailDTO inptAdviceDetailDTO: inptAdviceDetailDTOList) {
             //获取对应的医嘱信息
             InptAdviceDTO inptAdviceDTO = adviceMap.get(inptAdviceDetailDTO.getIaId());
@@ -2535,7 +2531,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 }
 
                 inptCostDTOs.add(inptCostDTO);
-
+                if(inptCostDTOs.size() % 100 == 0){
+                    inptCostDAO.insertInptCostBatch(inptCostDTOs);
+                    inptCostDTOs.clear();
+                }
                 //时间根据频率周期变化 开始时间 = 开始时间+频率周期
                 startTime = DateUtils.dateAdd(startTime, day);
             }
@@ -2750,6 +2749,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             InptAdviceExecDTO.setCrteTime(medicalAdviceDTO.getCheckTime());
             if (InptAdviceExecDTO != null) {
                 inptAdviceExecDTOList.add(InptAdviceExecDTO);
+            }
+            if(inptAdviceExecDTOList.size() % 500 == 0) {
+                inptAdviceExecDAO.insertInptAdviceExecBatch(inptAdviceExecDTOList);
+                inptAdviceExecDTOList.clear();
             }
         }
     }

@@ -135,6 +135,8 @@
     <dubbo:service interface="cn.hsa.module.clinical.clinicalpathitem.service.ClinicalPathItemService" ref="clinicalPathItemService_provider"/>
     <!-- 临床路径阶段描述 -->
     <dubbo:service interface="cn.hsa.module.clinical.clinicalpathstage.service.ClinicalPathStageService" ref="clinicalPathStageService_provider"/>
+    <!-- 临床路径明细与医院项目对应 -->
+    <dubbo:service interface="cn.hsa.module.clinical.clinicalpathstagedetailitem.service.ClinicalPathStageDetailItemService" ref="clinicalPathStageDetailItemService_provider"/>
     <!--病人阶段病情记录-->
     <dubbo:service interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" ref="inptClinicalPathStageService_provider"/>
     <!--临床路径病人记录-->

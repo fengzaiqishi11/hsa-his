@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.inptclinicalpathstate.dao.InptClinicalPathStateDAO">
+
+
+    <select id="queryClinicalItem"
+            resultType="cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO">
+        select
+        a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
+        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName
+        from clinical_path_stage_detail a
+        join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
+        join clinical_path_stage c on c.id = a.stage_id and a.hosp_code = b.hosp_code
+        join clinical_path_list l on l.id = a.list_id
+        where a.hosp_code = #{hospCode}
+        <if test="listId != null and listId != ''">
+            and a.list_id = #{listId}
+        </if>
+        <if test="stageId != null and stageId != ''">
+            and a.stage_id = #{stageId}
+        </if>
+        <if test="itemType != null and itemType != ''">
+            and a.item_type = #{itemType}
+        </if>
+        <if test="itemId != null and itemId != ''">
+            and a.item_id = #{itemId}
+        </if>
+        order by a.sort_no
+    </select>
+</mapper>

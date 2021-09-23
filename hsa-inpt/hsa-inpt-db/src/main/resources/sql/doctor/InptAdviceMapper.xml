@@ -243,7 +243,7 @@
         a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
         (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum
-        from inpt_visit a
+        from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
         where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
         <if test="id != null and id != ''">
             and a.id = #{id}
@@ -255,7 +255,7 @@
         <if test='zgbrQuery =="1"'>
             and a.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by a.crte_time desc
+        order by b.seq_no asc
     </select>
 
     <!--查询住院就诊医嘱信息-->

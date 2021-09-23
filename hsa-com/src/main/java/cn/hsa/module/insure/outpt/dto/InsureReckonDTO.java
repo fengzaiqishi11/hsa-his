@@ -29,4 +29,19 @@ public class InsureReckonDTO extends InsureReckonDO implements Serializable {
     private String startDate;
     //结束时间
     private String endDate;
+
+    // 医疗机构名称
+    private String hospName;
+
+    // 医疗机构编码
+    private String fixmedinsCode;
+
+    // 医疗机构名称
+    private String fixmedinsName;
+
+    // 清算id
+    private String feeClrId;
+
+    // 清算状态
+    private String clrStas;
 }

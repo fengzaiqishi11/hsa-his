@@ -48,6 +48,9 @@
         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -125,6 +128,9 @@
          ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -193,6 +199,9 @@
         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -267,6 +276,9 @@
          b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">

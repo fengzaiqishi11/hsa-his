@@ -351,13 +351,14 @@
        检查项目或者材料是否有库存明细记录
        条件:医院编码、库房ID、项目代码、项目ID
        返回：是否有数据
+       2021/9/22 添加条件 过滤掉已经失效的明细数据
    -->
     <select id="getStockDetail" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
         select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
         a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
         a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
         from stro_stock_detail a
-        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0 and a.expiry_date &gt;= now()
         <if test="sfBatchNo!=null and sfBatchNo!='' and batchNo!=null and batchNo!=''">
             and batch_no = #{batchNo}
         </if>

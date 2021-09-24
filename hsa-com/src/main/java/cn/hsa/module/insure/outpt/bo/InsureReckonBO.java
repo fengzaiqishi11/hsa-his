@@ -3,7 +3,9 @@ package cn.hsa.module.insure.outpt.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReckonDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,4 +81,112 @@ public interface InsureReckonBO {
      * @Return
      **/
     Boolean deleteInsureReckon(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 医药机构清算申请 - 获取清算机构
+     *
+     * @param insureReckonDTO
+     * @Method getInsureClrOptinsByRegCode
+     * @Desrciption
+     * @Author liaojiguang
+     * @Date 2021/9/9 17:31
+     * @Return
+     **/
+    List<String> getInsureClrOptinsByRegCode(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 医疗机构月结算申请汇总信息分页查询-3693
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureMonSettleApplyInfo
+     * @Desrciption
+     * @Author liaojiguang
+     * @Date 2021/9/9 17:31
+     * @Return
+     **/
+    PageDTO queryInsureMonSettleApplyInfo(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取清算机构 -3694
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureClrOptinsInfo
+     * @Desrciption
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureClrOptinsInfo(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取清算汇总明细 -3695
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureSettleApplyInfo
+     * @Desrciption 获取清算汇总明细
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureSettleApplyInfo(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取暂扣明细信息 -3696
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureDetDetlList
+     * @Desrciption 获取暂扣明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureDetDetlList(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 医疗机构月结算报表pdf文档 -3697
+     *
+     * @param insureReckonDTO
+     * @Method getImportClredReportPdf
+     * @Desrciption 医疗机构月结算报表pdf文档
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    Map<String,Object> getImportClredReportPdf(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取拨付单信息 - 3407
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureAppropriationList
+     * @Desrciption 获取拨付单信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureAppropriationList(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取基金明细信息 - 3702
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureDetailFundList
+     * @Desrciption 获取基金明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureDetailFundList(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取结算明细信息 - 3703
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 获取结算明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    PageDTO queryInsureSetlDetlList(InsureReckonDTO insureReckonDTO);
 }

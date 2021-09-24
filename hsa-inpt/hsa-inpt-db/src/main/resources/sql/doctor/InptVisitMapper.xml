@@ -238,7 +238,7 @@
 		v.out_oper_name, v.out_oper_time, v.out_situation_code, v.out_remark, v.out_mode_code, v.is_archive, v.archive_time,
 		v.archive_id, v.archive_name, v.insure_code, v.insure_org_code, v.insure_no, v.insure_biz_code, v.insure_treat_code,
 		v.insure_patient_id, v.insure_remark, v.total_advance, v.total_cost, v.total_balance, v.crte_id, v.crte_name, v.crte_time, s.settle_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName, b.seq_no,
 		CONCAT(
 		inpt_visit.name,'/',
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
@@ -248,6 +248,7 @@
 		inpt_visit.age_unit_code),'')
 		) AS keyword
 		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
 		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and v.id = #{id}
@@ -303,7 +304,7 @@
 		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
 		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
 		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time, s.settle_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName, b.seq_no,
 		CONCAT(
 		pt.name,'/',
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
@@ -314,6 +315,7 @@
 		) AS keyword
 		from inpt_visit pt join inpt_baby pb on pt.id = pb.visit_id
 		left join inpt_settle s on s.hsop_code = pt.hosp_code and pt.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		left join base_bed b on b.hosp_code = pt.hosp_code and b.id = pt.bed_id
 		where pt.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and pt.id = #{id}
@@ -356,7 +358,7 @@
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
 			and pt.in_time BETWEEN #{Stime} and #{Etime}
 		</if>)
-		order by crte_time desc,px asc
+		order by seq_no asc,px asc
 	</select>
 
 	<!--根据金额预警线分页查询患者 住院催款用 谢星宇-->
@@ -2106,7 +2108,7 @@
 		v.insure_patient_id, v.insure_remark, v.total_advance, s.settle_time,
 		(select sum(reality_price) from inpt_cost b where b.visit_id = v.id and v.hosp_code = b.hosp_code ) as total_cost,
 		v.total_balance, v.crte_id, v.crte_name, v.crte_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,b.seq_no,
 		CONCAT(
 		v.name,
 		'/',
@@ -2116,6 +2118,7 @@
 		(case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
 		) AS keyword
 		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
 		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and v.id = #{id}
@@ -2159,7 +2162,7 @@
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
 			and v.in_time BETWEEN #{Stime} and #{Etime}
 		</if>
-		order by v.crte_time desc, px asc
+		order by seq_no asc, px asc
 	</select>
 	<!-- 获取药品信息 -->
 	<select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">

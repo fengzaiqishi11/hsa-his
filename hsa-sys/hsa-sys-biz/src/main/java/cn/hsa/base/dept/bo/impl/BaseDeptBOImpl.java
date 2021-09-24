@@ -356,8 +356,10 @@ public class BaseDeptBOImpl extends HsafBO implements BaseDeptBO {
     public List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO) {
 
         baseDeptDTO.setIsValid(Constants.SF.S);
-        List<BaseDeptDTO> pharList = baseDeptDAO.getPharInfo(baseDeptDTO);
-        return pharList;
+        if(Constants.SF.S.equals(baseDeptDTO.getMultiPharFlag())){
+            return baseDeptDAO.getPharInfoOfOperDept(baseDeptDTO);
+        }
+        return  baseDeptDAO.getPharInfo(baseDeptDTO);
     }
 
     /**

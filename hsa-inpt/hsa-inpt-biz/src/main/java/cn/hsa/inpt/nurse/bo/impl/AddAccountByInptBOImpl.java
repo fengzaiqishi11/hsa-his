@@ -389,6 +389,20 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
       if (Constants.XMLB.YP.equals(inptCostDTO.getItemCode()) && StringUtils.isEmpty(inptCostDTO.getUsageCode())) {
         throw new AppException(inptCostDTO.getItemName()+":用法不能为空");
       }
+      // 校验药品库存
+      if(Constants.XMLB.YP.equals(inptCostDTO.getItemCode())){
+            Map<String,Object> params = new HashMap<String,Object>();
+            params.put("hospCode",hospCode);
+            params.put("pharId",inptCostDTO.getPharId());
+            params.put("itemId",inptCostDTO.getItemId());
+            params.put("hospCode",hospCode);
+
+            List stock = inptCostDAO.checkStock(params);
+            if(ListUtils.isEmpty(stock)){
+                throw new AppException(inptCostDTO.getItemName()+" 库存不足!,请检查发药药房是否选择正确以及库存是否充足");
+            }
+
+      }
     }
     return true;
   }

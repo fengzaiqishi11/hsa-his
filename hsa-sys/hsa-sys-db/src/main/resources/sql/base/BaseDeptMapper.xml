@@ -449,6 +449,27 @@
           and a.is_valid = #{isValid}
           and a.hosp_code = #{hospCode}
     </select>
+
+    <!-- 手术室获取药房信息 -->
+    <select id="getPharInfoOfOperDept" resultMap="BaseDeptMap">
+        select distinct a.*,c.name as pharName,c.id as pharId
+        from  base_dept a ,
+              base_dept_drugstore  b ,
+              base_dept c ,
+              sys_code_detail d
+        where  a.hosp_code = b.hosp_code and a.`code` = b.dept_code
+          and c.`code` in(SELECT
+                              SUBSTRING_INDEX(SUBSTRING_INDEX(b.drugstore_code,',',help_topic_id+1),',',-1) AS num
+                          FROM
+                              mysql.help_topic
+                          WHERE
+                                  help_topic_id &lt; LENGTH(b.drugstore_code)-LENGTH(REPLACE(b.drugstore_code,',',''))+1 )
+          and b.hosp_code = d.hosp_code and  c_code ='YFLB' and b.type_code = d.`value`
+          and a.id = #{loginDeptId}
+          and a.is_valid = #{isValid}
+          and a.hosp_code = #{hospCode}
+    </select>
+
     <select id="getDeptTypeIdentity" resultMap="BaseDeptMap">
       select c.id, c.name , c.hosp_code,c.type_code,c.type_identity,c.code,c.up_dept_code
           from base_dept a

@@ -8,4 +8,8 @@ import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO
 public interface InptClinicalPathStateBO {
 
     PageDTO queryClinicalPathStageDetail(InptClinicalPathStateDTO inptClinicalPathStateDTO);
+
+    PageDTO queryInptClinicalPathState(InptClinicalPathStateDTO inptClinicalPathStateDTO);
+
+    InptClinicalPathStateDTO queryInptClinicalPathStateByVisitId(InptClinicalPathStateDTO inptClinicalPathStateDTO);
 }

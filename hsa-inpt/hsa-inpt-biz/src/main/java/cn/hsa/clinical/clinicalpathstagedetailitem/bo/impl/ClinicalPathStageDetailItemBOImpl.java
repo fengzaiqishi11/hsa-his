@@ -6,6 +6,7 @@ import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.clinical.clinicalpathstagedetailitem.bo.ClinicalPathStageDetailItemBO;
 import cn.hsa.module.clinical.clinicalpathstagedetailitem.dao.ClinicalPathStageDetailItemDAO;
 import cn.hsa.module.clinical.clinicalpathstagedetailitem.dto.ClinicalPathStageDetailItemDTO;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
@@ -99,11 +100,16 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
     if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
       throw new AppException("绑定医嘱明细数据为空");
     }
+    List<ClinicalPathStageDetailItemDTO> newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
+    if(!ListUtils.isEmpty(clinicalItem.getIds())) {
+      clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
+    }
     // 新增医嘱绑定明细列表
     List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
     // 编辑医嘱绑定明细列表
     List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
-    for(ClinicalPathStageDetailItemDTO item : clinicalPathStageDetailItemDTOS) {
+    for(ClinicalPathStageDetailItemDTO item : newList) {
+      item.setHospCode(clinicalItem.getHospCode());
       if(StringUtils.isNotEmpty(item.getId())) {
         editList.add(item);
         continue;
@@ -120,9 +126,75 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
       clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
     }
     if(!ListUtils.isEmpty(editList)) {
-      clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(editList);
+      clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
     }
     return true;
+  }
+
+
+  /**
+  * @Menthod buildInptAdviceDTOGroupNo
+  * @Desrciption 构建组号
+  *
+  * @Param
+  * [clinicalPathStageDetailItemDTOS]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/9/23 20:04
+  * @Return java.util.List<cn.hsa.module.clinical.clinicalpathstagedetailitem.dto.ClinicalPathStageDetailItemDTO>
+  **/
+  public List<ClinicalPathStageDetailItemDTO> buildInptAdviceDTOGroupNo(List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS){
+    List<ClinicalPathStageDetailItemDTO> outptGroupNoList = clinicalPathStageDetailItemDTOS;
+    //组号
+    int groupNo = 0;
+    //组内序号
+    int groupSeqNo = 1;
+    if(!ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)){
+      //获取最大组号
+      groupNo = clinicalPathStageDetailItemDAO.getMaxGroupNo(outptGroupNoList.get(0));
+    }
+    boolean isTrue = true;
+    for(int i = 0; i < clinicalPathStageDetailItemDTOS.size() ; i++){
+      if(i == 0){
+        outptGroupNoList.get(i).setGroupNo(0);
+        outptGroupNoList.get(i).setGroupSeqNo(0);
+      }else{
+        //用法是否同上
+        if("0".equals(outptGroupNoList.get(i).getUsageCode())){
+          //判断是否是连续联录，多条序号不需要添加
+          if(isTrue){
+            groupNo = groupNo + 1;
+            isTrue = false;
+            //序号(修改第一条序号)
+            outptGroupNoList.get(i-1).setGroupSeqNo(groupSeqNo);
+            //组号修改第一条组号)
+            outptGroupNoList.get(i-1).setGroupNo(groupNo);
+          }
+          groupSeqNo = groupSeqNo + 1;
+          outptGroupNoList.get(i).setGroupNo(groupNo);
+          //序号
+          outptGroupNoList.get(i).setGroupSeqNo(groupSeqNo);
+          //频率
+          outptGroupNoList.get(i).setRateId(outptGroupNoList.get(i-1).getRateId());
+          //执行科室
+          outptGroupNoList.get(i).setExecDeptId(outptGroupNoList.get(i-1).getExecDeptId());
+          //用药性质
+          if(StringUtils.isEmpty(outptGroupNoList.get(i).getUseCode())){
+            outptGroupNoList.get(i).setUseCode(outptGroupNoList.get(i-1).getUseCode());
+          }
+          //使用天数
+          outptGroupNoList.get(i).setUseDays(outptGroupNoList.get(i-1).getUseDays());
+          // 用法
+          outptGroupNoList.get(i).setUsageCode(outptGroupNoList.get(i-1).getUsageCode());
+        }else{
+          isTrue = true;
+          outptGroupNoList.get(i).setGroupNo(0);
+          outptGroupNoList.get(i).setGroupSeqNo(0);
+          groupSeqNo = 1;
+        }
+      }
+    }
+    return outptGroupNoList;
   }
 
   /**

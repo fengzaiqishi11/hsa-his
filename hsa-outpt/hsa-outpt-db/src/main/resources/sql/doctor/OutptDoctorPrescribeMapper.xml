@@ -345,7 +345,7 @@
             a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
             a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
             a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
-            a.crte_time,
+            a.crte_time, a.now_address as nowAddress,
             otv.triage_start_code as triageStatusCode,
             otv.is_call as isCanCall,
             case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk

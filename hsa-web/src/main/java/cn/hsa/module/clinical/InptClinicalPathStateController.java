@@ -53,5 +53,43 @@ public class InptClinicalPathStateController extends BaseController {
         map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
         return inptClinicalPathStateService_consumer.queryClinicalPathStageDetail(map);
     }
+    /**
+     * @Meth: queryInptClinicalPathState
+     * @Description: 根据条件查询临床路径病人记录表
+     * @Param: [inptClinicalPathStateDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/23
+     */
+    @GetMapping("/queryInptClinicalPathState")
+    public WrapperResponse<PageDTO> queryInptClinicalPathState(InptClinicalPathStateDTO inptClinicalPathStateDTO,
+                                                               HttpServletRequest req, HttpServletResponse res){
+        Map map = new HashMap();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+        inptClinicalPathStateDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        inptClinicalPathStateDTO.setZgDoctorId(sysUserDTO.getId());
 
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
+        return inptClinicalPathStateService_consumer.queryInptClinicalPathState(map);
+    }
+    /**
+     * @Meth: queryInptClinicalPathStateByVisitId
+     * @Description: 通过就诊id查询单个临床路径病人的记录
+     * @Param: [inptClinicalPathStateDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/23
+     */
+    @GetMapping("/queryInptClinicalPathStateByVisitId")
+    public WrapperResponse<InptClinicalPathStateDTO> queryInptClinicalPathStateByVisitId(InptClinicalPathStateDTO inptClinicalPathStateDTO,
+                                                                                         HttpServletRequest req, HttpServletResponse res){
+            Map map = new HashMap();
+            SysUserDTO sysUserDTO = getSession(req, res);
+            inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+            map.put("hospCode",sysUserDTO.getHospCode());
+            map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
+            return inptClinicalPathStateService_consumer.queryInptClinicalPathStateByVisitId(map);
+    }
 }

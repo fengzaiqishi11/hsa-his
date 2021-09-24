@@ -912,6 +912,12 @@
         and id = #{id}
     </update>
 
+    <select id="checkStock" resultType="map" parameterType="map">
+      select * from  stro_stock  stock where stock.item_id = #{itemId} and stock.hosp_code = #{hospCode}
+        and stock.biz_id = #{pharId}
+        AND ( stock.num - ifnull( stock.stock_occupy, 0 )/ stock.split_ratio ) > 0
+    </select>
+
     <!--批量更新住院费用的回退数量-->
     <update id="updateInptCostBatch">
         <foreach collection="list" item="dto" separator=";">

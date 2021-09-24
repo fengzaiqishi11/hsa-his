@@ -7,11 +7,16 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.inptprint.bo.InptPrintBO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
 import cn.hsa.module.inpt.inptprint.service.InptPrintService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +37,9 @@ public class InptPrintServiceImpl extends HsafService implements InptPrintServic
   @Resource
   private InptPrintBO inptPrintBO;
 
+  @Resource
+  SysParameterService sysParameterService_consumer;
+
 
   /**
   * @Menthod queryInptCostList
@@ -47,7 +55,18 @@ public class InptPrintServiceImpl extends HsafService implements InptPrintServic
   @Override
   public WrapperResponse<Map> queryInptCostListPrint(Map<String, Object> map) {
     InptCostDTO inptCostDTO = MapUtils.get(map, "inptCostDTO");
-    return WrapperResponse.success(inptPrintBO.queryInptCostListPrint(inptCostDTO));
+    //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
+    SysParameterDTO sysParameterDTO =null;
+    Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+    isInsureUnifiedMap.put("hospCode", inptCostDTO.getHospCode());
+    isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
+    sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+    // 开启大人婴儿合并结算
+    if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+      return WrapperResponse.success(inptPrintBO.queryBabyInptCostListPrint(inptCostDTO));
+    }else {
+      return WrapperResponse.success(inptPrintBO.queryInptCostListPrint(inptCostDTO));
+    }
   }
 
   //费用清单批量打印 author：luoyong date：2021-03-05

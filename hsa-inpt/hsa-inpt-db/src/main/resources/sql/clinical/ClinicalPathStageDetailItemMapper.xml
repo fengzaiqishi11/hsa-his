@@ -46,6 +46,7 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -59,131 +60,89 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryClinicalPathStageDetailItemDTOAll" resultMap="ClinicalPathStageDetailItemMap">
         select
-          id, hosp_code, list_id, stage_id, detail_id, is_must, is_valid, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time
-        from his_v2.clinical_path_stage_detail_item
-        where hosp_code = #{hospCode}
+          a.id, a.hosp_code, a.list_id, a.stage_id, a.detail_id, a.is_must, a.is_valid, a.group_no, a.group_seq_no, a.type_code,
+          a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code,
+          a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price,
+          a.total_num, a.total_num_unit_code, a.herb_num, a.exec_dept_id, a.use_days, a.use_code, a.is_skin, a.herb_note_code,
+          a.remark, a.herb_use_code, a.is_give, a.is_long, a.crte_id, a.crte_name, a.crte_time,
+          case when a.item_code = '4' then (
+          case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
+          ) when a.item_code = '1' then (
+          case when c.big_type_code = '2' then  '3' else '1' end
+          ) when a.item_code = '2' then '2' end type
+          from clinical_path_stage_detail_item a
+          left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+          left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
+          left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
+          where a.hosp_code = #{hospCode}
             <if test="listId != null and listId != ''">
-                and list_id = #{listId}
+                and a.list_id = #{listId}
             </if>
             <if test="stageId != null and stageId != ''">
-                and stage_id = #{stageId}
+                and a.stage_id = #{stageId}
             </if>
             <if test="detailId != null and detailId != ''">
-                and detail_id = #{detailId}
+                and a.detail_id = #{detailId}
             </if>
             <if test="isMust != null and isMust != ''">
-                and is_must = #{isMust}
+                and a.is_must = #{isMust}
             </if>
             <if test="isValid != null and isValid != ''">
-                and is_valid = #{isValid}
-            </if>
-            <if test="groupNo != null">
-                and group_no = #{groupNo}
-            </if>
-            <if test="groupSeqNo != null">
-                and group_seq_no = #{groupSeqNo}
+                and a.is_valid = #{isValid}
             </if>
             <if test="typeCode != null and typeCode != ''">
-                and type_code = #{typeCode}
+                and a.type_code = #{typeCode}
             </if>
             <if test="signCode != null and signCode != ''">
-                and sign_code = #{signCode}
+                and a.sign_code = #{signCode}
             </if>
             <if test="startExecNum != null">
-                and start_exec_num = #{startExecNum}
+                and a.start_exec_num = #{startExecNum}
             </if>
             <if test="endExecNum != null">
-                and end_exec_num = #{endExecNum}
+                and a.end_exec_num = #{endExecNum}
             </if>
             <if test="bfcId != null and bfcId != ''">
-                and bfc_id = #{bfcId}
+                and a.bfc_id = #{bfcId}
             </if>
             <if test="itemCode != null and itemCode != ''">
-                and item_code = #{itemCode}
+                and a.item_code = #{itemCode}
             </if>
             <if test="itemId != null and itemId != ''">
-                and item_id = #{itemId}
+                and a.item_id = #{itemId}
             </if>
             <if test="itemName != null and itemName != ''">
-                and item_name = #{itemName}
+                and a.item_name = #{itemName}
             </if>
             <if test="spec != null and spec != ''">
-                and spec = #{spec}
+                and a.spec = #{spec}
             </if>
             <if test="prepCode != null and prepCode != ''">
-                and prep_code = #{prepCode}
-            </if>
-            <if test="dosage != null">
-                and dosage = #{dosage}
-            </if>
-            <if test="dosageUnitCode != null and dosageUnitCode != ''">
-                and dosage_unit_code = #{dosageUnitCode}
-            </if>
-            <if test="usageCode != null and usageCode != ''">
-                and usage_code = #{usageCode}
-            </if>
-            <if test="rateId != null and rateId != ''">
-                and rate_id = #{rateId}
-            </if>
-            <if test="speedCode != null and speedCode != ''">
-                and speed_code = #{speedCode}
-            </if>
-            <if test="num != null">
-                and num = #{num}
-            </if>
-            <if test="unitCode != null and unitCode != ''">
-                and unit_code = #{unitCode}
-            </if>
-            <if test="price != null">
-                and price = #{price}
-            </if>
-            <if test="totalPrice != null">
-                and total_price = #{totalPrice}
-            </if>
-            <if test="totalNum != null">
-                and total_num = #{totalNum}
-            </if>
-            <if test="totalNumUnitCode != null and totalNumUnitCode != ''">
-                and total_num_unit_code = #{totalNumUnitCode}
-            </if>
-            <if test="herbNum != null">
-                and herb_num = #{herbNum}
+                and a.prep_code = #{prepCode}
             </if>
             <if test="execDeptId != null and execDeptId != ''">
-                and exec_dept_id = #{execDeptId}
+                and a.exec_dept_id = #{execDeptId}
             </if>
             <if test="useDays != null">
-                and use_days = #{useDays}
+                and a.use_days = #{useDays}
             </if>
             <if test="useCode != null and useCode != ''">
-                and use_code = #{useCode}
+                and a.use_code = #{useCode}
             </if>
             <if test="isSkin != null and isSkin != ''">
-                and is_skin = #{isSkin}
+                and a.is_skin = #{isSkin}
             </if>
             <if test="herbNoteCode != null and herbNoteCode != ''">
-                and herb_note_code = #{herbNoteCode}
-            </if>
-            <if test="remark != null and remark != ''">
-                and remark = #{remark}
+                and a.herb_note_code = #{herbNoteCode}
             </if>
             <if test="herbUseCode != null and herbUseCode != ''">
-                and herb_use_code = #{herbUseCode}
+                and a.herb_use_code = #{herbUseCode}
             </if>
             <if test="isGive != null and isGive != ''">
-                and is_give = #{isGive}
+                and a.is_give = #{isGive}
             </if>
             <if test="isLong != null and isLong != ''">
-                and is_long = #{isLong}
-            </if>
-            <if test="crteId != null and crteId != ''">
-                and crte_id = #{crteId}
-            </if>
-            <if test="crteName != null and crteName != ''">
-                and crte_name = #{crteName}
-            </if>
-            <if test="crteTime != null">
-                and crte_time = #{crteTime}
+                and a.is_long = #{isLong}
             </if>
     </select>
 
@@ -209,142 +168,143 @@
 
     <!--通过主键修改数据-->
     <update id="updateClinicalPathStageDetailItemDTO">
+      <foreach collection="list" item="item" separator=";">
         update clinical_path_stage_detail_item
         <set>
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode},
-            </if>
-            <if test="listId != null and listId != ''">
-                list_id = #{listId},
-            </if>
-            <if test="stageId != null and stageId != ''">
-                stage_id = #{stageId},
-            </if>
-            <if test="detailId != null and detailId != ''">
-                detail_id = #{detailId},
-            </if>
-            <if test="isMust != null and isMust != ''">
-                is_must = #{isMust},
-            </if>
-            <if test="isValid != null and isValid != ''">
-                is_valid = #{isValid},
-            </if>
-            <if test="groupNo != null">
-                group_no = #{groupNo},
-            </if>
-            <if test="groupSeqNo != null">
-                group_seq_no = #{groupSeqNo},
-            </if>
-            <if test="typeCode != null and typeCode != ''">
-                type_code = #{typeCode},
-            </if>
-            <if test="signCode != null and signCode != ''">
-                sign_code = #{signCode},
-            </if>
-            <if test="startExecNum != null">
-                start_exec_num = #{startExecNum},
-            </if>
-            <if test="endExecNum != null">
-                end_exec_num = #{endExecNum},
-            </if>
-            <if test="bfcId != null and bfcId != ''">
-                bfc_id = #{bfcId},
-            </if>
-            <if test="itemCode != null and itemCode != ''">
-                item_code = #{itemCode},
-            </if>
-            <if test="itemId != null and itemId != ''">
-                item_id = #{itemId},
-            </if>
-            <if test="itemName != null and itemName != ''">
-                item_name = #{itemName},
-            </if>
-            <if test="spec != null and spec != ''">
-                spec = #{spec},
-            </if>
-            <if test="prepCode != null and prepCode != ''">
-                prep_code = #{prepCode},
-            </if>
-            <if test="dosage != null">
-                dosage = #{dosage},
-            </if>
-            <if test="dosageUnitCode != null and dosageUnitCode != ''">
-                dosage_unit_code = #{dosageUnitCode},
-            </if>
-            <if test="usageCode != null and usageCode != ''">
-                usage_code = #{usageCode},
-            </if>
-            <if test="rateId != null and rateId != ''">
-                rate_id = #{rateId},
-            </if>
-            <if test="speedCode != null and speedCode != ''">
-                speed_code = #{speedCode},
-            </if>
-            <if test="num != null">
-                num = #{num},
-            </if>
-            <if test="unitCode != null and unitCode != ''">
-                unit_code = #{unitCode},
-            </if>
-            <if test="price != null">
-                price = #{price},
-            </if>
-            <if test="totalPrice != null">
-                total_price = #{totalPrice},
-            </if>
-            <if test="totalNum != null">
-                total_num = #{totalNum},
-            </if>
-            <if test="totalNumUnitCode != null and totalNumUnitCode != ''">
-                total_num_unit_code = #{totalNumUnitCode},
-            </if>
-            <if test="herbNum != null">
-                herb_num = #{herbNum},
-            </if>
-            <if test="execDeptId != null and execDeptId != ''">
-                exec_dept_id = #{execDeptId},
-            </if>
-            <if test="useDays != null">
-                use_days = #{useDays},
-            </if>
-            <if test="useCode != null and useCode != ''">
-                use_code = #{useCode},
-            </if>
-            <if test="isSkin != null and isSkin != ''">
-                is_skin = #{isSkin},
-            </if>
-            <if test="herbNoteCode != null and herbNoteCode != ''">
-                herb_note_code = #{herbNoteCode},
-            </if>
-            <if test="remark != null and remark != ''">
-                remark = #{remark},
-            </if>
-            <if test="herbUseCode != null and herbUseCode != ''">
-                herb_use_code = #{herbUseCode},
-            </if>
-            <if test="isGive != null and isGive != ''">
-                is_give = #{isGive},
-            </if>
-            <if test="isLong != null and isLong != ''">
-                is_long = #{isLong},
-            </if>
-            <if test="crteId != null and crteId != ''">
-                crte_id = #{crteId},
-            </if>
-            <if test="crteName != null and crteName != ''">
-                crte_name = #{crteName},
-            </if>
-            <if test="crteTime != null">
-                crte_time = #{crteTime},
-            </if>
+          <if test="item.listId != null">
+            list_id = #{item.listId},
+          </if>
+          <if test="item.stageId != null">
+            stage_id = #{item.stageId},
+          </if>
+          <if test="item.detailId != null">
+            detail_id = #{item.detailId},
+          </if>
+          <if test="item.isMust != null">
+            is_must = #{item.isMust},
+          </if>
+          <if test="item.isValid != null">
+            is_valid = #{item.isValid},
+          </if>
+          <if test="item.groupNo != null">
+            group_no = #{item.groupNo},
+          </if>
+          <if test="item.groupSeqNo != null">
+            group_seq_no = #{item.groupSeqNo},
+          </if>
+          <if test="item.typeCode != null">
+            type_code = #{item.typeCode},
+          </if>
+          <if test="item.signCode != null">
+            sign_code = #{item.signCode},
+          </if>
+          <if test="item.startExecNum != null">
+            start_exec_num = #{item.startExecNum},
+          </if>
+          <if test="item.endExecNum != null">
+            end_exec_num = #{item.endExecNum},
+          </if>
+          <if test="item.bfcId != null">
+            bfc_id = #{item.bfcId},
+          </if>
+          <if test="item.itemCode != null">
+            item_code = #{item.itemCode},
+          </if>
+          <if test="item.itemId != null">
+            item_id = #{item.itemId},
+          </if>
+          <if test="item.itemName != null">
+            item_name = #{item.itemName},
+          </if>
+          <if test="item.spec != null">
+            spec = #{item.spec},
+          </if>
+          <if test="item.prepCode != null">
+            prep_code = #{item.prepCode},
+          </if>
+          <if test="item.dosage != null">
+            dosage = #{item.dosage},
+          </if>
+          <if test="item.dosageUnitCode != null">
+            dosage_unit_code = #{item.dosageUnitCode},
+          </if>
+          <if test="item.usageCode != null">
+            usage_code = #{item.usageCode},
+          </if>
+          <if test="item.rateId != null">
+            rate_id = #{item.rateId},
+          </if>
+          <if test="item.speedCode != null">
+            speed_code = #{item.speedCode},
+          </if>
+          <if test="item.num != null">
+            num = #{item.num},
+          </if>
+          <if test="item.unitCode != null">
+            unit_code = #{item.unitCode},
+          </if>
+          <if test="item.price != null">
+            price = #{item.price},
+          </if>
+          <if test="item.totalPrice != null">
+            total_price = #{item.totalPrice},
+          </if>
+          <if test="item.totalNum != null">
+            total_num = #{item.totalNum},
+          </if>
+          <if test="item.totalNumUnitCode != null">
+            total_num_unit_code = #{item.totalNumUnitCode},
+          </if>
+          <if test="item.herbNum != null">
+            herb_num = #{item.herbNum},
+          </if>
+          <if test="item.execDeptId != null">
+            exec_dept_id = #{item.execDeptId},
+          </if>
+          <if test="item.useDays != null">
+            use_days = #{item.useDays},
+          </if>
+          <if test="item.useCode != null">
+            use_code = #{item.useCode},
+          </if>
+          <if test="item.isSkin != null">
+            is_skin = #{item.isSkin},
+          </if>
+          <if test="item.herbNoteCode != null">
+            herb_note_code = #{item.herbNoteCode},
+          </if>
+          <if test="item.remark != null">
+            remark = #{item.remark},
+          </if>
+          <if test="item.herbUseCode != null">
+            herb_use_code = #{item.herbUseCode},
+          </if>
+          <if test="item.isGive != null">
+            is_give = #{item.isGive},
+          </if>
+          <if test="item.isLong != null">
+            is_long = #{item.isLong},
+          </if>
         </set>
-        where id = #{id} and hosp_code = #{hospCode}
+        where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
     </update>
 
     <!--通过主键删除-->
     <delete id="deleteClinicalPathStageDetailItemDTOById">
-        delete from clinical_path_stage_detail_item where id = #{id} and hosp_code = #{hospCode}
+        delete from clinical_path_stage_detail_item
+        where hosp_code = #{hospCode} and list_id = #{listId} and stage_id = #{stageId}
+        and detail_id = #{detailId} and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
     </delete>
+
+  <!--  获取最大组号 -->
+   <select id="getMaxGroupNo" resultType="java.lang.Integer">
+        select ifnull(max(ifnull(group_no,0)),0) groupNo from clinical_path_stage_detail_item a where list_id = #{listId} and a.hosp_code = #{hospCode}
+        and stage_id = #{stageId} and detail_id = #{detailId}
+   </select>
 
     <!--查询所有项目-->
     <select id="quertAllItem" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">

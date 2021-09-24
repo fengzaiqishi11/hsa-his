@@ -87,6 +87,19 @@ public interface ClinicalPathStageDetailItemDAO {
   int deleteClinicalPathStageDetailItemDTOById(ClinicalPathStageDetailItemDTO clinicalPathStageDetailItemDTO);
 
   /**
+  * @Menthod getMaxGroupNo
+  * @Desrciption 获取改阶段项目下绑定医嘱最大组号
+  *
+  * @Param
+  * [clinicalPathStageDetailItemDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/9/23 20:05
+  * @Return int
+  **/
+  int getMaxGroupNo(ClinicalPathStageDetailItemDTO clinicalPathStageDetailItemDTO);
+
+  /**
   * @Menthod quertAllItem
   * @Desrciption 查询所有项目（药品，材料，医嘱项目）
   *

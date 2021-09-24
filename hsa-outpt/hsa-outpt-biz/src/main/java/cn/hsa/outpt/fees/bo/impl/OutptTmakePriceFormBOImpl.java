@@ -972,7 +972,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 List<OutinInvoiceDTO> outinInvoiceDTOS = outinInvoiceService.updateForOutinInvoiceQuery(map).getData();
                 if (outinInvoiceDTOS == null || outinInvoiceDTOS.size() != 1) {
                     //没有发票信息
-                    return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    //return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    throw new AppException("当前没有可用发票，请领取发票或取消使用发票再结算");
                 }
                 outinInvoiceDTO = outinInvoiceDTOS.get(0);
             }

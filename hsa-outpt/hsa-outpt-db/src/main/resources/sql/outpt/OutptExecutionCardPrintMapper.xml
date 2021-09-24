@@ -21,7 +21,7 @@
         d.crte_time as crteTime,
         b.content,
         b.item_name as itemName,
-        b.speed_code as speeCdode,
+        b.speed_code as speedCode,
         b.exec_name as execName,
         b.dosage,
         b.dosage_unit_code as dosageUnitCode,

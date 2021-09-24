@@ -3,6 +3,7 @@ package cn.hsa.module.insure.outpt.dao;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReckonDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
+import cn.hsa.module.insure.outpt.entity.InsureReckonDO;
 
 import java.util.List;
 import java.util.Map;
@@ -60,4 +61,18 @@ public interface InsureReckonDAO {
      * @Return
      **/
     int deleteInsureReckon(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 医药机构清算申请 - 获取清算机构
+     *
+     * @param insureReckonDTO
+     * @Method getInsureClrOptinsByRegCode
+     * @Desrciption
+     * @Author liaojiguang
+     * @Date 2021/9/9 17:31
+     * @Return
+     **/
+    List<String> getInsureClrOptinsByRegCode(InsureReckonDTO insureReckonDTO);
+
+    InsureReckonDO getInsureUnifiedReckonById(InsureReckonDTO insureReckonDTO);
 }

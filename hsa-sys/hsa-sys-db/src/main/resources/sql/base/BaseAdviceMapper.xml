@@ -375,7 +375,7 @@
     <!--合管条码打印查询合并-->
     <select id="queryPtPipePrintPage" resultType="java.util.Map">
         select * from  (select ma.merge_id,max(ov.dept_name ) dept_name,max(ov.visit_no ) visit_no,max( ba.container_code ) container_code,
-        max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,
+        max( ba.specimen_code ) specimen_code, 	GROUP_CONCAT( DISTINCT opd.content SEPARATOR ',' ) content, max( ma.document_sta ) document_sta,max(ma.apply_no ) apply_no,
         max( ov.NAME ) `name`,max( ov.gender_code ) gender_code,
         max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
         max(ma.bar_code ) bar_code,
@@ -436,7 +436,7 @@
         max(iv.in_no) AS visit_no,
         max(ba.container_code) container_code,
         max(ba.specimen_code) specimen_code,
-        GROUP_CONCAT(ia.content separator ',') content,
+        GROUP_CONCAT(DISTINCT ia.content separator ',') content,
         max(ma.document_sta) document_sta,
         max(ma.apply_no) apply_no,
         max(iv.name) name,

@@ -412,7 +412,7 @@
 
     <!-- 护士站补记账获取药房信息 -->
     <select id="getPharInfo" resultMap="BaseDeptMap">
-        select distinct a.*,c.name as pharName,c.id as pharId
+        select a.*,c.name as pharName,c.id as pharId
         from  base_dept a ,
         base_dept_drugstore  b ,
         base_dept c ,
@@ -425,10 +425,12 @@
         WHERE
         help_topic_id &lt; LENGTH(b.drugstore_code)-LENGTH(REPLACE(b.drugstore_code,',',''))+1 )
           and b.hosp_code = d.hosp_code and  c_code ='YFLB' and b.type_code = d.`value`
+          and b.type_code = '4'
           and a.id = #{loginDeptId}
           and a.is_valid = #{isValid}
           and a.hosp_code = #{hospCode}
     </select>
+
     <select id="getDeptTypeIdentity" resultMap="BaseDeptMap">
       select c.id, c.name , c.hosp_code,c.type_code,c.type_identity,c.code,c.up_dept_code
           from base_dept a

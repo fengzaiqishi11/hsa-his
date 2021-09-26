@@ -3,6 +3,7 @@ package cn.hsa.stro.stock.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dao.StroStockDao;
@@ -1541,6 +1542,104 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             list = stroStockDao.queryAlldrug(stroStockDTO);
         } else if (!cn.hsa.util.StringUtils.isEmpty(stroStockDTO.getTypeIdentity()) && ListUtils.isEmpty(stroStockDTO.getTypes())) {
             list = stroStockDao.queryAllmaterial(stroStockDTO);
+        }
+        // 返回分页结果
+        return PageDTO.of(list);
+    }
+    /**
+     * @Meth: queryAllStockPage
+     * @Description: 查询全院库存
+     * @Param: [stroStockDTO]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @Override
+    public PageDTO queryAllStockPage(StroStockDTO stroStockDTO) {
+        List<StroStockDTO> list = new ArrayList<>();
+        PageHelper.startPage(stroStockDTO.getPageNo(), stroStockDTO.getPageSize());
+        // 通过选择的科室id 查询科室类别
+        //根据科室类别区分是中药还是西药还是材料
+        List<String> types = new ArrayList<>();
+        String bizId = stroStockDTO.getBizId();
+        if (StringUtils.isEmpty(bizId) || "all".equals(bizId)) {// 选择的库房或者药房为空，那么查询全院的库存
+            stroStockDTO.setBizId("");
+            types = Arrays.asList("1","2","0");
+            stroStockDTO.setTypes(types);
+            if ("0".equals(stroStockDTO.getResultType())) { // 材料
+                list = stroStockDao.queryAllmaterial(stroStockDTO);
+            } else if ("1".equals(stroStockDTO.getResultType())){ // 查询药品
+                list = stroStockDao.queryAlldrug(stroStockDTO);
+            } else { // 查询材料、药品
+                list = stroStockDao.queryAll(stroStockDTO);
+            }
+        } else {
+            String loginTypeIdentity =  stroStockDao.getTypeIdentityByBizId(stroStockDTO.getBizId(),stroStockDTO.getHospCode());
+            if (StringUtils.isEmpty(loginTypeIdentity)){
+                throw new AppException("药房药库类别标识为空");
+            }
+            for (String loginType : loginTypeIdentity.split(",")) {
+                if (loginType.equals("2") || loginType.equals("4")) {//中成药
+                    types.add("1");
+                } else if (loginType.equals("3")) {//中草药
+                    types.add("2");
+                } else if (loginType.equals("1")) {//西药
+                    types.add("0");
+                } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
+                    stroStockDTO.setTypeIdentity("5");
+                } else {
+                    throw new AppException("没有该药房药库类别标识");
+                }
+            }
+            stroStockDTO.setTypes(types);
+            if (!ListUtils.isEmpty(stroStockDTO.getTypes())) {
+                list = stroStockDao.queryAlldrug(stroStockDTO);
+            } else if (ListUtils.isEmpty(stroStockDTO.getTypes())) {
+                list = stroStockDao.queryAllmaterial(stroStockDTO);
+            }
+        }
+        // 返回分页结果
+        return PageDTO.of(list);
+    }
+    /**
+     * @Meth: queryAllStockDetails
+     * @Description: 查询全部库存明细
+     * @Param: [stroStockDetail]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @Override
+    public PageDTO queryAllStockDetails(StroStockDetailDTO stroStockDetail) {
+        List<StroStockDetailDTO> list = new ArrayList<>();
+        PageHelper.startPage(stroStockDetail.getPageNo(), stroStockDetail.getPageSize());
+        // 通过选择的科室id 查询科室类别
+        //根据科室类别区分是中药还是西药还是材料
+        String loginTypeIdentity = stroStockDao.getTypeIdentityByBizId(stroStockDetail.getBizId(), stroStockDetail.getHospCode());
+        stroStockDetail.setLoginTypeIdentity(loginTypeIdentity);
+        if (!StringUtils.isEmpty(loginTypeIdentity)) {
+            List<String> types = new ArrayList<>();
+            for (String loginType : loginTypeIdentity.split(",")) {
+                if (loginType.equals("2")) {//中成药
+                    types.add("1");
+                } else if (loginType.equals("3")) {//中草药
+                    types.add("2");
+                } else if (loginType.equals("1")) {//西药
+                    types.add("0");
+                } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
+                    stroStockDetail.setTypeIdentity("5");
+                }
+            }
+            stroStockDetail.setTypes(types);
+        }
+        if (StringUtils.isEmpty(stroStockDetail.getLoginTypeIdentity())) {
+            list = stroStockDetailDao.queryAll(stroStockDetail);
+        } else if (!cn.hsa.util.StringUtils.isEmpty(stroStockDetail.getTypeIdentity()) && !ListUtils.isEmpty(stroStockDetail.getTypes())) {
+            list = stroStockDetailDao.queryAll(stroStockDetail);
+        } else if (cn.hsa.util.StringUtils.isEmpty(stroStockDetail.getTypeIdentity()) && !ListUtils.isEmpty(stroStockDetail.getTypes())) {
+            list = stroStockDetailDao.queryAllDrug(stroStockDetail);
+        } else if (!cn.hsa.util.StringUtils.isEmpty(stroStockDetail.getTypeIdentity()) && ListUtils.isEmpty(stroStockDetail.getTypes())) {
+            list = stroStockDetailDao.queryAllMaterial(stroStockDetail);
         }
         // 返回分页结果
         return PageDTO.of(list);

@@ -3023,6 +3023,7 @@
     <select id="queryStroReportAdjustPrice" resultType="java.util.Map">
         select
         a.order_no,
+        a.batch_no as batchNo,
         a.crte_time,
         a.crte_name as checkName,
         (select b.crte_name from stro_adjust b where a.order_no = b.order_no and b.hosp_code = #{hospCode}) as crteName,

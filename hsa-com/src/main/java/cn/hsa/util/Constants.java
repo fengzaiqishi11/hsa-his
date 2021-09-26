@@ -193,6 +193,7 @@ public interface Constants {
         public static final String LCLJXM ="121";//临床路径项目
         public static final String LCLJJDMS ="122";//临床路径阶段描述
         public static final String LCJDMX = "120";//临床路径阶段明细
+        public static final String YBJSQD = "130";// 医保结算清单
 
     }
 

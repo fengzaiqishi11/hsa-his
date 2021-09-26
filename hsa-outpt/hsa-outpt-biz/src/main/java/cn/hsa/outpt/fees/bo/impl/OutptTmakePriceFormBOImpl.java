@@ -816,6 +816,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             unifiedPayMap.put("realityPrice", realityPrice);
             unifiedPayMap.put("hospCode", outptVisitDTO.getHospCode());
             unifiedPayMap.put("crteId", outptVisitDTO.getCrteId());
+            unifiedPayMap.put("code", outptVisitDTO.getCode());
             unifiedPayMap.put("crteName", outptVisitDTO.getCrteName());
             try {
                 Map<String, Object> stringObjectMap = updateFeeSubmit(unifiedPayMap);
@@ -1510,6 +1511,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostUploadAndTrialParam.put("settleId", settleId);//门诊结算id
         outptCostUploadAndTrialParam.put("outptVisitDTO",outptVisitDTO);
         outptCostUploadAndTrialParam.put("crteId", userId);//创建人id
+        outptCostUploadAndTrialParam.put("code", outptVisitDTO.getCode());//创建人id
         outptCostUploadAndTrialParam.put("crteName", userName);//创建人姓名
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
         outptCostUploadAndTrialParam.put("action", "settle");//操作 = 结算操作

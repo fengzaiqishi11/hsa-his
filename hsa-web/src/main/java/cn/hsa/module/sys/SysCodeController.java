@@ -10,6 +10,7 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,9 @@ public class SysCodeController extends BaseController {
 
     @Resource
     private SysCodeService sysCodeService_consumer;
+    /** redis缓存操作 **/
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * @Method: getByCode
@@ -53,6 +57,15 @@ public class SysCodeController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("code", code==null?"":code);
         return sysCodeService_consumer.getByCode(map);
+    }
+
+    @GetMapping("/getCodeDetailByCodeCache")
+    public WrapperResponse<Map<String, List<SysCodeSelectDTO>>> getCodeDetailByCodeCache(String code, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("code", code==null?"":code);
+        return sysCodeService_consumer.getCodeDetailsByCodeCache(map);
     }
     
     /**

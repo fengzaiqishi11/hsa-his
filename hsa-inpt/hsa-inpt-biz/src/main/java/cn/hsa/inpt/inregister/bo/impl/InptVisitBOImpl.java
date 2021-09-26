@@ -472,24 +472,34 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
         List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
-        List<Map<String, Object>> finalResult = new ArrayList<>();
+//        List<Map<String, Object>> finalResult = new ArrayList<>();
         if (!ListUtils.isEmpty(inptVisitDTOS)) {
             List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
             List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
-            finalResult = inptVisitDTOS.stream().map(data -> {
-                patientCostDataList.stream().map(costsData ->{
-                    if(data.get("id").equals(costsData.get("visit_id")))
-                    {
-                        data.put("ypfy",costsData.get("item_price"));
-                        data.put("total_price",costsData.get("total_price"));
-                        data.put("fyb",costsData.get("fyb"));
+//            finalResult = inptVisitDTOS.stream().map(data -> {
+//                patientCostDataList.stream().map(costsData ->{
+//                    if(data.get("id").equals(costsData.get("visit_id")))
+//                    {
+//                        data.put("ypfy",costsData.get("item_price"));
+//                        data.put("total_price",costsData.get("total_price"));
+//                        data.put("fyb",costsData.get("fyb"));
+//                    }
+//                    return costsData;
+//                });
+//                return data;
+//            }).collect(Collectors.toList());
+            outer: for (Map<String, Object> map : inptVisitDTOS) {
+                for (Map<String, Object> map2 : patientCostDataList) {
+                    if (map.get("id").equals(map2.get("visit_id"))) {
+                        map.put("ypfy",map2.get("item_price"));
+                        map.put("total_price",map2.get("total_price"));
+                        map.put("fyb",map2.get("fyb"));
+                        continue outer;
                     }
-                    return costsData;
-                });
-                return data;
-            }).collect(Collectors.toList());
+                }
+            }
         }
-        return PageDTO.of(finalResult);
+        return PageDTO.of(inptVisitDTOS);
     }
 
     /**

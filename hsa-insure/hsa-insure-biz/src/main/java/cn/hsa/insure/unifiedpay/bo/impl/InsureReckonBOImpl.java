@@ -399,11 +399,15 @@ public class InsureReckonBOImpl extends HsafBO implements InsureReckonBO {
     @Override
     public PageDTO queryInsureAppropriationList(InsureReckonDTO insureReckonDTO) {
         String hospCode = insureReckonDTO.getHospCode();
-        String fixmedinsCode = insureReckonDTO.getFixmedinsCode();
         String insureRegCode = insureReckonDTO.getInsureRegCode();
 
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
         Map<String,Object> dataMap = new HashMap<>();
-        dataMap.put("fixmedinsCode",fixmedinsCode);	 // 医疗机构编码
+        dataMap.put("fixmedinsCode",insureConfigurationDTO.getOrgCode());	 // 医疗机构编码
         dataMap.put("pageNum",insureReckonDTO.getPageNo()); // 页码
         dataMap.put("pageSize",insureReckonDTO.getPageSize()); // 每页条数
         dataMap.put("clrOptins",insureReckonDTO.getClrOptins()); // 清算中心

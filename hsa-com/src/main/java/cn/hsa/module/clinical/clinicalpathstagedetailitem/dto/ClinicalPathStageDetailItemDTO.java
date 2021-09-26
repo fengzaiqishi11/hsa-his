@@ -24,6 +24,7 @@ import java.util.List;
 @ToString
 public class ClinicalPathStageDetailItemDTO extends ClinicalPathStageDetailItemDO implements Serializable {
   private static final long serialVersionUID = 4652859477510050483L;
+  private String type;
   private List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS;
   private List<String> ids;
 }

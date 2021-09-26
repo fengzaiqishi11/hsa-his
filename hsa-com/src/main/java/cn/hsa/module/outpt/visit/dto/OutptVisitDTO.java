@@ -242,4 +242,6 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private List<String> opIds;
 
     private String opIdList;
+
+    private String isUseAccount;
 }

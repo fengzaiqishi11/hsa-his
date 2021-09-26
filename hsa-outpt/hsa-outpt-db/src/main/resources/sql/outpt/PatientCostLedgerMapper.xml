@@ -235,8 +235,8 @@
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         c.mi_price as miPrice,
-        case when ib.id is null then (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
-        else (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
+        case when ib.id is null then (case when DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
+        else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
         b.*
         from inpt_visit a
         left join (
@@ -282,6 +282,12 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and d.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and d.patient_code = #{patientCode}
+        </if>
         <if test="keyword != null and keyword != ''">
             and d.name like concat('%', #{keyword}, '%')
         </if>
@@ -325,6 +331,12 @@
             or a.jz_doctor_name like concat('%', #{doctorName}, '%')
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and a.name like concat('%', #{keyword}, '%')

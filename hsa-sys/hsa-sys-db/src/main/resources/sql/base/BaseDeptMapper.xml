@@ -449,7 +449,7 @@
           and a.is_valid = #{isValid}
           and a.hosp_code = #{hospCode}
     </select>
-
+    
     <select id="getDeptTypeIdentity" resultMap="BaseDeptMap">
       select c.id, c.name , c.hosp_code,c.type_code,c.type_identity,c.code,c.up_dept_code
           from base_dept a

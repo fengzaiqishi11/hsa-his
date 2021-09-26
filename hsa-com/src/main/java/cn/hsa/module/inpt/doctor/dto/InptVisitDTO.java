@@ -393,4 +393,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 费用条数
     private BigDecimal costNumbers;
+
+    // 医生类型
+    private String doctorType;
+
+    // 婴儿费用
+    private BigDecimal babyCost;
 }

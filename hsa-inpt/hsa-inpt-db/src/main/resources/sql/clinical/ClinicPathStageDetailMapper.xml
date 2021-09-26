@@ -20,6 +20,8 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
+        <result property="describe" column="describe" jdbcType="VARCHAR"/>
+        <result property="listName" column="listName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -42,9 +44,11 @@
     <select id="queryAllClinicPathStageDetail" resultMap="ClinicPathStageDetailMap">
         select
           a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
-      a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName
+        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName
         from clinical_path_stage_detail a
         join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
+        join clinical_path_stage c on c.id = a.stage_id and a.hosp_code = b.hosp_code
+        join clinical_path_list l on l.id = a.list_id
         where a.hosp_code = #{hospCode}
             <if test="id != null and id != ''">
                 and a.id = #{id}
@@ -81,15 +85,6 @@
             </if>
             <if test="isOperationDay != null and isOperationDay != ''">
                 and a.is_operation_day = #{isOperationDay}
-            </if>
-            <if test="crteId != null and crteId != ''">
-                and a.crte_id = #{crteId}
-            </if>
-            <if test="crteName != null and crteName != ''">
-                and a.crte_name = #{crteName}
-            </if>
-            <if test="crteTime != null">
-                and a.crte_time = #{crteTime}
             </if>
             order by a.sort_no
     </select>

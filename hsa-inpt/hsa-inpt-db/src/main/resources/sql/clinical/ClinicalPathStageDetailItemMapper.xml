@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathstagedetailitem.dao.ClinicalPathStageDetailItemDAO">
+
+    <resultMap type="cn.hsa.module.clinical.clinicalpathstagedetailitem.dto.ClinicalPathStageDetailItemDTO" id="ClinicalPathStageDetailItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="listId" column="list_id" jdbcType="VARCHAR"/>
+        <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
+        <result property="detailId" column="detail_id" jdbcType="VARCHAR"/>
+        <result property="isMust" column="is_must" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
+        <result property="groupSeqNo" column="group_seq_no" jdbcType="INTEGER"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
+        <result property="startExecNum" column="start_exec_num" jdbcType="INTEGER"/>
+        <result property="endExecNum" column="end_exec_num" jdbcType="INTEGER"/>
+        <result property="bfcId" column="bfc_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="prepCode" column="prep_code" jdbcType="VARCHAR"/>
+        <result property="dosage" column="dosage" jdbcType="NUMERIC"/>
+        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+        <result property="rateId" column="rate_id" jdbcType="VARCHAR"/>
+        <result property="speedCode" column="speed_code" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="totalNum" column="total_num" jdbcType="NUMERIC"/>
+        <result property="totalNumUnitCode" column="total_num_unit_code" jdbcType="VARCHAR"/>
+        <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+        <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+        <result property="herbNoteCode" column="herb_note_code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="herbUseCode" column="herb_use_code" jdbcType="VARCHAR"/>
+        <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
+        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getClinicalPathStageDetailItemDTOById" resultMap="ClinicalPathStageDetailItemMap">
+        select
+          id, hosp_code, list_id, stage_id, detail_id, is_must, is_valid, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time
+        from clinical_path_stage_detail_item
+        where id = #{id} and hosp_code =#{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryClinicalPathStageDetailItemDTOAll" resultMap="ClinicalPathStageDetailItemMap">
+        select
+          a.id, a.hosp_code, a.list_id, a.stage_id, a.detail_id, a.is_must, a.is_valid, a.group_no, a.group_seq_no, a.type_code,
+          a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code,
+          a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price,
+          a.total_num, a.total_num_unit_code, a.herb_num, a.exec_dept_id, a.use_days, a.use_code, a.is_skin, a.herb_note_code,
+          a.remark, a.herb_use_code, a.is_give, a.is_long, a.crte_id, a.crte_name, a.crte_time,
+          case when a.item_code = '4' then (
+          case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
+          ) when a.item_code = '1' then (
+          case when c.big_type_code = '2' then  '3' else '1' end
+          ) when a.item_code = '2' then '2' end type
+          from clinical_path_stage_detail_item a
+          left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+          left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
+          left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
+          where a.hosp_code = #{hospCode}
+            <if test="listId != null and listId != ''">
+                and a.list_id = #{listId}
+            </if>
+            <if test="stageId != null and stageId != ''">
+                and a.stage_id = #{stageId}
+            </if>
+            <if test="detailId != null and detailId != ''">
+                and a.detail_id = #{detailId}
+            </if>
+            <if test="isMust != null and isMust != ''">
+                and a.is_must = #{isMust}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and a.is_valid = #{isValid}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and a.type_code = #{typeCode}
+            </if>
+            <if test="signCode != null and signCode != ''">
+                and a.sign_code = #{signCode}
+            </if>
+            <if test="startExecNum != null">
+                and a.start_exec_num = #{startExecNum}
+            </if>
+            <if test="endExecNum != null">
+                and a.end_exec_num = #{endExecNum}
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                and a.bfc_id = #{bfcId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and a.item_code = #{itemCode}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemName != null and itemName != ''">
+                and a.item_name = #{itemName}
+            </if>
+            <if test="spec != null and spec != ''">
+                and a.spec = #{spec}
+            </if>
+            <if test="prepCode != null and prepCode != ''">
+                and a.prep_code = #{prepCode}
+            </if>
+            <if test="execDeptId != null and execDeptId != ''">
+                and a.exec_dept_id = #{execDeptId}
+            </if>
+            <if test="useDays != null">
+                and a.use_days = #{useDays}
+            </if>
+            <if test="useCode != null and useCode != ''">
+                and a.use_code = #{useCode}
+            </if>
+            <if test="isSkin != null and isSkin != ''">
+                and a.is_skin = #{isSkin}
+            </if>
+            <if test="herbNoteCode != null and herbNoteCode != ''">
+                and a.herb_note_code = #{herbNoteCode}
+            </if>
+            <if test="herbUseCode != null and herbUseCode != ''">
+                and a.herb_use_code = #{herbUseCode}
+            </if>
+            <if test="isGive != null and isGive != ''">
+                and a.is_give = #{isGive}
+            </if>
+            <if test="isLong != null and isLong != ''">
+                and a.is_long = #{isLong}
+            </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertClinicalPathStageDetailItemDTO" keyProperty="id" useGeneratedKeys="true">
+        insert into clinical_path_stage_detail_item(id,hosp_code, list_id, stage_id, detail_id, is_must, is_valid,
+         group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id,
+         item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code,
+         price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin,
+          herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+          (#{item.id},#{item.hospCode}, #{item.listId}, #{item.stageId}, #{item.detailId}, #{item.isMust},
+          #{item.isValid}, #{item.groupNo}, #{item.groupSeqNo}, #{item.typeCode}, #{item.signCode},
+          #{item.startExecNum}, #{item.endExecNum}, #{item.bfcId}, #{item.itemCode}, #{item.itemId},
+          #{item.itemName}, #{item.spec}, #{item.prepCode}, #{item.dosage}, #{item.dosageUnitCode},
+          #{item.usageCode}, #{item.rateId}, #{item.speedCode}, #{item.num}, #{item.unitCode}, #{item.price},
+          #{item.totalPrice}, #{item.totalNum}, #{item.totalNumUnitCode}, #{item.herbNum}, #{item.execDeptId},
+          #{item.useDays}, #{item.useCode}, #{item.isSkin}, #{item.herbNoteCode}, #{item.remark},
+          #{item.herbUseCode}, #{item.isGive}, #{item.isLong}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateClinicalPathStageDetailItemDTO">
+      <foreach collection="list" item="item" separator=";">
+        update clinical_path_stage_detail_item
+        <set>
+          <if test="item.listId != null">
+            list_id = #{item.listId},
+          </if>
+          <if test="item.stageId != null">
+            stage_id = #{item.stageId},
+          </if>
+          <if test="item.detailId != null">
+            detail_id = #{item.detailId},
+          </if>
+          <if test="item.isMust != null">
+            is_must = #{item.isMust},
+          </if>
+          <if test="item.isValid != null">
+            is_valid = #{item.isValid},
+          </if>
+          <if test="item.groupNo != null">
+            group_no = #{item.groupNo},
+          </if>
+          <if test="item.groupSeqNo != null">
+            group_seq_no = #{item.groupSeqNo},
+          </if>
+          <if test="item.typeCode != null">
+            type_code = #{item.typeCode},
+          </if>
+          <if test="item.signCode != null">
+            sign_code = #{item.signCode},
+          </if>
+          <if test="item.startExecNum != null">
+            start_exec_num = #{item.startExecNum},
+          </if>
+          <if test="item.endExecNum != null">
+            end_exec_num = #{item.endExecNum},
+          </if>
+          <if test="item.bfcId != null">
+            bfc_id = #{item.bfcId},
+          </if>
+          <if test="item.itemCode != null">
+            item_code = #{item.itemCode},
+          </if>
+          <if test="item.itemId != null">
+            item_id = #{item.itemId},
+          </if>
+          <if test="item.itemName != null">
+            item_name = #{item.itemName},
+          </if>
+          <if test="item.spec != null">
+            spec = #{item.spec},
+          </if>
+          <if test="item.prepCode != null">
+            prep_code = #{item.prepCode},
+          </if>
+          <if test="item.dosage != null">
+            dosage = #{item.dosage},
+          </if>
+          <if test="item.dosageUnitCode != null">
+            dosage_unit_code = #{item.dosageUnitCode},
+          </if>
+          <if test="item.usageCode != null">
+            usage_code = #{item.usageCode},
+          </if>
+          <if test="item.rateId != null">
+            rate_id = #{item.rateId},
+          </if>
+          <if test="item.speedCode != null">
+            speed_code = #{item.speedCode},
+          </if>
+          <if test="item.num != null">
+            num = #{item.num},
+          </if>
+          <if test="item.unitCode != null">
+            unit_code = #{item.unitCode},
+          </if>
+          <if test="item.price != null">
+            price = #{item.price},
+          </if>
+          <if test="item.totalPrice != null">
+            total_price = #{item.totalPrice},
+          </if>
+          <if test="item.totalNum != null">
+            total_num = #{item.totalNum},
+          </if>
+          <if test="item.totalNumUnitCode != null">
+            total_num_unit_code = #{item.totalNumUnitCode},
+          </if>
+          <if test="item.herbNum != null">
+            herb_num = #{item.herbNum},
+          </if>
+          <if test="item.execDeptId != null">
+            exec_dept_id = #{item.execDeptId},
+          </if>
+          <if test="item.useDays != null">
+            use_days = #{item.useDays},
+          </if>
+          <if test="item.useCode != null">
+            use_code = #{item.useCode},
+          </if>
+          <if test="item.isSkin != null">
+            is_skin = #{item.isSkin},
+          </if>
+          <if test="item.herbNoteCode != null">
+            herb_note_code = #{item.herbNoteCode},
+          </if>
+          <if test="item.remark != null">
+            remark = #{item.remark},
+          </if>
+          <if test="item.herbUseCode != null">
+            herb_use_code = #{item.herbUseCode},
+          </if>
+          <if test="item.isGive != null">
+            is_give = #{item.isGive},
+          </if>
+          <if test="item.isLong != null">
+            is_long = #{item.isLong},
+          </if>
+        </set>
+        where id = #{item.id} and hosp_code = #{item.hospCode}
+      </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteClinicalPathStageDetailItemDTOById">
+        delete from clinical_path_stage_detail_item
+        where hosp_code = #{hospCode} and list_id = #{listId} and stage_id = #{stageId}
+        and detail_id = #{detailId} and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+    </delete>
+
+  <!--  获取最大组号 -->
+   <select id="getMaxGroupNo" resultType="java.lang.Integer">
+        select ifnull(max(ifnull(group_no,0)),0) groupNo from clinical_path_stage_detail_item a where list_id = #{listId} and a.hosp_code = #{hospCode}
+        and stage_id = #{stageId} and detail_id = #{detailId}
+   </select>
+
+    <!--查询所有项目-->
+    <select id="quertAllItem" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+      select a.*
+      from (
+      select a.id, a.hosp_code, a.bfc_code, a.code, a.good_name,a.usual_name as bName, a.spec, a.prep_code, a.dosage,
+      a.dosage_unit_code, a.unit_code, a.rate_code,
+      case when a.in_unit_code = a.unit_code then a.price when a.in_unit_code = a.split_unit_code then a.split_price end price,
+      a.split_ratio, a.split_unit_code,
+      a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code,
+      <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
+      case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
+      a.antibacterial_code, a.is_skin,
+      a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
+      case when a.big_type_code = '2' then  '3' else '1' end type, '1' itemCode,
+      ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
+      <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
+      '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
+      a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, '0' isWz,
+      a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code
+      from base_drug a
+      left join base_rate c on a.rate_code = c.code and a.hosp_code = c.hosp_code
+      left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+      left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
+      left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+      <if test="operType == '1'.toString() ">
+        left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+      </if>
+      <if test="operType == '2'.toString() ">
+        left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+      </if>
+      where a.hosp_code = #{hospCode}
+      <if test="yzmlType != null and yzmlType != ''" >
+        and  '2' = #{yzmlType}
+      </if>
+      and (
+      ((#{operType} = '1' and ifnull(a.is_out,'1') = '1' and (a.out_unit_code = a.unit_code or a.out_unit_code = a.split_unit_code or ifnull(a.out_unit_code,'')='') )
+      or (#{operType} = '2' and ifnull(a.is_in,'1') = '1' and (a.in_unit_code = a.unit_code or a.in_unit_code = a.split_unit_code or ifnull(a.in_unit_code,'')='')))
+      <if test="visitId != null and visitId != ''">
+        and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+        (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9') or a.gender_code = '' or visit.gender_code = '')
+      </if>
+      )
+      and a.is_valid = '1'
+      union all
+
+      select a.id, a.hosp_code, a.bfc_code, a.code, a.name good_name,a.other_name as bName, a.spec, null prep_code, null dosage,
+      null dosage_unit_code, a.unit_code,null rate_code,a.split_price price, '1' split_ratio, a.split_unit_code
+      split_unit_code,
+      a.split_price split_price, null is_lvp,null usage_code, null ddd, null durg_code, '1' ph_code,null
+      antibacterial_code, null is_skin,
+      null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code, '2' type, '2' itemCode,
+      null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
+      a.split_unit_code ouUtnitCode,
+      a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
+      drugRemark, '' drugImgPath,
+      f.name prodName, '0' isWz, a.name usual_name,a.wbm usual_wbm,
+      a.pym usual_pym ,'' as technology_code
+      from base_material a
+      left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+      left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+      where a.hosp_code = #{hospCode} and a.is_valid = '1'
+      <if test="yzmlType != null and yzmlType != ''" >
+        and  '3' = #{yzmlType}
+      </if>
+      union all
+
+      select a.id, a.hosp_code, null bfc_code, a.code, a.name good_name,a.other_name as bName, null spec, null prep_code, null dosage,
+      null dosage_unit_code, a.unit_code, null rate_code, a.price,'1' split_ratio, a.unit_code split_unit_code,
+      a.price split_price, null is_lvp, null usage_code, null ddd, null durg_code,'1' ph_code,null
+      antibacterial_code,null is_skin,
+      null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,
+      case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type, '4' itemCode,
+      '' rateId, '' bfcId, b.id execDeptId,
+      a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
+      a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
+      '' prodName, case when e.id is null then '0' else '1' end isWz, a.name
+      usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code
+      from base_advice a
+      left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+      left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+      left join sys_parameter e on e.code = 'WZYZ_YZCODE' and a.code = e.value and a.hosp_code = e.hosp_code and e.is_valid = '1'
+      <if test="operType == '1'.toString() ">
+        left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+      </if>
+      <if test="operType == '2'.toString() ">
+        left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+      </if>
+      left join base_dept f on f.id = #{loginDeptId} and a.hosp_code = f.hosp_code
+      where a.hosp_code = #{hospCode}
+      <if test="yzmlType != null and yzmlType != '' and yzmlType == '1'.toString()" >
+        and  '1' = #{yzmlType}
+      </if>
+      <if test="yzmlType != null and yzmlType != '' and yzmlType == '4'.toString()" >
+        and  e.id is not null
+      </if>
+      <if test="yzmlType != null and yzmlType != '' and yzmlType != '1'.toString() and yzmlType != '4'.toString()" >
+        and  '1' = #{yzmlType}
+      </if>
+      and (FIND_IN_SET(f.code ,a.dept_code) or ifnull(a.dept_code,'') = '') and a.is_valid = '1' and (
+      (#{operType} = a.use_scope_code or ifnull(a.use_scope_code,'0') = '0')
+      <if test="visitId != null and visitId != ''">
+        and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+        (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9')
+        or ifnull(visit.gender_code,'0') = '' or ifnull(a.gender_code,'0') = '')
+      </if>
+      )
+      )a
+      where 1=1
+      <if test="keyword != null and keyword != ''">
+        and (
+        a.good_pym like concat('%',#{keyword},'%') or a.good_wbm like concat('%',#{keyword},'%') or a.good_name like concat('%',#{keyword},'%') or
+        a.usual_name like concat('%',#{keyword},'%') or a.usual_pym like concat('%',#{keyword},'%') or a.usual_wbm like concat('%',#{keyword},'%')
+        or a.bName like concat('%',#{keyword},'%')
+        )
+      </if>
+    </select>
+
+</mapper>

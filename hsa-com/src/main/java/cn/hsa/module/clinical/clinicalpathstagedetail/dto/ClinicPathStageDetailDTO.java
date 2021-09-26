@@ -28,4 +28,6 @@ public class ClinicPathStageDetailDTO extends ClinicPathStageDetailDO implements
   private String itemName;
   private List<String> ids;
   private String flag;
+  private String describe;
+  private String listName;
 }

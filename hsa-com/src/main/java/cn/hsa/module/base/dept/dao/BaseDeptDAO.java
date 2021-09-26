@@ -149,6 +149,10 @@ public interface BaseDeptDAO {
     **/
     List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO);
 
+    /** 手术室补记账获取发药药房信息  **/
+    List<BaseDeptDTO> getPharInfoOfOperDept(BaseDeptDTO baseDeptDTO);
+
+
     List<BaseDeptDTO> getDeptTypeIdentity(BaseDeptDTO baseDeptDTO);
 
     /**

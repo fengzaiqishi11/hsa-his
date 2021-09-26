@@ -198,4 +198,7 @@ public class OutinInvoiceDTO extends OutinInvoiceDO implements Serializable {
 	private String genderCode;
 	private String age;
 	private String ageUnitCode;
+
+	// 个人账户支付
+	private BigDecimal personalPrice;
 }

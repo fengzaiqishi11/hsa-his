@@ -156,7 +156,7 @@ public class LoginController extends BaseController {
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("baseDeptDTO", baseDeptDTO);
-        BaseDeptDTO baseDeptDto = getData(baseDeptService.getById(map));
+        BaseDeptDTO baseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
         sysUserDTO.setBaseDeptDTO(baseDeptDto);
         // 所属科室信息 -- add by zhongming end
         //医院级别
@@ -432,7 +432,7 @@ public class LoginController extends BaseController {
      * @Return
      **/
     @PostMapping("/setLoginDept")
-    public synchronized WrapperResponse<SysUserDTO> setLoginDept(@RequestParam(required = true) String loginDeptId, @RequestParam(required = true) String usId, @RequestParam(required = true) String systemCode, HttpServletRequest req, HttpServletResponse res) {
+    public  WrapperResponse<SysUserDTO> setLoginDept(@RequestParam(required = true) String loginDeptId, @RequestParam(required = true) String usId, @RequestParam(required = true) String systemCode, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         // 获取登录用户信息，禁止密码传输
         if (sysUserDTO != null) {
@@ -451,7 +451,7 @@ public class LoginController extends BaseController {
             Map map = new HashMap();
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("baseDeptDTO", baseDeptDTO);
-            BaseDeptDTO loginBaseDeptDto = getData(baseDeptService.getById(map));
+            BaseDeptDTO loginBaseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
             sysUserDTO.setLoginBaseDeptDTO(loginBaseDeptDto);
         }
         // 设置用户和子系统关系ID

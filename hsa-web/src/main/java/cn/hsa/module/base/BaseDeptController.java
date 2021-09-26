@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.StringUtils;
 import cn.hsa.util.UploadByExcel;
@@ -268,6 +269,19 @@ public class BaseDeptController extends BaseController {
         baseDeptDTO.setHospCode(sysUserDTO.getHospCode());
         baseDeptDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         map.put("baseDeptDTO", baseDeptDTO);
+        return this.baseDeptService_consumer.getPharInfo(map);
+    }
+    /** 获取手术补记账药房信息 **/
+    @PostMapping("/getPharInfoOfOperDept")
+    public WrapperResponse<List<BaseDeptDTO>> getPharInfoOfOperDept(@RequestBody BaseDeptDTO baseDeptDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        baseDeptDTO.setHospCode(sysUserDTO.getHospCode());
+        baseDeptDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        baseDeptDTO.setMultiPharFlag(Constants.SF.S);
+        map.put("baseDeptDTO", baseDeptDTO);
+
         return this.baseDeptService_consumer.getPharInfo(map);
     }
 

@@ -1248,9 +1248,9 @@
         a.insure_patient_id,
         a.insure_remark,
         a.total_advance,
-        (case s.id when null then a.total_cost else s.reality_price end) total_cost,
-        (case when s.settle_take_price != '0' then s.settle_take_price
-        when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
+        (case when s.id is null then a.total_cost else s.reality_price end) total_cost,
+        (case when s.settle_take_price != 0 then s.settle_take_price
+        when s.settle_back_price != 0 then s.settle_back_price else 0 end) as bu_tui_fei,
         a.total_balance,
         a.crte_id,
         a.crte_name,

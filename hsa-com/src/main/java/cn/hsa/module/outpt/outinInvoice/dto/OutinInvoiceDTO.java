@@ -201,4 +201,23 @@ public class OutinInvoiceDTO extends OutinInvoiceDO implements Serializable {
 
 	// 个人账户支付
 	private BigDecimal personalPrice;
+
+    /**
+     * 就诊日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String visitTime;
+
+    //就诊科别
+    private String deptName;
+
+    // 就诊类别  JZLB
+    private String visitCode;
+
+    // 个人编号
+    private String personalNO;
+
+    // 待遇类型名称
+    private String bka006Name;
 }

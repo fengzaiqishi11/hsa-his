@@ -890,7 +890,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
         insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
         insureIndividualSettleDO.setRetirePrice(ake026);//离休基金支付
+        insureIndividualSettleDO.setMafPay(bka821); // 医疗救助基金
         insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
+        insureIndividualSettleDO.setRestsPrice(bka839); // 其他支付
         insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
         insureIndividualSettleDO.setHospPrice(bka842);//医院支付
         insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额

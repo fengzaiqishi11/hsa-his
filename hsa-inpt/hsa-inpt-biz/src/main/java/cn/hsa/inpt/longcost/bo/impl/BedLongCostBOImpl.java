@@ -62,7 +62,8 @@ public class BedLongCostBOImpl implements BedLongCostBO {
      **/
     @Override
     public Boolean saveBedLongCost(Map map) {
-        Date endTime = DateUtils.getNow();
+        //考虑到护士站手动执行床位费,添加一个endTime参数，有结束时间取参数值，没有参数值取当前时间
+        Date endTime = MapUtils.get(map,"endTime",DateUtils.getNow());
         map.put("endTime", endTime);
         try {
             String hospCode = MapUtils.getEmptyErr(map, "hospCode", "未传入医院编码");

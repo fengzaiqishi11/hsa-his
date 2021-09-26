@@ -206,4 +206,22 @@ public interface StroStockBO {
      * @Return cn.hsa.base.PageDTO
      */
     PageDTO queryPageByOutptOrInpt(StroStockDTO stroStockDTO);
+    /**
+     * @Meth: queryAllStockPage
+     * @Description: 查询全院库存
+     * @Param: [stroStockDTO]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    PageDTO queryAllStockPage(StroStockDTO stroStockDTO);
+    /**
+     * @Meth: queryAllStockDetails
+     * @Description: 查询全部库存明细
+     * @Param: [stroStockDTO]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    PageDTO queryAllStockDetails(StroStockDetailDTO stroStockDetail);
 }

@@ -161,7 +161,7 @@ public class InptNurseThirdController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         inptNurseThirdDTO.setHospCode(sysUserDTO.getHospCode());
         if (StringUtils.isEmpty(inptNurseThirdDTO.getDeptId())) {
-            inptNurseThirdDTO.setDeptId(sysUserDTO.getBaseDeptDTO().getId());
+            inptNurseThirdDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         }
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());

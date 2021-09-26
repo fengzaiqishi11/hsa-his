@@ -1563,7 +1563,12 @@
         f.visit_no AS visitNo,
         f.gender_code as genderCode,
         '' AS outptSettleInvoiceId,
-        0 as personalPrice
+        0 as personalPrice,
+        b.settle_time as visitTime,
+        a.visit_code as visitCode,
+        a.dept_name as deptName,
+        '' as personalNO,
+        '' as bka006Name
         FROM
         outpt_register_settle b
         LEFT JOIN outpt_register a ON a.id = b.register_id
@@ -1616,7 +1621,12 @@
         c.visit_no AS visitNo,
         c.gender_code as genderCode,
         b.id AS outptSettleInvoiceId,
-        ifnull(iis.personal_price, 0) as personalPrice
+        ifnull(iis.personal_price, 0) as personalPrice,
+        c.visit_time as visitTime,
+        c.visit_code as visitCode,
+        c.dept_name as deptName,
+        ifnull(iiv.aac001, '') as personalNO,
+        ifnull(iiv.bka006_name, '') as bka006Name
         FROM
         outpt_settle_invoice b
         right JOIN outpt_settle a ON b.hosp_code = a.hosp_code AND b.visit_id = a.visit_id  and a.id = b.settle_id
@@ -1625,6 +1635,7 @@
         LEFT JOIN outin_invoice_detail d ON ( d.id = b.invoice_detail_id )
         LEFT JOIN outpt_register f ON f.id = c.register_id
         LEFT JOIN insure_individual_settle iis on a.hosp_code = iis.hosp_code and a.id = iis.settle_id
+        left join insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and c.id = iiv.visit_id
         WHERE
         1 = 1
         AND a.status_code = '0'

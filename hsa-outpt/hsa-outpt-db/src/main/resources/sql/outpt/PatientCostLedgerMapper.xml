@@ -235,8 +235,8 @@
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         c.mi_price as miPrice,
-        case when ib.id is null then (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
-        else (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
+        case when ib.id is null then (case when DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
+        else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
         b.*
         from inpt_visit a
         left join (
@@ -282,6 +282,12 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and d.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and d.patient_code = #{patientCode}
+        </if>
         <if test="keyword != null and keyword != ''">
             and d.name like concat('%', #{keyword}, '%')
         </if>
@@ -325,6 +331,12 @@
             or a.jz_doctor_name like concat('%', #{doctorName}, '%')
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and a.name like concat('%', #{keyword}, '%')
@@ -1248,9 +1260,9 @@
         a.insure_patient_id,
         a.insure_remark,
         a.total_advance,
-        (case s.id when null then a.total_cost else s.reality_price end) total_cost,
-        (case when s.settle_take_price != '0' then s.settle_take_price
-        when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
+        (case when s.id is null then a.total_cost else s.reality_price end) total_cost,
+        (case when s.settle_take_price != 0 then s.settle_take_price
+        when s.settle_back_price != 0 then s.settle_back_price else 0 end) as bu_tui_fei,
         a.total_balance,
         a.crte_id,
         a.crte_name,
@@ -3023,6 +3035,7 @@
     <select id="queryStroReportAdjustPrice" resultType="java.util.Map">
         select
         a.order_no,
+        a.batch_no as batchNo,
         a.crte_time,
         a.crte_name as checkName,
         (select b.crte_name from stro_adjust b where a.order_no = b.order_no and b.hosp_code = #{hospCode}) as crteName,

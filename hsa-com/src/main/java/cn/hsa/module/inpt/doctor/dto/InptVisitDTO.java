@@ -399,4 +399,13 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 婴儿费用
     private BigDecimal babyCost;
+
+    // 是否在路径内
+    private String isClinicalList;
+
+    // 路径状态
+    private String pathState;
+
+    // 路径名称
+    private String clinicalListName;
 }

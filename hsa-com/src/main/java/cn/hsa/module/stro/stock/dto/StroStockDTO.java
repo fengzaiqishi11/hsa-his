@@ -72,4 +72,13 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     private String isSort;
     // 是否作废  
     private String isValid;
+    /**
+     * 查看药品还是材料,0:材料 1：药品，默认全部
+     */
+    private String resultType;
+    /**
+     * 科室名称
+     */
+    private String deptName;
+
 }

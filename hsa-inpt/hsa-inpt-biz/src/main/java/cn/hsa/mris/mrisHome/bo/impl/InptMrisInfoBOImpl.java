@@ -124,7 +124,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
             return data;
         }
         data = (String) object;
-        data = data.replace("\n","").replace("null","");
+        data = data.replace("\n","").replace("null","").replace("\t","");
         return data;
     }
 }

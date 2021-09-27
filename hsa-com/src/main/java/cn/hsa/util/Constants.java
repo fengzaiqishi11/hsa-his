@@ -897,6 +897,7 @@ public interface Constants {
         public static final String SPECIALCALC ="SPECIALCALC";
         public static final String DAILYFIRSTCALC ="DAILYFIRSTCALC";
         public static final String PARAMETER ="PARAMETER";
+        /** 缓存中码表类型数据的后缀 **/
         public static final String CODEDETAIL ="CODEDETAIL";
     }
 

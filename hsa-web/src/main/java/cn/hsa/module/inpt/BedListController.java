@@ -44,6 +44,7 @@ public class BedListController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
         inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        inptVisitDTO.setCrteId(sysUserDTO.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptVisitDTO", inptVisitDTO);

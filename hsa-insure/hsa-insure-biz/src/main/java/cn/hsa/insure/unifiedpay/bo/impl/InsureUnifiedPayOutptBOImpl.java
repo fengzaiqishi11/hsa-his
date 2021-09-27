@@ -552,7 +552,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         } else {
             patientDataMap.put("chrg_bchno", batchNo); // 收费批次号
         }
-        patientDataMap.put("acct_used_flag", "1"); // TODO 个人账户使用标志
+        patientDataMap.put("acct_used_flag", outptVisitDTO.getIsUseAccount()); // TODO 个人账户使用标志
         patientDataMap.put("insutype", insureIndividualVisitDTO.getAae140()); // 险种类型
         patientDataMap.put("med_mdtrt_type", insureIndividualVisitDTO.getBka006()); //  医疗待遇类型
         patientDataMap.put("dept_code", insureIndividualVisitDTO.getVisitDrptId()); // 科室编码
@@ -751,7 +751,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("ake035", ake035);//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
         paramMap.put("ake039", ake039); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
         paramMap.put("bka801", null); //床位费超额金额
-        paramMap.put("bka821", bka821);//民政救助金支付
+        paramMap.put("bka821", outDataMap.get("maf_pay").toString());//民政救助金支付
 
         Object fulamtOwnpayAmt = outDataMap.get("fulamt_ownpay_amt");
         if (fulamtOwnpayAmt == null || "null".equals(fulamtOwnpayAmt)) {

@@ -237,7 +237,7 @@
         where hosp_code =#{hospCode}
         <if test="keyword != null and keyword != ''">
             and ( hilist_code like concat('%',#{keyword},'%') or
-            ( med_list_codg like concat('%',#{keyword},'%')
+             med_list_codg like concat('%',#{keyword},'%')
             )
         </if>
     </select>
@@ -305,10 +305,12 @@
         , begndate, enddate, aprvno, dosform, exct_cont, item_cont,
         prcunt, spec, pacspec, memo, vali_flag, rid, updt_time, crter_id, crter_name,
         crte_time, crte_optins_no, opter_id, opter_name, opt_time,
-        optins_no, poolarea_no from insure_unified_medicmatch
+        optins_no, poolarea_no from insure_unified_medicmatch where hosp_code =#{hospCode}
         <if test="keyword != null and keyword != ''">
-            and ( hilist_code like concat('%',#{keyword},'%')
-            )
+            and ( med_list_codg like concat('%',#{keyword},'%')
+                or medins_list_codg like concat('%',#{keyword},'%')
+            or medins_list_name like concat('%',#{keyword},'%'))
+
         </if>
     </select>
     <select id="queyrAllInsureNationDrug"

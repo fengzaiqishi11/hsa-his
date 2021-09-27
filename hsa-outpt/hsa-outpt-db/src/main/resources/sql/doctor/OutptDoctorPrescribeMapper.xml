@@ -1544,7 +1544,8 @@
     <!--根据处方模板id查询出处方模板明细-->
     <select id="queryOutptPrescribeTempDetails" resultMap="OutptPrescribeTempDetailMap" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
         select
-          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id, a.item_name,
+          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id,
+          case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name else a.item_name end item_name,
           case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage,
           a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.total_num,
         case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price

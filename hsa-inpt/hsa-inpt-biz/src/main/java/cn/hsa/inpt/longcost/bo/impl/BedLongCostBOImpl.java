@@ -317,6 +317,8 @@ public class BedLongCostBOImpl implements BedLongCostBO {
             costDTO.setDoctorName(dto.getInptVisit().getZzDoctorName());
             // 开嘱科室ID
             costDTO.setDeptId(dto.getInptVisit().getInDeptId());
+            // 发药药房ID
+            costDTO.setPharId(dto.getPharId());
             // 执行人ID
             costDTO.setExecId(MapUtils.get(map, "userId"));
             // 执行人姓名

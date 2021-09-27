@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

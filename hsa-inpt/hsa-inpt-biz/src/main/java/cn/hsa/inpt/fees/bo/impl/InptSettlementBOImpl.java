@@ -176,6 +176,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     public synchronized WrapperResponse saveCostTrial(InptVisitDTO inptVisitDTO) {
         String id = inptVisitDTO.getId();//就诊id
         String code = inptVisitDTO.getCode();
+        String userName = inptVisitDTO.getCrteName();
         String hospCode = inptVisitDTO.getHospCode();//医院编码
         String treatmentCode = inptVisitDTO.getTreatmentCode();
         String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
@@ -389,7 +390,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     unifiedMap.put("hospCode", hospCode);
                     unifiedMap.put("visitId", id);
                     unifiedMap.put("code", code);
-                    unifiedMap.put("userName", inptVisitDTO.getCrteName());
+                    unifiedMap.put("userName", userName);
                     unifiedMap.put("inptVisit", inptVisitDTO1);
                     unifiedMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
                     unifiedMap.put("inptVisitDTO",inptVisitDTO1);

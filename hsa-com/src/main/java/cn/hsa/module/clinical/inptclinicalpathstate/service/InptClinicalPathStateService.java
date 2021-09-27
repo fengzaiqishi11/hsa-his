@@ -2,8 +2,12 @@ package cn.hsa.module.clinical.inptclinicalpathstate.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 public interface InptClinicalPathStateService {
@@ -35,4 +39,59 @@ public interface InptClinicalPathStateService {
      * @Date: 2021/9/23
      */
     WrapperResponse<InptClinicalPathStateDTO> queryInptClinicalPathStateByVisitId(Map map);
+
+
+    /**
+    * @Menthod updateInptClinicalPathStateByVisitId
+    * @Desrciption 修改病人入径信息
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/24 14:20
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    WrapperResponse<Boolean> updateInptClinicalPathStateByVisitId(Map map);
+
+    /**
+    * @Menthod insertInptClinicalPathStateByVisitId
+    * @Desrciption 新增病人入径
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/24 14:21
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    WrapperResponse<Boolean> insertInptClinicalPathStateByVisitId(Map map);
+
+    /**
+    * @Menthod queryDeptByClinicalPathDeptId
+    * @Desrciption 查询科室
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/24 16:34
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.base.dept.dto.BaseDeptDTO>>
+    **/
+    WrapperResponse<List<BaseDeptDTO>> queryDeptByClinicalPathDeptId(Map map);
+
+    /**
+    * @Menthod queryPatientPage
+    * @Desrciption 查询患者信息
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/26 11:26
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+    **/
+    WrapperResponse<PageDTO> queryPatientPage(Map map);
+
+
 }

@@ -2091,7 +2091,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 } else if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getSplitUnitCode())){
                     inptCostDTO.setPrice(materialDTO.getSplitPrice());
                 }
-            } else if(Constants.XMLB.YZML.equals(inptAdviceDetailDTO.getItemCode())){
+            }
+            //特殊处理 如果医嘱目录绑定的材料数量大于0，那么就是根据医嘱主表去判断是否为医嘱目录医嘱，并且总数量是医嘱主表的总数*医嘱明细表的数量
+            else if(Constants.XMLB.YZML.equals(adviceDTO.getItemCode())){
                 inptCostDTO.setTotalNum(BigDecimalUtils.multiply(inptAdviceDetailDTO.getNum(), adviceDTO.getTotalNum()));
             }
 

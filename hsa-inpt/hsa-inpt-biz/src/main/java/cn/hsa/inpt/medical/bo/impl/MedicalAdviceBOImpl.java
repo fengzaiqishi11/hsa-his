@@ -2091,6 +2091,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 } else if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getSplitUnitCode())){
                     inptCostDTO.setPrice(materialDTO.getSplitPrice());
                 }
+            } else if(Constants.XMLB.YZML.equals(inptAdviceDetailDTO.getItemCode())){
+                inptCostDTO.setTotalNum(BigDecimalUtils.multiply(inptAdviceDetailDTO.getNum(), adviceDTO.getTotalNum()));
             }
 
             inptCostDTO.setTotalPrice((BigDecimalUtils.multiply(inptCostDTO.getTotalNum(), inptCostDTO.getPrice())).setScale(2, BigDecimal.ROUND_HALF_UP));

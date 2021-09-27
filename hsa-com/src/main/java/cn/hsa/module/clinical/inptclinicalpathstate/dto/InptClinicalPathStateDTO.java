@@ -9,12 +9,16 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class InptClinicalPathStateDTO extends InptClinicalPathStateDO implements Serializable {
+    private static final long serialVersionUID = 8600727328444945571L;
+
+    private List<InptClinicalPathStateDTO> inptClinicalPathStateDTOList;
     /**
      * 项目分类(LCXMFL):1诊疗；2医嘱；3；护理； 9其他
      */
@@ -109,4 +113,6 @@ public class InptClinicalPathStateDTO extends InptClinicalPathStateDO implements
      * 证件号码
      */
     private String certNo;
+
+    private String isValid;
 }

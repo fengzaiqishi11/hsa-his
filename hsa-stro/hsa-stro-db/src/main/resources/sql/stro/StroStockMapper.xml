@@ -45,7 +45,8 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="isValid != null and isValid != ''">
@@ -125,7 +126,8 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num,
          a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,
-         ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+         ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="isValid != null and isValid != ''">
@@ -196,7 +198,8 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="isValid != null and isValid != ''">
@@ -273,7 +276,8 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,a.unit_code,
         ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code,
          ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="isValid != null and isValid != ''">

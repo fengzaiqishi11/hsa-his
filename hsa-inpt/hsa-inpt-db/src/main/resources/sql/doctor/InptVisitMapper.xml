@@ -238,14 +238,14 @@
 		v.out_oper_name, v.out_oper_time, v.out_situation_code, v.out_remark, v.out_mode_code, v.is_archive, v.archive_time,
 		v.archive_id, v.archive_name, v.insure_code, v.insure_org_code, v.insure_no, v.insure_biz_code, v.insure_treat_code,
 		v.insure_patient_id, v.insure_remark, v.total_advance, v.total_cost, v.total_balance, v.crte_id, v.crte_name, v.crte_time, s.settle_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName, b.seq_no,
+		(select name from base_dept where v.in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName, b.seq_no,
 		CONCAT(
-		inpt_visit.name,'/',
+		v.name,'/',
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		inpt_visit.gender_code),'-'),'/',
-		IFNULL(inpt_visit.age,'-'),
+		v.gender_code),'-'),'/',
+		IFNULL(v.age,'-'),
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		inpt_visit.age_unit_code),'')
+		v.age_unit_code),'')
 		) AS keyword
 		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
@@ -295,16 +295,16 @@
 		(select
 		pt.id, pt.hosp_code, pt.profile_id, pt.in_profile, pt.in_no, pt.name, pt.gender_code, pt.age, pt.age_unit_code, pt.birthday,
 		pt.nationality_cation, pt.occupation_code, pt.education_code, pt.contact_name, pt.contact_rela_code, pt.contact_address,
-		pt.contact_phone, pt.nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
-		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
-		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
-		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
-		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
-		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
-		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
-		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time, s.settle_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName, b.seq_no,
+		pt.contact_phone, pt.nation_code, pt.cert_code, pt.cert_no, pt.marry_code, pt.phone, pt.address, pt.preferential_type_id, pt.patient_code,
+		pt.receive_hosp_name, pt.bed_id, pt.bed_name, pt.nursing_code, pt.diet_type, pt.Illness_code, pt.status_code, pt.in_ward_id, pt.in_dept_id,
+		pt.in_dept_name, pt.in_time, pt.zz_doctor_id, pt.zz_doctor_name, pt.jz_doctor_id, pt.jz_doctor_name, pt.zg_doctor_id, pt.zg_doctor_name,
+		pt.in_remark, pt.in_mode_code, pt.in_disease_id, pt.in_disease_name, pt.in_disease_icd10, pt.in_situation_code, pt.outpt_visit_no,
+		pt.outpt_doctor_id, pt.outpt_doctor_name, pt.outpt_disease_id, pt.outpt_disease_name, pt.outpt_disease_icd10, pt.out_ward_id,
+		pt.out_dept_id, pt.out_dept_name, pt.out_time, pt.out_disease_id, pt.out_disease_name, pt.out_disease_icd10, pt.out_oper_id,
+		pt.out_oper_name, pt.out_oper_time, pt.out_situation_code, pt.out_remark, pt.out_mode_code, pt.is_archive, pt.archive_time,
+		pt.archive_id, pt.archive_name, pt.insure_code, pt.insure_org_code, pt.insure_no, pt.insure_biz_code, pt.insure_treat_code,
+		pt.insure_patient_id, pt.insure_remark, pt.total_advance, pt.total_cost, pt.total_balance, pt.crte_id, pt.crte_name, pt.crte_time, s.settle_time,
+		(select name from base_dept where pt.in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName, b.seq_no,
 		CONCAT(
 		pt.name,'/',
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
@@ -314,7 +314,7 @@
 		pt.age_unit_code),'')
 		) AS keyword
 		from inpt_visit pt join inpt_baby pb on pt.id = pb.visit_id
-		left join inpt_settle s on s.hsop_code = pt.hosp_code and pt.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		left join inpt_settle s on s.hosp_code = pt.hosp_code and pt.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		left join base_bed b on b.hosp_code = pt.hosp_code and b.id = pt.bed_id
 		where pt.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">

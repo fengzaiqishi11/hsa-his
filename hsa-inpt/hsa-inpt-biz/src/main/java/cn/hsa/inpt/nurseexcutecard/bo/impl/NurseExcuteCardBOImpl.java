@@ -147,7 +147,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         SysParameterDTO sysParameterDTO = this.getSysParameter(code, inptVisitDTO.getHospCode());
         if ("1".equals(printType)) {
             // 输液瓶贴
-            if (StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
                 adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
             } else {
                 // 瓶贴多条 不分组
@@ -276,7 +276,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
              */
             SysParameterDTO sysParameter = this.getSysParameter("INFUSION_BOTTLE_STICKER", inptAdviceDTO.getHospCode());
             if ("1".equals(inptAdviceDTO.getPrintType())) {
-                if (StringUtils.isNotEmpty(sysParameter.getValue()) && "1".equals(sysParameter.getValue())) {
+                if (sysParameter != null && StringUtils.isNotEmpty(sysParameter.getValue()) && "1".equals(sysParameter.getValue())) {
                     // 开启参数，页面输液瓶贴展示一条，根据页面医嘱id修改执行表所有打印状态
                 } else {
                     // 默认不开启，根据执行id修改打印状态

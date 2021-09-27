@@ -1337,6 +1337,11 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      **/
     @Override
     public boolean updatePrescribeIsCancel(OutptPrescribeDTO outptPrescribeDTO){
+        // 根据处方id 查询当前处方是否全部退费，全部退费才能作废处方
+        List<OutptCostDTO> prescribeCostList = outptDoctorPrescribeDAO.selectCost(outptPrescribeDTO);
+        if (!ListUtils.isEmpty(prescribeCostList)) {
+            throw new AppException("该处方还存在有未退费的费用，不能作废，如需作废，请将该处方的所有费用退费");
+        }
         //作废处方信息
         outptDoctorPrescribeDAO.updatePrescribeIsCancel(outptPrescribeDTO);
         return true;

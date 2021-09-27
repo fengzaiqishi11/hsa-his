@@ -122,4 +122,8 @@ public class EmrPatientDO extends PageDO implements Serializable {
 	 * 时间记录项
 	 */
 	private Date recordTime;
+	/**
+	 * 病历打印次数
+	 */
+	private int printNum;
 }

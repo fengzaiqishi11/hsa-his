@@ -178,6 +178,19 @@ public class BaseDeptServiceImpl extends HsafService implements BaseDeptService 
 
     }
 
+    /***
+     *  查询登录科室信息
+     * @param map 参数
+     * @return BaseDeptDTO 基本部门信息
+     */
+    @Override
+    @HsafRestPath(value = "/getSingleBaseDeptInfoById", method = RequestMethod.GET)
+    public WrapperResponse<BaseDeptDTO> getSingleBaseDeptInfoById(Map map) {
+        BaseDeptDTO baseDeptDTO = MapUtils.get(map, "baseDeptDTO");
+        return WrapperResponse.success(baseDeptBO.getSingleBaseDeptInfoById(baseDeptDTO));
+
+    }
+
     /**
      * @Method getDeptTypeCode
      * @Desrciption  查询科室性质的方法

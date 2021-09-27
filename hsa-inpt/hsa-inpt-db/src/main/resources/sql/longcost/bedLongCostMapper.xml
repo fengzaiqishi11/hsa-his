@@ -27,6 +27,7 @@
         <result property="cancelTime" column="ilc_cancel_time" jdbcType="TIMESTAMP"/>
         <result property="cancelRemark" column="ilc_cancel_remark" jdbcType="VARCHAR"/>
         <result property="crteId" column="ilc_crte_id" jdbcType="VARCHAR"/>
+        <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="ilc_crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="ilc_crte_time" jdbcType="TIMESTAMP"/>
 
@@ -184,6 +185,7 @@
         ilc.cancel_time ilc_cancel_time,
         ilc.cancel_remark ilc_cancel_remark,
         ilc.crte_id ilc_crte_id,
+        ilc.phar_id,
         ilc.crte_name ilc_crte_name,
         ilc.crte_time ilc_crte_time,
         ilc.attribution_code  attribution_code,

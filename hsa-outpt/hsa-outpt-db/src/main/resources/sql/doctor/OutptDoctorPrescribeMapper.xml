@@ -345,7 +345,7 @@
             a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
             a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
             a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
-            a.crte_time,
+            a.crte_time, a.now_address as nowAddress,
             otv.triage_start_code as triageStatusCode,
             otv.is_call as isCanCall,
             case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
@@ -1544,7 +1544,8 @@
     <!--根据处方模板id查询出处方模板明细-->
     <select id="queryOutptPrescribeTempDetails" resultMap="OutptPrescribeTempDetailMap" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
         select
-          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id, a.item_name,
+          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id,
+          case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name else a.item_name end item_name,
           case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage,
           a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.total_num,
         case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
@@ -2248,4 +2249,10 @@
             </if>
         </foreach>
     </update>
+
+
+    <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        select * from outpt_cost where hosp_code = #{hospCode} and op_id = #{id} and status_code = '0'
+    </select>
+
 </mapper>

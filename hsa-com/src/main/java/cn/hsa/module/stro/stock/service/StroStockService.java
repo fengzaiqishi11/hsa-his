@@ -191,4 +191,24 @@ public interface StroStockService {
      */
     @PostMapping("/service/web/stro/stroStock/queryPageByOutptOrInpt")
     WrapperResponse<PageDTO> queryPageByOutptOrInpt(Map map);
+    /**
+     * @Meth: queryAllStockPage
+     * @Description: 查询全院库存
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @GetMapping("/service/web/stro/cxstrostock/queryAllStockPage")
+    WrapperResponse<PageDTO> queryAllStockPage(Map map);
+    /**
+     * @Meth: queryAllStockDetails
+     * @Description: 查询全院库存明细
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @GetMapping("/service/web/stro/cxstrostock/queryAllStockDetails")
+    WrapperResponse<PageDTO> queryAllStockDetails(Map map);
 }

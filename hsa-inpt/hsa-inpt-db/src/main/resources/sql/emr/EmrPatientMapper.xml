@@ -508,4 +508,84 @@
         select * from emr_patient where visit_id = #{visitId} and hosp_code = #{hospCode} and dept_id =#{deptId}
     </select>
 
+    <!--新增病历打印记录 2021/9/10-->
+    <insert id="insertEmrPirnt" parameterType="cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO">
+        INSERT INTO  emr_print  (id,hosp_code,emr_id,visit_id,emr_name,print_name,print_id,print_time)
+	    VALUES(#{id},#{hospCode},#{emrId},#{visitId},#{emrName},#{printName},#{printId},#{printTime})
+    </insert>
+
+    <!--更新病历打印次数 2021/9/10-->
+    <update id="updatePatientEmrPrintNum" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+      update emr_patient set print_num =#{printNum} where hosp_code =#{hospCode} and id =#{id} and visit_id = #{visitId}
+    </update>
+
+    <!--获取病历打印次数 2021/9/10-->
+    <select id="getPrintNum" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.lang.Integer">
+        select count(1)
+        from emr_print
+        where hosp_code = #{hospCode}
+        and emr_id = #{emrId} and visit_id = #{visitId}
+    </select>
+
+    <select id="queryPatientEmrReportForm" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO" resultType="cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO">
+        select * from (select DISTINCT v.name,v.age,v.gender_code as genderCode,
+        v.in_dept_name as deptName,
+        a.dept_id as deptId,c.`name` as emrName,
+        (select name
+        from emr_classify ec
+        WHERE
+        ec.`code` = c.up_code
+        and ec.up_code = 'EMR'
+        AND type_code = '2'
+        AND is_valid = '1'
+        AND is_end = '0'
+        AND (dept_id = '' OR dept_id IS NULL)
+        AND ec.hosp_code = #{hospCode} ) as upClassifyName,
+        c.up_code as upCode,a.record_time as recordTime,a.crte_name as doctorName,a.review_name as
+        reviewName,a.review_time as reviewTime,a.crte_time as crteTime,
+        a.audit_code as auditCode,
+        a.audit_time as auditTime,a.audit_name as auditName,ifnull(a.print_num,0) as printNum,
+        ifnull(ar.archive_state,0) as archiveState, v.in_no as inNo, v.in_profile as inProfile
+        from inpt_visit v
+        LEFT JOIN emr_archive_logging ar
+        on ar.visit_id = v.id
+        and ar.hosp_code = v.hosp_code
+        left join emr_patient a
+        on a.visit_id = v.id
+        and a.hosp_code = v.hosp_code
+        left JOIN emr_classify_template b
+        on a.classify_template_id = b.id and a.dept_id = b.dept_id
+        and a.hosp_code = b.hosp_code
+        left JOIN emr_classify c
+        on b.classify_code =c.`code`
+        and a.hosp_code = c.hosp_code
+        where c.is_valid = '1'
+        and c.is_del_nullline = '0'
+        and c.type_code ='2'
+        and v.hosp_code =#{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and v.in_dept_id =#{deptId}
+        </if>
+        <if test="classifyCode != null and classifyCode != ''">
+            and c.up_code =#{classifyCode}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and a.crte_id=#{doctorId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (v.name like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+            or c.name like concat('%', #{keyword,jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and a.record_time <= #{endDate}
+            ]]>
+        </if>
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and a.record_time >= #{startDate}
+            ]]>
+        </if> GROUP BY a.id ) f
+        order by f.name,f.deptId,f.recordTime desc
+    </select>
 </mapper>

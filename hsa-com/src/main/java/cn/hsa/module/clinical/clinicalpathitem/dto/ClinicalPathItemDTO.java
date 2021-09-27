@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -34,5 +37,10 @@ public class ClinicalPathItemDTO extends ClinicalPathItemDO implements Serializa
      * 项目ids 用于批量删除
      */
     private List<String> ids;
+
+    /**
+     * 导入的文件
+     * */
+    private Map<String, Object> resultMap;
 
 }

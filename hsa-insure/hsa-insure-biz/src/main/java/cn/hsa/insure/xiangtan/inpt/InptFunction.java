@@ -71,6 +71,7 @@ public class InptFunction {
         httpParam.put("aae240",null);//使用个帐金额
         httpParam.put("bka438",Constant.Xiangtan.DICT.YWCJ);//业务场景阶段 (1：业务开始有且仅能为1)
         Map<String,Object> httpResult = requestInsure.call((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
+        httpResult.put("bka831",MapUtils.get(httpResult,"akb067")); // 个人自付 = 个人现金支付
         return httpResult;
     }
 
@@ -257,6 +258,7 @@ public class InptFunction {
             httpParam.put("bmc030",null);//妊娠周期
         }
         Map<String,Object> httpResult = requestInsure.call((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
+        httpResult.put("bka831",MapUtils.get(httpResult,"akb067")); // 个人自付 = 个人现金支付
         return httpResult;
     }
 

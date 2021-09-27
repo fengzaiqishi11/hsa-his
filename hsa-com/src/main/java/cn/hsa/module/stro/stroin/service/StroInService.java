@@ -152,5 +152,6 @@ public interface StroInService {
   @PostMapping("/service/stro/storin/insertWholeSuppOut")
   WrapperResponse<List<StroInDetailDTO>> queryStroinDetail(Map map);
 
-
+  @PostMapping("/service/stro/storin/queryStroinDetailForExprot")
+  WrapperResponse<List<StroInDetailDTO>> queryStroinDetailForExprot(Map map);
 }

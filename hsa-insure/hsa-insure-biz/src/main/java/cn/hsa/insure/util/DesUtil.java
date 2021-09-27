@@ -38,6 +38,15 @@ public class DesUtil {
         return strs;
     }
 
+    public static void main(String args[]) throws Exception {
+        String A_KEY = "0083_insure_producer";
+        String B_KEY = "0083_insure_consumer";
+        String A_data = encrypt(A_KEY);
+        String B_data = encrypt(B_KEY);
+        System.out.println(A_data);
+        System.out.println(B_data);
+    }
+
     /**
      * @Menthod decrypt
      * @Desrciption

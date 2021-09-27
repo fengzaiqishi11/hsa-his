@@ -120,7 +120,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         orderMap.put("typeCode",Constants.ORDERRULE.YBJSQD);
         setlinfo.put("settleNo", baseOrderRuleService_consumer.getOrderNo(orderMap).getData());// 清单流水号
 
-        setlinfo.put("hi_setl_lv",settleInfoDTO.getHiSetlLv());//医保结算等级
+        orderMap.put("code","SETTLELEVEL");
+
+        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(orderMap).getData();
+        if(data == null){
+            throw new AppException("请先维护系统参数SETTLELEVEL"+"值为医院结算等级");
+        }
+
+        setlinfo.put("hi_setl_lv",data.getValue());//医保结算等级
 
         setlinfo.put("fixmedins_name",insureSettleInfoDTO.getHospName()); // 定点医药机构名称
         setlinfo.put("fixmedins_code",insureSettleInfoDTO.getMedicineOrgCode()); // 定点医药机构编号

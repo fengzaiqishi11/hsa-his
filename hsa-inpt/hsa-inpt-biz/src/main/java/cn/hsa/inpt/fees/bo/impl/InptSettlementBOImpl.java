@@ -1284,6 +1284,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("selfPrice", list.get(0).get("selfPrice"));
             returnMap.put("settleRealityPrice", list.get(0).get("settleRealityPrice"));  // 优惠后总金额（支付）
             returnMap.put("settleTime", list.get(0).get("settleTime"));  // 结算时间  2021年6月2日11:09:58
+            returnMap.put("personalPrice", list.get(0).get("personalPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {

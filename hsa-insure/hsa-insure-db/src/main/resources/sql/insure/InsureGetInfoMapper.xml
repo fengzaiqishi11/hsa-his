@@ -4,9 +4,7 @@
 
     <select id="getSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select
-            a.id,
-            a.visit_id,
-            d.mib_id,
+            a.id,a.visit_id,d.mib_id,
              ifnull((select settle_no from insure_setl_info where insure_setl_info.settle_id = a.insureSettleId and insure_setl_info.visit_id = a.visit_id limit 1),0) as settleNo,
             (select baa027 from insure_individual_basic iib where d.mib_id = iib.id) as baa027,
             (select iib.aac001 from insure_individual_basic iib where d.mib_id = iib.id) as aac001,
@@ -16,36 +14,28 @@
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'lV1_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as lv1NurscareDays,
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'SCD_NURS_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as scdNurscareDays,
             (select count(*) from sys_parameter sp,base_item bi,inpt_cost ic where sp.value = bi.code and sp.code = 'lV3_NURSE_CARE' and bi.id = ic.item_id and ic.visit_id = a.visit_id and a.hosp_code = ic.hosp_code) as lv3NursecareDays,
-            d.medical_reg_no,
-            a.settle_id,
-            a.insureSettleId,
-            a.hosp_code,
-            b.in_profile,
-            b.name,
-            b.age,
-            b.gender_code,
-            b.birthday,
-            b.nationality_cation,
-            b.nation_code,
-            b.cert_code,
-            b.cert_no as certno,b.occupation_code,b.contact_name,
-            b.contact_rela_code, b.contact_address, b.contact_phone,
-            b.insure_code,a.aka130,b.patient_code,
+            (select su.prac_certi_no from sys_user su where su.hosp_code = b.hosp_code and b.zz_doctor_id = su.id) as doctorPracCertiNo,
+            (select su.prac_certi_no from sys_user su where su.hosp_code = b.hosp_code and b.resp_nurse_id = su.id) as nursePracCertiNo,
+               d.medical_reg_no,a.settle_id,a.insureSettleId,a.hosp_code,
+            b.in_profile,b.name,b.age,b.gender_code, b.birthday,b.nationality_cation,b.nation_code,
+            b.cert_code,b.cert_no as certno,b.in_mode_code,
+            b.insure_code,a.aka130,b.patient_code,b.resp_nurse_name,b.zz_doctor_name,
             b.in_dept_id,b.in_dept_name as inDeptCode,b.out_dept_id,
-            b.out_dept_name as outDeptCode,b.out_mode_code,a.insureSettleId,
+            b.out_dept_name as outDeptCode,a.insureSettleId,
             a.personal_price, a.person_price,a.settleway,a.insure_org_code,a.crte_time,
             d.insuplc_admdvs AS insuplc,b.in_time,b.out_time,f.hi_setl_lv,
-            f.crte_time as dclaTime,b.address,e.baby_age_month,e.work, e.work_phone,e.work_address,
+            f.crte_time as dclaTime,b.address,e.baby_age_month,
             e.work_post_code,e.turn_dept_ids,e.in_days,b.outpt_disease_name,d.visit_icd_code,e.in_situation_name,
             d.accessory_diagnosis_name,
             e.inpt_before_day,e.inpt_before_hour,e.inpt_before_minute, e.inpt_last_day,
-            e.inpt_last_hour, e.inpt_last_minute,e.out_mode_name,
+            e.inpt_last_hour, e.inpt_last_minute,
             e.is_inpt,e.zg_doctor_name, e.zg_doctor_id,e.zr_nurse_id,e.zr_nurse_name,
-            g.start_time,g.end_time,a.omsgid,e.work,
+            g.start_time,g.end_time,a.omsgid,
+            e.out_mode_name,e.out_mode_code,
             e.work_address,e.work_post_code,e.work_phone,e.work,
             e.contact_name,e.contact_phone,e.contact_rela_code,e.contact_address,
-            e.baby_birth_weight,e.baby_in_weight,
-            h.invoice_detail_id,e.in_way,e.occupation_code,
+            e.baby_birth_weight,e.baby_in_weight,e.turn_org_name,iib.bka035,
+            h.invoice_id AS invoiceDetailId,e.in_way,e.occupation_code,
             h.invoice_no,iib.aae140,d.aka130 as iptMedType
         from insure_individual_settle a
         left join inpt_visit b on a.visit_id = b.id and a.hosp_code=b.hosp_code
@@ -471,11 +461,99 @@
     </select>
 
     <select id="getSettleInfo" resultType="java.util.Map">
-        select * from insure_setl_info
-        where
-             settle_id = #{insureSettleId}
-        and  visit_id = #{visitId}
-        and  hosp_code = #{hospCode}
+        select id,
+               visit_id,
+               settle_id,
+               settle_no,
+               IF(settle_no = settle_no is NULL
+                          OR settle_no = '', '未上传', '已上传') as isUpload,
+               fixmedins_name,
+               fixmedins_code,
+               hi_setl_lv,
+               hi_no,
+               medcasno,
+               dcla_time,
+               psn_name,
+               gend,
+               brdy,
+               age,
+               ntly,
+               neb_age,
+               naty,
+               patn_cert_type,
+               certno,
+               prfs,
+               curr_addr,
+               emp_name,
+               emp_addr,
+               emp_tel,
+               poscode,
+               coner_name,
+               patn_rlts,
+               coner_addr,
+               coner_tel,
+               hi_type,
+               insulic,
+               sp_psn_type,
+               nwb_adm_type,
+               nwb_bir_wt,
+               nwb_adm_wt,
+               opsp_diag_caty,
+               opsp_mdtrt_date,
+               ipt_med_type,
+               adm_way,
+               trt_type,
+               adm_time,
+               adm_caty,
+               refldept_dept,
+               dscg_time,
+               dscg_caty,
+               act_ipt_days,
+               opt_wm_dise,
+               wm_disw_code,
+               opt_tcm_dise,
+               tcm_dise_code,
+               diag_code_cnt,
+               oprn_oprt_code_cnt,
+               vent_used_durg,
+               pwcry_bfadmcoma_dura,
+               pwcry_afadmcoma_dura,
+               bld_cat,
+               bld_amt,
+               bld_unt,
+               spga_nurscare_days,
+               lv1_nurscare_days,
+               scd_nurscare_days,
+               lv3_nursecare_days,
+               dscg_way,
+               acp_medins_name,
+               acp_optins_code,
+               bill_code,
+               bill_no,
+               biz_sn,
+               days_rinp_flag_31,
+               days_rinp_pup_31,
+               chfpdr_name,
+               chfpdr_code,
+               setl_begn_date,
+               setl_en_date,
+               psn_selfpay,
+               psn_ownpay,
+               acct_pay,
+               psn_cashpay,
+               hi_paymtd,
+               hsorg,
+               hsorg_opter,
+               medins_fill_dept,
+               medins_fill_psn,
+               crte_id,
+               crte_name,
+               crte_time,
+               hosp_code
+        from insure_setl_info
+        where settle_id = #{insureSettleId}
+          and visit_id = #{visitId}
+          and hosp_code = #{hospCode}
     </select>
     <select id="queryID" resultType="java.lang.Integer">
         select count(1)
@@ -484,6 +562,12 @@
             settle_id = #{insureSettleId}
           and  visit_id = #{visitId}
           and  hosp_code = #{hospCode}
+    </select>
+    <select id="getInvoiceNo" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
+               prefix, start_no, end_no, curr_no,
+               status_code, num, remark, crte_id, crte_name, crte_time from outin_invoice
+        where hosp_code =#{hospCode} and id =#{id}
     </select>
 
     <!-- 根据主键删除表信息 -->

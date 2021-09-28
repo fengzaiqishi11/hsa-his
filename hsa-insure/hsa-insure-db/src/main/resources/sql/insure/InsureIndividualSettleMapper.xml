@@ -156,7 +156,7 @@
         then (select patient_code from outpt_visit ov where ov.hosp_code = iic.hosp_code and ov.id = iic.visit_id)
         end
         ) as patientCode,
-        if(isnull((select settle_id from insure_setl_info isi where iic.settle_id = isi.settle_id
+        if(isnull((select settle_id from insure_setl_info isi where iic.insureSettleId = isi.settle_id and iic.state='0'
         and iic.visit_id = isi.visit_id limit 1)),0,1) as isUpload,
         iv.in_time,
         iv.out_time,

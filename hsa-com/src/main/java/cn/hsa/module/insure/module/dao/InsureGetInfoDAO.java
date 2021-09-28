@@ -3,6 +3,7 @@ package cn.hsa.module.insure.module.dao;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -248,4 +249,6 @@ public interface InsureGetInfoDAO {
     List<InptCostDTO> queryInptUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 
     List<InptCostDTO> queryOutUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    OutinInvoiceDTO getInvoiceNo(Map<String, Object> orderMap);
 }

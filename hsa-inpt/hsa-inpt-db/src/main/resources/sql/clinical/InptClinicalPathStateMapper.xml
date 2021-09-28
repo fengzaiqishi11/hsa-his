@@ -161,7 +161,7 @@
               iv.archive_id, iv.archive_name, iv.insure_code, iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code,
               iv.insure_patient_id, iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
               (select name from base_dept where in_ward_id = base_dept.id) as wardName,
-              if((ic.path_state is null),"0","1") as isClinicalList,
+              if((ic.path_state is null),"0","1") as isClinicalList,ic.list_id,
               (select a.name from clinical_path_list a where a.id = ic.list_id and a.hosp_code = ic.hosp_code ) as clinicalListName,
               CONCAT(
               iv.name,'/',
@@ -195,6 +195,18 @@
         where A.isClinicalList = #{isClinicalList}
       </if>
       order by A.crte_time desc
+    </select>
+
+    <select id="getPatientByVisitID" resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+      select iv.id as visitId,iv.in_no,iv.name,iv.gender_code,iv.age,iv.bed_id,iv.bed_name,iv.in_time,
+      iv.in_disease_name,a.path_crte_time,a.path_crte_name,a.list_id,a.stage_id,a.total_price,a.path_state,
+      (select b.name from clinical_path_list b where b.id = a.list_id and b.hosp_code = a.hosp_code ) as listName,
+      (select c.begin_time from inpt_clinical_path_stage c where c.visit_id = a.visit_id and
+       c.list_id = a.list_id and c.stage_id = a.stage_id and c.hosp_code = a.hosp_code) as beginTime,
+       (select s.name from clinical_path_stage s where s.id = a.stage_id) as stageName
+      from inpt_clinical_path_state a
+      join inpt_visit iv on a.visit_id = iv.id and a.hosp_code = iv.hosp_code
+      where a.visit_id = #{ visitId } and a.list_id = #{listId} and a.path_state = "1"
     </select>
 
 </mapper>

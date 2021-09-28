@@ -1194,7 +1194,7 @@
             and ma.content like concat('%',#{itemName},'%')
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
             and 1=2
@@ -1256,7 +1256,7 @@
             and 1=2
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code

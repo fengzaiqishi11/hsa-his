@@ -68,6 +68,9 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     @Resource
     private MedicalAdviceService medicalAdviceService_consumer;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * 开启事务
      */
@@ -96,9 +99,15 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         adviceMap.put("typeCode", id);
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryInptAdviceAdvanceTake(adviceMap);
         if(!ListUtils.isEmpty(inptAdviceDTOList)){
+            String key = hospCode + deptId + id + "_MEDICALADVICE" ;
             List<String> adviceIds = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
             TransactionStatus status = null;
             try{
+                if(redisUtils.hasKey(key)){
+                    throw  new RuntimeException("当前科室正在做提前领药申请,请耐心等待!");
+                }
+                redisUtils.set(key,key);
+
                 // 开启独立新事务
                 DefaultTransactionDefinition def = new DefaultTransactionDefinition();
                 def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -126,6 +135,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
                     transactionManager.rollback(status);
                 }
                 throw new RuntimeException("提前领药异常，原因："+e.getMessage());
+            }finally {
+                redisUtils.del(key);
             }
         }
 

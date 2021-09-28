@@ -182,4 +182,27 @@ public class InptClinicalPathStateController extends BaseController {
       return inptClinicalPathStateService_consumer.queryPatientPage(map);
     }
 
+
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption  用于出径病人信息展示
+    *
+    * @Param
+    * [inptClinicalPathStateDTO, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 15:00
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO>
+    **/
+    @RequestMapping("/getPatientByVisitID")
+    public WrapperResponse<InptClinicalPathStateDTO> getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO, HttpServletRequest req, HttpServletResponse res) {
+      Map map = new HashMap();
+      SysUserDTO sysUserDTO = getSession(req, res);
+      inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+      inptClinicalPathStateDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+      map.put("hospCode",sysUserDTO.getHospCode());
+      map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
+      return inptClinicalPathStateService_consumer.getPatientByVisitID(map);
+    }
+
 }

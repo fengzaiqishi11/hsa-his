@@ -93,5 +93,18 @@ public interface InptClinicalPathStateService {
     **/
     WrapperResponse<PageDTO> queryPatientPage(Map map);
 
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption 用于出径病人信息展示
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 14:54
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO>
+    **/
+    WrapperResponse<InptClinicalPathStateDTO> getPatientByVisitID(Map map);
+
 
 }

@@ -196,4 +196,26 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
       return PageDTO.of(inptVisitDTOS);
     }
 
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption 用于出径病人信息展示
+    *
+    * @Param
+    * [inptClinicalPathStateDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 15:01
+    * @Return cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO
+    **/
+    @Override
+    public InptClinicalPathStateDTO getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO) {
+      if(StringUtils.isEmpty(inptClinicalPathStateDTO.getVisitId())) {
+        throw new AppException("患者信息为空");
+      }
+      if(StringUtils.isEmpty(inptClinicalPathStateDTO.getListId())) {
+        throw new AppException("该患者路径目录为空");
+      }
+      return inptClinicalPathStateDAO.getPatientByVisitID(inptClinicalPathStateDTO);
+    }
+
 }

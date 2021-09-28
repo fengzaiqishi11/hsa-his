@@ -99,4 +99,17 @@ public interface InptClinicalPathStateBO {
     * @Return cn.hsa.base.PageDTO
     **/
     PageDTO queryPatientPage(InptVisitDTO inptVisitDTO);
+
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption 用于出径病人信息展示
+    *
+    * @Param
+    * [inptClinicalPathStateDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 14:56
+    * @Return cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO
+    **/
+    InptClinicalPathStateDTO getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO);
 }

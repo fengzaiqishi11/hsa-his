@@ -124,4 +124,20 @@ public class InptClinicalPathStateServiceImpl implements InptClinicalPathStateSe
     public WrapperResponse<PageDTO> queryPatientPage(Map map) {
       return WrapperResponse.success(inptClinicalPathStateBO.queryPatientPage(MapUtils.get(map,"inptVisitDTO")));
     }
+
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption 用于出径病人信息展示
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 14:57
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO>
+    **/
+    @Override
+    public WrapperResponse<InptClinicalPathStateDTO> getPatientByVisitID(Map map) {
+      return WrapperResponse.success(inptClinicalPathStateBO.getPatientByVisitID(MapUtils.get(map,"inptClinicalPathStateDTO")));
+    }
 }

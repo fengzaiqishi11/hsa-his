@@ -195,4 +195,17 @@ public class BaseDrugServiceImpl extends HsafService implements BaseDrugService 
     public WrapperResponse<PageDTO> queryUnifiedPage(Map<String, Object> map) {
         return WrapperResponse.success(baseDrugBO.queryUnifiedPage(MapUtils.get(map,"baseDrugDTO")));
     }
+
+    /**
+     * @Meth: queryEnableCancel
+     * @Description: 查看能否作废药品
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    @Override
+    public WrapperResponse<Boolean> queryEnableCancel(Map map) {
+        return WrapperResponse.success(baseDrugBO.queryEnableCancel(MapUtils.get(map,"baseDrugDTO")));
+    }
 }

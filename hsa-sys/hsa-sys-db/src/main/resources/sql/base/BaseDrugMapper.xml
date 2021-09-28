@@ -963,4 +963,31 @@
 		</if>
 		order by a.crte_time
 	</select>
+	<!--判断住院费用表中是否存在未发药的数据-->
+	<select id="queryCostIsInptOut" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+		select distinct item_name
+		 from inpt_cost where hosp_code = #{hospCode} and status_code = '0' and is_dist = '0'
+		 and item_id in
+		 <foreach collection="ids" open="(" close=")" separator="," item="item">
+			 #{item}
+		 </foreach>
+	</select>
+	<!--判断门诊费用表中是否存在未发药的数据-->
+	<select id="queryCostIsOutptOut" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+		select distinct item_name
+		from outpt_cost where hosp_code = #{hospCode} and status_code = '0' and is_dist = '0'
+		and item_id in
+		<foreach collection="ids" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	<!--长期医嘱是否开了该药品，如果有，不允许作废-->
+	<select id="queryInptAdviceIsLong" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+		select distinct item_name
+		from inpt_advice where  hosp_code = #{hospCode} and is_long = '0' and is_stop = '0'
+		and plan_stop_time >= now() and item_id in
+		<foreach collection="ids" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
 </mapper>

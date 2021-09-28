@@ -2092,9 +2092,17 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     inptCostDTO.setPrice(materialDTO.getSplitPrice());
                 }
             }
-            //特殊处理 如果医嘱目录绑定的材料数量大于0，那么就是根据医嘱主表去判断是否为医嘱目录医嘱，并且总数量是医嘱主表的总数*医嘱明细表的数量
+            //特殊处理 2021-09-28 考虑到临时医嘱下的医嘱目录用量大于1时的处理
+            /**
+             * 1。需要算出当前医嘱目录下的材料数量,再用算出的数量乘以 医嘱主表的总数量 就得到了实际的收费数量
+             * 注意：（也可以直接根据医嘱目录查询医嘱目录明细的中的base_advice_detail.num）
+             */
             else if(Constants.XMLB.YZML.equals(adviceDTO.getItemCode())){
-                inptCostDTO.setTotalNum(BigDecimalUtils.multiply(inptAdviceDetailDTO.getNum(), adviceDTO.getTotalNum()));
+                //算出医嘱目录下绑定的材料数量
+                BigDecimal numNew = BigDecimalUtils.divide(inptAdviceDetailDTO.getNum(),adviceDTO.getNum());
+                //算出实际收费项目的总数量
+                inptCostDTO.setTotalNum(BigDecimalUtils.multiply(numNew, adviceDTO.getTotalNum()));
+
             }
 
             inptCostDTO.setTotalPrice((BigDecimalUtils.multiply(inptCostDTO.getTotalNum(), inptCostDTO.getPrice())).setScale(2, BigDecimal.ROUND_HALF_UP));

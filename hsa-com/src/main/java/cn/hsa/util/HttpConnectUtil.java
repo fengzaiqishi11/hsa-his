@@ -284,9 +284,8 @@ public class HttpConnectUtil {
             URL url = new URL(path);
             //打开和url之间的连接
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            PrintWriter out = null;
             //请求方式
-          conn.setRequestMethod("POST");
+            conn.setRequestMethod("POST");
 //           //设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -298,9 +297,9 @@ public class HttpConnectUtil {
             conn.setDoOutput(true);
             conn.setDoInput(true);
             //获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream(),"UTF8");
             //发送请求参数即数据
-            out.print(data);
+            out.write(data);
             //缓冲数据
             out.flush();
             //获取URLConnection对象对应的输入流

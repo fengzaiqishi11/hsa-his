@@ -773,21 +773,36 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
         List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
 
-        if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
-            isBackWaitReceiveList.forEach(isBackDto -> {
-                for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
+//        if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
+//            isBackWaitReceiveList.forEach(isBackDto -> {
+//                for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
+//                    if (isBackDto.getOldWrId().equals(waitDto.getId())) {
+//                        waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
+//                        waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
+//                        waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
+//                        if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
+//                            waitReceiveListAll.remove(waitDto);
+//                        }
+//                        break;
+//                    }
+//                }
+//            });
+//        }
+            // update by 2021/9/29 修改领药申请出现0的问题
+            for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
+                for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
+                    PharInWaitReceiveDTO waitDto = it.next();
                     if (isBackDto.getOldWrId().equals(waitDto.getId())) {
                         waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
                         waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
                         waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
                         if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
-                            waitReceiveListAll.remove(waitDto);
+                            it.remove();
                         }
                         break;
                     }
                 }
-            });
-        }
+            }
 
 
         //所有单据筛选出来的药品的集合

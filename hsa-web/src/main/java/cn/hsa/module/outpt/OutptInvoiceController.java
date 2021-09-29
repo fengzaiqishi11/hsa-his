@@ -9,6 +9,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.service.OutinInvoiceService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
@@ -483,6 +484,28 @@ public class OutptInvoiceController extends BaseController {
     map.put("outinInvoiceDTO",outinInvoiceDTO);
     map.put("hospCode",userDTO.getHospCode());
     return outinInvoiceService_consumer.queryOutptCFCostDetails(map);
+  }
+
+
+  /**
+   * @Menthod queryPartInvoice()
+   * @Desrciption  查询门诊发票分单详情
+   * @Param outinInvoiceDTO
+   * @Author liuliyun
+   * @Date   2021/09/16 15:26
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<List<Map<String, Object>>>
+   **/
+  @GetMapping("/queryPartInvoice")
+  public WrapperResponse<Map<String, List<OutinPartInvoiceDO>>> queryPartInvoice(OutinInvoiceDTO outinInvoiceDTO, HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    if (StringUtils.isEmpty(outinInvoiceDTO.getSettleId())) {
+      throw new AppException("参数错误");
+    }
+    SysUserDTO userDTO = getSession(req, res) ;
+    outinInvoiceDTO.setHospCode(userDTO.getHospCode());
+    map.put("outinInvoiceDTO",outinInvoiceDTO);
+    map.put("hospCode",userDTO.getHospCode());
+    return outinInvoiceService_consumer.queryPartInvoice(map);
   }
 
 }

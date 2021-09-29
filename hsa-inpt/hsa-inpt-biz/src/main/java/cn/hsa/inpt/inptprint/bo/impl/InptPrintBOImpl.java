@@ -1,10 +1,13 @@
 package cn.hsa.inpt.inptprint.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.inpt.drawMedicine.bo.impl.DrawMedicineBOImpl;
+import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
+import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inptprint.bo.InptPrintBO;
@@ -46,7 +49,8 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   private InptVisitDAO inptVisitDAO;
 
   @Resource
-  SysParameterService sysParameterService_consumer;
+  private InptBabyDAO inptBabyDAO;
+
 
 
   /**
@@ -62,18 +66,6 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   **/
   @Override
   public Map queryInptCostListPrint(InptCostDTO inptCostDTO) {
-    //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
-    SysParameterDTO sysParameterDTO =null;
-    Map<String, Object> isInsureUnifiedMap = new HashMap<>();
-    isInsureUnifiedMap.put("hospCode", inptCostDTO.getHospCode());
-    isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
-    sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
-    // 开启大人婴儿合并结算
-    if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
-      inptCostDTO.setQueryBaby("");
-      inptCostDTO.setBabyId("");
-    }
-    //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
     List<InptCostDTO> inptCostDTOS = inptPrintDAO.queryInptCostListPrint(inptCostDTO);
     Map<String, List<InptCostDTO>> collect = new TreeMap<>();
     if(ListUtils.isEmpty(inptCostDTOS)){
@@ -604,4 +596,78 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     List<InptAdvicePrintDTO> inptAdvicePrintDTOS = inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
     return inptAdvicePrintDTOS;
   }
+
+
+  /**
+   * @Menthod queryBabyInptCostListPrint
+   * @Desrciption 获取婴儿费用清单
+   * @Param [inptCostDTO]
+   * @Author liuliyun
+   * @Date   2021/9/23 8:40
+   * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+   **/
+  @Override
+  public Map queryBabyInptCostListPrint(InptCostDTO inptCostDTO) {
+      Map mergeList = new HashMap();
+      List<Map> babyCostList = new ArrayList<>();
+      // 获取大人费用
+      Map patientCost=queryInptCostListPrint(inptCostDTO);
+      mergeList.put("patientCost",patientCost);
+      BigDecimal totalCost = BigDecimal.valueOf(0);
+      totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) patientCost.get("total"));
+      InptBabyDTO inptBabyDTO=new InptBabyDTO();
+      inptBabyDTO.setVisitId(inptCostDTO.getVisitId());
+      inptBabyDTO.setHospCode(inptCostDTO.getHospCode());
+      List<InptBabyDTO> inptBabyDTOS=inptBabyDAO.findByCondition(inptBabyDTO);
+      if (inptBabyDTOS!=null && inptBabyDTOS.size()>0) {
+        for (InptBabyDTO inptBabyDTO1:inptBabyDTOS) {
+          inptCostDTO.setBabyId(inptBabyDTO1.getId());
+          // 获取婴儿费用
+          Map babyCost = queryBabyCost(inptCostDTO);
+          if (babyCost.isEmpty()){
+              continue;
+          }
+          totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) babyCost.get("total"));
+          babyCostList.add(babyCost);
+        }
+      }
+      mergeList.put("babyCost",babyCostList);
+      mergeList.put("totalCost",totalCost);
+      return mergeList;
+    }
+
+
+  public Map queryBabyCost(InptCostDTO inptCostDTO) {
+    inptCostDTO.setQueryBaby("");
+    List<InptCostDTO> inptCostDTOS = inptPrintDAO.queryInptCostListPrint(inptCostDTO);
+    Map<String, List<InptCostDTO>> collect = new TreeMap<>();
+    if(ListUtils.isEmpty(inptCostDTOS)){
+       return null;
+    }
+    if("1".equals(inptCostDTO.getPrintFlag())){
+      collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate,TreeMap::new,Collectors.toList()));
+      return queryDetailCostByDay(collect);
+    } else if("2".equals(inptCostDTO.getPrintFlag())){
+      collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
+      return queryDetailCostByDay(collect);
+    } else if("3".equals(inptCostDTO.getPrintFlag())){
+      collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate,TreeMap::new,Collectors.toList()));
+      return queryStructureByDate(inptCostDTOS,collect);
+    } else if("4".equals(inptCostDTO.getPrintFlag())){
+      Map<String, BigDecimal> collect1 = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName,
+              Collectors.mapping(InptCostDTO::getAmountMoney, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+      return queryStructureByAll(inptCostDTOS,collect1);
+    } else if("5".equals(inptCostDTO.getPrintFlag())){
+      List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptItemCostListPrint(inptCostDTO);
+      collect = inptCostDTOS1.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
+      return queryDetailCostByDay(collect);
+    }else if("6".equals(inptCostDTO.getPrintFlag())){
+      List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptItemCostListPrint(inptCostDTO);
+      collect = inptCostDTOS1.stream().collect(Collectors.groupingBy(s->s.getCostDate()+'-'+s.getBfcName(),TreeMap::new,Collectors.toList()));
+      return queryDetailCostByDay(collect);
+    } else {
+      return null;
+    }
+  }
+
 }

@@ -9,6 +9,7 @@ import cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
+import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
@@ -290,6 +291,7 @@ public class OutptTmakePriceFormController extends BaseController {
         outptVisitDTO.setHospCode(userDTO.getHospCode());//医院编码
         outptVisitDTO.setHospName(userDTO.getHospName());//医院名称
         outptVisitDTO.setCrteId(userDTO.getId());//当前用户id
+        outptVisitDTO.setCrteName(userDTO.getCrteName());
         outptVisitDTO.setCode(userDTO.getCode()); // 操作员编码
         outptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId() );//当前登录用户操作科室ID
         outptSettleDTO.setHospCode(userDTO.getHospCode());//医院编码
@@ -700,5 +702,38 @@ public class OutptTmakePriceFormController extends BaseController {
 
         outptTmakePriceFormService_consumer.lisData(map);
 
+    }
+
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03
+     * @Return PageDTO
+     **/
+    @PostMapping("/queryPatientPrescribeNoSettle")
+    public WrapperResponse<PageDTO> queryPatientPrescribeNoSettle(@RequestBody OutptPrescribeDO outptPrescribeDO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptPrescribeDO.setHospCode(userDTO.getHospCode());
+        Map param =new HashMap();
+        param.put("outptPrescribeDO", outptPrescribeDO);
+        param.put("hospCode" ,userDTO.getHospCode());
+        return outptTmakePriceFormService_consumer.queryPatientPrescribeNoSettle(param);
+    }
+
+    /**
+     * @Method queryOutptPrescribeCostList
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03
+     * @Return PageDTO
+     **/
+    @PostMapping("/queryOutptPrescribeCostList")
+    public WrapperResponse<List<OutptCostDTO>> queryOutptPrescribeCostList(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        param.put("hospCode" ,userDTO.getHospCode());
+        return outptTmakePriceFormService_consumer.queryOutptPrescribeCostList(param);
     }
 }

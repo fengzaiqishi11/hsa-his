@@ -67,10 +67,11 @@ public class InptFunction {
         httpParam.put("akb020",insureIndividualVisitDTO.getInsureOrgCode());//医疗机构编码
         httpParam.put("aaz217",insureIndividualVisitDTO.getMedicalRegNo());//就医登记号
         httpParam.put("akc196",inptVisitDTO.getOutDiseaseIcd10());//出院诊断疾病编码
-        httpParam.put("aae031",DateUtils.format(inptVisitDTO.getOutOperTime(),DateUtils.YMD));//业务结束时间
+        httpParam.put("aae031",DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.YMD));//业务结束时间
         httpParam.put("aae240",null);//使用个帐金额
         httpParam.put("bka438",Constant.Xiangtan.DICT.YWCJ);//业务场景阶段 (1：业务开始有且仅能为1)
         Map<String,Object> httpResult = requestInsure.call((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
+        httpResult.put("bka831",MapUtils.get(httpResult,"akb067")); // 个人自付 = 个人现金支付
         return httpResult;
     }
 
@@ -96,7 +97,7 @@ public class InptFunction {
         httpParam.put("bka066",Constants.SF.F);//保存标志 是否保存计算结果（0：否 1：是）
         httpParam.put("bka006",insureIndividualVisitDTO.getBka006());//待遇类别
         httpParam.put("akc196",inptVisitDTO.getOutDiseaseIcd10());//出院诊断
-        httpParam.put("aae031",DateUtils.format(inptVisitDTO.getOutOperTime(),DateUtils.YMD));//出院日期
+        httpParam.put("aae031",DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.YMD));//出院日期
         if (Constant.Xiangtan.DEFAULTVAL.SY_AKA130.equals(insureIndividualVisitDTO.getAka130())){
             httpParam.put("bka016","P");//生育就诊类型 生育住院不能为空，D：定额， P：普通消费 T：特殊情况
         }
@@ -236,7 +237,7 @@ public class InptFunction {
         httpParam.put("akc196",inptVisitDTO.getOutDiseaseIcd10());//出院诊断疾病编码
         httpParam.put("bkz102",inptVisitDTO.getOutDiseaseName());//出院诊断疾病名称
         httpParam.put("ake021",inptVisitDTO.getZzDoctorName());//诊断医生
-        httpParam.put("aae031",DateUtils.format(new Date(),DateUtils.YMD));//业务结束时间
+        httpParam.put("aae031",DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.YMD));//业务结束时间
         httpParam.put("aae030",DateUtils.format(inptVisitDTO.getInTime(),DateUtils.YMD));//业务开始时间
         httpParam.put("bka066",Constant.Xiangtan.DEFAULTVAL.BKA066.get(inptVisitDTO.getOutSituationCode()));//出院转归情况（A-治愈 B-好转 C-无效 D-未愈 E-死亡 F-其它）
         httpParam.put("aae240",null);//使用个帐金额
@@ -257,6 +258,7 @@ public class InptFunction {
             httpParam.put("bmc030",null);//妊娠周期
         }
         Map<String,Object> httpResult = requestInsure.call((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
+        httpResult.put("bka831",MapUtils.get(httpResult,"akb067")); // 个人自付 = 个人现金支付
         return httpResult;
     }
 
@@ -280,7 +282,7 @@ public class InptFunction {
         httpParam.put("akc252", null);//本次业务个人帐户可用金额（如果为空，默认使用个人帐户。如果不为空就录入可使用的个人帐户值，如果不使用输入0）
         httpParam.put("akc196", inptVisitDTO.getOutDiseaseIcd10());//出院疾病（中心疾病编码）
         httpParam.put("bkz102", inptVisitDTO.getOutDiseaseName());//出院诊断名称（中心疾病名称）
-        httpParam.put("aae031", DateUtils.format(inptVisitDTO.getOutOperTime(),DateUtils.Y_M_DH_M_S));//出院日期（格式：YYYY-MM-DD HH24:MI:SS(24小时)）
+        httpParam.put("aae031", DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));//出院日期（格式：YYYY-MM-DD HH24:MI:SS(24小时)）
         httpParam.put("akc188", null);//第一副诊断（中心疾病编码）
         httpParam.put("akc189", null);//第二副诊断（中心疾病编码）
         httpParam.put("bka066", Constant.Xiangtan.DEFAULTVAL.BKA066.get(inptVisitDTO.getOutSituationCode()));//出院详情（好转、其他、死亡、未愈、无效、治愈、转科、转院（病人要求）、转院（医院要求））

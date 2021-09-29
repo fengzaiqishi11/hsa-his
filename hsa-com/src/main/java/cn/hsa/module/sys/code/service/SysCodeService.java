@@ -37,6 +37,17 @@ public interface SysCodeService {
      **/
     @GetMapping("/service/sys/code/getByCode")
     WrapperResponse<Map<String, List<SysCodeSelectDTO>>> getByCode(Map map);
+    /**
+     *  根据编码获取值域代码值优先从缓存获取
+     * @Method: getCodeDetailsByCodeCache
+     * @Description:
+     * @Param: [code]
+     * @Author: luonianxin
+     * @Email: nianxin.luo@powersi.com
+     * @Date: 2020/7/15 11:25
+     * @Return: java.util.List
+     **/
+    WrapperResponse<Map<String, List<SysCodeSelectDTO>>> getCodeDetailsByCodeCache(Map map);
 
     /**
      * @Method: queryCodePage

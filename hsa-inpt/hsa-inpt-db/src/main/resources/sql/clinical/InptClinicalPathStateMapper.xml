@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.inptclinicalpathstate.dao.InptClinicalPathStateDAO">
+
+
+    <select id="queryClinicalItem"
+            resultType="cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO">
+        select
+        a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
+        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName
+        from clinical_path_stage_detail a
+        join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
+        join clinical_path_stage c on c.id = a.stage_id and a.hosp_code = c.hosp_code
+        join clinical_path_list l on l.id = a.list_id and a.hosp_code = l.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="listId != null and listId != ''">
+            and a.list_id = #{listId}
+        </if>
+        <if test="stageId != null and stageId != ''">
+            and a.stage_id = #{stageId}
+        </if>
+        <if test="itemType != null and itemType != ''">
+            and a.item_type = #{itemType}
+        </if>
+        <if test="itemId != null and itemId != ''">
+            and a.item_id = #{itemId}
+        </if>
+        order by a.sort_no
+    </select>
+
+    <!-- 根据就诊id查询 临床路径病人记录表-->
+    <select id="queryInptClinicalPathStateByVisitId"
+            resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+        select
+        c.name as listName,d.name as stageName,
+        a.id,a.hosp_code,a.visit_id,a.baby_id,a.path_state,a.list_id,a.path_crte_id,a.path_crte_name,a.path_crte_time,
+        a.stage_id,a.end_crte_id,a.end_crte_name,a.end_crte_time,a.end_path_type,a.end_path_remarke,a.total_price
+        from inpt_clinical_path_state a
+        join inpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+        join clinical_path_list c on a.list_id = c.id and a.hosp_code = c.hosp_code
+        join clinical_path_stage d on a.stage_id = d.id and a.hosp_code = d.hosp_code
+        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} limit 1
+    </select>
+
+    <!--查询入径病人信息-->
+    <select id="queryInptClinicalPathState"
+            resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+        select
+        a.id, a.hosp_code,a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code,
+        a.preferential_type_id, a.patient_code, a.bed_id, a.bed_name,a.cert_no,
+        (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
+        (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
+        cp.name as listName,d.name as stageName,a.in_time as inTimestring
+        from inpt_clinical_path_state c
+        join inpt_visit a on a.hosp_code = c.hosp_code and c.visit_id = a.id
+        join clinical_path_list cp on c.list_id = cp.id and c.hosp_code = cp.hosp_code
+        join clinical_path_stage d on c.stage_id = d.id and c.hosp_code = d.hosp_code
+        left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
+        where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
+        <if test="id != null and id != ''">
+            and a.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%')
+            or a.in_no like concat('%',#{keyword},'%') or a.bed_name like concat('%',#{keyword},'%'))
+        </if>
+        <if test='zgbrQuery =="1"'>
+            and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        order by b.seq_no asc
+    </select>
+
+    <!--新增病人入径信息-->
+    <insert id="insertInptClinicalPathStateByVisitId" keyProperty="id" useGeneratedKeys="true">
+        insert into inpt_clinical_path_state(id,hosp_code, visit_id, baby_id, path_state, list_id, path_crte_id,
+        path_crte_name, path_crte_time, stage_id, end_stage_id, end_crte_id, end_crte_name, end_crte_time,
+        end_path_type, end_path_remarke, total_price)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+          (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.pathState}, #{item.listId}, #{item.pathCrteId}, #{item.pathCrteName},#{item.pathCrteTime}, #{item.stageId}, #{item.endStageId},
+          #{item.endCrteId}, #{item.endCrteName}, #{item.endCrteTime}, #{item.endPathType},#{item.endPathRemarke},
+          #{item.totalPrice})
+        </foreach>
+    </insert>
+
+    <!--修改病人入径信息-->
+    <update id="updateInptClinicalPathStateByVisitId" parameterType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+      update inpt_clinical_path_state
+      <set>
+        <if test="visitId != null and visitId != ''">
+          visit_id = #{visitId},
+        </if>
+        <if test="babyId != null and babyId != ''">
+          baby_id = #{babyId},
+        </if>
+        <if test="pathState != null and pathState != ''">
+          path_state = #{pathState},
+        </if>
+        <if test="listId != null and listId != ''">
+          list_id = #{listId},
+        </if>
+        <if test="pathCrteId != null and pathCrteId != ''">
+          path_crte_id = #{pathCrteId},
+        </if>
+        <if test="pathCrteName != null and pathCrteName != ''">
+          path_crte_name = #{pathCrteName},
+        </if>
+        <if test="pathCrteTime != null">
+          path_crte_time = #{pathCrteTime},
+        </if>
+        <if test="stageId != null and stageId != ''">
+          stage_id = #{stageId},
+        </if>
+        <if test="endStageId != null and endStageId != ''">
+          end_stage_id = #{endStageId},
+        </if>
+        <if test="endCrteId != null and endCrteId != ''">
+          end_crte_id = #{endCrteId},
+        </if>
+        <if test="endCrteName != null and endCrteName != ''">
+          end_crte_name = #{endCrteName},
+        </if>
+        <if test="endCrteTime != null">
+          end_crte_time = #{endCrteTime},
+        </if>
+        <if test="endPathType != null and endPathType != ''">
+          end_path_type = #{endPathType},
+        </if>
+        <if test="endPathRemarke != null and endPathRemarke != ''">
+          end_path_remarke = #{endPathRemarke},
+        </if>
+        <if test="totalPrice != null">
+          total_price = #{totalPrice},
+        </if>
+      </set>
+      where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--查询所有路径科室-->
+    <select id="queryDeptByClinicalPathDeptId" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+      select a.id, a.hosp_code, a.type_code, a.nation_code, a.code, a.name, a.ward_code, a.phone, a.person_name, a.up_dept_code,
+             a.mg_dept_code, a.intro, a.place, a.remark, a.pym, a.wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,a.type_identity
+      from base_dept a
+      join clinical_path_list b on b.dept_id is not null and a.id = b.dept_id and a.hosp_code = b.hosp_code
+      where a.hosp_code = #{hospCode} and a.is_valid = #{isValid}
+    </select>
+
+    <!--查询患者信息-->
+    <select id="queryPatientPage" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+      select A.* from (
+              select
+              iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code, iv.age, iv.age_unit_code, iv.birthday,
+              iv.nationality_cation, iv.occupation_code, iv.education_code, iv.contact_name, iv.contact_rela_code, iv.contact_address,
+              iv.contact_phone, iv.nation_code, iv.cert_code, iv.cert_no, iv.marry_code, iv.phone, iv.address, iv.preferential_type_id, iv.patient_code,
+              iv.receive_hosp_name, iv.bed_id, iv.bed_name, iv.nursing_code, iv.diet_type, iv.Illness_code, iv.status_code, iv.in_ward_id, iv.in_dept_id,
+              iv.in_dept_name, iv.in_time, iv.zz_doctor_id, iv.zz_doctor_name, iv.jz_doctor_id, iv.jz_doctor_name, iv.zg_doctor_id, iv.zg_doctor_name,
+              iv.in_remark, iv.in_mode_code, iv.in_disease_id, iv.in_disease_name, iv.in_disease_icd10, iv.in_situation_code, iv.outpt_visit_no,
+              iv.outpt_doctor_id, iv.outpt_doctor_name, iv.outpt_disease_id, iv.outpt_disease_name, iv.outpt_disease_icd10, iv.out_ward_id,
+              iv.out_dept_id, iv.out_dept_name, iv.out_time, iv.out_disease_id, iv.out_disease_name, iv.out_disease_icd10, iv.out_oper_id,
+              iv.out_oper_name, iv.out_oper_time, iv.out_situation_code, iv.out_remark, iv.out_mode_code, iv.is_archive, iv.archive_time,
+              iv.archive_id, iv.archive_name, iv.insure_code, iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code,
+              iv.insure_patient_id, iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
+              (select name from base_dept where in_ward_id = base_dept.id) as wardName,
+              if((ic.path_state is null),"0","1") as isClinicalList,
+              (select a.name from clinical_path_list a where a.id = ic.list_id and a.hosp_code = ic.hosp_code ) as clinicalListName,
+              CONCAT(
+              iv.name,'/',
+              IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
+              iv.gender_code),'-'),'/',
+              IFNULL(iv.age,'-'),
+              IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+              iv.age_unit_code),'')
+              ) AS keyword
+              from inpt_visit iv
+              left join inpt_clinical_path_state ic on ic.path_state = '1' and ic.visit_id = iv.id and ic.hosp_code = iv.hosp_code
+              where iv.hosp_code = #{hospCode}
+              and iv.status_code = '2'
+              <if test="id != null and id != ''">
+                and iv.id = #{id}
+              </if>
+              /*开始日期*/
+              <if test="startTime != null and startTime != ''">
+                and date(iv.in_time) >= date(#{startTime})
+              </if>
+              /*结束时间*/
+              <if test="endTime != null and endTime != ''">
+                and date(iv.in_time) &lt;= date(#{endTime})
+              </if>
+              <if test="keyword != null and keyword != ''">
+                and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%')
+                or iv.in_no like concat('%',#{keyword},'%'))
+              </if>
+           ) A
+      <if test="isClinicalList != null and isClinicalList != ''">
+        where A.isClinicalList = #{isClinicalList}
+      </if>
+      order by A.crte_time desc
+    </select>
+
+</mapper>

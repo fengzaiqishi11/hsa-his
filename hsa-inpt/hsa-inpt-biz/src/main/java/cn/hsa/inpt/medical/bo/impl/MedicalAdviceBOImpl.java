@@ -1870,11 +1870,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             outptPrescribeDetailsDTO.setItemId(inptAdviceDetailDTO.getItemId());
             outptPrescribeDetailsDTO.setLoginDeptId(adviceDTO.getInDeptId());
 
-            Map parmMap = new HashMap();
-            parmMap.put("hospCode",inptAdviceDetailDTO.getHospCode());
-            parmMap.put("outptPrescribeDetailsDTO",outptPrescribeDetailsDTO);
-            drugDTO = outptDoctorPrescribeService_consumer.getBaseDrug(parmMap).getData();
-
+            drugDTO = inptVisitDAO.getBaseDrug(outptPrescribeDetailsDTO);
+            if(drugDTO == null){
+                throw new RuntimeException("医嘱【" + adviceDTO.getItemName() + "】未获取到有效药品,检查药品信息!");
+            }
             // 没有配置默认 1：单次向上取整
             if(StringUtils.isEmpty(drugDTO.getTruncCode()) || "1".equals(drugDTO.getTruncCode())){
                 inptAdviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(inptAdviceDetailDTO.getNum().doubleValue())));
@@ -2092,6 +2091,18 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 } else if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getSplitUnitCode())){
                     inptCostDTO.setPrice(materialDTO.getSplitPrice());
                 }
+            }
+            //特殊处理 2021-09-28 考虑到临时医嘱下的医嘱目录用量大于1时的处理
+            /**
+             * 1。需要算出当前医嘱目录下的材料数量,再用算出的数量乘以 医嘱主表的总数量 就得到了实际的收费数量
+             * 注意：（也可以直接根据医嘱目录查询医嘱目录明细的中的base_advice_detail.num）
+             */
+            else if(Constants.XMLB.YZML.equals(adviceDTO.getItemCode())){
+                //算出医嘱目录下绑定的材料数量
+                BigDecimal numNew = BigDecimalUtils.divide(inptAdviceDetailDTO.getNum(),adviceDTO.getNum());
+                //算出实际收费项目的总数量
+                inptCostDTO.setTotalNum(BigDecimalUtils.multiply(numNew, adviceDTO.getTotalNum()));
+
             }
 
             inptCostDTO.setTotalPrice((BigDecimalUtils.multiply(inptCostDTO.getTotalNum(), inptCostDTO.getPrice())).setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -2405,7 +2416,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (ListUtils.isEmpty(inptAdviceDetailDTOList)) {
             return;
         }
-
         for(InptAdviceDetailDTO inptAdviceDetailDTO: inptAdviceDetailDTOList) {
             //获取对应的医嘱信息
             InptAdviceDTO inptAdviceDTO = adviceMap.get(inptAdviceDetailDTO.getIaId());
@@ -2533,7 +2543,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 }
 
                 inptCostDTOs.add(inptCostDTO);
-
+                if(inptCostDTOs.size() % 100 == 0){
+                    inptCostDAO.insertInptCostBatch(inptCostDTOs);
+                    inptCostDTOs.clear();
+                }
                 //时间根据频率周期变化 开始时间 = 开始时间+频率周期
                 startTime = DateUtils.dateAdd(startTime, day);
             }
@@ -2748,6 +2761,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             InptAdviceExecDTO.setCrteTime(medicalAdviceDTO.getCheckTime());
             if (InptAdviceExecDTO != null) {
                 inptAdviceExecDTOList.add(InptAdviceExecDTO);
+            }
+            if(inptAdviceExecDTOList.size() % 500 == 0) {
+                inptAdviceExecDAO.insertInptAdviceExecBatch(inptAdviceExecDTOList);
+                inptAdviceExecDTOList.clear();
             }
         }
     }

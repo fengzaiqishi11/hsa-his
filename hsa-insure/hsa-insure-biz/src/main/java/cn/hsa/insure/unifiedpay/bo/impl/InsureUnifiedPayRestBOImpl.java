@@ -16,6 +16,7 @@ import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.*;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
+import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayRestBO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -77,6 +78,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     private InsureIndividualVisitDAO insureIndividualVisitDAO;
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private InsureIndividualBasicService insureIndividualBasicService_consumer;
 
     @Resource
     private InsureDictDAO   insureDictDAO;
@@ -579,17 +583,22 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     @Override
     public Map<String, Object> selectPersonTreatment(Map<String, Object> map) {
         String hospCode = map.get("hospCode").toString();
-        /**
-         * 获取医保就诊信息
-         */
-        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
+        String orgCode = MapUtils.get(map,"orgCode");
+
         /**
          * 获取访问的url地址
          */
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setOrgCode(orgCode); // 医疗机构编码;
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
+        if(insureConfigurationDTO == null){
+            throw new AppException("根据"+orgCode+"获取医保机构编码配置信息为空");
+        }
+        map.put("regCode",insureConfigurationDTO.getCode());
+        Map<String, Object> data = insureIndividualBasicService_consumer.queryInsureInfo(map).getData();
+        String psnNo = MapUtils.get(data, "psnNo");
+
         Map httpParam = new HashMap();
         httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_2001);  //交易编号
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
@@ -598,23 +607,30 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
         httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("insutype", insureIndividualVisitDTO.getAae140());
+        if(StringUtils.isEmpty(psnNo)){
+            throw new AppException("医保个人编号参数为空");
+        }
+        dataMap.put("psn_no", psnNo);
+        if(StringUtils.isEmpty(MapUtils.get(map,"insutype"))){
+            throw new AppException("险种类型参数为空");
+        }
+        dataMap.put("insutype", MapUtils.get(map,"insutype"));
         dataMap.put("fixmedins_code", insureConfigurationDTO.getOrgCode());
-        dataMap.put("med_type", insureIndividualVisitDTO.getAka130());
+        if(StringUtils.isEmpty(MapUtils.get(map,"medType"))){
+            throw new AppException("医疗类别参数为空");
+        }
+        dataMap.put("med_type", MapUtils.get(map,"medType"));
         dataMap.put("begntime", MapUtils.get(map, "startDate"));
-        dataMap.put("endtime", MapUtils.get(map, "endDate"));
-        dataMap.put("dise_codg", insureIndividualVisitDTO.getVisitIcdCode());
-        dataMap.put("dise_name", insureIndividualVisitDTO.getVisitIcdName());
+        dataMap.put("endtime", null);
+        dataMap.put("dise_codg", "");
+        dataMap.put("dise_name", "");
         dataMap.put("oprn_oprt_code", null);
         dataMap.put("oprn_oprt_name", null);
         dataMap.put("matn_type", null);
         dataMap.put("birctrl_type", null);
-
         Map<String, Object> inputMap = new HashMap<>();
         inputMap.put("data", dataMap);
         httpParam.put("input", inputMap);
-
         String json = JSONObject.toJSONString(httpParam);
         logger.info("人员待遇享受检查入参:" + json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
@@ -2809,7 +2825,20 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         logger.info("医保目录先自付比例信息查询入参:" + json);
         String url = insureConfigurationDTO.getUrl();
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
+
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问统一支付平台");
+        }
+        logger.info("医保目录先自付比例信息查询回参:" + resultJson);
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
+
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
+
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         List<InsureUnifidRatioDO> list = insureDirectoryDownLoadDAO.queryAllInsureUnifiedRatio(map);
@@ -2839,16 +2868,31 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureUnifidRatioDO.setSelfpayProp(MapUtils.get(item, "selfpay_prop"));
                     insureUnifidRatioDO.setValiFlag(MapUtils.get(item, "vali_flag"));
                     insureUnifidRatioDO.setRid(MapUtils.get(item, "rid"));
-                    insureUnifidRatioDO.setUpdtTime(DateUtils.parse(MapUtils.get(item, "updt_time"), DateUtils.Y_M_DH_M_S));
+
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "updt_time"))){
+                        insureUnifidRatioDO.setUpdtTime(DateUtils.parse(MapUtils.get(item, "updt_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setUpdtTime(null);
+                    }
+
                     insureUnifidRatioDO.setCrterId(MapUtils.get(item, "crter_id"));
                     insureUnifidRatioDO.setCrterName(MapUtils.get(item, "crter_name"));
-                    insureUnifidRatioDO.setCrteTime(DateUtils.parse(MapUtils.get(item, "crte_time"), DateUtils.Y_M_DH_M_S));
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "crte_time"))){
+                        insureUnifidRatioDO.setCrteTime(DateUtils.parse(MapUtils.get(item, "crte_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setCrteTime(null);
+                    }
                     insureUnifidRatioDO.setCrteOptinsNo(MapUtils.get(item, "crte_optins_no"));
                     insureUnifidRatioDO.setOpterId(MapUtils.get(item, "opter_id"));
                     insureUnifidRatioDO.setOpterName(MapUtils.get(item, "opter_name"));
                     insureUnifidRatioDO.setOptinsNo(MapUtils.get(item, "optins_no"));
                     insureUnifidRatioDO.setPoolareaNo(MapUtils.get(item, "poolarea_no"));
-                    insureUnifidRatioDO.setOptTime(DateUtils.parse(MapUtils.get(item, "opt_time"), DateUtils.Y_M_DH_M_S));
+
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "opt_time"))){
+                        insureUnifidRatioDO.setOptTime(DateUtils.parse(MapUtils.get(item, "opt_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setOptTime(null);
+                    }
                     insureDirectoryInfoDOList.add(insureUnifidRatioDO);
                 }
             }
@@ -2862,6 +2906,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureDirectoryDownLoadDAO.insertInsureUnifiedRation(newList);
                 }
             }
+        }else{
+            throw new AppException("根据"+MapUtils.get(map, "hilistCode")+" 查询医保目录先自付比例信息为空");
         }
         return map;
     }
@@ -3151,6 +3197,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureDirectoryDownLoadDAO.insertInsureMedicinesMatch(newList);
                 }
             }
+        }else{
+            throw new AppException("根据"+MapUtils.get(map, "hilistCode")+" 查询医药机构目录匹配信息为空");
         }
         return map;
     }
@@ -3453,6 +3501,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureDirectoryDownLoadDAO.insertInsureDirectory(newList);
                 }
             }
+        }else {
+            throw new AppException("根据"+MapUtils.get(map, "hilistCode")+"查询医保目录信息为空");
         }
         return map;
     }
@@ -3565,6 +3615,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureDirectoryDownLoadDAO.insertInsureUnfiedMatch(newList);
                 }
             }
+        }else{
+            throw new AppException("根据"+MapUtils.get(map, "hilistCode")+"查询医疗目录与医保目录匹配信息为空");
         }
         return map;
     }
@@ -3681,6 +3733,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     insureDirectoryDownLoadDAO.insertInsureUnfiedLimitPrice(newList);
                 }
             }
+        }
+        else{
+            throw new AppException("根据"+MapUtils.get(map, "hilistCode")+"医保目录编码查询限价信息为空");
         }
         return map;
     }

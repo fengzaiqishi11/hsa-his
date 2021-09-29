@@ -100,6 +100,8 @@ public interface InptCostDAO {
      **/
     int updateInptCost(InptCostDTO inptCostDTO);
 
+    List<Map<String,Object>> checkStock(Map<String,Object> params);
+
     /**
      * @param inptCostDTOs
      * @Method updateInptCostBatch

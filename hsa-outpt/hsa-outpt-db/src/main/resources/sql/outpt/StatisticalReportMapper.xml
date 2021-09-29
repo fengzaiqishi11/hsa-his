@@ -1150,7 +1150,8 @@
         ia.hosp_code as hosp_code,
         ia.total_num as num,
         ma.visit_id,
-        ma.opd_id
+        ma.opd_id,
+        ma.document_sta
         FROM
         medic_apply ma,
         inpt_advice ia,
@@ -1188,7 +1189,7 @@
             and ma.content like concat('%',#{itemName},'%')
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
             and 1=2
@@ -1211,7 +1212,8 @@
         ov.hosp_code as hosp_code,
         '-1' as num,
         ma.visit_id,
-        ma.opd_id
+        ma.opd_id,
+        ma.document_sta
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
@@ -1249,7 +1251,7 @@
             and 1=2
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
@@ -1334,10 +1336,10 @@
         g.hosp_code = #{hospCode}
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and b.crte_time > #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+            and b.crte_time &lt;= #{endDate}
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
         )tab where tab.num !=0
@@ -1369,10 +1371,10 @@
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
 
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d  %H:%i:%s')
+            and b.crte_time > #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d  %H:%i:%s'),INTERVAL 1 day)
+            and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
         <if test='statisWay == "5"'>
@@ -1443,10 +1445,10 @@
         g.hosp_code = #{hospCode}
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and b.crte_time > #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+            and b.crte_time &lt;= #{endDate}
         </if>
         group by code,good_name,g.prod_code,spec,unit_code
         )tab where tab.num != 0
@@ -1475,10 +1477,10 @@
         AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
 
         <if test="startDate != null and startDate != ''">
-            and b.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and b.crte_time > #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and b.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)
+            and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
         <if test='statisWay == "6"'>
@@ -1679,10 +1681,10 @@
     g.hosp_code = #{hospCode}
     AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
     <if test="startDate != null and startDate != ''">
-      and b.crte_time >= STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+      and b.crte_time >= #{startDate}
     </if>
     <if test="endDate != null and endDate != ''">
-      and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+      and b.crte_time &lt;= #{endDate}
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
     )tab where tab.num != 0 order by tab.code asc, tab.crte_time desc
@@ -1741,14 +1743,116 @@
     g.hosp_code = #{hospCode}
     AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
     <if test="startDate != null and startDate != ''">
-      and b.crte_time >=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+      and b.crte_time >=#{startDate}
     </if>
     <if test="endDate != null and endDate != ''">
-      and b.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+      and b.crte_time &lt;= #{endDate}
     </if>
     group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
 
     )tab where num > 0 order by tab.code asc, tab.crte_time desc
   </select>
+    <!-- 抗菌药物报表增加按月份统计门诊住院各药品使用量-->
+    <select id="queryOutSumAntibiosisDrugDetail" resultType="java.util.Map">
+        SELECT
+        crte_time,
+        type_code,
+        code,
+        usual_name,
+        good_name,
+        spec,
+        unit_code,
+        split_ratio,
+        num,
+        price,
+        total_price,
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+        prod_code,
+        prod_name
+        FROM
+        (
+        SELECT
+        date_format(b.crte_time,'%Y%m') crte_time,
+        max('住院') type_code,
+        g.code,
+        max(g.usual_name) usual_name,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        max(g.split_ratio) split_ratio,
+        sum(a.num) num,
+        max(a.price) price,
+        sum(a.total_price) total_price,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_in_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time >=#{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by date_format(b.crte_time,'%Y%m'),code,good_name,g.prod_code,spec,unit_code
+    union all
+        SELECT
+        date_format(b.crte_time,'%Y%m') crte_time,
+        max('门诊') type_code,
+        g.code,
+        max(g.usual_name) usual_name,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        max(g.split_ratio) split_ratio,
+        sum(a.num) num,
+        max(a.price) price,
+        sum(a.total_price) total_price,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_out_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by date_format(b.crte_time,'%Y%m'),code,good_name,g.prod_code,spec,unit_code
+        )tab where tab.num != 0 order by tab.crte_time desc,tab.code asc
+    </select>
 
 </mapper>

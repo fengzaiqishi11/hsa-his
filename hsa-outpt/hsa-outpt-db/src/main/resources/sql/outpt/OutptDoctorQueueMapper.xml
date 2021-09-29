@@ -83,10 +83,10 @@
         where a.hosp_code = #{hospCode}
         --         and a.is_valid = '0'
         <if test="triageId !=null and triageId !=''">
-            AND #{triageId} = (SELECT b.triage_id FROM outpt_classes_queue b WHERE b.id = a.cq_id)
+            AND #{triageId} = (SELECT b.triage_id FROM outpt_classes_queue b WHERE b.hosp_code = a.hosp_code and b.id = a.cq_id)
         </if>
-        AND (SELECT count(*) FROM outpt_register b where b.dq_id = a.id) = 0
-        AND (select count(*) FROM outpt_doctor_register d where d.dq_id = a.id and d.is_use = '1' ) = 0
+        AND (SELECT count(*) FROM outpt_register b where b.hosp_code = a.hosp_code and b.dq_id = a.id) = 0
+        AND (select count(*) FROM outpt_doctor_register d where d.hosp_code=a.hosp_code and d.dq_id = a.id and d.is_use = '1' ) = 0
     </select>
 
 

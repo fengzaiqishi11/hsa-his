@@ -235,8 +235,8 @@
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         c.mi_price as miPrice,
-        case when ib.id is null then (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
-        else (case when a.out_time is null or DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
+        case when ib.id is null then (case when DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
+        else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
         b.*
         from inpt_visit a
         left join (
@@ -282,6 +282,12 @@
             or d.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and d.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and d.patient_code = #{patientCode}
+        </if>
         <if test="keyword != null and keyword != ''">
             and d.name like concat('%', #{keyword}, '%')
         </if>
@@ -325,6 +331,12 @@
             or a.jz_doctor_name like concat('%', #{doctorName}, '%')
             or a.zg_doctor_name like concat('%', #{doctorName}, '%')
             )
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and a.name like concat('%', #{keyword}, '%')
@@ -960,7 +972,7 @@
         select * from
         (
         select a.crte_name as crteName,'住院结账补交款' as inCometype,a.visit_id as visitId,p.price as money,a.settle_time as time,
-        a.red_id as redId,a.status_code as statusCode, c.name as payCode,a.settle_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode, p.pay_code as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
@@ -970,11 +982,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -990,11 +1002,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1011,11 +1023,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1032,11 +1044,11 @@
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         /*开始日期*/
         <if test="keyword != null and keyword != ''">
@@ -1044,63 +1056,60 @@
         </if>
         union all
         select a.crte_name as crteName,'住院预交款' as inCometype,a.visit_id as visitId,a.price as money,a.crte_time as time,
-        a.red_id as redId,a.status_code as statusCode,c.name as payCode,a.ap_order_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode,a.pay_code as payCode,a.ap_order_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from inpt_advance_pay a
-        join sys_code_detail c on c.c_code = 'ZFFS' and a.pay_code = c.value and a.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.crte_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.crte_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
         </if>
         union all
-        select a.crte_name as crteName,'门诊收费挂号' as inCometype,rs.visit_id as visitId,p.price as money,a.settle_time as time,
-        '' as redId,a.status_code as statusCode,c.name as payCode, rs.register_no as settleNo,
+        select a.crte_name as crteName,'挂号' as inCometype,rs.visit_id as visitId,p.price as money,a.settle_time as time,
+        '' as redId,a.status_code as statusCode,p.pay_code as payCode,a.register_id as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         rs.name as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from outpt_register_settle a
         left join outpt_register_pay p on p.rs_id = a.id and p.hosp_code = a.hosp_code
         left join outpt_register rs on rs.id = a.register_id and rs.hosp_code = a.hosp_code
-        join sys_code_detail c on c.c_code = 'ZFFS' and p.pay_code = c.value and p.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,p.price as money,a.settle_time as time,
-        a.red_id as redId,a.status_code as statusCode,c.name as payCode,a.settle_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode,p.pay_code as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from outpt_settle a
         join outpt_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        join sys_code_detail c on c.c_code = 'ZFFS' and p.pay_code = c.value and p.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1115,11 +1124,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1135,11 +1144,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1155,11 +1164,11 @@
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+            and a.settle_time &gt;= #{startDate}
         </if>
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.settle_time &lt;= #{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
@@ -1251,9 +1260,9 @@
         a.insure_patient_id,
         a.insure_remark,
         a.total_advance,
-        (case s.id when null then a.total_cost else s.reality_price end) total_cost,
-        (case when s.settle_take_price != '0' then s.settle_take_price
-        when s.settle_back_price != '0' then s.settle_back_price else '0' end) as bu_tui_fei,
+        (case when s.id is null then a.total_cost else s.reality_price end) total_cost,
+        (case when s.settle_take_price != 0 then s.settle_take_price
+        when s.settle_back_price != 0 then s.settle_back_price else 0 end) as bu_tui_fei,
         a.total_balance,
         a.crte_id,
         a.crte_name,
@@ -1786,16 +1795,16 @@
         </if>
         UNION ALL
         SELECT
-        b.bfc_id as bfcId,
-        c.name as bfcName
+            b.bfc_id as bfcId,
+            c.name as bfcName
         FROM
-        outpt_register_settle a
+            outpt_register_settle a
         LEFT JOIN outpt_register_detail b on a.register_id = b.register_id and a.hosp_code = b.hosp_code
         LEFT JOIN base_finance_classify c on b.bfc_id = c.id and a.hosp_code = b.hosp_code
         where a.status_code = '0'
-        and b.status_code = '0'
-        and b.bfc_id is not null
-        and a.hosp_code = #{hospCode}
+          and b.status_code = '0'
+          and b.bfc_id is not null
+          and a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             <![CDATA[and date(a.settle_time) >= date(#{startDate})]]>
@@ -1840,7 +1849,7 @@
         <if test="endTime != null and endTime != ''">
             and date(a.settle_time) &lt;= date(#{endTime})
         </if>
-        ) t1 GROUP BY t1.dept_name, t1.dept_id ) aaa ,  ( select c.dept_id ,
+         ) t1 GROUP BY t1.dept_name, t1.dept_id ) aaa ,  ( select c.dept_id ,
         ${sumSqlStr} from (select b.dept_id,
         ${caseSqlStr}
         from (
@@ -1860,7 +1869,7 @@
         </if>
         union all
         SELECT
-        c.dept_id, b.bfc_id, b.reality_price
+         c.dept_id, b.bfc_id, b.reality_price
         FROM
         outpt_register_settle a
         LEFT JOIN outpt_register_detail b on a.register_id = b.register_id and a.hosp_code = b.hosp_code
@@ -2574,11 +2583,11 @@
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
         <if test="startDate != null and startDate != ''">
-            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and sid.crte_time &gt;=#{startDate}
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and sid.crte_time &lt;= #{endDate}
         </if>
         /*药房*/
         <if test="yfids != null and yfids.size()>0">
@@ -2587,7 +2596,10 @@
                 #{id}
             </foreach>
         </if>
-
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  sid.item_name like '%${ypxm}%'
+        </if>
         /*科室*/
         <if test="ksids != null and ksids.size()>0">
             and bs.id in
@@ -2866,11 +2878,15 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         group by a.item_id
     </select>
@@ -2904,11 +2920,15 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         /*出院日期*/
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
         </if>
         group by a.item_id,a.batch_no
     </select>
@@ -3015,6 +3035,7 @@
     <select id="queryStroReportAdjustPrice" resultType="java.util.Map">
         select
         a.order_no,
+        a.batch_no as batchNo,
         a.crte_time,
         a.crte_name as checkName,
         (select b.crte_name from stro_adjust b where a.order_no = b.order_no and b.hosp_code = #{hospCode}) as crteName,
@@ -3048,6 +3069,10 @@
 
         <if test="endDate != null and endDate !='' ">
             and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
     </select>
 
@@ -3083,10 +3108,14 @@
             #{item}
         </foreach>
         <if test="startDate != null and startDate != ''">
-            and a.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &gt;=#{startDate}
+        </if>
+        /*药品或者项目*/
+        <if test="ypxm != null and ypxm != ''">
+            and  a.item_name like '%${ypxm}%'
         </if>
         <if test="endDate != null and endDate !='' ">
-            and a.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and a.crte_time &lt;= #{endDate}
         </if>
 
     </select>
@@ -3575,6 +3604,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3599,6 +3637,15 @@
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and b.crte_id = #{crteId}
+        </if>
         UNION ALL
         select
         (select name from sys_code_detail where hosp_code = c.hosp_code and c_code = 'PJLX' and value = c.type_code) as typeCode,
@@ -3620,6 +3667,15 @@
         </if>
         <if test="endTime != null and endTime != '' ">
             and DATE_FORMAT(a.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and c.type_code = #{typeCode}
+        </if>
+        <if test="statusCode != null and statusCode != '' ">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="crteId != null and crteId != '' ">
+            and a.crte_id = #{crteId}
         </if>
     </select>
 

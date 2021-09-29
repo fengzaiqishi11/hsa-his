@@ -347,6 +347,9 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         }else if("8".equals(statisWay)) {
             //4：住院明细汇总
             resultList = statisticalReportDAO.queryOnlyInSumAntibiosisDrug(paramMap);
+        }else if ("9".equals(statisWay)){
+            // 抗菌药物报表增加按月份统计门诊住院各药品使用量
+            resultList = statisticalReportDAO.queryOutSumAntibiosisDrugDetail(paramMap);
         }
 
         return PageDTO.of(resultList);

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathitem.dao.ClinicalPathItemDAO">
+    <!--插入数据-->
+    <insert id="insert">
+        insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time,is_valid)
+        values
+        (#{id},#{hospCode},#{code},#{name},#{itemType},#{pym},#{wbm},#{remarke},#{crteId},#{crteName},#{crteTime},#{isValid})
+    </insert>
+    <!-- 批量插入 -->
+    <insert id="insertBatchByExcelUpload">
+          insert into clinical_path_item (id,hosp_code,code,name,item_type,pym,wbm,
+          remarke,crte_id,crte_name,crte_time,is_valid)
+        values
+          <foreach collection="insertLists" item="item" separator=",">
+              (#{item.id},#{item.hospCode},#{item.code},#{item.name},#{item.itemType},#{item.pym},#{item.wbm},
+              #{item.remarke},#{item.crteId},#{item.crteName},#{item.crteTime},#{item.isValid})
+          </foreach>
+    </insert>
+
+    <!--修改数据-->
+    <update id="updateById">
+        update clinical_path_item
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="itemType != null">
+                item_type = #{itemType},
+            </if>
+            <if test="pym != null">
+                pym = #{pym},
+            </if>
+            <if test="wbm != null">
+                wbm = #{wbm},
+            </if>
+            <if test="remarke != null">
+                remarke = #{remarke}
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+    <!-- 删除临床项目 2021/9/15修改为update 作废或者启用 -->
+    <update id="deletePathItemBatch">
+        update clinical_path_item set is_valid = #{isValid} where
+        hosp_code = #{hospCode}
+        and
+        id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+    <!-- 查询项目路径 -->
+    <select id="queryAll" resultType="cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO">
+        select id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time,is_valid
+        from clinical_path_item
+        where hosp_code = #{hospCode}
+        <if test="itemType != null and itemType != ''">
+            and item_type = #{itemType}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            name like concat('%', #{keyword}, '%')
+            or pym like concat('%', #{keyword}, '%')
+            or wbm like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+           and crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+           and crte_time &lt;= #{endTime}
+        </if>
+        <if test="isValid != null and isValid != ''">
+           and is_valid = #{isValid}
+        </if>
+        order by code asc
+    </select>
+    <!--查看项目编码是否存在-->
+    <select id="queryByCode" resultType="java.lang.Integer">
+        select count(code) from clinical_path_item where hosp_code = #{hospCode}
+        and code = #{code}
+        <if test="id != null and id != '' ">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!-- 通过id 查询临床路径项目-->
+    <select id="queryPathItemById"
+            resultType="cn.hsa.module.clinical.clinicalpathitem.dto.ClinicalPathItemDTO">
+        select id,hosp_code,code,name,item_type,pym,wbm,remarke,crte_id,crte_name,crte_time
+        from clinical_path_item
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
+</mapper>
+

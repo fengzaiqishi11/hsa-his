@@ -425,4 +425,30 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
         return WrapperResponse.success(outptTmakePriceFormBO.lisData(map));
     }
 
+    /**
+     * @Method queryPatientPrescribeNoSettle
+     * @Desrciption  查询病人已提交未结算的处方单号
+     * @Param  outptPrescribeDO
+     * @Author liuliyun
+     * @Date  2021/09/03 10:45
+     * @Return WrapperResponse<PageDTO>
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryPatientPrescribeNoSettle(Map map) {
+        return WrapperResponse.success(outptTmakePriceFormBO.queryPatientPrescribeNoSettle(map));
+    }
+
+    /**
+     * @Method queryOutptPrescribeCostList
+     * @Desrciption  根据处方id查询处方费用
+     * @Param  java.util.map
+     * @Author liuliyun
+     * @Date  2021/09/07 10:45
+     * @Return WrapperResponse<List<OutptCostDTO>>
+     **/
+    @Override
+    public WrapperResponse<List<OutptCostDTO>> queryOutptPrescribeCostList(Map map) {
+        return WrapperResponse.success(outptTmakePriceFormBO.queryOutptPrescribeCostList(map));
+    }
+
 }

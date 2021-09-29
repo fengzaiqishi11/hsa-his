@@ -34,7 +34,7 @@
     <select id="getClinicPathById" resultMap="ClinicPathListMap">
         select
           id, hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
-        from clinic_path_list
+        from clinical_path_list
         where id = #{id}
     </select>
 
@@ -42,14 +42,8 @@
     <select id="queryClinicPathAll" resultMap="ClinicPathListMap">
         select
           id, hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
-        from clinic_path_list
-        <where>
-            <if test="id != null and id != ''">
-                and id = #{id}
-            </if>
-            <if test="hospCode != null and hospCode != ''">
-                and hosp_code = #{hospCode}
-            </if>
+        from clinical_path_list
+        where hosp_code = #{hospCode}
             <if test="code != null and code != ''">
                 and code = #{code}
             </if>
@@ -71,146 +65,123 @@
             <if test="diagnoseIds != null and diagnoseIds != ''">
                 and diagnose_ids = #{diagnoseIds}
             </if>
-            <if test="minInptDay != null and minInptDay != ''">
-                and min_inpt_day = #{minInptDay}
-            </if>
-            <if test="maxInptDay != null and maxInptDay != ''">
-                and max_inpt_day = #{maxInptDay}
-            </if>
-            <if test="minPrice != null and minPrice != ''">
-                and min_price = #{minPrice}
-            </if>
-            <if test="maxPrice != null and maxPrice != ''">
-                and max_price = #{maxPrice}
-            </if>
-            <if test="isFreeEntry != null and isFreeEntry != ''">
-                and is_free_entry = #{isFreeEntry}
-            </if>
-            <if test="printColunm != null and printColunm != ''">
-                and print_colunm = #{printColunm}
-            </if>
-            <if test="pym != null and pym != ''">
-                and pym = #{pym}
-            </if>
-            <if test="wbm != null and wbm != ''">
-                and wbm = #{wbm}
-            </if>
-            <if test="remarke != null and remarke != ''">
-                and remarke = #{remarke}
-            </if>
-            <if test="crteId != null and crteId != ''">
-                and crte_id = #{crteId}
-            </if>
-            <if test="crteName != null and crteName != ''">
-                and crte_name = #{crteName}
-            </if>
-            <if test="crteTime != null">
-                and crte_time = #{crteTime}
-            </if>
             <if test="auditCode != null and auditCode != ''">
                 and audit_code = #{auditCode}
-            </if>
-            <if test="auditId != null and auditId != ''">
-                and audit_id = #{auditId}
-            </if>
-            <if test="auditName != null and auditName != ''">
-                and audit_name = #{auditName}
             </if>
             <if test="auditTime != null">
                 and audit_time = #{auditTime}
             </if>
-        </where>
+            /*开始日期*/
+            <if test="startDate != null">
+              and date(crte_time) &gt;= date(#{startDate})
+            </if>
+            /*结束日期*/
+            <if test="endDate != null">
+              and date(crte_time) &lt;= date(#{endDate})
+            </if>
+            <if test="keyword != null and keyword != ''">
+              and (code like concat('%',#{keyword},'%')
+              or name like concat('%',#{keyword},'%')
+              or pym like concat('%',#{keyword},'%')
+              or wbm like concat('%',#{keyword},'%'))
+            </if>
     </select>
 
     <!--新增所有列-->
     <insert id="insertClinicPath" keyProperty="id" useGeneratedKeys="true">
-        insert into clinic_path_list(id,hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time)
+        insert into clinical_path_list(id,hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time)
         values (#{id},#{hospCode}, #{code}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{sortNo}, #{diagnoseIds}, #{minInptDay}, #{maxInptDay}, #{minPrice}, #{maxPrice}, #{isFreeEntry}, #{printColunm}, #{pym}, #{wbm}, #{remarke}, #{crteId}, #{crteName}, #{crteTime}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime})
     </insert>
 
     <!--通过主键修改数据-->
     <update id="updateClinicPath">
-        update clinic_path_list
+        update clinical_path_list
         <set>
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode},
-            </if>
             <if test="code != null and code != ''">
                 code = #{code},
             </if>
-            <if test="name != null and name != ''">
+            <if test="name != null">
                 name = #{name},
             </if>
-            <if test="typeCode != null and typeCode != ''">
+            <if test="typeCode != null">
                 type_code = #{typeCode},
             </if>
-            <if test="deptId != null and deptId != ''">
-                dept_id = #{deptId},
-            </if>
-            <if test="deptName != null and deptName != ''">
-                dept_name = #{deptName},
-            </if>
-            <if test="sortNo != null and sortNo != ''">
+            dept_id = #{deptId},
+            dept_name = #{deptName},
+            <if test="sortNo != null">
                 sort_no = #{sortNo},
             </if>
-            <if test="diagnoseIds != null and diagnoseIds != ''">
+            <if test="diagnoseIds != null">
                 diagnose_ids = #{diagnoseIds},
             </if>
-            <if test="minInptDay != null and minInptDay != ''">
+            <if test="minInptDay != null">
                 min_inpt_day = #{minInptDay},
             </if>
-            <if test="maxInptDay != null and maxInptDay != ''">
+            <if test="maxInptDay != null">
                 max_inpt_day = #{maxInptDay},
             </if>
-            <if test="minPrice != null and minPrice != ''">
+            <if test="minPrice != null">
                 min_price = #{minPrice},
             </if>
-            <if test="maxPrice != null and maxPrice != ''">
+            <if test="maxPrice != null">
                 max_price = #{maxPrice},
             </if>
-            <if test="isFreeEntry != null and isFreeEntry != ''">
+            <if test="isFreeEntry != null">
                 is_free_entry = #{isFreeEntry},
             </if>
-            <if test="printColunm != null and printColunm != ''">
+            <if test="printColunm != null">
                 print_colunm = #{printColunm},
             </if>
-            <if test="pym != null and pym != ''">
+            <if test="pym != null">
                 pym = #{pym},
             </if>
-            <if test="wbm != null and wbm != ''">
+            <if test="wbm != null">
                 wbm = #{wbm},
             </if>
-            <if test="remarke != null and remarke != ''">
+            <if test="remarke != null">
                 remarke = #{remarke},
             </if>
-            <if test="crteId != null and crteId != ''">
-                crte_id = #{crteId},
-            </if>
-            <if test="crteName != null and crteName != ''">
-                crte_name = #{crteName},
-            </if>
-            <if test="crteTime != null">
-                crte_time = #{crteTime},
-            </if>
-            <if test="auditCode != null and auditCode != ''">
+            <if test="auditCode != null">
                 audit_code = #{auditCode},
             </if>
-            <if test="auditId != null and auditId != ''">
+            <if test="auditId != null">
                 audit_id = #{auditId},
             </if>
-            <if test="auditName != null and auditName != ''">
+            <if test="auditName != null">
                 audit_name = #{auditName},
             </if>
             <if test="auditTime != null">
                 audit_time = #{auditTime},
             </if>
         </set>
-        where id = #{id}
+        where id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!--通过主键删除-->
-    <delete id="deleteClinicPathById">
-        delete from clinic_path_list where id = #{id} and hosp_code = #{hospCode}
-    </delete>
+    <update id="updateClinicPathAuditCode">
+        update clinical_path_list
+        <set>
+          audit_code = #{auditCode},
+          <if test="auditId != null || auditId != ''">
+            audit_id = #{auditId},
+          </if>
+          <if test="auditName != null || auditName != ''">
+            audit_name = #{auditName},
+          </if>
+          <if test="auditTime != null">
+            audit_time = #{auditTime},
+          </if>
+        </set>
+        where hosp_code = #{hospCode} and id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+    </update>
+
+    <select id="getMaxSortNo" resultMap="ClinicPathListMap">
+      select id, hosp_code, code, name, type_code, dept_id, dept_name, sort_no, diagnose_ids, min_inpt_day, max_inpt_day, min_price, max_price, is_free_entry, print_colunm, pym, wbm, remarke, crte_id, crte_name, crte_time, audit_code, audit_id, audit_name, audit_time
+      from clinical_path_list where hosp_code = #{hospCode}
+      order by sort_no desc limit 1
+    </select>
 
 </mapper>

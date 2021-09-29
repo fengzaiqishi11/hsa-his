@@ -12,6 +12,7 @@ import cn.hsa.module.outpt.outinInvoice.dao.OutinInvoiceDAO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDetailDO;
+import cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -23,10 +24,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -1022,4 +1021,38 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			throw new RuntimeException("号码比较错误，检查是否为数字");
 		}
 	}
+
+	@Override
+	public Map<String, List<OutinPartInvoiceDO>> queryPartInvoice(OutinInvoiceDTO outinInvoiceDTO) {
+		List<OutinPartInvoiceDO> invoiceDOS = outinInvoiceDao.queryPartInvoicePrint(outinInvoiceDTO);
+		Map<String, List<OutinPartInvoiceDO>> collect = invoiceDOS.stream().collect(Collectors.groupingBy(OutinPartInvoiceDO::getId));
+		return queryDetailInvoice(collect);
+	}
+
+
+	public Map queryDetailInvoice(Map<String, List<OutinPartInvoiceDO>> collect){
+		List<Map> list= new ArrayList<>();
+		Map mapdata = new HashMap();
+		if(collect.size() > 0){
+			for (String key : collect.keySet()) {
+				List<OutinPartInvoiceDO> mid = Arrays.asList(new OutinPartInvoiceDO[collect.get(key).size()]);
+				Collections.copy(mid,collect.get(key));
+				BigDecimal sum = BigDecimal.valueOf(0);
+				for (int i = 0; i < mid.size(); i++) {
+					sum = BigDecimalUtils.add(sum,mid.get(i).getRealityPrice());
+					if(BigDecimalUtils.isZero(BigDecimalUtils.nullToZero(mid.get(i).getRealityPrice()))){
+						collect.get(key).remove(mid.get(i));
+					}
+				}
+				Map map = new HashMap();
+				map.put("data",collect.get(key));
+				map.put("key",key);
+				map.put("sum",sum);
+				list.add(map);
+			}
+		}
+		mapdata.put("listData",list);
+		return mapdata;
+	}
+
 }

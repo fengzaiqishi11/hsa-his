@@ -176,6 +176,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     public synchronized WrapperResponse saveCostTrial(InptVisitDTO inptVisitDTO) {
         String id = inptVisitDTO.getId();//就诊id
         String code = inptVisitDTO.getCode();
+        String userName = inptVisitDTO.getCrteName();
         String hospCode = inptVisitDTO.getHospCode();//医院编码
         String treatmentCode = inptVisitDTO.getTreatmentCode();
         String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
@@ -389,7 +390,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     unifiedMap.put("hospCode", hospCode);
                     unifiedMap.put("visitId", id);
                     unifiedMap.put("code", code);
-                    unifiedMap.put("userName", inptVisitDTO.getCrteName());
+                    unifiedMap.put("userName", userName);
                     unifiedMap.put("inptVisit", inptVisitDTO1);
                     unifiedMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
                     unifiedMap.put("inptVisitDTO",inptVisitDTO1);
@@ -432,7 +433,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal bka821 = BigDecimalUtils.convert(inptInsureResult.get("bka821"));//民政救助金支付
                 BigDecimal bka825 = BigDecimalUtils.convert(inptInsureResult.get("bka825"));//全自费费用
                 BigDecimal bka826 = BigDecimalUtils.convert(inptInsureResult.get("bka826"));//部分自费费用
-                BigDecimal bka831 = BigDecimalUtils.convert(inptInsureResult.get("bka831"));//个人自付bka831 = akb067 + akb066
+                BigDecimal bka831 = BigDecimalUtils.convert(inptInsureResult.get("bka831"));//个人自付bka831 = akb067
                 BigDecimal bka838 = BigDecimalUtils.convert(inptInsureResult.get("bka838"));//超共付段费用个人自付
                 BigDecimal bka839 = BigDecimalUtils.convert(inptInsureResult.get("bka839"));//其他支付
                 BigDecimal bka840 = BigDecimalUtils.convert(inptInsureResult.get("bka840"));//其他基金支付
@@ -502,6 +503,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
                 insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
                 insureIndividualSettleDO.setRetirePrice(ake026);//离休基金支付
+                insureIndividualSettleDO.setMafPay(bka821); // 医疗救助基金
                 insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
                 insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
                 insureIndividualSettleDO.setHospPrice(bka842);//医院支付
@@ -1282,6 +1284,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("selfPrice", list.get(0).get("selfPrice"));
             returnMap.put("settleRealityPrice", list.get(0).get("settleRealityPrice"));  // 优惠后总金额（支付）
             returnMap.put("settleTime", list.get(0).get("settleTime"));  // 结算时间  2021年6月2日11:09:58
+            returnMap.put("personalPrice", list.get(0).get("personalPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {
@@ -1532,7 +1535,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             costParam.put("settleCodes", settleCodes);//结算状态 = 未结算、预结算
             //costParam.put("backCode", Constants.TYZT.YFY);//退费状态 = 正常
             List<InptCostDO> inptCostDOList = inptCostDAO.queryInptCostList(costParam);
-            //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
+            if (inptCostDOList.isEmpty()){
+                throw new AppException("该患者没有产生费用信息。");
+            }
             if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
             }

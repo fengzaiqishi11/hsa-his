@@ -202,5 +202,22 @@ public interface StroInDAO {
     List<StroInDetailDTO> queryStroInDetailAllByOrderNo(StroInDetailDTO stroStroInDetailDTO);
 
     StroInRecordDTO queryStroInRecord(StroInRecordDTO stroInRecordDTO);
-
+    /**
+     * @Meth: queryStroInPageForExprot
+     * @Description: 查询入库单
+     * @Param: [stroInDetailDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroin.dto.StroInDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/17
+     */
+    List<StroInDTO> queryStroInPageForExprot(StroInDetailDTO stroInDetailDTO);
+    /**
+     * @Meth:queryStroinDetailForExprot
+     * @Description: 批量查询明细为了 批量导出
+     * @Param: [stroInDetailDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroin.dto.StroInDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/17
+     */
+    List<StroInDetailDTO> queryStroinDetailForExprot(StroInDetailDTO stroInDetailDTO);
 }

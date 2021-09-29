@@ -1,12 +1,15 @@
 package cn.hsa.module.clinical.clinicalpathlist.dto;
 
+import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.clinical.clinicalpathlist.entity.ClinicPathListDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,5 +27,14 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ClinicPathListDTO extends ClinicPathListDO implements Serializable {
   private static final long serialVersionUID = -8286967177244410037L;
+  private String flag;
   private List<String> ids;
+  private List<String> newDiagnoseIds;
+  private List<BaseDiseaseDTO> baseDiseaseDTOS;
+  private String diagnoseNames;
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private Date startDate;        //开始日期
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private Date endDate;         //结束日期
+  private String keyword;       //搜索关键字
 }

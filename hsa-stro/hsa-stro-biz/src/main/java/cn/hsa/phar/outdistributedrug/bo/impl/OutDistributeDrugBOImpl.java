@@ -735,7 +735,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
         outptPrescribeDTO.setOrId(pharOutReceiveDTO.getId());
         List<Map> prescribeDetailPrint = outDistributeDrugDAO.getPrescribeDetailPrint(outptPrescribeDTO);
         outptPrescribeDTO.setOutptPrescribeDetailsDtoPrintList(prescribeDetailPrint);
-          outptPrescribeDTO.setSinglePatInfo(map);
+        outptPrescribeDTO.setSinglePatInfo(map);
       }
       return prescribePrint;
     }

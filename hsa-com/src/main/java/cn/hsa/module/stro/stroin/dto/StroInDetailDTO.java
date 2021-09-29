@@ -30,4 +30,8 @@ public class StroInDetailDTO extends StroInDetailDO implements Serializable {
     private String code;          //项目编码
     private static final long serialVersionUID = -25487061965973397L;
     private String model;       //材料型号
+    /**
+     * 供应商
+     */
+    private String supplierName;
 }

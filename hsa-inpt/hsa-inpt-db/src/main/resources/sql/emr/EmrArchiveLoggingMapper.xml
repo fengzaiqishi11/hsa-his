@@ -59,7 +59,7 @@
         select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name, e.archive_name, e.archive_option,
         if(e.archive_state is null, "0", e.archive_state) as archive_state, e.archive_time, v.zg_doctor_name as doctorName,v.zg_doctor_id as doctorId
         from inpt_visit v left join emr_archive_logging e on v.id = e.visit_id
-        where v.hosp_code = #{hospCode}
+        where v.hosp_code = #{hospCode} and v.status_code in ('5','7')
         <if test="endTime != null and endTime != ''">
             and v.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
@@ -89,7 +89,7 @@
         select v.id as visitId, v.in_dept_name as inDeptName, v.name as patientName, v.age as patientAge, v.age_unit_code as patientNldw, v.gender_code as patientSex , v.in_time as ryDate, v.out_time as cyDate, v.in_no, v.bed_name as bedName, e.archive_name, e.archive_option,
         if(e.archive_state is null, "0", e.archive_state) as archive_state, e.archive_time, v.zg_doctor_name as doctorName,v.zg_doctor_id as doctorId
         from inpt_visit v join emr_archive_logging e on v.id = e.visit_id
-        where v.hosp_code = #{hospCode}
+        where v.hosp_code = #{hospCode} and v.status_code in('5','7')
         <if test="ryDate != null and cyDate != null">
             and DATE_FORMAT(v.in_time,'%Y-%m-%d') between #{ryDate} and #{cyDate}
         </if>

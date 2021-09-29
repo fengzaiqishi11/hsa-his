@@ -838,6 +838,35 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
   public List<StroInDetailDTO> queryStroinDetail(StroInDetailDTO stroInDetailDTO) {
     return stroInDao.queryStroInDetailAll(stroInDetailDTO);
   }
+  /**
+   * @Meth: queryStroinDetailForExprot
+   * @Description: 查询明细为了批量导出
+   * @Param: [stroInDetailDTO]
+   * @return: java.util.List<cn.hsa.module.stro.stroin.dto.StroInDetailDTO>
+   * @Author: zhangguorui
+   * @Date: 2021/9/17
+   */
+  @Override
+  public List<StroInDetailDTO> queryStroinDetailForExprot(StroInDetailDTO stroInDetailDTO) {
+    Optional.ofNullable(stroInDetailDTO.getHospCode()).orElseThrow(()-> new AppException("医院编码不能为空"));
+    if (ListUtils.isEmpty(stroInDetailDTO.getInIds())){
+      throw new AppException("请先勾选入库单据");
+    }
+    // 通过入库id 查询供应商名称
+    List<StroInDTO> stroInDTOS = stroInDao.queryStroInPageForExprot(stroInDetailDTO);
+    // 转化成map，格式为 <id,name> 供应商
+    Map<String, String> supplierMap = stroInDTOS.stream().collect(Collectors.toMap(StroInDTO::getId, StroInDTO::getName));
+    if (MapUtils.isEmpty(supplierMap)){
+      throw new AppException("所选的入库单据查询出来的供应商为空");
+    }
+    // 查询明细
+    List<StroInDetailDTO> resultList = stroInDao.queryStroinDetailForExprot(stroInDetailDTO);
+    // 遍历设置供应商名称
+    resultList.stream().forEach(item ->{
+      item.setSupplierName(supplierMap.get(item.getInId()));
+    });
+    return resultList;
+  }
 
 
 }

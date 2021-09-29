@@ -236,5 +236,23 @@ public class StroinController extends BaseController {
     return this.stroInService_consumer.queryStroinDetail(map);
   }
 
+  /**
+   * @Meth: queryStroinDetailForExprot
+   * @Description:  查询明细数据为了批量导出
+   * @Param:
+   * @return:
+   * @Author: zhangguorui
+   * @Date: 2021/9/17
+  */
+  @PostMapping("/queryStroinDetailForExprot")
+  public WrapperResponse<List<StroInDetailDTO>> queryStroinDetailForExprot(@RequestBody StroInDetailDTO stroInDetailDTO,
+                                                                           HttpServletRequest req, HttpServletResponse res){
+      SysUserDTO sysUserDTO = getSession(req, res);
+      stroInDetailDTO.setHospCode(sysUserDTO.getHospCode());
+      Map map = new HashMap();
+      map.put("hospCode",sysUserDTO.getHospCode());
+      map.put("stroInDetailDTO",stroInDetailDTO);
+      return this.stroInService_consumer.queryStroinDetailForExprot(map);
+  }
 
 }

@@ -536,7 +536,7 @@
                         ov.dept_name AS dept_name,
                         osi.invoice_no AS invoice_no,
                         DATE_FORMAT(os.settle_time, '%Y-%m-%d %H:%i:%s') AS settle_time,
-                        round(os.actual_price, 2) AS total_price,
+                        ifnull(round(osi.total_price, 2), round(os.actual_price, 2)) AS total_price,
                         os.crte_name AS crte_name,
                         os.status_code as status_code
                     FROM
@@ -582,6 +582,9 @@
             AND od.hosp_code = iv.hosp_code
             AND od.id = iap.daily_settle_id
             AND iap.visit_id = iv.id
+            <if test="payCode != null and payCode != ''">
+                and iap.pay_code = #{payCode}
+            </if>
         ORDER BY
             iap.crte_time DESC
     </select>
@@ -615,7 +618,6 @@
             AND od.hosp_code = iap.hosp_code
             AND od.hosp_code = iv.hosp_code
             and od.id = iss.daily_settle_id
-            and od.id = iap.daily_settle_id
             AND iss.id = iap.settle_id
             AND iss.visit_id = iv.id
         ORDER BY
@@ -685,7 +687,7 @@
          select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
             left join (
                 select a.pay_code, sum(total_price) as total_price from (
-                    SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
+                    SELECT odp.pay_code, odp.total_price FROM outin_daily_pay odp
                     WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
                     union all
                     select pay_code, total_price from outin_daily_advance_pay where hosp_code = #{hospCode} AND daily_no = #{dailyNo} and type_code = #{typeCode}

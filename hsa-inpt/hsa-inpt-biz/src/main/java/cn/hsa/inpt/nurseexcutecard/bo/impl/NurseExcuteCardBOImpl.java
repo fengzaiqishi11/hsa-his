@@ -141,9 +141,31 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
            inptVisitDTO.setIsStop(Constants.SF.S);
          }
         PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
-        List<InptAdviceDTO> adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
-
+        List<InptAdviceDTO> adviceDTOList = new ArrayList<>();
+        // 获取系统参数，判断执行卡输液瓶贴是返回一条还是多条，默认是多条
+        String code = "INFUSION_BOTTLE_STICKER";
+        SysParameterDTO sysParameterDTO = this.getSysParameter(code, inptVisitDTO.getHospCode());
+        if ("1".equals(printType)) {
+            // 输液瓶贴
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+                adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
+            } else {
+                // 瓶贴多条 不分组
+                adviceDTOList = nurseExcuteCardDAO.queryDocterAdviceMany(inptVisitDTO);
+            }
+        } else {
+            adviceDTOList = nurseExcuteCardDAO.queryDocterAdvice(inptVisitDTO);
+        }
         return PageDTO.of(adviceDTOList);
+    }
+
+    // 获取系统参数
+    private SysParameterDTO getSysParameter(String code, String hospCode) {
+        Map map = new HashMap();
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        WrapperResponse<SysParameterDTO> response = sysParameterService_consumer.getParameterByCode(map);
+        return response.getData();
     }
 
     /**
@@ -252,6 +274,16 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
              *  isPrint(mapToString): {'1':'0'; '2':'0'; '3':'0'; '14':'0'; '16':'0'} 未打印状态
              *  isPrint(mapToString): {'1':'1'; '2':'1'; '3':'1'; '14':'1'; '16':'1'} 已打印状态
              */
+            SysParameterDTO sysParameter = this.getSysParameter("INFUSION_BOTTLE_STICKER", inptAdviceDTO.getHospCode());
+            if ("1".equals(inptAdviceDTO.getPrintType())) {
+                if (sysParameter != null && StringUtils.isNotEmpty(sysParameter.getValue()) && "1".equals(sysParameter.getValue())) {
+                    // 开启参数，页面输液瓶贴展示一条，根据页面医嘱id修改执行表所有打印状态
+                } else {
+                    // 默认不开启，根据执行id修改打印状态
+                    inptAdviceDTO.setInptAdviceExecIds(inptAdviceDTO.getIds());
+                    inptAdviceDTO.setIds(null);
+                }
+            }
             //根据医嘱执行id查询出对应的医嘱执行记录
             List<InptAdviceExecDTO> list =  nurseExcuteCardDAO.queryExcuteByIds(inptAdviceDTO);
             if (!ListUtils.isEmpty(list)){

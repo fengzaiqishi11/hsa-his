@@ -33,6 +33,7 @@
         <result property="restsPrice" column="rests_price" jdbcType="NUMERIC"/>
         <result property="assignPrice" column="assign_price" jdbcType="NUMERIC"/>
         <result property="startingPrice" column="starting_price" jdbcType="NUMERIC"/>
+        <result property="mafPay" column="maf_pay" jdbcType="NUMERIC"/>
         <result property="topPrice" column="top_price" jdbcType="NUMERIC"/>
         <result property="planAccountPrice" column="plan_account_price" jdbcType="NUMERIC"/>
         <result property="portionPrice" column="portion_price" jdbcType="NUMERIC"/>
@@ -114,6 +115,7 @@
         iis.crte_time,
         iis.insureSettleId,
         iis.medicalRegNo,
+        iis.maf_pay,
         iis.ext03,
         iis.ext04,
         iis.ext05,
@@ -288,7 +290,8 @@
          ext07,
          ext08,
          ext09,
-         ext10)
+         ext10,
+         maf_pay)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -340,7 +343,8 @@
                 #{ext07,jdbcType=VARCHAR},
                 #{ext08,jdbcType=VARCHAR},
                 #{ext09,jdbcType=VARCHAR},
-                #{ext10,jdbcType=VARCHAR})
+                #{ext10,jdbcType=VARCHAR},
+                #{mafPay,jdbcType=DECIMAL})
     </insert>
     <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
     <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
@@ -501,7 +505,10 @@
                 ext09,
             </if>
             <if test="ext10 != null and ext10 != ''">
-                ext10
+                ext10,
+            </if>
+            <if test="mafPay != null and mafPay != ''">
+                maf_pay
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -659,7 +666,10 @@
                 #{ext09,jdbcType=VARCHAR},
             </if>
             <if test="ext10 != null and ext10 != ''">
-                #{ext10,jdbcType=VARCHAR}
+                #{ext10,jdbcType=VARCHAR},
+            </if>
+            <if test="mafPay != null and mafPay != ''">
+                #{mafPay,jdbcType=DECIMAL}
             </if>
         </trim>
     </insert>
@@ -758,7 +768,8 @@
             ext07              = #{ext07,jdbcType=VARCHAR},
             ext08              = #{ext08,jdbcType=VARCHAR},
             ext09              = #{ext09,jdbcType=VARCHAR},
-            ext10              = #{ext10,jdbcType=VARCHAR}
+            ext10              = #{ext10,jdbcType=VARCHAR},
+            maf_pay            = #{mafPay,jdbcType=DECIMAL}
         where id = #{id}
     </update>
 
@@ -935,7 +946,10 @@
                 clr_type = #{clrType,jdbcType=VARCHAR},
             </if>
             <if test="clrOptins != null and clrOptins != ''">
-                clr_optins = #{clrOptins,jdbcType=VARCHAR}
+                clr_optins = #{clrOptins,jdbcType=VARCHAR},
+            </if>
+            <if test="mafPay != null and mafPay != ''">
+                maf_pay = #{mafPay,jdbcType=DECIMAL}
             </if>
         </set>
         where 1=1

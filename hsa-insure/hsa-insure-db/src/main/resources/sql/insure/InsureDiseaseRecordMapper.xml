@@ -171,20 +171,32 @@
           and iir.trt_dcla_detl_sn = #{trtDclaDetlSn}
     </select>
     <select id="queryPageInptRecord" resultType="cn.hsa.module.insure.module.dto.InsureInptRecordDTO">
-        select iv.name,iv.phone,iv.address,iiv.medical_reg_no,iiv.medicine_org_code as
+        select iiv.medical_reg_no,iiv.medicine_org_code as
         medicineOrgCode,iiv.bka006,iiv.visit_icd_code,iiv.visit_icd_name,
         iiv.visit_berth as visitBerth, iiv.visit_icd_code as visitIcdCode,iiv.visit_drpt_name as
         visitDrptName,iiv.visit_icd_name as visitIcdName,
-        iiv.aac001,iiv.aka130_name as aka130Name,iv.phone as tel,iv.address as address,iiv.insure_reg_code,iiv.visit_id
-        as visitId,iib.aae140 as aae140,
+        iiv.aac001,iiv.aka130_name as aka130Name,iiv.insure_reg_code,iiv.visit_id
+        as visitId,iib.aae140 as aae140,iib.aac003 as name,
         iir.*
         from insure_individual_visit iiv
-        join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
+        <if test="isHospital == '1'.toString()">
+            join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
+        </if>
+        <if test="isHospital == '0'.toString()">
+            join outpt_visit ov on iiv.visit_id = ov.id and iiv.hosp_code = ov.hosp_code
+        </if>
         join  insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
         left join insure_inpt_record iir on iir.hosp_code = iiv.hosp_code and iir.visit_id = iiv.visit_id
-        and iiv.hosp_code = #{hospCode} and iiv.is_hospital ='1'
-        <if test="keyword !=null and keyword != ''">
-            and (iv.name like '%${keyword}%')
+        where 1=1 and  iiv.hosp_code = #{hospCode}
+        <if test="isHospital == '1'.toString()">
+            <if test="keyword !=null and keyword != ''">
+                and iv.name like concat('%',#{keyword},'%')
+            </if>
+        </if>
+        <if test="isHospital == '0'.toString()">
+            <if test="keyword !=null and keyword != ''">
+                and ov.name like concat('%',#{keyword},'%')
+            </if>
         </if>
         order by iir.crte_time desc
     </select>

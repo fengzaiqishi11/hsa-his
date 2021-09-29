@@ -5,6 +5,8 @@ import cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
 import cn.hsa.module.emr.emrelementtemplate.dto.EmrElementTemplateDTO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
+import cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO;
+import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -345,4 +347,12 @@ public interface EmrPatientDAO {
 	EmrPatientRecordDTO queryEmrOutInfo(Map map);
 
 	List<EmrPatientDTO> queryEmrPaitentInfo(Map map);
+
+	int insertEmrPirnt(EmrPatientPrintDO emrPatientPrintDO);
+
+	int updatePatientEmrPrintNum(EmrPatientDTO emrPatientDTO);
+
+	Integer getPrintNum(EmrPatientPrintDO emrPatientPrintDO);
+
+	List<EmrPatientReportFormDTO> queryPatientEmrReportForm(EmrPatientReportFormDTO reportFormDTO);
 }

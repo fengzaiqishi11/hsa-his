@@ -120,15 +120,76 @@ public class OutptFunction {
         httpParam.put("bkc290",null);//照片base64编码
         List<InsureIndividualCostDO> insureIndividualCostDOS = null;
         Boolean isSettle = Constant.Xiangtan.DICT.JSBZ_SF.equals(param.get("bka894"));//是否结算
+
+        int len = 1;
+        List<OutptCostDTO> feesList = (List<OutptCostDTO>) param.get("fees");
+        List<Map<String,Object>> feeinfoList = new ArrayList<Map<String,Object>>();
+        if (feesList != null && !feesList.isEmpty()){
+            List<String> itemIds = new ArrayList<String>();
+            feesList.stream().forEach(outptCostDTO -> {itemIds.add(outptCostDTO.getItemId());});
+            Map<String,Object> itemMatchParam = new HashMap<String,Object>();
+            itemMatchParam.put("hospCode",hospCode);
+            itemMatchParam.put("isValid",Constants.SF.S);
+            itemMatchParam.put("isMatch",Constants.SF.S);
+            itemMatchParam.put("itemIds",itemIds);
+            List<InsureItemMatchDTO> insureItemMatchDTOList = insureItemMatchDAO.queryByHospItemId(itemMatchParam);
+            if (insureItemMatchDTOList != null && !insureItemMatchDTOList.isEmpty()){
+                insureIndividualCostDOS = new ArrayList<InsureIndividualCostDO>();
+                for (OutptCostDTO item : feesList){
+                    for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchDTOList){
+                        if (StringUtils.isNotEmpty(item.getItemId()) && item.getItemId().equals(insureItemMatchDTO.getHospItemId())
+                                && StringUtils.isNotEmpty(item.getItemCode()) && item.getItemCode().equals(insureItemMatchDTO.getHospItemType())){
+                            Map<String,Object> fee = new HashMap<String,Object>();
+                            /* 费用信息（Feeinfo） */
+                            fee.put("ake005",insureItemMatchDTO.getHospItemCode());//医院药品项目编码
+                            fee.put("ake006",insureItemMatchDTO.getHospItemName());//医院药品项目名称
+                            fee.put("aka070",insureItemMatchDTO.getHospItemPrepCode());//剂型
+                            fee.put("bka073",insureItemMatchDTO.getManufacturer());//厂家
+                            fee.put("aka074",insureItemMatchDTO.getHospItemSpec());//规格
+                            fee.put("ake007",DateUtils.format(item.getCrteTime(),DateUtils.YMD));//费用发生日期
+                            fee.put("aka067",item.getDosage());//计量单位
+                            fee.put("bka040",item.getPrice());//单价
+                            fee.put("akc226",item.getTotalNum());//用量
+                            fee.put("aae019",item.getRealityPrice());//金额
+                            fee.put("aaz213",len++);//费用序号
+                            fee.put("bka070",item.getOpId());//处方号
+                            fee.put("bka074",item.getDoctorId());//处方医生编号
+                            fee.put("bka075",item.getDoctorName());//处方医生姓名
+                            fee.put("bka071",item.getId());//医院费用的唯一标识
+                            feeinfoList.add(fee);
+                            if (isSettle){
+                                InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
+                                insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
+                                insureIndividualCostDO.setHospCode(hospCode);//医院编码
+                                insureIndividualCostDO.setVisitId(visitId);//就诊id
+                                insureIndividualCostDO.setSettleId(settleId);//结算id
+                                insureIndividualCostDO.setIsHospital(Constants.SF.F);//是否住院
+                                insureIndividualCostDO.setItemType(insureItemMatchDTO.getInsureItemType());//对应医保项目类别
+                                insureIndividualCostDO.setItemCode(insureItemMatchDTO.getInsureItemCode());//对应医保项目编码
+                                insureIndividualCostDO.setItemName(insureItemMatchDTO.getInsureItemName());//对应医保项目名称
+                                insureIndividualCostDO.setGuestRatio(null);//自付比例
+                                insureIndividualCostDO.setPrimaryPrice(null);//原费用
+                                insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
+                                insureIndividualCostDO.setOrderNo(null);//顺序号
+                                insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志
+                                insureIndividualCostDO.setCrteId(crteId);//创建人id
+                                insureIndividualCostDO.setCrteName(crteName);//创建姓名
+                                insureIndividualCostDO.setCrteTime(new Date());//创建时间
+                                insureIndividualCostDOS.add(insureIndividualCostDO);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // 自定义，1 表示退费数据上传
         if ("1".equals(param.get("type"))) {
             httpParam.put("bka893",param.get("bka893"));
             httpParam.put("bka894",Constant.Xiangtan.DICT.JSBZ_TF); // 退费
             httpParam.put("aaz217",param.get("aaz217"));
-
-            List<Map<String,Object>> feesList = (List<Map<String,Object>>) param.get("fees");
-            if (!ListUtils.isEmpty(feesList)) {
-                for (Map<String,Object> fee : feesList) {
+            if (!ListUtils.isEmpty(feeinfoList)) {
+                for (Map<String,Object> fee : feeinfoList) {
                     // 总费用
                     BigDecimal money = new BigDecimal(String.valueOf(fee.get("aae019")));
                     // 总用量
@@ -136,75 +197,14 @@ public class OutptFunction {
                     fee.put("aae019", BigDecimalUtils.negate(money));
                     fee.put("akc226",BigDecimalUtils.negate(num));
                 }
-                httpParam.put("feeinfo",feesList);
-            }
-        } else {
-            int len = 1;
-            List<OutptCostDTO> feesList = (List<OutptCostDTO>) param.get("fees");
-            List<Map<String,Object>> feeinfoList = new ArrayList<Map<String,Object>>();
-            if (feesList != null && !feesList.isEmpty()){
-                List<String> itemIds = new ArrayList<String>();
-                feesList.stream().forEach(outptCostDTO -> {itemIds.add(outptCostDTO.getItemId());});
-                Map<String,Object> itemMatchParam = new HashMap<String,Object>();
-                itemMatchParam.put("hospCode",hospCode);
-                itemMatchParam.put("isValid",Constants.SF.S);
-                itemMatchParam.put("isMatch",Constants.SF.S);
-                itemMatchParam.put("itemIds",itemIds);
-                List<InsureItemMatchDTO> insureItemMatchDTOList = insureItemMatchDAO.queryByHospItemId(itemMatchParam);
-                if (insureItemMatchDTOList != null && !insureItemMatchDTOList.isEmpty()){
-                    insureIndividualCostDOS = new ArrayList<InsureIndividualCostDO>();
-                    for (OutptCostDTO item : feesList){
-                        for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchDTOList){
-                            if (StringUtils.isNotEmpty(item.getItemId()) && item.getItemId().equals(insureItemMatchDTO.getHospItemId())
-                                    && StringUtils.isNotEmpty(item.getItemCode()) && item.getItemCode().equals(insureItemMatchDTO.getHospItemType())){
-                                Map<String,Object> fee = new HashMap<String,Object>();
-                                /* 费用信息（Feeinfo） */
-                                fee.put("ake005",insureItemMatchDTO.getHospItemCode());//医院药品项目编码
-                                fee.put("ake006",insureItemMatchDTO.getHospItemName());//医院药品项目名称
-                                fee.put("aka070",insureItemMatchDTO.getHospItemPrepCode());//剂型
-                                fee.put("bka073",insureItemMatchDTO.getManufacturer());//厂家
-                                fee.put("aka074",insureItemMatchDTO.getHospItemSpec());//规格
-                                fee.put("ake007",DateUtils.format(item.getCrteTime(),DateUtils.YMD));//费用发生日期
-                                fee.put("aka067",item.getDosage());//计量单位
-                                fee.put("bka040",item.getPrice());//单价
-                                fee.put("akc226",item.getTotalNum());//用量
-                                fee.put("aae019",item.getRealityPrice());//金额
-                                fee.put("aaz213",len++);//费用序号
-                                fee.put("bka070",item.getOpId());//处方号
-                                fee.put("bka074",item.getDoctorId());//处方医生编号
-                                fee.put("bka075",item.getDoctorName());//处方医生姓名
-                                fee.put("bka071",item.getId());//医院费用的唯一标识
-                                feeinfoList.add(fee);
-                                if (isSettle){
-                                    InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
-                                    insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
-                                    insureIndividualCostDO.setHospCode(hospCode);//医院编码
-                                    insureIndividualCostDO.setVisitId(visitId);//就诊id
-                                    insureIndividualCostDO.setSettleId(settleId);//结算id
-                                    insureIndividualCostDO.setIsHospital(Constants.SF.F);//是否住院
-                                    insureIndividualCostDO.setItemType(insureItemMatchDTO.getInsureItemType());//对应医保项目类别
-                                    insureIndividualCostDO.setItemCode(insureItemMatchDTO.getInsureItemCode());//对应医保项目编码
-                                    insureIndividualCostDO.setItemName(insureItemMatchDTO.getInsureItemName());//对应医保项目名称
-                                    insureIndividualCostDO.setGuestRatio(null);//自付比例
-                                    insureIndividualCostDO.setPrimaryPrice(null);//原费用
-                                    insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
-                                    insureIndividualCostDO.setOrderNo(null);//顺序号
-                                    insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志
-                                    insureIndividualCostDO.setCrteId(crteId);//创建人id
-                                    insureIndividualCostDO.setCrteName(crteName);//创建姓名
-                                    insureIndividualCostDO.setCrteTime(new Date());//创建时间
-                                    insureIndividualCostDOS.add(insureIndividualCostDO);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            httpParam.put("feeinfo",feeinfoList);
-            if (len == 1){
-                throw new AppException("费用在医保中心未审核或者未匹配。");
             }
         }
+
+        httpParam.put("feeinfo",feeinfoList);
+        if (len == 1){
+            throw new AppException("费用在医保中心未审核或者未匹配。");
+        }
+
         Map<String,Object> httpResult = requestInsure.call((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
         if (httpResult.containsKey("payinfo")){
             List<Map<String,String>> payinfoList = (List<Map<String, String>>) httpResult.get("payinfo");

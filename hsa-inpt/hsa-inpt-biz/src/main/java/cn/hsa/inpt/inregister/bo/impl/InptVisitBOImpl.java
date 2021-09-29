@@ -472,24 +472,34 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
         List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
-        if(ListUtils.isEmpty(inptVisitDTOS)){
-            return PageDTO.of(inptVisitDTOS);
-        }
-        List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
-        List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
-        List<Map<String, Object>> finalResult = inptVisitDTOS.stream().map(data -> {
-            patientCostDataList.stream().map(costsData ->{
-                if(data.get("id").equals(costsData.get("visit_id")))
-                {
-                    data.put("ypfy",costsData.get("item_price"));
-                    data.put("total_price",costsData.get("total_price"));
-                    data.put("fyb",costsData.get("fyb"));
+//        List<Map<String, Object>> finalResult = new ArrayList<>();
+        if (!ListUtils.isEmpty(inptVisitDTOS)) {
+            List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
+            List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
+//            finalResult = inptVisitDTOS.stream().map(data -> {
+//                patientCostDataList.stream().map(costsData ->{
+//                    if(data.get("id").equals(costsData.get("visit_id")))
+//                    {
+//                        data.put("ypfy",costsData.get("item_price"));
+//                        data.put("total_price",costsData.get("total_price"));
+//                        data.put("fyb",costsData.get("fyb"));
+//                    }
+//                    return costsData;
+//                });
+//                return data;
+//            }).collect(Collectors.toList());
+            outer: for (Map<String, Object> map : inptVisitDTOS) {
+                for (Map<String, Object> map2 : patientCostDataList) {
+                    if (map.get("id").equals(map2.get("visit_id"))) {
+                        map.put("ypfy",map2.get("item_price"));
+                        map.put("total_price",map2.get("total_price"));
+                        map.put("fyb",map2.get("fyb"));
+                        continue outer;
+                    }
                 }
-                return costsData;
-            });
-            return data;
-        }).collect(Collectors.toList());
-        return PageDTO.of(finalResult);
+            }
+        }
+        return PageDTO.of(inptVisitDTOS);
     }
 
     /**
@@ -855,6 +865,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureInptRegisterDTO.setAab001(""); // 单位电脑号
         insureInptRegisterDTO.setAab019(""); // 单位类型
         insureInptRegisterDTO.setAab999(""); // 单位管理码
+        insureInptRegisterDTO.setCardIden(insureIndividualBasicDTO.getCardIden());// 卡识别码
+        insureInptRegisterDTO.setAac002(insureIndividualBasicDTO.getAac002()); // 证件号码
         insureInptRegisterDTO.setAac148(""); // 补助类型
         insureInptRegisterDTO.setAae140(""); // 险种编码
         insureInptRegisterDTO.setBaa027(""); // 人员所属中心
@@ -885,9 +897,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
         // 工伤生育必填
         insureInptRegisterDTO.setInjuryBorthSn(insureIndividualBasicDTO.getInjuryBorthSn());
-        insureInptRegisterDTO.setCardIden(insureIndividualBasicDTO.getCardIden());// 卡识别码
-        insureInptRegisterDTO.setAac002(insureIndividualBasicDTO.getAac002()); // 证件号码
-
 
         // TODO 远程调用医保接口
         Map<String, Object> insureParam = new HashMap<>();

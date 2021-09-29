@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.outpt.dao.InsureReckonDAO">
+    <!-- 字段映射 -->
+    <resultMap id="insureUnifiedReckonMap" type="cn.hsa.module.insure.outpt.entity.InsureReckonDO">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="hosp_code" property="hospCode" jdbcType="VARCHAR" />
+        <result column="insure_reg_code" property="insureRegCode" jdbcType="VARCHAR" />
+        <result column="medicine_org_code" property="medicineOrgCode" jdbcType="VARCHAR" />
+        <result column="clr_type" property="clrType" jdbcType="VARCHAR" />
+        <result column="clr_way" property="clrWay" jdbcType="VARCHAR" />
+        <result column="clr_optins" property="clrOptins" jdbcType="VARCHAR" />
+        <result column="setlym" property="setlym" jdbcType="VARCHAR" />
+        <result column="psntime" property="psntime" jdbcType="INTEGER" />
+        <result column="medfee_sumamt" property="medfeeSumamt" jdbcType="DECIMAL" />
+        <result column="med_sumfee" property="medSumfee" jdbcType="DECIMAL" />
+        <result column="fund_appy_sum" property="fundAppySum" jdbcType="DECIMAL" />
+        <result column="cash_payamt" property="cashPayamt" jdbcType="DECIMAL" />
+        <result column="acct_pay" property="acctPay" jdbcType="DECIMAL" />
+        <result column="begndate" property="begndate" jdbcType="TIMESTAMP" />
+        <result column="enddate" property="enddate" jdbcType="TIMESTAMP" />
+        <result column="is_declare" property="isDeclare" jdbcType="VARCHAR" />
+        <result column="declare_time" property="declareTime" jdbcType="TIMESTAMP" />
+        <result column="declare_name" property="declareName" jdbcType="VARCHAR" />
+        <result column="clr_appy_evt_id" property="clrAppyEvtId" jdbcType="VARCHAR" />
+        <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
+        <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
+        <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 表查询字段 -->
+    <sql id="allColumns">
+        id, hosp_code, insure_reg_code, medicine_org_code, clr_type, clr_way,clr_optins, setlym, psntime,
+        medfee_sumamt, med_sumfee, fund_appy_sum, cash_payamt, acct_pay, begndate, enddate, is_declare,
+        declare_time, declare_name, clr_appy_evt_id, crte_name, crte_id, crte_time
+    </sql>
+
+    <!-- 查询所有数据 -->
+    <select id="findInsureUnifiedReckonAll" resultMap="insureUnifiedReckonMap">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_unified_reckon
+    </select>
+
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="queryInsureReckonInfoPage" resultMap="insureUnifiedReckonMap" parameterType="cn.hsa.module.insure.outpt.dto.InsureReckonDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_unified_reckon WHERE 1 = 1
+        <if test="hospCode != null and hospCode != ''">
+            AND hosp_code LIKE CONCAT('%', #{hospCode}, '%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            AND insure_reg_code LIKE CONCAT('%', #{insureRegCode}, '%')
+        </if>
+        <if test="medicineOrgCode != null and medicineOrgCode != ''">
+            AND medicine_org_code LIKE CONCAT('%', #{medicineOrgCode}, '%')
+        </if>
+        <if test="clrType != null and clrType != ''">
+            AND clr_type LIKE CONCAT('%', #{clrType}, '%')
+        </if>
+        <if test="clrWay != null and clrWay != ''">
+            AND clr_way LIKE CONCAT('%', #{clrWay}, '%')
+        </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            AND clr_optins LIKE CONCAT('%', #{clrOptins}, '%')
+        </if>
+        <if test="setlym != null and setlym != ''">
+            AND setlym LIKE CONCAT('%', #{setlym}, '%')
+        </if>
+        <if test="psntime != null">
+            AND psntime = #{psntime}
+        </if>
+        <if test="medfeeSumamt != null">
+            AND medfee_sumamt = #{medfeeSumamt}
+        </if>
+        <if test="medSumfee != null">
+            AND med_sumfee = #{medSumfee}
+        </if>
+        <if test="fundAppySum != null">
+            AND fund_appy_sum = #{fundAppySum}
+        </if>
+        <if test="cashPayamt != null">
+            AND cash_payamt = #{cashPayamt}
+        </if>
+        <if test="acctPay != null">
+            AND acct_pay = #{acctPay}
+        </if>
+        <if test="begndate != null">
+            AND begndate = #{begndate}
+        </if>
+        <if test="enddate != null">
+            AND enddate = #{enddate}
+        </if>
+        <if test="isDeclare != null and isDeclare != ''">
+            AND is_declare LIKE CONCAT('%', #{isDeclare}, '%')
+        </if>
+        <if test="declareTime != null">
+            AND declare_time = #{declareTime}
+        </if>
+        <if test="declareName != null and declareName != ''">
+            AND declare_name LIKE CONCAT('%', #{declareName}, '%')
+        </if>
+        <if test="clrAppyEvtId != null and clrAppyEvtId != ''">
+            AND clr_appy_evt_id LIKE CONCAT('%', #{clrAppyEvtId}, '%')
+        </if>
+        <if test="crteName != null and crteName != ''">
+            AND crte_name LIKE CONCAT('%', #{crteName}, '%')
+        </if>
+        <if test="crteId != null and crteId != ''">
+            AND crte_id LIKE CONCAT('%', #{crteId}, '%')
+        </if>
+        <if test="crteTime != null">
+            AND crte_time = #{crteTime}
+        </if>
+    </select>
+
+    <!-- 根据主键查询数据 -->
+    <select id="getInsureUnifiedReckonById" resultMap="insureUnifiedReckonMap" parameterType="cn.hsa.module.insure.outpt.dto.InsureReckonDTO">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_unified_reckon WHERE id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!-- 根据主键查询数据 批量-->
+    <select id="findInsureUnifiedReckonByIds" resultMap="insureUnifiedReckonMap" parameterType="list">
+        SELECT
+        <include refid="allColumns" />
+        FROM insure_unified_reckon WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="addInsureReckonInfo" parameterType="cn.hsa.module.insure.outpt.dto.InsureReckonDTO">
+        INSERT INTO insure_unified_reckon (
+            id, hosp_code, insure_reg_code, medicine_org_code, clr_type, clr_way,clr_optins, setlym, psntime,
+            medfee_sumamt, med_sumfee, fund_appy_sum, cash_payamt, acct_pay, begndate, enddate, is_declare,
+            declare_time, declare_name, clr_appy_evt_id, crte_name, crte_id, crte_time
+        ) VALUES (
+                     #{id},
+                     #{hospCode},
+                     #{insureRegCode},
+                     #{medicineOrgCode},
+                     #{clrType},
+                     #{clrWay},
+                     #{clrOptins},
+                     #{setlym},
+                     #{psntime},
+                     #{medfeeSumamt},
+                     #{medSumfee},
+                     #{fundAppySum},
+                     #{cashPayamt},
+                     #{acctPay},
+                     #{begndate},
+                     #{enddate},
+                     #{isDeclare},
+                     #{declareTime},
+                     #{declareName},
+                     #{clrAppyEvtId},
+                     #{crteName},
+                     #{crteId},
+                     #{crteTime}
+                 )
+    </insert>
+
+    <!-- 批量插入数据 -->
+    <insert id="insertInsureUnifiedReckons" parameterType="list">
+        INSERT INTO insure_unified_reckon (
+        id, hosp_code, insure_reg_code, medicine_org_code, clr_type, clr_way,clr_optins, setlym, psntime,
+        medfee_sumamt, med_sumfee, fund_appy_sum, cash_payamt, acct_pay, begndate, enddate, is_declare,
+        declare_time, declare_name, clr_appy_evt_id, crte_name, crte_id, crte_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.insureRegCode},
+            #{item.medicineOrgCode},
+            #{item.clrType},
+            #{item.clrWay},
+            #{item.clrOptins},
+            #{item.setlym},
+            #{item.psntime},
+            #{item.medfeeSumamt},
+            #{item.medSumfee},
+            #{item.fundAppySum},
+            #{item.cashPayamt},
+            #{item.acctPay},
+            #{item.begndate},
+            #{item.enddate},
+            #{item.isDeclare},
+            #{item.declareTime},
+            #{item.declareName},
+            #{item.clrAppyEvtId},
+            #{item.crteName},
+            #{item.crteId},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateInsureReckonInfo" parameterType="cn.hsa.module.insure.outpt.dto.InsureReckonDTO">
+        UPDATE insure_unified_reckon
+        <set>
+            <if test="insureRegCode != null">
+                insure_reg_code = #{insureRegCode},
+            </if>
+            <if test="medicineOrgCode != null">
+                medicine_org_code = #{medicineOrgCode},
+            </if>
+            <if test="clrType != null">
+                clr_type = #{clrType},
+            </if>
+            <if test="clrWay != null">
+                clr_way = #{clrWay},
+            </if>
+            <if test="clrOptins != null">
+                clr_optins = #{clrOptins},
+            </if>
+            <if test="setlym != null">
+                setlym = #{setlym},
+            </if>
+            <if test="psntime != null">
+                psntime = #{psntime},
+            </if>
+            <if test="medfeeSumamt != null">
+                medfee_sumamt = #{medfeeSumamt},
+            </if>
+            <if test="medSumfee != null">
+                med_sumfee = #{medSumfee},
+            </if>
+            <if test="fundAppySum != null">
+                fund_appy_sum = #{fundAppySum},
+            </if>
+            <if test="cashPayamt != null">
+                cash_payamt = #{cashPayamt},
+            </if>
+            <if test="acctPay != null">
+                acct_pay = #{acctPay},
+            </if>
+            <if test="begndate != null">
+                begndate = #{begndate},
+            </if>
+            <if test="enddate != null">
+                enddate = #{enddate},
+            </if>
+            <if test="isDeclare != null">
+                is_declare = #{isDeclare},
+            </if>
+            <if test="declareTime != null">
+                declare_time = #{declareTime},
+            </if>
+            <if test="declareName != null">
+                declare_name = #{declareName},
+            </if>
+            <if test="clrAppyEvtId != null">
+                clr_appy_evt_id = #{clrAppyEvtId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!-- 批量修改数据 -->
+    <update id="updateInsureUnifiedReckons" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE insure_unified_reckon
+            <set>
+                <if test="item.hospCode != null">
+                    hosp_code = #{item.hospCode},
+                </if>
+                <if test="item.insureRegCode != null">
+                    insure_reg_code = #{item.insureRegCode},
+                </if>
+                <if test="item.medicineOrgCode != null">
+                    medicine_org_code = #{item.medicineOrgCode},
+                </if>
+                <if test="item.clrType != null">
+                    clr_type = #{item.clrType},
+                </if>
+                <if test="item.clrWay != null">
+                    clr_way = #{item.clrWay},
+                </if>
+                <if test="clrOptins != null">
+                    clr_optins = #{clrOptins},
+                </if>
+                <if test="item.setlym != null">
+                    setlym = #{item.setlym},
+                </if>
+                <if test="item.psntime != null">
+                    psntime = #{item.psntime},
+                </if>
+                <if test="item.medfeeSumamt != null">
+                    medfee_sumamt = #{item.medfeeSumamt},
+                </if>
+                <if test="item.medSumfee != null">
+                    med_sumfee = #{item.medSumfee},
+                </if>
+                <if test="item.fundAppySum != null">
+                    fund_appy_sum = #{item.fundAppySum},
+                </if>
+                <if test="item.cashPayamt != null">
+                    cash_payamt = #{item.cashPayamt},
+                </if>
+                <if test="item.acctPay != null">
+                    acct_pay = #{item.acctPay},
+                </if>
+                <if test="item.begndate != null">
+                    begndate = #{item.begndate},
+                </if>
+                <if test="item.enddate != null">
+                    enddate = #{item.enddate},
+                </if>
+                <if test="item.isDeclare != null">
+                    is_declare = #{item.isDeclare},
+                </if>
+                <if test="item.declareTime != null">
+                    declare_time = #{item.declareTime},
+                </if>
+                <if test="item.declareName != null">
+                    declare_name = #{item.declareName},
+                </if>
+                <if test="item.clrAppyEvtId != null">
+                    clr_appy_evt_id = #{item.clrAppyEvtId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <!-- 根据主键删除数据 -->
+    <delete id="deleteInsureReckon" parameterType="string">
+        DELETE FROM insure_unified_reckon WHERE id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteInsureUnifiedReckonByIds" parameterType="list">
+        DELETE FROM insure_unified_reckon WHERE id IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getInsureClrOptinsByRegCode" parameterType="cn.hsa.module.insure.outpt.dto.InsureReckonDTO" resultType="java.lang.String">
+        select clr_optins clrOptins from insure_individual_settle
+        where
+            hosp_code = #{hospCode}
+        and insure_reg_code = #{insureRegCode} group by clr_optins
+    </select>
+
+</mapper>

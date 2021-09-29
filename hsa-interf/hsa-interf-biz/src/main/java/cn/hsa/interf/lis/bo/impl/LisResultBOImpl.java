@@ -120,6 +120,48 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
         return map;
     }
+    /**
+     * @Description: lis结果数据存库
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangxuan
+     * @Date: 2021-09-09
+     */
+    @Override
+    public Map insertDXLisResult(Map map) {
+        List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
+        List<String> stringList = new ArrayList<>();
+        for(Map resultMap : medicalResultDTOList){
+            resultMap.put("id", SnowflakeUtils.getId());
+            resultMap.put("crteTime", DateUtils.getNow());
+            resultMap.put("crteId", "lis");
+            resultMap.put("crteName", "lis");
+
+            stringList.add(MapUtils.get(resultMap,"id"));
+        }
+        List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
+
+        lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
+        // 新增结果
+        int num = lisResultDAO.insertDXResult(medicalResultDTOList);
+        // 更新申请单状态
+//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+
+        return map;
+    }
+
+    /**
+    * @Description: 查询没有结果的申请单的医嘱id
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-09-11
+    */
+    @Override
+    public List<String> queryDXNoResult(Map map){
+        List<String> list = lisResultDAO.queryDXNoResult(map);
+        return list;
+    }
 
     /** 
     * @Description: 获取没有结果的申请单的医嘱id

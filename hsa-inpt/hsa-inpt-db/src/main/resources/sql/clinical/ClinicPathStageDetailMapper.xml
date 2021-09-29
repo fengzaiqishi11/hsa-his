@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicalpathstagedetail.dao.ClinicPathStageDetailDAO">
+
+    <resultMap type="cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO" id="ClinicPathStageDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="listId" column="list_id" jdbcType="VARCHAR"/>
+        <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="itemType" column="item_type" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemSupplyType" column="item_supply_type" jdbcType="VARCHAR"/>
+        <result property="isMust" column="is_must" jdbcType="VARCHAR"/>
+        <result property="classify" column="classify" jdbcType="VARCHAR"/>
+        <result property="sortNo" column="sort_no" jdbcType="VARCHAR"/>
+        <result property="remarke" column="remarke" jdbcType="VARCHAR"/>
+        <result property="isOperationDay" column="is_operation_day" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
+        <result property="describe" column="describe" jdbcType="VARCHAR"/>
+        <result property="listName" column="listName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getClinicPathStageDetailById" resultMap="ClinicPathStageDetailMap">
+        select
+          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
+        from clinical_path_stage_detail
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <select id="getMaxSortNo" resultMap="ClinicPathStageDetailMap">
+      select
+          id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
+        from clinical_path_stage_detail
+        where hosp_code = #{hospCode}
+      order by sort_no desc limit 1
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllClinicPathStageDetail" resultMap="ClinicPathStageDetailMap">
+        select
+          a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
+        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName
+        from clinical_path_stage_detail a
+        join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
+        join clinical_path_stage c on c.id = a.stage_id and a.hosp_code = b.hosp_code
+        join clinical_path_list l on l.id = a.list_id
+        where a.hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
+            </if>
+            <if test="listId != null and listId != ''">
+                and a.list_id = #{listId}
+            </if>
+            <if test="stageId != null and stageId != ''">
+                and a.stage_id = #{stageId}
+            </if>
+            <if test="code != null and code != ''">
+                and a.code = #{code}
+            </if>
+            <if test="itemType != null and itemType != ''">
+                and a.item_type = #{itemType}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and a.item_id = #{itemId}
+            </if>
+            <if test="itemSupplyType != null and itemSupplyType != ''">
+                and a.item_supply_type = #{itemSupplyType}
+            </if>
+            <if test="isMust != null and isMust != ''">
+                and a.is_must = #{isMust}
+            </if>
+            <if test="classify != null and classify != ''">
+                and a.classify = #{classify}
+            </if>
+            <if test="sortNo != null and sortNo != ''">
+                and a.sort_no = #{sortNo}
+            </if>
+            <if test="remarke != null and remarke != ''">
+                and a.remarke = #{remarke}
+            </if>
+            <if test="isOperationDay != null and isOperationDay != ''">
+                and a.is_operation_day = #{isOperationDay}
+            </if>
+            order by a.sort_no
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertClinicPathStageDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into clinical_path_stage_detail(id,hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{listId}, #{stageId}, #{code}, #{itemType}, #{itemId}, #{itemSupplyType}, #{isMust}, #{classify}, #{sortNo}, #{remarke}, #{isOperationDay}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateClinicPathStageDetail">
+        update clinical_path_stage_detail
+        set
+            <if test="listId != null">
+                list_id = #{listId},
+            </if>
+            <if test="stageId != null">
+                stage_id = #{stageId},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="itemType != null">
+                item_type = #{itemType},
+            </if>
+            <if test="itemId != null">
+                item_id = #{itemId},
+            </if>
+            <if test="itemSupplyType != null">
+                item_supply_type = #{itemSupplyType},
+            </if>
+            <if test="isMust != null">
+                is_must = #{isMust},
+            </if>
+            <if test="classify != null">
+                classify = #{classify},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo},
+            </if>
+            <if test="remarke != null">
+                remarke = #{remarke},
+            </if>
+            <if test="isOperationDay != null">
+                is_operation_day = #{isOperationDay},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime}
+            </if>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteClinicPathStageDetailById">
+        delete from clinical_path_stage_detail where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id}
+        </foreach>
+    </delete>
+
+    <select id="queryClinicalPathTree" resultType="cn.hsa.base.TreeMenuNode">
+       (select id,name as label,'-1' as parentId,code from clinical_path_list
+       where hosp_code = #{hospCode} and audit_code = '1' order by sort_no limit 10000000)
+       union
+       (select id,name as label,list_id as parentId,code from clinical_path_stage
+       where hosp_code = #{hospCode} order by sort_no limit 10000000)
+    </select>
+
+</mapper>

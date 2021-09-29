@@ -47,6 +47,8 @@ public class SysCodeDetailDo extends PageDO implements Serializable {
 
   private String upValue;
 
+  private String upName;
+
   private String isEnd;
 
   private String isValid;

@@ -352,7 +352,8 @@
         personPrice,
         apTotalPrice,
         ynyh,
-        remark
+        remark,
+        mafPay
         FROM
         (
         SELECT
@@ -374,7 +375,8 @@
         b.person_price AS personPrice,
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -402,7 +404,8 @@
         b.person_price AS personPrice,
         a.ap_total_price AS apTotalPrice,
         a.hosp_jm_price AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
         JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
@@ -663,7 +666,8 @@
         SUM( ss.hospPrice ) AS hospPrice,
         SUM( ss.personPrice ) AS personPrice,
         SUM( ss.apTotalPrice ) AS apTotalPrice,
-        SUM( ss.ynyh ) AS ynyh
+        SUM( ss.ynyh ) AS ynyh,
+        SUM( ss.mafPay) AS mafPay
         FROM
         (
         SELECT
@@ -678,7 +682,8 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         0 AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -700,7 +705,8 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         inpt_settle a,
         insure_individual_settle b

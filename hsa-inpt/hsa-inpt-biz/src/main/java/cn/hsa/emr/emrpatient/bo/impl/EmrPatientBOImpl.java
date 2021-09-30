@@ -22,6 +22,7 @@ import cn.hsa.module.emr.emrpatienthtml.dao.EmrPatientHtmlDAO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.emr.emrpatientrecord.dao.EmrPatientRecordDAO;
 import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
+import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService;
@@ -422,6 +423,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		if (emrPatientDTO.getNrMap() != null) {
 			String json = JSONObject.toJSONString(emrPatientDTO.getNrMap());
 			map.put("emr_json", json);
+			checkEmrDataIsValid(emrPatientDTO, json);
 		}
 		// 结构化保存数据到数据库
 		emrPatientRecordDAO.insertEmrPatientRecord(map);
@@ -446,6 +448,43 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		emrPatientHtmlDAO.insertEmrPatientHtml(emrPatientHtmlDTO);
 
 		return true;
+	}
+
+	// 检验数据是否有符合规则  20210929 liuliyun
+	public void checkEmrDataIsValid(EmrPatientDTO emrPatientDTO,String json){
+		String newJson = json.replace("\\\"","");
+		List<EmrQualityDataRulesDTO> emrQualityDataRulesDTOS = emrPatientDAO.queryEmrQualityDataRulesByCode(emrPatientDTO);
+		if (emrQualityDataRulesDTOS!=null&&emrQualityDataRulesDTOS.size()>0){
+			for (EmrQualityDataRulesDTO emrQualityDataRulesDTO:emrQualityDataRulesDTOS){
+				boolean isExitEmrElement = true;
+				String newsql ="";
+				String sql = emrQualityDataRulesDTO.getRulesSql();
+				if (StringUtils.isNotEmpty(sql)){
+					String isExistSql ="";
+                    String sqls[] = sql.split(" ");
+                    for (String s:sqls){
+                    	if (s.contains("emr")){
+							 isExistSql ="JSON_EXTRACT('"+newJson+"','$."+s.replace("@","")+"')";
+							 newsql=sql.replace(s,"JSON_EXTRACT('"+newJson+"','$."+s.replace("@","")+"')");
+							 sql = newsql;
+							String count = emrPatientDAO.queryDataIsExist(isExistSql);
+							if (StringUtils.isEmpty(count) || count.equals("1")) {
+								isExitEmrElement = false;
+								break;
+							}
+						}
+					}
+                    if (isExitEmrElement) {
+						if (StringUtils.isNotEmpty(newsql)) {
+							String emrCount = emrPatientDAO.queryDataIsValid(newsql);
+							if (StringUtils.isNotEmpty(emrCount) && emrCount.equals("0")) {
+								throw new AppException("病历数据校验信息：" + emrQualityDataRulesDTO.getTips());
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**

@@ -527,7 +527,7 @@ public class InsureReckonBOImpl extends HsafBO implements InsureReckonBO {
         //获得医保配置信息
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setRegCode("430105");
+        insureConfigurationDTO.setRegCode(insureRegCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
         //封装统一支付接口入参

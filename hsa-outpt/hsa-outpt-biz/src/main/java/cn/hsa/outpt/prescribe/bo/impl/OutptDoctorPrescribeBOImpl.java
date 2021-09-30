@@ -1781,8 +1781,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         List<OutptPrescribeExecDTO> outptPrescribeExecDTOList = new ArrayList<>();
         for(OutptPrescribeDTO outptPrescribeDTO : outptPrescribeDTOList){
             for(OutptPrescribeDetailsDTO  outptPrescribeDetails : outptPrescribeDTO.getOutptPrescribeDetailsDTOList()){
-                //是否是否本院执行（跟进执行次数来判断）/用法
-                if(outptPrescribeDetails.getExecNum() != null && outptPrescribeDetails.getExecNum() > 0 && StringUtils.isNotEmpty(outptPrescribeDetails.getUsageCode()) && yyfs.contains(outptPrescribeDetails.getUsageCode())){
+                //是否是否本院执行（跟进执行次数来判断）/用法/ 用药性质排除出院带药(add luoyong 2021-09-29)
+                if(outptPrescribeDetails.getExecNum() != null && outptPrescribeDetails.getExecNum() > 0 && StringUtils.isNotEmpty(outptPrescribeDetails.getUsageCode()) && yyfs.contains(outptPrescribeDetails.getUsageCode()) && !Constants.YYXZ.CYDY.equals(outptPrescribeDetails.getUseCode())){
                     //获取频率
                     BaseRateDTO baseRateDTO = outptDoctorPrescribeDAO.queryBaseRate(outptPrescribeDetails);
                     //频次

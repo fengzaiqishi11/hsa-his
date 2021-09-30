@@ -258,5 +258,19 @@ public class InsureReckonServiceImpl extends HsafService implements InsureReckon
 
     }
 
+    /**
+     * 获取医保对账汇总查询 - 3699
+     *
+     * @param selectMap@Method queryInsureSetlDetlList
+     * @Desrciption 获取结算明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryInsureTotlStmtInfo(Map<String, Object> selectMap) {
+        return WrapperResponse.success(insureReckonBO.queryInsureTotlStmtInfo(MapUtils.get(selectMap,"insureReckonDTO")));
+    }
+
 
 }

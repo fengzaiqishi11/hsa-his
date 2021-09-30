@@ -282,7 +282,7 @@ public class InptFunction {
         httpParam.put("akc252", null);//本次业务个人帐户可用金额（如果为空，默认使用个人帐户。如果不为空就录入可使用的个人帐户值，如果不使用输入0）
         httpParam.put("akc196", inptVisitDTO.getOutDiseaseIcd10());//出院疾病（中心疾病编码）
         httpParam.put("bkz102", inptVisitDTO.getOutDiseaseName());//出院诊断名称（中心疾病名称）
-        httpParam.put("aae031", DateUtils.format(inptVisitDTO.getOutOperTime(),DateUtils.Y_M_DH_M_S));//出院日期（格式：YYYY-MM-DD HH24:MI:SS(24小时)）
+        httpParam.put("aae031", DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));//出院日期（格式：YYYY-MM-DD HH24:MI:SS(24小时)）
         httpParam.put("akc188", null);//第一副诊断（中心疾病编码）
         httpParam.put("akc189", null);//第二副诊断（中心疾病编码）
         httpParam.put("bka066", Constant.Xiangtan.DEFAULTVAL.BKA066.get(inptVisitDTO.getOutSituationCode()));//出院详情（好转、其他、死亡、未愈、无效、治愈、转科、转院（病人要求）、转院（医院要求））

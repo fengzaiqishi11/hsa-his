@@ -9,11 +9,13 @@ import cn.hsa.module.emr.emrpatient.dto.EmrPatientReportFormDTO;
 import cn.hsa.module.emr.emrpatient.entity.EmrPatientPrintDO;
 import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
+import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -355,4 +357,10 @@ public interface EmrPatientDAO {
 	Integer getPrintNum(EmrPatientPrintDO emrPatientPrintDO);
 
 	List<EmrPatientReportFormDTO> queryPatientEmrReportForm(EmrPatientReportFormDTO reportFormDTO);
+
+	String queryDataIsValid(@Param("sql") String sql);
+
+	String queryDataIsExist(@Param("sql") String sql);
+
+	List<EmrQualityDataRulesDTO> queryEmrQualityDataRulesByCode(EmrPatientDTO emrPatientDTO);
 }

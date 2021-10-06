@@ -477,7 +477,12 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         if(map.get("sfBatchNo") != null){
             sfBatchNo = map.get("sfBatchNo").toString();
         }
+
         for(StroStockDetailDTO stroStockDetailDTO : stroStockDetailDTOList){
+            // 退供应商 不用过滤有效期
+            if ("3".equals(map.get("type"))){
+                stroStockDetailDTO.setIsExpiryDate("1");
+            }
             //拆零数量如果出现小数四舍五入
             stroStockDetailDTO.setSplitNum(BigDecimal.valueOf(Math.round(stroStockDetailDTO.getSplitNum().doubleValue())));
 
@@ -1119,7 +1124,7 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             }
         }
         if (num.compareTo(BigDecimal.valueOf(0)) > 0 || splitNum.compareTo(BigDecimal.valueOf(0)) > 0) {
-            throw new AppException(stroStockDetailDTO.getItemName()+"["+stroStockDetailDTO.getBatchNo()+"]库存不足");
+            throw new AppException(stroStockDetailDTO.getItemName()+"["+stroStockDetailDTO.getBatchNo()+"]库存不足或者该药品已经过期");
         }
         //库存明细表
         storMap.put("stockDetailOutList",stockDetailOutList);

@@ -189,4 +189,16 @@ public interface InsureReckonBO {
      * @Return
      **/
     PageDTO queryInsureSetlDetlList(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 对账汇总查询 - 3699
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 对账汇总查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     * */
+    PageDTO queryInsureTotlStmtInfo(InsureReckonDTO insureReckonDTO);
 }

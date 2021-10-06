@@ -1389,6 +1389,9 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
+        <if test="insureCode != null and insureCode != ''">
+            and t.patient_code = #{insureCode}
+        </if>
         ORDER BY t.item_type ,t.visit_id,t.bfc_id,t.item_code,t.item_id
     </select>
     <select id = "queryHospitalItemReportInfoGroupFourSum" resultType="java.util.LinkedHashMap">
@@ -1407,6 +1410,9 @@
         </if>
         <if test="userId != null and userId != ''">
             and t.doctor_id = #{userId}
+        </if>
+        <if test="insureCode != null and insureCode != ''">
+            and t.patient_code = #{insureCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
@@ -1559,6 +1565,9 @@
                 <if test="bfcId != null and bfcId != ''">
                     and b.bfc_id = #{bfcId}
                 </if>
+                <if test="insureCode != null and insureCode != ''">
+                    and a.patient_code = #{insureCode}
+                </if>
             </if>
         </if>
         <if test="queryType == 'all'.toString()">
@@ -1607,6 +1616,9 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                and a.patient_code = #{insureCode}
             </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
                 <if test="userId != null and userId != ''">
@@ -1657,6 +1669,9 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                and a.patient_code = #{insureCode}
             </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
                 <if test="userId != null and userId != ''">

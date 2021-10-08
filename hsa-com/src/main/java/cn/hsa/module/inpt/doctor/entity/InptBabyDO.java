@@ -74,4 +74,22 @@ public class InptBabyDO extends PageDO implements Serializable {
      * 结算类型代码（JSLX）
      */
     private String typeCode;
+    /**
+     * 是否作废（SF）
+     */
+    private String isCancel;
+    /**
+     * 作废人id
+     */
+    private String cancelId;
+    /**
+     * 作废人姓名
+     */
+    private String cancelName;
+    /**
+     * 作废人时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date cancelTime;
 }

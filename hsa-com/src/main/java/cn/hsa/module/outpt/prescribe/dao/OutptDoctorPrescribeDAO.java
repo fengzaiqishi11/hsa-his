@@ -23,7 +23,6 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
-import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -871,4 +870,14 @@ public interface OutptDoctorPrescribeDAO {
 
     // 根据处方ids和visitId从处方明细表副表查询出处方列表
     List<OutptPrescribeDetailsExtDTO> queryPrescribeListByIdsAndVisitId(OutptPrescribeDTO outptPrescribeDTO);
+
+    /**
+     * @Description: 查询处方费用信息
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/9/22 15:25
+     * @Return
+     */
+    List<OutptCostDTO> selectCost(OutptPrescribeDTO outptPrescribeDTO);
 }

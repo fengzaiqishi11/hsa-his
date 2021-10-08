@@ -88,4 +88,114 @@ public interface InsureReckonService {
      **/
     @PostMapping("serive/insure/reckon/deleteInsureReckon")
     WrapperResponse<Boolean> deleteInsureReckon(Map<String, Object> selectMap);
+
+    /**医药机构清算申请 - 获取清算机构
+     * @Method getInsureClrOptinsByRegCode
+     * @Desrciption
+     * @param selectMap
+     * @Author liaojiguang
+     * @Date   2021/9/9 17:31
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/getInsureClrOptinsByRegCode")
+    WrapperResponse<List<String>> getInsureClrOptinsByRegCode(Map<String, Object> selectMap);
+
+    /**医疗机构月结算申请汇总信息分页查询-3693
+     * @Method queryInsureMonSettleApplyInfo
+     * @Desrciption
+     * @param selectMap
+     * @Author liaojiguang
+     * @Date   2021/9/9 17:31
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureMonSettleApplyInfo")
+    WrapperResponse<PageDTO> queryInsureMonSettleApplyInfo(Map<String, Object> selectMap);
+
+    /**获取清算机构 -3694
+     * @Method queryInsureClrOptinsInfo
+     * @Desrciption
+     * @param selectMap
+     * @Author liaojiguang
+     * @Date   2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureClrOptinsInfo")
+    WrapperResponse<PageDTO> queryInsureClrOptinsInfo(Map<String, Object> selectMap);
+
+    /** 获取清算汇总明细 -3695
+     * @param selectMap
+     * @Method queryInsureSettleApplyInfo
+     * @Desrciption 获取清算汇总明细
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureSettleApplyInfo")
+    WrapperResponse<PageDTO> queryInsureSettleApplyInfo(Map<String, Object> selectMap);
+
+    /** 获取暂扣明细信息 -3696
+     * @param selectMap
+     * @Method queryInsureDetDetlList
+     * @Desrciption 获取暂扣明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureDetDetlList")
+    WrapperResponse<PageDTO> queryInsureDetDetlList(Map<String, Object> selectMap);
+
+    /** 医疗机构月结算报表pdf文档 -3697
+     * @param selectMap
+     * @Method getImportClredReportPdf
+     * @Desrciption 医疗机构月结算报表pdf文档
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/getImportClredReportPdf")
+    WrapperResponse<Map<String,Object>> getImportClredReportPdf(Map<String, Object> selectMap);
+
+    /** 获取拨付单信息 - 3407
+     * @param selectMap
+     * @Method queryInsureAppropriationList
+     * @Desrciption 获取拨付单信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureAppropriationList")
+    WrapperResponse<PageDTO> queryInsureAppropriationList(Map<String, Object> selectMap);
+
+    /** 获取基金明细信息 - 3702
+     * @param selectMap
+     * @Method queryInsureDetailFundList
+     * @Desrciption 获取基金明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureDetailFundList")
+    WrapperResponse<PageDTO> queryInsureDetailFundList(Map<String, Object> selectMap);
+
+    /** 获取结算明细信息 - 3703
+     * @param selectMap
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 获取结算明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureSetlDetlList")
+    WrapperResponse<PageDTO> queryInsureSetlDetlList(Map<String, Object> selectMap);
+
+    /** 获取医保对账汇总查询 - 3699
+     * @param queryInsureTotlStmtInfo
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 获取结算明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureTotlStmtInfo")
+    WrapperResponse<PageDTO> queryInsureTotlStmtInfo(Map<String, Object> selectMap);
 }

@@ -311,8 +311,7 @@
           or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
       </if>
       <if test="queryDate !=null and queryDate != ''">
-          AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
-          AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
+          and date_format(iae.plan_exec_time, '%Y-%m-%d') = date_format(#{queryDate}, '%Y-%m-%d')
       </if>
       <!--数据共享标志为1，需根据单据类型判断打印状态-->
       <if test="isShared != null and isShared == '1'.toString()">
@@ -409,8 +408,7 @@
             or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
         </if>
         <if test="queryDate !=null and queryDate != ''">
-            AND iae.plan_exec_time &gt; DATE_ADD( date(#{queryDate}), INTERVAL - 1 DAY )
-            AND iae.plan_exec_time &lt; DATE_ADD( date(#{queryDate}), INTERVAL 1 DAY )
+            and date_format(iae.plan_exec_time, '%Y-%m-%d') = date_format(#{queryDate}, '%Y-%m-%d')
         </if>
         <!--数据共享标志为1，需根据单据类型判断打印状态-->
         <if test="isShared != null and isShared == '1'.toString()">

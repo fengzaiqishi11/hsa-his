@@ -177,5 +177,30 @@ public class StroStockServiceImpl extends HsafBO implements StroStockService {
         return WrapperResponse.success(stroStockBO.queryPageByOutptOrInpt(MapUtils.get(map,"stroStockDTO")));
     }
 
+    /**
+     * @Meth: queryAllStockPage
+     * @Description: 查询全院库存
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryAllStockPage(Map map) {
+        return WrapperResponse.success(stroStockBO.queryAllStockPage(MapUtils.get(map,"stroStockDTO")));
+    }
+    /**
+     * @Meth: queryAllStockDetails
+     * @Description: 查询全部库存明细
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryAllStockDetails(Map map) {
+        return WrapperResponse.success(stroStockBO.queryAllStockDetails(MapUtils.get(map,"stroStockDetail")));
+    }
+
 
 }

@@ -1,6 +1,9 @@
 package cn.hsa.module.base.drug.dao;
 
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -161,4 +164,31 @@ public interface BaseDrugDAO {
     void insertInsureMatch(@Param("baseDrugDTOList")List<BaseDrugDTO> baseDrugDTOList);
 
     List<BaseDrugDTO> queryUnifiedPage(BaseDrugDTO baseDrugDTO);
+    /**
+     * @Meth: queryCostIsInptOut
+     * @Description: 判断住院费用表是否存在未发药
+     * @Param: [baseDrugDTO]
+     * @return: java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    List<InptCostDTO> queryCostIsInptOut(BaseDrugDTO baseDrugDTO);
+    /**
+     * @Meth: queryCostIsInptOut
+     * @Description: 判断门诊费用表是否存在未发药
+     * @Param: [baseDrugDTO]
+     * @return: java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    List<OutptCostDTO> queryCostIsOutptOut(BaseDrugDTO baseDrugDTO);
+    /**
+     * @Meth: queryInptAdviceIsLong
+     * @Description: 长期医嘱是否开了该药品，如果有，不允许作废
+     * @Param: [baseDrugDTO]
+     * @return: java.util.List<cn.hsa.module.inpt.doctor.dto.InptAdviceDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    List<InptAdviceDTO> queryInptAdviceIsLong(BaseDrugDTO baseDrugDTO);
 }

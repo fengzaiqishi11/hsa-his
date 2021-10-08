@@ -108,6 +108,14 @@ public interface BaseDeptBO {
     BaseDeptDTO getById(BaseDeptDTO baseDeptDTO);
 
     /**
+     *  登录时查询部门信息方法
+     * @param baseDeptDTO  实体类参数
+     * @Date: 2021/9/26 19:05
+     * @return baseDeptDTO  部门基础信息
+     */
+    BaseDeptDTO getSingleBaseDeptInfoById(BaseDeptDTO baseDeptDTO);
+
+    /**
      * @Method getDeptTypeCode
      * @Desrciption  查询科室性质的方法
      * @Param baseDeptDTO 科室维护信息数据传输对象

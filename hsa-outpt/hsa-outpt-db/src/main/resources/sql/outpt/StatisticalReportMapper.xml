@@ -352,7 +352,8 @@
         personPrice,
         apTotalPrice,
         ynyh,
-        remark
+        remark,
+        mafPay
         FROM
         (
         SELECT
@@ -374,7 +375,8 @@
         b.person_price AS personPrice,
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -402,7 +404,8 @@
         b.person_price AS personPrice,
         a.ap_total_price AS apTotalPrice,
         a.hosp_jm_price AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
         JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
@@ -663,7 +666,8 @@
         SUM( ss.hospPrice ) AS hospPrice,
         SUM( ss.personPrice ) AS personPrice,
         SUM( ss.apTotalPrice ) AS apTotalPrice,
-        SUM( ss.ynyh ) AS ynyh
+        SUM( ss.ynyh ) AS ynyh,
+        SUM( ss.mafPay) AS mafPay
         FROM
         (
         SELECT
@@ -678,7 +682,8 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         0 AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -700,7 +705,8 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay
         FROM
         inpt_settle a,
         insure_individual_settle b
@@ -923,6 +929,8 @@
         t1.doctor_id,
         t1.now_address as nowAddress,
         t1.diagnose_ids AS diagnoseIds,
+        t1.diagnose_time as diagnoseTime,
+        t1.start_date as startDate,
         (SELECT bd.name FROM base_disease bd WHERE bd.id = t1.diagnose_ids and bd.hosp_code = t1.hosp_code) AS
         diagnoseName,
         t1.total_price AS totalPrice
@@ -957,8 +965,9 @@
         (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = a.age_unit_code AND hosp_code =
         a.hosp_code ), '岁' )))) as patientInfo,
         a.patient_code,
-        ( SELECT max( b.disease_id ) FROM outpt_diagnose b WHERE a.id = b.visit_id AND a.hosp_code = b.hosp_code AND
-        b.is_main = '1' ) diagnose_ids,
+        od.disease_id diagnose_ids,
+        od.crte_time as diagnose_time,
+        ifnull(omr.start_date, a.visit_time) as start_date,
         b.reality_price total_price
         FROM
         outpt_visit a
@@ -970,6 +979,8 @@
         select a.hosp_code, a.visit_id, a.reality_price reality_price from outpt_settle a where a.is_settle = '1'
         )a group by a.hosp_code, a.visit_id
         )b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+        left join outpt_diagnose od on a.id = od.visit_id and a.hosp_code = od.hosp_code and od.is_main = '1'
+        left join outpt_medical_record omr on a.id = omr.visit_id and a.hosp_code = omr.hosp_code
         ) t1
         WHERE
         t1.hosp_code = #{hospCode}
@@ -1189,7 +1200,7 @@
             and ma.content like concat('%',#{itemName},'%')
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
             and 1=2
@@ -1251,7 +1262,7 @@
             and 1=2
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and ma.medic_type = #{technologyCode}
+            and bd.technology_code = #{technologyCode}
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code

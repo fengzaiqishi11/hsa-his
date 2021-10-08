@@ -50,6 +50,9 @@ public class InsureReckonDO extends PageDO implements Serializable {
     /** 清算方式 */
     private String clrWay;
 
+    // 清算中心
+    private String clrOptins;
+
     /** 清算年月 */
     private String setlym;
 
@@ -73,16 +76,20 @@ public class InsureReckonDO extends PageDO implements Serializable {
 
     /** 开始日期 */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date begndate;
 
     /** 结束日期 */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date enddate;
 
     /** 是否申报 */
     private String isDeclare;
 
     /** 申报时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date declareTime;
 
     /** 申报人姓名 */

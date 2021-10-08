@@ -816,6 +816,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             unifiedPayMap.put("realityPrice", realityPrice);
             unifiedPayMap.put("hospCode", outptVisitDTO.getHospCode());
             unifiedPayMap.put("crteId", outptVisitDTO.getCrteId());
+            unifiedPayMap.put("code", outptVisitDTO.getCode());
             unifiedPayMap.put("crteName", outptVisitDTO.getCrteName());
             try {
                 Map<String, Object> stringObjectMap = updateFeeSubmit(unifiedPayMap);
@@ -890,7 +891,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
         insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
         insureIndividualSettleDO.setRetirePrice(ake026);//离休基金支付
+        insureIndividualSettleDO.setMafPay(bka821); // 医疗救助基金
         insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
+        insureIndividualSettleDO.setRestsPrice(bka839); // 其他支付
         insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
         insureIndividualSettleDO.setHospPrice(bka842);//医院支付
         insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额
@@ -972,7 +975,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 List<OutinInvoiceDTO> outinInvoiceDTOS = outinInvoiceService.updateForOutinInvoiceQuery(map).getData();
                 if (outinInvoiceDTOS == null || outinInvoiceDTOS.size() != 1) {
                     //没有发票信息
-                    return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    //return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    throw new AppException("当前没有可用发票，请领取发票或取消使用发票再结算");
                 }
                 outinInvoiceDTO = outinInvoiceDTOS.get(0);
             }
@@ -1510,6 +1514,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostUploadAndTrialParam.put("settleId", settleId);//门诊结算id
         outptCostUploadAndTrialParam.put("outptVisitDTO",outptVisitDTO);
         outptCostUploadAndTrialParam.put("crteId", userId);//创建人id
+        outptCostUploadAndTrialParam.put("code", outptVisitDTO.getCode());//创建人id
         outptCostUploadAndTrialParam.put("crteName", userName);//创建人姓名
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
         outptCostUploadAndTrialParam.put("action", "settle");//操作 = 结算操作

@@ -45,9 +45,13 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -122,9 +126,13 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num,
          a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,
-         ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+         ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -190,9 +198,13 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.prep_code, ifnull(a.num,0) num,
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+        b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -264,9 +276,13 @@
         a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, b.model as prep_code, ifnull(a.num,0) num,a.unit_code,
         ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code,
          ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
-         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code
+         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        <if test="isValid != null and isValid != ''">
+            and b.is_valid = #{isValid}
+        </if>
         <where>
             and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
@@ -351,6 +367,7 @@
        检查项目或者材料是否有库存明细记录
        条件:医院编码、库房ID、项目代码、项目ID
        返回：是否有数据
+       2021/9/22 添加条件 过滤掉已经失效的明细数据
    -->
     <select id="getStockDetail" parameterType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" >
         select a.id, a.hosp_code hospCode, a.biz_id bizId,  a.item_code itemCode, a.item_id itemId, a.item_name itemName,
@@ -358,6 +375,9 @@
         a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
         from stro_stock_detail a
         where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0
+        <if test="isExpiryDate == null and isExpiryDate != '1'">
+            and a.expiry_date &gt;= now()
+        </if>
         <if test="sfBatchNo!=null and sfBatchNo!='' and batchNo!=null and batchNo!=''">
             and batch_no = #{batchNo}
         </if>

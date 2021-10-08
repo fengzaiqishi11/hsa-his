@@ -291,6 +291,7 @@ public class OutptTmakePriceFormController extends BaseController {
         outptVisitDTO.setHospCode(userDTO.getHospCode());//医院编码
         outptVisitDTO.setHospName(userDTO.getHospName());//医院名称
         outptVisitDTO.setCrteId(userDTO.getId());//当前用户id
+        outptVisitDTO.setCrteName(userDTO.getCrteName());
         outptVisitDTO.setCode(userDTO.getCode()); // 操作员编码
         outptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId() );//当前登录用户操作科室ID
         outptSettleDTO.setHospCode(userDTO.getHospCode());//医院编码

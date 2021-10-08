@@ -332,4 +332,24 @@ public class BaseDrugController extends BaseController {
         nationStandardDrugZYDTO.setProvinceCode(provinceCode);
         return nationStandardDrugService_consumer.queryNationStandardDrugZYPage(nationStandardDrugZYDTO);
     }
+    /**
+     * @Meth: queryEnableCancel
+     * @Description: 查看能否作废药品。
+     * 1.判断费用表是否有未发药品。
+     * 2.长期医嘱是否开了该药品.如果有,不允许作废.
+     * @Param: [baseDrugDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    @PostMapping("/queryEnableCancel")
+    public WrapperResponse<Boolean> queryEnableCancel(@RequestBody BaseDrugDTO baseDrugDTO,
+                                                      HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseDrugDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("baseDrugDTO",baseDrugDTO);
+        return baseDrugService_consumer.queryEnableCancel(map);
+    }
 }

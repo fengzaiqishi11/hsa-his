@@ -107,6 +107,24 @@ public class StroStockController extends BaseController {
         return stroStockService_consumer.queryPage(map);
     }
     /**
+     * @Meth: queryAllStockPage
+     * @Description: 查询全院的库存
+     * @Param: [stroStsockDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @GetMapping("/queryAllStockPage")
+    public WrapperResponse<PageDTO> queryAllStockPage(StroStockDTO stroStockDTO,
+                                                      HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        stroStockDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("stroStockDTO",stroStockDTO);
+        return stroStockService_consumer.queryAllStockPage(map);
+    }
+    /**
      * @Method queryPageByOutptOrInpt
      * @Desrciption 提供给门诊医生站、住院医生站的药品查询接口
      * @Param [stroStockDTO]
@@ -223,7 +241,26 @@ public class StroStockController extends BaseController {
         map.put("bean",stroStockDetail);
         return stroStockService_consumer.queryStockDetails(map);
     }
-
+    /**
+     * @Meth: queryAllStockDetails
+     * @Description: 查询所有库存明细
+     * @Param: [stroStockDetail, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/9/26
+     */
+    @GetMapping("/queryAllStockDetails")
+    public WrapperResponse<PageDTO> queryAllStockDetails(StroStockDetailDTO stroStockDetail, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        stroStockDetail.setHospCode(sysUserDTO.getHospCode());
+        if (stroStockDetail.getIsMun() == null) {
+            stroStockDetail.setIsMun(true);
+        }
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("stroStockDetail",stroStockDetail);
+        return stroStockService_consumer.queryAllStockDetails(map);
+    }
     /**
      * @Method queryAllDetail()
      * @Description 通过实体作为筛选条件查询

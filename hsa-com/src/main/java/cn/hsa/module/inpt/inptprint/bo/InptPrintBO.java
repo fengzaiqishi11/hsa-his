@@ -123,4 +123,14 @@ public interface InptPrintBO {
   * @Return java.util.List<cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO>
   **/
   List<InptAdvicePrintDTO> queryAdvicePrintDTOByVisit(InptAdvicePrintDTO inptAdvicePrintDTO);
+
+  /**
+   * @Menthod queryBabyInptCostListPrint
+   * @Desrciption 合并结算费用清单合并打印
+   * @Param  [inptCostDTO]
+   * @Author liuliyun
+   * @Date   2021/09/23 09:06
+   * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+   **/
+  Map queryBabyInptCostListPrint(InptCostDTO inptCostDTO);
 }

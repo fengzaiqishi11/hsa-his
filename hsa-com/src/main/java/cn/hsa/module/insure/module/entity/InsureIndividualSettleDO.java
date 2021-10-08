@@ -144,5 +144,6 @@ public class InsureIndividualSettleDO extends PageDO implements Serializable {
         private String clrWay;
         private String clrType;
         private String clrOptins;
-
+        private BigDecimal mafPay; // 医疗救助金额
+        private BigDecimal hospExemAmount; //医院减免金额（一站式紧急基金）
 }

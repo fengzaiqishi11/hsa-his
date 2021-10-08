@@ -308,6 +308,20 @@ public class BaseDeptBOImpl extends HsafBO implements BaseDeptBO {
         }
         return deptDTO;
     }
+
+    /**
+     * 登录时查询部门信息方法
+     *
+     * @param baseDeptDTO 实体类参数
+     * @return baseDeptDTO  部门基础信息
+     * @Date: 2021/9/26 19:05
+     */
+    @Override
+    public BaseDeptDTO getSingleBaseDeptInfoById(BaseDeptDTO baseDeptDTO) {
+        BaseDeptDTO deptDTO = baseDeptDAO.getById(baseDeptDTO);
+        return deptDTO;
+    }
+
     /**
      * @Method findParentTreeNode()
      * @Desrciption  根据子节点查询出所有的父节点
@@ -356,8 +370,10 @@ public class BaseDeptBOImpl extends HsafBO implements BaseDeptBO {
     public List<BaseDeptDTO> getPharInfo(BaseDeptDTO baseDeptDTO) {
 
         baseDeptDTO.setIsValid(Constants.SF.S);
-        List<BaseDeptDTO> pharList = baseDeptDAO.getPharInfo(baseDeptDTO);
-        return pharList;
+        if(Constants.SF.S.equals(baseDeptDTO.getMultiPharFlag())){
+            return baseDeptDAO.getPharInfoOfOperDept(baseDeptDTO);
+        }
+        return  baseDeptDAO.getPharInfo(baseDeptDTO);
     }
 
     /**

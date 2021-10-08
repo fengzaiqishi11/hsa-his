@@ -10,15 +10,13 @@ import cn.hsa.module.sys.code.dto.SysCodeDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
-import cn.hsa.util.TreeUtils;
+import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
 * @Package_name: cn.hsa.sys.code.bo.impl
@@ -39,7 +37,10 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
      */
     @Resource
     private SysCodeBO sysCodeBO;
-
+    @Resource
+    private RedisUtils redisUtils;
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
     /**
      * @Method: getCodes
      * @Description: 根据编码获取值域代码值
@@ -58,6 +59,49 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);
+        }
+    }
+
+    /**
+     * 根据编码获取值域代码值优先从缓存获取
+     *
+     * @param map
+     * @Method: getCodeDetailsByCodeCache
+     * @Description:
+     * @Param: [code]
+     * @Author: luonianxin
+     * @Email: nianxin.luo@powersi.com
+     * @Date: 2020/7/15 11:25
+     * @Return: java.util.List
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public WrapperResponse<Map<String, List<SysCodeSelectDTO>>> getCodeDetailsByCodeCache(Map map) {
+
+        String code = MapUtils.get(map, "code");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String codeCacheRedisKey = hospCode+"_"+Constants.REDISKEY.CODEDETAIL;
+        List<String> codeList = null;
+        if(!StringUtils.isEmpty(code)){
+            codeList = Arrays.asList(code.split(","));
+        }
+        if(redisUtils.hasKey(codeCacheRedisKey)){
+            Map allCodeDetails = redisUtils.hmget(codeCacheRedisKey);
+            if(!ListUtils.isEmpty(codeList)){
+                List<String> finalCodeList = codeList;
+                // 移除查询的所有缓存中未查询
+                allCodeDetails.keySet().removeIf(key -> !(finalCodeList.contains(key)));
+            }
+            return WrapperResponse.success(allCodeDetails);
+        }else{
+            Map codeDetailMap = sysCodeBO.getByCode("",hospCode);
+            redisUtils.hmset(codeCacheRedisKey,codeDetailMap);
+            if(!ListUtils.isEmpty(codeList)){
+                List<String> finalCodeList = codeList;
+                // 移除查询的所有缓存中未查询的数据
+                codeDetailMap.keySet().removeIf(key -> !(finalCodeList.contains(key)));
+            }
+            return WrapperResponse.success(codeDetailMap);
         }
     }
 
@@ -212,7 +256,17 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (StringUtils.isEmpty(sysCodeDTO.getCode())) {
                 return WrapperResponse.error(400,"编码不能为空",null);
             }
-            return WrapperResponse.success(sysCodeBO.saveCode(sysCodeDTO));
+            // add by zhangguorui 新增完成之后，调用getCodeDetailsByCodeCache先清除redis，再添加
+            Boolean aBoolean = sysCodeBO.saveCode(sysCodeDTO);
+            if (aBoolean){
+                Map codeMap = new HashMap();
+                codeMap.put("hospCode",sysCodeDTO.getHospCode());
+                getCodeDetailsByCodeCache(codeMap);
+                return WrapperResponse.success(true);
+            }else{
+                return WrapperResponse.success(false);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);
@@ -236,7 +290,17 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (sysCodeDetailDTO == null) {
                 return WrapperResponse.error(400,"参数不能为空",null);
             }
-            return WrapperResponse.success(sysCodeBO.saveCodeDetail(sysCodeDetailDTO));
+            // add by zhangguorui 新增完成之后，调用getCodeDetailsByCodeCache先清除redis，再添加
+            Boolean aBoolean = sysCodeBO.saveCodeDetail(sysCodeDetailDTO);
+            if (aBoolean){
+                Map codeMap = new HashMap();
+                codeMap.put("hospCode",sysCodeDetailDTO.getHospCode());
+                getCodeDetailsByCodeCache(codeMap);
+                return WrapperResponse.success(true);
+            } else {
+                return WrapperResponse.success(false);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);
@@ -260,7 +324,16 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (sysCodeDTO.getIds()==null && sysCodeDTO.getIds().size()<=0) {
                 return WrapperResponse.error(400,"ids参数不能为空",null);
             }
-            return WrapperResponse.success(sysCodeBO.deleteCodes(sysCodeDTO));
+            // add by zhangguorui 删除完成之后，调用getCodeDetailsByCodeCache清除redis
+            Boolean aBoolean = sysCodeBO.deleteCodes(sysCodeDTO);
+            if (aBoolean){
+                Map codeMap = new HashMap();
+                codeMap.put("hospCode",sysCodeDTO.getHospCode());
+                getCodeDetailsByCodeCache(codeMap);
+                return WrapperResponse.success(true);
+            } else {
+                return WrapperResponse.success(false);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);
@@ -284,7 +357,16 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (sysCodeDetailDTO.getIds()==null && sysCodeDetailDTO.getIds().size()<=0) {
                 return WrapperResponse.error(400,"ids参数不能为空",null);
             }
-            return WrapperResponse.success(sysCodeBO.deleteCodeDetails(sysCodeDetailDTO));
+            // add by zhangguorui 删除完成之后，调用getCodeDetailsByCodeCache清除redis
+            Boolean aBoolean = sysCodeBO.deleteCodeDetails(sysCodeDetailDTO);
+            if (aBoolean){
+                Map codeMap = new HashMap();
+                codeMap.put("hospCode",sysCodeDetailDTO.getHospCode());
+                getCodeDetailsByCodeCache(codeMap);
+                return WrapperResponse.success(true);
+            } else {
+                return WrapperResponse.success(false);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);

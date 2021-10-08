@@ -65,6 +65,15 @@ public interface LisResultDAO {
     */ 
     List<String> queryDXNoResult(Map map);
 
+    /**
+    * @Description: 更新申请单是否上传状态
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-10-08
+    */
+    int updateIsIssue(@Param("list") List<Map> mapList);
+
     List<Map> queryAdvice(Map map);
 
     List<Map> queryDept(Map map);

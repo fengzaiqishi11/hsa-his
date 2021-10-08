@@ -108,7 +108,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
             resultMap.put("crteId", "lis");
             resultMap.put("crteName", "lis");
 
-            stringList.add(MapUtils.get(resultMap,"id"));
+            stringList.add(MapUtils.get(resultMap,"barCode"));
         }
         List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
@@ -116,7 +116,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         // 新增结果
         int num = lisResultDAO.insertResult(medicalResultDTOList);
         // 更新申请单状态
-//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+        int applyStatus = lisResultDAO.updateApplyStatus(collect);
 
         return map;
     }
@@ -160,6 +160,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public List<String> queryDXNoResult(Map map){
         List<String> list = lisResultDAO.queryDXNoResult(map);
+//        lisResultDAO.updateIsIssue(list);
         return list;
     }
 
@@ -171,8 +172,11 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     * @Date: 2021-09-04
     */ 
     @Override
-    public Map queryNoResultLis(Map map){
+    public Map updateNoResultLis(Map map){
         List<Map> mapList = lisResultDAO.queryNoResultLis();
+        if(mapList.size() > 0){
+            lisResultDAO.updateIsIssue(mapList);
+        }
         Map newMap = new HashMap();
         newMap.put("result",mapList);
         return newMap;

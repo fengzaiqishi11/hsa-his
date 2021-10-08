@@ -77,8 +77,8 @@ public class LisResultServiceImpl extends HsafBO implements LisResultService {
     * @Date: 2021-09-04
     */
     @Override
-    public Map queryNoResultLis(Map map){
-        return lisResultBO.queryNoResultLis(map);
+    public Map updateNoResultLis(Map map){
+        return lisResultBO.updateNoResultLis(map);
     }
 
     /**

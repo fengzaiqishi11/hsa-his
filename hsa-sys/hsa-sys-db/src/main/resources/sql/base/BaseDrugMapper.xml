@@ -491,7 +491,7 @@
 				or a.good_wbm like '%${keyword}%'
 				or a.usual_pym like '%${keyword}%'
 				or a.usual_wbm like '%${keyword}%'
-				or a.dan like '%${keyword}%'
+				or a.ndan like '%${keyword}%'
 				or a.spec like '%${keyword}%'
 				or e.name like '%${keyword}%')
 			</if>

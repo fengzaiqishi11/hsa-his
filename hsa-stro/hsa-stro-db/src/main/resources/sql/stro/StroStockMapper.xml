@@ -374,7 +374,10 @@
         a.num, a.buy_price_all buyPriceAll, a.sell_price_all sellPriceAll, a.split_num splitNum, a.split_price splitPrice, a.unit_code unitCode,
         a.batch_no batchNo, a.expiry_date expiryDate, a.split_unit_code splitUnitCode,a.split_ratio splitRatio,a.buy_price buyPrice,a.sell_price sellPrice
         from stro_stock_detail a
-        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0 and a.expiry_date &gt;= now()
+        where hosp_code = #{hospCode} and biz_id = #{bizId} and item_code = #{itemCode} and item_id = #{itemId} and a.split_num > 0
+        <if test="isExpiryDate == null and isExpiryDate != '1'">
+            and a.expiry_date &gt;= now()
+        </if>
         <if test="sfBatchNo!=null and sfBatchNo!='' and batchNo!=null and batchNo!=''">
             and batch_no = #{batchNo}
         </if>

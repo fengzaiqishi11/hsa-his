@@ -600,7 +600,7 @@
     <!-- 根据模板id查询数据规则 -->
     <select id="queryEmrQualityDataRulesByCode" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO">
         select id,hosp_code,emr_code,rules_name,rules_sql,tips,is_valid,crte_id,crte_name,crte_time,remark
-        from  emr_quality_data_rules where hosp_code = #{hospCode}
+        from  emr_quality_data_rules where hosp_code = #{hospCode} and is_valid ='1'
         <choose>
             <when test="classifyCode != null and classifyCode != ''">
                 and emr_code = #{classifyCode}

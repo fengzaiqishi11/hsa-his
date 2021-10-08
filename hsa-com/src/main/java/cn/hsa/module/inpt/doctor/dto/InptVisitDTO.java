@@ -408,4 +408,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String clinicalListName;
     // 路径ID
     private String listId;
+    // 住院天数
+    private Integer inDays;
 }

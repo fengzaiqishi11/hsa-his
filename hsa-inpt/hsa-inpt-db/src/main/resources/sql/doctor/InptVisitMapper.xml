@@ -247,7 +247,9 @@
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		v.age_unit_code),'')
 		) AS keyword
-		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		from inpt_visit v
+		left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		and (s.baby_id is null or s.baby_id ='')
 		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
 		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
@@ -313,8 +315,10 @@
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		pt.age_unit_code),'')
 		) AS keyword
-		from inpt_visit pt join inpt_baby pb on pt.id = pb.visit_id
-		left join inpt_settle s on s.hosp_code = pt.hosp_code and pt.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
+		from inpt_visit pt
+		join inpt_baby pb on pt.id = pb.visit_id and pb.is_cancel ='0'
+		left join inpt_settle s on s.hosp_code = pb.hosp_code and pb.visit_id = s.visit_id
+		and pb.id = s.baby_id and s.status_code = '0' and s.is_settle = '1'
 		left join base_bed b on b.hosp_code = pt.hosp_code and b.id = pt.bed_id
 		where pt.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">

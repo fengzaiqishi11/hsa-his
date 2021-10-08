@@ -6364,7 +6364,7 @@
         bpf.source_tj_code,
         bpf.total_in,2 as px
         from inpt_visit a
-        join inpt_baby ib on a.id=ib.visit_id and a.hosp_code=ib.hosp_code
+        join inpt_baby ib on a.id=ib.visit_id and a.hosp_code=ib.hosp_code and ib.is_cancel ='0'
         left join inpt_settle s on ib.visit_id=s.visit_id  and ib.hosp_code=s.hosp_code and s.is_settle='1' and s.status_code = '0'
         and ib.id=s.baby_id
         left join base_profile_file bpf on a.profile_id = bpf.id

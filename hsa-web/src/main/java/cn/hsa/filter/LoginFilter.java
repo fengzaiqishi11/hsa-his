@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.RedisUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 
 import javax.annotation.Resource;
 import javax.servlet.*;
@@ -27,8 +28,6 @@ import java.util.List;
  **/
 @WebFilter(filterName = "loginFilter", urlPatterns = "/*")
 public class LoginFilter implements Filter {
-    @Resource
-    private RedisUtils redisUtils;
     /**
      * 不过滤集合
      */
@@ -44,24 +43,20 @@ public class LoginFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-
         // 不过滤
         if (isExclude(request)) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             // 获取session
-            HttpSession session = request.getSession();
-            SysUserDTO userDto = redisUtils.get("SESSION_USER_INFO_"+session.getId());
+            SysUserDTO userDto = (SysUserDTO)request.getSession().getAttribute("SESSION_USER_INFO");
 //            SysUserDTO userDto = (SysUserDTO) session.getAttribute("SESSION_USER_INFO");
             // 判断session中是否有用户数据，如果有，则返回true，继续向下执行
             if (userDto != null) {
-                redisUtils.set("SESSION_USER_INFO_"+ session.getId(), userDto,120 * 60);
                 filterChain.doFilter(servletRequest, servletResponse);
             } else {
                 // {"code":99,"message":"未登录或接口访问超时，请重新登录！","type":"error"}
                 WrapperResponse wr = WrapperResponse.error(99, "未登录或访问超时，请重新登录！", null);
                 String retJson = JSONObject.toJSONString(wr);
-
                 // 返回前端无权限信息
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("application/json; charset=UTF-8");

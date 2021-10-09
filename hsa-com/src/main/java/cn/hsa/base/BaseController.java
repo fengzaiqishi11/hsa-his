@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.rpc.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.session.Session;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,6 +42,9 @@ public class BaseController extends HsafController {
     public static final String SESSION_USER_INFO = "SESSION_USER_INFO";
     @Resource
     private RedisUtils redisUtils;
+    /** Session缓存操作 **/
+    @Resource
+    private RedisOperationsSessionRepository redisSessionRepository;
 
    /* *//**
      * 当前登录用户所属医院编码
@@ -108,15 +113,14 @@ public class BaseController extends HsafController {
     protected HttpSession session;*/
 
     public <T> T getSession(HttpServletRequest req, HttpServletResponse res) {
-        Object value = redisUtils.get("SESSION_USER_INFO_"+req.getSession().getId());
-//        Object value = req.getSession().getAttribute(SESSION_USER_INFO);
+        Session session = redisSessionRepository.findById(req.getRequestedSessionId());
+        SysUserDTO value = session.getAttribute("SESSION_USER_INFO");
         return (T)(value == null ? null : value);
     }
 
     protected void setSession(String name, Object value, int s, HttpServletRequest req, HttpServletResponse res) {
         req.getSession().setAttribute(name, value);
         req.getSession().setMaxInactiveInterval(s);
-        redisUtils.set(name+"_"+req.getSession().getId(), value, s);
     }
 
     /**
@@ -138,11 +142,10 @@ public class BaseController extends HsafController {
 
 
     protected <T> T getAndRemoveSession(HttpServletRequest req, HttpServletResponse res) {
-//        Object value = req.getSession().getAttribute(SESSION_AUTH_CODE);
-        Object value = redisUtils.get("SESSION_AUTH_CODE_"+req.getSession().getId());
+       Session sesion = redisSessionRepository.findById(req.getRequestedSessionId()) ;
+        Object value = sesion.getAttribute(SESSION_AUTH_CODE);
         if (value != null) {
-            req.getSession().removeAttribute(SESSION_AUTH_CODE);
-            redisUtils.del("SESSION_AUTH_CODE_"+req.getSession().getId());
+            sesion.removeAttribute(SESSION_AUTH_CODE);
         }
         return (T)value;
     }

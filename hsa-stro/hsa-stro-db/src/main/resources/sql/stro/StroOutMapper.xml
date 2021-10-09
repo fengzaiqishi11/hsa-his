@@ -493,7 +493,7 @@
 		max(a.batch_no) as batch_no,
 		max(a.expiry_date) as expiry_date,
 		max(a.split_ratio) as split_ratio,
-		max(a.split_num) as split_num,
+		sum(a.split_num) as split_num,
 		max(a.split_price) as split_price,
 		max(a.split_unit_code) as split_unit_code
 		FROM

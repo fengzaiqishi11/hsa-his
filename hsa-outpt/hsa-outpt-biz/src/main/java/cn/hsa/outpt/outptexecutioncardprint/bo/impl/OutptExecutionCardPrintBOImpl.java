@@ -58,7 +58,7 @@ public class OutptExecutionCardPrintBOImpl extends HsafBO implements OutptExecut
             throw new RuntimeException("请选择需要打印的执行卡单据类型");
         }
         // 由于输液瓶贴、静脉输液卡、输液一览卡、留观输液瓶贴为同一组数据，需根据不同的打印单据类型过滤打印状态，增加一个是否共享（isShared）字段来区分
-        if (StringUtils.isNotEmpty(typeCode) && ("1".equals(typeCode) || "2".equals(typeCode) || "3".equals(typeCode) || "4".equals(typeCode))){
+        if (StringUtils.isNotEmpty(typeCode) && ("1".equals(typeCode) || "2".equals(typeCode) || "3".equals(typeCode) || "4".equals(typeCode) || "5".equals(typeCode) || "6".equals(typeCode))){
             outptInfusionRegisterDTO.setIsShared(Constants.SF.S);
         } else {
             outptInfusionRegisterDTO.setIsShared(Constants.SF.F);

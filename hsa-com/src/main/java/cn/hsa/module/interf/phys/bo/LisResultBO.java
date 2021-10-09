@@ -50,7 +50,7 @@ public interface LisResultBO {
     * @Author: zhangxuan
     * @Date: 2021-09-04
     */ 
-    Map queryNoResultLis(Map map);
+    Map updateNoResultLis(Map map);
 
     /**
      * @Description: 医嘱目录信息

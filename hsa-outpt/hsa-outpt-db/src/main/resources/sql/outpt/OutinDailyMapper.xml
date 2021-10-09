@@ -446,7 +446,7 @@
             <!-- 住院日结 -->
             <when test="typeCode == '2'.toString()">
                 SELECT * FROM (
-                    SELECT
+                    <!--SELECT
                         '住院预交' AS type,
                         iap.ap_order_no AS settle_no,
                         iv.in_no AS profile_no,
@@ -470,7 +470,7 @@
                         AND od.id = iap.daily_settle_id
                         AND iap.visit_id = iv.id
 
-                    union all
+                    union all -->
 
                     SELECT
                         '住院收费' AS type,

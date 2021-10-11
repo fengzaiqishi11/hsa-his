@@ -102,5 +102,12 @@
             </if>
     </select>
 
+  <select id="getNextClinicalPathStage" resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
+        select id,hosp_code,list_id,`code`,`name`,`describe`,min_time,max_time,time_unit,sort_no,remarke,
+               is_operation_day,crte_id,crte_name,crte_time
+        from clinical_path_stage
+        where hosp_code = #{hospCode} and list_id = #{listId} and sort_no > #{sortNo} limit 1
+  </select>
+
 </mapper>
 

@@ -1051,4 +1051,13 @@ public interface Constants {
         /** 完成(接收到结果) **/
         public static final String Charge_Completed = "08";
     }
+
+    /**
+     * 模板类型（MBLX）
+     */
+    class MBLX {
+        public static final String QY = "0"; // 全院
+        public static final String KS = "1"; // 科室
+        public static final String GR = "2"; // 个人
+    }
 }

@@ -6,8 +6,8 @@ import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.List;
@@ -142,4 +142,10 @@ public interface OutptVisitDAO {
 
     // 根据就诊id查询手术信息
     List<OperInfoRecordDTO> queryOperInfoRecordByVistiId(Map<String, Object> map);
+
+    // 根据就诊id查询挂号信息
+	OutptRegisterDTO getOutptRegister(OutptVisitDTO outptVisitDTO);
+
+	// 根据就诊id删除所有诊断
+	void deleteDiagnoseByVisitId(OutptVisitDTO outptVisitDTO);
 }

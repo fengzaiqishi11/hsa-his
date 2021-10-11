@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.medical.bo.MedicalAdviceBO;
@@ -16,6 +17,8 @@ import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.nurse.bo.AddAccountByInptBO;
 import cn.hsa.module.inpt.nurse.bo.BackCostByInputBO;
 import cn.hsa.module.inpt.nurse.dao.InptAdviceExecDAO;
+import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -24,6 +27,7 @@ import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -74,6 +78,12 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
 
     @Resource
     private InptBabyDAO inptBabyDAO;
+
+    @Resource
+    private OperInfoRecordDAO operInfoRecordDAO;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
     * @Method queryBackCostInfoPage
@@ -131,232 +141,300 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
         if (inptCostDTOs.stream().filter(cost -> cost.getBackNum().compareTo(BigDecimal.valueOf(0)) <= 0).collect(Collectors.toList()).size() > 0) {
             throw new AppException("退费数量小于等于0不能退费");
         }
-        //退费费用ID
-        List<String> ids = inptCostDTOs.stream().map(InptCostDTO::getId).collect(Collectors.toList());
-
-        InptCostDTO inptCostDTO = new InptCostDTO();
-        inptCostDTO.setIds(ids);
-        inptCostDTO.setHospCode(hospCode);
-        inptCostDTO.setQueryBaby(queryBaby);
-        List<InptCostDTO> inptCostDTOSList = inptCostDAO.queryInptCostPage(inptCostDTO);
-        //不等于正常状态
-        if(!ListUtils.isEmpty(inptCostDTOSList.stream().filter(s-> !s.getStatusCode().equals(Constants.ZTBZ.ZC)).collect(Collectors.toList()))){
-            throw new AppException("当前退费医嘱状态已修改,请刷新在操作");
+        //生成redis结算Key，医院编码 + 证件号码 + 划价收费KEY
+        String visitId = inptCostDTOs.get(0).getVisitId();
+        String key = new StringBuilder(hospCode).append("ZYTF").append(StringUtils.isEmpty(visitId)).append(Constants.OUTPT_FEES_REDIS_KEY).toString();
+        if (StringUtils.isNotEmpty(redisUtils.get(key))) {
+            throw  new AppException("当前患者正在退费,请稍后操作");
         }
-        //  退费需要校验系统参数，判断医技是否需要确费 =========2021年3月16日16:23:00 官红强  start
-        Map<String, Object> canshuMap = new HashMap<>();
-        map.put("hospCode", hospCode);
-        map.put("code", "LIS_PACS_SFQF");
-        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && sys.getValue().equals("0")) {
-            // 需要查询当前退费id中医技费用
-            List<InptCostDTO> yjInptCostDTOSList = inptCostDAO.queryYJInptCostPage(inptCostDTO);
-            if (yjInptCostDTOSList != null && yjInptCostDTOSList.size() > 0) {
-                StringBuilder str = new StringBuilder();
-                for (InptCostDTO dto : inptCostDTOSList) {
-                    if (dto.getIsOk() != null && dto.getIsOk().equals("1")) { // 没有确费的项目需要确费
-                        str.append("[");
-                        str.append(dto.getItemName());
-                        str.append("]");
-                    }
+        try {
+            // 使用redis锁病人，并设置自动过期时间600秒，防止异常情况没有结算成功且redis不会自动清除的问题
+            redisUtils.set(key, visitId, 600);
+            //退费费用ID
+            List<String> ids = inptCostDTOs.stream().map(InptCostDTO::getId).collect(Collectors.toList());
+
+            //==================start退费校验手术状态(add-luoyong-2021.10.11) start==============
+            //医嘱ids
+            List<String> adviceIds = inptCostDTOs.stream().map(InptCostDTO::getIatId).distinct().collect(Collectors.toList());
+            //查询医嘱列表
+            InptAdviceDTO adviceDTOParam = new InptAdviceDTO();
+            adviceDTOParam.setHospCode(hospCode);
+            adviceDTOParam.setIds(adviceIds);
+            List<InptAdviceDTO> inptAdviceDTOS = inptAdviceDAO.queryAll(adviceDTOParam);
+            if (ListUtils.isEmpty(inptAdviceDTOS)) {
+                throw new AppException("未查询到勾选的相关医嘱信息");
+            }
+            // 手术类医嘱 item_code = 4 处置 type_code=5手术
+            List<InptAdviceDTO> operAdviceList = inptAdviceDTOS.stream().filter(inptAdviceDTO -> Constants.XMLB.YZML.equals(inptAdviceDTO.getItemCode()) && Constants.YZLB.YZLB5.equals(inptAdviceDTO.getTypeCode())).collect(Collectors.toList());
+            if (!ListUtils.isEmpty(operAdviceList)) {
+                // 退费前校验手术状态
+                Map operMap = new HashMap();
+                operMap.put("hospCode", hospCode);
+                OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
+                operInfoRecordDTO.setPageSize(1000);
+                operInfoRecordDTO.setPageNo(0);
+                operInfoRecordDTO.setAdviceIds(operAdviceList.stream().map(InptAdviceDTO::getId).collect(Collectors.toList()));
+                List<OperInfoRecordDTO> operInfoRecordDTOs  = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
+                String msg = "";
+                // 已申请未安排的手术列表
+                List<OperInfoRecordDTO> unArrangeList = operInfoRecordDTOs.stream().filter(o -> "1".equals(o.getStatusCode())).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(unArrangeList)){
+                    msg = unArrangeList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                    throw new AppException("存在已申请未安排的手术【" + msg + " 】，请先取消申请！");
                 }
-                throw new AppException(str.toString()+ "医技项目已经确费，请先取消确费");
+                // 已安排未完成的手术列表
+                List<OperInfoRecordDTO> unCompleteOperList = operInfoRecordDTOs.stream().filter(o -> "2".equals(o.getStatusCode())).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(unCompleteOperList)){
+                    msg = unCompleteOperList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                    throw new AppException("存在已安排未完成的手术【" + msg + "】，请先取消安排！");
+                }
+                // 已完成的手术列表
+                List<OperInfoRecordDTO> completeList = operInfoRecordDTOs.stream().filter(o -> "3".equals(o.getStatusCode())).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(completeList)){
+                    msg = completeList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                    throw new AppException("手术【" + msg + "】已完成，不可以退费！");
+                }
+                // 已申请的手术列表
+                List<OperInfoRecordDTO> applyUnScheduledList = operInfoRecordDTOs.stream().filter(o -> "0".equals(o.getStatusCode())).collect(Collectors.toList());
+                // 获取当前医嘱对应的已申请未安排手术并将其取消
+                if(!ListUtils.isEmpty(applyUnScheduledList)){
+                    applyUnScheduledList.forEach( item -> {
+                        item.setStatusCode("-1");
+                    });
+                    // 更新手术状态
+                    operInfoRecordDAO.updateOperStatusBatch(applyUnScheduledList);
+                }
             }
-        }
-        //  退费需要校验系统参数，判断医技是否需要确费 =========2021年3月16日16:23:00 官红强  end
+            //==================end退费校验手术状态(add-luoyong-2021.10.11) end==============
 
-        //根据费用集合信息获得待领集合信息
-        PharInWaitReceiveDTO pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
-        pharInWaitReceiveDTO.setHospCode(hospCode);
-        pharInWaitReceiveDTO.setCostIds(ids);
-        List<PharInWaitReceiveDTO> pharInWaitReceiveDTOs = pharInWaitReceiveService_consumer.queryPharInWaitReceive(HandParamMap(hospCode,"pharInWaitReceiveDTO",pharInWaitReceiveDTO)).getData();
-        BaseDrugDTO baseDrugDTO = null;
-        Map mapParm = null;
-
-        for(InptCostDTO dto:inptCostDTOs) {
-
-            //校验所退数量是否为拆零单位的整数倍
-            if ((Constants.XMLB.YP.equals(dto.getItemCode()))) {
-                baseDrugDTO = new BaseDrugDTO ();
-                baseDrugDTO.setId(dto.getItemId());
-                baseDrugDTO.setHospCode(dto.getHospCode());
-
-                mapParm = new HashMap();
-                mapParm.put("hospCode",dto.getHospCode());
-                mapParm.put("baseDrugDTO",baseDrugDTO);
-
-                baseDrugDTO = baseDrugService_consumer.getById(mapParm).getData();
-
-                //费用里面的单位如果是拆零单位不允许是小数
-                if(dto.getTotalNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
-                    if(new BigDecimal(dto.getBackNum().intValue()).compareTo(dto.getBackNum()) != 0){
-                        throw new AppException("退药数量不能为小数");
+            InptCostDTO inptCostDTO = new InptCostDTO();
+            inptCostDTO.setIds(ids);
+            inptCostDTO.setHospCode(hospCode);
+            inptCostDTO.setQueryBaby(queryBaby);
+            List<InptCostDTO> inptCostDTOSList = inptCostDAO.queryInptCostPage(inptCostDTO);
+            //不等于正常状态
+            if(!ListUtils.isEmpty(inptCostDTOSList.stream().filter(s-> !s.getStatusCode().equals(Constants.ZTBZ.ZC)).collect(Collectors.toList()))){
+                throw new AppException("当前退费医嘱状态已修改,请刷新在操作");
+            }
+            //  退费需要校验系统参数，判断医技是否需要确费 =========2021年3月16日16:23:00 官红强  start
+            Map<String, Object> canshuMap = new HashMap<>();
+            map.put("hospCode", hospCode);
+            map.put("code", "LIS_PACS_SFQF");
+            SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+            if (sys != null && sys.getValue().equals("0")) {
+                // 需要查询当前退费id中医技费用
+                List<InptCostDTO> yjInptCostDTOSList = inptCostDAO.queryYJInptCostPage(inptCostDTO);
+                if (yjInptCostDTOSList != null && yjInptCostDTOSList.size() > 0) {
+                    StringBuilder str = new StringBuilder();
+                    for (InptCostDTO dto : inptCostDTOSList) {
+                        if (dto.getIsOk() != null && dto.getIsOk().equals("1")) { // 没有确费的项目需要确费
+                            str.append("[");
+                            str.append(dto.getItemName());
+                            str.append("]");
+                        }
                     }
-                }else if(dto.getTotalNumUnitCode().equals(baseDrugDTO.getUnitCode())){
-                    //小单位的退药数量
-                    BigDecimal backSplitNum = BigDecimalUtils.multiply(dto.getBackNum(),baseDrugDTO.getSplitRatio());
-                    //四舍五入退药数量
-                    int intBackNum = backSplitNum.setScale( 0, BigDecimal.ROUND_HALF_UP ).intValue();
-                    //四舍五入的数量与实际数量做相减
-                    BigDecimal subtractNum = BigDecimalUtils.subtract(new BigDecimal(intBackNum),backSplitNum);
-                    //差距如果大于 0.01 或者小于 -0.01 则提示
-                    if(subtractNum.compareTo(new BigDecimal("0.01")) > 0 || subtractNum.compareTo(new BigDecimal("-0.01")) < 0){
-                        throw new AppException("退药数量和拆零数量不一致");
+                    throw new AppException(str.toString()+ "医技项目已经确费，请先取消确费");
+                }
+            }
+            //  退费需要校验系统参数，判断医技是否需要确费 =========2021年3月16日16:23:00 官红强  end
+
+            //根据费用集合信息获得待领集合信息
+            PharInWaitReceiveDTO pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
+            pharInWaitReceiveDTO.setHospCode(hospCode);
+            pharInWaitReceiveDTO.setCostIds(ids);
+            List<PharInWaitReceiveDTO> pharInWaitReceiveDTOs = pharInWaitReceiveService_consumer.queryPharInWaitReceive(HandParamMap(hospCode,"pharInWaitReceiveDTO",pharInWaitReceiveDTO)).getData();
+            BaseDrugDTO baseDrugDTO = null;
+            Map mapParm = null;
+
+            for(InptCostDTO dto:inptCostDTOs) {
+
+                //校验所退数量是否为拆零单位的整数倍
+                if ((Constants.XMLB.YP.equals(dto.getItemCode()))) {
+                    baseDrugDTO = new BaseDrugDTO ();
+                    baseDrugDTO.setId(dto.getItemId());
+                    baseDrugDTO.setHospCode(dto.getHospCode());
+
+                    mapParm = new HashMap();
+                    mapParm.put("hospCode",dto.getHospCode());
+                    mapParm.put("baseDrugDTO",baseDrugDTO);
+
+                    baseDrugDTO = baseDrugService_consumer.getById(mapParm).getData();
+
+                    //费用里面的单位如果是拆零单位不允许是小数
+                    if(dto.getTotalNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
+                        if(new BigDecimal(dto.getBackNum().intValue()).compareTo(dto.getBackNum()) != 0){
+                            throw new AppException("退药数量不能为小数");
+                        }
+                    }else if(dto.getTotalNumUnitCode().equals(baseDrugDTO.getUnitCode())){
+                        //小单位的退药数量
+                        BigDecimal backSplitNum = BigDecimalUtils.multiply(dto.getBackNum(),baseDrugDTO.getSplitRatio());
+                        //四舍五入退药数量
+                        int intBackNum = backSplitNum.setScale( 0, BigDecimal.ROUND_HALF_UP ).intValue();
+                        //四舍五入的数量与实际数量做相减
+                        BigDecimal subtractNum = BigDecimalUtils.subtract(new BigDecimal(intBackNum),backSplitNum);
+                        //差距如果大于 0.01 或者小于 -0.01 则提示
+                        if(subtractNum.compareTo(new BigDecimal("0.01")) > 0 || subtractNum.compareTo(new BigDecimal("-0.01")) < 0){
+                            throw new AppException("退药数量和拆零数量不一致");
+                        }
                     }
+
                 }
 
-            }
-
-            //计算退费总金额(当婴儿id为空,代表是大人,则累加金额,后续更新inpt_visit表（备注：婴儿费用不计入大人的费用中）)
-            if(StringUtils.isEmpty(dto.getBabyId())){
-                totalCost = BigDecimalUtils.add(totalCost, dto.getBackAmount());
-            }
-            dto.setStatusCode(Constants.ZTBZ.BCH);//状态标志 被冲红
-            // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   start =======================================
-            if ("1".equals(dto.getItemCode()) || "2".equals(dto.getItemCode())) {
-                dto.setIsOk(Constants.SF.F); //是否确费 未确费
-            } else {
-                dto.setIsOk(Constants.SF.S); //是否确费 确费
-            }
-            // dto.setIsOk(Constants.SF.F); //是否确费 未确费
-            // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   end =======================================
-
-            InptCostDTO redDto = DeepCopy.deepCopy(dto);//深度复制
-            redDto.setIsOk(Constants.SF.S); //是否确费 未确费
-            redDto.setOldCostId(dto.getId());
-            redDto.setId(SnowflakeUtils.getId());
-            redDto.setCrteId(userId);
-            redDto.setCrteName(userName);
-            redDto.setCrteTime(DateUtils.getNow());
-            redDto.setDeptId(deptId);
-            redDto.setBackNum(BigDecimal.valueOf(0));
-
-            if (BigDecimalUtils.compareTo(dto.getBackNum(), dto.getTotalNum()) == 0) {//如果全退，只要新增一条充红记录即可
-                redDto.setTotalNum(BigDecimalUtils.multiply(dto.getTotalNum(), BigDecimal.valueOf(-1)));
-                redDto.setNum(BigDecimalUtils.multiply(dto.getNum(), BigDecimal.valueOf(-1)));
-                redDto.setTotalPrice(BigDecimalUtils.multiply(dto.getPrice(), redDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                redDto.setStatusCode(Constants.ZTBZ.CH);//状态标志 冲红
-                toReds.add(redDto);
-            } else if (BigDecimalUtils.compareTo(dto.getBackNum(), dto.getTotalNum()) < 0) {//如果是部分退，先生成一条负的记录，然后生成一条正常的记录
-                redDto.setTotalNum(BigDecimalUtils.multiply(dto.getTotalNum(), BigDecimal.valueOf(-1)));
-                redDto.setNum(BigDecimalUtils.multiply(dto.getNum(), BigDecimal.valueOf(-1)));
-                redDto.setTotalPrice(BigDecimalUtils.multiply(dto.getPrice(), redDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                redDto.setStatusCode(Constants.ZTBZ.CH);//状态标志 冲红
-                toReds.add(redDto);
-
-                InptCostDTO normalDto = DeepCopy.deepCopy(redDto);//深度复制
-                normalDto.setId(SnowflakeUtils.getId());
-                normalDto.setTotalNum(BigDecimalUtils.subtract(dto.getTotalNum(), dto.getBackNum()));
-                normalDto.setNum(dto.getNum());
-                normalDto.setTotalPrice(BigDecimalUtils.multiply(normalDto.getPrice(), normalDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                normalDto.setStatusCode(Constants.ZTBZ.ZC);//状态标志 正常
-                normals.add(normalDto);
-            } else {
-                throw new AppException("退费失败," + dto.getItemName() + "的退费数量不能大于" + dto.getNum());
-            }
-
-            //非项目材料,不需要退药
-            if (!(Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode()))) {
-                dto.setBackCode(Constants.COST_TYZT.TFBTY);
-            }
-            /***
-             * 判断发药状态
-             * 1.待领:修改费用表退费状态为已退费已退药
-             * 2.预配药:修改费用表退费状态为已退费未退药，插入一条负数记录
-             * 3.配药状态：修改费用表退费状态为已退费未退药，冲红领药表receive,解除占用库存
-             * 4.发药状态:修改费用表退费状态为已退费未退药
-             */
-            for (PharInWaitReceiveDTO receiveDTO : pharInWaitReceiveDTOs) {
-                if (Constants.FYZT.DL.equals(receiveDTO.getStatusCode())) {
-                    dto.setBackCode(Constants.COST_TYZT.TFBTY);
+                //计算退费总金额(当婴儿id为空,代表是大人,则累加金额,后续更新inpt_visit表（备注：婴儿费用不计入大人的费用中）)
+                if(StringUtils.isEmpty(dto.getBabyId())){
+                    totalCost = BigDecimalUtils.add(totalCost, dto.getBackAmount());
+                }
+                dto.setStatusCode(Constants.ZTBZ.BCH);//状态标志 被冲红
+                // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   start =======================================
+                if ("1".equals(dto.getItemCode()) || "2".equals(dto.getItemCode())) {
+                    dto.setIsOk(Constants.SF.F); //是否确费 未确费
                 } else {
-                    dto.setBackCode(Constants.COST_TYZT.TFWTY);
+                    dto.setIsOk(Constants.SF.S); //是否确费 确费
                 }
-            }
-        }
+                // dto.setIsOk(Constants.SF.F); //是否确费 未确费
+                // 2021年9月6日14:12:12   住院退费，除了从药房发出且已经发出的才需要确费，其他都自动确费   end =======================================
 
-        if(!ListUtils.isEmpty(toReds)){
-            //住院优惠重算
-            List<InptCostDTO> toRedsNew = addAccountByInptBO.inptPreferentialRecalculate(toReds);
-            //新增退费费用冲红记录
-            if (!ListUtils.isEmpty(toRedsNew)) {
-                inptCostDAO.insertInptCostBatch(toRedsNew);
-            }
-        }
+                InptCostDTO redDto = DeepCopy.deepCopy(dto);//深度复制
+                redDto.setIsOk(Constants.SF.S); //是否确费 未确费
+                redDto.setOldCostId(dto.getId());
+                redDto.setId(SnowflakeUtils.getId());
+                redDto.setCrteId(userId);
+                redDto.setCrteName(userName);
+                redDto.setCrteTime(DateUtils.getNow());
+                redDto.setDeptId(deptId);
+                redDto.setBackNum(BigDecimal.valueOf(0));
 
-        if(!ListUtils.isEmpty(normals)) {
-            //住院优惠重算
-            List<InptCostDTO> normalsNew = addAccountByInptBO.inptPreferentialRecalculate(normals);
-            //新增退费费用冲红记录
-            if (!ListUtils.isEmpty(normalsNew)) {
-                inptCostDAO.insertInptCostBatch(normalsNew);
-                //批量更新待领表的费用明细id:用于退药查询用
-                pharInWaitReceiveService_consumer.updateCostIdBatch(HandParamMap(hospCode,"inptCostDTOs",normalsNew));
-            }
-        }
+                if (BigDecimalUtils.compareTo(dto.getBackNum(), dto.getTotalNum()) == 0) {//如果全退，只要新增一条充红记录即可
+                    redDto.setTotalNum(BigDecimalUtils.multiply(dto.getTotalNum(), BigDecimal.valueOf(-1)));
+                    redDto.setNum(BigDecimalUtils.multiply(dto.getNum(), BigDecimal.valueOf(-1)));
+                    redDto.setTotalPrice(BigDecimalUtils.multiply(dto.getPrice(), redDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    redDto.setStatusCode(Constants.ZTBZ.CH);//状态标志 冲红
+                    toReds.add(redDto);
+                } else if (BigDecimalUtils.compareTo(dto.getBackNum(), dto.getTotalNum()) < 0) {//如果是部分退，先生成一条负的记录，然后生成一条正常的记录
+                    redDto.setTotalNum(BigDecimalUtils.multiply(dto.getTotalNum(), BigDecimal.valueOf(-1)));
+                    redDto.setNum(BigDecimalUtils.multiply(dto.getNum(), BigDecimal.valueOf(-1)));
+                    redDto.setTotalPrice(BigDecimalUtils.multiply(dto.getPrice(), redDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    redDto.setStatusCode(Constants.ZTBZ.CH);//状态标志 冲红
+                    toReds.add(redDto);
 
-        //更新原费用的退药数量,状态标志
-        inptCostDAO.updateInptCostBatch(inptCostDTOs);
+                    InptCostDTO normalDto = DeepCopy.deepCopy(redDto);//深度复制
+                    normalDto.setId(SnowflakeUtils.getId());
+                    normalDto.setTotalNum(BigDecimalUtils.subtract(dto.getTotalNum(), dto.getBackNum()));
+                    normalDto.setNum(dto.getNum());
+                    normalDto.setTotalPrice(BigDecimalUtils.multiply(normalDto.getPrice(), normalDto.getTotalNum()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    normalDto.setStatusCode(Constants.ZTBZ.ZC);//状态标志 正常
+                    normals.add(normalDto);
+                } else {
+                    throw new AppException("退费失败," + dto.getItemName() + "的退费数量不能大于" + dto.getNum());
+                }
 
-        //判断是否有自动审核权限,如果有,那么就自动审核
-        handAutomatic(hospCode, inptCostDTOs, sourceType, userId, userName, pharInWaitReceiveDTOs);
-
-        //有待领信息的才需要新增负的待领记录，没有的说明是自备的，不需要操作待领表
-        for(PharInWaitReceiveDTO dto:pharInWaitReceiveDTOs){
-            dto.setOldWrId(dto.getId());
-            dto.setCrteId(userId);
-            dto.setCrteName(userName);
-            dto.setCrteTime(DateUtils.getNow());
-            dto.setIsBack(Constants.SF.S);//是否需要退药 用于区分是正常的还是退费的
-            for(InptCostDTO d:inptCostDTOs) {
-                if(dto.getHospCode().equals(d.getHospCode()) && dto.getCostId().equals(d.getId())){
-                    //是否拆零单位
-                    if(dto.getUnitCode().equals(dto.getCurrUnitCode())){
-                        dto.setNum(BigDecimalUtils.multiply(d.getBackNum(),BigDecimal.valueOf(-1)));
-                        dto.setSplitNum(BigDecimalUtils.multiply(BigDecimalUtils.multiply(d.getBackNum(),dto.getSplitRatio()),BigDecimal.valueOf(-1)));
-                    }else{
-                        dto.setSplitNum(BigDecimalUtils.multiply(d.getBackNum(),BigDecimal.valueOf(-1)));
-                        dto.setNum(BigDecimalUtils.multiply(BigDecimalUtils.divide(d.getBackNum(),dto.getSplitRatio()),BigDecimal.valueOf(-1)));
+                //非项目材料,不需要退药
+                if (!(Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode()))) {
+                    dto.setBackCode(Constants.COST_TYZT.TFBTY);
+                }
+                /***
+                 * 判断发药状态
+                 * 1.待领:修改费用表退费状态为已退费已退药
+                 * 2.预配药:修改费用表退费状态为已退费未退药，插入一条负数记录
+                 * 3.配药状态：修改费用表退费状态为已退费未退药，冲红领药表receive,解除占用库存
+                 * 4.发药状态:修改费用表退费状态为已退费未退药
+                 */
+                for (PharInWaitReceiveDTO receiveDTO : pharInWaitReceiveDTOs) {
+                    if (Constants.FYZT.DL.equals(receiveDTO.getStatusCode())) {
+                        dto.setBackCode(Constants.COST_TYZT.TFBTY);
+                    } else {
+                        dto.setBackCode(Constants.COST_TYZT.TFWTY);
                     }
-                    dto.setTotalPrice(BigDecimalUtils.multiply(dto.getNum(),dto.getPrice()));
-                    dto.setCurrUnitCode(d.getTotalNumUnitCode());
-                    break;
                 }
             }
-            dto.setId(SnowflakeUtils.getId());
-        }
-        if(!ListUtils.isEmpty(pharInWaitReceiveDTOs)){
-            //新增负的待领记录 （考虑到事务统一 2021-08-05-pengbo）
-            // pharInWaitReceiveService_consumer.insertPharInWaitBatch(HandParamMap(hospCode,"pharInWaitReceiveDTOs",pharInWaitReceiveDTOs));
-            inptCostDAO.insertPharInWaitReceiveBatch(pharInWaitReceiveDTOs);
-        }
 
-        InptVisitDTO inptVisitDTO = new InptVisitDTO();
-        inptVisitDTO.setHospCode(hospCode);
-        inptVisitDTO.setId(inptCostDTOs.get(0).getVisitId());
-        inptVisitDTO.setTotalCost(BigDecimalUtils.multiply(totalCost,BigDecimal.valueOf(-1)));
-        //更新患者的合计费用 20210520 liuliyun婴儿费用退费不用更新大人总费用
-        //if (StringUtils.isNotEmpty(queryBaby)&&queryBaby.equals("N")) {
-        inptVisitDAO.updateTotalCost(inptVisitDTO);
-        //}
+            if(!ListUtils.isEmpty(toReds)){
+                //住院优惠重算
+                List<InptCostDTO> toRedsNew = addAccountByInptBO.inptPreferentialRecalculate(toReds);
+                //新增退费费用冲红记录
+                if (!ListUtils.isEmpty(toRedsNew)) {
+                    inptCostDAO.insertInptCostBatch(toRedsNew);
+                }
+            }
 
-        /***
-         * 根据退费费用更新医嘱执行的签名为取消
-         * 医嘱核收调用,不取消执行记录,核收那边自行处理执行记录
-         * 修改人:游先林
-         */
-        if (StringUtils.isEmpty(sourceType)) {
-            //更新医嘱执行状态(取消)
-            updateAdviceExecCancel(inptCostDTOs);
+            if(!ListUtils.isEmpty(normals)) {
+                //住院优惠重算
+                List<InptCostDTO> normalsNew = addAccountByInptBO.inptPreferentialRecalculate(normals);
+                //新增退费费用冲红记录
+                if (!ListUtils.isEmpty(normalsNew)) {
+                    inptCostDAO.insertInptCostBatch(normalsNew);
+                    //批量更新待领表的费用明细id:用于退药查询用
+                    pharInWaitReceiveService_consumer.updateCostIdBatch(HandParamMap(hospCode,"inptCostDTOs",normalsNew));
+                }
+            }
 
-            //通过费用ID获取动态费用,如果有表示需要退动态费用并且重新计算该用户的当天的动态费用
-            //List<InptCostDTO> costDTOS = inptCostDAO.queryDTCosts(ids, hospCode);
-            //if (ListUtils.isEmpty(costDTOS)) {
-            //    return true;
+            //更新原费用的退药数量,状态标志
+            inptCostDAO.updateInptCostBatch(inptCostDTOs);
+
+            //判断是否有自动审核权限,如果有,那么就自动审核
+            handAutomatic(hospCode, inptCostDTOs, sourceType, userId, userName, pharInWaitReceiveDTOs);
+
+            //有待领信息的才需要新增负的待领记录，没有的说明是自备的，不需要操作待领表
+            for(PharInWaitReceiveDTO dto:pharInWaitReceiveDTOs){
+                dto.setOldWrId(dto.getId());
+                dto.setCrteId(userId);
+                dto.setCrteName(userName);
+                dto.setCrteTime(DateUtils.getNow());
+                dto.setIsBack(Constants.SF.S);//是否需要退药 用于区分是正常的还是退费的
+                for(InptCostDTO d:inptCostDTOs) {
+                    if(dto.getHospCode().equals(d.getHospCode()) && dto.getCostId().equals(d.getId())){
+                        //是否拆零单位
+                        if(dto.getUnitCode().equals(dto.getCurrUnitCode())){
+                            dto.setNum(BigDecimalUtils.multiply(d.getBackNum(),BigDecimal.valueOf(-1)));
+                            dto.setSplitNum(BigDecimalUtils.multiply(BigDecimalUtils.multiply(d.getBackNum(),dto.getSplitRatio()),BigDecimal.valueOf(-1)));
+                        }else{
+                            dto.setSplitNum(BigDecimalUtils.multiply(d.getBackNum(),BigDecimal.valueOf(-1)));
+                            dto.setNum(BigDecimalUtils.multiply(BigDecimalUtils.divide(d.getBackNum(),dto.getSplitRatio()),BigDecimal.valueOf(-1)));
+                        }
+                        dto.setTotalPrice(BigDecimalUtils.multiply(dto.getNum(),dto.getPrice()));
+                        dto.setCurrUnitCode(d.getTotalNumUnitCode());
+                        break;
+                    }
+                }
+                dto.setId(SnowflakeUtils.getId());
+            }
+            if(!ListUtils.isEmpty(pharInWaitReceiveDTOs)){
+                //新增负的待领记录 （考虑到事务统一 2021-08-05-pengbo）
+                // pharInWaitReceiveService_consumer.insertPharInWaitBatch(HandParamMap(hospCode,"pharInWaitReceiveDTOs",pharInWaitReceiveDTOs));
+                inptCostDAO.insertPharInWaitReceiveBatch(pharInWaitReceiveDTOs);
+            }
+
+            InptVisitDTO inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setHospCode(hospCode);
+            inptVisitDTO.setId(inptCostDTOs.get(0).getVisitId());
+            inptVisitDTO.setTotalCost(BigDecimalUtils.multiply(totalCost,BigDecimal.valueOf(-1)));
+            //更新患者的合计费用 20210520 liuliyun婴儿费用退费不用更新大人总费用
+            //if (StringUtils.isNotEmpty(queryBaby)&&queryBaby.equals("N")) {
+            inptVisitDAO.updateTotalCost(inptVisitDTO);
             //}
 
-            //重新计算动态费用
-            //buildDTCost(hospCode, userId, userName, deptId, ids,queryBaby);
+            /***
+             * 根据退费费用更新医嘱执行的签名为取消
+             * 医嘱核收调用,不取消执行记录,核收那边自行处理执行记录
+             * 修改人:游先林
+             */
+            if (StringUtils.isEmpty(sourceType)) {
+                //更新医嘱执行状态(取消)
+                updateAdviceExecCancel(inptCostDTOs);
+
+                //通过费用ID获取动态费用,如果有表示需要退动态费用并且重新计算该用户的当天的动态费用
+                //List<InptCostDTO> costDTOS = inptCostDAO.queryDTCosts(ids, hospCode);
+                //if (ListUtils.isEmpty(costDTOS)) {
+                //    return true;
+                //}
+
+                //重新计算动态费用
+                //buildDTCost(hospCode, userId, userName, deptId, ids,queryBaby);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            redisUtils.del(key);//删除结算key
         }
         return true;
     }

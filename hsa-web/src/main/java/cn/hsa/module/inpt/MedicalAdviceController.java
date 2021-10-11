@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,9 @@ public class MedicalAdviceController extends BaseController {
 
     @Resource
     private MedicalAdviceService medicalAdviceService_consumer;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
     * @Method queryDoctorAdvice
@@ -102,7 +106,19 @@ public class MedicalAdviceController extends BaseController {
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("medicalAdviceDTO", medicalAdviceDTO);
-        return medicalAdviceService_consumer.acceptMedicalAdvices(map);
+        String key = sysUserDTO.getHospCode() + medicalAdviceDTO.getDeptId() + "_YZHS";
+        if(redisUtils.hasKey(key)){
+            throw  new RuntimeException("当前科室正在做医嘱核收,请耐心等待!");
+        }
+        try{
+            redisUtils.set(key,key);
+            medicalAdviceService_consumer.acceptMedicalAdvices(map);
+        }catch (Exception e){
+            throw  new RuntimeException("医嘱核收失败,原因：" + e.getMessage());
+        } finally {
+            redisUtils.del(key);
+        }
+        return WrapperResponse.success(true);
     }
 
     /**

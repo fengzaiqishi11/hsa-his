@@ -465,7 +465,18 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (!flag) {
                         //判断该医嘱目录的医技分类是否包含在参数里面,采血费
                         if (codeArray!=null && codeArray.length>0 && cxfBaseItem!=null && isContainsInBloodParameters) {
-                            saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
+                            // 2021-10-09 更改采血费生成方式,
+                            // 以前是根据医嘱目录相关参数判断是否需要合管,再去收取采血费,现在是只根据收费项目判断,当天有就不产生费用
+                            // 如果要改回来 直接把这一段去掉,用下面这一段即可
+                            // saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
+                            List<InptCostDTO> cxCostDTOList = inptCostDAO.queryCxFfCost(visitDTO.getHospCode(), visitDTO.getId(),
+                                    DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), cxfBaseItem.getId());
+                            if (ListUtils.isEmpty(cxCostDTOList)) {
+                                //判断该医嘱目录的医技分类是否包含在参数里面
+                                if (codeArray!=null && codeArray.length>0 && isContainsInBloodParameters) {
+                                    saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
+                                }
+                            }
                         }
                         //容器费
                         if (!ListUtils.isEmpty(sysCodeDetailDTOList) && !StringUtils.isEmpty(sysCodeDetailDTOList.get(0).getRemark())) {
@@ -3110,16 +3121,16 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             PharInWaitReceiveDTO pharInWaitReceiveDTO = null ;
             for (InptCostDTO costDTO:inptCostDTOList) {
                 // 如果是药品 或者材料  并且是   常规或者 出院带药的情况 需要校验是否预配药,发药
-                if((Constants.XMLB.YP.equals(inptAdviceDTO.getItemCode()) || Constants.XMLB.CL.equals(inptAdviceDTO.getItemCode())) && (Constants.YYXZ.CG.equals(inptAdviceDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(inptAdviceDTO.getUseCode())) ){
-                    pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
-                    pharInWaitReceiveDTO.setCostId(costDTO.getId());
-                    pharInWaitReceiveDTO.setHospCode(costDTO.getHospCode());
-                    pharInWaitReceiveDTO = inptCostDAO.getPharInWaitReceiveByIatid(pharInWaitReceiveDTO);
-                    //如果 该请领不是带领状态  那么跳过次医嘱
-                    if(pharInWaitReceiveDTO != null && !Constants.LYZT.DL.equals(pharInWaitReceiveDTO.getStatusCode())){
-                        continue;
-                    }
-                }
+//                if((Constants.XMLB.YP.equals(inptAdviceDTO.getItemCode()) || Constants.XMLB.CL.equals(inptAdviceDTO.getItemCode())) && (Constants.YYXZ.CG.equals(inptAdviceDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(inptAdviceDTO.getUseCode())) ){
+//                    pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
+//                    pharInWaitReceiveDTO.setCostId(costDTO.getId());
+//                    pharInWaitReceiveDTO.setHospCode(costDTO.getHospCode());
+//                    pharInWaitReceiveDTO = inptCostDAO.getPharInWaitReceiveByIatid(pharInWaitReceiveDTO);
+//                    //如果 该请领不是带领状态  那么跳过次医嘱
+//                    if(pharInWaitReceiveDTO != null && !Constants.LYZT.DL.equals(pharInWaitReceiveDTO.getStatusCode())){
+//                      continue;
+//                    }
+//                }
 
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);

@@ -48,6 +48,17 @@ public interface LisResultService {
     */
     @PostMapping("/service/lis/queryDXNoResult")
     List<String> queryDXNoResult(Map map);
+
+    /**
+     * @Description: 查询退费的医嘱id
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-11
+     */
+    @PostMapping("/service/lis/queryDXBackResult")
+    List<String> queryDXBackResult(Map map);
+
     /**
     * @Description: 查询没有结果的lis申请单
     * @Param:

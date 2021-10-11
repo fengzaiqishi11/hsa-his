@@ -2,20 +2,25 @@ package cn.hsa.module.clinical.inptclinicalpathstage.entity;
 
 import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 病人阶段病情记录表(InptClinicalPathStage)实体类
- *
- * @author makejava
- * @since 2021-09-22 14:16:19
- */
+ * @Package_name: cn.hsa.module.clinical.clinicalpathlist.entity
+ * @Class_name: ClinicPathListDO
+ * @Describe: 病人阶段病情记录表
+ * @Author: yangjiahong
+ * @Email: jiahong.yang@powersi.com
+ * @Date: 2021/9/8 19:27
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +39,10 @@ public class InptClinicalPathStageDO extends PageDO implements Serializable  {
      * 就诊ID
      */
     private String visitId;
+    /**
+     * 入径状态表id
+     */
+    private String clinicalPathStageId;
     /**
      * 婴儿ID
      */
@@ -65,10 +74,14 @@ public class InptClinicalPathStageDO extends PageDO implements Serializable  {
     /**
      * 阶段开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginTime;
     /**
      * 阶段结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
     /**
      * 备注
@@ -85,6 +98,8 @@ public class InptClinicalPathStageDO extends PageDO implements Serializable  {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 
 }

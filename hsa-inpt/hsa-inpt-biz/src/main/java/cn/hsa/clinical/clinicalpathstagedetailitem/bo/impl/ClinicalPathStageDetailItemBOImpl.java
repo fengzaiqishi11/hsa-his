@@ -97,36 +97,36 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
   @Override
   public Boolean saveClinicalPathStageDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
     List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
-    if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
-      throw new AppException("绑定医嘱明细数据为空");
-    }
-    List<ClinicalPathStageDetailItemDTO> newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
     if(!ListUtils.isEmpty(clinicalItem.getIds())) {
       clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
     }
-    // 新增医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
-    // 编辑医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
-    for(ClinicalPathStageDetailItemDTO item : newList) {
-      item.setHospCode(clinicalItem.getHospCode());
-      if(StringUtils.isNotEmpty(item.getId())) {
-        editList.add(item);
-        continue;
+    if (!ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
+      List<ClinicalPathStageDetailItemDTO> newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
+      // 新增医嘱绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
+      // 编辑医嘱绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
+      for (ClinicalPathStageDetailItemDTO item : newList) {
+        item.setHospCode(clinicalItem.getHospCode());
+        if (StringUtils.isNotEmpty(item.getId())) {
+          editList.add(item);
+          continue;
+        }
+        item.setId(SnowflakeUtils.getId());
+        item.setHospCode(clinicalItem.getHospCode());
+        item.setCrteId(clinicalItem.getCrteId());
+        item.setCrteName(clinicalItem.getCrteName());
+        item.setCrteTime(clinicalItem.getCrteTime());
+        item.setIsValid("1");
+        addList.add(item);
       }
-      item.setId(SnowflakeUtils.getId());
-      item.setHospCode(clinicalItem.getHospCode());
-      item.setCrteId(clinicalItem.getCrteId());
-      item.setCrteName(clinicalItem.getCrteName());
-      item.setCrteTime(clinicalItem.getCrteTime());
-      item.setIsValid("1");
-      addList.add(item);
-    }
-    if(!ListUtils.isEmpty(addList)) {
-      clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
-    }
-    if(!ListUtils.isEmpty(editList)) {
-      clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+      if (!ListUtils.isEmpty(addList)) {
+        clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
+      }
+      if (!ListUtils.isEmpty(editList)) {
+        clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+      }
+      return true;
     }
     return true;
   }

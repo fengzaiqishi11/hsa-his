@@ -471,15 +471,15 @@
         ( case when a.baby_id is null or <![CDATA[LENGTH(trim(a.baby_id)) < 1]]> then
             (CONCAT(
             e.name,'/',
-            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女'  end) , '/' ,
+            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女' else '-' end) , '/' ,
             e.age ,
-            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天'  end )))
+            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天' else '-' end )))
           else (
             CONCAT(
             e.name,'/',
-            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女'  end) , '/' ,
+            (case when e.gender_code = '1' then '男'  when e.gender_code = '2' then '女' else '-' end) , '/' ,
             e.age ,
-            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天'  end ), '/' ,
+            (case when e.age_unit_code = '1' then '岁' when e.age_unit_code = '2' then '月' when e.age_unit_code = '3' then '周' when e.age_unit_code = '4' then '天' else '-' end ), '/' ,
             t1.name
             ))
           end

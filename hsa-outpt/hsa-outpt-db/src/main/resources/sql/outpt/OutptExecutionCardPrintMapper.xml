@@ -77,7 +77,7 @@
         <if test="isShared != null and isShared == '1'.toString()">
             <!--护理单据对应、未打印的-->
             <if test="printSign != null and printSign == '0'.toString()">
-                and (!JSON_CONTAINS(ope.is_print, JSON_OBJECT(#{typeCode}, '1')) or ope.is_print = #{printSign})
+                and (!JSON_CONTAINS(ope.is_print, JSON_OBJECT(#{typeCode}, '1')) or ope.is_print = #{printSign} or ope.is_print is null)
             </if>
             <!--护理单据对应、已打印的-->
             <if test="printSign != null and printSign == '1'.toString()">

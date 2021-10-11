@@ -226,6 +226,16 @@
         </foreach>
     </delete>
 
+    <update id="updateBabyRegister" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
+        update inpt_baby
+        set is_cancel = #{isCancel},
+            cancel_id = #{cancelId},
+            cancel_name = #{cancelName},
+            cancel_time = #{cancelTime}
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+
     <!-- 根据条件参数查询数据列表 -->
     <select id="findByCondition" resultMap="inptBabyDtoMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
         SELECT
@@ -233,6 +243,7 @@
         FROM inpt_baby ib 
         where
         ib.hosp_code = #{hospCode}
+        and ib.is_cancel = '0'
         <if test="visitId != null and visitId != ''">
             AND ib.visit_id = #{visitId}
         </if>
@@ -243,8 +254,8 @@
 
     <!--新增婴儿信息-->
     <insert id="insertBaby" parameterType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
-        insert into inpt_baby(id, hosp_code, code, visit_id, name, gender_code, birth_time, weight, height, remark, type_code)
-        values (#{id}, #{hospCode}, #{code}, #{visitId}, #{name}, #{genderCode}, #{birthTime}, #{weight}, #{height}, #{remark}, #{typeCode})
+        insert into inpt_baby(id, hosp_code, code, visit_id, name, gender_code, birth_time, weight, height, remark, type_code, is_cancel)
+        values (#{id}, #{hospCode}, #{code}, #{visitId}, #{name}, #{genderCode}, #{birthTime}, #{weight}, #{height}, #{remark}, #{typeCode}, #{isCancel})
     </insert>
 
     <!--编辑婴儿信息-->
@@ -278,6 +289,18 @@
             <if test="typeCode != null and typeCode != ''">
                 type_code = #{typeCode},
             </if>
+            <if test="isCancel != null and isCancel != ''">
+                is_cancel = #{isCancel},
+            </if>
+            <if test="cancelId != null and cancelId != ''">
+                cancel_id = #{cancelId},
+            </if>
+            <if test="cancelName != null and cancelName != ''">
+                cancel_name = #{cancelName},
+            </if>
+            <if test="cancelTime != null and cancelTime != ''">
+                cancel_time = #{cancelTime},
+            </if>
         </set>
         where hosp_code = #{hospCode} and id = #{id}
     </update>
@@ -299,6 +322,7 @@
         ib.type_code
         from inpt_baby ib
         where ib.hosp_code = #{hospCode}
+        and ib.is_cancel = '0'
         <if test="id != null and id != ''">
             and ib.visit_id = #{id}
         </if>
@@ -319,6 +343,7 @@
         type_code
         from inpt_baby
         where hosp_code = #{hospCode}
+          and is_cancel = #{isCancel}
         <if test="visitId != null and visitId != ''">
             and visit_id = #{visitId}
         </if>
@@ -344,7 +369,7 @@
                remark,
                type_code
         from inpt_baby
-        where hosp_code = #{hospCode} and id = #{id}
+        where hosp_code = #{hospCode} and id = #{id} and is_cancel = '0'
     </select>
 
     <!--通过实体作为筛选条件查询-->

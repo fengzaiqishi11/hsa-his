@@ -55,8 +55,8 @@ public interface LisResultService {
     * @Author: zhangxuan
     * @Date: 2021-09-04
     */
-    @PostMapping("/service/lis/queryNoResultLis")
-    Map queryNoResultLis(Map map);
+    @PostMapping("/service/lis/updateNoResultLis")
+    Map updateNoResultLis(Map map);
 
     /**
      * @Description: 医嘱目录信息

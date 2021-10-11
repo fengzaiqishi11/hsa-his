@@ -53,10 +53,10 @@ public class LisResultController extends BaseController {
      * @Date: 2021-07-06
      */
     @PostMapping("queryNoResult")
-    public Map queryNoResult(){
+    public Map updateNoResult(){
         Map map = new HashMap();
         map.put("hospCode","1000001");
-        return lisResultService.queryNoResultLis(map);
+        return lisResultService.updateNoResultLis(map);
     }
 
     /**

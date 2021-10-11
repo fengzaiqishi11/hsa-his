@@ -79,4 +79,16 @@ public interface InptBabyService {
      */
     @GetMapping("/service/inpt/baby/getBabyCost")
     WrapperResponse<InptBabyDTO> getBabyCost(Map map);
+
+    /**
+     * @Menthod: cancelBaby
+     * @Desrciption: 新生儿取消登记
+     * @Param: inptBabyDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-08 11:30
+     * @Return:
+     **/
+    @PostMapping("/service/inpt/baby/cancelBaby")
+    WrapperResponse<Boolean> cancelBaby(Map map);
 }

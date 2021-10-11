@@ -233,7 +233,7 @@
     max(ic.item_code) as itemCode,
       ic.item_id,
     max(ic.item_name) as itemName,
-    max(ic.price) as price,
+    ic.price as price,
     sum(ic.total_num) as num,
     max(ic.spec) as spec,
     max(ic.dosage_unit_code) as dosageUnitCode,
@@ -257,7 +257,7 @@
       left join
       base_material bm
       on bm.id = ic.item_id and bm.hosp_code = ic.hosp_code
-    where ic.hosp_code = #{hospCode} and ic.cost_time is not null
+    where ic.hosp_code = #{hospCode} and ic.cost_time is not null and ic.status_code ='0'
     <if test="visitId != null and visitId != ''">
       AND ic.visit_id = #{visitId}
     </if>
@@ -283,7 +283,7 @@
                     and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
                 ]]>
       </if>
-    group by ic.item_id
+    group by ic.item_id,ic.price
     order by max(ic.crte_time),max(ic.bfc_id)
   </select>
     <!-- 费用清单打印批量-->
@@ -295,7 +295,7 @@
         max(item_code) as itemCode,
         item_id,
         max(item_name) as itemName,
-        max(price) as price,
+        price as price,
         sum(total_num) as num,
         max(spec) as spec,
         max(dosage_unit_code) as dosageUnitCode,
@@ -309,7 +309,7 @@
         (select max(DATE_FORMAT(ic.crte_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as endCostDate,
         (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = hosp_code) as bfcName
         from inpt_cost
-        where hosp_code = #{hospCode} and cost_time is not null
+        where hosp_code = #{hospCode} and cost_time is not null and status_code ='0'
         <if test="visitIds != null and visitIds.size() > 0">
             AND visit_id in
             <foreach collection="visitIds" item="visitId" open="(" close=")" separator=",">
@@ -319,7 +319,7 @@
         <if test="statusCode != null and statusCode != ''">
             AND status_code = #{statusCode}
         </if>
-        group by item_id
+        group by item_id,price
         order by max(crte_time),max(bfc_id)
     </select>
 

@@ -5,11 +5,14 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.service.BaseAdviceService;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
 import cn.hsa.module.oper.operpatientrecord.dto.OperPatientRecordDTO;
 import cn.hsa.module.oper.operpatientrecord.service.OperPatientRecordService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
@@ -159,6 +162,47 @@ public class OperInfoRecordController extends BaseController {
         map.put("operInfoRecordDTO",operInfoRecordDTO);
         WrapperResponse<PageDTO> operInfoRecordDOListPageDTO = operInfoRecordService_consumer.queryOperInfoRecordList(map);
         return operInfoRecordDOListPageDTO;
+    }
+
+    /**
+     * @Menthod: queryOperCostByVisitId
+     * @Desrciption: 查询个人手术补记账费用
+     * @Param: visit_id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-09 17:37
+     * @Return: List<InptCostDTO>
+     **/
+    @GetMapping("/queryOperCostByVisitId")
+    public WrapperResponse<List<InptCostDTO>> queryOperCostByVisitId(@RequestParam Map<String, Object> paramMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String visitId = MapUtils.get(paramMap, "visitId");
+        if (StringUtils.isEmpty(visitId)) {
+            throw new RuntimeException("未选择就诊人信息");
+        }
+        paramMap.put("hospCode", sysUserDTO.getHospCode());
+        return operInfoRecordService_consumer.queryOperCostByVisitId(paramMap);
+    }
+
+    /**
+     * @Menthod: cancelOper
+     * @Desrciption: 取消手术，已核收未申请的状态下取消，statusCode更改未-1
+     * @Param: operInfoRecordDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-11 20:19
+     * @Return:
+     **/
+    @PostMapping("/cancelOper")
+    public WrapperResponse<Boolean> cancelOper(@RequestBody OperInfoRecordDTO operInfoRecordDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(operInfoRecordDTO.getId())) {
+            throw new RuntimeException("未选择需要取消的手术");
+        }
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("operInfoRecordDTO", operInfoRecordDTO);
+        return operInfoRecordService_consumer.cancelOper(map);
     }
 
     @GetMapping("getOperInfoById")

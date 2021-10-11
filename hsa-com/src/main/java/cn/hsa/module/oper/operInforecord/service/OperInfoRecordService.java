@@ -2,10 +2,13 @@ package cn.hsa.module.oper.operInforecord.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -101,4 +104,28 @@ public interface OperInfoRecordService {
     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO>
     **/
     WrapperResponse<OperInfoRecordDTO>  getOperInfoById(Map map);
+
+    /**
+     * @Menthod: queryOperCostByVisitId
+     * @Desrciption: 查询个人手术补记账费用
+     * @Param: visit_id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-09 17:37
+     * @Return: List<InptCostDTO>
+     **/
+    @GetMapping("/service/oper/operInfoRecord/queryOperCostByVisitId")
+    WrapperResponse<List<InptCostDTO>> queryOperCostByVisitId(Map<String, Object> paramMap);
+
+    /**
+     * @Menthod: cancelOper
+     * @Desrciption: 取消手术，已核收未申请的状态下取消，statusCode更改未-1
+     * @Param: operInfoRecordDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-11 20:19
+     * @Return:
+     **/
+    @PostMapping("/service/oper/operInfoRecord/cancelOper")
+    WrapperResponse<Boolean> cancelOper(Map map);
 }

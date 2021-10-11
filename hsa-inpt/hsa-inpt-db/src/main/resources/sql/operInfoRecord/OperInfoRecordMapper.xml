@@ -271,6 +271,16 @@
               hosp_code = #{hospCode}
     </update>
 
+    <!--医嘱取消，批量取消手术状态-->
+    <update id="updateOperStatusBatch" parameterType="java.util.List">
+        <foreach collection="operList" item="item" separator=";">
+            update oper_info_record
+            set status_code = #{item.statusCode}
+            where hosp_code = #{item.hospCode}
+              and id = #{item.id}
+        </foreach>
+    </update>
+
     <select id="queryOperInfoRecordList"
             resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
         select
@@ -305,6 +315,12 @@
             </if>
             <if test="adviceId != null and adviceId != ''">
                 and a.advice_id = #{adviceId}
+            </if>
+            <if test="adviceIds != null and adviceIds.size() > 0">
+                and a.advice_id in
+                <foreach collection="adviceIds" open="(" close=")" separator="," item="adviceId">
+                    #{adviceId}
+                </foreach>
             </if>
             <if test="name != null and name != ''">
                 and a.name = #{name}
@@ -665,6 +681,71 @@
         ORDER BY
         outpt.crte_time DESC
         )
+    </select>
+
+    <!--根据就诊id查询手术补记账费用-->
+    <select id="queryOperCostByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+            a.id,
+            a.hosp_code,
+            a.visit_id,
+            a.item_code,
+            a.item_name,
+            a.price,
+            a.num,
+            a.num_unit_code,
+            a.spec,
+            a.prep_code,
+            a.dosage,
+            a.dosage_unit_code,
+            a.use_days,
+            a.use_code,
+            a.usage_code,
+            a.settle_code,
+            (SELECT br.name from base_rate br where a.rate_id = br.id and a.hosp_code = br.hosp_code) as rate_name,
+            a.total_price,
+            a.preferential_price,
+            a.reality_price,
+            a.doctor_id,
+            a.doctor_name,
+            a.dept_id,
+            (SELECT bd.name FROM base_dept bd where a.dept_id = bd.id and a.hosp_code = bd.hosp_code) as dept_name
+        FROM
+            inpt_cost a
+        WHERE a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+          AND a.source_code = '8'
+        union all
+        SELECT
+            a.id,
+            a.hosp_code,
+            a.visit_id,
+            a.item_code,
+            a.item_name,
+            a.price,
+            a.num,
+            a.num_unit_code,
+            a.spec,
+            a.prep_code,
+            a.dosage,
+            a.dosage_unit_code,
+            a.use_days,
+            a.use_code,
+            a.usage_code,
+            a.settle_code,
+            (SELECT br.name from base_rate br where a.rate_id = br.id and a.hosp_code = br.hosp_code) as rate_name,
+            a.total_price,
+            a.preferential_price,
+            a.reality_price,
+            a.doctor_id,
+            a.doctor_name,
+            a.dept_id,
+            (SELECT bd.name FROM base_dept bd where a.dept_id = bd.id and a.hosp_code = bd.hosp_code) as dept_name
+        FROM
+            outpt_cost a
+        WHERE a.hosp_code = #{hospCode}
+          and a.visit_id = #{visitId}
+          AND a.source_code = '8'
     </select>
 
 

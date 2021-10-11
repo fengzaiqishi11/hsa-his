@@ -1036,6 +1036,9 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDTO.setIatIdList(Arrays.asList(inptAdviceDTO.getIatIds().split(",")));
         }
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
+        if (ListUtils.isEmpty(inptAdviceDTOList)) {
+            throw new AppException("未查询到勾选的相关医嘱信息");
+        }
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         //长期医嘱
         checkInptAdviceList = inptAdviceDTOList.stream().filter(s-> Constants.SF.F.equals(s.getIsLong())).collect(Collectors.toList());
@@ -1069,25 +1072,37 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
             operInfoRecordDTO.setPageSize(1000);
             operInfoRecordDTO.setPageNo(0);
-            operInfoRecordDTO.setAdviceId(operAdviceList.get(0).getId());
+//            operInfoRecordDTO.setAdviceId(operAdviceList.get(0).getId());
+            operInfoRecordDTO.setAdviceIds(operAdviceList.stream().map(InptAdviceDTO::getId).collect(Collectors.toList()));
             List<OperInfoRecordDTO> operInfoRecordDTOs  = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
+            String msg = "";
+            // 已申请未安排的手术列表
+            List<OperInfoRecordDTO> unArrangeList = operInfoRecordDTOs.stream().filter(o -> "1".equals(o.getStatusCode())).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(unArrangeList)){
+                msg = unArrangeList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                throw new AppException("存在已申请未安排的手术【" + msg + " 】，请先取消申请！");
+            }
             // 已安排未完成的手术列表
             List<OperInfoRecordDTO> unCompleteOperList = operInfoRecordDTOs.stream().filter(o -> "2".equals(o.getStatusCode())).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(unCompleteOperList)){
+                msg = unCompleteOperList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                throw new AppException("存在已安排未完成的手术【" + msg + "】，请先取消安排！");
+            }
+            // 已完成的手术列表
+            List<OperInfoRecordDTO> completeList = operInfoRecordDTOs.stream().filter(o -> "3".equals(o.getStatusCode())).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(completeList)){
+                msg = completeList.stream().map(OperInfoRecordDTO::getContent).collect(Collectors.joining(","));
+                throw new AppException("手术【" + msg + "】已完成，不可以取消！");
+            }
             // 已申请的手术列表
             List<OperInfoRecordDTO> applyUnScheduledList = operInfoRecordDTOs.stream().filter(o -> "0".equals(o.getStatusCode())).collect(Collectors.toList());
-            if(!ListUtils.isEmpty(unCompleteOperList)){
-                throw new AppException("存在已安排未完成的手术 "+unCompleteOperList.get(0).getContent()+" 请检查！");
-            }
             // 获取当前医嘱对应的已申请未安排手术并将其取消
             if(!ListUtils.isEmpty(applyUnScheduledList)){
-                OperInfoRecordDTO dto = null;
-                for (OperInfoRecordDTO operInfoRecordDto:applyUnScheduledList) {
-                    dto = new OperInfoRecordDTO();
-                    dto.setId(operInfoRecordDto.getId());
-                    dto.setHospCode(operInfoRecordDto.getHospCode());
-                    dto.setStatusCode("-1");
-                    operInfoRecordDAO.updateSurgeryStatus(dto);
-                }
+                applyUnScheduledList.forEach( item -> {
+                    item.setStatusCode("-1");
+                });
+                // 更新手术状态
+                operInfoRecordDAO.updateOperStatusBatch(applyUnScheduledList);
             }
         }
         return inptAdviceDAO.updateBatchInptAdviceCancel(inptAdviceDTO) > 0;

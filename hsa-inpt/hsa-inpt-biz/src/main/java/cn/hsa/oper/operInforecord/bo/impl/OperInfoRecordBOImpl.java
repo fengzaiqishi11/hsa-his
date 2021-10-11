@@ -7,6 +7,7 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.bo.OperInfoRecordBO;
 import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
@@ -403,5 +404,44 @@ public class OperInfoRecordBOImpl extends HsafBO implements OperInfoRecordBO {
     @Override
     public Boolean updateSurgeryCompleteToCancel(OperInfoRecordDTO operInfoRecordDTO) {
         return operInfoRecordDAO.updateSurgeryCompleteToCancel(operInfoRecordDTO) > 0;
+    }
+
+    /**
+     * @Menthod: queryOperCostByVisitId
+     * @Desrciption: 查询个人手术补记账费用
+     * @Param: visit_id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-09 17:37
+     * @Return: List<InptCostDTO>
+     **/
+    @Override
+    public List<InptCostDTO> queryOperCostByVisitId(Map<String, Object> paramMap) {
+        return operInfoRecordDAO.queryOperCostByVisitId(paramMap);
+    }
+
+    /**
+     * @Menthod: cancelOper
+     * @Desrciption: 取消手术，已核收未申请的状态下取消，statusCode更改未-1
+     * @Param: operInfoRecordDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-11 20:19
+     * @Return:
+     **/
+    @Override
+    public Boolean updateOperStatusCode(OperInfoRecordDTO operInfoRecordDTO) {
+        OperInfoRecordDTO operInfoById = operInfoRecordDAO.getOperInfoById(operInfoRecordDTO);
+        if ("1".equals(operInfoById.getStatusCode())) {
+            throw new RuntimeException("【" + operInfoById.getContent() +"】已申请，请先取消申请");
+        }
+        if ("2".equals(operInfoById.getStatusCode())) {
+            throw new RuntimeException("【" + operInfoById.getContent() +"】已安排，请先取消安排");
+        }
+        if ("3".equals(operInfoById.getStatusCode())) {
+            throw new RuntimeException("【" + operInfoById.getContent() +"】已完成登记，无法进行取消");
+        }
+        operInfoRecordDTO.setStatusCode("-1");
+        return operInfoRecordDAO.updateSurgeryStatus(operInfoRecordDTO) > 0;
     }
 }

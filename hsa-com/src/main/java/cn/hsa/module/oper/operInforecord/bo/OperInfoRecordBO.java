@@ -1,6 +1,7 @@
 package cn.hsa.module.oper.operInforecord.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 
 import java.util.List;
@@ -24,4 +25,8 @@ public interface OperInfoRecordBO {
     OperInfoRecordDTO getOperInfoById(OperInfoRecordDTO operInfoRecordDTO);
 
     Boolean updateSurgeryCompleteToCancel(OperInfoRecordDTO operInfoRecordDTO);
+
+    List<InptCostDTO> queryOperCostByVisitId(Map<String, Object> paramMap);
+
+    Boolean updateOperStatusCode(OperInfoRecordDTO operInfoRecordDTO);
 }

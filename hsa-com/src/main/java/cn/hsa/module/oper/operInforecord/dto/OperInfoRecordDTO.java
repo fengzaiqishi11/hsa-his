@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -102,4 +103,8 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
      * 患者姓名
      */
     private String name;
+    /**
+     * 医嘱ids
+     */
+    private List<String> adviceIds;
 }

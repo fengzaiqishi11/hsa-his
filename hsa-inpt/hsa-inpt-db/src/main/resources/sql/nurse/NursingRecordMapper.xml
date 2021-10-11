@@ -254,7 +254,7 @@
         </foreach>
     </update>
 
-    <delete id="delete" parameterType="java.util.List">
+    <update id="delete" parameterType="java.util.List">
         <!--delete from inpt_nurse_record
         where group_no in
         <foreach collection="deleteList" separator="," item="item" open="(" close=")">
@@ -269,7 +269,8 @@
             #{item.hospCode}
         </foreach>-->
         <foreach collection="deleteList" separator=";" item="item">
-            delete from inpt_nurse_record
+            update inpt_nurse_record
+            set is_valid = '0'
             <where>
                 <if test="item.hospCode != null and item.hospCode != ''">
                     and hosp_code = #{item.hospCode}
@@ -285,7 +286,7 @@
                 </if>
             </where>
         </foreach>
-    </delete>
+    </update>
 
     <!--分页查询护理单记录-->
     <select id="queryNursingRecord" resultType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO"

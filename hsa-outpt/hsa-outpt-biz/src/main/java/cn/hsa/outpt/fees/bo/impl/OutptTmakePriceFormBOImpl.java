@@ -40,6 +40,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
@@ -385,22 +386,68 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
 
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试", null);
+                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
             }
 
             // 2判断人员信息是选择还是手动录入；
             String id = null; //就诊id  其中门诊过来的病人已经有就诊id，直接取病人id，如果是直接划价收费的，需要生成就诊id
             Boolean isDel = true;//判断是否需要删除费用数据（只有在患者为直接划价收费，且第二次或以上结算时才需要删除原直接划价收费费用信息）
 
+            //诊断
+            OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
+            List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
+            String[] tempIds = outptVisitDTO.getDiagnose();
+            StringBuilder str = new StringBuilder();
+            for (int i = 0; i < tempIds.length; i++) {
+                str.append(tempIds[i]);
+                if (i < tempIds.length - 1) {
+                    str.append(",");
+                }
+            }
+            boolean isChange = false;
+            if (tempIds != null && tempIds.length > 0) {
+                isChange = true;
+                outptPrescribeDTO.setHospCode(outptVisitDTO.getHospCode());
+                outptPrescribeDTO.setVisitId(outptVisitDTO.getId());
+                outptPrescribeDTO.setDiagnoseIds(str.toString());
+                outptPrescribeDTO.setCrteId(outptVisitDTO.getCrteId());
+                outptPrescribeDTO.setCrteName(outptVisitDTO.getCrteName());
+                outptDiagnoseDTOList = this.buildOutptDiagnose(outptPrescribeDTO);
+            }
+            // 根据就诊id查询挂号信息
+            OutptRegisterDTO outptRegisterDTO = outptVisitDAO.getOutptRegister(outptVisitDTO);
             // 2.1 如果病人没有挂号开处方，直接划价买药，需要保存患者基本信息、诊断信息、费用信息的新增
             if (StringUtils.isEmpty(outptVisitDTO.getId())) {
                 id = this.addPatientInfo(outptVisitDTO);
                 outptVisitDTO.setId(id);
+                if (isChange) {
+                    //诊断信息保存
+                    if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
+                        //保存处方诊断
+                        outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTOList);
+                    }
+                }
                 isDel = false;
             } else {
                 id = outptVisitDTO.getId();//赋值就诊id
-                //人员信息修改操作
-                outptCostDAO.editOutptVisitByKey(outptVisitDTO);//编辑操作
+                if (outptRegisterDTO == null) {  // 如果挂号信息为空，则说明患者为直接划价患者 可以修改患者信息
+                    //人员信息修改操作
+                    outptCostDAO.editOutptVisitByKey(outptVisitDTO);//编辑操作
+                    // 更新诊断信息
+                    if (isChange && tempIds != null && tempIds.length > 0) {
+                        OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+                        outptDiagnoseDTO.setHospCode(outptVisitDTO.getHospCode());
+                        outptDiagnoseDTO.setVisitId(outptVisitDTO.getId());
+                        outptDiagnoseDTO.setDiseaseIds(str.toString());
+                        // 根据就诊id删除历史诊断
+                        outptVisitDAO.deleteDiagnoseByVisitId(outptVisitDTO);
+                        //诊断信息保存
+                        if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
+                            //保存处方诊断
+                            outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTOList);
+                        }
+                    }
+                }
             }
 
             // 3、判断病人类型，门诊直接划价收费 or 处方病人
@@ -500,6 +547,71 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             redisUtils.del(key);//删除结算key
         }
         return WrapperResponse.success("成功。", result);
+    }
+
+    /**
+     * @Menthod buildOutptDiagnose
+     * @Desrciption  诊断表赋值
+     * @param outptPrescribeDTO
+     * @Author zengfeng
+     * @Date   2020/9/14 10:24
+     * @Return OutptPrescribeDTO
+     **/
+    public List<OutptDiagnoseDTO> buildOutptDiagnose(OutptPrescribeDTO outptPrescribeDTO){
+        //是否主诊断
+        String isMain = "0";
+        int i = 0;
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
+        if(StringUtils.isEmpty(outptPrescribeDTO.getDiagnoseIds())){
+            return outptDiagnoseDTOList;
+        }
+        //获取诊断信息
+        List<OutptDiagnoseDTO> yjzOutptDiagnoseDTOList = outptDoctorPrescribeDAO.getOutptDiagnose(outptPrescribeDTO);
+        if(!ListUtils.isEmpty(yjzOutptDiagnoseDTOList)){
+            //判断是否有主诊断
+            List<OutptDiagnoseDTO> isMainList = yjzOutptDiagnoseDTOList.stream().filter(s->s.getIsMain().equals(Constants.SF.S)).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(isMainList)){
+                isMain = "1";
+            }
+        }
+        //获取诊断ID
+        String diagnoseIds = outptPrescribeDTO.getDiagnoseIds();
+        //拆分ID串
+        String[] diagnoseIdArray = diagnoseIds.split(",");
+        for(String diagnoseId : diagnoseIdArray){
+            if(StringUtils.isEmpty(diagnoseId)){
+                continue;
+            }
+            List<OutptDiagnoseDTO> isMainList = yjzOutptDiagnoseDTOList.stream().filter(s->diagnoseId.equals(s.getDiseaseId())).collect(Collectors.toList());
+            //存在该诊断
+            if(!ListUtils.isEmpty(isMainList)){
+                continue;
+            }
+            OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+            //主键
+            outptDiagnoseDTO.setId(SnowflakeUtils.getId());
+            //医院编码
+            outptDiagnoseDTO.setHospCode(outptPrescribeDTO.getHospCode());
+            //就诊ID
+            outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
+            //疾病ID
+            outptDiagnoseDTO.setDiseaseId(diagnoseId);
+            //第一条数据，默认为主诊断(没有主诊断情况下)
+            if(i == 0 && Constants.SF.F.equals(isMain) ){
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.S);
+            }else{
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.F);
+            }
+            i++;
+            //创建人ID
+            outptDiagnoseDTO.setCrteId(outptPrescribeDTO.getCrteId());
+            //创建人
+            outptDiagnoseDTO.setCrteName(outptPrescribeDTO.getCrteName());
+            outptDiagnoseDTOList.add(outptDiagnoseDTO);
+        }
+        return outptDiagnoseDTOList;
     }
 
     /**

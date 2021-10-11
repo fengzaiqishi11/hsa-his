@@ -42,4 +42,8 @@ public class PharInDistributeAllDetailDTO extends PharInDistributeAllDetailDO im
   private Date endTime;
   // 开方科室名称
   private String deptName;
+  /**
+   * 发药药房id
+   */
+  private String pharId;
 }

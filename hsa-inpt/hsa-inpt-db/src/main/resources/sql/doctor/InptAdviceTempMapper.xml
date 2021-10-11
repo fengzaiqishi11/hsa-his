@@ -82,6 +82,15 @@
         <if test="typeCode != null and typeCode !=''">
             and a.type_code = #{typeCode}
         </if>
+        <if test="isValid != null and isValid !=''">
+            and a.is_valid = #{isValid}
+        </if>
+        <if test="deptId != null and deptId !=''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="doctorId != null and doctorId !=''">
+            and a.doctor_id = #{doctorId}
+        </if>
     </select>
 
     <!--获取模板数据-->

@@ -410,4 +410,12 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String listId;
     // 住院天数
     private Integer inDays;
+    /**
+     * 申请科室
+     */
+    private String deptId;
+    /**
+     * 剂型
+     */
+    private String prepCode;
 }

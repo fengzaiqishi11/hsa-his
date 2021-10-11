@@ -261,6 +261,8 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (aBoolean){
                 Map codeMap = new HashMap();
                 codeMap.put("hospCode",sysCodeDTO.getHospCode());
+                String key = sysCodeDTO.getHospCode() + "_" + Constants.REDISKEY.CODEDETAIL;
+                redisUtils.del(key);
                 getCodeDetailsByCodeCache(codeMap);
                 return WrapperResponse.success(true);
             }else{
@@ -295,6 +297,8 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (aBoolean){
                 Map codeMap = new HashMap();
                 codeMap.put("hospCode",sysCodeDetailDTO.getHospCode());
+                String key = sysCodeDetailDTO.getHospCode() + "_" + Constants.REDISKEY.CODEDETAIL;
+                redisUtils.del(key);
                 getCodeDetailsByCodeCache(codeMap);
                 return WrapperResponse.success(true);
             } else {
@@ -329,6 +333,8 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (aBoolean){
                 Map codeMap = new HashMap();
                 codeMap.put("hospCode",sysCodeDTO.getHospCode());
+                String key = sysCodeDTO.getHospCode() + "_" + Constants.REDISKEY.CODEDETAIL;
+                redisUtils.del(key);
                 getCodeDetailsByCodeCache(codeMap);
                 return WrapperResponse.success(true);
             } else {
@@ -362,6 +368,8 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
             if (aBoolean){
                 Map codeMap = new HashMap();
                 codeMap.put("hospCode",sysCodeDetailDTO.getHospCode());
+                String key = sysCodeDetailDTO.getHospCode() + "_" + Constants.REDISKEY.CODEDETAIL;
+                redisUtils.del(key);
                 getCodeDetailsByCodeCache(codeMap);
                 return WrapperResponse.success(true);
             } else {

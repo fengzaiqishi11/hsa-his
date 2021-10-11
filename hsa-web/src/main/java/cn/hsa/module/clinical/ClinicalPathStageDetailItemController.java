@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @Package_name: cn.hsa.module.clinical
  * @Class_name: clinicalPathStageDetailItem
- * @Describe:
+ * @Describe: 路径阶段明细项目关联医嘱
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
  * @Date: 2021/9/17 14:09

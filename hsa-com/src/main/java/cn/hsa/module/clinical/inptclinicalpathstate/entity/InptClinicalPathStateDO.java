@@ -46,6 +46,14 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
      */
     private String pathState;
     /**
+     * 入径开始ID(clinic_path_list.id)
+     */
+    private String startStageId;
+    /**
+     * 入径开始阶段名称
+     */
+    private String startStageName;
+    /**
      * 当前路径目录ID(clinic_path_list.id)
      */
     private String listId;
@@ -68,9 +76,17 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
      */
     private String stageId;
     /**
+     * 当前阶段名称
+     */
+    private String stageName;
+    /**
      * 出径阶段ID(clinic_path_stage.id)
      */
     private String endStageId;
+    /**
+     * 出径阶段名称
+     */
+    private String endStageName;
     /**
      * 出径人ID
      */

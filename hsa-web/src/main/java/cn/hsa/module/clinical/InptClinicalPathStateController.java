@@ -4,7 +4,6 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
-import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -133,6 +132,9 @@ public class InptClinicalPathStateController extends BaseController {
       Map map = new HashMap();
       SysUserDTO sysUserDTO = getSession(req, res);
       inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+      inptClinicalPathStateDTO.setEndCrteId(sysUserDTO.getId());
+      inptClinicalPathStateDTO.setEndCrteName(sysUserDTO.getName());
+      inptClinicalPathStateDTO.setEndCrteTime(DateUtils.getNow());
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
       return inptClinicalPathStateService_consumer.updateInptClinicalPathStateByVisitId(map);

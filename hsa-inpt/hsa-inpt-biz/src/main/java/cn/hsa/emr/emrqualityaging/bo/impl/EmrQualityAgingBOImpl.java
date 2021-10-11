@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrquality.bo.EmrQualityAgingBO;
 import cn.hsa.module.emr.emrquality.dao.EmrQualityAgingDAO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO;
+import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
@@ -38,6 +39,14 @@ public class EmrQualityAgingBOImpl extends HsafBO implements EmrQualityAgingBO {
             if (emrQualityAgingDTO.getTipsType()!=null &&emrQualityAgingDTO.getTipsType().equals("5")){
                 if (StringUtils.isEmpty(emrQualityAgingDTO.getAdviceList())){
                     throw new AppException("请选择医嘱");
+                }
+            }
+            if (emrQualityAgingDTO.getTimeOut()!=null){
+                if(BigDecimalUtils.isZero(emrQualityAgingDTO.getTimeOut())){
+                    throw new AppException("超时时间不能为0");
+                }
+                if(BigDecimalUtils.lessZero(emrQualityAgingDTO.getTimeOut())){
+                    throw new AppException("超时时间不能为负数");
                 }
             }
             EmrQualityAgingDTO qualityAgingDTO =emrQualityAgingDAO.queryEmrQualityListByEmrCode(emrQualityAgingDTO);

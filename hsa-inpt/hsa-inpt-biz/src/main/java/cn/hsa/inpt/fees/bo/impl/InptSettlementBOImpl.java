@@ -708,6 +708,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO.setHospCode(hospCode);//医院编码
             inptVisitDTO.setId(id);//就诊id
             inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }

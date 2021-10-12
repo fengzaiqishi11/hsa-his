@@ -397,6 +397,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 outFeeMap.put("bka893","1");
                 outFeeMap.put("aaz217",insureIndividualBasicDTO.getAaz217());
                 outFeeMap.put("saveFlag","1");
+                outFeeMap.put("code",outptVisitDTO.getCode());
+                outFeeMap.put("crteName",outptVisitDTO.getCrteName());
+                outFeeMap.put("aac001",insureIndividualBasicDTO.getAac001());
                 if (StringUtils.isEmpty(insureIndividualBasicDTO.getAaz217())) {
                     throw new AppException("医保退费失败：未获取病人医保登记号，请去医保前台系统退费");
                 }

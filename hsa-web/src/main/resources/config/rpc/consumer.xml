@@ -297,7 +297,7 @@
     <!--护理记录单-->
     <dubbo:reference id="nursingRecordService_consumer" interface="cn.hsa.module.inpt.nurse.service.NursingRecordService" check="false"/>
     <!--医嘱核收-->
-    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false"/>
+    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false" retries="0"/>
     <!-- 住院结算 -->
     <dubbo:reference id="inptSettlementService_consumer" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
     <!-- 取消住院结算 -->

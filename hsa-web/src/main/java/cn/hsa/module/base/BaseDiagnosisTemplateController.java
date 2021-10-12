@@ -5,7 +5,10 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.diagnosistemplate.dto.BaseDiagnosisTemplateDTO;
 import cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -185,6 +188,39 @@ public class BaseDiagnosisTemplateController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("baseDiagnosisTemplateDTO",baseDiagnosisTemplateDTO);
         return baseDiagnosisTemplateService_customer.updateById(map);
+    }
+
+    /**
+     * @Menthod: updateStatusCode
+     * @Desrciption: 审核/作废诊断管理
+     * @Param: baseDiagnosisTemplateDTO
+     *  审核：checkFlag = 1，作废：checkFlag = 2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-12 13:49
+     * @Return: Boolean
+     **/
+    @PostMapping("/updateStatusCode")
+    public WrapperResponse<Boolean> updateStatusCode(@RequestBody BaseDiagnosisTemplateDTO baseDiagnosisTemplateDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        baseDiagnosisTemplateDTO.setHospCode(sysUserDTO.getHospCode());
+        if (StringUtils.isEmpty(baseDiagnosisTemplateDTO.getCheckFlag())) {
+            throw new RuntimeException("请选择审核或作废状态");
+        }
+        if ("1".equals(baseDiagnosisTemplateDTO.getCheckFlag())) {
+            //审核
+            baseDiagnosisTemplateDTO.setIsCheck(Constants.SF.S);
+            baseDiagnosisTemplateDTO.setCheckId(sysUserDTO.getId());
+            baseDiagnosisTemplateDTO.setCheckName(sysUserDTO.getName());
+            baseDiagnosisTemplateDTO.setCheckTime(DateUtils.getNow());
+        } else if ("2".equals(baseDiagnosisTemplateDTO.getCheckFlag())) {
+            //作废
+            baseDiagnosisTemplateDTO.setIsValid(Constants.SF.F);
+        }
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("baseDiagnosisTemplateDTO",baseDiagnosisTemplateDTO);
+        return baseDiagnosisTemplateService_customer.updateStatusCode(map);
     }
 
 }

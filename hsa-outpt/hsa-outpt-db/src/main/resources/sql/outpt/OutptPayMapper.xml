@@ -277,7 +277,7 @@
         where a.hosp_code = #{hospCode} and a.visit_id = #{id}
     </select>
 
-    <select id="queryInptMedicalApplyList">
+    <select id="queryInptMedicalApplyList" resultType="java.util.Map">
         select a.hosp_code, a.apply_no, a.type_code, a.visit_id as pid, a.in_no, a.opd_id,a.id,
         c.item_id,
         b.age_unit_code as ageunit,

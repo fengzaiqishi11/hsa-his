@@ -1,11 +1,9 @@
 package cn.hsa.interf.lis.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.interf.phys.bo.LisResultBO;
 import cn.hsa.module.interf.phys.dao.LisResultDAO;
-import cn.hsa.module.medic.result.dto.MedicalResultDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -108,7 +106,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
             resultMap.put("crteId", "lis");
             resultMap.put("crteName", "lis");
 
-            stringList.add(MapUtils.get(resultMap,"id"));
+            stringList.add(MapUtils.get(resultMap,"barCode"));
         }
         List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
@@ -116,7 +114,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         // 新增结果
         int num = lisResultDAO.insertResult(medicalResultDTOList);
         // 更新申请单状态
-//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+        int applyStatus = lisResultDAO.updateApplyStatus(collect);
 
         return map;
     }
@@ -132,12 +130,11 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
         List<String> stringList = new ArrayList<>();
         for(Map resultMap : medicalResultDTOList){
+            stringList.add(MapUtils.get(resultMap,"barCode"));
             resultMap.put("id", SnowflakeUtils.getId());
             resultMap.put("crteTime", DateUtils.getNow());
             resultMap.put("crteId", "lis");
             resultMap.put("crteName", "lis");
-
-            stringList.add(MapUtils.get(resultMap,"id"));
         }
         List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
@@ -145,7 +142,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         // 新增结果
         int num = lisResultDAO.insertDXResult(medicalResultDTOList);
         // 更新申请单状态
-//        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+        int applyStatus = lisResultDAO.updateApplyStatus(collect);
 
         return map;
     }
@@ -160,9 +157,22 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public List<String> queryDXNoResult(Map map){
         List<String> list = lisResultDAO.queryDXNoResult(map);
+        lisResultDAO.updateStatus(list);
         return list;
     }
 
+    /**
+     * @Description: 查询没有结果的申请单的医嘱id
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-11
+     */
+    @Override
+    public List<String> queryDXBackResult(Map map){
+        List<String> list = lisResultDAO.queryDXBackResult();
+        return list;
+    }
     /** 
     * @Description: 获取没有结果的申请单的医嘱id
     * @Param: 
@@ -171,10 +181,15 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     * @Date: 2021-09-04
     */ 
     @Override
-    public Map queryNoResultLis(Map map){
+    public Map updateNoResultLis(Map map){
         List<Map> mapList = lisResultDAO.queryNoResultLis();
+        List<String> backList = lisResultDAO.queryDXBackResult();
+        if(mapList.size() > 0){
+            lisResultDAO.updateStatusMap(mapList);
+        }
         Map newMap = new HashMap();
         newMap.put("result",mapList);
+        newMap.put("backList",backList);
         return newMap;
     }
 

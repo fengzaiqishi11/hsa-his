@@ -46,7 +46,25 @@ public interface LisResultDAO {
     * @Date: 2021-09-09
     */
     int updateApplyStatus(@Param("list") List<String> stringList);
-    
+
+    /**
+     * @Description: 更新申请单状态
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-09
+     */
+    int updateStatus(@Param("list") List<String> stringList);
+
+    /**
+     * @Description: 更新申请单状态
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-09
+     */
+    int updateStatusMap(@Param("list") List<Map> stringList);
+
     /** 
     * @Description: 获取未上传的申请单的医嘱id
     * @Param: 
@@ -64,6 +82,23 @@ public interface LisResultDAO {
     * @Date: 2021-09-11
     */ 
     List<String> queryDXNoResult(Map map);
+
+    /**
+     * @Description: 查询没有结果的lis申请单的医嘱id
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-11
+     */
+    List<String> queryDXBackResult();
+    /**
+    * @Description: 更新申请单是否上传状态
+    * @Param:
+    * @return:
+    * @Author: zhangxuan
+    * @Date: 2021-10-08
+    */
+    int updateIsIssue(@Param("list") List<Map> mapList);
 
     List<Map> queryAdvice(Map map);
 

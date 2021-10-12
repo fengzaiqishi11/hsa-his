@@ -1036,9 +1036,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDTO.setIatIdList(Arrays.asList(inptAdviceDTO.getIatIds().split(",")));
         }
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
-        if (ListUtils.isEmpty(inptAdviceDTOList)) {
-            throw new AppException("未查询到勾选的相关医嘱信息");
-        }
+
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         //长期医嘱
         checkInptAdviceList = inptAdviceDTOList.stream().filter(s-> Constants.SF.F.equals(s.getIsLong())).collect(Collectors.toList());

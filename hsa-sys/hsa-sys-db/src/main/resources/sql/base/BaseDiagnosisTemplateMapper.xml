@@ -49,7 +49,9 @@
         <if test="isValid != null and isValid != ''">
             and is_valid = #{isValid}
         </if>
-
+        <if test="isCheck != null and isCheck != ''">
+            and is_check = #{isCheck}
+        </if>
         <if test="useScopeCode != null and useScopeCode != ''">
             and use_scope_code = #{useScopeCode}
         </if>
@@ -143,5 +145,29 @@
             is_valid=#{isValid}
             WHERE
             id = #{id}
+    </update>
+
+    <!--审核/作废-->
+    <update id="updateStatusCode" parameterType="cn.hsa.module.base.diagnosistemplate.dto.BaseDiagnosisTemplateDTO">
+        update base_diagnosis_template
+        <set>
+            <if test="isCheck != null and isCheck != ''">
+                is_check = #{isCheck},
+            </if>
+            <if test="checkId != null and checkId != ''">
+                check_id = #{checkId},
+            </if>
+            <if test="checkName != null and checkName != ''">
+                check_name = #{checkName},
+            </if>
+            <if test="checkTime != null">
+                check_time = #{checkTime},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid = #{isValid},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+          and id = #{id}
     </update>
 </mapper>

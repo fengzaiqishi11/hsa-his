@@ -1019,7 +1019,8 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
+        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName,
+               ib.gender_code as babyGenderCode,a.technology_code as fee_type  from (
         SELECT
         iv.name,
         iv.in_dept_id,
@@ -1029,7 +1030,7 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ic.total_price as price,
+        ia.total_price as price,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1042,16 +1043,13 @@
         medic_apply ma,
         inpt_advice ia,
         inpt_visit iv,
-        (select visit_id ,iat_id, sum(total_price) as total_price ,source_code from inpt_cost where status_code='0' group by visit_id
-        ,iat_id)ic,
         base_advice bd
         WHERE
         ma.order_no = ia.order_no
         and ma.visit_id = ia.visit_id
+        AND ma.hosp_code = ia.hosp_code
         AND ma.visit_id = iv.id
         AND iv.hosp_code = ma.hosp_code
-        AND ic.visit_id = iv.id
-        AND ic.iat_id = ia.id
         and ia.item_id = bd.id
         and ma.type_code =  #{typeCode}
         and ma.hosp_code = #{hospCode}
@@ -1060,10 +1058,6 @@
         </if>
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
-        </if>
-
-        <if test="typeCode != null and typeCode != ''">
-            and ma.type_code = #{typeCode}
         </if>
         <if test="deptId != null and deptId != ''">
             and ma.dept_id = #{deptId}
@@ -1115,9 +1109,6 @@
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
         and ma.type_code =  #{typeCode}
-        <if test="typeCode != null and typeCode != ''">
-            and ma.type_code = #{typeCode}
-        </if>
         <if test="startTime != null and startTime != ''">
             and  ma.crte_time &gt; #{startTime}
         </if>
@@ -1142,14 +1133,11 @@
         </if>
         ) a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
-        left join (SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'PACSXMLX' ) scd  on scd.hosp_code = a.hosp_code
-        AND a.technology_code = scd.value
-        left join	(SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'LISXMLX' ) scd2 on scd2.hosp_code = a.hosp_code
-        AND a.technology_code = scd2.value
     </select>
 
     <select id="passStatistics"  resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,case when a.type_code = '4' then scd2.name WHEN A.type_code='5' THEN scd.name ELSE '' end as fee_type from (
+        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,
+               a.technology_code as fee_type from (
         SELECT
         iv.name,
         iv.in_dept_id,
@@ -1159,7 +1147,7 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ic.total_price as price,
+        ia.total_price as price,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1173,16 +1161,12 @@
         medic_apply ma,
         inpt_advice ia,
         inpt_visit iv,
-        (select visit_id ,iat_id, sum(total_price) as total_price ,source_code from inpt_cost where status_code='0' group by visit_id
-        ,iat_id)ic,
         base_advice bd
         WHERE
         ma.order_no = ia.order_no
         and ma.visit_id = ia.visit_id
         AND ma.visit_id = iv.id
         AND iv.hosp_code = ma.hosp_code
-        AND ic.visit_id = iv.id
-        AND ic.iat_id = ia.id
         and ia.item_id = bd.id
         and ma.type_code =  #{typeCode}
         and ma.hosp_code = #{hospCode}
@@ -1272,10 +1256,6 @@
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
-        left join (SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'PACSXMLX') scd  on scd.hosp_code = a.hosp_code
-        AND a.technology_code = scd.value
-        left join	(SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'LISXMLX' ) scd2 on scd2.hosp_code = a.hosp_code
-        AND a.technology_code  = scd2.value
     </select>
 
     <!-- 根据处方、医嘱id查询费用数量信息 -->

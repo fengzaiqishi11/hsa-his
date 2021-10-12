@@ -68,6 +68,17 @@ public class LisResultServiceImpl extends HsafBO implements LisResultService {
         return lisResultBO.queryDXNoResult(map);
     }
 
+    /**
+     * @Description: 查询退费的医嘱id
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-11
+     */
+    @Override
+    public List<String> queryDXBackResult(Map map){
+        return lisResultBO.queryDXBackResult(map);
+    }
 
     /**
     * @Description: 查询没有结果的lis申请单

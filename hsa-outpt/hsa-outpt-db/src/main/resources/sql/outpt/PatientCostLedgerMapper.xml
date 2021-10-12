@@ -1917,6 +1917,7 @@
         max(a.split_price) as splitPrice,
         case max(a.item_code) when '1' then max(bd.spec) when '2' then max(bm.spec) end spec,
         case max(a.item_code) when '1' then max(bd.code) when '2' then max(bm.code) end code,
+        case max(a.item_code) when '1' then max(bd.prep_code) when '2' then '' end prepCode,
         max(a.unit_code) as unitCode,
         max(a.split_unit_code) as splitUnitCode,
         (select name from base_dept where id = b.dept_id) as deptName
@@ -1942,6 +1943,14 @@
             or bd.usual_pym like concat('%',#{keyword},'%')
             or bd.usual_wbm like concat('%',#{keyword},'%')
             )
+        </if>
+        /*开嘱科室*/
+        <if test="deptId != null and deptId != ''">
+            and b.dept_id = #{deptId}
+        </if>
+        /*剂型*/
+        <if test="prepCode != null and prepCode != ''">
+            and bd.prep_code = #{prepCode}
         </if>
         group by b.dept_id, a.item_id
         ) A where A.splitNum != 0

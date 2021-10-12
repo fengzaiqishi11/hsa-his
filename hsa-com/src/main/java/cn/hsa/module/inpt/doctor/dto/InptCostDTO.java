@@ -177,4 +177,8 @@ public class InptCostDTO extends InptCostDO implements Serializable {
      * 是否临嘱（SF）（0：长期，1：临时）
      */
     private String isLong;
+    /**
+     * 频率名
+     */
+    private String rateName;
 }

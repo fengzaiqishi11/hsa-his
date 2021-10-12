@@ -109,6 +109,10 @@ public class BaseNurseTbHeadDO extends PageDO implements Serializable {
      */
     private String isValid;
     /**
+     * 是否分行（SF）
+     */
+    private String isBranch;
+    /**
      * 创建人ID
      */
     private String crteId;

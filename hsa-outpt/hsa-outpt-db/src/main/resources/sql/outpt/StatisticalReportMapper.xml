@@ -353,7 +353,8 @@
         apTotalPrice,
         ynyh,
         remark,
-        mafPay
+        mafPay,
+        personalPrice
         FROM
         (
         SELECT
@@ -376,7 +377,8 @@
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
         b.remark,
-        ifnull(b.maf_pay, 0.00) as mafPay
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -405,7 +407,8 @@
         a.ap_total_price AS apTotalPrice,
         a.hosp_jm_price AS ynyh,
         b.remark,
-        ifnull(b.maf_pay, 0.00) as mafPay
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
         JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
@@ -667,7 +670,8 @@
         SUM( ss.personPrice ) AS personPrice,
         SUM( ss.apTotalPrice ) AS apTotalPrice,
         SUM( ss.ynyh ) AS ynyh,
-        SUM( ss.mafPay) AS mafPay
+        SUM( ss.mafPay) AS mafPay,
+        SUM( ss.personalPrice) as personalPrice
         FROM
         (
         SELECT
@@ -683,7 +687,8 @@
         IFNULL( b.person_price, 0 ) AS personPrice,
         0 AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
-        ifnull(b.maf_pay, 0.00) as mafPay
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -706,7 +711,8 @@
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
-        ifnull(b.maf_pay, 0.00) as mafPay
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         inpt_settle a,
         insure_individual_settle b

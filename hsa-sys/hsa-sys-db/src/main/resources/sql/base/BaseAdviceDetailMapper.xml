@@ -306,7 +306,8 @@
 	bfcId,
 	bfcName,
 	bigTypeCode,
-    dosage, dosageUnitCode, prepCode, pharId, inUnitCode, type
+    dosage, dosageUnitCode, prepCode, pharId, inUnitCode, type,
+    stockNum,stockOccupy,splitNum
 FROM
 	(
 	SELECT
@@ -325,7 +326,8 @@ FROM
 		( SELECT d.id FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
 		( SELECT d.NAME FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
         null as bigTypeCode,
-        null as dosage, null dosageUnitCode, null prepCode, null pharId, unit_code inUnitCode, '9' type
+        null as dosage, null dosageUnitCode, null prepCode, null pharId, unit_code inUnitCode, '9' type,
+        null stockNum, null stockOccupy,null splitNum
 	FROM
 		base_item m
 	WHERE
@@ -353,7 +355,8 @@ FROM
 		( SELECT d.id FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
 		( SELECT d.NAME FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
         null as bigTypeCode,
-        null as dosage, null dosageUnitCode, null prepCode, b.clf pharId, l.split_unit_code inUnitCode, '2' type
+        null as dosage, null dosageUnitCode, null prepCode, b.clf pharId, l.split_unit_code inUnitCode, '2' type,
+        null stockNum, null stockOccupy,null splitNum
 	FROM
 		base_material l
         left join(
@@ -402,7 +405,8 @@ FROM
         a.in_unit_code inUnitCode,
         CASE WHEN a.big_type_code = '2' THEN
         '3' ELSE '1'
-        END type
+        END type,
+        stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum
         FROM
         base_drug a
         LEFT JOIN (

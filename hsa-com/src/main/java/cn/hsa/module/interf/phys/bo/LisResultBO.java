@@ -42,7 +42,16 @@ public interface LisResultBO {
     * @Date: 2021-09-11
     */
     List<String> queryDXNoResult(Map map);
-    
+
+
+    /**
+     * @Description: 查询退费医嘱id
+     * @Param:
+     * @return:
+     * @Author: zhangxuan
+     * @Date: 2021-09-11
+     */
+    List<String> queryDXBackResult(Map map);
     /** 
     * @Description: 查询没有结果的lis申请单
     * @Param: 

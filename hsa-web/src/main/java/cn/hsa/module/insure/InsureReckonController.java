@@ -333,4 +333,23 @@ public class InsureReckonController extends BaseController {
         return insureReckonService_consumer.queryInsureSetlDetlList(selectMap);
     }
 
+    /** 获取医保对账汇总查询 - 3699
+     * @param insureReckonDTO
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 获取医保对账汇总查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("/queryInsureTotlStmtInfo")
+    public WrapperResponse<PageDTO> queryInsureTotlStmtInfo(InsureReckonDTO insureReckonDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+
+        Map<String,Object> selectMap = new HashMap();
+        insureReckonDTO.setHospCode(sysUserDTO.getHospCode());
+        selectMap.put("hospCode",sysUserDTO.getHospCode());
+        selectMap.put("insureReckonDTO",insureReckonDTO);
+        return insureReckonService_consumer.queryInsureTotlStmtInfo(selectMap);
+    }
+
 }

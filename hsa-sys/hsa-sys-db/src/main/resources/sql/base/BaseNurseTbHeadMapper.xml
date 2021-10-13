@@ -5,7 +5,7 @@
     <select id="queryPage" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO"
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         select id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code,
-        date_type_code, data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid,
+        date_type_code, data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, is_branch,
         crte_id, crte_name, crte_time
         from base_nurse_tbhead
         where hosp_code = #{hospCode} and is_valid = '1'
@@ -41,6 +41,7 @@
                is_up,
                is_sum,
                is_valid,
+               is_branch,
                crte_id,
                crte_name,
                crte_time
@@ -68,11 +69,11 @@
     <insert id="insert" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         insert into base_nurse_tbhead(id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num,
                                       gender_code, date_type_code, data_width, data_length, source_code, source_value,
-                                      default_value, is_up, is_sum, is_valid, crte_id, crte_name, crte_time)
+                                      default_value, is_up, is_sum, is_valid, is_branch, crte_id, crte_name, crte_time)
         values (#{id}, #{hospCode}, #{bnoCode}, #{seqNo}, #{upCode}, #{code}, #{name}, #{itemCode}, #{minNum},
                 #{maxNum},
                 #{genderCode}, #{dateTypeCode}, #{dataWidth}, #{dataLength}, #{sourceCode}, #{sourceValue},
-                #{defaultValue}, #{isUp}, #{isSum}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+                #{defaultValue}, #{isUp}, #{isSum}, #{isValid}, #{isBranch}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
     <!--修改-->
@@ -110,6 +111,9 @@
             <if test="isUp != null and isUp != ''">
                 is_up = #{isUp},
             </if>
+            <if test="isBranch != null and isBranch != ''">
+                is_branch = #{isBranch},
+            </if>
             <if test="isSum != null and isSum != ''">
                 is_sum = #{isSum},
             </if>
@@ -132,7 +136,7 @@
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         select
         id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code, date_type_code,
-        data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, crte_id, crte_name,
+        data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, is_branch, crte_id, crte_name,
         crte_time
         from base_nurse_tbhead
         where
@@ -193,6 +197,7 @@
                is_up,
                is_sum,
                is_valid,
+               is_branch,
                crte_id,
                crte_name,
                crte_time

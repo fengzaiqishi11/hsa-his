@@ -16,6 +16,8 @@ import cn.hsa.module.outpt.statement.dao.PatientCostLedgerDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
@@ -50,6 +52,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
     @Resource
     BaseDeptService baseDeptService_customer;
+
+    @Resource
+    SysParameterService sysParameterService_consumer;
 
     /**
      * @Menthod queryPatirntCostLedger
@@ -268,7 +273,17 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     public PageDTO queryInPatient(InptVisitDTO inptVisitDTO) {
 
         PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
-        return PageDTO.of(patientCostLedgerDAO.queryInPatient(inptVisitDTO));
+        SysParameterDTO sysParameterDTO =null;
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", inptVisitDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
+        sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        // 开启大人婴儿合并结算
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+            return PageDTO.of(patientCostLedgerDAO.queryInPatient(inptVisitDTO));
+        } else {
+            return PageDTO.of(patientCostLedgerDAO.queryMergeInPatient(inptVisitDTO));
+        }
     }
 
     /**

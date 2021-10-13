@@ -6,23 +6,23 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.clinical.clinicalpathstage.dao.ClinicalPathStageDAO;
 import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
+import cn.hsa.module.clinical.inptclinicalpathstage.dao.InptClinicalPathStageDAO;
+import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.bo.InptClinicalPathStateBO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dao.InptClinicalPathStateDAO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
-import cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.Op;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -32,6 +32,9 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
 
     @Resource
     private ClinicalPathStageDAO clinicalPathStageDAO;
+
+    @Resource
+    private InptClinicalPathStageDAO inptClinicalPathStageDAO;
 
     /**
      * @Meth: queryClinicalPathStageDetail
@@ -96,6 +99,15 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
     **/
     @Override
     public Boolean updateInptClinicalPathStateByVisitId(InptClinicalPathStateDTO inptClinicalPathStateDTO) {
+      if("3".equals(inptClinicalPathStateDTO.getPathState())) {
+        // 设置出径阶段id
+        inptClinicalPathStateDTO.setEndStageId(inptClinicalPathStateDTO.getStageId());
+        // 设置出径阶段名称
+        inptClinicalPathStateDTO.setEndStageName(inptClinicalPathStateDTO.getStageName());
+      } else {
+        inptClinicalPathStateDTO.setEndCrteId(null);
+        inptClinicalPathStateDTO.setEndCrteName(null);
+      }
       return inptClinicalPathStateDAO.updateInptClinicalPathStateByVisitId(inptClinicalPathStateDTO) > 0;
     }
 
@@ -130,7 +142,8 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
       }
       // 默认为第一阶段
       String stageId = clinicalPathStageDTOS.get(0).getId();
-
+      String stageName = clinicalPathStageDTOS.get(0).getName();
+      List<InptClinicalPathStageDTO> inptClinicalPathStageDTOS = new ArrayList<>();
       for(InptClinicalPathStateDTO item : inptClinicalPathStateDTOList) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(inptClinicalPathStateDTO.getHospCode());
@@ -155,11 +168,60 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
         item.setPathCrteName(inptClinicalPathStateDTO.getPathCrteName());
         // 创建时间
         item.setPathCrteTime(inptClinicalPathStateDTO.getPathCrteTime());
+        // 入径开始阶段
+        item.setStartStageId(stageId);
+        // 入径开始阶段名称
+        item.setStartStageName(stageName);
         // 默认第一阶段
         item.setStageId(stageId);
+        // 都一阶段名称
+        item.setStageName(stageName);
         item.setPathState("1");
+        setStateParam(inptClinicalPathStageDTOS,item);
+      }
+      if(!ListUtils.isEmpty(inptClinicalPathStageDTOS)) {
+        inptClinicalPathStageDAO.insertInptClinicalPathStageList(inptClinicalPathStageDTOS);
       }
       return inptClinicalPathStateDAO.insertInptClinicalPathStateByVisitId(inptClinicalPathStateDTOList) > 0;
+    }
+
+    /**
+    * @Menthod setStateParam
+    * @Desrciption 入径默认填写第一阶段
+    *
+    * @Param
+    * [inptClinicalPathStageDTOS, item]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/28 9:50
+    * @Return void
+    **/
+    public void setStateParam(List<InptClinicalPathStageDTO> inptClinicalPathStageDTOS,InptClinicalPathStateDTO item){
+      // 病情阶段默认填写第一阶段开始
+      InptClinicalPathStageDTO inptClinicalPathStageDTO = new InptClinicalPathStageDTO();
+      // 医院编码
+      inptClinicalPathStageDTO.setHospCode(item.getHospCode());
+      // 主键id
+      inptClinicalPathStageDTO.setId(SnowflakeUtils.getId());
+      // 就诊id
+      inptClinicalPathStageDTO.setVisitId(item.getVisitId());
+      // 婴儿id
+      inptClinicalPathStageDTO.setBabyId(item.getBabyId());
+      // 路径目录id
+      inptClinicalPathStageDTO.setListId(item.getListId());
+      // 阶段id
+      inptClinicalPathStageDTO.setStageId(item.getStartStageId());
+      // 阶段开始时间
+      inptClinicalPathStageDTO.setBeginTime(item.getPathCrteTime());
+      // 创建人
+      inptClinicalPathStageDTO.setCrteId(item.getPathCrteId());
+      // 创建人姓名
+      inptClinicalPathStageDTO.setCrteName(item.getPathCrteName());
+      // 创建时间
+      inptClinicalPathStageDTO.setCrteTime(item.getPathCrteTime());
+      // 入径状态表id
+      inptClinicalPathStageDTO.setClinicalPathStageId(item.getId());
+      inptClinicalPathStageDTOS.add(inptClinicalPathStageDTO);
     }
 
     /**
@@ -194,6 +256,28 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
       PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
       List<InptVisitDTO> inptVisitDTOS = inptClinicalPathStateDAO.queryPatientPage(inptVisitDTO);
       return PageDTO.of(inptVisitDTOS);
+    }
+
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption 用于出径病人信息展示
+    *
+    * @Param
+    * [inptClinicalPathStateDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 15:01
+    * @Return cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO
+    **/
+    @Override
+    public InptClinicalPathStateDTO getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO) {
+      if(StringUtils.isEmpty(inptClinicalPathStateDTO.getVisitId())) {
+        throw new AppException("患者信息为空");
+      }
+      if(StringUtils.isEmpty(inptClinicalPathStateDTO.getListId())) {
+        throw new AppException("该患者路径目录为空");
+      }
+      return inptClinicalPathStateDAO.getPatientByVisitID(inptClinicalPathStateDTO);
     }
 
 }

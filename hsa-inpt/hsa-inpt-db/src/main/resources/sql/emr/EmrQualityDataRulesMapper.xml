@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrquality.dao.EmrQualityDataRulesDAO">
+
+  <insert id="insertEmrQualityDataRules">
+      INSERT INTO emr_quality_data_rules
+      (id,hosp_code,emr_code,rules_name,rules_sql,tips,is_valid,crte_id,crte_name,crte_time,remark)
+      VALUES
+	  ( #{id},#{hospCode},#{emrCode},#{rulesName},#{rulesSql},#{tips},#{isValid},#{crteId},#{crteName},#{crteTime},#{remark})
+  </insert>
+
+    <update id="updateEmrQualityDataRules">
+     UPDATE  emr_quality_data_rules
+     <set>
+         <if test="emrCode !=null and emrCode !=''">
+             emr_code=#{emrCode},
+         </if>
+         <if test="rulesName !=null and rulesName !=''">
+             rules_name=#{rulesName},
+         </if>
+         <if test="rulesSql !=null and rulesSql !=''">
+             rules_sql=#{rulesSql},
+         </if>
+         <if test="tips !=null and tips !=''">
+             tips=#{tips},
+         </if>
+         <if test="isValid !=null and isValid !=''">
+             is_valid=#{isValid},
+         </if>
+         <if test="crteId !=null and crteId !=''">
+             crte_id=#{crteId},
+         </if>
+         <if test="crteName !=null and crteName !=''">
+             crte_name=#{crteName},
+         </if>
+         <if test="crteTime !=null">
+             crte_time=#{crteTime},
+         </if>
+         <if test="remark !=null">
+             remark=#{remark},
+         </if>
+     </set>
+        WHERE hosp_code =#{hospCode} and id =#{id}
+    </update>
+
+    <!--查询规则列表-->
+    <select id="queryEmrQualityDataRulesList" parameterType="cn.hsa.module.emr.emrquality.entity.EmrQualityDataRulesDO" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO">
+      select id,hosp_code,emr_code,rules_name,rules_sql,tips,is_valid,crte_id,crte_name,crte_time,remark
+      from  emr_quality_data_rules
+      where hosp_code =#{hospCode}  and is_valid = '1'
+      <if test="emrCode != null and emrCode != ''">
+          and emr_code =#{emrCode}
+      </if>
+    </select>
+
+    <!--查询单个规则-->
+    <select id="queryEmrQualityDataRulesById" parameterType="cn.hsa.module.emr.emrquality.entity.EmrQualityDataRulesDO" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO">
+      select id,hosp_code,emr_code,rules_name,rules_sql,tips,is_valid,crte_id,crte_name,crte_time,remark
+      from  emr_quality_data_rules
+      where hosp_code =#{hospCode} and emr_code =#{emrCode} and id=#{id}
+    </select>
+    <!--规则作废-->
+    <update id="updateEmrQualityDataInvalid" parameterType="java.util.Map">
+        UPDATE  emr_quality_data_rules
+        set is_valid ='0'
+        WHERE hosp_code =#{hospCode} and id =#{id}
+    </update>
+
+</mapper>

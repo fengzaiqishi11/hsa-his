@@ -297,7 +297,7 @@
     <!--护理记录单-->
     <dubbo:reference id="nursingRecordService_consumer" interface="cn.hsa.module.inpt.nurse.service.NursingRecordService" check="false"/>
     <!--医嘱核收-->
-    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false"/>
+    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false" retries="0"/>
     <!-- 住院结算 -->
     <dubbo:reference id="inptSettlementService_consumer" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
     <!-- 取消住院结算 -->
@@ -341,6 +341,11 @@
     <dubbo:reference id="emrDocTemplateService_consumer" interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" check="false"/>
     <!-- 电子病历子系统   电子病历借阅 -->
     <dubbo:reference id="emrBorrowService_consumer" interface="cn.hsa.module.emr.emrborrow.service.EmrBorrowService" check="false"/>
+    <!-- 电子病历子系统   电子时效控制 -->
+    <dubbo:reference id="emrQualityAgingService_consumer" interface="cn.hsa.module.emr.emrquality.service.EmrQualityAgingService" check="false"/>
+    <!-- 电子病历子系统   电子数据控制规则 -->
+    <dubbo:reference id="emrQualityDataRulesService_consumer" interface="cn.hsa.module.emr.emrquality.service.EmrQualityDataRulesService" check="false"/>
+
     <!-- ########################################### 电子病历子系统consumer end ############################################## -->
 
     <!-- ########################################### 手麻系统 start ########################################### -->

@@ -15,4 +15,6 @@ public class BaseDiagnosisTemplateDTO extends BaseDiagnosisTemplateDO  implement
 
     private String keyword;
 
+    private String checkFlag;
+
 }

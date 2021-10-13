@@ -187,4 +187,15 @@ public interface InsureReckonService {
      **/
     @GetMapping("serive/insure/reckon/queryInsureSetlDetlList")
     WrapperResponse<PageDTO> queryInsureSetlDetlList(Map<String, Object> selectMap);
+
+    /** 获取医保对账汇总查询 - 3699
+     * @param queryInsureTotlStmtInfo
+     * @Method queryInsureSetlDetlList
+     * @Desrciption 获取结算明细信息
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("serive/insure/reckon/queryInsureTotlStmtInfo")
+    WrapperResponse<PageDTO> queryInsureTotlStmtInfo(Map<String, Object> selectMap);
 }

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.emr.emrquality.dao.EmrQualityAgingDAO">
+
+   <insert id="insertQualityRecord" parameterType="cn.hsa.module.emr.emrquality.entity.EmrQualityAgingDO">
+       INSERT INTO emr_quality_aging 
+       (id,hosp_code, emr_code,tips_type,datum_time,time_out,advice_list,is_valid,crte_id,crte_name,crte_time)
+       VALUES (#{id}, #{hospCode}, #{emrCode}, #{tipsType},#{datumTime}, #{timeOut}, #{adviceList}, #{isValid}, #{crteId},#{crteName},#{crteTime});
+   </insert>
+
+    <update id="updateQualityRecord" parameterType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+     UPDATE  emr_quality_aging
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="emrCode != null and emrCode != ''">
+                emr_code  = #{emrCode},
+            </if>
+            <if test="tipsType != null and tipsType != ''">
+                tips_type  = #{tipsType},
+            </if>
+            <if test="datumTime != null and datumTime != ''">
+                datum_time  = #{datumTime},
+            </if>
+            <if test="timeOut != null and timeOut != ''">
+                time_out  = #{timeOut},
+            </if>
+            <if test="adviceList != null and adviceList != ''">
+                advice_list  = #{adviceList},
+            </if>
+            <if test="isValid != null and isValid != ''">
+                is_valid  = #{isValid},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id  = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name  = #{crteName},
+            </if>
+            <if test="crteTime != null and crteTime != ''">
+                crte_time  = #{crteTime},
+            </if>
+      </set>
+    WHERE  hosp_code =#{hospCode} and id =#{id}
+    </update>
+    <delete id="deleteEmrQualityAging" parameterType="java.util.Map">
+        delete  from  emr_quality_aging
+        WHERE hosp_code = #{hospCode} and id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="queryEmrQualityList" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+        select a.id,a.hosp_code, emr_code,tips_type,datum_time,time_out,advice_list,a.is_valid,a.crte_id,a.crte_name,a.crte_time,
+        CONCAT(b.`name`,'提醒时间：(',a.time_out,'小时)') as label,b.name as emrName
+        from emr_quality_aging a
+        LEFT JOIN emr_classify b on a.emr_code = b.`code` and a.hosp_code = b.hosp_code and (b.dept_id is null or b.dept_id = '')
+        where a.hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (emr_code like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        </if>
+    </select>
+    <select id="queryEmrTemplateList" parameterType="java.util.Map" resultType="java.util.Map">
+        select a.code as id,a.name as label,a.up_code as parentId
+		,if(a.is_end >0,true,false) as isEnd,b.id as templateId,
+		a.valid_time as validTime, b.dept_id
+		from emr_classify as a
+		left join emr_classify_template as b
+		on a.hosp_code = b.hosp_code  and a.code = b.classify_code
+		and IFNULL(a.dept_id,'') = IFNULL(b.dept_id,'')
+		where a.hosp_code = #{hospCode} and a.is_valid  = '1' and a.dept_id is null  and a.up_code !='EMR'
+    </select>
+
+    <select id="queryEmrQualityListById" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+        select a.id,a.hosp_code, emr_code,tips_type,datum_time,time_out,advice_list,a.is_valid,a.crte_id,a.crte_name,a.crte_time,
+        CONCAT(b.`name`,'提醒时间：(',a.time_out,'小时)') as label,b.name as emrName
+        from emr_quality_aging a
+        LEFT JOIN emr_classify b on a.emr_code = b.`code` and a.hosp_code = b.hosp_code and (b.dept_id is null or b.dept_id = '')
+        where a.hosp_code =#{hospCode} and a.id = #{id}
+        <if test="keyword != null and keyword != ''">
+            and (emr_code like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        </if>
+    </select>
+
+    <select id="queryEmrQualityListByEmrCode" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+        select a.id,a.hosp_code, emr_code,tips_type,datum_time,time_out,advice_list,a.is_valid,a.crte_id,a.crte_name,a.crte_time,
+        CONCAT(b.`name`,'提醒时间：(',a.time_out,'小时)') as label,b.name as emrName
+        from emr_quality_aging a
+        LEFT JOIN emr_classify b on a.emr_code = b.`code` and a.hosp_code = b.hosp_code and (b.dept_id is null or b.dept_id = '')
+        where a.hosp_code =#{hospCode} and b.code = #{emrCode}
+    </select>
+</mapper>

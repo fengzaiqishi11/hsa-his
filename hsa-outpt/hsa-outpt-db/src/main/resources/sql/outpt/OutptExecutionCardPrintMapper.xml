@@ -52,11 +52,8 @@
             or c.cert_no like CONCAT('%',#{keyword},'%') )
         </if>
         <if test="typeCode != null and typeCode != ''">
-            and b.usage_code in
-            <if test="usageCodeList != null and usageCodeList.size() > 0">
-                <foreach collection="usageCodeList" separator="," open="(" close=")" item="item">
-                    #{item}
-                </foreach>
+            <if test="usageCode != null and usageCode != ''">
+                and  FIND_IN_SET(b.usage_code,#{ usageCode })
             </if>
         </if>
         <!--皮试单执行卡数据查询，用法为输液用法，过滤处方不需要皮试的数据-->

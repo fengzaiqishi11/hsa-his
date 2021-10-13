@@ -409,9 +409,19 @@
         left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
         left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
         join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
-        left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
+        <!--是否关联领药表，默认关联-->
+        <if test="isRelevance != null and isRelevance != '' and isRelevance == '0'.toString()">
+            left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
+        </if>
         where ia.hosp_code=#{hospCode}
-        and (ia.use_code  in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
+        <!--是否关联领药表，关联-->
+        <if test="isRelevance != null and isRelevance != '' and isRelevance == '0'.toString()">
+            and (ia.use_code in ('2','3') or ( ia.item_code = '1' and piwr.status_code > '0' and ia.use_code ='1') or (ia.item_code != '1'))
+        </if>
+        <!--是否关联领药表，不关联-->
+        <if test="isRelevance != null and isRelevance != '' and isRelevance == '1'.toString()">
+            and ia.use_code != '4'
+        </if>
         and ia.is_check='1'
         <if test="keyword !=null and keyword != ''">
             and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')

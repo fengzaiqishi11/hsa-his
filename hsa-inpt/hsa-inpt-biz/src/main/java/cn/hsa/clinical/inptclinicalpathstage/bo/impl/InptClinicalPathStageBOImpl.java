@@ -123,7 +123,7 @@ public class InptClinicalPathStageBOImpl implements InptClinicalPathStageBO {
       if(nextClinicalPathStage == null) {
         throw new AppException("该阶段已是最后阶段，不能进入下一阶段");
       }
-      /**用于更新入径病人当前阶段*/
+      /**用于更新入径病人当前阶段**/
       InptClinicalPathStateDTO inptClinicalPathStateDTO = new InptClinicalPathStateDTO();
       inptClinicalPathStateDTO.setHospCode(inptClinicalPathStageDTO.getHospCode());
       // 当前阶段
@@ -157,6 +157,21 @@ public class InptClinicalPathStageBOImpl implements InptClinicalPathStageBO {
       nextStage.setCrteTime(inptClinicalPathStageDTO.getCrteTime());
       // 病情阶段新增下一阶段
       inptClinicalPathStageDAO.insertInptClinicalPathStage(nextStage);
+    }
+    // 如果状态是3  退出路径
+    if("3".equals(inptClinicalPathStageDTO.getSaveFlag())) {
+      InptClinicalPathStateDTO inptClinicalPathStateDTO = new InptClinicalPathStateDTO();
+      inptClinicalPathStateDTO.setHospCode(inptClinicalPathStageDTO.getHospCode());
+      inptClinicalPathStateDTO.setId(inptClinicalPathStageDTO.getClinicalPathStageId());
+      inptClinicalPathStateDTO.setEndCrteId(inptClinicalPathStageDTO.getCrteId());
+      inptClinicalPathStateDTO.setEndCrteTime(inptClinicalPathStageDTO.getEndCrteTime());
+      inptClinicalPathStateDTO.setEndCrteName(inptClinicalPathStageDTO.getCrteName());
+      inptClinicalPathStateDTO.setEndPathType(inptClinicalPathStageDTO.getEndPathType());
+      inptClinicalPathStateDTO.setEndPathRemarke(inptClinicalPathStageDTO.getEndPathRemarke());
+      inptClinicalPathStateDTO.setEndStageName(inptClinicalPathStageDTO.getStageName());
+      inptClinicalPathStateDTO.setEndStageId(inptClinicalPathStageDTO.getStageId());
+      inptClinicalPathStateDTO.setPathState("2");
+      inptClinicalPathStateDAO.updateInptClinicalPathStateByVisitId(inptClinicalPathStateDTO);
     }
     return true;
   }

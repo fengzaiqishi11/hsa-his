@@ -38,7 +38,7 @@
         MAX(ope.is_print) as is_print
         FROM
         outpt_infusion_register a
-        inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+        inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
         inner JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
         inner JOIN outpt_prescribe d on b.op_id = d.id and a.hosp_code = d.hosp_code
         left JOIN base_rate f on b.rate_id = f.id and a.hosp_code = f.hosp_code

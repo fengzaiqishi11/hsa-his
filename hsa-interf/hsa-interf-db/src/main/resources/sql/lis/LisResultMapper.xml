@@ -50,7 +50,6 @@
 	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
 	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
 	a.crte_time AS sftime,
-	a.medic_type AS pattype,
 	b.name,
 IF
 	( b.gender_code = '1', '男', '女' ) AS sex,
@@ -89,7 +88,6 @@ SELECT
 	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
 	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
 	a.crte_time AS sftime,
-	a.medic_type AS pattype,
 	b.name,
 IF
 	( b.gender_code = '1', '男', '女' ) AS sex,
@@ -105,7 +103,7 @@ FROM
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">
-        select opd_id from medic_apply where report_time is null
+        select opd_id from medic_apply where report_time is null and document_sta = '03'
     </select>
 
     <select id="queryDXBackResult" resultType="java.lang.String">

@@ -161,9 +161,6 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             adviceDTOParam.setHospCode(hospCode);
             adviceDTOParam.setIds(adviceIds);
             List<InptAdviceDTO> inptAdviceDTOS = inptAdviceDAO.queryAll(adviceDTOParam);
-            if (ListUtils.isEmpty(inptAdviceDTOS)) {
-                throw new AppException("未查询到勾选的相关医嘱信息");
-            }
             // 手术类医嘱 item_code = 4 处置 type_code=5手术
             List<InptAdviceDTO> operAdviceList = inptAdviceDTOS.stream().filter(inptAdviceDTO -> Constants.XMLB.YZML.equals(inptAdviceDTO.getItemCode()) && Constants.YZLB.YZLB5.equals(inptAdviceDTO.getTypeCode())).collect(Collectors.toList());
             if (!ListUtils.isEmpty(operAdviceList)) {

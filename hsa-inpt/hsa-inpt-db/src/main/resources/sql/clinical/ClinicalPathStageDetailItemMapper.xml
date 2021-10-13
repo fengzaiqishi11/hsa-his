@@ -75,16 +75,7 @@
           left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
           left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
           left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
-          where a.hosp_code = #{hospCode}
-            <if test="listId != null and listId != ''">
-                and a.list_id = #{listId}
-            </if>
-            <if test="stageId != null and stageId != ''">
-                and a.stage_id = #{stageId}
-            </if>
-            <if test="detailId != null and detailId != ''">
-                and a.detail_id = #{detailId}
-            </if>
+          where a.hosp_code = #{hospCode} and a.detail_id = #{detailId}  and a.stage_id = #{stageId} and a.list_id = #{listId}
             <if test="itemType != null and itemType != ''">
               and a.item_type = #{itemType}
             </if>

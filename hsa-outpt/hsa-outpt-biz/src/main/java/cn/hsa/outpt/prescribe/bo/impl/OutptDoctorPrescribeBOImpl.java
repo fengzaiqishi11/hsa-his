@@ -3158,7 +3158,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setSourceTjCode(outptVisitDTO.getSourceTjCode());
         outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
-        outptProfileFileDTO.setType("1");
+        outptProfileFileDTO.setType("2");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
 
         //调用本地建档服务

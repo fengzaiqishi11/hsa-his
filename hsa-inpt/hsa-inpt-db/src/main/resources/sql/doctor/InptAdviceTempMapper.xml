@@ -106,7 +106,7 @@
     <select id="queryInptAdviceDetailTemp" resultMap="InptAdviceDetailTempMap">
         select a.id, a.hosp_code, a.iat_id, a.group_no, a.group_seq_no, a.item_code,
         a.item_id,
-        case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name when a.item_code = '4' then e.name else a.item_name end item_name,
+        case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name when a.item_code = '4' then (case when e.type_code = '10' then a.item_name else e.name end ) else a.item_name end item_name,
         case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code,
         a.num, a.unit_code,  case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
         when a.item_code = '1' and a.unit_code = c.unit_code then c.price

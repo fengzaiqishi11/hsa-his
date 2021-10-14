@@ -155,14 +155,27 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         List<InptNurseRecordDTO> addList = new ArrayList<>();
         List<InptNurseRecordDTO> editList = new ArrayList<>();
         List<InptNurseRecordDTO> deleteList = new ArrayList<>();
+        Map<Integer, Object> groupNoFlagMap = new HashMap<>();
 
         for (InptNurseRecordDTO inptNurseRecordDTO : saveList) {
             if (StringUtils.isEmpty(inptNurseRecordDTO.getId())) {
+                if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())){
+                    if (inptNurseRecordDTO.getGroupNo() == null || inptNurseRecordDTO.getGroupNo() <= 0 ) {
+                        throw new RuntimeException("保存的数据检测到没有组号，请刷新后重试");
+                    }
+                    //记录标志 时间，组号
+                    String recordTime = inptNurseRecordDTO.getItem039() + ":00";
+                    groupNoFlagMap.put(inptNurseRecordDTO.getGroupNo(), recordTime);
+                }
+
                 //新增
                 this.handelParam(userId, userName, addList, inptNurseRecordDTO);
             } else {
                 //编辑
                 if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
+                    if (inptNurseRecordDTO.getGroupNo() == null || inptNurseRecordDTO.getGroupNo() <= 0) {
+                        throw new RuntimeException("保存的数据检测到没有组号，请刷新后重试");
+                    }
                     //护理记录单，编辑前先删除对应的同组号数据
                     if (deleteList.indexOf(inptNurseRecordDTO.getGroupNo()) == -1) {
                         deleteList.add(inptNurseRecordDTO);
@@ -174,6 +187,17 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
             }
         }
 
+        // 判断新增的addList，数据是否合格。不同时间的组号相同的为不合格数据
+        for (InptNurseRecordDTO dto : addList) {
+            if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
+                // 日期+时间 2021-10-13 13:10:00
+                Integer groupNo = dto.getGroupNo();
+                String recordTime  = dto.getItem039() + ":00";
+                if (!MapUtils.get(groupNoFlagMap, groupNo).equals(recordTime)){
+                    throw new RuntimeException("【" + recordTime + "】与【" + MapUtils.get(groupNoFlagMap, groupNo) +"】组号冲突，请刷新后再试");
+                }
+            }
+        }
         if (!ListUtils.isEmpty(addList)) {
             nursingRecordDAO.insert(addList);
         }
@@ -194,6 +218,7 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         bnoCodeList.add("xsehljld");
         bnoCodeList.add("cqdchljld");
         bnoCodeList.add("chhljld");
+        bnoCodeList.add("ckhljld");
         Map map = new HashMap();
         map.put("hospCode", hospCode);
         map.put("code", code);
@@ -493,8 +518,8 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
 
         // 根据就诊id，护理单据规则查询
         Integer max = nursingRecordDAO.getMaxGroupNo(inptNurseRecordDTO);
-        if (max == 0) {
-            max = 1;
+        if (max == null) {
+            max = 0;
         }
 
         //生成日间小结护理记录dto, 进行赋值

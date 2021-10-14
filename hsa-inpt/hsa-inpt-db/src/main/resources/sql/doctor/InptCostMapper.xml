@@ -524,7 +524,7 @@
         <if test="babyId != null and babyId != ''">
             AND baby_id = #{babyId}
         </if>
-        order by t.crte_time desc
+        order by t.crte_time asc
     </select>
     <!-- 查询门诊病人手术补记账部分数据 -->
     <select id="queryOutpatientSurgeryCostPage" resultMap="InptCostMap">

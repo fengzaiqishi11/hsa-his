@@ -1,5 +1,6 @@
 package cn.hsa.stro.storin.bo.impl;
 
+import ch.qos.logback.core.util.TimeUtil;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -178,6 +179,8 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
   **/
   @Override
   public Boolean save(StroInDTO stroInDTO) {
+    // 进行有效期校验
+    validExpiryDate(stroInDTO.getStroInDetailDTOS());
     StroInDTO stroInDTO1 = checkMoney(stroInDTO);
 
     List<StroInDetailDTO> stroInDetailDTOS = stroInDTO1.getStroInDetailDTOS();
@@ -245,6 +248,26 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       }
     }
     return true;
+  }
+  /**
+   * @Meth: validExpiryDate
+   * @Description: 校验有效期是否过期
+   * @Param: [stroInDetailDTOS]
+   * @return: void
+   * @Author: zhangguorui
+   * @Date: 2021/10/14
+   */
+  private void validExpiryDate(List<StroInDetailDTO> stroInDetailDTOS) {
+    // 查看入库明细是否为空
+    if (ListUtils.isEmpty(stroInDetailDTOS)){
+      throw new AppException("入库明细不能为空");
+    }
+    // 校验有效期
+    for (StroInDetailDTO stroInDetailDTO : stroInDetailDTOS){
+      if ( DateUtils.getNow().compareTo(stroInDetailDTO.getExpiryDate())>0){
+          throw new AppException("入库失败："+stroInDetailDTO.getItemName()+"有效期小于或等于当前时间");
+      }
+    }
   }
 
   /**

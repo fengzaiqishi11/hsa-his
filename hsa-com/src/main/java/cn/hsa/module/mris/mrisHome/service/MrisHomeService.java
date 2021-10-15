@@ -290,6 +290,14 @@ public interface MrisHomeService {
     @GetMapping("/service/mris/mrisHome/importMrisInfo")
     WrapperResponse<List<LinkedHashMap<String,Object>>> importMrisInfo(Map map) throws Exception;
 
+    /**
+     *
+     * @param map
+     * @return String
+     */
+    @GetMapping("/service/mris/mrisHome/importCSVMrisInfo")
+    WrapperResponse<String> importCSVMrisInfo(Map map) throws Exception;
+
     /**@description 获取导出表头
      * @auth liuliyun
      * @date 2021/07/30

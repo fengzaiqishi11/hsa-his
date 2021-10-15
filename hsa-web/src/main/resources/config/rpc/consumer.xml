@@ -496,6 +496,8 @@
     <dubbo:reference id="inptClinicalPathStageService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" check="false"/>
     <!--临床路径病人记录-->
     <dubbo:reference id="inptClinicalPathStateService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService" check="false"/>
-    <!-- *************************************************** 临床路径子系统 *************************************************************** -->
+    <!--临床路径执行情况-->
+    <dubbo:reference id="clinicPathExecService_consumer" interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" check="false"/>
+  <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

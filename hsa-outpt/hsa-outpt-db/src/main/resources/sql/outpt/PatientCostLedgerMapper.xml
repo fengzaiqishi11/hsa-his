@@ -6422,5 +6422,68 @@
         </if>)
         ORDER BY in_time desc ,px asc
     </select>
+    <!--按材料分类汇总-->
+    <select id="queryStroBusinessSummaryByMaterialClassification" resultType="java.util.Map">
+        select
+        x.supplierName as supplierName,
+        max(bfc.name) as bfcName,
+        count(distinct x.itemId) as itemNum,
+        count(distinct x.batchNo) as batchNoNum,
+        sum(x.buyPriceAll)/count(distinct x.itemId) as avgItemBuyPrice,
+        sum(x.buyPriceAll) as buyPriceAll,
+        sum(x.sellPriceAll) as sellPriceAll,
+        x.typeCode,
+        (sum(x.sellPriceAll) - sum(x.buyPriceAll)) as priceSpread
+        from (
+        select
+        bs.name as supplierName,
+        sid.item_id as itemId,
+        sid.batch_no as batchNo,
+        sid.buy_price as buyPrice,
+        (sid.buy_price * sid.num) as buyPriceAll,
+        (sid.sell_price * sid.num) as sellPriceAll,
+        c.bfc_code  as bfcCode,
+        c.type_code  typeCode
+        from stro_invoicing sid
+        join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
+        ${sql}
+        <if test="startDate != null and startDate != ''">
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*出院日期*/
+        <if test="endDate != null and endDate !='' ">
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*药房*/
+        <if test="yfids != null and yfids.size()>0">
+            and bs.id in
+            <foreach collection="yfids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        /*科室*/
+        <if test="ksids != null and ksids.size()>0">
+            and bs.id in
+            <foreach collection="ksids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        /*供应商*/
+        <if test="gysids != null and gysids.size()>0">
+            and bs.id in
+            <foreach collection="gysids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and
+        sid.biz_id in
+        <foreach collection="bizIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        )x left join base_finance_classify bfc on x.bfcCode = bfc.code and bfc.hosp_code = #{hospCode}
+        group by supplierName,x.typeCode
+        order by supplierName
+    </select>
 
 </mapper>

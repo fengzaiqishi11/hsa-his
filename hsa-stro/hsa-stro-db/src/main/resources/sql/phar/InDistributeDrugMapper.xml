@@ -522,9 +522,15 @@
   <select id="querySurplusPharInReceiveDetailDTO" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
     select * from phar_in_receive_detail where hosp_code = #{hospCode} and receive_id = #{id}
   </select>
-
-  <!--删除配药主表-->
+    <!--删除配药主表-->
   <delete id="deleteCanclePharInReceivelDTO">
     delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
   </delete>
+<!--根据费用id集合查询老费用 且 back_code = 1 表示退药为退费-->
+    <select id="getOldCostIds" resultType="java.lang.String">
+        select old_cost_id from inpt_cost where hosp_code = #{hospCode} and back_code = '1' and old_cost_id is not null and id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

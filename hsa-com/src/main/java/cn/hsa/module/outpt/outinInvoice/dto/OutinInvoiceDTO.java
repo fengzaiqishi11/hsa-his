@@ -220,4 +220,7 @@ public class OutinInvoiceDTO extends OutinInvoiceDO implements Serializable {
 
     // 待遇类型名称
     private String bka006Name;
+
+    // 传入当前使用票号
+    private String dqCurrNo;
 }

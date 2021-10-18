@@ -445,6 +445,9 @@
         <if test="endDate != null and endDate != ''">
             and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
+        </if>
         ORDER BY settleTime DESC
     </select>
 
@@ -737,6 +740,9 @@
         </if>
         <if test="endDate != null and endDate != ''">
             and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
         </if>
         GROUP BY ywlx, patientCode
     </select>

@@ -804,5 +804,13 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
    **/
   List<InptVisitDTO> queryMergeInPatient(InptVisitDTO inptVisitDTO);
-
+  /**
+   * @Meth: queryStroBusinessSummaryByMaterialClassification
+   * @Description: 按材料分类汇总
+   * @Param: [paraMap]
+   * @return: java.util.List<java.util.Map>
+   * @Author: zhangguorui
+   * @Date: 2021/10/16
+   */
+  List<Map> queryStroBusinessSummaryByMaterialClassification(Map<String, Object> paraMap);
 }

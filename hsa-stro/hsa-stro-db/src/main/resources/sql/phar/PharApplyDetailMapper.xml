@@ -262,7 +262,10 @@
                 and ss.item_id = #{itemId}
             </if>
             <if test="keyword != null and keyword != ''">
-                and ss.item_name like concat('%',#{keyword},'%')
+                and (ss.item_name like concat('%',#{keyword},'%')
+                or b.pym like concat('%',#{keyword},'%')
+                or b.wbm like concat('%',#{keyword},'%')
+                )
             </if>
             <if test="unitCode != null and unitCode != ''">
                 and ss.unit_code = #{unitCode}
@@ -291,7 +294,12 @@
                 and ss.item_id = #{itemId}
             </if>
             <if test="keyword != null and keyword != ''">
-                and ss.item_name like concat('%',#{keyword},'%')
+                and (ss.item_name like concat('%',#{keyword},'%')
+                or b.good_pym like concat('%',#{keyword},'%')
+                or b.good_wbm like concat('%',#{keyword},'%')
+                or b.usual_pym like concat('%',#{keyword},'%')
+                or b.usual_wbm like concat('%',#{keyword},'%')
+                )
             </if>
             <if test="unitCode != null and unitCode != ''">
                 and ss.unit_code = #{unitCode}
@@ -326,7 +334,10 @@
           and ss.item_id = #{itemId}
         </if>
         <if test="keyword != null and keyword != ''">
-          and ss.item_name like concat('%',#{keyword},'%')
+            and (ss.item_name like concat('%',#{keyword},'%')
+                or b.pym like concat('%',#{keyword},'%')
+                or b.wbm like concat('%',#{keyword},'%')
+            )
         </if>
         <if test="unitCode != null and unitCode != ''">
           and ss.unit_code = #{unitCode}
@@ -354,7 +365,12 @@
           and ss.item_id = #{itemId}
         </if>
         <if test="keyword != null and keyword != ''">
-          and ss.item_name like concat('%',#{keyword},'%')
+            and (ss.item_name like concat('%',#{keyword},'%')
+            or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            )
         </if>
         <if test="unitCode != null and unitCode != ''">
           and ss.unit_code = #{unitCode}

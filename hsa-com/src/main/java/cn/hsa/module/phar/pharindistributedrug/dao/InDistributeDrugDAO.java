@@ -347,13 +347,4 @@ public interface InDistributeDrugDAO {
     **/
     int deleteCanclePharInReceivelDTO(PharInReceiveDTO pharInReceiveDTO);
 
-    /**
-     * @Meth: getOldCostIds
-     * @Description: 根据费用id 查询老费用集合
-     * @Param: [inptCostDTO]
-     * @return: java.util.List<java.lang.String>
-     * @Author: zhangguorui
-     * @Date: 2021/10/18
-     */
-    List<String> getOldCostIds(InptCostDTO inptCostDTO);
 }

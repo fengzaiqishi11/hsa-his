@@ -104,7 +104,9 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			selectInvoice.setNum(0);
 		} else {
 			selectInvoice.setNum(BigDecimalUtils.subtract(selectInvoice.getEndNo(), outinInvoiceDTO.getCurrNo()).intValue());
-			selectInvoice.setCurrNo(BigDecimalUtils.add(outinInvoiceDTO.getCurrNo(), "1").toString());
+			// 以0开头的发票号左侧补0
+			String currentNo =changeInvoiceNo(outinInvoiceDTO.getDqCurrNo(),BigDecimalUtils.add(outinInvoiceDTO.getCurrNo(), "1").toString());
+			selectInvoice.setCurrNo(currentNo);
 		}
 		outinInvoiceDao.updateOutinInvoice(selectInvoice);
 
@@ -112,13 +114,25 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 		outinInvoiceDetail.setId(SnowflakeUtils.getId());
 		outinInvoiceDetail.setHospCode(selectInvoice.getHospCode());
 		outinInvoiceDetail.setInvoiceId(selectInvoice.getId());
-		outinInvoiceDetail.setInvoiceNo(outinInvoiceDTO.getCurrNo());
+		// 以0开头的发票号左侧补0
+		String invoiceNo =changeInvoiceNo(outinInvoiceDTO.getDqCurrNo(),outinInvoiceDTO.getCurrNo());
+		outinInvoiceDetail.setInvoiceNo(invoiceNo);
 		outinInvoiceDetail.setStatusCode(Constants.PJMXSYZT.YSY);
 		outinInvoiceDetail.setUseTime(DateUtils.getNow());
 		outinInvoiceDetail.setSettleId(outinInvoiceDTO.getSettleId());
 		outinInvoiceDao.insertOutinInvoiceDetail(outinInvoiceDetail);
 		return outinInvoiceDetail;
 
+	}
+
+	// 发票数字左边补0 lly 20211015
+	public String changeInvoiceNo(String currNo,String userNo){
+		if (currNo!=null&&userNo!=null){
+			if (currNo.startsWith("0")) {
+				return String.format("%0" + currNo.length() + "d", Integer.valueOf(userNo));
+			}
+		}
+		return userNo;
 	}
 
 	@Override

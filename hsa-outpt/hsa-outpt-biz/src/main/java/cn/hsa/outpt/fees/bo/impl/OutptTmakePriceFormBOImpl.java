@@ -3344,6 +3344,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         for (OutptSettleInvoiceDTO outptSettleInvoiceDTO : pjList) {
             Map<String, Object> map = new HashMap<String, Object>();
             outinInvoiceDTO.setCurrNo(String.valueOf(currNoInt));
+            outinInvoiceDTO.setDqCurrNo(dqCurrNo);
             map.put("hospCode", outinInvoiceDTO.getHospCode());
             map.put("outinInvoiceDTO", outinInvoiceDTO);
             // 执行使用发票

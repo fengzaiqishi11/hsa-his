@@ -398,10 +398,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
             String[] tempIds = outptVisitDTO.getDiagnose();
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < tempIds.length; i++) {
-                str.append(tempIds[i]);
-                if (i < tempIds.length - 1) {
-                    str.append(",");
+            if(tempIds!=null && tempIds.length>0) {
+                for (int i = 0; i < tempIds.length; i++) {
+                    str.append(tempIds[i]);
+                    if (i < tempIds.length - 1) {
+                        str.append(",");
+                    }
                 }
             }
             boolean isChange = false;
@@ -739,6 +741,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     if (Constants.FYLYFS.ZJHJSF.equals(outptCostDTO.getSourceCode())) {
                         BigDecimal num = MapUtils.get(prescribeMap.get(0), "num");  // 总库存
                         BigDecimal stockOccupy = MapUtils.get(prescribeMap.get(0), "stock_occupy");  // 占用库存
+                        if (stockOccupy==null){
+                            stockOccupy =BigDecimalUtils.nullToZero(stockOccupy);
+                        }
                         BigDecimal sykc = BigDecimalUtils.subtract(num, stockOccupy);  // 剩余库存
                         if (BigDecimalUtils.greater(outptCostDTO.getTotalNum(), sykc)) {
                             throw new AppException(outptCostDTO.getItemName() + ":指定药房库存不足");
@@ -3339,6 +3344,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         for (OutptSettleInvoiceDTO outptSettleInvoiceDTO : pjList) {
             Map<String, Object> map = new HashMap<String, Object>();
             outinInvoiceDTO.setCurrNo(String.valueOf(currNoInt));
+            outinInvoiceDTO.setDqCurrNo(dqCurrNo);
             map.put("hospCode", outinInvoiceDTO.getHospCode());
             map.put("outinInvoiceDTO", outinInvoiceDTO);
             // 执行使用发票

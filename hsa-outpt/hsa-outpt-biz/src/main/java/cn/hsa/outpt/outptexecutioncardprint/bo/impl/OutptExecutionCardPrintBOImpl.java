@@ -83,10 +83,7 @@ public class OutptExecutionCardPrintBOImpl extends HsafBO implements OutptExecut
         List<String> usageCodeList = new ArrayList<>();
         if (StringUtils.isNotEmpty(value)){
             value = value.replace("'","");
-            usageCodeList = Arrays.asList(value.split(","));
-            if (!ListUtils.isEmpty(usageCodeList)){
-                outptInfusionRegisterDTO.setUsageCodeList(usageCodeList);
-            }
+            outptInfusionRegisterDTO.setUsageCode(value);
         }
 
         //设置分页信息

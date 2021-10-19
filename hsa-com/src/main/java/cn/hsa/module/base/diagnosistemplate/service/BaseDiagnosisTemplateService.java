@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.diagnosistemplate.dto.BaseDiagnosisTemplateDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Map;
 
@@ -67,4 +68,17 @@ public interface BaseDiagnosisTemplateService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.base.bmm.dto.BaseMaterialDTO>
      **/
     WrapperResponse<Boolean> updateById(Map<String,Object> map);
+
+    /**
+     * @Menthod: updateStatusCode
+     * @Desrciption: 审核/作废诊断管理
+     * @Param: baseDiagnosisTemplateDTO
+     *  审核：checkFlag = 1，作废：checkFlag = 2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-12 13:49
+     * @Return: Boolean
+     **/
+    @PostMapping("/service/base/basediagnosistemplate/updateStatusCode")
+    WrapperResponse<Boolean> updateStatusCode(Map map);
 }

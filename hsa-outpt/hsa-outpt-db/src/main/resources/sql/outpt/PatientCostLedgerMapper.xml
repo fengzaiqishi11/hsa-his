@@ -1356,7 +1356,9 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
-
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
+        </if>
         GROUP BY  t.bizCode,
         t.item_type,
         t.item_id,
@@ -1394,6 +1396,9 @@
         <if test="insureCode != null and insureCode != ''">
             and t.patient_code = #{insureCode}
         </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
+        </if>
         ORDER BY t.item_type ,t.visit_id,t.bfc_id,t.item_code,t.item_id
     </select>
     <select id = "queryHospitalItemReportInfoGroupFourSum" resultType="java.util.LinkedHashMap">
@@ -1419,6 +1424,9 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
+        </if>
 
         ORDER BY t.bizCode ,t.visit_id
     </select>
@@ -1440,6 +1448,9 @@
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
+        </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
         </if>
     </select>
 
@@ -1471,6 +1482,9 @@
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
         </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
+        </if>
         group by  t.item_type,
         t.bizCode,
         t.item_id,
@@ -1497,6 +1511,9 @@
         </if>
         <if test="keyword != null and keyword != ''">
             and t.item_name  like '%${keyword}%'
+        </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
         </if>
     </select>
 
@@ -1735,6 +1752,9 @@
         <if test="name != null and name != ''">
             and t.name  like '%${name}%'
         </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
+        </if>
         group by t.item_id,
         t.bfc_name,
         t.item_code,
@@ -1783,6 +1803,9 @@
         </if>
         <if test="name != null and name != ''">
             and t.name  like '%${name}%'
+        </if>
+        <if test="itemId != null and itemId != ''">
+            and t.item_id = #{itemId}
         </if>
     </select>
 
@@ -1917,6 +1940,7 @@
         max(a.split_price) as splitPrice,
         case max(a.item_code) when '1' then max(bd.spec) when '2' then max(bm.spec) end spec,
         case max(a.item_code) when '1' then max(bd.code) when '2' then max(bm.code) end code,
+        case max(a.item_code) when '1' then max(bd.prep_code) when '2' then '' end prepCode,
         max(a.unit_code) as unitCode,
         max(a.split_unit_code) as splitUnitCode,
         (select name from base_dept where id = b.dept_id) as deptName
@@ -1942,6 +1966,14 @@
             or bd.usual_pym like concat('%',#{keyword},'%')
             or bd.usual_wbm like concat('%',#{keyword},'%')
             )
+        </if>
+        /*开嘱科室*/
+        <if test="deptId != null and deptId != ''">
+            and b.dept_id = #{deptId}
+        </if>
+        /*剂型*/
+        <if test="prepCode != null and prepCode != ''">
+            and bd.prep_code = #{prepCode}
         </if>
         group by b.dept_id, a.item_id
         ) A where A.splitNum != 0
@@ -3318,7 +3350,7 @@
         <!-- 住院科室/医生收入 -->
         <if test="statement == '2'.toString() or statement == '3'.toString() or statement == '4'.toString()">
             select
-            ifnull(ics.reality_price,0) as realityPrice,
+            ifnull(ics.reality_price, ifnull(B.reality_price, 0)) as realityPrice,
             ifnull(B.bfc_id,'0') as bfcId,
             ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
             ),'其他')
@@ -3381,17 +3413,12 @@
             ifnull(B.visit_id,'0') as visitId,
             t.name as visitName
             from
-            inpt_settle A
-            inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
-            inner join inpt_cost_settle ics on B.id=ics.cost_id
-            inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
-            where
-            A.hosp_code = #{hospCode}
-            and A.is_settle = '1'
-            and B.settle_code = '2'
-            and A.status_code = '0'
             <!-- 按计费时间 -->
             <if test="statement == '4'.toString()">
+                inpt_cost B
+                inner join inpt_visit t on t.hosp_code = B.hosp_code and B.visit_id = t.id
+                left join inpt_cost_settle ics on ics.hosp_code = t.hosp_code and ics.cost_id = B.id
+                where B.hosp_code = #{hospCode}
                 <if test="startDate != null and startDate !='' ">
                     and B.cost_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
                 </if>
@@ -3402,6 +3429,15 @@
             </if>
             <!-- 按结算时间 -->
             <if test="statement == '2'.toString() or statement == '3'.toString()">
+                inpt_settle A
+                inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+                inner join inpt_cost_settle ics on B.id=ics.cost_id
+                inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+                where
+                A.hosp_code = #{hospCode}
+                and A.is_settle = '1'
+                and B.settle_code = '2'
+                and A.status_code = '0'
                 <if test="startDate != null and startDate !='' ">
                     and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
                 </if>
@@ -5701,10 +5737,10 @@
         )t3 on t1.settleTime = t3.settleTime and t1.visit_id = t3.visit_id
     </select>
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        select item_name from
-        (select item_name from inpt_cost
+        select item_id, item_name from
+        (select item_id, max(item_name) as item_name from inpt_cost group by item_id
         union
-        select item_name from outpt_cost
+        select item_id, max(item_name) as item_name from outpt_cost group by item_id
         )t
         where 1=1
         <if test="keyword != null and keyword != ''">
@@ -6412,6 +6448,69 @@
             and a.zg_doctor_id = #{zgDoctorId}
         </if>)
         ORDER BY in_time desc ,px asc
+    </select>
+    <!--按材料分类汇总-->
+    <select id="queryStroBusinessSummaryByMaterialClassification" resultType="java.util.Map">
+        select
+        x.supplierName as supplierName,
+        max(bfc.name) as bfcName,
+        count(distinct x.itemId) as itemNum,
+        count(distinct x.batchNo) as batchNoNum,
+        sum(x.buyPriceAll)/count(distinct x.itemId) as avgItemBuyPrice,
+        sum(x.buyPriceAll) as buyPriceAll,
+        sum(x.sellPriceAll) as sellPriceAll,
+        x.typeCode,
+        (sum(x.sellPriceAll) - sum(x.buyPriceAll)) as priceSpread
+        from (
+        select
+        bs.name as supplierName,
+        sid.item_id as itemId,
+        sid.batch_no as batchNo,
+        sid.buy_price as buyPrice,
+        (sid.buy_price * sid.num) as buyPriceAll,
+        (sid.sell_price * sid.num) as sellPriceAll,
+        c.bfc_code  as bfcCode,
+        c.type_code  typeCode
+        from stro_invoicing sid
+        join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
+        ${sql}
+        <if test="startDate != null and startDate != ''">
+            and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*出院日期*/
+        <if test="endDate != null and endDate !='' ">
+            and sid.crte_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*药房*/
+        <if test="yfids != null and yfids.size()>0">
+            and bs.id in
+            <foreach collection="yfids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        /*科室*/
+        <if test="ksids != null and ksids.size()>0">
+            and bs.id in
+            <foreach collection="ksids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        /*供应商*/
+        <if test="gysids != null and gysids.size()>0">
+            and bs.id in
+            <foreach collection="gysids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        and
+        sid.biz_id in
+        <foreach collection="bizIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        )x left join base_finance_classify bfc on x.bfcCode = bfc.code and bfc.hosp_code = #{hospCode}
+        group by supplierName,x.typeCode
+        order by supplierName
     </select>
 
 </mapper>

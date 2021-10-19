@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * @Package_name: cn.hsa.module.clinical.clinicalpathstagedetailitem.entity
  * @Class_name: ClinicalPathStageDetailItemDO
- * @Describe:
+ * @Describe: 阶段明细绑定项目/病历明细数据映射实体
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
  * @Date: 2021/9/17 13:46
@@ -51,6 +51,10 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
      * 项目分类(LCXMFL)
      */
     private String itemType;
+    /**
+     * 系统归类(XTGL)
+     */
+    private String classify;
     /**
      * 是否必要(SF)
      */

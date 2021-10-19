@@ -223,7 +223,8 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
         List<Map<String, Object>> resultData = statisticalReportDAO.passStatistics(paramMap);
-        return getPageDTO(paramMap, resultData);
+        return PageDTO.of(resultData);
+//        return getPageDTO(paramMap, resultData);
     }
 
     private PageDTO getPageDTO(Map<String, Object> paramMap, List<Map<String, Object>> resultData) {

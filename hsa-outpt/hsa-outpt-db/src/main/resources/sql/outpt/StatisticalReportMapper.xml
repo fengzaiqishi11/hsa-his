@@ -1211,13 +1211,13 @@
         '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        '-1' as price,
+        pd.total_price as price,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
         '' as baby_id,
         ov.hosp_code as hosp_code,
-        '-1' as num,
+        pd.total_num as num,
         ma.visit_id,
         ma.opd_id,
         ma.document_sta
@@ -1380,16 +1380,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "5"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "5"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         DATE_FORMAT( ( b.crte_time ), '%Y-%m' ),
         g.antibacterial_code,
@@ -1486,16 +1486,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "6"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "6"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         g.antibacterial_code,
         g.proton_pump,

@@ -382,15 +382,24 @@ public class MrisHomeController extends BaseController {
      * @Return: csv文件
      **/
     @GetMapping("/importCSVMrisInfo")
-    public void importCSVMrisInfo(HttpServletRequest req, HttpServletResponse res,String statusCode,String keyword) throws Exception {
+    public void importCSVMrisInfo(HttpServletRequest req, HttpServletResponse res,String statusCode,String keyword,String startTime,String endTime) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map param =new HashMap();
         param.put("statusCode",statusCode);
         param.put("keyword",keyword);
-        param.put("startTime",null);
-        param.put("endTime",null);
+        if (StringUtils.isEmpty(startTime)||startTime.equals("null")){
+            startTime =null;
+        }
+        if (StringUtils.isEmpty(endTime)||endTime.equals("null")){
+            endTime =null;
+        }
+        param.put("startTime",startTime);
+        param.put("endTime",endTime);
         param.put("hospName",sysUserDTO.getHospName());
         param.put("hospCode",sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
         WrapperResponse<String> returnDatas =mrisHomeService_consumer.importCSVMrisInfo(param);
         String path = returnDatas.getData();
         try {

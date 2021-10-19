@@ -504,6 +504,7 @@
             a.crte_name,
             a.settle_time,
             a.card_price as cardPrice,
+            (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code) as preferentialName,
             CONCAT(
             b.name,'/',
                 (CASE b.gender_code WHEN '0' THEN '未知的性别'

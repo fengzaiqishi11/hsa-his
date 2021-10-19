@@ -110,10 +110,6 @@ FROM
         select opd_id from medic_apply where document_sta in ('05','06')
     </select>
 
-    <select id="queryDXBackResult" resultType="java.lang.String">
-        select opd_id from medic_apply where document_sta in ('05','06')
-    </select>
-
     <update id="updateIsIssue">
         update medic_apply set is_issue = '1'
         where opd_id in

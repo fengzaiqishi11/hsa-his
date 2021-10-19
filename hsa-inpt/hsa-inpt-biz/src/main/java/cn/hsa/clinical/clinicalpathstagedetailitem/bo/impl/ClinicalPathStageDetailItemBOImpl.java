@@ -85,7 +85,7 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
 
   /**
   * @Menthod insertClinicalPathStageDetailItemDTO
-  * @Desrciption 保存路径明细绑定医嘱
+  * @Desrciption 保存路径明细绑定医嘱/ 病历
   *
   * @Param
   * [clinicalPathStageDetailItemDTO]
@@ -96,37 +96,45 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
   **/
   @Override
   public Boolean saveClinicalPathStageDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
+    // 获取保存的项目明细
     List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
-    if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
-      throw new AppException("绑定医嘱明细数据为空");
-    }
-    List<ClinicalPathStageDetailItemDTO> newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
+    // 是否又要删除的数据
     if(!ListUtils.isEmpty(clinicalItem.getIds())) {
       clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
     }
-    // 新增医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
-    // 编辑医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
-    for(ClinicalPathStageDetailItemDTO item : newList) {
-      item.setHospCode(clinicalItem.getHospCode());
-      if(StringUtils.isNotEmpty(item.getId())) {
-        editList.add(item);
-        continue;
+    if (!ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
+      List<ClinicalPathStageDetailItemDTO> newList = clinicalPathStageDetailItemDTOS;
+      // 如果系统归类为医嘱  进行组号添加
+      if("1".equals(clinicalItem.getClassify())) {
+        newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
       }
-      item.setId(SnowflakeUtils.getId());
-      item.setHospCode(clinicalItem.getHospCode());
-      item.setCrteId(clinicalItem.getCrteId());
-      item.setCrteName(clinicalItem.getCrteName());
-      item.setCrteTime(clinicalItem.getCrteTime());
-      item.setIsValid("1");
-      addList.add(item);
-    }
-    if(!ListUtils.isEmpty(addList)) {
-      clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
-    }
-    if(!ListUtils.isEmpty(editList)) {
-      clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+
+      // 新增绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
+      // 编辑绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
+      for (ClinicalPathStageDetailItemDTO item : newList) {
+        item.setHospCode(clinicalItem.getHospCode());
+        // 没有id即为新增
+        if (StringUtils.isNotEmpty(item.getId())) {
+          editList.add(item);
+          continue;
+        }
+        item.setId(SnowflakeUtils.getId());
+        item.setHospCode(clinicalItem.getHospCode());
+        item.setCrteId(clinicalItem.getCrteId());
+        item.setCrteName(clinicalItem.getCrteName());
+        item.setCrteTime(clinicalItem.getCrteTime());
+        item.setIsValid("1");
+        addList.add(item);
+      }
+      if (!ListUtils.isEmpty(addList)) {
+        clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
+      }
+      if (!ListUtils.isEmpty(editList)) {
+        clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+      }
+      return true;
     }
     return true;
   }

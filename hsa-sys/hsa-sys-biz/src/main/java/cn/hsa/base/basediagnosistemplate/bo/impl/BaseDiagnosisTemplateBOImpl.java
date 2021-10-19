@@ -80,8 +80,8 @@ public class BaseDiagnosisTemplateBOImpl extends HsafBO implements BaseDiagnosis
         baseDiagnosisTemplate.setId(SnowflakeUtils.getId());
         baseDiagnosisTemplate.setPym(PinYinUtils.toFirstPY(baseDiagnosisTemplate.getDiseaseName()));
         baseDiagnosisTemplate.setWbm(WuBiUtils.getWBCode(baseDiagnosisTemplate.getDiseaseName()));
-        baseDiagnosisTemplate.setIsCheck("1");
-        baseDiagnosisTemplate.setIsValid("1");
+        baseDiagnosisTemplate.setIsCheck(Constants.SF.F);
+        baseDiagnosisTemplate.setIsValid(Constants.SF.S);
         baseDiagnosisTemplate.setCrteId(MapUtils.getVS(map,"crteId",""));
         baseDiagnosisTemplate.setCrteName(MapUtils.getVS(map,"crteName",""));
         baseDiagnosisTemplate.setCrteTime(new Date());
@@ -143,5 +143,20 @@ public class BaseDiagnosisTemplateBOImpl extends HsafBO implements BaseDiagnosis
         baseDiagnosisTemplate.setPym(PinYinUtils.toFirstPY(baseDiagnosisTemplate.getDiseaseName()));
         baseDiagnosisTemplate.setWbm(WuBiUtils.getWBCode(baseDiagnosisTemplate.getDiseaseName()));
         return baseDiagnosisTemplateDAO.updateById(baseDiagnosisTemplate);
+    }
+
+    /**
+     * @Menthod: updateStatusCode
+     * @Desrciption: 审核/作废诊断管理
+     * @Param: baseDiagnosisTemplateDTO
+     *  审核：checkFlag = 1，作废：checkFlag = 2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-12 13:49
+     * @Return: Boolean
+     **/
+    @Override
+    public Boolean updateStatusCode(BaseDiagnosisTemplateDTO baseDiagnosisTemplateDTO) {
+        return baseDiagnosisTemplateDAO.updateStatusCode(baseDiagnosisTemplateDTO) > 0;
     }
 }

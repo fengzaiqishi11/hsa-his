@@ -1039,6 +1039,21 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     }
 
     /**
+     * @param outptPayDTO
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     */
+    @Override
+    public OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO) {
+        return outptPayDAO.getPayInfoByParams(outptPayDTO);
+    }
+
+    /**
      * @param outptSettleDTO
      * @Menthod chargeChangeRed
      * @Desrciption 原始结算支付数据冲红处理

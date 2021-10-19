@@ -73,5 +73,18 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
     private BigDecimal splitPrice;
     /** 拆零单位 **/
     private String splitUnitCode;
+    /**
+     * 库存数量
+     */
+    private BigDecimal stockNum;
+    /**
+     * 占存数量
+     */
+    private BigDecimal stockOccupy;
+    /**
+     * 拆零数量
+     */
+    private BigDecimal splitNum;
+
 
 }

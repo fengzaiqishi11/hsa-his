@@ -244,14 +244,16 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
         //接受页面传递的拼音码、五笔码
         String usualPym = baseDrugDTO.getUsualPym();
         String usualWbm = baseDrugDTO.getUsualWbm();
+        String goodPym = baseDrugDTO.getGoodPym();
+        String goodWym = baseDrugDTO.getGoodWbm();
 
-        if ((!StringUtils.isEmpty(baseDrugDTO.getUsualName()) || !StringUtils.isEmpty(baseDrugDTO.getGoodName())) && StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm)) {
+        if (!StringUtils.isEmpty(baseDrugDTO.getUsualName()) && StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm)) {
             //设置通用名拼音码
             //设置通用名五笔码
             baseDrugDTO.setUsualPym(PinYinUtils.toFirstPY(baseDrugDTO.getUsualName()));
             baseDrugDTO.setUsualWbm(WuBiUtils.getWBCode(baseDrugDTO.getUsualName()));
         }
-        if (!StringUtils.isEmpty(baseDrugDTO.getGoodName()) && (StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm))) {
+        if (!StringUtils.isEmpty(baseDrugDTO.getGoodName()) && (StringUtils.isEmpty(goodPym) && StringUtils.isEmpty(goodWym))) {
             //设置商品名拼音码
             //设置商品名五笔码
             baseDrugDTO.setGoodPym(PinYinUtils.toFirstPY(baseDrugDTO.getGoodName()));

@@ -496,21 +496,25 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<String> yfids = new ArrayList<>();
         List<String> ksids = new ArrayList<>();
         List<String> gysids= new ArrayList<>();
+        // yfids 前端传过来的药房id集合
         String str2 = MapUtils.get(paraMap,"yfids");
         if(!StringUtils.isEmpty(str2)) {
             yfids = new ArrayList<>(Arrays.asList(str2.split(",")));
         }
         paraMap.put("yfids", yfids);
+        // 前端传过来的供应商集合
         String str3 = MapUtils.get(paraMap,"gysids");
         if(!StringUtils.isEmpty(str3)) {
             gysids = new ArrayList<>(Arrays.asList(str3.split(",")));
         }
         paraMap.put("gysids", gysids);
+        // 前端传过来的科室id集合
         String str4 = MapUtils.get(paraMap,"ksids");
         if(!StringUtils.isEmpty(str4)) {
             ksids = new ArrayList<>(Arrays.asList(str4.split(",")));
         }
         paraMap.put("ksids", ksids);
+        // flag 表示的是汇总方式
         if (StringUtils.isEmpty(flag)){
             flag = "1";
         }
@@ -778,7 +782,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             flag = "1";
         }
         switch (statement){
-            case "2": //药房退库汇总  6药房退库
+            case "2": //药房退库汇总  6药房退库 出库药房汇总
                 String sql2 = "        left join stro_out si on sid.order_no = si.order_no and sid.hosp_code = si.hosp_code\n" +
                         "        left join base_dept bs on si.in_stock_id = bs.id and sid.hosp_code =  bs.hosp_code\n" +
                         "        where sid.hosp_code = #{hospCode}  and sid.outin_code = '6'";
@@ -831,7 +835,22 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         }
         return PageDTO.of(maps);
     }
-
+    /**
+     * @Meth: switchFlag
+     * @Description: 添加注释：
+     * flag：表示的是前端传入的汇总方式
+     * 1.flag = 2 表示的是 xxx/按品种
+     * 2.flag = 3 表示的是 xxx/按批次id
+     * 3.flag = 4 表示的是 xxx/按入库单据
+     * 4.flag = 5 表示的是 xxx/按计费类别
+     * 5.flag = 6 表示的是 xxx/按单据明细
+     * 6.flag = 7 表示的是 xxx/按材料分类
+     * 7. 其他的 表示xxx
+     * @Param: [flag, maps, paraMap]
+     * @return: java.util.List<java.util.Map>
+     * @Author: zhangguorui
+     * @Date: 2021/10/16
+     */
     private List<Map> switchFlag(String flag, List<Map> maps, Map<String, Object> paraMap){
         switch (flag){
             // 按供应商/品种
@@ -854,6 +873,10 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             case "6" :
             maps = patientCostLedgerDAO.queryStroBusinessSummaryMainDeTail(paraMap);
             break;
+            // add by zhangguorui 2021/10/16 按材料分类查
+            case "7" :
+                maps = patientCostLedgerDAO.queryStroBusinessSummaryByMaterialClassification(paraMap);
+                break;
             // 按供应商
             default:
                 maps = patientCostLedgerDAO.queryStroBusinessSummary(paraMap);

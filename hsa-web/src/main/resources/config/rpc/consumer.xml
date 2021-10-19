@@ -297,7 +297,7 @@
     <!--护理记录单-->
     <dubbo:reference id="nursingRecordService_consumer" interface="cn.hsa.module.inpt.nurse.service.NursingRecordService" check="false"/>
     <!--医嘱核收-->
-    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false"/>
+    <dubbo:reference id="medicalAdviceService_consumer" interface="cn.hsa.module.inpt.medical.service.MedicalAdviceService" check="false" retries="0"/>
     <!-- 住院结算 -->
     <dubbo:reference id="inptSettlementService_consumer" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
     <!-- 取消住院结算 -->
@@ -496,6 +496,8 @@
     <dubbo:reference id="inptClinicalPathStageService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" check="false"/>
     <!--临床路径病人记录-->
     <dubbo:reference id="inptClinicalPathStateService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService" check="false"/>
-    <!-- *************************************************** 临床路径子系统 *************************************************************** -->
+    <!--临床路径执行情况-->
+    <dubbo:reference id="clinicPathExecService_consumer" interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" check="false"/>
+  <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

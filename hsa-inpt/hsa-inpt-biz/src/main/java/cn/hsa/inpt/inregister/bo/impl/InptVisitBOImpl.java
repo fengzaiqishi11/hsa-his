@@ -1539,6 +1539,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (outptVisitDTO == null && selectEntiey == null) {
             throw new AppException("修改患者信息失败：门诊/住院均未找到患者就诊信息【就诊id:" + inptVisitDTO.getId() + "】");
         }
+        // 修改入院登记信息，使用数据库中的病人状态 20211015
+        if (selectEntiey!=null){
+            inptVisitDTO.setStatusCode(selectEntiey.getStatusCode());
+        }
 //        param.put("code", "UNIFIED_PAY");
 //        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();
         // 获取医保个人信息

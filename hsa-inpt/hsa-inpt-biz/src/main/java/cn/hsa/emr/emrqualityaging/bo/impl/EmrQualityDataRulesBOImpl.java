@@ -1,6 +1,7 @@
 package cn.hsa.emr.emrqualityaging.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrquality.bo.EmrQualityDataRulesBO;
 import cn.hsa.module.emr.emrquality.dao.EmrQualityDataRulesDAO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
@@ -33,6 +34,9 @@ public class EmrQualityDataRulesBOImpl extends HsafBO implements EmrQualityDataR
         if (emrQualityDataRulesDTO!=null){
             emrQualityDataRulesDTO.setId(SnowflakeUtils.getId());
         }
+        if (emrQualityDataRulesDTO.getRulesSql()!=null&&!emrQualityDataRulesDTO.getRulesSql().contains("emr")){
+            throw new AppException("sql规则语句没有模板元素!");
+        }
         if (emrQualityDataRulesDAO.insertEmrQualityDataRules(emrQualityDataRulesDTO)>0){
             return true;
         }else {
@@ -42,6 +46,9 @@ public class EmrQualityDataRulesBOImpl extends HsafBO implements EmrQualityDataR
 
     @Override
     public boolean updateEmrQualityDataRules(EmrQualityDataRulesDTO emrQualityDataRulesDTO) {
+        if (emrQualityDataRulesDTO.getRulesSql()!=null&&!emrQualityDataRulesDTO.getRulesSql().contains("emr")){
+            throw new AppException("sql规则语句没有模板元素!");
+        }
         if (emrQualityDataRulesDAO.updateEmrQualityDataRules(emrQualityDataRulesDTO)>0){
             return true;
         }else {

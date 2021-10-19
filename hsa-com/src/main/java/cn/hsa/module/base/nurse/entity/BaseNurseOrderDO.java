@@ -49,6 +49,10 @@ public class BaseNurseOrderDO extends PageDO implements Serializable {
      */
     private String isAssign;
     /**
+     * 是否竖向打印（SF）
+     */
+    private String isVertical;
+    /**
      * 是否有效（SF）
      */
     private String isValid;

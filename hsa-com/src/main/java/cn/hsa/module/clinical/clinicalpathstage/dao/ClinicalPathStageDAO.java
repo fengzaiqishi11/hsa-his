@@ -68,5 +68,18 @@ public interface ClinicalPathStageDAO {
      * @Date: 2021/9/13
      */
     ClinicalPathStageDTO queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO);
+
+    /**
+    * @Menthod getNextClinicalPathStage
+    * @Desrciption 查询下一阶段阶段
+    *
+    * @Param
+    * [clinicalPathStageDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/10/8 16:52
+    * @Return cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO
+    **/
+    ClinicalPathStageDTO getNextClinicalPathStage(ClinicalPathStageDTO clinicalPathStageDTO);
 }
 

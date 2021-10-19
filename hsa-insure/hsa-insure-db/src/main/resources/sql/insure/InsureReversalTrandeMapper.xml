@@ -194,7 +194,7 @@
         e.clr_optins,
         sum(e.person_price) as person_price,
         sum(e.total_price) as medfee_sumamt,
-        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
         sum(e.personal_price) as acct_pay,
         count(1) as fixmedins_setl_cnt
         FROM
@@ -238,7 +238,7 @@
             e.clr_optins,
             t.insure_reg_code as setl_optins,
             e.total_price as medfee_sumamt,
-            (e.total_price - e.personal_price - e.person_price) as fund_pay_sumamt,
+            (e.total_price - e.personal_price - e.person_price - e.rests_price) as fund_pay_sumamt,
             e.personal_price as acct_pay
         FROM
         insure_individual_settle e,

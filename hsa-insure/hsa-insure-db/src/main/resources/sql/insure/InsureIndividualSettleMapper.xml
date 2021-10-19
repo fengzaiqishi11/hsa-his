@@ -134,7 +134,7 @@
         select * from(
         select
         iic.id, iic.hosp_code, iic.visit_id, iic.settle_id, iic.is_hospital, iic.visit_no, iic.discharge_dn_code,
-        iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_price,
+        iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_pay,
         iic.medicine_org_code,iic.discharge_dn_name, discharged_date, iic.discharged_case,
         (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
         iic.total_price, iic.plan_price,

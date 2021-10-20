@@ -72,11 +72,11 @@ SELECT
 	a.in_no,
 	a.opd_id,
 	a.id,
-	c.item_id,
+	c.ba_id as item_id,
 	b.age_unit_code AS ageunit,
 	'住院' AS patType,
 	b.bed_name AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
+	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
 	c.item_name AS sfname,
 	c.total_price AS sfmoney,
 	'1' AS sfcount,
@@ -99,11 +99,11 @@ FROM
 	AND a.hosp_code = b.hosp_code
 	LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
 	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '1' and a.report_time is null and a.document_sta = '02'
+	where a.is_inpt = '1' and a.report_time is null and a.document_sta is null
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">
-        select opd_id from medic_apply where report_time is null and document_sta = '03'
+        select opd_id from medic_apply where report_time is null
     </select>
 
     <select id="queryDXBackResult" resultType="java.lang.String">

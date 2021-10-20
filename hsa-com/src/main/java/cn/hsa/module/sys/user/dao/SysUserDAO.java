@@ -272,4 +272,14 @@ public interface SysUserDAO {
     SysUserDTO querySysUserHaveTeachDoctor(SysUserSystemDTO sysUserSystemDTO);
 
     List<SysUserDTO> queryVisitDoctorByWorkTypeCode(SysUserDTO sysUserDTO);
+
+    /**
+     * @Description: 查询门诊医生与收费员
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/10/20 10:17
+     * @Return
+     */
+    List<SysUserDTO> queryMZAndSFYAllUser(SysUserDTO sysUserDTO);
 }

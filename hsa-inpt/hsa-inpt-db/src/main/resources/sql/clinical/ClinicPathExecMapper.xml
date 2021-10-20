@@ -7,6 +7,7 @@
         <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
         <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
         <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="clinicalPathStageId" column="clinical_path_stage_id" jdbcType="VARCHAR"/>
         <result property="listId" column="list_id" jdbcType="VARCHAR"/>
         <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
         <result property="detailId" column="detail_id" jdbcType="VARCHAR"/>
@@ -25,7 +26,7 @@
     <!--查询单个-->
     <select id="queryClinicPathExecById" resultMap="ClinicPathExecMap">
         select
-          id, hosp_code, visit_id, baby_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
+          id, hosp_code, visit_id, baby_id, clinical_path_stage_id,list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
         from clinic_path_exec
         where id = #{id} and hosp_code = #{hospCode}
     </select>
@@ -33,7 +34,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryClinicPathExecAll" resultMap="ClinicPathExecMap">
         select
-          id, hosp_code, visit_id, baby_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
+          id, hosp_code, visit_id, baby_id, clinical_path_stage_id,list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
         from clinic_path_exec
         where hosp_code = #{hospCode}
             <if test="id != null and id != ''">
@@ -44,6 +45,9 @@
             </if>
             <if test="babyId != null and babyId != ''">
                 and baby_id = #{babyId}
+            </if>
+            <if test="clinicalPathStageId != null and clinicalPathStageId != ''">
+              and clinical_path_stage_id = #{clinicalPathStageId}
             </if>
             <if test="listId != null and listId != ''">
                 and list_id = #{listId}
@@ -88,8 +92,8 @@
 
     <!--新增所有列-->
     <insert id="insertClinicPathExec" keyProperty="id" useGeneratedKeys="true">
-        insert into clinic_path_exec(id,hosp_code, visit_id, baby_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{listId}, #{stageId}, #{detailId}, #{detailItemId}, #{isExec}, #{execTime}, #{execId}, #{execName}, #{itemType}, #{itemId}, #{crteId}, #{crteName}, #{crteTime})
+        insert into clinic_path_exec(id,hosp_code, visit_id, baby_id, clinical_path_stage_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{clinicalPathStageId}, #{listId}, #{stageId}, #{detailId}, #{detailItemId}, #{isExec}, #{execTime}, #{execId}, #{execName}, #{itemType}, #{itemId}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
     <!--通过主键修改数据-->
@@ -104,6 +108,9 @@
             </if>
             <if test="babyId != null and babyId != ''">
                 baby_id = #{babyId},
+            </if>
+            <if test="clinicalPathStageId != null and clinicalPathStageId != ''">
+              clinical_path_stage_id = #{clinicalPathStageId},
             </if>
             <if test="listId != null and listId != ''">
                 list_id = #{listId},

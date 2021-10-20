@@ -27,4 +27,7 @@ public class ClinicalPathStageDetailItemDTO extends ClinicalPathStageDetailItemD
   private String type;
   private List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS;
   private List<String> ids;
+  private String  bigTypeCode;
+  private String  splitUnitCode;
+  private String  bigUnitCode;
 }

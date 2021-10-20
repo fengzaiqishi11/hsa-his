@@ -43,6 +43,10 @@ public class ClinicPathExecDO extends PageDO implements Serializable {
      */
     private String babyId;
     /**
+     * 入径状态表id
+     */
+    private String clinicalPathStageId;
+    /**
      * 临床路径目录ID(clinic_path_list.id)
      */
     private String listId;

@@ -158,4 +158,16 @@ public interface OutptPayDAO {
      * @Return
      */
     List<OutptPayDTO> selectOutptPatByVisitIdAndSettleId(Map selectMap);
+
+    /**
+     * @param outptPayDTO
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     */
+    OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO);
 }

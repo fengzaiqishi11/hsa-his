@@ -1,6 +1,7 @@
 package cn.hsa.module.outpt.fees.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.fees.dto.OutptPayDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -123,4 +124,15 @@ public interface OutptOutTmakePriceFormService {
      * @Return:
      **/
     WrapperResponse<Boolean> addOperAndRescue(Map<String, Object> map);
+
+    /**
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     **/
+    WrapperResponse<OutptPayDTO> getPayInfoByParams(Map<String,Object> map);
 }

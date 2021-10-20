@@ -46,8 +46,8 @@
     <select id="queryInptClinicalPathState"
             resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
         select a.id as visitId, a.hosp_code,a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code,
-        a.preferential_type_id, a.patient_code, a.bed_id, a.bed_name,a.cert_no,a.in_disease_name,a.in_time,
-        (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
+        a.preferential_type_id, a.patient_code, a.bed_id, a.bed_name,a.cert_no,a.in_disease_name,a.in_disease_id,a.in_time,
+        (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,a.in_dept_id,
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
         cp.name as listName,d.name as stageName,a.in_time as inTimestring,c.list_id,c.stage_id,c.id,
         CONCAT(

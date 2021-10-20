@@ -48,6 +48,9 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"/>
+        <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -70,7 +73,10 @@
           case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
           ) when a.item_code = '1' then (
           case when c.big_type_code = '2' then  '3' else '1' end
-          ) when a.item_code = '2' then '2' end type
+          ) when a.item_code = '2' then '2' end type,
+          case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+          case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
+          case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode
           from clinical_path_stage_detail_item a
           left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1' and a.classify = '1'
           left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2' and a.classify = '1'
@@ -298,10 +304,16 @@
     <delete id="deleteClinicalPathStageDetailItemDTOById">
         delete from clinical_path_stage_detail_item
         where hosp_code = #{hospCode} and list_id = #{listId} and stage_id = #{stageId}
-        and detail_id = #{detailId} and id in
-        <foreach collection="ids" item="id" separator="," open="(" close=")">
-          #{id}
-        </foreach>
+        and detail_id = #{detailId}
+        <if test="classify != null and classify != ''">
+            and classify = #{classify}
+        </if>
+        <if test="ids!=null and ids.size()> 0">
+          and id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
     </delete>
 
   <!--  获取最大组号 -->

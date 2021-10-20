@@ -282,4 +282,5 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String turnOrgName;
     private String bka035;
     private String inModeCode;
+    private String phone;
 }

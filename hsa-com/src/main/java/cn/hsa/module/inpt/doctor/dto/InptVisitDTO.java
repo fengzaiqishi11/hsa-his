@@ -408,4 +408,5 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String clinicalListName;
     // 路径ID
     private String listId;
+    private String settleId;
 }

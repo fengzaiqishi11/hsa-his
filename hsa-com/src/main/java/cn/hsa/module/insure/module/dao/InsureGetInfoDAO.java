@@ -251,4 +251,7 @@ public interface InsureGetInfoDAO {
     List<InptCostDTO> queryOutUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
 
     OutinInvoiceDTO getInvoiceNo(Map<String, Object> orderMap);
+
+
+    String querySettleNo(Map<String, Object> orderMap);
 }

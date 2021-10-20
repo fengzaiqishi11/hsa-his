@@ -279,7 +279,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     /**
      * @Method cancelRegister
      * @Desrciption 取消入院登记
-     * 1，判断 （1）是否有医嘱  （2)是否有费用  （3）是否有预交金
+     * 1，判断 （1）是否有医嘱  （2)是否有费用  （3）是否有预交金 4.是否进行了医保登记 如果存在医保登记信息，则先提示取消医保登记
      * 2. 如果上面都通过，删除此记录
      * 3. 如果上面不通过，按123优先级进行提醒
      * @Param [inptVisitDTO]

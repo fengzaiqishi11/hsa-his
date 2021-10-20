@@ -96,6 +96,13 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
   **/
   @Override
   public Boolean saveClinicalPathStageDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
+    if(StringUtils.isEmpty(clinicalItem.getClassify())) {
+      throw new AppException("系统归类属性为空");
+    }
+    // 系统归类 1医嘱 2病历
+    if("2".equals(clinicalItem.getClassify())) {
+      return saveClinicalMedicalRecordDetailItem(clinicalItem);
+    }
     // 获取保存的项目明细
     List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
     // 是否又要删除的数据
@@ -105,10 +112,7 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
     if (!ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
       List<ClinicalPathStageDetailItemDTO> newList = clinicalPathStageDetailItemDTOS;
       // 如果系统归类为医嘱  进行组号添加
-      if("1".equals(clinicalItem.getClassify())) {
-        newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
-      }
-
+      newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
       // 新增绑定明细列表
       List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
       // 编辑绑定明细列表
@@ -139,7 +143,36 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
     return true;
   }
 
-
+  /**
+  * @Menthod saveClinicalMedicalRecordDetailItem
+  * @Desrciption 路径明细系统归类为病历的  绑定病历
+ *
+  * @Param
+  * [clinicalItem]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/15 11:51
+  * @Return java.lang.Boolean
+  **/
+  public Boolean saveClinicalMedicalRecordDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
+    // 获取保存的项目明细
+    List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
+    if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
+      throw new AppException("保存病历信息为空");
+    }
+    clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
+    for (ClinicalPathStageDetailItemDTO item : clinicalPathStageDetailItemDTOS) {
+      item.setHospCode(clinicalItem.getHospCode());
+      item.setId(SnowflakeUtils.getId());
+      item.setCrteId(clinicalItem.getCrteId());
+      item.setCrteName(clinicalItem.getCrteName());
+      item.setCrteTime(clinicalItem.getCrteTime());
+      // 是否有效  1是 0否
+      item.setIsValid("1");
+    }
+    clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(clinicalPathStageDetailItemDTOS);
+    return true;
+  }
   /**
   * @Menthod buildInptAdviceDTOGroupNo
   * @Desrciption 构建组号

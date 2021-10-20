@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +49,9 @@ public class BedLongCostController extends BaseController {
     @Resource
     private BedLongCostService bedLongCostService ;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * @Method: longCost
      * @Description: 长期费用滚动入口
@@ -61,10 +66,15 @@ public class BedLongCostController extends BaseController {
     @NoRepeatSubmit
     public WrapperResponse<Boolean> longCost(HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
-        WrapperResponse<Boolean> response = WrapperResponse.success(true);
+        String message = "";
+        WrapperResponse<Boolean> response = null ;
         logger.info("====================["+sysUserDTO.getHospCode()+"]长期费用开始:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
-
         Map map = new HashMap();
+        String key = sysUserDTO.getHospCode()+"_LONGCOST";
+        if(redisUtils.hasKey(key)){
+            throw  new RuntimeException("当前医院有正在执行的长期费用,请耐心等待!");
+        }
+        redisUtils.set(key,key);
         try {
             MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
             medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
@@ -74,9 +84,11 @@ public class BedLongCostController extends BaseController {
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
             medicalAdviceService_consumer.longCost(map);
+            message = "长期医嘱费用执行成功";
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("["+sysUserDTO.getHospCode()+"]"+e.getMessage());
+            message = "长期医嘱费用执行失败：" + e.getMessage();
         } finally {
             logger.info("====================["+sysUserDTO.getHospCode()+"]长期医嘱费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         }
@@ -87,15 +99,26 @@ public class BedLongCostController extends BaseController {
             map.put("userId", "-1");
             map.put("userName", "护士站长期床位费用手动执行");
             map.put("hospCode", sysUserDTO.getHospCode());
+            //床位费当天费用不生成,所以-1天
+            map.put("endTime",DateUtils.dateAdd(new Date(),-1));
             // 滚动医院长期床位费用
             bedLongCostService.saveBedLongCost(map);
+            message += "，长期床位费用执行成功";
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("["+sysUserDTO.getHospCode()+"]"+e.getMessage());
+            message += "，长期床位费用执行失败：" + e.getMessage();
+
         } finally {
             logger.info("====================["+sysUserDTO.getHospCode()+"]长期床位费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         }
 
+        if(message.contains("失败")){
+            response = WrapperResponse.error(-1,message,null);
+        }else{
+            response = WrapperResponse.success(message,null);
+        }
+        redisUtils.del(key);
 
         return response;
     }

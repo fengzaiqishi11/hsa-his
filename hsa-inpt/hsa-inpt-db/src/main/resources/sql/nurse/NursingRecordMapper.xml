@@ -254,7 +254,7 @@
         </foreach>
     </update>
 
-    <delete id="delete" parameterType="java.util.List">
+    <update id="delete" parameterType="java.util.List">
         <!--delete from inpt_nurse_record
         where group_no in
         <foreach collection="deleteList" separator="," item="item" open="(" close=")">
@@ -269,23 +269,16 @@
             #{item.hospCode}
         </foreach>-->
         <foreach collection="deleteList" separator=";" item="item">
-            delete from inpt_nurse_record
-            <where>
-                <if test="item.hospCode != null and item.hospCode != ''">
-                    and hosp_code = #{item.hospCode}
-                </if>
-                <if test="item.visitId != null and item.visitId != ''">
-                    and visit_id = #{item.visitId}
-                </if>
-                <if test="item.groupNo != null and item.groupNo != ''">
-                    and group_no = #{item.groupNo}
-                </if>
-                <if test="item.babyId != null and item.babyId != ''">
-                    and baby_id = #{item.babyId}
-                </if>
-            </where>
+            update inpt_nurse_record
+            set is_valid = '0'
+            where hosp_code = #{item.hospCode}
+              and visit_id = #{item.visitId}
+              and group_no = #{item.groupNo}
+            <if test="item.babyId != null and item.babyId != ''">
+                and baby_id = #{item.babyId}
+            </if>
         </foreach>
-    </delete>
+    </update>
 
     <!--分页查询护理单记录-->
     <select id="queryNursingRecord" resultType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO"
@@ -568,7 +561,7 @@
 
     <!--获取当前人员最大组号-->
     <select id="getMaxGroupNo" parameterType="cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO" resultType="java.lang.Integer">
-        select Max(group_no)
+        select ifnull(Max(group_no), 0)
         from inpt_nurse_record
         where hosp_code = #{hospCode} and visit_id = #{visitId} and is_valid = '1'
     </select>

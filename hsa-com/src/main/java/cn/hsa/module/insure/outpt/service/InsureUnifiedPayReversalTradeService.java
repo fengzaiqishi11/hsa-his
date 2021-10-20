@@ -123,4 +123,5 @@ public interface InsureUnifiedPayReversalTradeService {
     @PutMapping("/service/insure/upOutptService/updateUP_5265")
     WrapperResponse<Map<String,Object>> updateUP_5265(Map<String,Object> parameterMap);
 
+    WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map);
 }

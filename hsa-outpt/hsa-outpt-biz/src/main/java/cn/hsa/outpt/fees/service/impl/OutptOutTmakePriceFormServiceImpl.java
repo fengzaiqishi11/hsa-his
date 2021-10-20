@@ -180,4 +180,20 @@ public class OutptOutTmakePriceFormServiceImpl extends HsafService implements Ou
         return WrapperResponse.success(outptOutTmakePriceFormBO.addOperAndRescue(map));
     }
 
+    /**
+     * @param params
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     */
+    @Override
+    public WrapperResponse<OutptPayDTO> getPayInfoByParams(Map<String,Object> params) {
+        OutptPayDTO outptPayDTO = MapUtils.get(params,"outptPayDTO");
+        return WrapperResponse.success(outptOutTmakePriceFormBO.getPayInfoByParams(outptPayDTO));
+    }
+
 }

@@ -97,7 +97,7 @@ public class PatientComprehensiveQueryController extends BaseController {
     inptSettleDTO.setHospCode(sysUserDTO.getHospCode());
     Map map = new HashMap();
     map.put("hospCode", sysUserDTO.getHospCode());
-    map.put("deptId", sysUserDTO.getBaseDeptDTO().getId());
+    map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
     map.put("inptSettleDTO",inptSettleDTO);
     return comprehensiveQueryService_consumer.querySettleInfo(map);
   }
@@ -116,7 +116,7 @@ public class PatientComprehensiveQueryController extends BaseController {
       inptSettleDTO.setHospCode(sysUserDTO.getHospCode());
       Map map = new HashMap();
       map.put("hospCode", sysUserDTO.getHospCode());
-      map.put("deptId", sysUserDTO.getBaseDeptDTO().getId());
+      map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
       map.put("inptSettleDTO",inptSettleDTO);
       return comprehensiveQueryService_consumer.queryAllInptVisitInfo(map);
   }

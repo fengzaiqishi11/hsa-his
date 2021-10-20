@@ -119,6 +119,14 @@ public interface BaseDeptService {
     @GetMapping("/api/base/baseDept/getById")
     WrapperResponse<BaseDeptDTO> getById(Map map);
 
+    /***
+     *  查询登录科室信息
+     * @param map 参数
+     * @return  BaseDeptDTO 基本部门信息
+     */
+    @GetMapping("/api/base/baseDept/getSingleBaseDeptInfoById")
+    WrapperResponse<BaseDeptDTO> getSingleBaseDeptInfoById(Map map);
+
     /**
      * @Method getDeptTypeCode
      * @Desrciption  查询科室性质的方法

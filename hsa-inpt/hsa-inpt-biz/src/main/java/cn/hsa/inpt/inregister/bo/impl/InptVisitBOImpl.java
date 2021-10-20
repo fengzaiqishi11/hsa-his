@@ -279,7 +279,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     /**
      * @Method cancelRegister
      * @Desrciption 取消入院登记
-     * 1，判断 （1）是否有医嘱  （2)是否有费用  （3）是否有预交金
+     * 1，判断 （1）是否有医嘱  （2)是否有费用  （3）是否有预交金 4.是否进行了医保登记 如果存在医保登记信息，则先提示取消医保登记
      * 2. 如果上面都通过，删除此记录
      * 3. 如果上面不通过，按123优先级进行提醒
      * @Param [inptVisitDTO]
@@ -471,22 +471,50 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageNo = (String) paramMap.get("pageNo");
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
-        List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
-        List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
-        List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
-        List<Map<String, Object>> finalResult = inptVisitDTOS.stream().map(data -> {
-            patientCostDataList.stream().map(costsData ->{
-                if(data.get("id").equals(costsData.get("visit_id")))
-                {
-                    data.put("ypfy",costsData.get("item_price"));
-                    data.put("total_price",costsData.get("total_price"));
-                    data.put("fyb",costsData.get("fyb"));
+        List<Map<String, Object>> inptVisitDTOS =null;
+        // 获取系统参数 是否开启大人婴儿合并结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", paramMap.get("hospCode"));
+        isMergeParam.put("code", "BABY_INSURE_FEE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        //《========新生婴儿试算========》
+        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())){
+            // 开启合并结算
+            inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
+        }else {
+            // 大人婴儿费用单独结算
+            inptVisitDTOS = inptVisitDAO.queryNoMergePatients(paramMap);
+            return PageDTO.of(inptVisitDTOS);
+        }
+//        List<Map<String, Object>> finalResult = new ArrayList<>();
+        if (!ListUtils.isEmpty(inptVisitDTOS)) {
+            List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
+            List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
+//            finalResult = inptVisitDTOS.stream().map(data -> {
+//                patientCostDataList.stream().map(costsData ->{
+//                    if(data.get("id").equals(costsData.get("visit_id")))
+//                    {
+//                        data.put("ypfy",costsData.get("item_price"));
+//                        data.put("total_price",costsData.get("total_price"));
+//                        data.put("fyb",costsData.get("fyb"));
+//                    }
+//                    return costsData;
+//                });
+//                return data;
+//            }).collect(Collectors.toList());
+            outer: for (Map<String, Object> map : inptVisitDTOS) {
+                for (Map<String, Object> map2 : patientCostDataList) {
+                    if (map.get("id").equals(map2.get("visit_id"))) {
+                        map.put("ypfy",map2.get("item_price"));
+                        map.put("total_price",map2.get("total_price"));
+                        map.put("fyb",map2.get("fyb"));
+                        continue outer;
+                    }
                 }
-                return costsData;
-            });
-            return data;
-        }).collect(Collectors.toList());
-        return PageDTO.of(finalResult);
+            }
+        }
+        return PageDTO.of(inptVisitDTOS);
     }
 
     /**
@@ -1525,6 +1553,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         OutptVisitDTO outptVisitDTO = outptVisitService_consumer.queryByVisitID(param);
         if (outptVisitDTO == null && selectEntiey == null) {
             throw new AppException("修改患者信息失败：门诊/住院均未找到患者就诊信息【就诊id:" + inptVisitDTO.getId() + "】");
+        }
+        // 修改入院登记信息，使用数据库中的病人状态 20211015
+        if (selectEntiey!=null){
+            inptVisitDTO.setStatusCode(selectEntiey.getStatusCode());
+            inptVisitDTO.setBedId(selectEntiey.getBedId());
+            inptVisitDTO.setBedName(selectEntiey.getBedName());
         }
 //        param.put("code", "UNIFIED_PAY");
 //        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();

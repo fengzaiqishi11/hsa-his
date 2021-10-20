@@ -54,4 +54,16 @@ public interface BaseDiagnosisTemplateDAO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.base.bmm.dto.BaseMaterialDTO>
      **/
     Boolean updateById(BaseDiagnosisTemplateDTO baseDiagnosisTemplateDTO);
+
+    /**
+     * @Menthod: updateStatusCode
+     * @Desrciption: 审核/作废诊断管理
+     * @Param: baseDiagnosisTemplateDTO
+     *  审核：checkFlag = 1，作废：checkFlag = 2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-12 13:49
+     * @Return: Boolean
+     **/
+    int updateStatusCode(BaseDiagnosisTemplateDTO baseDiagnosisTemplateDTO);
 }

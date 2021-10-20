@@ -150,7 +150,8 @@
         order_no,
         crte_id,
         crte_name,
-        crte_time
+        crte_time,
+        acct_pay
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -458,7 +459,10 @@
                     crte_name,
                 </if>
                 <if test="crteTime != null">
-                    crte_time
+                    crte_time,
+                </if>
+                <if test="acctPay != null">
+                acct_pay
                 </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -562,7 +566,10 @@
                         #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                        #{crteTime,jdbcType=TIMESTAMP}
+                        #{crteTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="acctPay != null">
+                        #{acctPay,jdbcType=DECIMAL}
                 </if>
         </trim>
     </insert>
@@ -711,7 +718,10 @@
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="acctPay != null">
+                    acct_pay = #{acctPay,jdbcType=DECIMAL}
                 </if>
         </set>
         where
@@ -848,13 +858,14 @@
             (select ifnull(sum(settle_back_price),0) from inpt_settle where id=#{settleId} and hosp_code=d.hospCode and settle_back_code!='1') tkzz,
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') bsxj,
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') bszz,
-            (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr
+            (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr, d.personalPrice
             from
             (
             select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice,
-            (c.reality_price - c.trunc_price - c.mi_price) as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId
+            (c.reality_price - c.trunc_price - c.mi_price) as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId, ifnull(iis.personal_price, 0) as personalPrice
             from inpt_cost a join inpt_visit b on a.visit_id=b.id
             join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id
+            left join insure_individual_settle iis on iis.hosp_code = c.hosp_code and iis.settle_id = c.id
             where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
             and c.status_code='0' and a.status_code='0'  and c.id=#{settleId}
             group by a.bfc_id,a.visit_id,a.hosp_code
@@ -886,6 +897,10 @@
           AND a.hosp_code = #{hospCode}
         ORDER BY
             crte_time DESC
+    </select>
+    <select id="queryInptInsure" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select * from insure_individual_settle where hosp_code =#{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+        and state ='0' and settle_state ='1' and is_cancel ='1' and insureSettleId is not null
     </select>
 
 </mapper>

@@ -84,13 +84,20 @@
         <result property="wardName" column="wardName" jdbcType="VARCHAR"/>
         <result property="isOutHosp" column="isOutHosp" jdbcType="VARCHAR"/>
         <result property="nursingCode" column="nursing_code" jdbcType="VARCHAR"/>
+        <result property="babyCost" column="babyCost" jdbcType="VARCHAR"/>
+        <result property="babyId" column="babyId" jdbcType="VARCHAR"/>
+        <result property="inDays" column="inDays" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 根据医院编码、住院就诊ID查询人员在床信息 updated by zhongming 20201221 -->
     <select id="queryPage" resultMap="InptVisitMap">
         select iv.*, bb.name as bbBedName, bb.status_code as bbStatusCode, bb.id as bbId,
         c.id as diseaseId, c.name as diseaseName, c.nation_code as diseaseIcd10,
-        iv.critical_value_code as criticalValueCode,iv.patient_code, d.name wardName, iv.nursing_code
+        iv.critical_value_code as criticalValueCode,iv.patient_code, d.name wardName, iv.nursing_code,
+        (select sum(reality_price) from inpt_cost c where c.baby_id is not null and c.baby_id !=''
+        and c.hosp_code =#{hospCode} and c.visit_id = iv.id) as babyCost,
+        case when ifnull(datediff(ifnull(iv.out_time, now()),iv.in_time),0) = 0 then 1 else datediff(ifnull(iv.out_time, now()),iv.in_time) end inDays,
+        (select id from inpt_baby ib where ib.visit_id = iv.id and ib.hosp_code =#{hospCode} limit 1) as babyId
         from base_bed bb
         left join inpt_visit iv on bb.visit_id = iv.id and bb.hosp_code = iv.hosp_code
         left join (
@@ -128,6 +135,18 @@
             and exists (
             select 1 from inpt_advice ia where bb.hosp_code = ia.hosp_code and ia.visit_id = iv.id and sign_code = '1'
             )
+        </if>
+        <if test="doctorType != null and doctorType == '1'.toString()">
+            and iv.zg_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '2'.toString()">
+            and iv.zz_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '3'.toString()">
+            and iv.jz_doctor_id = #{crteId}
+        </if>
+        <if test="doctorType != null and doctorType == '4'.toString()">
+            and iv.resp_nurse_id = #{crteId}
         </if>
         order by bb.seq_no, bb.crte_time
     </select>

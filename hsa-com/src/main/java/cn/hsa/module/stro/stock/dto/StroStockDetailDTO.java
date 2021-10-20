@@ -112,4 +112,8 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private String distributeAllDetailId;
 
     private List<StroStockDetailDTO> stroStockDetailDTOS;
+    /**
+     * 判断查询库存明细的时候是否需要加上有效期，默认为空是加上，不为空是不加上
+     */
+    private String  isExpiryDate;
 }

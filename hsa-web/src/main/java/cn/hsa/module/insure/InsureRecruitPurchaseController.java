@@ -178,4 +178,36 @@ public class InsureRecruitPurchaseController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureRecruitPurchaseService_consumer.deleteDrugSells(map);
     }
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    @PostMapping("/selectCommonInterfaceTest")
+    public WrapperResponse<Map<String,Object>> selectCommonInterfaceTest(Map<String,Object> paramMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paramMap.put("hospCode",sysUserDTO.getHospCode());
+        return insureRecruitPurchaseService_consumer.selectCommonInterfaceTest(paramMap);
+    }
+
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 获取token
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    @PostMapping("/getToken")
+    public WrapperResponse<Map<String,Object>> getToken(Map<String,Object> paramMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paramMap.put("hospCode",sysUserDTO.getHospCode());
+        return insureRecruitPurchaseService_consumer.getToken(paramMap);
+    }
+
 }

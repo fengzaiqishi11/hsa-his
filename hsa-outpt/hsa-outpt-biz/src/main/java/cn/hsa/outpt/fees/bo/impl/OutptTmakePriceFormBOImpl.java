@@ -40,6 +40,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
@@ -385,22 +386,70 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
 
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试", null);
+                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
             }
 
             // 2判断人员信息是选择还是手动录入；
             String id = null; //就诊id  其中门诊过来的病人已经有就诊id，直接取病人id，如果是直接划价收费的，需要生成就诊id
             Boolean isDel = true;//判断是否需要删除费用数据（只有在患者为直接划价收费，且第二次或以上结算时才需要删除原直接划价收费费用信息）
 
+            //诊断
+            OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
+            List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
+            String[] tempIds = outptVisitDTO.getDiagnose();
+            StringBuilder str = new StringBuilder();
+            if(tempIds!=null && tempIds.length>0) {
+                for (int i = 0; i < tempIds.length; i++) {
+                    str.append(tempIds[i]);
+                    if (i < tempIds.length - 1) {
+                        str.append(",");
+                    }
+                }
+            }
+            boolean isChange = false;
+            if (tempIds != null && tempIds.length > 0) {
+                isChange = true;
+                outptPrescribeDTO.setHospCode(outptVisitDTO.getHospCode());
+                outptPrescribeDTO.setVisitId(outptVisitDTO.getId());
+                outptPrescribeDTO.setDiagnoseIds(str.toString());
+                outptPrescribeDTO.setCrteId(outptVisitDTO.getCrteId());
+                outptPrescribeDTO.setCrteName(outptVisitDTO.getCrteName());
+                outptDiagnoseDTOList = this.buildOutptDiagnose(outptPrescribeDTO);
+            }
+            // 根据就诊id查询挂号信息
+            OutptRegisterDTO outptRegisterDTO = outptVisitDAO.getOutptRegister(outptVisitDTO);
             // 2.1 如果病人没有挂号开处方，直接划价买药，需要保存患者基本信息、诊断信息、费用信息的新增
             if (StringUtils.isEmpty(outptVisitDTO.getId())) {
                 id = this.addPatientInfo(outptVisitDTO);
                 outptVisitDTO.setId(id);
+                if (isChange) {
+                    //诊断信息保存
+                    if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
+                        //保存处方诊断
+                        outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTOList);
+                    }
+                }
                 isDel = false;
             } else {
                 id = outptVisitDTO.getId();//赋值就诊id
-                //人员信息修改操作
-                outptCostDAO.editOutptVisitByKey(outptVisitDTO);//编辑操作
+                if (outptRegisterDTO == null) {  // 如果挂号信息为空，则说明患者为直接划价患者 可以修改患者信息
+                    //人员信息修改操作
+                    outptCostDAO.editOutptVisitByKey(outptVisitDTO);//编辑操作
+                    // 更新诊断信息
+                    if (isChange && tempIds != null && tempIds.length > 0) {
+                        OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+                        outptDiagnoseDTO.setHospCode(outptVisitDTO.getHospCode());
+                        outptDiagnoseDTO.setVisitId(outptVisitDTO.getId());
+                        outptDiagnoseDTO.setDiseaseIds(str.toString());
+                        // 根据就诊id删除历史诊断
+                        outptVisitDAO.deleteDiagnoseByVisitId(outptVisitDTO);
+                        //诊断信息保存
+                        if(!ListUtils.isEmpty(outptDiagnoseDTOList)){
+                            //保存处方诊断
+                            outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTOList);
+                        }
+                    }
+                }
             }
 
             // 3、判断病人类型，门诊直接划价收费 or 处方病人
@@ -440,7 +489,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             Map<String, String> payinfo = new HashMap<String, String>();
             BigDecimal miPrice = new BigDecimal(0); //统筹支付金额
             BigDecimal selfPrice = realityPrice; //个人需支付金额
-            if (!Constants.BRLX.PTBR.equals(outptVisitDTO.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
+            if (patientValueCode > 0) {
                 Map<String, Object> ybMap = null;
 
                 // 查询医院医保配置（直接走医保还是走统一支付平台）
@@ -500,6 +550,71 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             redisUtils.del(key);//删除结算key
         }
         return WrapperResponse.success("成功。", result);
+    }
+
+    /**
+     * @Menthod buildOutptDiagnose
+     * @Desrciption  诊断表赋值
+     * @param outptPrescribeDTO
+     * @Author zengfeng
+     * @Date   2020/9/14 10:24
+     * @Return OutptPrescribeDTO
+     **/
+    public List<OutptDiagnoseDTO> buildOutptDiagnose(OutptPrescribeDTO outptPrescribeDTO){
+        //是否主诊断
+        String isMain = "0";
+        int i = 0;
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
+        if(StringUtils.isEmpty(outptPrescribeDTO.getDiagnoseIds())){
+            return outptDiagnoseDTOList;
+        }
+        //获取诊断信息
+        List<OutptDiagnoseDTO> yjzOutptDiagnoseDTOList = outptDoctorPrescribeDAO.getOutptDiagnose(outptPrescribeDTO);
+        if(!ListUtils.isEmpty(yjzOutptDiagnoseDTOList)){
+            //判断是否有主诊断
+            List<OutptDiagnoseDTO> isMainList = yjzOutptDiagnoseDTOList.stream().filter(s->s.getIsMain().equals(Constants.SF.S)).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(isMainList)){
+                isMain = "1";
+            }
+        }
+        //获取诊断ID
+        String diagnoseIds = outptPrescribeDTO.getDiagnoseIds();
+        //拆分ID串
+        String[] diagnoseIdArray = diagnoseIds.split(",");
+        for(String diagnoseId : diagnoseIdArray){
+            if(StringUtils.isEmpty(diagnoseId)){
+                continue;
+            }
+            List<OutptDiagnoseDTO> isMainList = yjzOutptDiagnoseDTOList.stream().filter(s->diagnoseId.equals(s.getDiseaseId())).collect(Collectors.toList());
+            //存在该诊断
+            if(!ListUtils.isEmpty(isMainList)){
+                continue;
+            }
+            OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+            //主键
+            outptDiagnoseDTO.setId(SnowflakeUtils.getId());
+            //医院编码
+            outptDiagnoseDTO.setHospCode(outptPrescribeDTO.getHospCode());
+            //就诊ID
+            outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
+            //疾病ID
+            outptDiagnoseDTO.setDiseaseId(diagnoseId);
+            //第一条数据，默认为主诊断(没有主诊断情况下)
+            if(i == 0 && Constants.SF.F.equals(isMain) ){
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.S);
+            }else{
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.F);
+            }
+            i++;
+            //创建人ID
+            outptDiagnoseDTO.setCrteId(outptPrescribeDTO.getCrteId());
+            //创建人
+            outptDiagnoseDTO.setCrteName(outptPrescribeDTO.getCrteName());
+            outptDiagnoseDTOList.add(outptDiagnoseDTO);
+        }
+        return outptDiagnoseDTOList;
     }
 
     /**
@@ -627,6 +742,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     if (Constants.FYLYFS.ZJHJSF.equals(outptCostDTO.getSourceCode())) {
                         BigDecimal num = MapUtils.get(prescribeMap.get(0), "num");  // 总库存
                         BigDecimal stockOccupy = MapUtils.get(prescribeMap.get(0), "stock_occupy");  // 占用库存
+                        if (stockOccupy==null){
+                            stockOccupy =BigDecimalUtils.nullToZero(stockOccupy);
+                        }
                         BigDecimal sykc = BigDecimalUtils.subtract(num, stockOccupy);  // 剩余库存
                         if (BigDecimalUtils.greater(outptCostDTO.getTotalNum(), sykc)) {
                             throw new AppException(outptCostDTO.getItemName() + ":指定药房库存不足");
@@ -891,7 +1009,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
         insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
         insureIndividualSettleDO.setRetirePrice(ake026);//离休基金支付
+        insureIndividualSettleDO.setMafPay(bka821); // 医疗救助基金
         insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
+        insureIndividualSettleDO.setRestsPrice(bka839); // 其他支付
         insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
         insureIndividualSettleDO.setHospPrice(bka842);//医院支付
         insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额
@@ -973,7 +1093,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 List<OutinInvoiceDTO> outinInvoiceDTOS = outinInvoiceService.updateForOutinInvoiceQuery(map).getData();
                 if (outinInvoiceDTOS == null || outinInvoiceDTOS.size() != 1) {
                     //没有发票信息
-                    return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    //return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+                    throw new AppException("当前没有可用发票，请领取发票或取消使用发票再结算");
                 }
                 outinInvoiceDTO = outinInvoiceDTOS.get(0);
             }
@@ -1167,7 +1288,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outInvoiceParam.put("outinInvoiceDTO", outinInvoiceDTO1);
             outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
             // 12、 如果是医保病人，做医保结算操作。
-            if (!Constants.BRLX.PTBR.equals(outptVisitDTO.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
+            if (patientValueCode > 0) {
                 // 查询当前医院医保是配置的统一支付平台还是医保服务
                 this.saveOutptSettle_YB(outptVisitDTO, settleId, visitId, userId, userName, outptCostDTOList, hospCode, code, outptSettleDTO1);
             }
@@ -1477,13 +1599,23 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setSettleState(Constants.YBJSZT.JS);//结算状态 = 结算
         individualSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
         insureIndividualSettleService.updateByPrimaryKeySelective(individualSettleParam);
-
+        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+        insureIndividualVisitDTO.setVisitId(visitId);
+        insureIndividualVisitDTO.setHospCode(hospCode);
+        Map<String,Object> visitMap = new HashMap<>();
+        visitMap.put("hospCode",hospCode);
+        visitMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        insureIndividualVisitDTO =  insureIndividualVisitService_consumer.selectInsureInfo(visitMap).getData();
+        if(insureIndividualVisitDTO == null){
+            throw new AppException("根据就诊未查询到医保就诊登记信息");
+        }
         //查询医保机构信息
         Map<String, Object> configurationParam = new HashMap<String, Object>();
         configurationParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+
         insureConfigurationDTO.setHospCode(outptVisitDTO.getHospCode());
-        insureConfigurationDTO.setRegCode(info.get("regCode"));
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); //医疗机构编码
         configurationParam.put("insureConfigurationDTO", insureConfigurationDTO);
         List<InsureConfigurationDTO> insureConfigurationDTOS = insureConfigurationService.queryAll(configurationParam).getData();
         if (insureConfigurationDTOS == null || insureConfigurationDTOS.isEmpty()) {
@@ -1583,6 +1715,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 String clrOptins =  MapUtils.get(payinfo, "clr_optins");
                 String clrWay =  MapUtils.get(payinfo, "clr_way");
                 String clrType =  MapUtils.get(payinfo, "clr_type");
+
+                Object object =  MapUtils.get(payinfo,"acct_pay");
                 InsureIndividualSettleDO individualSettleDO  = new InsureIndividualSettleDO();
                 individualSettleDO.setInsureSettleId(insureSettleId);
                 individualSettleDO.setMedicalRegNo(medicalRegNo);
@@ -1593,17 +1727,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 individualSettleDO.setClrWay(clrWay);
                 individualSettleDO.setClrType(clrType);
                 individualSettleDO.setClrOptins(clrOptins);
-
+                //  更新医保结算表的结算信息
                 Map<String,Object> updateMap  = new HashMap<>();
                 updateMap.put("hospCode",hospCode);
                 updateMap.put("insureIndividualSettleDO",individualSettleDO);
                 insureIndividualSettleService.updateByPrimaryKeySelective(updateMap);
+                // 更新医保费用表的结算id
                 InsureIndividualCostDTO insureIndividualCostDTO = new InsureIndividualCostDTO();
                 insureIndividualCostDTO.setHospCode(hospCode);
                 insureIndividualCostDTO.setVisitId(visitId);
                 insureIndividualCostDTO.setInsureSettleId(insureSettleId);
                 map.put("insureIndividualCostDTO",insureIndividualCostDTO);
                 insureIndividualCostService_consumer.updateInsureSettleCost(map).getData();
+                // 更新门诊结算表的个人账户金额
+                OutptSettleDO outptSettleDO = new OutptSettleDO();
+                outptSettleDO.setHospCode(hospCode);
+                outptSettleDO.setId(settleId);
+                if(object instanceof String){
+                    outptSettleDO.setAcctPay(BigDecimalUtils.convert(MapUtils.get(payinfo,"acct_pay")));
+                }else{
+                    outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
+                }
+                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
             }catch (Exception e){
                 if(StringUtils.isNotEmpty(insureSettleId)){
                     map.put("insureSettleId",insureSettleId);
@@ -3224,6 +3369,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         for (OutptSettleInvoiceDTO outptSettleInvoiceDTO : pjList) {
             Map<String, Object> map = new HashMap<String, Object>();
             outinInvoiceDTO.setCurrNo(String.valueOf(currNoInt));
+            outinInvoiceDTO.setDqCurrNo(dqCurrNo);
             map.put("hospCode", outinInvoiceDTO.getHospCode());
             map.put("outinInvoiceDTO", outinInvoiceDTO);
             // 执行使用发票

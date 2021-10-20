@@ -193,6 +193,7 @@ public interface Constants {
         public static final String LCLJXM ="121";//临床路径项目
         public static final String LCLJJDMS ="122";//临床路径阶段描述
         public static final String LCJDMX = "120";//临床路径阶段明细
+        public static final String YBJSQD = "130";// 医保结算清单
 
     }
 
@@ -896,6 +897,7 @@ public interface Constants {
         public static final String SPECIALCALC ="SPECIALCALC";
         public static final String DAILYFIRSTCALC ="DAILYFIRSTCALC";
         public static final String PARAMETER ="PARAMETER";
+        /** 缓存中码表类型数据的后缀 **/
         public static final String CODEDETAIL ="CODEDETAIL";
     }
 
@@ -1049,5 +1051,14 @@ public interface Constants {
         public static final String Charge_Registered = "07";
         /** 完成(接收到结果) **/
         public static final String Charge_Completed = "08";
+    }
+
+    /**
+     * 模板类型（MBLX）
+     */
+    class MBLX {
+        public static final String QY = "0"; // 全院
+        public static final String KS = "1"; // 科室
+        public static final String GR = "2"; // 个人
     }
 }

@@ -277,7 +277,7 @@
         where a.hosp_code = #{hospCode} and a.visit_id = #{id}
     </select>
 
-    <select id="queryInptMedicalApplyList">
+    <select id="queryInptMedicalApplyList" resultType="java.util.Map">
         select a.hosp_code, a.apply_no, a.type_code, a.visit_id as pid, a.in_no, a.opd_id,a.id,
         c.item_id,
         b.age_unit_code as ageunit,
@@ -299,4 +299,10 @@
     <select id="selectOutptPatByVisitIdAndSettleId" resultType="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
         select pay_code as payCode, price from outpt_pay where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{settleId}
     </select>
+
+    <select id="getPayInfoByParams" resultType="cn.hsa.module.outpt.fees.dto.OutptPayDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
+        select order_no as orderNo, price from outpt_pay where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{settleId} and pay_code = #{payCode}
+    </select>
+
+
 </mapper>

@@ -70,4 +70,15 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     private Date warDate;
     // 根据有效期降序或者升序 0--降序 1--升序，默认降序
     private String isSort;
+    // 是否作废  
+    private String isValid;
+    /**
+     * 查看药品还是材料,0:材料 1：药品，默认全部
+     */
+    private String resultType;
+    /**
+     * 科室名称
+     */
+    private String deptName;
+
 }

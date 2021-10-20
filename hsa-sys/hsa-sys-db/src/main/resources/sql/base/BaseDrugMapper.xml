@@ -336,13 +336,14 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.dan, a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,'1' as itemCode,
 		d.name as bfcName,
-		(select e.name from base_product e where e.code = a.prod_code) as prod_name
+		e.name as prod_name
 		from base_drug a
 		LEFT JOIN base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+		left join base_product e on a.hosp_code = e.hosp_code and e.code = a.prod_code
 		<where>
 			a.hosp_code = #{hospCode}
 			<if test="id != null and id != ''">
@@ -489,7 +490,10 @@
 				or a.good_pym like '%${keyword}%'
 				or a.good_wbm like '%${keyword}%'
 				or a.usual_pym like '%${keyword}%'
-				or a.usual_wbm like '%${keyword}%')
+				or a.usual_wbm like '%${keyword}%'
+				or a.ndan like '%${keyword}%'
+				or a.spec like '%${keyword}%'
+				or e.name like '%${keyword}%')
 			</if>
 			<if test="ids != null and ids.size() > 0">
 				and a.type_code in
@@ -958,5 +962,32 @@
 			or a.usual_wbm like '%${keyword}%')
 		</if>
 		order by a.crte_time
+	</select>
+	<!--判断住院费用表中是否存在未发药的数据-->
+	<select id="queryCostIsInptOut" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+		select distinct item_name
+		 from inpt_cost where hosp_code = #{hospCode} and status_code = '0' and is_dist = '0'
+		 and item_id in
+		 <foreach collection="ids" open="(" close=")" separator="," item="item">
+			 #{item}
+		 </foreach>
+	</select>
+	<!--判断门诊费用表中是否存在未发药的数据-->
+	<select id="queryCostIsOutptOut" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+		select distinct item_name
+		from outpt_cost where hosp_code = #{hospCode} and status_code = '0' and is_dist = '0'
+		and item_id in
+		<foreach collection="ids" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	<!--长期医嘱是否开了该药品，如果有，不允许作废-->
+	<select id="queryInptAdviceIsLong" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+		select distinct item_name
+		from inpt_advice where  hosp_code = #{hospCode} and is_long = '0' and is_stop = '0'
+		and plan_stop_time >= now() and item_id in
+		<foreach collection="ids" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
 	</select>
 </mapper>

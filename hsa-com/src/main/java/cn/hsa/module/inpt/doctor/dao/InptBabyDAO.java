@@ -175,4 +175,6 @@ public interface InptBabyDAO {
      * @Return
      */
     InptBabyDTO getBabyCost(Map param);
+
+    int updateBabyRegister(InptBabyDTO inptBabyDTO);
 }

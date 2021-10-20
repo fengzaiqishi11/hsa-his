@@ -100,6 +100,8 @@ public interface InptCostDAO {
      **/
     int updateInptCost(InptCostDTO inptCostDTO);
 
+    List<Map<String,Object>> checkStock(Map<String,Object> params);
+
     /**
      * @param inptCostDTOs
      * @Method updateInptCostBatch
@@ -466,4 +468,15 @@ public interface InptCostDAO {
      * @Return
      */
     List<InptCostDO> queryMidWaySettleInptCostList(Map<String, Object> param);
+
+    /**
+     * @Method checkInsureAndHisFee
+     * @Desrciption   办理医保预出院之前 需要核对his和医保费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/29 14:11
+     * @Return
+    **/
+    List<InptCostDTO> checkInsureAndHisFee(Map<String, Object> map);
 }

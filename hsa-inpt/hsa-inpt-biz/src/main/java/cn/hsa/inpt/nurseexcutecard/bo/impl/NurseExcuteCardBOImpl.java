@@ -145,6 +145,16 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         // 获取系统参数，判断执行卡输液瓶贴是返回一条还是多条，默认是多条
         String code = "INFUSION_BOTTLE_STICKER";
         SysParameterDTO sysParameterDTO = this.getSysParameter(code, inptVisitDTO.getHospCode());
+        // 增加是否不关联领药表的系统参数，默认关联
+        String pharCode = "HLZXK_RELEVANCE_PHAR";
+        SysParameterDTO pharSysParamDTO = this.getSysParameter(pharCode, inptVisitDTO.getHospCode());
+        if (pharSysParamDTO != null && StringUtils.isNotEmpty(pharSysParamDTO.getValue()) && "1".equals(pharSysParamDTO.getValue())) {
+            // 不关联，参数值为1
+            inptVisitDTO.setIsRelevance(Constants.SF.S);
+        } else {
+            // 关联，默认关联
+            inptVisitDTO.setIsRelevance(Constants.SF.F);
+        }
         if ("1".equals(printType)) {
             // 输液瓶贴
             if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
@@ -276,7 +286,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
              */
             SysParameterDTO sysParameter = this.getSysParameter("INFUSION_BOTTLE_STICKER", inptAdviceDTO.getHospCode());
             if ("1".equals(inptAdviceDTO.getPrintType())) {
-                if (StringUtils.isNotEmpty(sysParameter.getValue()) && "1".equals(sysParameter.getValue())) {
+                if (sysParameter != null && StringUtils.isNotEmpty(sysParameter.getValue()) && "1".equals(sysParameter.getValue())) {
                     // 开启参数，页面输液瓶贴展示一条，根据页面医嘱id修改执行表所有打印状态
                 } else {
                     // 默认不开启，根据执行id修改打印状态

@@ -171,4 +171,7 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         // 档案id
         private String profileId;
 
+        // 优惠类别名称
+        private String preferentialName;
+
 }

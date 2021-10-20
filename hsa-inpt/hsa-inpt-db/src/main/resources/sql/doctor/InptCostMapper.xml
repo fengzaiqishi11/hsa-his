@@ -524,7 +524,7 @@
         <if test="babyId != null and babyId != ''">
             AND baby_id = #{babyId}
         </if>
-        order by t.crte_time desc
+        order by t.crte_time asc
     </select>
     <!-- 查询门诊病人手术补记账部分数据 -->
     <select id="queryOutpatientSurgeryCostPage" resultMap="InptCostMap">
@@ -1831,6 +1831,16 @@
         AND (c.attribution_code = '0' or c.attribution_code is null or c.attribution_code = '')
       </if>
         order by c.cost_time ASC
+    </select>
+    <select id="checkInsureAndHisFee" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select distinct a.item_id,a.item_name ,
+        (select insure_reg_code from insure_individual_visit iiv where iiv.visit_id = #{id} and hosp_code =#{hospCode} ),
+        (select sum(ic.reality_price)  from inpt_cost ic where ic.visit_id = #{id} and hosp_code =#{hospCode} and ic.settle_code='0' ) as inptSumPrice,
+       (select sum(iic.primary_price)  from insure_individual_cost iic where iic.visit_id = #{id} and hosp_code =#{hospCode} ) as insureSumPrice
+        from inpt_cost  a
+            left join insure_individual_cost b
+        on a.id = b.cost_id where a.hosp_code =#{hospCode} and a.visit_id = #{id}
+        and b.id is null
     </select>
 
 </mapper>

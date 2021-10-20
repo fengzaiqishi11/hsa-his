@@ -380,12 +380,15 @@
     <dubbo:reference id="insureDiseaseMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" check="false"/>
 
     <dubbo:reference id="insureDictService_consumer" interface="cn.hsa.module.insure.module.service.InsureDictService" check="false"/>
-    <dubbo:reference id="insureIndividualCostService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
+    <dubbo:reference id="insureIndividualCostService_consumer" retries="0" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
     <!--人员备案-医保统一支付平台-->
     <dubbo:reference id="insurePersonnalRecordService_consumer" interface="cn.hsa.module.insure.module.service.InsurePersonnalRecordService" check="false"/>
 
     <!--冲正交易-医保统一支付平台-->
     <dubbo:reference id="insureUnifiedPayReversalTradeService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" check="false"/>
+
+    <dubbo:reference id="insureUnifiedLogService_consumer" interface="cn.hsa.module.insure.module.service.InsureUnifiedLogService" check="false"/>
+
     <dubbo:reference id="InsureGetInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureGetInfoService" check="false"/>
     <dubbo:reference id="insureUnifiedRemoteService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedRemoteService" check="false"/>
     <!--护理生命记录-统一支付平台-->
@@ -449,11 +452,11 @@
     <dubbo:reference id="outptRefundApplyService_consumer" interface="cn.hsa.module.outpt.outptrefundapply.service.OutptRefundApplyService" check="false"/>
     <dubbo:reference id="medicalTechnologyService_consumer" interface="cn.hsa.module.inpt.medicaltechnology.service.MedicalTechnologyService" check="false"/>
     <dubbo:reference id="insureUnifiedPayRestService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService" check="false"  retries = "0" timeout="1200000"/>
-    <dubbo:reference id="insureUnifiedPayInptService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" check="false"/>
+    <dubbo:reference id="insureUnifiedPayInptService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" check="false" retries = "0" />
     <!--诊断模板-->
     <dubbo:reference id="baseDiagnosisTemplateService_customer" interface="cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService" check="false"/>
 
-    <dubbo:reference id="insureUnifiedBaseService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" check="false"/>
+    <dubbo:reference id="insureUnifiedBaseService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" retries = "0"  check="false"/>
 
 
     <dubbo:reference id="insureUnifiedEmrUploadService_comsumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService" check="false"/>
@@ -496,6 +499,8 @@
     <dubbo:reference id="inptClinicalPathStageService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" check="false"/>
     <!--临床路径病人记录-->
     <dubbo:reference id="inptClinicalPathStateService_consumer" interface="cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService" check="false"/>
-    <!-- *************************************************** 临床路径子系统 *************************************************************** -->
+    <!--临床路径执行情况-->
+    <dubbo:reference id="clinicPathExecService_consumer" interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" check="false"/>
+  <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>
 

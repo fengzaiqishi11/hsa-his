@@ -51,11 +51,12 @@
 
     <!--申请记录-->
     <select id="getInRecivePage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO">
-        select DATE_FORMAT(a.crte_time, '%Y-%m-%d') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
+        select DATE_FORMAT(a.crte_time, '%Y-%m-%d %H:%i:%s') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
         a.order_no orderNo,(select name from base_window where id=a.window_id and hosp_code=#{hospCode}) windowName,a.window_id windowId,
         a.total_price totalPrice,a.status_code statusCode,a.assign_user_name assignUserName,
         DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,
-        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName
+        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName,
+        crte_name as crteName
         from phar_in_receive a
         where 1=1 and a.hosp_code=#{hospCode}
         <if test="queryFlag == '' or queryFlag == null">
@@ -521,8 +522,16 @@
   <select id="querySurplusPharInReceiveDetailDTO" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
     select * from phar_in_receive_detail where hosp_code = #{hospCode} and receive_id = #{id}
   </select>
-
-  <!--删除配药主表-->
+    <!--根据费用id集合查询老费用 且 back_code = 1 表示退药为退费-->
+    <select id="getOldCostIds" resultType="java.lang.String">
+        select a.old_cost_id from inpt_cost a
+        join inpt_cost b on a.old_cost_id = b.id and a.hosp_code = b.hosp_code
+         where a.hosp_code = #{hospCode} and b.back_code = '1' and a.id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <!--删除配药主表-->
   <delete id="deleteCanclePharInReceivelDTO">
     delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
   </delete>

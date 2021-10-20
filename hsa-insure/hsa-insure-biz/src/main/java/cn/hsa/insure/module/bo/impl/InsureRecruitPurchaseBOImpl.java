@@ -5,11 +5,14 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.insure.module.bo.InsureRecruitPurchaseBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureRecruitPurchaseDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -45,6 +48,12 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
+
+    @Resource
+    private UnifiedCommon unifiedCommon;
+
+    @Resource
+    private SysParameterService sysParameterService;
 
     /**
      * @Method queryAll
@@ -359,5 +368,58 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
             throw new AppException((String) resultMap.get("err_msg"));
         }
         return resultMap;
+    }
+    /**
+     * @param map
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public Map<String, Object> selectCommonInterfaceTest(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        String orgCode = getOrgCode(map);
+        Map<String,Object> paramMap = new HashMap<>();
+        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8101, paramMap);
+        return stringObjectMap;
+    }
+
+    /**
+     * @param map
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口：tOken获取
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public Map<String, Object> getToken(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        String orgCode = getOrgCode(map);
+        Map<String,Object> paramMap = new HashMap<>();
+        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8101, paramMap);
+        return stringObjectMap;
+    }
+
+    /**
+     * @Method getOrgCode
+     * @Desrciption  获取新医保医疗机构 系统参数配置
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 10:53
+     * @Return
+     **/
+    public String  getOrgCode(Map<String, Object> map){
+        map.put("code", "HOSP_INSURE_CODE");
+        SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
+        if(sysParameterDTO == null){
+            throw new AppException("请先配置系统参数HOSP_INSURE_CODE:" +"参数值是医疗机构编码");
+        }
+        return  sysParameterDTO.getValue();
     }
 }

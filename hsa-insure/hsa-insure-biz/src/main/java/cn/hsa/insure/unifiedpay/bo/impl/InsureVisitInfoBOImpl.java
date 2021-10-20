@@ -6,6 +6,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -45,7 +46,8 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 
 	@Resource
 	private InsureUnifiedPayOutptService insureUnifiedPayOutptService;
-
+	@Resource
+	private InsureUnifiedLogService insureUnifiedLogService_consumer;
 	@Resource
 	private SysParameterService sysParameterService_consumer;
 
@@ -78,7 +80,8 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		}
 		Map<String, Object> inputMap = new HashMap<>();
 		Map<String, Object> dataMap = new HashMap<>();
-		inputMap.put("infno", "1101");  // 交易编号
+		String functionCode = "1101";
+		inputMap.put("infno", functionCode);  // 交易编号
 		inputMap.put("medins_code",  insureConfigurationDTO.getOrgCode()); // 医疗机构编码
 		Map<String, Object> visitMap = new HashMap<>();
 		String mdtrtCertType = insureIndividualBasicDTO.getBka895();
@@ -136,7 +139,8 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			visitMap.put("certno", insureIndividualBasicDTO.getBka896()); // 传值证件号码
 			visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
 		}
-		visitMap.put("medins_code", insureConfigurationDTO.getOrgCode());
+		String medisCode = insureConfigurationDTO.getOrgCode();
+		visitMap.put("medins_code", medisCode);
 		String medType = insureIndividualBasicDTO.getAka130();
 		visitMap.put("med_type", medType);
 		visitMap.put("med_mdtrt_type", insureIndividualBasicDTO.getBka006());
@@ -153,13 +157,27 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		}else{
 			inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
 		}
-		inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+		String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+		inputMap.put("msgid", omsgId);
 		String url = insureConfigurationDTO.getUrl();
 		String json = JSONObject.toJSONString(inputMap);
 		logger.info("统一支付平台获取人员信息 [1101] 入参====>");
 		logger.info(json);
 		// 调用统一支付平台接口
 		String result = HttpConnectUtil.unifiedPayPostUtil(url, json);
+		params.put("medisCode",medisCode);
+		params.put("msgId",omsgId);
+		params.put("msgInfo",functionCode);
+		params.put("msgName","医保个人信息获取");
+		if (Constants.SF.F.equals(MapUtils.get(params,"isHospital"))) {
+			params.put("isHospital",Constants.SF.F) ;
+		}else{
+			params.put("isHospital",Constants.SF.S) ;
+		}
+		params.put("paramMapJson",json);
+		params.put("resultStr",result);
+		insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
+
 		logger.info("统一支付平台获取人员信息 [1101] 回参<====");
 		logger.info(result);
 		if(StringUtils.isEmpty(result)){

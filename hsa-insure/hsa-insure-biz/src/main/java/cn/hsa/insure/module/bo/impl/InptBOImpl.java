@@ -158,6 +158,8 @@ public class InptBOImpl extends HsafBO implements InptBO {
     public WrapperResponse delInptCostTransmit(Map<String, Object> param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String visitId = (String) param.get("visitId");//就诊id
+        String crteId = MapUtils.get(param,"crteId");
+        String crteName = MapUtils.get(param,"crteName");
         String userName = (String) param.get("userName"); // 经办人
         String code = (String) param.get("code"); // 操作人编码
         String medicalRegNo = MapUtils.get(param,"medicalRegNo");
@@ -216,6 +218,8 @@ public class InptBOImpl extends HsafBO implements InptBO {
 //        if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
         if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
                Map<String, Object> insureUnifiedMap = new HashMap<>();
+               insureUnifiedMap.put("crteName",crteName);
+               insureUnifiedMap.put("crteId",crteId);
                insureUnifiedMap.put("individualCostDTOList",individualCostDTOList);
                insureUnifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
                insureUnifiedMap.put("hospCode",hospCode);

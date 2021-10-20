@@ -148,6 +148,10 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.updateUP_5265(parameterMap));
     }
 
+    @Override
+    public WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.downLoadSettleInfo(map));
+    }
 
 
 }

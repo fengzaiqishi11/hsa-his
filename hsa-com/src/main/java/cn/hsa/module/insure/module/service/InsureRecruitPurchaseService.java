@@ -104,4 +104,27 @@ public interface InsureRecruitPurchaseService {
      **/
     @PostMapping("/service/insure/insureRecruitPurchase/deleteDrugSells")
     WrapperResponse<Boolean> deleteDrugSells(Map<String, Object> map);
+
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> selectCommonInterfaceTest(Map<String, Object> paramMap);
+
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap);
+
 }

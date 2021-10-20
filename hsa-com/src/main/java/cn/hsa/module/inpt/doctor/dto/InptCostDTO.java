@@ -181,4 +181,7 @@ public class InptCostDTO extends InptCostDO implements Serializable {
      * 频率名
      */
     private String rateName;
+    private String insureRegCode;
+    private BigDecimal inptSumPrice;
+    private BigDecimal insureSumPrice;
 }

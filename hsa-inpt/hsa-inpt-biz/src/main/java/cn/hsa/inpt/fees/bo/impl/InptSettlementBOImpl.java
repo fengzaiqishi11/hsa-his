@@ -11,16 +11,19 @@ import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.fees.bo.InptSettlementBO;
 import cn.hsa.module.inpt.fees.dao.*;
+import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.entity.*;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.entity.InsureDirectoryInfoDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.insure.module.service.*;
@@ -39,6 +42,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.inpt.fees.bo.impl
@@ -176,6 +181,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     public synchronized WrapperResponse saveCostTrial(InptVisitDTO inptVisitDTO) {
         String id = inptVisitDTO.getId();//就诊id
         String code = inptVisitDTO.getCode();
+        String crteId = inptVisitDTO.getCrteId();
         String userName = inptVisitDTO.getCrteName();
         String hospCode = inptVisitDTO.getHospCode();//医院编码
         String treatmentCode = inptVisitDTO.getTreatmentCode();
@@ -281,7 +287,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             //if (inptCostDOList.isEmpty()){throw new AppException("该患者没有产生费用信息。");}
-            if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(inptVisitDTO1.getPatientCode());
+            if (inptCostDOList.isEmpty() && patientValueCode >1) {
                 throw new AppException("该医保病人费用已经正常结算");
             }
             for (InptCostDO dto : inptCostDOList) {
@@ -291,7 +298,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
 
             //校验医保费用是否传输
-            if (!Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
+            if (patientValueCode > 0) {
                 Map<String, String> insureCostParam = new HashMap<String, String>();
                 insureCostParam.put("hospCode", hospCode);//医院编码
                 insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
@@ -390,6 +397,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     unifiedMap.put("hospCode", hospCode);
                     unifiedMap.put("visitId", id);
                     unifiedMap.put("code", code);
+                    unifiedMap.put("crteName",userName);
+                    unifiedMap.put("crteId",crteId);
                     unifiedMap.put("userName", userName);
                     unifiedMap.put("inptVisit", inptVisitDTO1);
                     unifiedMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
@@ -713,7 +722,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }
-            if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
+            if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
             }
             //校验预交金
@@ -1044,7 +1054,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
 //                if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
                 if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
                     handInsureUnifiedInptSettle(inptVisitDTO, insureIndividualVisitDTO, param, isInsureUnifiedMap, inptCostDOList, settleId);
-                } else {
+                }
+                else {
                     //TODO 封装医保结算参数；调用医保结算接口
                     Map<String, Object> insureInptParam = new HashMap<String, Object>();
                     //必传值：hospCode:医院编码、visitId:就诊id、insureRegCode:医保编码
@@ -1111,6 +1122,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureUnifiedPayParam.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         insureUnifiedPayParam.put("hospCode", inptVisitDTO.getHospCode());
         insureUnifiedPayParam.put("visitId", inptVisitDTO.getId());
+        insureUnifiedPayParam.put("crteName", userName);
+        insureUnifiedPayParam.put("crteId", MapUtils.get(param, "crteId"));
         insureUnifiedPayParam.put("code", code);
         insureUnifiedPayParam.put("userName", userName);
         /**统一支付平台调用出院办理   结束*/
@@ -1135,6 +1148,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrType = MapUtils.get(insureInptResult, "clr_type");
             String hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
 
+            BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
             /**
              * 结算成功以后 更新基金信息
              */
@@ -1231,6 +1245,14 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO.setMedicalRegNo(medicalRegNo);
             map.put("inptVisitDTO",inptVisitDTO);
             insureIndividualVisitService.updateInsureInidivdual(map);  // 更新就诊信息
+
+            InptSettleDO inptSettleDO = new InptSettleDO();
+            inptSettleDO.setId(settleId);
+            inptSettleDO.setAcctPay(acctPay);
+            inptSettleDO.setHospCode(hospCode);
+            System.out.println("---------------------"+ acctPay);
+            inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO);
+
         } catch (Exception e) {
             //调用结算异常，出院登记取消
             insureUnifiedPayParam.clear();
@@ -1383,6 +1405,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         // 获取该医保配置是否走统一支付平台，1走，0/null不走
         String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
 
+        /**
+         * 办理医保预出院之前 需要判断医保上传费用和his费用是不是一致
+         */
+
+        checkInsureAndHisFee(map);
+
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             map.put("visitId",id);
             map.put("medicalRegNo",medicalRegNo);
@@ -1396,6 +1424,32 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             insureIndividualVisitService.updateInsureInidivdual(map).getData();
         }
         return true;
+    }
+
+    /**
+     * @Method checkInsureAndHisFee
+     * @Desrciption  办理医保预出院之前 需要核对his和医保费用
+     * 1.费用已产生      项目未生成  基础数据正常
+     * 2.费用已产生   项目未生成 但是基础数据已作废
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/29 14:09
+     * @Return
+    **/
+    private void checkInsureAndHisFee(Map<String, Object> map) {
+        List<InptCostDTO> inptCostDTOList  =  inptCostDAO.checkInsureAndHisFee(map);
+        if(!ListUtils.isEmpty(inptCostDTOList)){
+            List<String> itemNameCollect = inptCostDTOList.stream().map(InptCostDTO::getItemName).collect(Collectors.toList());
+            BigDecimal inptSumPrice = inptCostDTOList.get(0).getInptSumPrice(); // his费用
+            BigDecimal insureSumPrice = inptCostDTOList.get(0).getInsureSumPrice(); // 医保费用
+            if(!ListUtils.isEmpty(itemNameCollect) && !BigDecimalUtils.equalTo(insureSumPrice,inptSumPrice)){
+               String[] arrs = new String[itemNameCollect.size()];
+                arrs = itemNameCollect.toArray(arrs);
+                throw new AppException("HIS总费用和医保上传费用不平:HIS费用为:"+inptSumPrice+ "医保费用为:"+insureSumPrice+ "存在如下未上传的项目数据"+Arrays.toString(arrs)+"" +
+                        "请先去生成匹配该项目");
+            }
+        }
     }
 
     /**
@@ -1544,7 +1598,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (inptCostDOList.isEmpty()){
                 throw new AppException("该患者没有产生费用信息。");
             }
-            if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO1.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(inptVisitDTO1.getPatientCode());
+            if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
             }
             for (InptCostDO dto : inptCostDOList) {
@@ -1726,7 +1781,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }
-            if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO.getPatientCode())) {
+            Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
+            if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
             }
 
@@ -2157,7 +2213,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         if (inptVisitDTO == null) {
           return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
         }
-        if (inptCostDOList.isEmpty() && !Constants.BRLX.PTBR.equals(inptVisitDTO.getPatientCode())) {
+        Integer patientValueCode = Integer.valueOf(inptVisitDTO.getPatientCode());
+        if (inptCostDOList.isEmpty() && patientValueCode > 0) {
           throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
         }
         BigDecimal realityPrice = new BigDecimal(0);//优惠后总费用

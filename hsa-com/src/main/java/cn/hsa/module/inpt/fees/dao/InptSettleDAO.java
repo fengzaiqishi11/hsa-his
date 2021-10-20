@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.entity.InptSettleDO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -152,4 +153,15 @@ public interface InptSettleDAO {
      * @Return: PageDTO
      **/
     List<InptDiagnoseDTO> queryDiagnose(InptVisitDTO inptVisitDTO);
+    
+    /**
+     * @Method queryInptInsure
+     * @Desrciption  根据就诊id 去查询是否作废的医保结算数据
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/10/12 16:12
+     * @Return 
+    **/
+    List<InsureIndividualSettleDTO> queryInptInsure(InptVisitDTO inptVisitDTO);
 }

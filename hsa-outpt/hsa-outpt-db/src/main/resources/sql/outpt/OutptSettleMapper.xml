@@ -32,6 +32,7 @@
         <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
         <result column="one_settle_id" property="oneSettleId" jdbcType="VARCHAR" />
+        <result column="acct_pay" property="acctPay" jdbcType="DECIMAL" />
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -61,7 +62,8 @@
         crte_id,
         crte_name,
         crte_time,
-        card_price
+        card_price,
+        acct_pay
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -135,7 +137,8 @@
           one_settle_id,
           crte_id,
           crte_name,
-          crte_time
+          crte_time,
+         acct_pay
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -163,7 +166,8 @@
           #{oneSettleId,jdbcType=VARCHAR},
           #{crteId,jdbcType=VARCHAR},
           #{crteName,jdbcType=VARCHAR},
-          #{crteTime,jdbcType=TIMESTAMP}
+          #{crteTime,jdbcType=TIMESTAMP},
+          #{acctPay,jdbcType=DECIMAL}
         )
     </insert>
 
@@ -444,8 +448,11 @@
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
                 </if>
+                <if test="acctPay != null">
+                acct_pay = #{acctPay,jdbcType=DECIMAL}
+             </if>
         </set>
         where
         id = #{id}
@@ -935,6 +942,10 @@
 
     <select id="getById" resultMap="outptSettleDtoMap">
        SELECT * from outpt_settle  where  id = #{id} and hosp_code = #{hospCode}
+    </select>
+    <select id="queryOutptSettle" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select * from insure_individual_settle where hosp_code =#{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+        and state ='0' and settle_state ='1' and is_cancel ='1' and insureSettleId is not null
     </select>
 
     <update id="updateOutptSettleStatus" >

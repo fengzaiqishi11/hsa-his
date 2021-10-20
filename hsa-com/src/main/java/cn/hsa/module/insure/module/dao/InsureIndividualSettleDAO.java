@@ -197,5 +197,16 @@ public interface InsureIndividualSettleDAO {
      * @Return
      **/
     OutptSettleDTO queryOutptSettle(Map<String, Object> map);
+
+    /**
+     * @Method updateInsureSettleValue
+     * @Desrciption  把没有取消结算的his的医保结算表作废
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/12 15:40
+     * @Return
+    **/
+    void updateInsureSettleValue(Map<String, Object> map);
 }
 

@@ -7,6 +7,7 @@ import cn.hsa.module.dzpz.hainan.ExtDataList;
 import cn.hsa.module.dzpz.hainan.RxList;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -240,4 +241,6 @@ public interface OutptSettleDAO {
     int updateOutptSettleStatus(Map<String, Object> selectMap);
 
     OutptSettleDTO getById(Map<String, Object> selectMap);
+
+    List<InsureIndividualSettleDTO> queryOutptSettle(Map selectMap);
 }

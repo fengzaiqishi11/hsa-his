@@ -70,4 +70,15 @@ public interface InptBabyBO {
      * @Return
      */
     InptBabyDTO getBabyCost(Map parm);
+
+    /**
+     * @Menthod: updateBabyRegister
+     * @Desrciption: 新生儿取消登记
+     * @Param: inptBabyDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-08 11:30
+     * @Return:
+     **/
+    Boolean updateBabyRegister(InptBabyDTO inptBabyDTO);
 }

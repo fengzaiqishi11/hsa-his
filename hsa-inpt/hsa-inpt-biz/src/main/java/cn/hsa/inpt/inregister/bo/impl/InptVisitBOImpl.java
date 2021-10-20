@@ -471,7 +471,22 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         String pageNo = (String) paramMap.get("pageNo");
         String pageSize = (String) paramMap.get("pageSize");
         PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
-        List<Map<String, Object>> inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
+        List<Map<String, Object>> inptVisitDTOS =null;
+        // 获取系统参数 是否开启大人婴儿合并结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", paramMap.get("hospCode"));
+        isMergeParam.put("code", "BABY_INSURE_FEE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        //《========新生婴儿试算========》
+        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())){
+            // 开启合并结算
+            inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
+        }else {
+            // 大人婴儿费用单独结算
+            inptVisitDTOS = inptVisitDAO.queryNoMergePatients(paramMap);
+            return PageDTO.of(inptVisitDTOS);
+        }
 //        List<Map<String, Object>> finalResult = new ArrayList<>();
         if (!ListUtils.isEmpty(inptVisitDTOS)) {
             List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
@@ -1538,6 +1553,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         OutptVisitDTO outptVisitDTO = outptVisitService_consumer.queryByVisitID(param);
         if (outptVisitDTO == null && selectEntiey == null) {
             throw new AppException("修改患者信息失败：门诊/住院均未找到患者就诊信息【就诊id:" + inptVisitDTO.getId() + "】");
+        }
+        // 修改入院登记信息，使用数据库中的病人状态 20211015
+        if (selectEntiey!=null){
+            inptVisitDTO.setStatusCode(selectEntiey.getStatusCode());
+            inptVisitDTO.setBedId(selectEntiey.getBedId());
+            inptVisitDTO.setBedName(selectEntiey.getBedName());
         }
 //        param.put("code", "UNIFIED_PAY");
 //        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();

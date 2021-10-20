@@ -312,6 +312,7 @@ public class OutDistributeController extends BaseController {
     public WrapperResponse<PageDTO> queryPharOutDistributeAllDetailDTO(PharOutDistributeAllDetailDTO pharOutDistributeAllDetailDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         pharOutDistributeAllDetailDTO.setHospCode(sysUserDTO.getHospCode());
+        pharOutDistributeAllDetailDTO.setPharId(sysUserDTO.getLoginBaseDeptDTO().getId());
       Map map = new HashMap();
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("pharOutDistributeAllDetailDTO",pharOutDistributeAllDetailDTO);
@@ -333,6 +334,7 @@ public class OutDistributeController extends BaseController {
     public WrapperResponse<PageDTO> queryPharInDistributeAllDetailDTO(PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         pharInDistributeAllDetailDTO.setHospCode(sysUserDTO.getHospCode());
+        pharInDistributeAllDetailDTO.setPharId(sysUserDTO.getLoginBaseDeptDTO().getId());
       Map map = new HashMap();
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("pharInDistributeAllDetailDTO",pharInDistributeAllDetailDTO);

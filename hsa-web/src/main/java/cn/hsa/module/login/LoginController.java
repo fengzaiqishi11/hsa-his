@@ -17,6 +17,7 @@ import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +42,6 @@ import java.util.stream.Collectors;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 @RestController
-@Scope("session")
 @RequestMapping("/web/login")
 @Slf4j
 public class LoginController extends BaseController {
@@ -58,6 +59,8 @@ public class LoginController extends BaseController {
     private static final int PWD_ERROR_CNT = 5;
     @Value("${rsa.private.key}")
     private String privateKey;
+
+    private final ReentrantLock rnLock = new ReentrantLock(true);
     /**
      * @Method 云HIS V2.0 统一登录接口
      * @Description
@@ -79,112 +82,117 @@ public class LoginController extends BaseController {
     @PostMapping("/doLogin")
     public WrapperResponse<List<Map<String, Object>>> doLogin(@RequestParam(required = true) String hospCode, @RequestParam(required = true) String userCode,
                                                               @RequestParam(required = true) String password, @RequestParam(required = true) String authCode, HttpServletRequest req, HttpServletResponse res) {
-
-        //校验验证码
-        String authCodeSession = getAndRemoveSession(req, res);
-        // 验证码已失效
-       if (StringUtils.isEmpty(authCodeSession)) {
-            throw new AppException("验证码已失效");
-        }
-
-        // 验证码错误
-        if (!authCode.equalsIgnoreCase(authCodeSession)) {
-            throw new AppException("验证码错误");
-        }
-        // 解密医院编码
+        rnLock.lock();
         try {
-            hospCode = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);
-        } catch (Exception e) {
-            throw new AppException("医院编码入参错误,请联系管理员！" + e.getMessage() + "11-" + hospCode);
+            //校验验证码
+            String authCodeSession = getAndRemoveSession(req, res);
+            // 验证码已失效
+            if (StringUtils.isEmpty(authCodeSession)) {
+                throw new AppException("验证码已失效");
+            }
+
+            // 验证码错误
+            if (!authCode.equalsIgnoreCase(authCodeSession)) {
+                throw new AppException("验证码错误");
+            }
+            // 解密医院编码
+            try {
+                hospCode = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);
+            } catch (Exception e) {
+                throw new AppException("医院编码入参错误,请联系管理员！" + e.getMessage() + "11-" + hospCode);
+            }
+
+            // 获取医院信息
+            CenterHospitalDTO hospitalDTOto = getData(centerHospitalService_consumer.getByHospCode(hospCode));
+            if (hospitalDTOto == null) {
+                throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
+            }
+
+            // 校验服务有效期
+            if (!DateUtils.betweenDate(hospitalDTOto.getStartDate(), hospitalDTOto.getEndDate())) {
+                String startDate = DateUtils.format(hospitalDTOto.getStartDate(), DateUtils.Y_M_DH_M_S);
+                String endDate = DateUtils.format(hospitalDTOto.getEndDate(), DateUtils.Y_M_DH_M_S);
+                throw new AppException("医院编码【" + hospCode + "】：未在有效服务期内，服务开始时间【" + startDate + "】，服务结束时间【" + endDate + "】");
+            }
+
+            // 指定医院数据源查询用户信息
+            Map paramMap = new HashMap<>();
+            paramMap.put("hospCode", hospCode);
+            paramMap.put("userCode", userCode);
+
+
+            // 获取用户信息
+            SysUserDTO sysUserDTO = getData(sysUserService_consumer.getByCode(paramMap));
+
+            // 校验用户信息
+            if (sysUserDTO == null) {
+                throw new AppException("员工账号不存在！");
+            }
+
+            // 是否停用
+            if ("1".equals(sysUserDTO.getStatusCode())) {
+                throw new AppException("当前账号已被停用！");
+            }
+
+            // 是否锁定
+            if ("2".equals(sysUserDTO.getStatusCode())) {
+                throw new AppException("当前账号已被锁定！");
+            }
+
+            // 账号或密码错误
+            if (!MD5Utils.verifySha(password, sysUserDTO.getPassword())) {
+                throw new AppException(updatePwdErrorInfo(sysUserDTO));
+            }
+
+            // 获取用户可操作子系统和对应子系统操作科室
+            // key -->> 基础数据子系统
+            // value -->> {id:"1", deptName:"内科"}
+            List<Map<String, Object>> resultList = convertSystemListToMap(paramMap);
+
+            // 记录最后登陆信息
+            updateLoginInfo(sysUserDTO, req, res);
+
+            // 所属科室信息 -- add by zhongming begin
+            BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+            baseDeptDTO.setHospCode(hospCode);
+            baseDeptDTO.setCode(sysUserDTO.getDeptCode());
+
+            Map map = new HashMap();
+            map.put("hospCode", sysUserDTO.getHospCode());
+            map.put("baseDeptDTO", baseDeptDTO);
+            BaseDeptDTO baseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
+            sysUserDTO.setBaseDeptDTO(baseDeptDto);
+            // 所属科室信息 -- add by zhongming end
+            //医院级别
+            sysUserDTO.setLevelCode(hospitalDTOto.getLevelCode());
+            //医院名称
+            sysUserDTO.setHospName(hospitalDTOto.getName());
+            //获取系统参数机构名称
+            Map parameterMap = new HashMap();
+            parameterMap.put("hospCode", hospCode);
+            parameterMap.put("code", "JG_NAME");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(parameterMap).getData();
+            if (sysParameterDTO == null) {
+                throw new AppException("系统首页展示名称参数为空");
+            }
+            sysUserDTO.setOrgName(sysParameterDTO.getValue());
+
+            // 添加定制化发票，收据样式（界面路径） 官红强  2021-3-26 09:25:53    start=======
+            parameterMap.put("code", "PAGE_PATH");
+            SysParameterDTO sysParameterDTOByPagePath = sysParameterService_consumer.getParameterByCode(parameterMap).getData();
+            if (sysParameterDTOByPagePath != null && StringUtils.isNotEmpty(sysParameterDTOByPagePath.getValue())) {
+                sysUserDTO.setPagePath(sysParameterDTOByPagePath.getValue());
+            }
+            // 添加定制化发票，收据样式（界面路径） 官红强  2021-3-26 09:25:53    end=======
+
+            // 用户信息放入会话中，并设置有效期为30分钟
+            setSession(SESSION_USER_INFO, sysUserDTO, 120 * 60, req, res);
+
+            // 返回前端：子系统列表信息
+            return WrapperResponse.success(resultList);
+        }finally{
+            rnLock.unlock();
         }
-
-        // 获取医院信息
-        CenterHospitalDTO hospitalDTOto = getData(centerHospitalService_consumer.getByHospCode(hospCode));
-        if (hospitalDTOto == null) {
-            throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
-        }
-
-        // 校验服务有效期
-        if (!DateUtils.betweenDate(hospitalDTOto.getStartDate(), hospitalDTOto.getEndDate())) {
-            String startDate = DateUtils.format(hospitalDTOto.getStartDate(), DateUtils.Y_M_DH_M_S);
-            String endDate = DateUtils.format(hospitalDTOto.getEndDate(), DateUtils.Y_M_DH_M_S);
-            throw new AppException("医院编码【" + hospCode + "】：未在有效服务期内，服务开始时间【" + startDate + "】，服务结束时间【" + endDate + "】");
-        }
-
-        // 指定医院数据源查询用户信息
-        Map paramMap = new HashMap<>();
-        paramMap.put("hospCode", hospCode);
-        paramMap.put("userCode", userCode);
-
-
-        // 获取用户信息
-        SysUserDTO sysUserDTO = getData(sysUserService_consumer.getByCode(paramMap));
-
-        // 校验用户信息
-        if (sysUserDTO == null) {
-            throw new AppException("员工账号不存在！");
-        }
-
-        // 是否停用
-        if ("1".equals(sysUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被停用！");
-        }
-
-        // 是否锁定
-        if ("2".equals(sysUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被锁定！");
-        }
-
-        // 账号或密码错误
-        if (!MD5Utils.verifySha(password, sysUserDTO.getPassword())) {
-            throw new AppException(updatePwdErrorInfo(sysUserDTO));
-        }
-
-        // 获取用户可操作子系统和对应子系统操作科室
-        // key -->> 基础数据子系统
-        // value -->> {id:"1", deptName:"内科"}
-        List<Map<String, Object>> resultList = convertSystemListToMap(paramMap);
-
-        // 记录最后登陆信息
-        updateLoginInfo(sysUserDTO, req, res);
-
-        // 所属科室信息 -- add by zhongming begin
-        BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
-        baseDeptDTO.setHospCode(hospCode);
-        baseDeptDTO.setCode(sysUserDTO.getDeptCode());
-
-        Map map = new HashMap();
-        map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("baseDeptDTO", baseDeptDTO);
-        BaseDeptDTO baseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
-        sysUserDTO.setBaseDeptDTO(baseDeptDto);
-        // 所属科室信息 -- add by zhongming end
-        //医院级别
-        sysUserDTO.setLevelCode(hospitalDTOto.getLevelCode());
-        //医院名称
-        sysUserDTO.setHospName(hospitalDTOto.getName());
-        //获取系统参数机构名称
-        Map parameterMap = new HashMap();
-        parameterMap.put("hospCode", hospCode);
-        parameterMap.put("code", "JG_NAME");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(parameterMap).getData();
-        if (sysParameterDTO == null) {
-            throw new AppException("系统首页展示名称参数为空");
-        }
-        sysUserDTO.setOrgName(sysParameterDTO.getValue());
-
-        // 添加定制化发票，收据样式（界面路径） 官红强  2021-3-26 09:25:53    start=======
-        parameterMap.put("code", "PAGE_PATH");
-        SysParameterDTO sysParameterDTOByPagePath = sysParameterService_consumer.getParameterByCode(parameterMap).getData();
-        if (sysParameterDTOByPagePath != null && StringUtils.isNotEmpty(sysParameterDTOByPagePath.getValue())) {
-            sysUserDTO.setPagePath(sysParameterDTOByPagePath.getValue());
-        }
-        // 添加定制化发票，收据样式（界面路径） 官红强  2021-3-26 09:25:53    end=======
-
-        // 用户信息放入会话中，并设置有效期为30分钟
-        setSession(SESSION_USER_INFO, sysUserDTO, 120 * 60, req, res);
-        // 返回前端：子系统列表信息
-        return WrapperResponse.success(resultList);
     }
 
     /**
@@ -369,6 +377,7 @@ public class LoginController extends BaseController {
                  g.setColor(new Color(20 + random.nextInt(110),20 + random.nextInt(110),20 + random.nextInt(110)));
                  g.drawString(rand, 13 * i + 6, 28);
              }
+
              // 将字验证码保存到session中用于前端的验证
              setSession(SESSION_AUTH_CODE, authCode, 5 * 60, req, res);
              g.dispose();
@@ -413,12 +422,17 @@ public class LoginController extends BaseController {
      **/
     @PostMapping("/getUserInfo")
     public WrapperResponse<SysUserDTO> getUserInfo(HttpServletRequest req, HttpServletResponse res) {
-        SysUserDTO sysUserDTO = getSession(req, res);
-        // 获取登录用户信息，禁止密码传输
-        if (sysUserDTO != null) {
-            sysUserDTO.setPassword(null);
+        rnLock.lock();
+        try {
+            SysUserDTO sysUserDTO = getSession(req, res);
+            // 获取登录用户信息，禁止密码传输
+            if (sysUserDTO != null) {
+                sysUserDTO.setPassword(null);
+            }
+            return WrapperResponse.success(sysUserDTO);
+        }finally{
+            rnLock.unlock();
         }
-        return WrapperResponse.success(sysUserDTO);
     }
 
     /**
@@ -433,35 +447,40 @@ public class LoginController extends BaseController {
      **/
     @PostMapping("/setLoginDept")
     public  WrapperResponse<SysUserDTO> setLoginDept(@RequestParam(required = true) String loginDeptId, @RequestParam(required = true) String usId, @RequestParam(required = true) String systemCode, HttpServletRequest req, HttpServletResponse res) {
-        SysUserDTO sysUserDTO = getSession(req, res);
-        // 获取登录用户信息，禁止密码传输
-        if (sysUserDTO != null) {
-            sysUserDTO.setPassword(null);
+        rnLock.lock();
+        try {
+            SysUserDTO sysUserDTO = getSession(req, res);
+            // 获取登录用户信息，禁止密码传输
+            if (sysUserDTO != null) {
+                sysUserDTO.setPassword(null);
+            }
+
+            // 登录科室信息 -- add by zhongming begin
+            // 登录科室和用户所属科室一致，不需要重新查询
+            if (sysUserDTO.getBaseDeptDTO().getId().equals(loginDeptId)) {
+                sysUserDTO.setLoginBaseDeptDTO(sysUserDTO.getBaseDeptDTO());
+            } else {
+                BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+                baseDeptDTO.setHospCode(sysUserDTO.getHospCode());
+                baseDeptDTO.setId(loginDeptId);
+
+                Map map = new HashMap();
+                map.put("hospCode", sysUserDTO.getHospCode());
+                map.put("baseDeptDTO", baseDeptDTO);
+                BaseDeptDTO loginBaseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
+                sysUserDTO.setLoginBaseDeptDTO(loginBaseDeptDto);
+            }
+            // 设置用户和子系统关系ID
+            sysUserDTO.setUsId(usId);
+            sysUserDTO.setSystemCode(systemCode);
+            // 登录科室信息 -- add by zhongming end
+
+            // 用户信息放入会话中，并设置有效期为30分钟
+            setSession(SESSION_USER_INFO, sysUserDTO, 120 * 60, req, res);
+            return WrapperResponse.success(sysUserDTO);
+        }finally{
+            rnLock.unlock();
         }
-
-        // 登录科室信息 -- add by zhongming begin
-        // 登录科室和用户所属科室一致，不需要重新查询
-        if (sysUserDTO.getBaseDeptDTO().getId().equals(loginDeptId)) {
-            sysUserDTO.setLoginBaseDeptDTO(sysUserDTO.getBaseDeptDTO());
-        } else {
-            BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
-            baseDeptDTO.setHospCode(sysUserDTO.getHospCode());
-            baseDeptDTO.setId(loginDeptId);
-
-            Map map = new HashMap();
-            map.put("hospCode", sysUserDTO.getHospCode());
-            map.put("baseDeptDTO", baseDeptDTO);
-            BaseDeptDTO loginBaseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
-            sysUserDTO.setLoginBaseDeptDTO(loginBaseDeptDto);
-        }
-        // 设置用户和子系统关系ID
-        sysUserDTO.setUsId(usId);
-        sysUserDTO.setSystemCode(systemCode);
-        // 登录科室信息 -- add by zhongming end
-
-        // 用户信息放入会话中，并设置有效期为30分钟
-        setSession(SESSION_USER_INFO, sysUserDTO, 120 * 60, req, res);
-        return WrapperResponse.success(sysUserDTO);
     }
 
     /**

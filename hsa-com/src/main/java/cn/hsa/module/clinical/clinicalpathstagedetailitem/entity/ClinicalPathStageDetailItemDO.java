@@ -1,18 +1,21 @@
 package cn.hsa.module.clinical.clinicalpathstagedetailitem.entity;
 
 import cn.hsa.base.PageDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * @Package_name: cn.hsa.module.clinical.clinicalpathstagedetailitem.entity
  * @Class_name: ClinicalPathStageDetailItemDO
- * @Describe:
+ * @Describe: 阶段明细绑定项目/病历明细数据映射实体
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
  * @Date: 2021/9/17 13:46
@@ -44,6 +47,14 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
      * 临床路径阶段明细ID(clinic_path_stage_detail.id)
      */
     private String detailId;
+    /**
+     * 项目分类(LCXMFL)
+     */
+    private String itemType;
+    /**
+     * 系统归类(XTGL)
+     */
+    private String classify;
     /**
      * 是否必要(SF)
      */
@@ -103,7 +114,7 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
     /**
      * 剂量
      */
-    private Double dosage;
+    private BigDecimal dosage;
     /**
      * 剂量单位代码（JLDW）
      */
@@ -123,7 +134,7 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
     /**
      * 数量
      */
-    private Double num;
+    private BigDecimal num;
     /**
      * 数量单位（DW）
      */
@@ -131,15 +142,15 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
     /**
      * 单价
      */
-    private Double price;
+    private BigDecimal price;
     /**
      * 总金额
      */
-    private Double totalPrice;
+    private BigDecimal totalPrice;
     /**
      * 总数量（数量*频率*用药天数）
      */
-    private Double totalNum;
+    private BigDecimal totalNum;
     /**
      * 总数量单位（DW）
      */
@@ -147,7 +158,7 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
     /**
      * 中草药付（剂）数
      */
-    private Double herbNum;
+    private BigDecimal herbNum;
     /**
      * 执行科室ID
      */
@@ -195,5 +206,7 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 }

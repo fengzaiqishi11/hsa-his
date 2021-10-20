@@ -53,10 +53,10 @@ public class LisResultController extends BaseController {
      * @Date: 2021-07-06
      */
     @PostMapping("queryNoResult")
-    public Map queryNoResult(){
-        Map map = new HashMap();
-        map.put("hospCode","1000001");
-        return lisResultService.queryNoResultLis(map);
+    public Map updateNoResult(@RequestBody Map map){
+        List<Map> resultList = MapUtils.get(map, "lisResult");
+        map.put("hospCode",MapUtils.get(resultList.get(0),"hospCode"));
+        return lisResultService.updateNoResultLis(map);
     }
 
     /**
@@ -99,7 +99,9 @@ public class LisResultController extends BaseController {
         map.put("hospCode",MapUtils.get(map,"hospCode"));
         List<String> list = lisResultService.queryDXNoResult(map);
         Map result = new HashMap();
+        List<String> backList = lisResultService.queryDXBackResult(map);
         result.put("list",list);
+        result.put("backList",backList);
         return result;
     }
 

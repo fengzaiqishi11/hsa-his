@@ -513,6 +513,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
                 insureIndividualSettleDO.setRetirePrice(ake026);//离休基金支付
                 insureIndividualSettleDO.setMafPay(bka821); // 医疗救助基金
+                insureIndividualSettleDO.setHospExemAmount(bka844); // 医院减免
                 insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
                 insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
                 insureIndividualSettleDO.setHospPrice(bka842);//医院支付
@@ -717,6 +718,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO.setHospCode(hospCode);//医院编码
             inptVisitDTO.setId(id);//就诊id
             inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }
@@ -1143,6 +1145,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrOptins = MapUtils.get(insureInptResult, "clr_optins");
             String clrWay = MapUtils.get(insureInptResult, "clr_way");
             String clrType = MapUtils.get(insureInptResult, "clr_type");
+            String hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
+
             BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
             /**
              * 结算成功以后 更新基金信息
@@ -1190,6 +1194,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     fundDTOList.add(insureIndividualFundDTO);
                 }
                 isInsureUnifiedMap.put("fundDTOList", fundDTOList);
+                System.out.println(isInsureUnifiedMap);
                 insureIndividualSettleService.insertBatchFund(isInsureUnifiedMap).getData();
             }
 

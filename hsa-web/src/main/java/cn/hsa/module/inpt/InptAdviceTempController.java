@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.doctor.service.InptAdviceTempService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,7 +72,16 @@ public class InptAdviceTempController extends BaseController {
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         inptAdviceTempDTO.setHospCode(sysUserDTO.getHospCode());
+        inptAdviceTempDTO.setIsValid(Constants.SF.S);
         map.put("inptAdviceTempDTO",inptAdviceTempDTO);
+        // 医嘱模板科室只可查询当前登录科室，个人只查询当前登陆人
+        if (StringUtils.isNotEmpty(inptAdviceTempDTO.getTypeCode()) && Constants.MBLX.KS.equals(inptAdviceTempDTO.getTypeCode())) {
+            // 科室
+            inptAdviceTempDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        } else if (StringUtils.isNotEmpty(inptAdviceTempDTO.getTypeCode()) && Constants.MBLX.GR.equals(inptAdviceTempDTO.getTypeCode())) {
+            // 个人
+            inptAdviceTempDTO.setDoctorId(sysUserDTO.getId());
+        }
         WrapperResponse<List<InptAdviceTempDTO>> inptAdviceTempWrapperResponse = inptAdviceTempService_consumer.queryInptAdviceTemp(map);
         return inptAdviceTempWrapperResponse;
     }

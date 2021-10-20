@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.diagnosistemplate.bo.BaseDiagnosisTemplateBO;
 import cn.hsa.module.base.diagnosistemplate.dto.BaseDiagnosisTemplateDTO;
 import cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService;
+import cn.hsa.util.MapUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -101,5 +102,20 @@ public class BaseDiagnosisTemplateServiceImpl extends HsafService implements Bas
     @Override
     public WrapperResponse<Boolean> updateById(Map<String, Object> map) {
         return WrapperResponse.success(baseDiagnosisTemplateBO.updateById(map));
+    }
+
+    /**
+     * @Menthod: updateStatusCode
+     * @Desrciption: 审核/作废诊断管理
+     * @Param: baseDiagnosisTemplateDTO
+     *  审核：checkFlag = 1，作废：checkFlag = 2
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-12 13:49
+     * @Return: Boolean
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateStatusCode(Map map) {
+        return WrapperResponse.success(baseDiagnosisTemplateBO.updateStatusCode(MapUtils.get(map, "baseDiagnosisTemplateDTO")));
     }
 }

@@ -82,6 +82,7 @@
         <result property="backAmount" column="backAmount" jdbcType="NUMERIC"/>
         <result property="isWait" column="is_wait" jdbcType="NUMERIC"/>
         <result property="hospItemCode" column="hospItemCode" jdbcType="VARCHAR"/>
+        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 实体字段映射 -->
@@ -250,11 +251,13 @@
         st.id, st.hosp_code, st.visit_id, st.baby_id, st.iat_id, st.iatd_group_no, st.iatd_seq_no, st.advice_exec_id, st.source_code, st.source_id, st.old_cost_id, st.source_dept_id, st.in_dept_id, st.bfc_id, st.item_code, st.item_id, st.item_name, st.price, st.num, st.spec, st.prep_code, st.dosage, st.dosage_unit_code, st.usage_code, st.rate_id, st.speed_code,
         st.use_days, st.num_unit_code, st.total_num, st.total_num_unit_code, st.herb_note_code, st.use_code, st.herb_num, st.total_price, st.preferential_price, st.reality_price, st.back_num, st.doctor_id, st.doctor_name, st.dept_id, st.phar_id, st.is_dist, st.is_give, st.back_code, st.is_ok, st.ok_id, st.ok_name, st.ok_time,
         st.settle_code, st.settle_id, st.is_check, st.check_id, st.check_name, st.check_time, st.zz_doctor_id, st.zz_doctor_name, st.jz_doctor_id, st.jz_doctor_name, st.zg_doctor_id, st.zg_doctor_name,
-        st.exec_id, st.exec_name, st.exec_time, st.exec_dept_id, st.plan_exec_time, st.status_code, is_cost, cost_time, st.crte_id, st.crte_name, crte_time,st.distribute_all_detail_id,
+        st.exec_id, st.exec_name, st.exec_time, st.exec_dept_id, st.plan_exec_time, st.status_code, is_cost, cost_time, st.crte_id, st.crte_name, st.crte_time,st.distribute_all_detail_id,
         (select pt.name from base_dept pt where pt.hosp_code = st.hosp_code and pt.id = st.exec_dept_id) execDeptName,
         (ifnull(st.back_num,0) * st.price) backAmount,
-        (select fy.name from base_finance_classify fy where fy.hosp_code = st.hosp_code and fy.id = st.bfc_id) bfcName,st.is_wait,st.attribution_code
+        (select fy.name from base_finance_classify fy where fy.hosp_code = st.hosp_code and fy.id = st.bfc_id) bfcName,st.is_wait,st.attribution_code,
+        (case ia.is_long when '0' then '长期' when '1' then '临时' else '' end ) as is_long
         from inpt_cost st
+        left join inpt_advice ia on st.iat_id = ia.id and st.hosp_code = ia.hosp_code
         where st.hosp_code = #{hospCode}
         <if test="id != null and id !=''">
             and st.id = #{id}
@@ -290,7 +293,10 @@
             and (st.baby_id is null or st.baby_id = '')
         </if>
         <if test="babyId != null and babyId != ''">
-            AND baby_id = #{babyId}
+            AND st.baby_id = #{babyId}
+        </if>
+        <if test="isLong != null and isLong != ''">
+            AND ia.is_long = #{isLong}
         </if>
         order by st.status_code asc,st.source_code asc,st.cost_time desc
     </select>
@@ -518,7 +524,7 @@
         <if test="babyId != null and babyId != ''">
             AND baby_id = #{babyId}
         </if>
-        order by t.crte_time desc
+        order by t.crte_time asc
     </select>
     <!-- 查询门诊病人手术补记账部分数据 -->
     <select id="queryOutpatientSurgeryCostPage" resultMap="InptCostMap">

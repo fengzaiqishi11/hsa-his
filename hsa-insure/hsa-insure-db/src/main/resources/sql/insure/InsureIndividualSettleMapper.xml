@@ -67,6 +67,7 @@
         <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
         <result property="bka035" column="bka035" jdbcType="VARCHAR"/>
         <result property="bka035Name" column="bka035_name" jdbcType="VARCHAR"/>
+        <result property="hospExemAmount" column="hosp_exem_amount" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 表所有字段（别名） -->
@@ -124,6 +125,8 @@
         iis.ext08,
         iis.ext09,
         iis.ext10,
+        iis.hosp_exem_amount,
+        iis.ext10,
         iis.clr_type,
         iis.clr_way,
         iis.clr_optins
@@ -135,7 +138,7 @@
         select * from(
         select
         iic.id, iic.hosp_code, iic.visit_id, iic.settle_id, iic.is_hospital, iic.visit_no, iic.discharge_dn_code,
-        iic.insure_org_code,iic.insure_reg_code,
+        iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_pay,
         iic.medicine_org_code,iic.discharge_dn_name, discharged_date, iic.discharged_case,
         (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
         iic.total_price, iic.plan_price,
@@ -294,7 +297,8 @@
          ext08,
          ext09,
          ext10,
-         maf_pay)
+         maf_pay,
+         hosp_exem_amount)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -347,7 +351,8 @@
                 #{ext08,jdbcType=VARCHAR},
                 #{ext09,jdbcType=VARCHAR},
                 #{ext10,jdbcType=VARCHAR},
-                #{mafPay,jdbcType=DECIMAL})
+                #{mafPay,jdbcType=DECIMAL},
+                #{hospExemAmount,jdbcType=DECIMAL})
     </insert>
     <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
     <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
@@ -511,8 +516,12 @@
                 ext10,
             </if>
             <if test="mafPay != null and mafPay != ''">
-                maf_pay
+                maf_pay,
             </if>
+            <if test="hospExemAmount != null and hospExemAmount != ''">
+                hosp_exem_amount
+            </if>
+
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">
@@ -672,7 +681,10 @@
                 #{ext10,jdbcType=VARCHAR},
             </if>
             <if test="mafPay != null and mafPay != ''">
-                #{mafPay,jdbcType=DECIMAL}
+                #{mafPay,jdbcType=DECIMAL},
+            </if>
+            <if test="hospExemAmount != null and hospExemAmount != ''">
+                #{hospExemAmount,jdbcType=DECIMAL}
             </if>
         </trim>
     </insert>
@@ -772,7 +784,8 @@
             ext08              = #{ext08,jdbcType=VARCHAR},
             ext09              = #{ext09,jdbcType=VARCHAR},
             ext10              = #{ext10,jdbcType=VARCHAR},
-            maf_pay            = #{mafPay,jdbcType=DECIMAL}
+            maf_pay            = #{mafPay,jdbcType=DECIMAL},
+            hosp_exem_amount   = #{hospExemAmount,jdbcType=DECIMAL}
         where id = #{id}
     </update>
 
@@ -952,8 +965,12 @@
                 clr_optins = #{clrOptins,jdbcType=VARCHAR},
             </if>
             <if test="mafPay != null and mafPay != ''">
-                maf_pay = #{mafPay,jdbcType=DECIMAL}
+                maf_pay = #{mafPay,jdbcType=DECIMAL},
             </if>
+            <if test="hospExemAmount != null and hospExemAmount != ''">
+                hosp_exem_amount   = #{hospExemAmount,jdbcType=DECIMAL}
+            </if>
+
         </set>
         where 1=1
         <if test="id != null and id!= ''">

@@ -403,6 +403,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 outFeeMap.put("bka893","1");
                 outFeeMap.put("aaz217",insureIndividualBasicDTO.getAaz217());
                 outFeeMap.put("saveFlag","1");
+                outFeeMap.put("code",outptVisitDTO.getCode());
+                outFeeMap.put("crteName",outptVisitDTO.getCrteName());
+                outFeeMap.put("aac001",insureIndividualBasicDTO.getAac001());
                 if (StringUtils.isEmpty(insureIndividualBasicDTO.getAaz217())) {
                     throw new AppException("医保退费失败：未获取病人医保登记号，请去医保前台系统退费");
                 }
@@ -1064,6 +1067,21 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 调用 统一支付平台-急诊留观手术及抢救信息【4302】接口
         insureUnifiedPayOutptService_consumer.UP4302(map);
         return true;
+    }
+
+    /**
+     * @param outptPayDTO
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     */
+    @Override
+    public OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO) {
+        return outptPayDAO.getPayInfoByParams(outptPayDTO);
     }
 
     /**

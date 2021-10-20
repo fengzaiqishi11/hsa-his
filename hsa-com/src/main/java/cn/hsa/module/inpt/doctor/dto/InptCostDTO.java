@@ -173,6 +173,14 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String inDate;
     // 总费用
     private String totalCost;
+    /**
+     * 是否临嘱（SF）（0：长期，1：临时）
+     */
+    private String isLong;
+    /**
+     * 频率名
+     */
+    private String rateName;
     private String insureRegCode;
     private BigDecimal inptSumPrice;
     private BigDecimal insureSumPrice;

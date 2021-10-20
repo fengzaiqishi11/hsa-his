@@ -7,6 +7,7 @@ import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.InptBabyService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +101,30 @@ public class InptBabyController extends BaseController {
         return inptBabyService_consumer.getById(map);
     }
 
+    /**
+     * @Menthod: cancelBaby
+     * @Desrciption: 新生儿取消登记
+     * @Param: inptBabyDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-08 11:30
+     * @Return:
+     **/
+    @PostMapping("/cancelBaby")
+    public WrapperResponse<Boolean> cancelBaby(@RequestBody InptBabyDTO inptBabyDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(inptBabyDTO.getId())){
+            throw new RuntimeException("未选择需要取消的婴儿");
+        }
+        inptBabyDTO.setHospCode(sysUserDTO.getHospCode());
+        inptBabyDTO.setCancelId(sysUserDTO.getId());
+        inptBabyDTO.setCancelName(sysUserDTO.getName());
+        inptBabyDTO.setCancelTime(DateUtils.getNow());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("inptBabyDTO", inptBabyDTO);
+        return inptBabyService_consumer.cancelBaby(map);
+    }
 
     /**
      * @Menthod: getBabyTotalCostById

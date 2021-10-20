@@ -4,7 +4,7 @@
     <!--分页查询所有护理单据-->
     <select id="queryPage" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
-        select id, hosp_code, code, name, is_assign, is_valid, dept_ids, pg_size, crte_id, crte_name, crte_time
+        select id, hosp_code, code, name, is_assign, is_valid, is_vertical, dept_ids, pg_size, crte_id, crte_name, crte_time
         from base_nurse_order
         where hosp_code = #{hospCode}
         and is_valid = '1'
@@ -23,6 +23,7 @@
                name,
                is_assign,
                is_valid,
+               is_vertical,
                dept_ids,
                pg_size,
                crte_id,
@@ -41,6 +42,7 @@
                code,
                name,
                is_assign,
+               is_vertical,
                is_valid,
                dept_ids,
                pg_size,
@@ -57,9 +59,9 @@
 
     <!--新增护理单据-->
     <insert id="insert" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO">
-        insert into base_nurse_order(id, hosp_code, code, name, is_assign, is_valid, dept_ids, pg_size, crte_id,
+        insert into base_nurse_order(id, hosp_code, code, name, is_assign, is_vertical, is_valid, dept_ids, pg_size, crte_id,
                                      crte_name, crte_time)
-        values (#{id}, #{hospCode}, #{code}, #{name}, #{isAssign}, #{isValid}, #{deptIds}, #{pgSize}, #{crteId},
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{isAssign}, #{isVertical}, #{isValid}, #{deptIds}, #{pgSize}, #{crteId},
                 #{crteName}, #{crteTime})
     </insert>
 
@@ -75,6 +77,9 @@
             </if>
             <if test="isAssign != null and isAssign != ''">
                 is_assign = #{isAssign},
+            </if>
+            <if test="isVertical != null and isVertical != ''">
+                is_vertical = #{isVertical},
             </if>
             <if test="isValid != null and isValid != ''">
                 is_valid = #{isValid},

@@ -956,6 +956,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 settleDataMap.put("resultStr",resultStr);
                 setlinfoDataMap.put("age",setlinfoDataMap.get("age").toString());
                 settleDataMap.put("setlinfo",setlinfoDataMap);
+                settleDataMap.put("crteId",inptVisitDTO.getCrteId());
+                settleDataMap.put("crteName",inptVisitDTO.getCrteName());
                 return  updateInptTrialSettleInfo(settleDataMap,hospCode,insureConfigurationDTO.getRegCode());
             }finally {
                 redisUtils.del(redisKey);
@@ -996,6 +998,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      **/
     public Map<String,String> updateInptTrialSettleInfo(Map<String,Object> outDataMap,String hospCode,String regCode){
         Map<String,String> paramMap = new HashMap<String,String>();
+        String crteId = MapUtils.get(outDataMap,"crteId");
+        String crteName = MapUtils.get(outDataMap,"crteName");
         Map sysParamMap = new HashMap<>();
         sysParamMap.put("hospCode", hospCode);
         sysParamMap.put("code", regCode);
@@ -1058,6 +1062,18 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             paramMap.put("clr_type",MapUtils.get(outDataMap,"clr_type"));
             paramMap.put("acct_pay",MapUtils.get(outDataMap,"acct_pay"));
             paramMap.put("setldetailList",MapUtils.get(outDataMap,"setldetailList"));
+
+        }
+       List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
+        // 保存结算基金信息
+        if (!ListUtils.isEmpty(setldetailList)) {
+            for (Map<String,Object> map : setldetailList) {
+                String fundPayType = MapUtils.get(map,"fund_pay_type");
+                String fundPayamt = MapUtils.get(map,"fund_payamt").toString();
+                if ("630101".equals(fundPayType)) {
+                    paramMap.put("bka844",fundPayamt);
+                }
+            }
         }
         return paramMap;
     }

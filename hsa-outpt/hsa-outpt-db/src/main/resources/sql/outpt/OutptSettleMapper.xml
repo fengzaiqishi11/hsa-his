@@ -511,6 +511,7 @@
             a.crte_name,
             a.settle_time,
             a.card_price as cardPrice,
+            (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code) as preferentialName,
             CONCAT(
             b.name,'/',
                 (CASE b.gender_code WHEN '0' THEN '未知的性别'
@@ -529,7 +530,9 @@
             (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
         FROM
         outpt_settle a JOIN outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
-        WHERE a.hosp_code = #{hospCode} and a.is_settle='1'
+        <!--存在就诊表里的就诊医生与费用表医生不一致，导致过滤的数据不正确，医生过滤修改成费用表医生 add luoyong 2021.10.4-->
+        left join outpt_cost c on a.id = c.settle_id and a.hosp_code = c.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.is_settle='1' and c.settle_code = '2'
         <if test="keyword != null and keyword != ''">
             and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
         </if>
@@ -543,8 +546,9 @@
             and a.crte_id = #{chargeId}
         </if>
         <if test="doctorId != null and doctorId != ''">
-            and b.doctor_id = #{doctorId}
+            and c.doctor_id = #{doctorId}
         </if>
+        group by a.id
         order by a.settle_no desc, a.settle_time desc
     </select>
 

@@ -485,4 +485,6 @@ public interface InptVisitDAO {
      * @Return BaseDrugDTO
      **/
     BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
+
+    List<Map<String, Object>> queryNoMergePatients(Map<String, Object> paramMap);
 }

@@ -107,6 +107,10 @@
     <dubbo:service interface="cn.hsa.module.emr.emrdoctemplate.service.EmrDocTemplateService" ref="emrDocTemplateService_provider"/>
     <!-- 电子病历子系统  病历借阅生产者 -->
     <dubbo:service interface="cn.hsa.module.emr.emrborrow.service.EmrBorrowService" ref="emrBorrowService_provider"/>
+    <!-- 电子病历子系统  病历时效质控生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrquality.service.EmrQualityAgingService" ref="emrQualityAgingService_provider"/>
+    <!-- 电子病历子系统  病历数据规则生产者 -->
+    <dubbo:service interface="cn.hsa.module.emr.emrquality.service.EmrQualityDataRulesService" ref="emrQualityDataRulesService_provider"/>
 
     <!-- 卫统数据上报 -->
     <dubbo:service interface="cn.hsa.module.upload.healthreport.service.HealthReportService" ref="healthReportService_provider"/>
@@ -141,5 +145,7 @@
     <dubbo:service interface="cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService" ref="inptClinicalPathStageService_provider"/>
     <!--临床路径病人记录-->
     <dubbo:service interface="cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService" ref="inptClinicalPathStateService_provider"/>
+    <!--临床路径病人记录-->
+    <dubbo:service interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" ref="clinicPathExecService_provider"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
 </beans>

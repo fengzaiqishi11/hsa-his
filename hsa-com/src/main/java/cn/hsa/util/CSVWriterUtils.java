@@ -89,8 +89,11 @@ public class CSVWriterUtils {
 
         if (files!=null) {
             // 删除昨天或更久的文件夹
-            for (File file : files)
-                delteFile(file);
+            for (File file : files) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
         }
     }
     // 递归删除文件

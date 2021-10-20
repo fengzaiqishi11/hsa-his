@@ -1380,16 +1380,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "5"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "5"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         DATE_FORMAT( ( b.crte_time ), '%Y-%m' ),
         g.antibacterial_code,
@@ -1486,16 +1486,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "6"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "6"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         g.antibacterial_code,
         g.proton_pump,

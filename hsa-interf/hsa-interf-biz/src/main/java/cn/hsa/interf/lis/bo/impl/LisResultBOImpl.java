@@ -157,7 +157,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public List<String> queryDXNoResult(Map map){
         List<String> list = lisResultDAO.queryDXNoResult(map);
-        lisResultDAO.updateStatus(list);
+//        lisResultDAO.updateStatus(list);
         return list;
     }
 

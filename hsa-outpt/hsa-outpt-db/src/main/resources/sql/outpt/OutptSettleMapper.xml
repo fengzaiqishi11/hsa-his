@@ -501,7 +501,7 @@
             b.age_unit_code,
             a.patient_code,
             b.dept_name,
-            b.doctor_name,
+            c.doctor_name,
             a.total_price,
             a.reality_price,
             IFNULL(a.self_price,0) as self_price,

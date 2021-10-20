@@ -938,8 +938,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      **/
     public Map<String,String> updateInptTrialSettleInfo(Map<String,Object> outDataMap,String hospCode,String regCode){
         Map<String,String> paramMap = new HashMap<String,String>();
-        String crteId = MapUtils.get(outDataMap,"crteId");
-        String crteName = MapUtils.get(outDataMap,"crteName");
         Map sysParamMap = new HashMap<>();
         sysParamMap.put("hospCode", hospCode);
         sysParamMap.put("code", regCode);
@@ -961,7 +959,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("hifmiPay",outDataMap.get("hifmi_pay").toString());// 居民大病保险资金支出
         paramMap.put("hifobPay",outDataMap.get("hifob_pay").toString()); // 职工大额医疗费用补助基金支出
         paramMap.put("bka821",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
-        paramMap.put("bka840",outDataMap.get("oth_pay").toString());//其他基金支付
+        paramMap.put("bka839",outDataMap.get("oth_pay").toString());//其他支付
         paramMap.put("psnPartAmt",outDataMap.get("psn_part_amt").toString());// 个人负担总金额
         paramMap.put("akb066",outDataMap.get("acct_pay").toString());// 个人账户支出
         paramMap.put("akb067",outDataMap.get("psn_cash_pay").toString()); // 个人现金支出

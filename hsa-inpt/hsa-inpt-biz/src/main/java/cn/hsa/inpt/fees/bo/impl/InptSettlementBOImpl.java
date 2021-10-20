@@ -895,6 +895,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (isInvoice) { //true:打印发票生成发票信息
                 Map<String, Object> map = new HashMap<String, Object>();
                 outinInvoiceDTO.setSettleId(settleId);//结算id
+                outinInvoiceDTO.setDqCurrNo(outinInvoiceDTO.getCurrNo());
                 map.put("hospCode", hospCode);
                 map.put("outinInvoiceDTO", outinInvoiceDTO);
                 OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService_consumer.updateInvoiceStatus(map).getData();
@@ -1896,6 +1897,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (isInvoice) { //true:打印发票生成发票信息
                 Map<String, Object> map = new HashMap<String, Object>();
                 outinInvoiceDTO.setSettleId(settleId);//结算id
+                outinInvoiceDTO.setDqCurrNo(outinInvoiceDTO.getCurrNo());
                 map.put("hospCode", hospCode);
                 map.put("outinInvoiceDTO", outinInvoiceDTO);
                 OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService_consumer.updateInvoiceStatus(map).getData();

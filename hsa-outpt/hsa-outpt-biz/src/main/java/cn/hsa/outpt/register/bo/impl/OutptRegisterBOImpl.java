@@ -1047,8 +1047,10 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outinInvoiceDTO.setPrefix(outptRegisterSettleDto.getPrefix());
         if (invoiceNo != null && !"".equals(invoiceNo.getCurrNo())) {
             outinInvoiceDTO.setCurrNo(invoiceNo.getCurrNo());
+            outinInvoiceDTO.setDqCurrNo(invoiceNo.getCurrNo());
         } else {
             outinInvoiceDTO.setCurrNo(outptRegisterSettleDto.getCurrNo());
+            outinInvoiceDTO.setDqCurrNo(outptRegisterSettleDto.getCurrNo());
         }
 
         queryMap.put("hospCode", hospCode);

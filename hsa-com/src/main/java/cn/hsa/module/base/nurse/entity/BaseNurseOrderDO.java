@@ -65,6 +65,10 @@ public class BaseNurseOrderDO extends PageDO implements Serializable {
      */
     private Integer pgSize;
     /**
+     * 单据头距顶部高度(mm)
+     */
+    private Integer topHeight;
+    /**
      * 创建人ID
      */
     private String crteId;

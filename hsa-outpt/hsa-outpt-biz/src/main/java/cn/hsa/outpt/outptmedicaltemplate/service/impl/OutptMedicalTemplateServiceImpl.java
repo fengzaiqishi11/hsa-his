@@ -120,4 +120,19 @@ public class OutptMedicalTemplateServiceImpl extends HsafService implements Outp
   public WrapperResponse<Boolean> deleteById(Map map) {
     return null;
   }
+
+
+  /**
+   * @Menthod queryAllMedicalTemplate
+   * @Desrciption 查询所有门诊病历模板
+   * @Param [outptMedicalTemplateDTO]
+   * @Author liuliyun
+   * @Date   2021/10/21 15:35
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryAllMedicalTemplate(Map map) {
+    OutptMedicalTemplateDTO outptMedicalTemplateDTO = MapUtils.get(map,"outptMedicalTemplateDTO");
+    return WrapperResponse.success(outptMedicalTemplateBO.queryAllMedicalTemplate(outptMedicalTemplateDTO));
+  }
 }

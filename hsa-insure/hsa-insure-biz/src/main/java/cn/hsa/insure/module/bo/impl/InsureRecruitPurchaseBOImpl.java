@@ -55,6 +55,9 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Resource
     private SysParameterService sysParameterService;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * @Method queryAll
      * @Param [map]
@@ -330,28 +333,20 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     private Map<String, Object> commonInsureUnified(String hospCode, String insureRegCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO.setOrgCode(insureRegCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if(insureConfigurationDTO ==null){
             throw new AppException("查询医保机构配置信息为空");
         }
-
-        // 调用海南招采接口
-        Map<String, Object> httpParam = new HashMap<String, Object>();
-        httpParam.put("infno", functionCode); //交易编号
-        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode())); //发送方报文ID
-        httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); //就医地医保区划
-        httpParam.put("recer_sys_code", ""); //接收方系统代码
-        httpParam.put("infver", ""); //接口版本号
-        httpParam.put("opter_type", ""); //经办人类别
-        httpParam.put("opter", ""); //经办人
-        httpParam.put("opter_name", ""); //经办人姓名
-        httpParam.put("inf_time", DateUtils.getNow()); //交易时间
-        httpParam.put("fixmedins_code", ""); //定点医药机构编号
-        httpParam.put("fixmedins_name", ""); //定点医药机构名称
-        httpParam.put("input", paramMap); //交易输入
-
+        Map httpParam = new HashMap();
+        httpParam.put("infno", functionCode);  //交易编号
+        httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
+        httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        httpParam.put("input", paramMap);
         String dataJson = JSONObject.toJSONString(httpParam);
         logger.debug("海南招采接口【" + functionCode + "】入参:" + dataJson);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
@@ -401,8 +396,20 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         String hospCode = MapUtils.get(map,"hospCode");
         String orgCode = getOrgCode(map);
         Map<String,Object> paramMap = new HashMap<>();
-        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8101, paramMap);
-        return stringObjectMap;
+        String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
+        String tokenValue = "";
+        if(redisUtils.hasKey(accessToken)){
+            tokenValue  = redisUtils.get(accessToken);
+        }else{
+            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+            Map<String,Object> outputMap =  MapUtils.get(stringObjectMap,"output");
+            Map<String,Object> dataMap = MapUtils.get(outputMap, "data");
+            tokenValue = MapUtils.get(dataMap,"accessToken");
+
+        }
+        redisUtils.set(accessToken,tokenValue,1800);
+        map.put("accessToken",tokenValue);
+        return map;
     }
 
     /**

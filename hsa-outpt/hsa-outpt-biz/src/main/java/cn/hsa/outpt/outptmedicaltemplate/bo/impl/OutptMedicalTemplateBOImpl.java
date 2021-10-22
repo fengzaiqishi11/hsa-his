@@ -225,4 +225,19 @@ public class OutptMedicalTemplateBOImpl extends HsafBO implements OutptMedicalTe
     }
     return list;
   }
+
+  /**
+   * @Menthod queryAllMedicalTemplate
+   * @Desrciption 查询所有门诊病历模板
+   * @Param [outptMedicalTemplateDTO]
+   * @Author liuliyun
+   * @Date   2021/10/21 15:27
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   **/
+  @Override
+  public PageDTO queryAllMedicalTemplate(OutptMedicalTemplateDTO outptMedicalTemplateDTO) {
+    List<OutptMedicalTemplateDTO> outptMedicalTemplateDTOS = outptMedicalTemplateDAO.queryMedicalTemplatePage(outptMedicalTemplateDTO);
+    outptMedicalTemplateDTOS = changeDisease(outptMedicalTemplateDTOS,outptMedicalTemplateDTO.getHospCode());
+    return PageDTO.of(outptMedicalTemplateDTOS);
+  }
 }

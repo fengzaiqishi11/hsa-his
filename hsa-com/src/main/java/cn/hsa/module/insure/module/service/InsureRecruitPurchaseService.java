@@ -126,5 +126,13 @@ public interface InsureRecruitPurchaseService {
      * @Return
      **/
     WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap);
-
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    WrapperResponse<Boolean> updateToInsure(Map<String, Object> map);
 }

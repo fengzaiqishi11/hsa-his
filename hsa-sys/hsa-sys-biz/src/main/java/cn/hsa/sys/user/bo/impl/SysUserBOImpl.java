@@ -24,7 +24,6 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -111,7 +110,11 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public List<SysUserDTO> queryAll(SysUserDTO sysUserDTO) {
          if("1".equals(sysUserDTO.getFlag())) {
-           return this.sysUserDAO.queryBedUserAll(sysUserDTO);
+            return this.sysUserDAO.queryBedUserAll(sysUserDTO);
+         }
+         // 111表示取门诊医生与财务人员
+         if ("111".equals(sysUserDTO.getFlag())) {
+            return this.sysUserDAO.queryMZAndSFYAllUser(sysUserDTO);
          }
         return this.sysUserDAO.queryAll(sysUserDTO);
     }

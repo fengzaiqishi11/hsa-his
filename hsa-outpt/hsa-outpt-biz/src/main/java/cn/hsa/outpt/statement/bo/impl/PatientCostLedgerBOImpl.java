@@ -562,10 +562,10 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 maps = patientCostLedgerDAO.queryStroReportAdjustPrice(paraMap);
                 break;
             default:
-                // 入库查询汇总  1 采购入库 2 直接入库
+                // 入库查询汇总  1 采购入库 2 直接入库 3 退供应商
                 String sql1 = "        left join stro_in si on sid.order_no = si.order_no and sid.hosp_code = si.hosp_code\n" +
                         "        left join base_supplier bs on si.supplier_id = bs.id and sid.hosp_code =  bs.hosp_code\n" +
-                        "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('1','2')";
+                        "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('1','2','3')";
                 paraMap.put("sql",sql1);
                 maps = switchFlag(flag,maps,paraMap);
                 break;

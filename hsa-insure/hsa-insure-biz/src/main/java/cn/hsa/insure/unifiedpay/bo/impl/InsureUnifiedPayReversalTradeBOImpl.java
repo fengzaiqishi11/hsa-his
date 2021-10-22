@@ -5,9 +5,13 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
@@ -16,6 +20,7 @@ import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +31,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.insure.unifiedpay.bo.impl
@@ -53,6 +56,15 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
+
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService;
+
+    @Resource
+    private InsureIndividualCostDAO insureIndividualCostDAO;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -422,6 +434,448 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
 
         return resultMap;
+    }
+
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  本地下载医保结算单
+     *
+     * @Param       C0000_BIZ2106   业务总次数且医疗业务类别为生育平产(居民)的累计  F0000_BIZ2106    总费用累计
+     *              C0000_BIZ2107   业务总次数且医疗业务类别为生育剖宫产(居民)的累计  F0000_BIZ2107  总费用累计
+     *              C0000_BIZ22   业务总次数且医疗业务类别为外伤住院的累计  F0000_BIZ22 总费用累计
+     *              C0000_BIZ51   业务总次数且医疗业务类别为职工生育门诊的累计  F0000_BIZ51 总费用累计
+     *              C0000_BIZ52  业务总次数且医疗业务类别为职工生育住院的累计  F0000_BIZ52 总费用累计
+     *              C0000_BIZ53   业务总次数且医疗业务类别为计划生育手术费的累计  F0000_BIZ53 总费用累计
+     *              C0000_BIZ9901  业务总次数且医疗业务类别为门诊两病的累计  F0000_BIZ9901 总费用累计
+     *              C0000_BIZ9903   业务总次数且医疗业务类别为意外伤害门诊的累计  F0000_BIZ9903 总费用累计
+     *              C0000_BIZ11 :  业务总次数且医疗业务类别为普通门诊的累计  F0000_BIZ11 总费用累计
+     *              C0000_BIZ14 :   业务总次数且医疗业务类别为门诊慢特病的累计  F0000_BIZ14 总费用累计
+     *              C0000_BIZ2101 :  业务总次数且医疗业务类别为普通住院的累计  F0000_BIZ2101 总费用累计
+     *              C0000_BIZ2102  : 业务总次数且医疗业务类别为单病种住院的累计  F0000_BIZ2102 总费用累计
+     *              C0000_BIZ13  业务总次数且医疗业务类别为急诊的累计  F0000_BIZ13 总费用累计
+     *
+     *              D320101 ：  公务员基金累计
+     *              D330101： 基金为大额医疗费用补助基金的累计
+     *              D310101/D390101 统筹基金支付
+     *              D310301/D390201 大病保险
+     *              D310201/D390501  个人账户支付
+     *              D610101   医疗救助支付
+     *
+     *
+     * @Author fuhui
+     * @Date   2021/10/14 11:18
+     * @Return
+    **/
+    public Map<String,Object> downLoadSettleInfo( Map<String,Object> map){
+        String hospCode = MapUtils.get(map,"hospCode");
+        InsureIndividualVisitDTO insureIndividualVisitDTO =  insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        String isHospital = insureIndividualVisitDTO.getIsHospital();
+        String medisCode = insureIndividualVisitDTO.getMedicineOrgCode();
+        // 获取医保结算信息  调用医保接口
+        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+        Map<String,Object> setlInfoMap = MapUtils.get(data,"setlinfo");
+        Map<String,Object> baseInfoMap  = handlerInptSettleParam(insureIndividualVisitDTO,setlInfoMap);
+        Map<String,Object> fourPartMap =  handlerInsureSettleFee(setlInfoMap);
+        // 个人累计信息查询
+        Map<String, Object> sumInfoMap = insureUnifiedBaseService.queryPatientSumInfo(map).getData();
+        List<Map<String, Object>> sumInfoMapList =  MapUtils.get(sumInfoMap,"resultDataMap");
+
+        map.put("code","HOSP_MEDICINS_INFO");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if(sysParameterDTO ==null || StringUtils.isEmpty(sysParameterDTO.getValue())){
+            throw new AppException("请先配置系统参数HOSP_MEDICINS_INFO");
+        }else{
+            String value = sysParameterDTO.getValue();
+            String hospLv = "";
+            String hospName ="";
+            String mdOrInsuplcAdmdvs ="";
+            String settleTitle ="";
+            Map<String,Object> stringObjectMap = JSON.parseObject(value,Map.class);
+            for(String key : stringObjectMap.keySet()){
+                if("hospLv".equals(key)){  // 珠海临时控制自费药的处理办法
+                    hospLv = MapUtils.get(stringObjectMap,key);
+                }
+                if("hospName".equals(key)){ // 湖南省特有的费流水号标识
+                    hospName = MapUtils.get(stringObjectMap,key);
+                }
+                if("mdOrInsuplcAdmdvs".equals(key)){
+                    mdOrInsuplcAdmdvs = MapUtils.get(stringObjectMap,key);
+                }
+            }
+            // 如果是1  结算单就取参保地区划
+            // 如果是0 结算单就取就医地区划
+            if(Constants.SF.S.equals(mdOrInsuplcAdmdvs)){
+
+            }
+        }
+        Map<String, Object> medisnInfMap = new HashMap<>();
+
+        Map<String,Object> pastFeeMap;
+        // 既往分类  340  离休人员医疗保障
+        if(!"340".equals(insureIndividualVisitDTO.getAka130())){
+            pastFeeMap = handlerPastFee(sumInfoMapList,isHospital);
+        }else{
+            pastFeeMap = handlerSpecialPastFee(sumInfoMapList);
+        }
+
+        // 查询his费用表集合
+        List<Map<String, Object>> settleFeeMap = insureIndividualCostDAO.selectIsSetlleFee(map);
+        if(ListUtils.isEmpty(settleFeeMap)){
+            throw new AppException("该患者在HIS费用表没有费用明细");
+        }
+        // 费用分组统计合并
+        List<Map<String, Object>> feeMapList = handlerInsureIndividualCost(settleFeeMap);
+        // 调用政策查询接口 住院独有
+        if(Constants.SF.S.equals(isHospital)){
+            Map<String, Object> policyMap = insureUnifiedBaseService.queryPolicyInfo(map).getData();
+            List <Map<String, Object>>  policyMapList =  MapUtils.get(policyMap,"outptMap");
+            map.put("policyMapList",policyMapList);
+        }
+
+        map.put("medisnInfMap",medisnInfMap); // 结算单第一部分数据
+        map.put("pastFeeMap",pastFeeMap); // 结算单显示第三部分数据
+        map.put("feeMapList",feeMapList); // 结算单第四部分数据
+        map.put("fourPartMap",fourPartMap);// 尾部结算数据
+        map.put("baseInfoMap",baseInfoMap);//患者就诊的基本信息数据部分
+        return map;
+    }
+    /**
+     * @Method handlerSpecialPastFee
+     * @Desrciption  离休人员费用结算单 本年既往费用
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/19 19:44
+     * @Return
+    **/
+    private Map<String, Object> handlerSpecialPastFee(List<Map<String, Object>> sumInfoMapList) {
+        Map<String,Object> partThreeMap = new HashMap<>();
+        if(!ListUtils.isEmpty(sumInfoMapList)){
+            BigDecimal totalCount = new BigDecimal(0.00); // 本年住院次数
+            BigDecimal s1 = new BigDecimal(0.00);  // 医疗费合计
+            BigDecimal s2 = new BigDecimal(0.00) ; // 离休基金支付
+            BigDecimal s3 = new BigDecimal(0.00); // 个人账户支付
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            String cumTypeCode ="";
+            BigDecimal cum = new BigDecimal(0.00);
+            for(Map<String, Object> item : sumInfoMapList){
+                cumTypeCode = MapUtils.get(item,"cum_type_code"); // 累计类别代码
+                cum = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "cum").toString())));
+                // 住院次数
+                if("C0000".equals(cumTypeCode)){
+                    totalCount= BigDecimalUtils.add(totalCount,cum);
+                }
+                //医疗费合计
+                if("S0000".equals(cumTypeCode)){
+                    s1 = BigDecimalUtils.add(s1,cum);
+                }
+                // 离休基金支付
+                if("D340101".equals(cumTypeCode)){
+                    s2 = BigDecimalUtils.add(s2,cum);
+                }
+                //个人账户支付
+                if("D310201".equals(cumTypeCode)){
+                    s3 = BigDecimalUtils.add(s3,cum);
+                }
+            }
+            partThreeMap.put("totalCount",totalCount);
+            partThreeMap.put("s1",s1);
+            partThreeMap.put("s2",s2);
+            partThreeMap.put("s3",s3);
+        }
+        return partThreeMap;
+    }
+
+    /**
+     * @Method handlerInsureSettleFee
+     * @Desrciption  结算单公共部分 尾部  结算信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/19 20:09
+     * @Return
+    **/
+    private Map<String, Object> handlerInsureSettleFee(Map<String, Object> setlInfoMap) {
+        Map<String,Object> partFourMap = new HashMap<>();
+        partFourMap.put("medfeeSumamt",MapUtils.get(setlInfoMap,"medfee_sumamt")); // 本次医疗费总额
+        partFourMap.put("hifpPay",MapUtils.get(setlInfoMap,"hifp_pay")); // 统筹基金支付
+        partFourMap.put("cvlservPay",MapUtils.get(setlInfoMap,"cvlserv_pay")); // 公务员补助支付
+        partFourMap.put("hifobPay",MapUtils.get(setlInfoMap,"hifob_pay")); // 大额基金支付
+        partFourMap.put("hifmiPay",MapUtils.get(setlInfoMap,"hifmi_pay")); // 大病保险支付
+        partFourMap.put("hifobPay",MapUtils.get(setlInfoMap,"hifob_pay")); // 大额基金支付
+        partFourMap.put("acctPay",MapUtils.get(setlInfoMap,"acct_pay")); // 个人账户支付金额
+        partFourMap.put("psnCashPay",MapUtils.get(setlInfoMap,"psn_cash_pay")); // 现金支付金额
+        return partFourMap;
+    }
+
+    /**
+     * @Method handlerPastFee
+     * @Desrciption  计算既往费用的；
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/15 16:20
+     * @Return
+    **/
+    private Map<String, Object> handlerPastFee(List<Map<String, Object>> sumInfoMapList, String isHospital) {
+        Map<String,Object> map = new HashMap<>();
+        BigDecimal inptCount = new BigDecimal(0.00); // 本年住院次数
+        BigDecimal outptCount = new BigDecimal(0.00); //
+        BigDecimal s1 = new BigDecimal(0.00);  // 本年度分段计算费用累计
+        BigDecimal s2 = new BigDecimal(0.00) ; // 医疗费合计
+        BigDecimal s3 = new BigDecimal(0.00); // 已付起付线
+        BigDecimal s4 = new BigDecimal(0.00);  // 统筹支付
+        BigDecimal s5 = new BigDecimal(0.00); //政策自费
+        BigDecimal s6 = new BigDecimal(0.00); // 政策自付
+        BigDecimal s7 = new BigDecimal(0.00);  // 大额基金支付
+        BigDecimal s8 = new BigDecimal(0.00); // 大病保险合规费用
+        BigDecimal s9 = new BigDecimal(0.00); // 大病保险支付
+        BigDecimal s10 = new BigDecimal(0.00); // 医疗救助支付
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        String cumTypeCode ="";
+        BigDecimal cum = new BigDecimal(0.00);
+        if(Constants.SF.S.equals(isHospital)){
+            for(Map<String, Object> item : sumInfoMapList){
+               cumTypeCode = MapUtils.get(item,"cum_type_code"); // 累计类别代码
+                cum = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "cum").toString())));
+                if("F0000_BIZ2101".equals(cumTypeCode) ||
+                "F0000_BIZ2102".equals(cumTypeCode) ||
+                "F0000_BIZ22".equals(cumTypeCode)||
+                "C0000_BIZ2106".equals(cumTypeCode) ||
+                "C0000_BIZ2107".equals(cumTypeCode)||
+                "C0000_BIZ52".equals(cumTypeCode)){
+                 inptCount  = BigDecimalUtils.add(inptCount,cum);
+                }
+
+                if("S0000_BIZ2101".equals(cumTypeCode)||
+                        "S0000_BIZ2102".equals(cumTypeCode) ||
+                        "S0000_BIZ22".equals(cumTypeCode) ||
+                        "S0000_BIZ2106".equals(cumTypeCode) ||
+                        "S0000_BIZ2107".equals(cumTypeCode) ||
+                        "S0000_BIZ52".equals(cumTypeCode)){
+                    s1  = BigDecimalUtils.add(s1,cum);
+                }
+                if("F0000_BIZ2101".equals(cumTypeCode)||
+                        "F0000_BIZ2102".equals(cumTypeCode) ||
+                        "F0000_BIZ22".equals(cumTypeCode) ||
+                        "F0000_BIZ2106".equals(cumTypeCode) ||
+                        "F0000_BIZ2107".equals(cumTypeCode) ||
+                        "F0000_BIZ52".equals(cumTypeCode)){
+                    s2  = BigDecimalUtils.add(s2,cum);
+                }
+                if("Q0000_BIZ2101".equals(cumTypeCode)||
+                        "Q0000_BIZ2102".equals(cumTypeCode) ||
+                        "Q0000_BIZ22".equals(cumTypeCode) ||
+                        "Q0000_BIZ2106".equals(cumTypeCode) ||
+                        "Q0000_BIZ2107".equals(cumTypeCode) ||
+                        "Q0000_BIZ52".equals(cumTypeCode)){
+                    s3  = BigDecimalUtils.add(s3,cum);
+                }
+                if("D310101_BIZ2101".equals(cumTypeCode)||
+                        "D310101_BIZ2102".equals(cumTypeCode) ||
+                        "D310101_BIZ22".equals(cumTypeCode) ||
+                        "D310101_BIZ2106".equals(cumTypeCode) ||
+                        "D310101_BIZ2107".equals(cumTypeCode) ||
+                        "D310101_BIZ52".equals(cumTypeCode) ||
+                "D390101_BIZ2101".equals(cumTypeCode)||
+                        "D390101_BIZ2102".equals(cumTypeCode) ||
+                        "D310101_BIZ22".equals(cumTypeCode) ||
+                        "D390101_BIZ22".equals(cumTypeCode) ||
+                        "D390101_BIZ2106".equals(cumTypeCode) ||
+                        "D390101_BIZ2107".equals(cumTypeCode) ||
+                        "D390101_BIZ52".equals(cumTypeCode)) {
+                    s4 = BigDecimalUtils.add(s4, cum);
+                }
+                    if("Z0000_BIZ2101_LAB101".equals(cumTypeCode)||
+                            "Z0000_BIZ2102_LAB101".equals(cumTypeCode) ||
+                            "Z0000_BIZ22_LAB101".equals(cumTypeCode) ||
+                            "Z0000_BIZ2106_LAB101".equals(cumTypeCode) ||
+                            "Z0000_BIZ2107_LAB101".equals(cumTypeCode) ||
+                            "Z0000_BIZ52_LAB101".equals(cumTypeCode) ||
+                            "Z0000_BIZ2101_LAB103".equals(cumTypeCode)||
+                            "Z0000_BIZ22_LAB103".equals(cumTypeCode) ||
+                            "Z0000_BIZ2106_LAB103".equals(cumTypeCode) ||
+                            "Z0000_BIZ52_LAB103".equals(cumTypeCode)){
+                        s5  = BigDecimalUtils.add(s5,cum);
+                }
+                if("Z0000_BIZ2101_LAB102".equals(cumTypeCode)||
+                        "Z0000_BIZ2102_LAB102".equals(cumTypeCode) ||
+                        "Z0000_BIZ22_LAB102".equals(cumTypeCode) ||
+                        "Z0000_BIZ2106_LAB102".equals(cumTypeCode) ||
+                        "Z0000_BIZ2107_LAB102".equals(cumTypeCode) ||
+                        "Z0000_BIZ52_LAB102".equals(cumTypeCode)){
+                    s6  = BigDecimalUtils.add(s6,cum);
+                }
+                if("D330101".equals(cumTypeCode)){
+                    s7  = BigDecimalUtils.add(s7,cum);
+                }
+                if("TS390201".equals(cumTypeCode)){
+                    s8  = BigDecimalUtils.add(s8,cum);
+                }
+                if("D390201".equals(cumTypeCode)){
+                    s9  = BigDecimalUtils.add(s9,cum);
+                }
+                if("D610101".equals(cumTypeCode)){
+                    s10  = BigDecimalUtils.add(s10,cum);
+                }
+            }
+            map.put("inptCount",inptCount);
+            map.put("s1",s1);
+            map.put("s2",s2);
+            map.put("s3",s3);
+            map.put("s4",s4);
+            map.put("s5",s5);
+            map.put("s6",s6);
+            map.put("s7",s7);
+            map.put("s8",s8);
+            map.put("s9",s9);
+            map.put("s10",s10);
+        }else{
+            for(Map<String, Object> item : sumInfoMapList){
+                cumTypeCode = MapUtils.get(item,"cum_type_code"); // 累计类别代码
+                cum = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "cum").toString())));
+                if("C0000_BIZ11".equals(cumTypeCode) || "C0000_BIZ13".equals(cumTypeCode) ||
+               "C0000_BIZ51".equals(cumTypeCode) || "C0000_BIZ9901".equals(cumTypeCode) ||
+                        "C0000_BIZ14".equals(cumTypeCode)){
+                    outptCount = BigDecimalUtils.add(outptCount,cum);
+                }
+                // F0000_BIZ9901    业务总费用且医疗业务类别为门诊两病的累计
+                // F0000_BIZ51      业务总费用且医疗业务类别为职工生育门诊的累计
+                // F0000_BIZ11      业务总费用且医疗业务类别为普通门诊的累计
+                // F0000_BIZ13      业务总费用且医疗业务类别为急诊的累计
+                // F0000_BIZ14      业务总费用且医疗业务类别为门诊慢特病的累计
+                if("F0000_BIZ9901".equals(cumTypeCode) || "F0000_BIZ51".equals(cumTypeCode) ||
+                        "F0000_BIZ11".equals(cumTypeCode) || "F0000_BIZ13".equals(cumTypeCode) ||
+                        "F0000_BIZ14".equals(cumTypeCode)){
+                    s1 = BigDecimalUtils.add(s1,cum);
+                }
+                // D390102_BIZ11  基金且城乡居民统筹基金且医疗业务类别为普通门诊的累计
+                // D390101_BIZ14  基金且城乡居民统筹基金且医疗业务类别为门诊慢特病的累计
+                // D310101_BIZ13  基金且城乡居民统筹基金且医疗业务类别为门诊慢特病的累计
+                // D310101_BIZ14 基金且职工统筹基金且医疗业务类别为门诊慢特病的累计
+                // D390101_BIZ13 基金且城乡居民统筹基金且医疗业务类别为急诊的累计
+                // D390102_BIZ9901 基金且城乡居民统筹基金且医疗业务类别为急诊的累计
+                if("D390102_BIZ11".equals(cumTypeCode) || "D390101_BIZ14".equals(cumTypeCode)||
+                "D310101_BIZ13".equals(cumTypeCode) || "D310101_BIZ14".equals(cumTypeCode)||
+                "D390101_BIZ13".equals(cumTypeCode) || "D390102_BIZ9901".equals(cumTypeCode)){
+                    s2 = BigDecimalUtils.add(s2,cum);
+                }
+                // D330101  大额基金支付
+                if("D330101_BIZ13".equals(cumTypeCode) || "D330101_BIZ14".equals(cumTypeCode)){
+                    s3 = BigDecimalUtils.add(s3,cum);
+                }
+                // D320101 公务员补助支付
+                if("D320101".equals(cumTypeCode)){
+                    s4 = BigDecimalUtils.add(s4,cum);
+                }
+                // D390201 大病保险支付
+                if("D390201".equals(cumTypeCode)){
+                    s5 = BigDecimalUtils.add(s5,cum);
+                }
+                // D310201 个人账户支付
+                if("D310201".equals(cumTypeCode)){
+                    s6 = BigDecimalUtils.add(s6,cum);
+                }
+                // D610101  医疗救助支付
+                if("D610101".equals(cumTypeCode)){
+                    s7 = BigDecimalUtils.add(s7,cum);
+                }
+            }
+            map.put("outptCount",outptCount);
+            map.put("s1",s1);
+            map.put("s2",s2);
+            map.put("s3",s3);
+            map.put("s4",s4);
+            map.put("s5",s5);
+            map.put("s6",s6);
+            map.put("s7",s7);
+        }
+        return map;
+    }
+
+    /**
+     * @Method handlerInptSettleParam
+     * @Desrciption  组装住院结算单 参数
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/15 15:23
+     * @Return
+    **/
+    private Map<String, Object> handlerInptSettleParam(InsureIndividualVisitDTO insureIndividualVisitDTO,
+                                                       Map<String, Object> setlInfoMap) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("fixmedinsName",insureIndividualVisitDTO.getFixmedinsName()); // 医疗机构名称
+        map.put("hospLv",insureIndividualVisitDTO.getHospLv()); // 医院等级
+        map.put("mdtrtId",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊号
+        map.put("psnName",MapUtils.get(setlInfoMap,"psn_name")); // 人员姓名
+        map.put("gend",MapUtils.get(setlInfoMap,"gend")); // 性别
+        map.put("age",MapUtils.get(setlInfoMap,"age")); // 年龄
+        map.put("psnNo",MapUtils.get(setlInfoMap,"psn_no")); // 个人编号
+        map.put("psnIdetType",MapUtils.get(setlInfoMap,"psn_name")); //补助类别
+        if(StringUtils.isNotEmpty(insureIndividualVisitDTO.getBka008())){
+            map.put("empName",insureIndividualVisitDTO.getBka008()); // 单位名称
+        }else{
+            map.put("empName","无"); // 单位名称
+        }
+        map.put("psnType",MapUtils.get(setlInfoMap,"psn_type")); // 人员类别
+        map.put("tel",insureIndividualVisitDTO.getInptPhone()); // 联系电话
+        map.put("cvlservFlag",MapUtils.get(setlInfoMap,"cvlserv_flag")); // 公务员标志
+        map.put("iptNo",insureIndividualVisitDTO.getVisitNo()); // 住院号
+        map.put("admDeptName",insureIndividualVisitDTO.getVisitDrptName()); // 科室
+        map.put("admBed",insureIndividualVisitDTO.getVisitBerth()); // 床位号
+        map.put("begntime",insureIndividualVisitDTO.getInTime()); // 入院日期
+        map.put("endtime",insureIndividualVisitDTO.getOutTime()); // 出院日期
+        map.put("endtime-begntime",insureIndividualVisitDTO.getTotalInDays()); // 住院天数
+        map.put("certno",MapUtils.get(setlInfoMap,"certno")); // 证件号码
+        map.put("mdtrtCert_type",MapUtils.get(setlInfoMap,"psn_cert_type")); // 证件类型
+        map.put("dscgMaindiagName",insureIndividualVisitDTO.getOutDiseaseName()); // 出院诊断
+        map.put("medType",MapUtils.get(setlInfoMap,"med_type")); // 医疗类别
+        map.put("setlTime",MapUtils.get(setlInfoMap,"setl_time")); // 结算时间
+        map.put("chfpdrName",insureIndividualVisitDTO.getZzDoctorName()); // 主管医师
+        map.put("balc",MapUtils.get(setlInfoMap,"balc")); // 个人账户余额
+        return map;
+    }
+
+    /**
+     * @Method handlerInsureIndividualCost
+     * @Desrciption  对医保费用表进行分组 统计合并费用
+     * @Param  feeDetailMapList：医保费用集合
+     *
+     * @Author fuhui
+     * @Date   2021/10/14 11:44
+     * @Return
+    **/
+    private List<Map<String, Object>>  handlerInsureIndividualCost(List<Map<String, Object>> feeDetailMapList ) {
+
+        List<Map<String, Object>> groupListMap = new ArrayList<>();
+        feeDetailMapList = feeDetailMapList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "med_chrgitm_type"))).collect(Collectors.toList());
+        Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
+                collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
+        Map<String, Object> pMap = null;
+        for (String key : groupMap.keySet()) {
+            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00);
+            BigDecimal fulamtOwnpayAmt = new BigDecimal(0.00);
+            BigDecimal preselfpayAmt = new BigDecimal(0.00);
+            System.out.println(key + "=====" + groupMap.get(key));
+            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+            if (iterator.hasNext()) {
+                pMap = new HashMap<>();
+                List<Map<String, Object>> listMap = groupMap.get(key);
+                for (Map<String, Object> item : listMap) {
+                    DecimalFormat df1 = new DecimalFormat("0.00");
+                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                    fulamtOwnpayAmt = BigDecimalUtils.add(fulamtOwnpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                    preselfpayAmt = BigDecimalUtils.add(preselfpayAmt, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "preselfpay_amt") == null ? "" : MapUtils.get(item, "preselfpay_amt").toString()))));
+                }
+                pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
+                pMap.put("fulamtOwnpayAmt", fulamtOwnpayAmt);
+                pMap.put("preselfpayAmt", preselfpayAmt);
+                pMap.put("medChrgitmType", key);
+                groupListMap.add(pMap);
+            }
+        }
+        return groupListMap;
     }
 
     /**

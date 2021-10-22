@@ -125,4 +125,33 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
     public WrapperResponse<Boolean> deleteDrugSells(Map<String, Object> map) {
         return WrapperResponse.success(insureRecruitPurchaseBO.deleteDrugSells(map));
     }
+
+    /**
+     * @param paramMap
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> selectCommonInterfaceTest(Map<String, Object> paramMap) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.selectCommonInterfaceTest(paramMap));
+    }
+
+    /**
+     * @param paramMap
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.getToken(paramMap));
+    }
+
 }

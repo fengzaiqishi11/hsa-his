@@ -2,7 +2,9 @@ package cn.hsa.module.insure.module.dao;
 
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
@@ -293,5 +295,58 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     InsureIndividualVisitDTO queryInsureVisitInfo(Map<String, Object> map);
+
+    /**
+     * @Method updateInptPatientCode
+     * @Desrciption  修改病人类型
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 11:04
+     * @Return
+    **/
+    void updateInptPatientCode(Map<String, Object> map);
+
+    void updateInptSettlePatientCode(Map<String, Object> map);
+
+    /**
+     * @Method updateOutptPatientCode
+     * @Desrciption  修正门诊医保病人类型
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/9 9:02
+     * @Return
+    **/
+    void updateOutptPatientCode(Map<String, Object> map);
+
+
+    void updateOutptSettlePatientCode(Map<String, Object> map);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method 查询住院医保病人类型
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/9 9:42
+     * @Return
+     */
+    List<InsureIndividualVisitDTO> queryInptInsurePatient(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method 查询门诊医保病人类型
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/9 9:42
+     * @Return
+     */
+    List<InsureIndividualVisitDTO> queryOutptInsurePatient(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    void insertCommonLog(InsureFunctionLogDO insureFunctionDO);
+
+
 }
 

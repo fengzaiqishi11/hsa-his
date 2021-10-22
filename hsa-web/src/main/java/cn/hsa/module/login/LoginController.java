@@ -218,7 +218,7 @@ public class LoginController extends BaseController {
         String errMsg = "";
         // 密码错误次数超过5次，锁定账户，错误次数应从系统参数中获取
         if (dto.getPswdErrCnt() >= PWD_ERROR_CNT) {
-            dto.setStatusCode("3");
+            dto.setStatusCode("2");
             errMsg = "账号或密码错误，账户已被锁定！";
         } else {
             errMsg = "账号或密码错误，将在密码错误" + (PWD_ERROR_CNT - dto.getPswdErrCnt()) + "次后锁定账户！";

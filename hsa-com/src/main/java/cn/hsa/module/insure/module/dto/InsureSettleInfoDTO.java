@@ -276,4 +276,11 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String isTransmit ;
     private String isMatch;
     private String orgCode;
+    private String aae140;
+    private String doctorPracCertiNo;
+    private String nursePracCertiNo;
+    private String turnOrgName;
+    private String bka035;
+    private String inModeCode;
+    private String phone;
 }

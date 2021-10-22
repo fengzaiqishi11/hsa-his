@@ -642,6 +642,8 @@ public class OutptTmakePriceFormController extends BaseController {
     public WrapperResponse<Boolean> updateCancelFeeSubmit(@RequestBody Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
         map.put("visitId", MapUtils.get(map,"id"));
+        map.put("crteName",userDTO.getCrteName());
+        map.put("crteId",userDTO.getCrteId());
         map.put("hospCode" ,userDTO.getHospCode());
         return outptTmakePriceFormService_consumer.updateCancelFeeSubmit(map);
     }

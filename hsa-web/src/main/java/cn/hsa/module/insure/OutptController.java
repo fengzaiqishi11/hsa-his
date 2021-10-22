@@ -45,6 +45,8 @@ public class OutptController extends BaseController {
     public WrapperResponse getOutptVisitInfo(@RequestParam Map<String,Object> param, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("crteId",sysUserDTO.getCrteId());
+        param.put("crteName",sysUserDTO.getCrteName());
         param.put("code",sysUserDTO.getCode()); // 操作员编码
         String aac001 = String.valueOf(param.get("aac001"));
         String aac002 = String.valueOf(param.get("aac002"));

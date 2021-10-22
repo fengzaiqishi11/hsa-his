@@ -495,7 +495,8 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 				selectEntity.setCurrNo("");
 				selectEntity.setStatusCode(Constants.PJSYZT.YW);
 			} else {// 未用完
-				selectEntity.setCurrNo(String.valueOf(currNo));
+				String currentNo = changeInvoiceNo(currNoStr,String.valueOf(currNo));
+				selectEntity.setCurrNo(currentNo);
 			}
 			selectEntity.setNum(num);
 			outinInvoiceDao.updateOutinInvoice(selectEntity);

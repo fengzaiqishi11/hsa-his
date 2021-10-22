@@ -25,7 +25,7 @@ public interface InsureRecruitPurchaseBO {
      * @return
      * @throws
      */
-    Map<String,Object> queryAll(Map<String,Object> map);
+    PageDTO queryAll(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
 
     /**
      * @Method insertinvChgMedinsInfo

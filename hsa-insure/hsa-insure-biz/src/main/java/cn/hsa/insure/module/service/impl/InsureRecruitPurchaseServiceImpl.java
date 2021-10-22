@@ -39,8 +39,8 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
      * @return
      */
     @Override
-    public WrapperResponse<Map<String, Object>> queryAll(Map<String, Object> map) {
-        return WrapperResponse.success(insureRecruitPurchaseBO.queryAll(map));
+    public WrapperResponse<PageDTO> queryAll(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.queryAll(MapUtils.get(map,"insureRecruitPurchaseDTO")));
     }
 
     @Override

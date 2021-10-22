@@ -45,10 +45,13 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @return
      * @throws
      */
-    @PostMapping("/queryHospitalInventory")
-    public WrapperResponse<Map<String,Object>> queryHospitalInventory(@RequestBody Map<String,Object> map,HttpServletRequest req, HttpServletResponse res){
+    @GetMapping("/queryHospitalInventory")
+    public WrapperResponse<PageDTO> queryHospitalInventory(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureRecruitPurchaseDTO",insureRecruitPurchaseDTO);
         return insureRecruitPurchaseService_consumer.queryAll(map);
     }
 

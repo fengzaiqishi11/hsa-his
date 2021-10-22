@@ -27,7 +27,7 @@ public interface InsureRecruitPurchaseService {
      * @param map
      * @return
      */
-    WrapperResponse<Map<String, Object>> queryAll(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryAll(Map<String, Object> map);
     /**
      * @Description: 获取当前医院库存列表
      * @Param: [map]

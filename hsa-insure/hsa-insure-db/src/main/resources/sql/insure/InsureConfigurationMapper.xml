@@ -485,13 +485,7 @@
         where
         id = #{id}
     </update>
-    <!--回写库存表 把上传状态改成已经上传-->
-    <update id="updateByIds">
-        update stro_stock set is_upload_to_insure = '1' where id in
-        <foreach collection="invChgMedinsInfoList" item="item" open="(" separator="," close=")">
-            #{item.prodCode}
-        </foreach>
-    </update>
+
 
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
@@ -616,20 +610,21 @@
     </select>
     <!--获得库存变更数据-->
     <select id="getNeedUploadStrockData" resultType="java.util.Map">
-        select a.id as prodCode,
+        select  b.insure_item_code  prodCode,
         case when a.item_code = '1' then bd.code
              when a.item_code = '2' then bm.code
              end as fixmedinsHilistId,
         a.item_name as fixmedinsHilistName,'0' as rxFlag,now() as invdate,
         '' as manuLotnum,'' as fixmedinsBchno, '' as manuDate,'' as expyEnd,'' as memo,'' as invChgType,'' as pric,
-        a.num as invCnt,
+        sum(a.num) as invCnt,
         '0' as trdnFlag
         from stro_stock a
 		left join base_drug bd on a.item_id = bd.id and a.hosp_code =  bd.hosp_code
 		left join base_material bm on a.item_id = bm.id and a.hosp_code =  bm.hosp_code
         join insure_item_match b on a.item_id = b.hosp_item_id
 				and a.hosp_code = b.hosp_code
-				where b.is_valid = '1' AND b.is_match = '1' and b.is_trans = '1' and (a.is_upload_to_insure = '0' or a.is_upload_to_insure is null)
+				where b.is_valid = '1' AND b.is_match = '1' and b.is_trans = '1' and a.hosp_code = #{hospCode}
 				and a.item_code = #{itemCode}
+		group by b.insure_item_code
     </select>
 </mapper>

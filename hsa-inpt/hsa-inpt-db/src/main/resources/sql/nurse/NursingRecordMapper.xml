@@ -528,17 +528,33 @@
             or iv.in_no like CONCAT('%', #{keyword}, '%')
             or iv.in_dept_name like CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="startTime != null and startTime != ''">
-            <!--and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')-->
-          <![CDATA[
+        <if test="timeFlag == null or timeFlag == '1'.toString()">
+            <if test="startTime != null and startTime != ''">
+                <!--and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')-->
+                <![CDATA[
             and DATE_FORMAT(iv.in_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
           ]]>
-        </if>
-        <if test="endTime != null and endTime != ''">
-            <!--and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)-->
-          <![CDATA[
+            </if>
+            <if test="endTime != null and endTime != ''">
+                <!--and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)-->
+                <![CDATA[
             and DATE_FORMAT(iv.in_time, '%Y-%m-%d %H:%i:%s') <= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
           ]]>
+            </if>
+        </if>
+        <if test="timeFlag != null or timeFlag == '2'.toString()">
+            <if test="startTime != null and startTime != ''">
+                <!--and iv.in_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')-->
+                <![CDATA[
+            and DATE_FORMAT(iap.crte_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+          ]]>
+            </if>
+            <if test="endTime != null and endTime != ''">
+                <!--and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 day)-->
+                <![CDATA[
+            and DATE_FORMAT(iap.crte_time, '%Y-%m-%d %H:%i:%s') <= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+          ]]>
+            </if>
         </if>
         <if test="isSettle != null and isSettle != ''">
             and iap.is_settle =#{isSettle}

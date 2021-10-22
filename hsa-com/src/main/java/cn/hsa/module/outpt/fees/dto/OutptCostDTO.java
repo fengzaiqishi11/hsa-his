@@ -170,4 +170,10 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
 
     // 就诊类别
     private String visitCode;
+
+    // 医保个人账户结算前余额
+    private BigDecimal beforeSettle;
+
+    // 医保个人账户结算后余额
+    private BigDecimal lastSettle;
 }

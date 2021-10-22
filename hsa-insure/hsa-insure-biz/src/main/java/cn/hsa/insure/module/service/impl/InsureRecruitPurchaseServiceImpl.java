@@ -153,5 +153,18 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
     public WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap) {
         return WrapperResponse.success(insureRecruitPurchaseBO.getToken(paramMap));
     }
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    @Override
+    public WrapperResponse<Boolean> updateToInsure(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.updateToInsure(map));
+
+    }
 
 }

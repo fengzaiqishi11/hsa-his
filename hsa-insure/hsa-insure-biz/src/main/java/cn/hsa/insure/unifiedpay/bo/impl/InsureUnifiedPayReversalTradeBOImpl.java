@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -481,4 +482,103 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         return resultMap;
     }
+
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryStatementInfo(Map<String, Object> paraMap) {
+        Map<String,Object> resultMap = new HashMap<>();
+        String type = MapUtils.get(paraMap,"statementType");
+        List<Map<String,Object>> statementList = new ArrayList<>();
+        switch (type) {
+            case Constants.DZDLX.CX_PT: // 390 - (11 14 2101 2102 9904)
+                List<String> list = new ArrayList<>();
+                list.add("11");
+                list.add("14");
+                list.add("2101");
+                list.add("2102");
+                list.add("9904");
+                paraMap.put("list",list);
+                statementList = insureReversalTradeDAO.queryStatementInfo(paraMap);
+                break;
+            case Constants.DZDLX.CX_DBBX: // 390 - 大病保险没有这个业务类型
+                break;
+            case Constants.DZDLX.CX_YWSH: // 390 -(9903,22)
+                break;
+            case Constants.DZDLX.ZG_PT: // 310 - (11 14 2101 2102 9904)
+                break;
+            case Constants.DZDLX.ZG_SYBX: // 310 - (51,52)
+                break;
+            case Constants.DZDLX.ZG_YWSH: // 310 -(9903,22)
+                break;
+        }
+
+        if (!ListUtils.isEmpty(statementList)) {
+            this.doResultData(statementList,paraMap);
+        }
+        return resultMap;
+    }
+
+    private Map<String,Object> doResultData(List<Map<String,Object>> statementList,Map<String,Object> paraMap) {
+        BigDecimal ptmz = BigDecimal.ZERO;
+        BigDecimal jz = BigDecimal.ZERO;
+        BigDecimal tm = BigDecimal.ZERO;
+        BigDecimal ywshzy = BigDecimal.ZERO;
+        BigDecimal symz = BigDecimal.ZERO;
+        BigDecimal syzy = BigDecimal.ZERO;
+        BigDecimal ptzy = BigDecimal.ZERO;
+        BigDecimal dbzzy = BigDecimal.ZERO;
+        BigDecimal sypc_jm = BigDecimal.ZERO;
+        BigDecimal sypkc_jm = BigDecimal.ZERO;
+        BigDecimal mzlb = BigDecimal.ZERO;
+        BigDecimal ywshmz = BigDecimal.ZERO;
+        BigDecimal dbty = BigDecimal.ZERO;
+
+        for (Map<String,Object> map : statementList) {
+            String ywlx = MapUtils.get(map,"aka130");
+            String personNum = MapUtils.get(map,"personNum"); // 清算次数（人次），对冲数据不计算
+            String medfeeSumamt = MapUtils.get(map,"medfeeSumamt"); // 本次医疗总费用
+            String planSumPrice = MapUtils.get(map,"planSumPrice"); // 医保基金合计
+            String personPrice = MapUtils.get(map,"personPrice"); // 医保基金合计
+
+            switch (ywlx) {
+                case "11": //todo 普通门诊
+                    ptmz = BigDecimalUtils.add(ptmz.toString(),personNum);
+                    break;
+                case "13": // 急诊
+                    break;
+                case "14": // 特门
+                    break;
+                case "22":  // 意外伤害住院
+                    break;
+                case "51":  // 生育门诊
+                    break;
+                case "52":  // 生育住院
+                    break;
+                case "2101": // 普通住院
+                    break;
+                case "2102": // 单病种住院
+                    break;
+                case "2106": // 生育平产(居民)
+                    break;
+                case "2107": // 生育剖宫产(居民)
+                    break;
+                case "9901": // 门诊两病
+                    break;
+                case "9903": // 意外伤害门诊
+                    break;
+                case "9904": // 大病特药
+                    break;
+            }
+        }
+        return null;
+    }
+
+
 }

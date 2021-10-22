@@ -68,5 +68,13 @@ public interface InsureReversalTradeDAO {
 
     Map<String,Object> getHisReckonInfo(Map<String,Object> map);
 
-
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap);
 }

@@ -587,6 +587,22 @@ public interface Constant {
 
         }
 
+        public static class YWLX {
+            public static final String PTMZ = "11"; // 普通门诊
+            public static final String GH = "12"; // 门诊挂号
+            public static final String JZ = "13"; // 急诊
+            public static final String MZMXB = "14"; // 门诊慢性病
+            public static final String MZTC = "15"; // 门诊统筹
+            public static final String MZTSB = "16"; // 门诊特殊病
+            public static final String PTZY = "21"; // 普通住院
+            public static final String WSZY = "22"; // 外伤住院
+            public static final String ZWZZZY = "22"; // 转外诊治住院
+            public static final String SYMZ = "51"; // 生育门诊
+            public static final String SYZY = "52"; // 生育住院
+        }
+
+
+
         /**
          * 新医保电子凭证扫码读卡政策
          */
@@ -796,5 +812,7 @@ public interface Constant {
 
         }
     }
+
+
 
 }

@@ -79,7 +79,7 @@ public interface InsureRecruitPurchaseService {
      * @Return: list
      **/
     @PostMapping("/service/insure/insureRecruitPurchase/queryDrugSells")
-    WrapperResponse<List<Map<String, Object>>> queryDrugSells(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryDrugSells(Map<String, Object> map);
 
     /**
      * @Menthod:

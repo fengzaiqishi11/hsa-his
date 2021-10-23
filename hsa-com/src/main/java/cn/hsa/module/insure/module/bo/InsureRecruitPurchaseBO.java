@@ -108,7 +108,7 @@ public interface InsureRecruitPurchaseBO {
      * @Date: 2021-08-26 10:27
      * @Return: list
      **/
-    List<Map<String, Object>> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+    PageDTO queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
 
     /**
      * @Menthod:

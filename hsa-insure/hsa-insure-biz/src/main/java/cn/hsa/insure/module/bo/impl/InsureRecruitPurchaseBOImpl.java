@@ -98,6 +98,8 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         httpParam.put("accessToken", token);
         // 必填参数 currentPageNumber 当前是第几页
         httpParam.put("currentPageNumber", currentPageNumber);
+        // todo 这个是我猜的 当前显示多少条
+        httpParam.put("totalRecordCount", totalRecordCount);
         // 调医保接口 获得医保返回的库存列表
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> resultMap2 = new HashMap<>();
@@ -170,9 +172,9 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if (StringUtils.isEmpty(itemType)) {
             throw new RuntimeException("未选择业务类型，药品1或者材料2");
         }
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new RuntimeException("未选择医保机构编码，请选择");
-        }
+//        if (StringUtils.isEmpty(insureRegCode)) {
+//            throw new RuntimeException("未选择医保机构编码，请选择");
+//        }
         if (StringUtils.isEmpty(sellType)) {
             throw new RuntimeException("未选择业务类型，销售1或者退货2");
         }
@@ -211,14 +213,29 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         } else {
             // todo 耗材
             insureRecruitPurchaseDTO.setItemCode(Constants.XMLB.CL);
+            result = insureRecruitPurchaseDAO.queryDrugList(insureRecruitPurchaseDTO);
         }
         if (!ListUtils.isEmpty(result)) {
             for (Map<String, Object> map : result) {
-                BigDecimal splitRatio = MapUtils.get(map, "splitRatio");
-                if (BigDecimalUtils.compareTo(splitRatio, new BigDecimal(1)) > 0) {
-                    map.put("trdnFla", Constants.SF.S);
-                } else {
-                    map.put("trdnFla", Constants.SF.F);
+                // 把查询到的负数转成正数
+                BigDecimal selRetnCnt = MapUtils.get(map, "selRetnCnt");
+                BigDecimal finlTrnsPric = MapUtils.get(map, "finlTrnsPric");
+                map.put("selRetnCnt", BigDecimalUtils.negate(selRetnCnt));
+                map.put("finlTrnsPric", BigDecimalUtils.negate(finlTrnsPric));
+                // 判断项目是否存在拆分比，存在则判断是否拆零并赋值
+                if (!MapUtils.isEmpty(map, "splitRatio")){
+                    BigDecimal splitRatio = MapUtils.get(map, "splitRatio");
+                    if (BigDecimalUtils.compareTo(splitRatio, new BigDecimal(1)) > 0) {
+                        map.put("trdnFlag", Constants.SF.S);
+                    } else {
+                        map.put("trdnFlag", Constants.SF.F);
+                    }
+                }else {
+                    throw new AppException("请先维护["+ MapUtils.get(map, "itemName") + "]项目的拆分比" );
+                }
+                // 判断是否为材料，给材料设置是否处方药标志字段用于上传必填字段
+                if (!"1".equals(itemType)) {
+                    map.put("rxFlag", Constants.SF.F);
                 }
             }
         }
@@ -235,10 +252,10 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
      * @Return: list
      **/
     @Override
-    public List<Map<String, Object>> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO) {
+    public PageDTO queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO) {
         String hospCode = insureRecruitPurchaseDTO.getHospCode();
         Map map = new HashMap();
-        map.put("hospCode", hospCode);
+        map.put("hospCode",hospCode);
         Map<String, Object> accessTokenMap = getToken(map);
         String token = MapUtils.get(accessTokenMap, "accessToken");
         if (StringUtils.isEmpty(token)) {
@@ -265,7 +282,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(insureRecruitPurchaseDTO.getItemCode())) {
             // 调用药品的接口
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8503, data);
-            resultMap2 = MapUtils.get(MapUtils.get(resultMap, "output"), "dataList");
+            resultMap2 = MapUtils.get(MapUtils.get(resultMap, "output"), "data");
         } else {
             // 调用耗材的接口
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8508, data);
@@ -273,10 +290,10 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         }
 
         List<Map<String, Object>> list = new ArrayList<>();
-        if (!MapUtils.isEmpty(resultMap2)) {
+        if (!MapUtils.isEmpty(resultMap2,"dataList")) {
             list = MapUtils.get(resultMap2, "dataList");
         }
-        return list;
+        return PageDTO.of(list);
     }
 
     /**
@@ -306,7 +323,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
-        inptMap.put("accessToken", token); //调用凭证Token
+        inptMap.put("accessToken", token ); //调用凭证Token
         inptMap.put("sellInfo", dataList); //销售信息
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -314,14 +331,12 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
         // 调用海南招采公共接口
         Map<String, Object> resultMap = new HashMap<>();
-        if ("1".equals(itemCode)) {
+        if ("1".equals(itemCode)){
             // 药品销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8504, data);
-        } else if ("0".equals(itemCode)) {
+        } else {
             // 耗材销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8509, data);
-        } else {
-            throw new AppException("请选择上传的类型");
         }
 
         // 费用ids，用于更新上传状态
@@ -364,10 +379,10 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
         // 调用海南招采公共接口
         Map<String, Object> resultMap = new HashMap<>();
-        if ("1".equals(itemCode)) {
+        if ("1".equals(itemCode)){
             // 药品销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8505, data);
-        } else {
+        }else{
             // 耗材销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8510, data);
         }
@@ -476,7 +491,6 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
      */
     @Override
     public Map<String, Object> getToken(Map<String, Object> map) {
-
         String hospCode = MapUtils.get(map, "hospCode");
         String orgCode = getOrgCode(map);
         Map<String, Object> paramMap = new HashMap<>();
@@ -498,11 +512,12 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
     /**
      * @Meth: uploadToInsure
-     * @Description: 药品/材料 库存上传变更（最新的库存）
-     * 1.查询本地库存表汇总数据 通过字段 is_upload_to_insure，还需要匹配医保匹配表
+     * @Description: 药品/材料 库存上传变更
+     * 1.查询本地库存表中没有上传的数据 通过字段 is_upload_to_insure，还需要匹配医保匹配表
      * 2.转换参数（在sql中进行转换）
      * 3.获得医院的token 、 医保机构编码
      * 4. 封装参数 调用接口上传
+     * 5.成功之后回写库存表
      * @Param: [map]
      * @return: java.lang.Boolean
      * @Author: zhangguorui
@@ -512,8 +527,8 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     public Boolean updateToInsure(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         //------- 1. 查询本地库存表中需要上传的数据 begin ----------
-        // 判断是材料还是药品 1：药品 2：材料 默认上次药品
-        String isDrugOrMaterial = MapUtils.getVS(map, "itemCode", "1");
+        // 判断是材料还是药品 1：药品 2：材料
+        String isDrugOrMaterial = MapUtils.get(map, "itemCode");
         // 封装查询参数
         StroStockDTO stroStockDTO = new StroStockDTO();
         stroStockDTO.setHospCode(hospCode);
@@ -544,17 +559,19 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         httpParam.put("invChgMedinsInfo", invChgMedinsInfoList);
         // 调医保接口 获得医保返回的库存列表 医保编号为
         Map<String, Object> resultMap = new HashMap<>();
-        if ("1".equals(isDrugOrMaterial)) {
+        if ("1".equals(isDrugOrMaterial)){
             // 药品变更上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
-        } else {
+        } else{
             // 材料变更上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
         }
+
         //------------- 4.封装参数 调用接口上传 end --------
 
         // 5.如果上传成功 回写库存表
         if ("0".equals(MapUtils.get(resultMap, "infcode"))) {
+            // 获得修改的ids
             return true;
         } else {
             return false;

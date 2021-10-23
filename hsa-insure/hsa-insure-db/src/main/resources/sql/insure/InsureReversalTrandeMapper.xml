@@ -154,7 +154,7 @@
             sum(e.person_price) as person_price,
             t.medicine_org_code fixmedins_code,
             sum(e.total_price) as medfee_sumamt,
-            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
             sum(e.personal_price) as acct_pay,
             count(1) as fixmedins_setl_cnt
         FROM

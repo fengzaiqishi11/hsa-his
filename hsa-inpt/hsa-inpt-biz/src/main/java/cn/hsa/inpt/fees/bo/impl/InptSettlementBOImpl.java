@@ -1146,7 +1146,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrOptins = MapUtils.get(insureInptResult, "clr_optins");
             String clrWay = MapUtils.get(insureInptResult, "clr_way");
             String clrType = MapUtils.get(insureInptResult, "clr_type");
-            String hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
+            BigDecimal hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
 
             BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
             /**
@@ -1221,6 +1221,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             individualSettleDO.setMedicalRegNo(medicalRegNo);
             individualSettleDO.setVisitId(visitId);
             individualSettleDO.setOinfno(oinfno);
+            individualSettleDO.setHospExemAmount(hospExemAmount);
             individualSettleDO.setOmsgid(omsgid);
             Map<String, Object> map = new HashMap<>();
             map.put("hospCode", hospCode);

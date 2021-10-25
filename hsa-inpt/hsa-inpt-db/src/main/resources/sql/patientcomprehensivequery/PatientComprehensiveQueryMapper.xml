@@ -522,7 +522,8 @@
         (select ifnull(sum(price),0) price from inpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf,
         e.outpt_doctor_name,-- 门诊医生
         e.jz_doctor_name,-- 经治医生
-        e.zg_doctor_name-- 主管医生
+        e.zg_doctor_name,-- 主管医生
+        ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount
         FROM
         inpt_settle a
         left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code

@@ -792,9 +792,17 @@ public interface Constant {
 
             public static final String UP_8201 = "8201"; // 获取医院库房列表
             public static final String UP_8202 = "8202"; // 药品获取挂网目录列表
+            public static final String UP_8501 = "8501"; // 药品库存查询
+            public static final String UP_8502 = "8502"; // 药品库存上传变更
             public static final String UP_8503 = "8503"; // 药品销售列表查询
             public static final String UP_8504 = "8504"; // 药品销售
             public static final String UP_8505 = "8505"; // 药品销售退货
+            public static final String UP_8506 = "8506"; // 耗材库存查询
+            public static final String UP_8507 = "8507"; // 耗材库存上传变更
+            public static final String UP_8508 = "8508"; // 耗材销售列表查询
+            public static final String UP_8509 = "8509"; // 耗材销售
+            public static final String UP_8510 = "8510"; // 耗材销售退货
+
 
         }
     }

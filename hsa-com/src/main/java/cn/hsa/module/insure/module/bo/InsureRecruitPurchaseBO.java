@@ -152,5 +152,14 @@ public interface InsureRecruitPurchaseBO {
      * @Return
      */
     Map<String,Object> getToken(Map<String, Object> paramMap);
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    Boolean updateToInsure(Map<String, Object> map);
 
 }

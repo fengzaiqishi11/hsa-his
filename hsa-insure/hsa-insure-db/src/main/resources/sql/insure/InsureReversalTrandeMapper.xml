@@ -131,10 +131,10 @@
             )
         </if>
         <if test="startDate != null and startDate != ''">
-            and t.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and date(e.crte_time) &gt;= date(#{startDate})
         </if>
         <if test="endDate != null and endDate != ''">
-            and t.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and date(e.crte_time) &lt;= date(#{endDate})
         </if>
         <!--业务类型选择-->
         <if test="isHospital != null and isHospital != ''">
@@ -154,7 +154,7 @@
             sum(e.person_price) as person_price,
             t.medicine_org_code fixmedins_code,
             sum(e.total_price) as medfee_sumamt,
-            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
             sum(e.personal_price) as acct_pay,
             count(1) as fixmedins_setl_cnt
         FROM

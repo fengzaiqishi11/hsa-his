@@ -486,6 +486,7 @@
         id = #{id}
     </update>
 
+
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
     DELETE FROM insure_configuration WHERE id = #{id}
@@ -606,5 +607,24 @@
         <if test="visitId!=null and visitId!= ''">
             and visit_id = #{visitId}
         </if>
+    </select>
+    <!--获得库存变更数据-->
+    <select id="getNeedUploadStrockData" resultType="java.util.Map">
+        select  b.insure_item_code  prodCode,
+        case when a.item_code = '1' then bd.code
+             when a.item_code = '2' then bm.code
+             end as fixmedinsHilistId,
+        a.item_name as fixmedinsHilistName,'0' as rxFlag,now() as invdate,
+        '' as manuLotnum,'' as fixmedinsBchno, '' as manuDate,'' as expyEnd,'' as memo,'' as invChgType,'' as pric,
+        sum(a.num) as invCnt,
+        '0' as trdnFlag
+        from stro_stock a
+		left join base_drug bd on a.item_id = bd.id and a.hosp_code =  bd.hosp_code
+		left join base_material bm on a.item_id = bm.id and a.hosp_code =  bm.hosp_code
+        join insure_item_match b on a.item_id = b.hosp_item_id
+				and a.hosp_code = b.hosp_code
+				where b.is_valid = '1' AND b.is_match = '1' and b.is_trans = '1' and a.hosp_code = #{hospCode}
+				and a.item_code = #{itemCode}
+		group by b.insure_item_code
     </select>
 </mapper>

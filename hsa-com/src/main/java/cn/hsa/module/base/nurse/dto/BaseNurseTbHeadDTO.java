@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +42,8 @@ public class BaseNurseTbHeadDTO extends BaseNurseTbHeadDO implements Serializabl
      * 是否竖向打印(1竖向，0横向)
      */
     private String isVertical;
+    /**
+     * 单据头距顶部高度(mm)
+     */
+    private BigDecimal topHeight;
 }

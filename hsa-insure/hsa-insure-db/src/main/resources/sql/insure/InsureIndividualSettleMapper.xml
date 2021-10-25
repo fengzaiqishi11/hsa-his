@@ -125,7 +125,11 @@
         iis.ext08,
         iis.ext09,
         iis.ext10,
-        iis.hosp_exem_amount
+        iis.hosp_exem_amount,
+        iis.ext10,
+        iis.clr_type,
+        iis.clr_way,
+        iis.clr_optins
     </sql>
 
     <!--通过实体作为筛选条件 分页查询个人医保结算信息-->
@@ -134,7 +138,7 @@
         select * from(
         select
         iic.id, iic.hosp_code, iic.visit_id, iic.settle_id, iic.is_hospital, iic.visit_no, iic.discharge_dn_code,
-        iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_price,
+        iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_pay,
         iic.medicine_org_code,iic.discharge_dn_name, discharged_date, iic.discharged_case,
         (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
         iic.total_price, iic.plan_price,
@@ -158,7 +162,7 @@
         then (select patient_code from outpt_visit ov where ov.hosp_code = iic.hosp_code and ov.id = iic.visit_id)
         end
         ) as patientCode,
-        if(isnull((select settle_id from insure_setl_info isi where iic.settle_id = isi.settle_id
+        if(isnull((select settle_id from insure_setl_info isi where iic.insureSettleId = isi.settle_id and iic.state='0'
         and iic.visit_id = isi.visit_id limit 1)),0,1) as isUpload,
         iv.in_time,
         iv.out_time,
@@ -168,7 +172,7 @@
         left join insure_individual_visit iiv on iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
         join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
         left join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
-        where iic.hosp_code = #{hospCode} and iic.insureSettleId is not null
+        where iic.hosp_code = #{hospCode} and iic.insureSettleId is not null and iic.is_cancel ='0'
         <if test="keyWord != null and keyWord != ''">
             and ( iiv.visit_no like concat('%',#{keyWord},'%')
             or iib.aac003 like concat('%',#{keyWord},'%')
@@ -232,7 +236,7 @@
         iic.hosp_code = iiv.hosp_code
         left join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
         where iic.hosp_code = #{hospCode}
-        and iic.id = #{id}
+        and iic.id = #{id} and iic.is_cancel ='0'
         <if test="state !=null and state != ''">
             and iic.state = #{state}
         </if>
@@ -712,7 +716,7 @@
         <include refid="Base_ColumnAlias_List"/>
         FROM insure_individual_settle iis
         where
-        iis.hosp_code = #{hospCode}
+        iis.hosp_code = #{hospCode} and iis.is_cancel ='0'
         <if test="visitId != null and visitId != ''">
             AND iis.visit_id = #{visitId}
         </if>
@@ -991,6 +995,10 @@
             where id = #{item.id} and hosp_code=#{item.hospCode}
         </foreach>
     </update>
+    <update id="updateInsureSettleValue">
+        update insure_individual_settle set is_cancel ='1' where hosp_code =#{hospCode}
+        and visit_id = #{visitId} and insureSettleId = #{insureSettleId}
+    </update>
 
     <!-- 根据条件参数查询数据列表 -->
     <select id="getByParams" resultMap="insureIndividualSettleMap" parameterType="java.util.Map">
@@ -1001,6 +1009,7 @@
         iis.hosp_code = #{hospCode}
         AND iis.visit_id = #{visitId}
         AND iis.settle_id = #{settleId}
+          and iis.is_cancel ='0'
         <if test="state != null and state != ''">
             and iis.state = #{state}
         </if>
@@ -1050,7 +1059,7 @@
                            on iiv.visit_id = iis.visit_id and iiv.hosp_code = iis.hosp_code
         where iis.hosp_code = #{hospCode}
           and iis.state = #{state}
-          and iis.settle_state = '1'
+          and iis.settle_state = '1' and iis.is_cancel ='0'
           and date_format(iis.crte_time, '%Y-%m') = date_format(#{time}, '%Y-%m')
 
     </select>
@@ -1070,13 +1079,13 @@
           and state = #{state}
           and settle_state = #{settleState}
           and medicalRegNo = #{medicalRegNo}
-          and visit_id = #{visitId}
+          and visit_id = #{visitId} and is_cancel='0'
             and insureSettleId is not null
             limit 1
     </select>
 
     <select id="selectInsureSettInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
-        select * from insure_individual_settle where hosp_code =#{hospCode}
+        select * from insure_individual_settle where hosp_code =#{hospCode}  and is_cancel='0'
         <if test="visitId != null and visitId != ''">
             and visit_id = #{visitId}
         </if>
@@ -1106,11 +1115,13 @@
                iiv.mdtrt_cert_type as psn_cert_type, iiv.mdtrt_cert_no as certno
                 from insure_individual_settle iis
                left join insure_individual_visit iiv on iiv.visit_id = iis.visit_id and iiv.hosp_code = iis.hosp_code
-                    and iis.medicalRegNo = iiv.medical_reg_no
+               and iis.medicalRegNo = iiv.medical_reg_no
                left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
                left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
                 left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
-                where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode} and iis.insureSettleId = #{insureSettleId}
+                where iiv.visit_id=#{visitId} and iiv.hosp_code =#{hospCode}
+                  and iis.is_cancel ='0'
+                  and iis.insureSettleId = #{insureSettleId}
                 and iis.state='0' and iis.insureSettleId is not null and  iis.medicalRegNo =#{medicalRegNo}
     </select>
     <select id="queryInsureFundListMap" resultType="java.util.Map">

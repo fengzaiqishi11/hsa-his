@@ -234,7 +234,8 @@
         c.reality_price totalCost,
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
-        c.mi_price as miPrice,
+        (c.mi_price-c.acct_pay) as miPrice,
+        c.acct_pay as acctPay,
         case when ib.id is null then (case when DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
         else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
         b.*

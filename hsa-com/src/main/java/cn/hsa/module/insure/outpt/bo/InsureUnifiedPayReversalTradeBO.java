@@ -122,4 +122,5 @@ public interface InsureUnifiedPayReversalTradeBO {
     **/
     Map<String,Object> updateUP_5265(Map<String, Object> parameterMap);
 
+    Map<String,Object> downLoadSettleInfo(Map<String, Object> map);
 }

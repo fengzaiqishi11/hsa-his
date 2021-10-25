@@ -88,7 +88,7 @@
     <!-- 医保基础子系统-> 医保保存个人信息 -->
     <dubbo:reference id="InsureIndividualBasicService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" check="false"/>
     <!-- 医保结算 -->
-    <dubbo:reference id="insureIndividualSettleService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualSettleService" check="false"/>
+    <dubbo:reference id="insureIndividualSettleService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualSettleService" retries="0" check="false"/>
     <!-- 医保就诊 -->
     <dubbo:reference id="insureIndividualVisitService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualVisitService" check="false"/>
     <!-- 医保项目匹配Service -->
@@ -96,7 +96,7 @@
     <!-- 医保机构 -->
     <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
     <!-- 医保费用 -->
-    <dubbo:reference id="insureIndividualCostService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
+    <dubbo:reference id="insureIndividualCostService_consumer"  interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" retries="0"  check="false"/>
 
     <!-- 医保码表信息 -->
     <dubbo:reference id="insureDictService_consumer" interface="cn.hsa.module.insure.module.service.InsureDictService" check="false"/>
@@ -107,7 +107,7 @@
     <!-- 医保病案 -->
     <dubbo:reference id="mrisService_consumer" interface="cn.hsa.module.insure.mris.service.MrisService" check="false"/>
 
-    <dubbo:reference id="insureUnifiedPayInptService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" check="false"/>
+    <dubbo:reference id="insureUnifiedPayInptService_consumer" retries="0" interface="cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService" check="false"/>
 
     <!-- 农合医保患者信息下发本地数据库 -->
     <dubbo:reference id="insureNHPatientService_consumer" interface="cn.hsa.module.insure.module.service.InsureNHPatientService" check="false"/>

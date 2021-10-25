@@ -388,8 +388,16 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
 
     public WrapperResponse<String> importCSVMrisInfo(Map map) throws Exception {
         List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
-        String rootPath = System.getProperty("user.dir")+"/data/files/";
-        String hospName= (String) map.get("hospName");
+        String rootPath = "/logs/";
+        Map mapPatamater = new HashMap();
+        mapPatamater.put("hospCode", MapUtils.get(map,"hospCode"));
+        // 查询医疗机构编码
+        mapPatamater.put("code", "YLJGBM");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapPatamater).getData();
+        String hospName="";
+        if(sysParameterDTO!=null) {
+            hospName =sysParameterDTO.getValue();
+        }
         String fileName="hqmsts_"+hospName+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
         CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
         String path = rootPath+"/"+fileName+".csv";

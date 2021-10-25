@@ -128,8 +128,11 @@
     </select>
     <!--查看退库确认中是否存在，通过-->
     <select id="selectJudgeconfirmDruag" resultType="java.util.Map">
-        SELECT '21' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_out` a,stro_out_detail b where
-        a.id = b.out_id and a.audit_code = '1' and a.ok_audit_code='0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT '21' as outCode, b.item_Id as itemId, CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_out` a
+        join stro_out_detail b on a.id = b.out_id
+        left join base_dept bd on bd.id = a.in_stock_id
+        where
+        a.audit_code = '1' and a.ok_audit_code='0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}

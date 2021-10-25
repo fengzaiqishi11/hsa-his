@@ -159,43 +159,45 @@
 
   <!-- 费用清单打印 -->
     <select id="queryInptCostListPrint" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        select id,hosp_code,visit_id,baby_id,iat_id,iatd_group_no,iatd_seq_no,advice_exec_id,source_code,source_id,old_cost_id,source_dept_id,
-        in_dept_id,bfc_id,item_code,item_id,item_name,price,spec,prep_code,dosage,dosage_unit_code,usage_code,
-        rate_id,speed_code,use_days,total_num as num,total_num_unit_code as numUnitCode,herb_note_code,use_code,herb_num,total_price,
-        preferential_price,reality_price as amountMoney,back_num,back_code,doctor_id,doctor_name,dept_id,phar_id,is_dist,is_give,
-        is_ok,ok_id,ok_name,ok_time,settle_code,settle_id,is_check,check_id,check_name,check_time,zz_doctor_id,zz_doctor_name,jz_doctor_id,
-        jz_doctor_name,zg_doctor_id,zg_doctor_name,exec_id,exec_name,exec_time,exec_dept_id,plan_exec_time,status_code,is_cost,
-        cost_time,DATE_FORMAT(cost_time,'%Y-%m-%d') as cost_date,crte_id,crte_name,crte_time,
+        select ic.id,ic.hosp_code,ic.visit_id,ic.baby_id,ic.iat_id,ic.iatd_group_no,ic.iatd_seq_no,ic.advice_exec_id,ic.source_code,ic.source_id,ic.old_cost_id,ic.source_dept_id,
+        ic.in_dept_id,ic.bfc_id,ic.item_code,ic.item_id,ic.item_name,ic.price,ic.spec,ic.prep_code,ic.dosage,ic.dosage_unit_code,ic.usage_code,
+        ic.rate_id,ic.speed_code,ic.use_days,ic.total_num as num,ic.total_num_unit_code as numUnitCode,ic.herb_note_code,ic.use_code,herb_num,ic.total_price,
+        ic.preferential_price,ic.reality_price as amountMoney,ic.back_num,ic.back_code,ic.doctor_id,ic.doctor_name,ic.dept_id,ic.phar_id,ic.is_dist,ic.is_give,
+        ic.is_ok,ic.ok_id,ic.ok_name,ic.ok_time,ic.settle_code,ic.settle_id,ic.is_check,ic.check_id,ic.check_name,ic.check_time,ic.zz_doctor_id,ic.zz_doctor_name,ic.jz_doctor_id,
+        ic.jz_doctor_name,ic.zg_doctor_id,ic.zg_doctor_name,ic.exec_id,ic.exec_name,ic.exec_time,ic.exec_dept_id,ic.plan_exec_time,ic.status_code,ic.is_cost,
+        ic.cost_time,DATE_FORMAT(ic.cost_time,'%Y-%m-%d') as cost_date,ic.crte_id,ic.crte_name,ic.crte_time,
         (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
         (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
-        (select c.name from base_finance_classify c where c.id = bfc_id and c.hosp_code = #{hospCode}) as bfcName from inpt_cost
-        where hosp_code = #{hospCode} and cost_time is not null
+        (select c.name from base_finance_classify c where c.id = ic.bfc_id and c.hosp_code = #{hospCode}) as bfcName,
+        iic.guest_ratio as guestRatio
+        from inpt_cost ic left join insure_individual_cost iic on ic.id = iic.cost_id
+        where ic.hosp_code = #{hospCode} and ic.cost_time is not null
             <if test="visitId != null and visitId != ''">
-                AND visit_id = #{visitId}
+                AND ic.visit_id = #{visitId}
             </if>
             <if test="statusCode != null and statusCode != ''">
-                AND status_code = #{statusCode}
+                AND ic.status_code = #{statusCode}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-                and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
+                and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
             </if>
             <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
                 <![CDATA[
-                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
+                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
                 ]]>
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
                 <![CDATA[
-                    and DATE_FORMAT(cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
+                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
                 ]]>
             </if>
         <if test='queryBaby =="N"'>
-            and (baby_id is null or baby_id = '')
+            and (ic.baby_id is null or ic.baby_id = '')
         </if>
         <if test="babyId != null and babyId != ''">
-            AND baby_id = #{babyId}
+            AND ic.baby_id = #{babyId}
         </if>
-            order by cost_time,bfc_id
+            order by ic.cost_time, ic.bfc_id
     </select>
 
     <!-- 费用清单打印批量-->

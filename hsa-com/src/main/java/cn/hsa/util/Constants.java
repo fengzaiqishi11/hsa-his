@@ -193,6 +193,7 @@ public interface Constants {
         public static final String LCLJXM ="121";//临床路径项目
         public static final String LCLJJDMS ="122";//临床路径阶段描述
         public static final String LCJDMX = "120";//临床路径阶段明细
+        public static final String YBJSQD = "130";// 医保结算清单
 
     }
 
@@ -275,7 +276,12 @@ public interface Constants {
      * @Date 2020/8/28 9:07
      */
     String INPT_FEES_REDIS_KEY = "inpt_fees";
-
+    /**
+     * @Desrciption 门诊发药redis key值（用于做门诊发药，防止同一药房同时做同一操作）
+     * @Author Ou·Mr
+     * @Date 2020/8/28 9:07
+     */
+    String OUT_DISTRIBUTE_REDIS_KEY = "out_distribute";
     /**
      * @Desrciption 医院优惠配置代码key
      * @Author Ou·Mr

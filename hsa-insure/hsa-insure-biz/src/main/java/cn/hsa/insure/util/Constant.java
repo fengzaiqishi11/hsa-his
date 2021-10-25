@@ -710,7 +710,7 @@ public interface Constant {
             public static final String UP_2403 = "2403";// 住院信息变更
             public static final String UP_2404 = "2404"; // 入院办理撤销
             public static final String UP_2405 = "2405"; // 出院办理撤销
-
+            public static final String UP_2601 = "2601"; // 冲正交易
             public static final String UP_9162 = "9162"; // 对象
             public static final String UP_3301 = "3301"; // 项目对照上传
             public static final String UP_3302 = "3302"; // 项目对照撤销
@@ -744,6 +744,8 @@ public interface Constant {
             public static final String UP_5206 = "5206"; // 人员累计信息查询
             public static final String UP_2562 = "2562"; // 门诊两病备案
             public static final String UP_2563 = "2563"; // 门诊两病备案撤销
+
+            public static final String UP_100001= "100001"; // 政策项查询
 
             public static final String UP_7101 = "7101"; // 电子处方上传
             public static final String UP_4701 = "4701"; // 电子病历上传
@@ -790,9 +792,17 @@ public interface Constant {
 
             public static final String UP_8201 = "8201"; // 获取医院库房列表
             public static final String UP_8202 = "8202"; // 药品获取挂网目录列表
+            public static final String UP_8501 = "8501"; // 药品库存查询
+            public static final String UP_8502 = "8502"; // 药品库存上传变更
             public static final String UP_8503 = "8503"; // 药品销售列表查询
             public static final String UP_8504 = "8504"; // 药品销售
             public static final String UP_8505 = "8505"; // 药品销售退货
+            public static final String UP_8506 = "8506"; // 耗材库存查询
+            public static final String UP_8507 = "8507"; // 耗材库存上传变更
+            public static final String UP_8508 = "8508"; // 耗材销售列表查询
+            public static final String UP_8509 = "8509"; // 耗材销售
+            public static final String UP_8510 = "8510"; // 耗材销售退货
+
 
         }
     }

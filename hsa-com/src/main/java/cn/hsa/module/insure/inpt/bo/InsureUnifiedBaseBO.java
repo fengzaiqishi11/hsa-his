@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.inpt.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 
 import java.util.Map;
@@ -252,4 +253,64 @@ public interface InsureUnifiedBaseBO {
      * @Return
      */
     Map<String, Object>  queryInform(Map<String, Object> map);
+
+
+    /**
+     * @param map
+     * @Method updateInsureInptRegisterStatus
+     * @Desrciption 更新医保登记状态（医保已经登记 而his没有登记）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/8 8:33
+     * @Return
+     */
+    Boolean updateInsureInptRegisterStatus(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method updateInsureInptSettleStatus
+     * @Desrciption 更新医保结算状态（医保已经结算 而his没有结算）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/8 10:07
+     * @Return
+     */
+    Boolean updateInsureInptSettleStatus(Map<String, Object> map);
+
+    /**
+     * @Method updateInptPatientCode
+     * @Desrciption  修改病人类型
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:21
+     * @Return
+     **/
+    Boolean updateInptPatientCode(Map<String, Object> map);
+
+    /**
+     * @Method updateInsureInptCancelSettleStatus
+     * @Desrciption  同步取消结算状态  his和医保
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:21
+     * @Return
+     **/
+    Boolean updateInsureInptCancelSettleStatus(Map<String, Object> map);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method 查询住院医保病人类型
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/9 9:42
+     * @Return
+     */
+    PageDTO queryInptInsurePatient(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    Map<String,Object> querySettleDeInfo(Map<String, Object> map);
+
+    Map<String,Object> queryPolicyInfo(Map<String, Object> map);
 }

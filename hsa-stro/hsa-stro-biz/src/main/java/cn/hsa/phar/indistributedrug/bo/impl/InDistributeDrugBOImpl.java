@@ -797,6 +797,14 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
       InptCostDTO inptCostDTO = new InptCostDTO();
       inptCostDTO.setHospCode(pharInReceiveDTO.getHospCode());
       inptCostDTO.setIds(costIds);
+        // 查询费用表是否是退费之后生成的，如果是 那么需要把old_cost_id ，把old_cost_id 集合设置到costIds中
+        if(!ListUtils.isEmpty(costIds)){
+            List<String> oldCostIds = inDistributeDrugDAO.getOldCostIds(inptCostDTO);
+            if (!ListUtils.isEmpty(oldCostIds)){
+                costIds.addAll(oldCostIds);
+                inptCostDTO.setIds(costIds);
+            }
+        }
       // 已退费不退药状态
       inptCostDTO.setBackCode(Constants.COST_TYZT.TFBTY);
       // 更新费用退药状态

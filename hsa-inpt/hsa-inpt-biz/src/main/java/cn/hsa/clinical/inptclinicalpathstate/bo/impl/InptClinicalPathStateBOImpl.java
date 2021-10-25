@@ -6,6 +6,8 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.clinical.clinicalpathstage.dao.ClinicalPathStageDAO;
 import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
+import cn.hsa.module.clinical.clinicpathexec.dao.ClinicPathExecDAO;
+import cn.hsa.module.clinical.clinicpathexec.dto.ClinicPathExecDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dao.InptClinicalPathStageDAO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.bo.InptClinicalPathStateBO;
@@ -35,6 +37,9 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
 
     @Resource
     private InptClinicalPathStageDAO inptClinicalPathStageDAO;
+
+    @Resource
+    private ClinicPathExecDAO clinicPathExecDAO;
 
     /**
      * @Meth: queryClinicalPathStageDetail
@@ -100,6 +105,20 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
     @Override
     public Boolean updateInptClinicalPathStateByVisitId(InptClinicalPathStateDTO inptClinicalPathStateDTO) {
       if("3".equals(inptClinicalPathStateDTO.getPathState())) {
+        ClinicPathExecDTO clinicPathExecDTO = new ClinicPathExecDTO();
+        // 医院编码
+        clinicPathExecDTO.setHospCode(inptClinicalPathStateDTO.getHospCode());
+        // 路径id
+        clinicPathExecDTO.setListId(inptClinicalPathStateDTO.getListId());
+        // 是否执行  1是 0否
+        clinicPathExecDTO.setIsExec("1");
+        // 就诊id
+        clinicPathExecDTO.setVisitId(inptClinicalPathStateDTO.getVisitId());
+        clinicPathExecDTO.setClinicalPathStageId(inptClinicalPathStateDTO.getId());
+        List<ClinicPathExecDTO> clinicPathExecDTOS = clinicPathExecDAO.queryClinicPathExecAll(clinicPathExecDTO);
+        if(!ListUtils.isEmpty(clinicPathExecDTOS)) {
+          throw new AppException("该病人已经有已经执行完成的项目，如需出径，请去路径执行页面操作出径");
+        }
         // 设置出径阶段id
         inptClinicalPathStateDTO.setEndStageId(inptClinicalPathStateDTO.getStageId());
         // 设置出径阶段名称
@@ -107,6 +126,7 @@ public class InptClinicalPathStateBOImpl implements InptClinicalPathStateBO {
       } else {
         inptClinicalPathStateDTO.setEndCrteId(null);
         inptClinicalPathStateDTO.setEndCrteName(null);
+        inptClinicalPathStateDTO.setEndCrteTime(null);
       }
       return inptClinicalPathStateDAO.updateInptClinicalPathStateByVisitId(inptClinicalPathStateDTO) > 0;
     }

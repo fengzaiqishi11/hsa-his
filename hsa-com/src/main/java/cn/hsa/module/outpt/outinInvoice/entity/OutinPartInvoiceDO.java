@@ -38,4 +38,7 @@ public class OutinPartInvoiceDO extends PageDO implements java.io.Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date crteTime;
+
+    // 发票领用人
+    private String receiveName;
 }

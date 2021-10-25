@@ -14,6 +14,7 @@
         <result property="temperatureRetest" column="temperature_retest" jdbcType="OTHER"/>
         <result property="pulse" column="pulse" jdbcType="INTEGER"/>
         <result property="heartRate" column="heart_rate" jdbcType="INTEGER"/>
+        <result property="bloodSugar" column="blood_sugar" jdbcType="OTHER"/>
         <result property="isVentilator" column="is_ventilator" jdbcType="VARCHAR"/>
         <result property="breath" column="breath" jdbcType="INTEGER"/>
         <result property="fortyUpCode" column="forty_up_code" jdbcType="VARCHAR"/>
@@ -46,7 +47,7 @@
     <select id="queryAll" resultMap="InptNurseThirdMap">
         select
         id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
-        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        heart_rate, blood_sugar, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
         thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time , drug_allergy
         from inpt_nurse_third
@@ -82,6 +83,9 @@
             </if>
             <if test="heartRate != null">
                 and heart_rate = #{heartRate}
+            </if>
+            <if test="blood_sugar != null">
+                and blood_sugar = #{bloodSugar}
             </if>
             <if test="isVentilator != null and isVentilator != ''">
                 and is_ventilator = #{isVentilator}
@@ -168,7 +172,7 @@
     <select id="queryAllRecordTime" resultMap="InptNurseThirdMap">
         select
         id, hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
-        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        heart_rate, blood_sugar, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
         thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy
         from inpt_nurse_third
@@ -206,13 +210,13 @@
     <insert id="insertList" keyProperty="id" useGeneratedKeys="true" parameterType="list">
         insert into inpt_nurse_third
         (id,hosp_code, visit_id, baby_id, record_time, in_num, temperature_code, temperature, temperature_retest, pulse,
-        heart_rate, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
+        heart_rate, blood_sugar, is_ventilator, breath, forty_up_code, forty_up_remark, thirty_five_down_code,
         thirty_five_down_remark, intake, output, other_output, skin_code, remark, excrement_code, pee_code, height, weight, girth, am_bp, pm_bp, is_operation,
         operation_days, operation_cnt, crte_id, crte_name, crte_time, drug_allergy)
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
             (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.recordTime}, #{item.inNum}, #{item.temperatureCode},
-            #{item.temperature}, #{item.temperatureRetest}, #{item.pulse}, #{item.heartRate}, #{item.isVentilator},
+            #{item.temperature}, #{item.temperatureRetest}, #{item.pulse}, #{item.heartRate}, #{item.bloodSugar}, #{item.isVentilator},
             #{item.breath}, #{item.fortyUpCode}, #{item.fortyUpRemark}, #{item.thirtyFiveDownCode},
             #{item.thirtyFiveDownRemark}, #{item.intake}, #{item.output}, #{item.otherOutput}, #{item.skinCode}, #{item.remark}, #{item.excrementCode}, #{item.peeCode},
             #{item.height}, #{item.weight}, #{item.girth}, #{item.amBp}, #{item.pmBp}, #{item.isOperation}, #{item.operationDays},
@@ -224,25 +228,21 @@
     <select id="queryAllByTimeSlot" resultType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO">
         SELECT
         SJ.time_slot,
-         SJ.time_slot as start_day,
-          SJ.time_slot as record_time,
+        SJ.time_slot as start_day,
+        SJ.time_slot as record_time,
         SCD.hosp_code,
         SCD.visit_id,
         SCD.baby_id,
         SCD.record_time,
         SCD.temperature_code,
         SCD.in_num,
-        IF
-	( SCD.temperature = 0, NULL, SCD.temperature ) as temperature,
-        IF
-	( SCD.temperature_retest = 0, NULL, SCD.temperature_retest ) as temperature_retest,
-        IF
-	( SCD.pulse = 0, NULL, SCD.pulse ) as pulse,
-        IF
-	( SCD.heart_rate = 0, NULL, SCD.heart_rate ) as heart_rate,
-	SCD.is_ventilator,
-        IF
-	( SCD.breath = 0, NULL, SCD.breath ) as breath,
+        IF(SCD.temperature = 0, NULL, SCD.temperature ) as temperature,
+        IF(SCD.temperature_retest = 0, NULL, SCD.temperature_retest ) as temperature_retest,
+        IF(SCD.pulse = 0, NULL, SCD.pulse ) as pulse,
+        IF(SCD.heart_rate = 0, NULL, SCD.heart_rate ) as heart_rate,
+        IF(SCD.blood_sugar = 0, NULL, SCD.blood_sugar ) as blood_sugar,
+	    SCD.is_ventilator,
+        IF(SCD.breath = 0, NULL, SCD.breath ) as breath,
         SCD.forty_up_code,
         SCD.forty_up_remark,
         SCD.thirty_five_down_code,
@@ -721,6 +721,7 @@
             a.is_ventilator,
             a.pulse,
             a.heart_rate,
+            a.blood_sugar,
             a.temperature,
             a.am_bp,
             a.weight,
@@ -754,6 +755,7 @@
                 temperature_retest = #{dto.temperatureRetest},
                 pulse = #{dto.pulse},
                 heart_rate = #{dto.heartRate},
+                blood_sugar = #{dto.bloodSugar},
                 is_ventilator = #{dto.isVentilator},
                 breath = #{dto.breath},
                 forty_up_code = #{dto.fortyUpCode},

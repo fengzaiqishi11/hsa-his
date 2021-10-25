@@ -27,7 +27,7 @@ public interface InsureRecruitPurchaseService {
      * @param map
      * @return
      */
-    WrapperResponse<Map<String, Object>> queryAll(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryAll(Map<String, Object> map);
     /**
      * @Description: 获取当前医院库存列表
      * @Param: [map]
@@ -79,7 +79,7 @@ public interface InsureRecruitPurchaseService {
      * @Return: list
      **/
     @PostMapping("/service/insure/insureRecruitPurchase/queryDrugSells")
-    WrapperResponse<List<Map<String, Object>>> queryDrugSells(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryDrugSells(Map<String, Object> map);
 
     /**
      * @Menthod:

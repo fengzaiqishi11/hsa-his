@@ -591,7 +591,7 @@ public interface Constant {
             public static final String PTMZ = "11"; // 普通门诊
             public static final String GH = "12"; // 门诊挂号
             public static final String JZ = "13"; // 急诊
-            public static final String MZMXB = "14"; // 门诊慢性病
+            public static final String MZMXB = "14"; // 门诊慢性病(特门)
             public static final String MZTC = "15"; // 门诊统筹
             public static final String MZTSB = "16"; // 门诊特殊病
             public static final String PTZY = "21"; // 普通住院
@@ -599,6 +599,15 @@ public interface Constant {
             public static final String ZWZZZY = "22"; // 转外诊治住院
             public static final String SYMZ = "51"; // 生育门诊
             public static final String SYZY = "52"; // 生育住院
+            public static final String DBZZY = "2102"; // 单病种住院
+            public static final String PTZYWZM = "2101"; // 普通住院（未转码）
+            public static final String SYPCJM = "2106"; // 生育平产(居民)
+            public static final String SYPGCJM = "2107"; // 生育剖宫产(居民)
+            public static final String MXLB = "9901"; // 门诊两病
+            public static final String YWSHMZ = "9903"; // 意外伤害门诊
+            public static final String DBTY = "9904"; // 大病特药
+
+
         }
 
 

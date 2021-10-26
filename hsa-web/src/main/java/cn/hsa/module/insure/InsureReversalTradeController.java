@@ -279,6 +279,7 @@ public class InsureReversalTradeController extends BaseController {
     public WrapperResponse<Map<String,Object>> queryStatementInfo(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         paraMap.put("hospCode",sysUserDTO.getHospCode());
+        paraMap.put("statistician",sysUserDTO.getName());
         return insureUnifiedPayReversalTradeService_consumer.queryStatementInfo(paraMap);
     }
 

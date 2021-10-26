@@ -28,6 +28,10 @@
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
         <result column="primary_price" property="primaryPrice" jdbcType="VARCHAR" />
         <result column="is_unified_pay" property="isUnifiedPay" jdbcType="VARCHAR" />
+        <result column="hosp_account_name" property="hospAccountName" jdbcType="VARCHAR" />
+        <result column="hosp_account" property="hospAccount" jdbcType="VARCHAR" />
+        <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+        <result column="hosp_name" property="hospName" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -55,7 +59,11 @@
         crte_name,
         crte_time,
         mdtrtarea_admvs,
-        is_unified_pay
+        is_unified_pay,
+        hosp_account_name,
+        hosp_account,
+        bank_account,
+        hosp_name
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -83,13 +91,18 @@
         ic.crte_name,
         ic.crte_time,
         ic.mdtrtarea_admvs,
-        ic.is_unified_pay
+        ic.is_unified_pay,
+        ic.hosp_account_name,
+        ic.hosp_account,
+        ic.bank_account,
+        ic.hosp_name
     </sql>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="insureConfigurationMap">
         select
         id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
+        ,hosp_account_name,hosp_account,bank_account,hosp_name
         from insure_configuration
         <where>
             <if test="id != null and id != ''">
@@ -199,7 +212,11 @@
           crte_name,
           crte_time,
           mdtrtarea_admvs,
-          is_unified_pay
+          is_unified_pay,
+          hosp_account_name,
+          hosp_account,
+          bank_account,
+          hosp_name
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -224,7 +241,11 @@
           #{crteName,jdbcType=VARCHAR},
           #{crteTime,jdbcType=TIMESTAMP},
           #{mdtrtareaAdmvs,jdbcType=VARCHAR},
-          #{isUnifiedPay,jdbcType=VARCHAR}
+          #{isUnifiedPay,jdbcType=VARCHAR},
+          #{hospAccountName,jdbcType=VARCHAR},
+          #{hospAccount,jdbcType=VARCHAR},
+          #{bankAccount,jdbcType=VARCHAR},
+          #{hospName,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -300,7 +321,20 @@
                 crte_time,
             </if>
             <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
-                mdtrtarea_admvs
+                mdtrtarea_admvs,
+            </if>
+
+            <if test="hospAccountName != null and hospAccountName != ''">
+                hosp_account_name,
+            </if>
+            <if test="hospAccount != null and hospAccount != ''">
+                hosp_account,
+            </if>
+            <if test="bankAccount != null and bankAccount != ''">
+                bank_account,
+            </if>
+            <if test="hospName != null and hospName != ''">
+                hosp_name
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -371,7 +405,20 @@
                 #{crteTime,jdbcType=TIMESTAMP},
             </if>
             <if test="mdtrtareaAdmvs != null and mdtrtareaAdmvs != ''">
-                #{mdtrtareaAdmvs,jdbcType=VARCHAR}
+                #{mdtrtareaAdmvs,jdbcType=VARCHAR},
+            </if>
+
+            <if test="hospAccountName != null and hospAccountName != ''">
+                #{hospAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="hospAccount != null and hospAccount != ''">
+                #{hospAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="bankAccount != null and bankAccount != ''">
+                #{bankAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="hospName != null and hospName != ''">
+                #{hospName,jdbcType=VARCHAR}
             </if>
         </trim>
     </insert>
@@ -402,7 +449,11 @@
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 crte_time = #{crteTime,jdbcType=TIMESTAMP},
                 mdtrtarea_admvs = #{mdtrtareaAdmvs, jdbcType=VARCHAR},
-                is_unified_pay = #{isUnifiedPay, jdbcType=VARCHAR}
+                is_unified_pay = #{isUnifiedPay, jdbcType=VARCHAR},
+                hosp_account_name = #{hospAccountName,jdbcType=VARCHAR},
+                hosp_account = #{hospAccount,jdbcType=VARCHAR},
+                bank_account = #{bankAccount,jdbcType=VARCHAR},
+                hosp_name = #{hospName,jdbcType=VARCHAR}
         where
         id = #{id} and hosp_code = #{hospCode}
     </update>
@@ -481,6 +532,18 @@
             <if test="isUnifiedPay != null and isUnifiedPay != ''">
                 is_unified_pay = #{isUnifiedPay, jdbcType=VARCHAR},
             </if>
+            <if test="hospAccountName != null and hospAccountName != ''">
+                #{hospAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="hospAccount != null and hospAccount != ''">
+                #{hospAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="bankAccount != null and bankAccount != ''">
+                #{bankAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="hospName != null and hospName != ''">
+                #{hospName,jdbcType=VARCHAR}
+            </if>
         </set>
         where
         id = #{id}
@@ -538,6 +601,7 @@
     <select id="getById" parameterType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO" resultMap="insureConfigurationMap">
         select
         id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
+        ,is_unified_pay,hosp_account_name,hosp_account,bank_account,hosp_name
         from insure_configuration
         where  hosp_code = #{hospCode}
         <if test="id !=null and id !='' ">
@@ -579,6 +643,7 @@
             resultType="cn.hsa.module.insure.module.dto.InsureConfigurationDTO">
         select
         id, hosp_code, code, name, reg_code, org_code, attr_code, type_code, url, request_code, time_out, username, password, contact, email, phone, is_remote, is_valid, remark, crte_id, crte_name, crte_time, mdtrtarea_admvs, is_unified_pay
+        ,hosp_account_name,hosp_account,bank_account,hosp_name
         from insure_configuration
         where  hosp_code = #{hospCode}
         <if test="id !=null and id !='' ">

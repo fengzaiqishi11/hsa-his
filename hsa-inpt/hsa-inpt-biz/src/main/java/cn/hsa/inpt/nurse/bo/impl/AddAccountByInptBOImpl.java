@@ -1080,15 +1080,14 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     wdto.setStatusCode(Constants.LYZT.DL);
                     wdto.setUsageCode(dto.getUsageCode());
                     wdto.setVisitId(dto.getVisitId());
+                    wdto.setUnitCode(drug.getUnitCode());
                     //总数量的单位等于拆零单位
                     if(dto.getTotalNumUnitCode().equals(drug.getSplitUnitCode())){
                         wdto.setSplitNum(dto.getTotalNum());//拆零数量
                         wdto.setNum(BigDecimalUtils.divide(dto.getTotalNum(), drug.getSplitRatio()).setScale(2,   BigDecimal.ROUND_HALF_UP));//总数量
-                        wdto.setUnitCode(drug.getSplitUnitCode());
                     }else{
                         wdto.setSplitNum(BigDecimalUtils.multiply(dto.getTotalNum(),drug.getSplitRatio() ));//拆零数量
                         wdto.setNum(dto.getTotalNum());//总数量
-                        wdto.setUnitCode(drug.getUnitCode());
                     }
                     wdto.setSplitPrice(drug.getSplitPrice());//拆零单价
                     wdto.setPrice(drug.getPrice());//大单位单价

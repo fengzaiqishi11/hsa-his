@@ -395,5 +395,53 @@ public interface PatientCostLedgerService {
   @GetMapping("/service/outpt/statement/queryMedicalCostTitle")
   WrapperResponse<Map> queryMedicalCostTitle(Map map);
 
+
+  /**
+   * @Menthod queryMzPatientFinanceCostList
+   * @Desrciption 查询门诊财务分类明细
+   * @param map
+   * @Author liuliyun
+   * @Date   2021/10/22 16:26
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/service/outpt/statement/queryMzPatientFinanceCostList")
+  WrapperResponse<PageDTO> queryMzPatientFinanceCostList(Map map);
+
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @param map
+   * @Author liuliyun
+   * @Date   2021/10/22 16:25
+   * @Return WrapperResponse<Map>
+   **/
+  @GetMapping("/service/outpt/statement/getMzMedicalFinanceTitle")
+  WrapperResponse<Map> getMzMedicalFinanceTitle(Map map);
+
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption 查询住院财务分类明细
+   * @param map
+   * @Author liuliyun
+   * @Date   2021/10/25 15:26
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/service/outpt/statement/getInptFinanceList")
+  WrapperResponse<PageDTO> getInptFinanceList(Map map);
+
+
+  /**
+   * @Menthod getInptFinanceTitle
+   * @Desrciption  查询住院财务分类标题
+   * @param map
+   * @Author liuliyun
+   * @Date   2021/10/25 15:25
+   * @Return WrapperResponse<Map>
+   **/
+  @GetMapping("/service/outpt/statement/getInptFinanceTitle")
+  WrapperResponse<Map> getInptFinanceTitle(Map map);
+
 }
 

@@ -495,4 +495,62 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
     return WrapperResponse.success(patientCostLedgerBO.queryMedicalCostTitle(outptVisitDTO));
   }
+
+  /**
+   * @Menthod queryMzPatientFinanceCostList
+   * @Desrciption 查询门诊财务分类明细
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/10/22 16:28
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryMzPatientFinanceCostList(Map map) {
+    OutptVisitDTO outptVisitDTO =MapUtils.get(map,"outptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.queryMzPatientFinanceCostList(outptVisitDTO));
+  }
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/10/22 16:27
+   * @Return WrapperResponse<Map>
+   **/
+  @Override
+  public WrapperResponse<Map> getMzMedicalFinanceTitle(Map map) {
+    OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.getMzMedicalFinanceTitle(outptVisitDTO));
+  }
+
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption 查询住院财务分类明细
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/10/25 14:28
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> getInptFinanceList(Map map) {
+    InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.getInptFinanceList(inptVisitDTO));
+  }
+
+  /**
+   * @Menthod getInptFinanceTitle
+   * @Desrciption  查询住院财务分类标题
+   * @Param map
+   * @Author liuliyun
+   * @Date   2021/10/25 14:27
+   * @Return WrapperResponse<Map>
+   **/
+  @Override
+  public WrapperResponse<Map> getInptFinanceTitle(Map map) {
+    InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.getInptFinanceTitle(inptVisitDTO));
+  }
+
 }

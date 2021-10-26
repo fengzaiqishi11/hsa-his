@@ -46,9 +46,12 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @throws
      */
     @GetMapping("/queryHospitalInventory")
-    public WrapperResponse<Map<String,Object>> queryHospitalInventory(Map<String,Object> map,HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<PageDTO> queryHospitalInventory(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureRecruitPurchaseDTO",insureRecruitPurchaseDTO);
         return insureRecruitPurchaseService_consumer.queryAll(map);
     }
 
@@ -60,7 +63,7 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @Author: yuelong.chen
      * @Date: 2021/8/24 10:50
      */
-    @PostMapping("queryCommoditySalesRecord")
+    @PostMapping("/queryCommoditySalesRecord")
     public WrapperResponse<Map<String, Object>> queryCommoditySalesRecord(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
@@ -114,9 +117,9 @@ public class InsureRecruitPurchaseController extends BaseController {
         if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getQueryType())) {
             throw new RuntimeException("未选择查询范围，门诊1或者住院2");
         }
-        if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getInsureRegCode())) {
-            throw new RuntimeException("未选择医保机构编码，请选择");
-        }
+//        if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getInsureRegCode())) {
+//            throw new RuntimeException("未选择医保机构编码，请选择");
+//        }
         if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getSellType())) {
             throw new RuntimeException("未选择业务类型，销售1或者退货2");
         }
@@ -137,8 +140,8 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @Date: 2021-08-26 10:27
      * @Return: list
      **/
-    @PostMapping("/queryDrugSells")
-    public WrapperResponse<List<Map<String, Object>>> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO, HttpServletRequest req, HttpServletResponse res) {
+    @GetMapping("/queryDrugSells")
+    public WrapperResponse<PageDTO> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         Map<String, Object> map = new HashMap<String, Object>();
@@ -149,7 +152,7 @@ public class InsureRecruitPurchaseController extends BaseController {
 
     /**
      * @Menthod:
-     * @Desrciption: 海南招采接口-药品销售【8504】
+     * @Desrciption: 海南招采接口-药品/材料销售【8504】
      * @Param:
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
@@ -162,7 +165,20 @@ public class InsureRecruitPurchaseController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureRecruitPurchaseService_consumer.addDrugSells(map);
     }
-
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 招采：药品库存上传变更接口
+     * @Param: [map, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    @PostMapping("/updateToInsure")
+    public WrapperResponse<Boolean> updateToInsure(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureRecruitPurchaseService_consumer.updateToInsure(map);
+    }
     /**
      * @Menthod:
      * @Desrciption: 海南招采接口-药品销售退货【8505】

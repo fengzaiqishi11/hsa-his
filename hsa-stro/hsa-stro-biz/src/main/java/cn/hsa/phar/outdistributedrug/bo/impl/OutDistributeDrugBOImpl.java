@@ -57,6 +57,9 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
     @Resource
     BaseOrderRuleService baseOrderRuleService_consumer;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * @Method: getOutRecivePage
      * @Description: 获取待领列表
@@ -329,11 +332,18 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
      **/
     @Override
     public Boolean updateOutDistribute(PharOutReceiveDTO pharOutReceiveDTO) {
+        //校验必填信息
+        if(pharOutReceiveDTO==null && StringUtils.isEmpty(pharOutReceiveDTO.getId())){
+            throw new AppException("领药申请ID为空,发药失败");
+        }
+        // 查看当前领药申请id是否正在进行发药
+        String key = new StringBuilder(pharOutReceiveDTO.getHospCode()).append("MZFY").
+                append(pharOutReceiveDTO.getId()).append(Constants.OUTPT_FEES_REDIS_KEY).toString();
+        if (StringUtils.isNotEmpty(redisUtils.get(key)) || redisUtils.hasKey(key)){
+            throw new AppException("该单据正在进行发药，请不要重复发药");
+        }
         try {
-            //校验必填信息
-            if(pharOutReceiveDTO==null && StringUtils.isEmpty(pharOutReceiveDTO.getId())){
-                throw new AppException("领药申请ID为空,发药失败");
-            }
+            redisUtils.set(key,pharOutReceiveDTO.getId(),600);
 
             //根据id获取门诊领药申请对象
             PharOutReceiveDO receiveDTO = outDistributeDrugDAO.getOutReceiveById(pharOutReceiveDTO);
@@ -460,6 +470,8 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
         } catch (NoSuchMethodException e) {
             log.error("发药失败",e.getMessage());
             throw new AppException("发药失败");
+        } finally {
+            redisUtils.del(key);//删除key
         }
         return true;
     }

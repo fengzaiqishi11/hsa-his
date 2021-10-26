@@ -318,7 +318,7 @@
       (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
       b.split_price,"" as usageCode,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,b.model
       from stro_stock ss
-      LEFT JOIN base_material b on ss.item_id = b.id
+      JOIN base_material b on ss.item_id = b.id
       <where>
         and ss.num > 0 and ss.hosp_code = #{hospCode}
         <if test="id != null and id != ''">
@@ -349,7 +349,7 @@
       (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
       b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,"" as model
       from stro_stock ss
-      LEFT JOIN base_drug b on ss.item_id = b.id
+      JOIN base_drug b on ss.item_id = b.id
       <where>
         and ss.num > 0 and ss.hosp_code = #{hospCode}
         <if test="id != null and id != ''">

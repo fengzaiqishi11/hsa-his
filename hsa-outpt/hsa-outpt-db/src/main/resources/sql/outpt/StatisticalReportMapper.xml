@@ -960,7 +960,7 @@
         a.birthday,
         a.pym,
         a.wbm,
-        a.is_food_borne,
+        ifnull(a.is_food_borne, 0) as is_food_borne,
         a.visit_no,
         a.crte_time,
         a.dept_id,

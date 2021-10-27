@@ -15,6 +15,8 @@ import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
+import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
+import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -619,5 +621,25 @@ public interface OutptCostDAO {
 	 * @Return
 	 */
 	void updateMedicApply(String visitId, String hospCode, String documentSta, @Param("list") List<OutptCostDTO> deleteMedicApplyList);
+
+	/**
+	 * @Menthod batchInsert
+	 * @Desrciption  批量插入门诊领药申请数据
+	 * @param pharOutReceiveDOList 数据集合
+	 * @Author Ou·Mr
+	 * @Date 2020/9/18 17:49
+	 * @Return int 受影响的行数
+	 */
+	int batchPharOutReceiveInsert(List<PharOutReceiveDO> pharOutReceiveDOList);
+
+	/**
+	 * @Menthod batchInsert
+	 * @Desrciption  批量新增门诊领药申请信息
+	 * @param pharOutReceiveDetailDOList 参数
+	 * @Author Ou·Mr
+	 * @Date 2020/9/16 15:13
+	 * @Return int 受影响的行数
+	 */
+	int batchPharOutReceiveDetailInsert(List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList);
 
 }

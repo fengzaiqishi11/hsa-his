@@ -10,7 +10,7 @@
         values
         <foreach collection="list" item="entity" separator=",">
             (#{entity.id}, #{entity.hospCode}, #{entity.applyNo}, #{entity.typeCode}, #{entity.visitId},
-            #{entity.babyId}, #{entity.inNo}, #{entity.orderNo}, #{entity.isInpt}, #{entity.deptId}, #{entity.deptName},
+            #{entity.babyId}, #{entity.inNo}, #{entity.adviceId}, #{entity.isInpt}, #{entity.deptId}, #{entity.deptName},
             #{entity.doctorId}, #{entity.doctorName}, #{entity.applyTime}, #{entity.impDeptId}, #{entity.barCode},
             #{entity.printTime}, #{entity.printTimes}, #{entity.rporter}, #{entity.isAllergy}, #{entity.resultId},
             #{entity.isPositive}, #{entity.documentSta}, #{entity.opdId}, #{entity.content}, #{entity.medicType},
@@ -28,6 +28,7 @@
         SELECT
 	a.hosp_code,
 	a.apply_no,
+	a.order_no,
 	a.type_code,
 	a.visit_id AS pid,
 	a.in_no,
@@ -49,7 +50,6 @@
 	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
 	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
 	a.crte_time AS sftime,
-	a.medic_type AS pattype,
 	b.name,
 IF
 	( b.gender_code = '1', '男', '女' ) AS sex,
@@ -60,21 +60,23 @@ FROM
 	LEFT JOIN outpt_visit b ON a.visit_id = b.id
 	AND a.hosp_code = b.hosp_code
 	LEFT JOIN outpt_prescribe_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code where a.is_inpt = '0' and a.report_time is null and a.is_issue = '0'
+	AND a.hosp_code = c.hosp_code
+	where a.is_inpt = '0' and a.report_time is null and a.document_sta = '02'
 	UNION ALL
 SELECT
 	a.hosp_code,
 	a.apply_no,
+	a.order_no,
 	a.type_code,
 	a.visit_id AS pid,
 	a.in_no,
 	a.opd_id,
 	a.id,
-	c.item_id,
+	c.ba_id as item_id,
 	b.age_unit_code AS ageunit,
 	'住院' AS patType,
 	b.bed_name AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
+	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
 	c.item_name AS sfname,
 	c.total_price AS sfmoney,
 	'1' AS sfcount,
@@ -86,7 +88,6 @@ SELECT
 	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
 	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
 	a.crte_time AS sftime,
-	a.medic_type AS pattype,
 	b.name,
 IF
 	( b.gender_code = '1', '男', '女' ) AS sex,
@@ -97,11 +98,16 @@ FROM
 	LEFT JOIN inpt_visit b ON a.visit_id = b.id
 	AND a.hosp_code = b.hosp_code
 	LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code where a.is_inpt = '1' and a.report_time is null and a.is_issue = '0'
+	AND a.hosp_code = c.hosp_code
+	where a.is_inpt = '1' and a.report_time is null and a.document_sta is null
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">
         select opd_id from medic_apply where report_time is null
+    </select>
+
+    <select id="queryDXBackResult" resultType="java.lang.String">
+        select opd_id from medic_apply where document_sta in ('05','06')
     </select>
 
     <update id="updateIsIssue">
@@ -153,12 +159,29 @@ FROM
     </delete>
 
     <update id="updateApplyStatus">
-        update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s')
+        update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
         where bar_code in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
             #{entity}
         </foreach>
     </update>
+
+    <update id="updateStatus">
+        update medic_apply set document_sta = '03'
+        where opd_id in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+            #{entity}
+        </foreach>
+    </update>
+
+    <update id="updateStatusMap">
+        update medic_apply set document_sta = '03'
+        where opd_id in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+            #{entity.opd_id}
+        </foreach>
+    </update>
+
     <select id="queryAdvice" resultType="java.util.Map">
         select * from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode}
     </select>

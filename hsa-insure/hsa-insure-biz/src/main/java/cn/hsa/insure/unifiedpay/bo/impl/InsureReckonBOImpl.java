@@ -4,21 +4,17 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
-import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.outpt.bo.InsureReckonBO;
 import cn.hsa.module.insure.outpt.dao.InsureReckonDAO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReckonDTO;
-import cn.hsa.module.insure.outpt.entity.InsureReckonDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -473,6 +469,38 @@ public class InsureReckonBOImpl extends HsafBO implements InsureReckonBO {
         Map<String,Object> inptMap = new HashMap<>();
         inptMap.put("data",dataMap);
         Map<String,Object> resultMap = this.invokingUpay(hospCode, insureRegCode, "3703", dataMap);
+        Map<String,Object> outptMap =  (Map)resultMap.get("output");
+        List<Map<String,Object>> resultList = MapUtils.get(outptMap,"data");
+        return PageDTO.of(resultList);
+    }
+
+    /**
+     * 对账汇总明细查询 - 3699
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureTotlStmtInfo
+     * @Desrciption 对账汇总明细查询 - 3699
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @Override
+    public PageDTO queryInsureTotlStmtInfo(InsureReckonDTO insureReckonDTO) {
+        String hospCode = insureReckonDTO.getHospCode();
+        String insureRegCode = insureReckonDTO.getInsureRegCode();
+
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("fixmedinsCode",insureConfigurationDTO.getOrgCode());	 // 医疗机构编码
+        dataMap.put("stmtBegndate",insureReckonDTO.getBegndate()); // 对账开始时间
+        dataMap.put("stmtEnddate",insureReckonDTO.getEnddate()); // 对账结束时间
+        Map<String,Object> inptMap = new HashMap<>();
+        inptMap.put("data",dataMap);
+        Map<String,Object> resultMap = this.invokingUpay(hospCode, insureRegCode, "3699", dataMap);
         Map<String,Object> outptMap =  (Map)resultMap.get("output");
         List<Map<String,Object>> resultList = MapUtils.get(outptMap,"data");
         return PageDTO.of(resultList);

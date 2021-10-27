@@ -16,10 +16,13 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.drug.bo.BaseDrugBO;
 import cn.hsa.module.base.drug.dao.BaseDrugDAO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -35,6 +38,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * @Package_name: cn.hsa.base.bi.bo.impl
@@ -238,14 +244,16 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
         //接受页面传递的拼音码、五笔码
         String usualPym = baseDrugDTO.getUsualPym();
         String usualWbm = baseDrugDTO.getUsualWbm();
+        String goodPym = baseDrugDTO.getGoodPym();
+        String goodWym = baseDrugDTO.getGoodWbm();
 
-        if ((!StringUtils.isEmpty(baseDrugDTO.getUsualName()) || !StringUtils.isEmpty(baseDrugDTO.getGoodName())) && StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm)) {
+        if (!StringUtils.isEmpty(baseDrugDTO.getUsualName()) && StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm)) {
             //设置通用名拼音码
             //设置通用名五笔码
             baseDrugDTO.setUsualPym(PinYinUtils.toFirstPY(baseDrugDTO.getUsualName()));
             baseDrugDTO.setUsualWbm(WuBiUtils.getWBCode(baseDrugDTO.getUsualName()));
         }
-        if (!StringUtils.isEmpty(baseDrugDTO.getGoodName()) && (StringUtils.isEmpty(usualPym) && StringUtils.isEmpty(usualWbm))) {
+        if (!StringUtils.isEmpty(baseDrugDTO.getGoodName()) && (StringUtils.isEmpty(goodPym) && StringUtils.isEmpty(goodWym))) {
             //设置商品名拼音码
             //设置商品名五笔码
             baseDrugDTO.setGoodPym(PinYinUtils.toFirstPY(baseDrugDTO.getGoodName()));
@@ -934,6 +942,50 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
         PageHelper.startPage(baseDrugDTO.getPageNo(),baseDrugDTO.getPageSize());
         List<BaseDrugDTO> baseDrugDTOList = this.baseDrugDAO.queryUnifiedPage(baseDrugDTO);
         return PageDTO.of(baseDrugDTOList);
+    }
+    /**
+     * @Meth: queryEnableCancel
+     * @Description: 查看是否能够作废药品
+     *  1.判断费用表是否有未发药品。
+     *  2.长期医嘱是否开了该药品.如果有,不允许作废.
+     * @Param: [baseDrugDTO]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    @Override
+    public Boolean queryEnableCancel(BaseDrugDTO baseDrugDTO) {
+        // 获得作废药品id
+        List<String> ids = baseDrugDTO.getIds();
+        if (ListUtils.isEmpty(ids)) {
+            throw new AppException("作废的药品不能为空");
+        }
+        // 1.判断费用表是否存在未发药药品
+        // 住院费用表
+        List<InptCostDTO> inptCostDTOS = baseDrugDAO.queryCostIsInptOut(baseDrugDTO);
+        // 过滤出药品名称
+        List<String> inptCostItemNames = inptCostDTOS.stream().map(InptCostDTO::getItemName).collect(Collectors.toList());
+        // 门诊费用表
+        List<OutptCostDTO> outptCostDTOS = baseDrugDAO.queryCostIsOutptOut(baseDrugDTO);
+        // 过滤
+        List<String> ouptCostItemNames = inptCostDTOS.stream().map(InptCostDTO::getItemName).collect(Collectors.toList());
+        String errorMessage = "";
+        if (!ListUtils.isEmpty(inptCostItemNames)) {
+            errorMessage += "住院业务中：" + inptCostItemNames.toString() + "未发药，不可进行作废操作;";
+        }
+        if (!ListUtils.isEmpty(ouptCostItemNames)) {
+            errorMessage += "门诊业务中：" + ouptCostItemNames.toString() + "未发药，不可进行作废操作";
+        }
+        if (StringUtils.isNotEmpty(errorMessage)) {
+            throw new AppException(errorMessage);
+        }
+        // 2.长期医嘱是否开了该药品，如果有，不允许作废
+        List<InptAdviceDTO> inptAdviceDTOS = baseDrugDAO.queryInptAdviceIsLong(baseDrugDTO);
+        List<String> inptAdviceItemNames = inptAdviceDTOS.stream().map(InptAdviceDTO::getItemName).collect(Collectors.toList());
+        if (!ListUtils.isEmpty(inptAdviceItemNames)) {
+            throw new AppException("长期医嘱中存在：" + inptAdviceItemNames.toString() + "未停医嘱，不可进行作废操作");
+        }
+        return true;
     }
 
     public void cacheOperate(BaseDrugDTO baseDrugDTO, List<BaseDrugDTO> baseDrugDTOS, Boolean operation) {

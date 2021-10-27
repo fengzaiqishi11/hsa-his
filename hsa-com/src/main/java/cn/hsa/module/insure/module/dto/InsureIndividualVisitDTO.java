@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.security.PrivateKey;
 import java.util.Date;
 
 /**
@@ -118,4 +119,22 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private Date minRegister;// 最早登记时间
         private String pracCertiNo;  // 医师编码
+        // 床位号
+        private String bedName;
+        // 入院科室
+        private String indeptName;
+        // 性别
+        private String gendCode;
+        // 姓名
+        private String name;
+        // 状态
+        private String statusCode;
+        // 医疗机构名称
+        private String fixmedinsName;
+        // 医院等级
+        private String hospLv;
+        // 住院天数
+        private Integer  totalInDays;
+        // 就医地区划
+        private String mdtrtareaAdmvs;
 }

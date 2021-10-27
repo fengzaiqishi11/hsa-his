@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @Package_name: cn.hsa.module.clinical.clinicalpathstagedetailitem.dto
  * @Class_name: ClinicalPathStageDetailItemDTO
- * @Describe:
+ * @Describe: 阶段明细绑定项目/病历明细数据传输实体
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
  * @Date: 2021/9/17 13:48
@@ -27,4 +27,7 @@ public class ClinicalPathStageDetailItemDTO extends ClinicalPathStageDetailItemD
   private String type;
   private List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS;
   private List<String> ids;
+  private String  bigTypeCode;
+  private String  splitUnitCode;
+  private String  bigUnitCode;
 }

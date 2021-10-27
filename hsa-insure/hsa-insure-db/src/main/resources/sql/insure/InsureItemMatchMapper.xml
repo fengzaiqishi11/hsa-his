@@ -194,6 +194,12 @@
             <if test="regCode != null and regCode != ''">
                 and insure_reg_code = #{regCode}
             </if>
+            <if test="itemIdCollectList != null and itemIdCollectList.size() > 0">
+                and bd.hosp_item_id in
+                <foreach collection="itemIdCollectList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
         order by audit_code,crte_time desc
     </select>

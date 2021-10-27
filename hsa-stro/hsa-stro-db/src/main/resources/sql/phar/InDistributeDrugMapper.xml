@@ -51,11 +51,12 @@
 
     <!--申请记录-->
     <select id="getInRecivePage" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO">
-        select DATE_FORMAT(a.crte_time, '%Y-%m-%d') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
+        select DATE_FORMAT(a.crte_time, '%Y-%m-%d %H:%i:%s') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
         a.order_no orderNo,(select name from base_window where id=a.window_id and hosp_code=#{hospCode}) windowName,a.window_id windowId,
         a.total_price totalPrice,a.status_code statusCode,a.assign_user_name assignUserName,
         DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,
-        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName
+        (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName,
+        crte_name as crteName
         from phar_in_receive a
         where 1=1 and a.hosp_code=#{hospCode}
         <if test="queryFlag == '' or queryFlag == null">
@@ -137,6 +138,7 @@
         (select ifnull(sum(split_num),0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockNum,
         (select ifnull(stock_occupy,0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockOccupy,
         (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
+        (select seq_no from base_bed where base_bed.visit_id=a.visit_id and hosp_code=a.hosp_code) seqNo,
         (select name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) name,ifnull(a.dosage,0) dosage,a.dosage_unit_code dosageUnitCode,
         (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
@@ -160,7 +162,7 @@
         group by a.receive_id,a.item_name,a.spec,a.price,a.unit_code,a.item_code,a.item_id,a.id,
         a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age,a.split_unit_code,a.split_ratio,a.dosage_unit_code
         ) a
-        order by patientInfo
+        order by seqNo asc,patientInfo
     </select>
 
     <!--住院发药-取药明细单打印-->
@@ -179,6 +181,7 @@
         ifnull(a.num,0) num,
         ifnull(a.num*a.price,0) total,
         c.bed_name AS bedName,
+        (select seq_no from base_bed where base_bed.visit_id=a.visit_id and hosp_code=a.hosp_code) seqNo,
         c.in_no AS inNo,
         (case a.item_code when '1' then (select code from base_drug where  hosp_code=a.hosp_code and id=a.item_id )
         else (select code from base_material where id=a.item_id and a.item_code='2' and hosp_code=a.hosp_code) end) code,
@@ -219,7 +222,7 @@
         <if test="windowId!=null and windowId!=''">
             and b.window_id=#{windowId}
         </if>
-        order by patientInfo
+        order by seqNo asc, patientInfo
     </select>
 
     <!--住院发药-取药合计单-->
@@ -519,8 +522,16 @@
   <select id="querySurplusPharInReceiveDetailDTO" resultType="cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO">
     select * from phar_in_receive_detail where hosp_code = #{hospCode} and receive_id = #{id}
   </select>
-
-  <!--删除配药主表-->
+    <!--根据费用id集合查询老费用 且 back_code = 1 表示退药为退费-->
+    <select id="getOldCostIds" resultType="java.lang.String">
+        select a.old_cost_id from inpt_cost a
+        join inpt_cost b on a.old_cost_id = b.id and a.hosp_code = b.hosp_code
+         where a.hosp_code = #{hospCode} and b.back_code = '1' and a.id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <!--删除配药主表-->
   <delete id="deleteCanclePharInReceivelDTO">
     delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
   </delete>

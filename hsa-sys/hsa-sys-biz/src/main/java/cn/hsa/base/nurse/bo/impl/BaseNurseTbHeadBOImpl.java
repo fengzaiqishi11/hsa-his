@@ -107,6 +107,13 @@ public class BaseNurseTbHeadBOImpl extends HsafBO implements BaseNurseTbHeadBO {
                 if (!ListUtils.isEmpty(dtos)) {
                     //有子节点，设置子节点
                     nurseTbHeadDTO.setChildren(dtos);
+                    // 判断子集是否包含是否分行
+                    boolean isBranch = getChildrenIsBranch(nurseTbHeadDTO);
+                    if (isBranch){
+                        nurseTbHeadDTO.setIsBranch("2");
+                    } else {
+                        nurseTbHeadDTO.setIsBranch("0");
+                    }
                 }
                 //将根级菜单存入返回的表头动态列中
                 if (StringUtils.isEmpty(nurseTbHeadDTO.getUpCode())) {
@@ -115,6 +122,27 @@ public class BaseNurseTbHeadBOImpl extends HsafBO implements BaseNurseTbHeadBO {
             }
         }
         return result;
+    }
+
+    private boolean getChildrenIsBranch(BaseNurseTbHeadDTO nurseTbHeadDTO) {
+        int num = 0;
+        List<BaseNurseTbHeadDTO> dtos = nurseTbHeadDTO.getChildren();
+        if (!ListUtils.isEmpty(dtos)) {
+            for (BaseNurseTbHeadDTO dto : dtos) {
+                if (!ListUtils.isEmpty(dto.getChildren())) {
+                    this.getChildrenIsBranch(dto);
+                } else {
+                    if (StringUtils.isNotEmpty(dto.getIsBranch()) && "1".equals(dto.getIsBranch())) {
+                        num++;
+                    }
+                }
+            }
+        }
+        if (num > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -142,7 +170,7 @@ public class BaseNurseTbHeadBOImpl extends HsafBO implements BaseNurseTbHeadBO {
         BaseNurseTbHeadDTO baseNurseTbHeadDTO = (BaseNurseTbHeadDTO) map.get("baseNurseTbHeadDTO");
         //当数据来源方式为护士人员信息时，设置护士人员sql语句值到资源值中
         if ("2".equals(baseNurseTbHeadDTO.getSourceCode())) {
-            String sql = "select id,code,name from sys_user where is_in_job = '1' and hosp_code = '?'";
+            String sql = "select id,code,name from sys_user where is_in_job = '1' and work_type_code like '20%' and hosp_code = '?'";
             baseNurseTbHeadDTO.setSourceValue(sql);
         }
         try {

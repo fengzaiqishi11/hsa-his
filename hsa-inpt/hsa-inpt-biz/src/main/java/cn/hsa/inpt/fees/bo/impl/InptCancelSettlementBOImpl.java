@@ -91,6 +91,9 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
 
+    @Resource
+    private RedisUtils  redisUtils;
+
     /**
      * @Menthod querySettleVisitPage
      * @Desrciption 获取取消结算用户信息
@@ -196,6 +199,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             inptSettleDO.setSettleBackPrice(BigDecimalUtils.negate(inptSettleDO.getSettleBackPrice()));//结算退款 = -结算退款
             inptSettleDO.setHospDfPrice(BigDecimalUtils.negate(inptSettleDO.getHospDfPrice()));//医院垫付金额 = -医院垫付金额
             inptSettleDO.setHospJmPrice(BigDecimalUtils.negate(inptSettleDO.getHospJmPrice()));//医院减免金额 = -医院减免金额
+            inptSettleDO.setAcctPay(BigDecimalUtils.negate(inptSettleDO.getAcctPay()));//个人账户金额 = -个人账户金额
             inptSettleDO.setCrteId(userId);//创建人id
             inptSettleDO.setCrteName(userName);//创建人姓名
             inptSettleDO.setCrteTime(new Date());//创建时间
@@ -341,7 +345,6 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             }
             // ==============取消结算，医保患者需要取消中途结算，病人状态不更新  ghq end========2021年7月29日16:36:59======================
 
-
             //TODO 判断是否是医保病人（如果是医保病人，走医保取消结算接口 并且 生成医保结算冲红记录保存insure_individual_settle）
             // add by 廖继广 on 2020/11/04
             Integer patientCodeInt = Integer.valueOf(inptVisitDTO.getPatientCode());
@@ -428,6 +431,8 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                         inptCostSettleDAO.updateInsureSettleCost(settleMap); // TR35H9  取消结算，更新医保费用表的结算id
                     }
                     InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+                    individualSettleDTO.setId(insureSettleId);
+                    individualSettleDTO.setHospCode(hospCode);
                     individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
                     individualSettleDTO.setMedicalRegNo(MapUtils.get(setlInfoMap,"mdtrt_id"));
                     individualSettleDTO.setOmsgid(MapUtils.get(reMap,"msgId"));
@@ -465,6 +470,28 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                         //本地医保
                         InptService_consumer.udapteCanleInptSettle(insureParam);
                     }
+                }
+            }
+
+            /**
+             *   当取消结算的时候 出现医保和his单边账
+             *   1.医保已经取消  而his没有取消结算 这个时候就需要调用单边账（取消结算单边功能）
+             *   2.作废医保结算记录 置空医保结算id  把病人类型改完自费病人。his结算表变为自费病人
+             *   3.再把患者变成自费病人结算，结算完成以后（需要判断医保是否有作废的数据）  再修改病人类型
+             *   4.病人类型的值存在redis里面中（取消结算单边功能存入）
+             */
+            inptVisitDTO.setSettleId(settleId);
+            List<InsureIndividualSettleDTO> settleDTOList =  inptSettleDAO.queryInptInsure(inptVisitDTO);
+            String redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).
+                    append("2305").append("^").toString();
+            if(ListUtils.isEmpty(settleDTOList)){
+                String redisValue = redisUtils.get(redisKey);
+                if(StringUtils.isNotEmpty(redisValue)){
+                    InptVisitDTO visitDTO = new InptVisitDTO();
+                    visitDTO.setHospCode(hospCode);//医院编码
+                    visitDTO.setId(visitId);//就诊id
+                    visitDTO.setPatientCode(redisValue);
+                    inptVisitDAO.updateInptVisit(visitDTO);
                 }
             }
             return WrapperResponse.success("取消结算成功。",null);

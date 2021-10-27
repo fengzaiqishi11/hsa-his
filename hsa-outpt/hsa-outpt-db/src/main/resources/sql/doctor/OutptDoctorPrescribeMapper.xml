@@ -360,6 +360,8 @@
             <if test="operType == '1'.toString() ">
                 left join sys_parameter f on f.code = 'GH_JS' and a.hosp_code = f.hosp_code
                 left join outpt_register_settle g on b.id = g.register_id and b.hosp_code = g.hosp_code and g.status_code = '0'
+                <!-- 挂号保留的有效天数，默认为当天有效-->
+                left join sys_parameter sys on sys.code = 'GH_VALID_DAY' and a.hosp_code = sys.hosp_code and sys.is_valid = '1'
             </if>
             where a.hosp_code = #{hospCode}
             <!-- 待接诊 -->
@@ -367,7 +369,11 @@
                 and ((f.value = '0' and g.id is not null) or ifnull(f.value,'0') != '0' or f.id is null)
                 and (
                     b.doctor_id = #{doctorId} or (b.dept_id = #{deptId} and ifnull(b.doctor_id,'') = '')
-                ) and ifnull( a.is_visit, '0' ) = '0' and ifnull(b.is_cancel,'0') = '0' and date(b.register_time) = date(now())
+                ) and ifnull( a.is_visit, '0' ) = '0' and ifnull(b.is_cancel,'0') = '0'
+                <!--and date(b.register_time) = date(now())-->
+              <![CDATA[
+                and IF(sys.value > 0 , date(date_sub(now(), interval sys.value day)), date(now())) <= date(b.register_time)
+              ]]>
             </if>
 
             <!-- 已接诊 -->
@@ -830,7 +836,7 @@
       ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
       <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
       '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
-      a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, stock.stock_occupy stockOccupy,stock.split_num splitNum, '0' isWz,
+      a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
       a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code
       from base_drug a
       left join(
@@ -885,7 +891,7 @@
       a.split_unit_code ouUtnitCode,
       a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
       drugRemark, '' drugImgPath,
-      f.name prodName, null stockNum, null stockOccupy,null splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
+      f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
       a.pym usual_pym ,'' as technology_code
       from base_material a
       left join(
@@ -903,8 +909,12 @@
       </if>
       where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
       )b on 1 = 1
+      left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
       <if test="pharId != null and pharId != ''">
-        join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code and stock.biz_id = #{pharId}
+            and stock.biz_id = #{pharId}
+      </if>
+      <if test="pharId == null or pharId == ''">
+            and b.clf = stock.biz_id
       </if>
       left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
       left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code

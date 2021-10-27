@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.clinical.clinicpathexec.dao.ClinicPathExecDAO">
+
+    <resultMap type="cn.hsa.module.clinical.clinicpathexec.dto.ClinicPathExecDTO" id="ClinicPathExecMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="clinicalPathStageId" column="clinical_path_stage_id" jdbcType="VARCHAR"/>
+        <result property="listId" column="list_id" jdbcType="VARCHAR"/>
+        <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
+        <result property="detailId" column="detail_id" jdbcType="VARCHAR"/>
+        <result property="detailItemId" column="detail_item_id" jdbcType="VARCHAR"/>
+        <result property="isExec" column="is_exec" jdbcType="VARCHAR"/>
+        <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+        <result property="itemType" column="item_type" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryClinicPathExecById" resultMap="ClinicPathExecMap">
+        select
+          id, hosp_code, visit_id, baby_id, clinical_path_stage_id,list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
+        from clinic_path_exec
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryClinicPathExecAll" resultMap="ClinicPathExecMap">
+        select
+          id, hosp_code, visit_id, baby_id, clinical_path_stage_id,list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time
+        from clinic_path_exec
+        where hosp_code = #{hospCode}
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="babyId != null and babyId != ''">
+                and baby_id = #{babyId}
+            </if>
+            <if test="clinicalPathStageId != null and clinicalPathStageId != ''">
+              and clinical_path_stage_id = #{clinicalPathStageId}
+            </if>
+            <if test="listId != null and listId != ''">
+                and list_id = #{listId}
+            </if>
+            <if test="stageId != null and stageId != ''">
+                and stage_id = #{stageId}
+            </if>
+            <if test="detailId != null and detailId != ''">
+                and detail_id = #{detailId}
+            </if>
+            <if test="detailItemId != null and detailItemId != ''">
+                and detail_item_id = #{detailItemId}
+            </if>
+            <if test="isExec != null and isExec != ''">
+                and is_exec = #{isExec}
+            </if>
+            <if test="execTime != null">
+                and exec_time = #{execTime}
+            </if>
+            <if test="execId != null and execId != ''">
+                and exec_id = #{execId}
+            </if>
+            <if test="execName != null and execName != ''">
+                and exec_name = #{execName}
+            </if>
+            <if test="itemType != null and itemType != ''">
+                and item_type = #{itemType}
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and item_id = #{itemId}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertClinicPathExec" keyProperty="id" useGeneratedKeys="true">
+        insert into clinic_path_exec(id,hosp_code, visit_id, baby_id, clinical_path_stage_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{clinicalPathStageId}, #{listId}, #{stageId}, #{detailId}, #{detailItemId}, #{isExec}, #{execTime}, #{execId}, #{execName}, #{itemType}, #{itemId}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateClinicPathExec">
+        update clinic_path_exec
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="clinicalPathStageId != null and clinicalPathStageId != ''">
+              clinical_path_stage_id = #{clinicalPathStageId},
+            </if>
+            <if test="listId != null and listId != ''">
+                list_id = #{listId},
+            </if>
+            <if test="stageId != null and stageId != ''">
+                stage_id = #{stageId},
+            </if>
+            <if test="detailId != null and detailId != ''">
+                detail_id = #{detailId},
+            </if>
+            <if test="detailItemId != null and detailItemId != ''">
+                detail_item_id = #{detailItemId},
+            </if>
+            <if test="isExec != null and isExec != ''">
+                is_exec = #{isExec},
+            </if>
+            <if test="execTime != null">
+                exec_time = #{execTime},
+            </if>
+            <if test="execId != null and execId != ''">
+                exec_id = #{execId},
+            </if>
+            <if test="execName != null and execName != ''">
+                exec_name = #{execName},
+            </if>
+            <if test="itemType != null and itemType != ''">
+                item_type = #{itemType},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteClinicPathExecById">
+        delete from clinic_path_exec where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+
+</mapper>

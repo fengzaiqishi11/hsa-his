@@ -8,6 +8,7 @@
         <result property="listId" column="list_id" jdbcType="VARCHAR"/>
         <result property="stageId" column="stage_id" jdbcType="VARCHAR"/>
         <result property="detailId" column="detail_id" jdbcType="VARCHAR"/>
+        <result property="itemType" column="item_type" jdbcType="VARCHAR"/>
         <result property="isMust" column="is_must" jdbcType="VARCHAR"/>
         <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
         <result property="groupNo" column="group_no" jdbcType="INTEGER"/>
@@ -47,12 +48,15 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"/>
+        <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="getClinicalPathStageDetailItemDTOById" resultMap="ClinicalPathStageDetailItemMap">
         select
-          id, hosp_code, list_id, stage_id, detail_id, is_must, is_valid, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time
+          id, hosp_code, list_id, stage_id, detail_id, item_type,classify,is_must, is_valid, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time
         from clinical_path_stage_detail_item
         where id = #{id} and hosp_code =#{hospCode}
     </select>
@@ -60,7 +64,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryClinicalPathStageDetailItemDTOAll" resultMap="ClinicalPathStageDetailItemMap">
         select
-          a.id, a.hosp_code, a.list_id, a.stage_id, a.detail_id, a.is_must, a.is_valid, a.group_no, a.group_seq_no, a.type_code,
+          a.id, a.hosp_code, a.list_id, a.stage_id, a.detail_id, a.item_type,classify,a.is_must, a.is_valid, a.group_no, a.group_seq_no, a.type_code,
           a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code,
           a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price,
           a.total_num, a.total_num_unit_code, a.herb_num, a.exec_dept_id, a.use_days, a.use_code, a.is_skin, a.herb_note_code,
@@ -69,20 +73,17 @@
           case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
           ) when a.item_code = '1' then (
           case when c.big_type_code = '2' then  '3' else '1' end
-          ) when a.item_code = '2' then '2' end type
+          ) when a.item_code = '2' then '2' end type,
+          case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+          case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
+          case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode
           from clinical_path_stage_detail_item a
-          left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
-          left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
-          left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
-          where a.hosp_code = #{hospCode}
-            <if test="listId != null and listId != ''">
-                and a.list_id = #{listId}
-            </if>
-            <if test="stageId != null and stageId != ''">
-                and a.stage_id = #{stageId}
-            </if>
-            <if test="detailId != null and detailId != ''">
-                and a.detail_id = #{detailId}
+          left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1' and a.classify = '1'
+          left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2' and a.classify = '1'
+          left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4' and a.classify = '1'
+          where a.hosp_code = #{hospCode} and a.detail_id = #{detailId}  and a.stage_id = #{stageId} and a.list_id = #{listId}
+            <if test="itemType != null and itemType != ''">
+              and a.item_type = #{itemType}
             </if>
             <if test="isMust != null and isMust != ''">
                 and a.is_must = #{isMust}
@@ -93,6 +94,9 @@
             <if test="typeCode != null and typeCode != ''">
                 and a.type_code = #{typeCode}
             </if>
+            <if test="classify != null and classify != ''">
+                and a.classify = #{classify}
+             </if>
             <if test="signCode != null and signCode != ''">
                 and a.sign_code = #{signCode}
             </if>
@@ -148,14 +152,14 @@
 
     <!--新增所有列-->
     <insert id="insertClinicalPathStageDetailItemDTO" keyProperty="id" useGeneratedKeys="true">
-        insert into clinical_path_stage_detail_item(id,hosp_code, list_id, stage_id, detail_id, is_must, is_valid,
+        insert into clinical_path_stage_detail_item(id,hosp_code, list_id, stage_id, detail_id, item_type, classify, is_must, is_valid,
          group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id,
          item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code,
          price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin,
           herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-          (#{item.id},#{item.hospCode}, #{item.listId}, #{item.stageId}, #{item.detailId}, #{item.isMust},
+          (#{item.id},#{item.hospCode}, #{item.listId}, #{item.stageId}, #{item.detailId}, #{item.itemType},#{item.classify},#{item.isMust},
           #{item.isValid}, #{item.groupNo}, #{item.groupSeqNo}, #{item.typeCode}, #{item.signCode},
           #{item.startExecNum}, #{item.endExecNum}, #{item.bfcId}, #{item.itemCode}, #{item.itemId},
           #{item.itemName}, #{item.spec}, #{item.prepCode}, #{item.dosage}, #{item.dosageUnitCode},
@@ -179,6 +183,12 @@
           </if>
           <if test="item.detailId != null">
             detail_id = #{item.detailId},
+          </if>
+          <if test="item.itemType != null">
+            item_type = #{item.itemType},
+          </if>
+          <if test="item.classify != null">
+            item_type = #{item.classify},
           </if>
           <if test="item.isMust != null">
             is_must = #{item.isMust},
@@ -294,10 +304,16 @@
     <delete id="deleteClinicalPathStageDetailItemDTOById">
         delete from clinical_path_stage_detail_item
         where hosp_code = #{hospCode} and list_id = #{listId} and stage_id = #{stageId}
-        and detail_id = #{detailId} and id in
-        <foreach collection="ids" item="id" separator="," open="(" close=")">
-          #{id}
-        </foreach>
+        and detail_id = #{detailId}
+        <if test="classify != null and classify != ''">
+            and classify = #{classify}
+        </if>
+        <if test="ids!=null and ids.size()> 0">
+          and id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
     </delete>
 
   <!--  获取最大组号 -->

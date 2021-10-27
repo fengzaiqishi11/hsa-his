@@ -379,6 +379,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
      */
     private String isShared;
+    /**
+     * 护理执行卡打印数据是否不关联领药申请表，默认关联
+     */
+    private String isRelevance;
 
     private String attributionCode; // 结算类型
 
@@ -402,10 +406,21 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 是否在路径内
     private String isClinicalList;
-
     // 路径状态
     private String pathState;
-
     // 路径名称
     private String clinicalListName;
+    // 路径ID
+    private String listId;
+    private String settleId;
+    // 住院天数
+    private Integer inDays;
+    /**
+     * 申请科室
+     */
+    private String deptId;
+    /**
+     * 剂型
+     */
+    private String prepCode;
 }

@@ -267,4 +267,10 @@ public class InsureReversalTradeController extends BaseController {
         }
     }
 
+    @PostMapping("/downLoadSettleInfo")
+    public WrapperResponse<Map<String,Object>> downLoadSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureUnifiedPayReversalTradeService_consumer.downLoadSettleInfo(map);
+    }
 }

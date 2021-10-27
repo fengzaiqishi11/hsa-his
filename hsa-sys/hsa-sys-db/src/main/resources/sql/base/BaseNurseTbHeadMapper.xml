@@ -5,7 +5,7 @@
     <select id="queryPage" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO"
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         select id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code,
-        date_type_code, data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid,
+        date_type_code, data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, is_branch,
         crte_id, crte_name, crte_time
         from base_nurse_tbhead
         where hosp_code = #{hospCode} and is_valid = '1'
@@ -21,34 +21,37 @@
     <!--根据护理单据code查询出所有的动态表头列-->
     <select id="queryTbHeadByCode" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO"
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
-        select id,
-               hosp_code,
-               bno_code,
-               seq_no,
-               up_code,
-               code,
-               name,
-               item_code,
-               min_num,
-               max_num,
-               gender_code,
-               date_type_code,
-               data_width,
-               data_length,
-               source_code,
-               source_value,
-               default_value,
-               is_up,
-               is_sum,
-               is_valid,
-               crte_id,
-               crte_name,
-               crte_time
-        from base_nurse_tbhead
-        where hosp_code = #{hospCode}
-          and is_valid = #{isValid}
-          and bno_code = #{code}
-        order by seq_no
+        select a.id,
+               a.hosp_code,
+               a.bno_code,
+               a.seq_no,
+               a.up_code,
+               a.code,
+               a.name,
+               a.item_code,
+               a.min_num,
+               a.max_num,
+               a.gender_code,
+               a.date_type_code,
+               a.data_width,
+               a.data_length,
+               a.source_code,
+               a.source_value,
+               a.default_value,
+               a.is_up,
+               a.is_sum,
+               a.is_valid,
+               a.is_branch,
+               a.crte_id,
+               a.crte_name,
+               a.crte_time,
+               b.is_vertical
+        from base_nurse_tbhead a
+        left join base_nurse_order b on a.hosp_code = b.hosp_code and a.bno_code = b.code
+        where a.hosp_code = #{hospCode}
+          and a.is_valid = #{isValid}
+          and a.bno_code = #{code}
+        order by a.seq_no
     </select>
 
     <!--根据表头编码code查询出是否存在-->
@@ -68,11 +71,11 @@
     <insert id="insert" parameterType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         insert into base_nurse_tbhead(id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num,
                                       gender_code, date_type_code, data_width, data_length, source_code, source_value,
-                                      default_value, is_up, is_sum, is_valid, crte_id, crte_name, crte_time)
+                                      default_value, is_up, is_sum, is_valid, is_branch, crte_id, crte_name, crte_time)
         values (#{id}, #{hospCode}, #{bnoCode}, #{seqNo}, #{upCode}, #{code}, #{name}, #{itemCode}, #{minNum},
                 #{maxNum},
                 #{genderCode}, #{dateTypeCode}, #{dataWidth}, #{dataLength}, #{sourceCode}, #{sourceValue},
-                #{defaultValue}, #{isUp}, #{isSum}, #{isValid}, #{crteId}, #{crteName}, #{crteTime})
+                #{defaultValue}, #{isUp}, #{isSum}, #{isValid}, #{isBranch}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
     <!--修改-->
@@ -110,6 +113,9 @@
             <if test="isUp != null and isUp != ''">
                 is_up = #{isUp},
             </if>
+            <if test="isBranch != null and isBranch != ''">
+                is_branch = #{isBranch},
+            </if>
             <if test="isSum != null and isSum != ''">
                 is_sum = #{isSum},
             </if>
@@ -132,7 +138,7 @@
             resultType="cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO">
         select
         id, hosp_code, bno_code, seq_no, up_code, code, name, item_code, min_num, max_num, gender_code, date_type_code,
-        data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, crte_id, crte_name,
+        data_width, data_length, source_code, source_value, default_value, is_up, is_sum, is_valid, is_branch, crte_id, crte_name,
         crte_time
         from base_nurse_tbhead
         where
@@ -193,6 +199,7 @@
                is_up,
                is_sum,
                is_valid,
+               is_branch,
                crte_id,
                crte_name,
                crte_time

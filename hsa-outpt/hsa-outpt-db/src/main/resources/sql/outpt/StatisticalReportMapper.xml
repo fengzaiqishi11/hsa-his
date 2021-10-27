@@ -352,7 +352,9 @@
         personPrice,
         apTotalPrice,
         ynyh,
-        remark
+        remark,
+        mafPay,
+        personalPrice
         FROM
         (
         SELECT
@@ -374,7 +376,9 @@
         b.person_price AS personPrice,
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -402,7 +406,9 @@
         b.person_price AS personPrice,
         a.ap_total_price AS apTotalPrice,
         a.hosp_jm_price AS ynyh,
-        b.remark
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
         JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
@@ -438,6 +444,9 @@
         </if>
         <if test="endDate != null and endDate != ''">
             and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
         </if>
         ORDER BY settleTime DESC
     </select>
@@ -663,7 +672,9 @@
         SUM( ss.hospPrice ) AS hospPrice,
         SUM( ss.personPrice ) AS personPrice,
         SUM( ss.apTotalPrice ) AS apTotalPrice,
-        SUM( ss.ynyh ) AS ynyh
+        SUM( ss.ynyh ) AS ynyh,
+        SUM( ss.mafPay) AS mafPay,
+        SUM( ss.personalPrice) as personalPrice
         FROM
         (
         SELECT
@@ -678,7 +689,9 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         0 AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
         insure_individual_settle b
@@ -700,7 +713,9 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
-        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         inpt_settle a,
         insure_individual_settle b
@@ -725,6 +740,9 @@
         </if>
         <if test="endDate != null and endDate != ''">
             and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
         </if>
         GROUP BY ywlx, patientCode
     </select>
@@ -923,6 +941,8 @@
         t1.doctor_id,
         t1.now_address as nowAddress,
         t1.diagnose_ids AS diagnoseIds,
+        t1.diagnose_time as diagnoseTime,
+        t1.start_date as startDate,
         (SELECT bd.name FROM base_disease bd WHERE bd.id = t1.diagnose_ids and bd.hosp_code = t1.hosp_code) AS
         diagnoseName,
         t1.total_price AS totalPrice
@@ -957,8 +977,9 @@
         (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = a.age_unit_code AND hosp_code =
         a.hosp_code ), '岁' )))) as patientInfo,
         a.patient_code,
-        ( SELECT max( b.disease_id ) FROM outpt_diagnose b WHERE a.id = b.visit_id AND a.hosp_code = b.hosp_code AND
-        b.is_main = '1' ) diagnose_ids,
+        od.disease_id diagnose_ids,
+        od.crte_time as diagnose_time,
+        ifnull(omr.start_date, a.visit_time) as start_date,
         b.reality_price total_price
         FROM
         outpt_visit a
@@ -970,6 +991,8 @@
         select a.hosp_code, a.visit_id, a.reality_price reality_price from outpt_settle a where a.is_settle = '1'
         )a group by a.hosp_code, a.visit_id
         )b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+        left join outpt_diagnose od on a.id = od.visit_id and a.hosp_code = od.hosp_code and od.is_main = '1'
+        LEFT JOIN (select visit_id, hosp_code, max(start_date) as start_date from outpt_medical_record where hosp_code = #{hospCode} group by visit_id, hosp_code) omr on a.id = omr.visit_id and a.hosp_code = omr.hosp_code
         ) t1
         WHERE
         t1.hosp_code = #{hospCode}
@@ -1002,7 +1025,8 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,ifnull(scd.name,scd2.name) as fee_type  from (
+        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName,
+               ib.gender_code as babyGenderCode,a.technology_code as fee_type  from (
         SELECT
         iv.name,
         iv.in_dept_id,
@@ -1012,7 +1036,7 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ic.total_price as price,
+        ia.total_price as price,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1025,16 +1049,13 @@
         medic_apply ma,
         inpt_advice ia,
         inpt_visit iv,
-        (select visit_id ,iat_id, sum(total_price) as total_price ,source_code from inpt_cost where status_code='0' group by visit_id
-        ,iat_id)ic,
         base_advice bd
         WHERE
         ma.order_no = ia.order_no
         and ma.visit_id = ia.visit_id
+        AND ma.hosp_code = ia.hosp_code
         AND ma.visit_id = iv.id
         AND iv.hosp_code = ma.hosp_code
-        AND ic.visit_id = iv.id
-        AND ic.iat_id = ia.id
         and ia.item_id = bd.id
         and ma.type_code =  #{typeCode}
         and ma.hosp_code = #{hospCode}
@@ -1043,10 +1064,6 @@
         </if>
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
-        </if>
-
-        <if test="typeCode != null and typeCode != ''">
-            and ma.type_code = #{typeCode}
         </if>
         <if test="deptId != null and deptId != ''">
             and ma.dept_id = #{deptId}
@@ -1098,9 +1115,6 @@
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
         and ma.type_code =  #{typeCode}
-        <if test="typeCode != null and typeCode != ''">
-            and ma.type_code = #{typeCode}
-        </if>
         <if test="startTime != null and startTime != ''">
             and  ma.crte_time &gt; #{startTime}
         </if>
@@ -1125,14 +1139,11 @@
         </if>
         ) a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
-        left join (SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'PACSXMLX' ) scd  on scd.hosp_code = a.hosp_code
-        AND a.technology_code = scd.value
-        left join	(SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'LISXMLX' ) scd2 on scd2.hosp_code = a.hosp_code
-        AND a.technology_code = scd2.value
     </select>
 
     <select id="passStatistics"  resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,case when a.type_code = '4' then scd2.name WHEN A.type_code='5' THEN scd.name ELSE '' end as fee_type from (
+        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,
+               a.technology_code as fee_type from (
         SELECT
         iv.name,
         iv.in_dept_id,
@@ -1142,7 +1153,7 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ic.total_price as price,
+        ia.total_price as price,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1156,16 +1167,12 @@
         medic_apply ma,
         inpt_advice ia,
         inpt_visit iv,
-        (select visit_id ,iat_id, sum(total_price) as total_price ,source_code from inpt_cost where status_code='0' group by visit_id
-        ,iat_id)ic,
         base_advice bd
         WHERE
         ma.order_no = ia.order_no
         and ma.visit_id = ia.visit_id
         AND ma.visit_id = iv.id
         AND iv.hosp_code = ma.hosp_code
-        AND ic.visit_id = iv.id
-        AND ic.iat_id = ia.id
         and ia.item_id = bd.id
         and ma.type_code =  #{typeCode}
         and ma.hosp_code = #{hospCode}
@@ -1204,13 +1211,13 @@
         '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        '-1' as price,
+        pd.total_price as price,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
         '' as baby_id,
         ov.hosp_code as hosp_code,
-        '-1' as num,
+        pd.total_num as num,
         ma.visit_id,
         ma.opd_id,
         ma.document_sta
@@ -1255,10 +1262,6 @@
         </if>
         )a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
-        left join (SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'PACSXMLX') scd  on scd.hosp_code = a.hosp_code
-        AND a.technology_code = scd.value
-        left join	(SELECT name,value,c_code,hosp_code FROM sys_code_detail where c_code = 'LISXMLX' ) scd2 on scd2.hosp_code = a.hosp_code
-        AND a.technology_code  = scd2.value
     </select>
 
     <!-- 根据处方、医嘱id查询费用数量信息 -->
@@ -1377,16 +1380,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "5"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "5"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         DATE_FORMAT( ( b.crte_time ), '%Y-%m' ),
         g.antibacterial_code,
@@ -1483,16 +1486,16 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类-->
-        <if test='statisWay == "6"'>
-            AND EXISTS(
-            select 1
-            from sys_code_detail l
-            where l.hosp_code = g.hosp_code
-            and l.value = g.prep_code
-            and  l.c_code = 'JXFL'
-            and l.name like '%注射%'
-            )
-        </if>
+<!--        <if test='statisWay == "6"'>-->
+<!--            AND EXISTS(-->
+<!--            select 1-->
+<!--            from sys_code_detail l-->
+<!--            where l.hosp_code = g.hosp_code-->
+<!--            and l.value = g.prep_code-->
+<!--            and  l.c_code = 'JXFL'-->
+<!--            and l.name like '%注射%'-->
+<!--            )-->
+<!--        </if>-->
         GROUP BY
         g.antibacterial_code,
         g.proton_pump,

@@ -481,6 +481,15 @@
             </if>
         </trim>
     </insert>
+    <insert id="insertCommonLog">
+        insert into insure_function_log(id, hosp_code, visit_id, msg_id, msg_info, msg_name, in_params,
+                                        out_params, code, crte_id,
+                                        crte_name, crte_time, error_msg, is_hospital, status)
+                                         values
+        (#{id},#{hospCode},#{visitId},#{msgId},#{msgInfo},#{msgName},#{inParams},
+         #{outParams},#{code},#{crteId},#{crteName},#{crteTime},#{errorMsg},#{isHospital},
+         #{status})
+    </insert>
 
     <!-- 修改表信息 -->
     <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualVisitDO">
@@ -682,6 +691,18 @@
           and visit_id = #{visitId}
           and medical_reg_no = #{medicalRegNo}
     </update>
+    <update id="updateInptSettlePatientCode">
+        update inpt_settle set patient_code ='0' where  hosp_code =#{hospCode} and visit_id = #{visitId} and id = #{settleId}
+    </update>
+    <update id="updateInptPatientCode">
+            update inpt_visit set patient_code =#{patientCode} where  hosp_code =#{hospCode} and id = #{visitId}
+    </update>
+    <update id="updateOutptPatientCode">
+        update outpt_visit set patient_code =#{patientCode} where  hosp_code =#{hospCode} and id = #{visitId}
+    </update>
+    <update id="updateOutptSettlePatientCode">
+        update outpt_settle set patient_code ='0' where  hosp_code =#{hospCode} and id = #{visitId}
+    </update>
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
         DELETE
@@ -750,7 +771,7 @@
         ov.phone as outPhone,ov.visit_time as visitTime,iib.aac004 as gend,iib.aac002,iib.bka035 ,iib.bka008,
         iv.out_dept_id as outDeptId,iv.out_dept_name as outDeptName,iv.out_mode_code as outModeCode,
         iv.phone as inptPhone ,iv.out_time as outTime ,iv.in_time as inTime,iv.in_disease_name as
-        inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,
+        inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,iv.total_in_days,
         (IF(iiv.is_hospital ='1', (select su.prac_certi_no from sys_user su where su.hosp_code = iv.hosp_code and su.id
         = iv.zz_doctor_id ), (select su.prac_certi_no from sys_user su where su.hosp_code = ov.hosp_code and su.id =
         ov.doctor_id )) )
@@ -1002,7 +1023,7 @@
         join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
         join insure_individual_settle iis on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
         and iiv.medical_reg_no = iis.medicalRegNo
-        where iiv.hosp_code =#{hospCode}  and iis.state='0'
+        where iiv.hosp_code =#{hospCode}  and iis.state='0' and iis.is_cancel ='0'
           and iis.settle_state='1'
         <if test="keyWord != null and keyWord != ''">
             and (
@@ -1202,6 +1223,42 @@
         select id, hosp_code, visit_id, mib_id, insure_org_code, insure_reg_code, medicine_org_code, is_hospital
              from insure_individual_visit where visit_id =#{visitId} and hosp_code =#{hospCode}
     </select>
+    <select id="queryInptInsurePatient" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select a.*,b.name,b.status_code,b.age,b.gender_code,b.in_dept_name,b.bed_name,b.in_time,b.patient_code
+
+        from insure_individual_visit a join  inpt_visit b on a.visit_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="medicineOrgCode !=null and medicineOrgCode !='' ">
+            and a.medicine_org_code = #{medicineOrgCode}
+        </if>
+        <if test="statusCode !=null and statusCode !='' ">
+            and b.status_code = #{statusCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+            b.name like concat('%',#{keyword},'%')
+            or b.in_no like concat('%',#{keyword},'%')
+            )
+        </if>
+        order by a.crte_time desc
+    </select>
+    <select id="queryOutptInsurePatient" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select a.*,b.name,b.age,b.gender_code,b.dept_name,b.visit_time,b.patient_code
+        from insure_individual_visit a join  outpt_visit b on a.visit_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="medicineOrgCode !=null and medicineOrgCode !='' ">
+            and a.medicine_org_code = #{medicineOrgCode}
+        </if>
+
+        <if test="keyword != null and keyword != ''">
+            and (
+            b.name like concat('%',#{keyword},'%')
+            or b.visit_no like concat('%',#{keyword},'%')
+            )
+        </if>
+        order by a.crte_time desc
+    </select>
+
 
 
 </mapper>

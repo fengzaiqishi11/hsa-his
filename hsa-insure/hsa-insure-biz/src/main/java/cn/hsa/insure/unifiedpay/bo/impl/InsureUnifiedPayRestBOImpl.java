@@ -3310,7 +3310,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
 
         List<InsureItemMatchDTO> insertList = new ArrayList<>();
-        for (InsureItemMatchDTO hospItem : resultList) {
+            for (InsureItemMatchDTO hospItem : resultList) {
             for (InsureItemDTO insureItem : insureItemDTOList) {
                 if (hospItem.getHospItemCode().equals(insureItem.getHospItemCode())
                         && hospItem.getHospItemName().equals(insureItem.getHospItemName())) {

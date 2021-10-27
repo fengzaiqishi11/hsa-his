@@ -8,12 +8,15 @@ import cn.hsa.module.inpt.doctor.bo.InptBabyBO;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +96,7 @@ public class InptBabyBOImpl extends HsafBO implements InptBabyBO {
         if (StringUtils.isEmpty(inptBabyDTO.getId())) {
             // 新增
             inptBabyDTO.setId(SnowflakeUtils.getId());
+            inptBabyDTO.setIsCancel(Constants.SF.F);
             inptBabyDAO.insertBaby(inptBabyDTO);
         } else {
             // 编辑
@@ -127,5 +131,32 @@ public class InptBabyBOImpl extends HsafBO implements InptBabyBO {
     @Override
     public InptBabyDTO getBabyCost(Map param) {
         return inptBabyDAO.getBabyCost(param);
+    }
+
+    /**
+     * @Menthod: updateBabyRegister
+     * @Desrciption: 新生儿取消登记
+     * @Param: inptBabyDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-08 11:30
+     * @Return:
+     **/
+    @Override
+    public Boolean updateBabyRegister(InptBabyDTO inptBabyDTO) {
+        InptBabyDTO byId = inptBabyDAO.getById(inptBabyDTO);
+        if (byId == null) {
+            throw new RuntimeException("未查询到【" + inptBabyDTO.getName() + "】相关信息");
+        }
+        Map costMap = new HashMap();
+        costMap.put("hospCode", inptBabyDTO.getHospCode());
+        costMap.put("visitId", inptBabyDTO.getVisitId());
+        costMap.put("id", inptBabyDTO.getId());
+        InptBabyDTO babyCost = getBabyCost(costMap);
+        if (babyCost != null && BigDecimalUtils.compareTo(babyCost.getTotalBalance(), BigDecimal.ZERO) > 0) {
+            throw new RuntimeException("该【" + inptBabyDTO.getName() + "】婴儿已产生【" + babyCost.getTotalBalance() +"】元费用，请先退费！");
+        }
+        inptBabyDTO.setIsCancel(Constants.SF.S);
+        return inptBabyDAO.updateBabyRegister(inptBabyDTO) > 0;
     }
 }

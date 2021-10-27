@@ -85,7 +85,7 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
 
   /**
   * @Menthod insertClinicalPathStageDetailItemDTO
-  * @Desrciption 保存路径明细绑定医嘱
+  * @Desrciption 保存路径明细绑定医嘱/ 病历
   *
   * @Param
   * [clinicalPathStageDetailItemDTO]
@@ -96,42 +96,83 @@ public class ClinicalPathStageDetailItemBOImpl implements ClinicalPathStageDetai
   **/
   @Override
   public Boolean saveClinicalPathStageDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
-    List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
-    if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
-      throw new AppException("绑定医嘱明细数据为空");
+    if(StringUtils.isEmpty(clinicalItem.getClassify())) {
+      throw new AppException("系统归类属性为空");
     }
-    List<ClinicalPathStageDetailItemDTO> newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
+    // 系统归类 1医嘱 2病历
+    if("2".equals(clinicalItem.getClassify())) {
+      return saveClinicalMedicalRecordDetailItem(clinicalItem);
+    }
+    // 获取保存的项目明细
+    List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
+    // 是否又要删除的数据
     if(!ListUtils.isEmpty(clinicalItem.getIds())) {
       clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
     }
-    // 新增医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
-    // 编辑医嘱绑定明细列表
-    List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
-    for(ClinicalPathStageDetailItemDTO item : newList) {
-      item.setHospCode(clinicalItem.getHospCode());
-      if(StringUtils.isNotEmpty(item.getId())) {
-        editList.add(item);
-        continue;
+    if (!ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
+      List<ClinicalPathStageDetailItemDTO> newList = clinicalPathStageDetailItemDTOS;
+      // 如果系统归类为医嘱  进行组号添加
+      newList = buildInptAdviceDTOGroupNo(clinicalPathStageDetailItemDTOS);
+      // 新增绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> addList = new ArrayList<>();
+      // 编辑绑定明细列表
+      List<ClinicalPathStageDetailItemDTO> editList = new ArrayList<>();
+      for (ClinicalPathStageDetailItemDTO item : newList) {
+        item.setHospCode(clinicalItem.getHospCode());
+        // 没有id即为新增
+        if (StringUtils.isNotEmpty(item.getId())) {
+          editList.add(item);
+          continue;
+        }
+        item.setId(SnowflakeUtils.getId());
+        item.setHospCode(clinicalItem.getHospCode());
+        item.setCrteId(clinicalItem.getCrteId());
+        item.setCrteName(clinicalItem.getCrteName());
+        item.setCrteTime(clinicalItem.getCrteTime());
+        item.setIsValid("1");
+        addList.add(item);
       }
-      item.setId(SnowflakeUtils.getId());
-      item.setHospCode(clinicalItem.getHospCode());
-      item.setCrteId(clinicalItem.getCrteId());
-      item.setCrteName(clinicalItem.getCrteName());
-      item.setCrteTime(clinicalItem.getCrteTime());
-      item.setIsValid("1");
-      addList.add(item);
-    }
-    if(!ListUtils.isEmpty(addList)) {
-      clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
-    }
-    if(!ListUtils.isEmpty(editList)) {
-      clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+      if (!ListUtils.isEmpty(addList)) {
+        clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(addList);
+      }
+      if (!ListUtils.isEmpty(editList)) {
+        clinicalPathStageDetailItemDAO.updateClinicalPathStageDetailItemDTO(editList);
+      }
+      return true;
     }
     return true;
   }
 
-
+  /**
+  * @Menthod saveClinicalMedicalRecordDetailItem
+  * @Desrciption 路径明细系统归类为病历的  绑定病历
+ *
+  * @Param
+  * [clinicalItem]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/15 11:51
+  * @Return java.lang.Boolean
+  **/
+  public Boolean saveClinicalMedicalRecordDetailItem(ClinicalPathStageDetailItemDTO clinicalItem) {
+    // 获取保存的项目明细
+    List<ClinicalPathStageDetailItemDTO> clinicalPathStageDetailItemDTOS = clinicalItem.getClinicalPathStageDetailItemDTOS();
+    if(ListUtils.isEmpty(clinicalPathStageDetailItemDTOS)) {
+      throw new AppException("保存病历信息为空");
+    }
+    clinicalPathStageDetailItemDAO.deleteClinicalPathStageDetailItemDTOById(clinicalItem);
+    for (ClinicalPathStageDetailItemDTO item : clinicalPathStageDetailItemDTOS) {
+      item.setHospCode(clinicalItem.getHospCode());
+      item.setId(SnowflakeUtils.getId());
+      item.setCrteId(clinicalItem.getCrteId());
+      item.setCrteName(clinicalItem.getCrteName());
+      item.setCrteTime(clinicalItem.getCrteTime());
+      // 是否有效  1是 0否
+      item.setIsValid("1");
+    }
+    clinicalPathStageDetailItemDAO.insertClinicalPathStageDetailItemDTO(clinicalPathStageDetailItemDTOS);
+    return true;
+  }
   /**
   * @Menthod buildInptAdviceDTOGroupNo
   * @Desrciption 构建组号

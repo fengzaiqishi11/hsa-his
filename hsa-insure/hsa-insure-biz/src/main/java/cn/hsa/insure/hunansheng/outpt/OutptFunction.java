@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -321,6 +322,7 @@ public class OutptFunction {
         }
 
         List<Map<String,Object>> feeinfo = new ArrayList<>();
+        BigDecimal otherMoney = BigDecimal.ZERO;
         for(OutptCostDTO outptCostDTO : feeInfoList) {
             Map<String, Object> feeinfoMap = new HashMap<>();
             feeinfoMap.put("model",outptCostDTO.getPrepCode() == null ? "" : outptCostDTO.getPrepCode());//	剂型
@@ -328,10 +330,17 @@ public class OutptFunction {
             feeinfoMap.put("standard",outptCostDTO.getSpec() == null ? "" : outptCostDTO.getSpec());// 规格
             feeinfoMap.put("fee_date", DateUtils.format(outptCostDTO.getCrteTime(),DateUtils.Y_M_DH_M_S));//	费用发生时间
             feeinfoMap.put("unit","");//	计量单位
-            feeinfoMap.put("price",String.valueOf(BigDecimalUtils.scale(outptCostDTO.getPrice(),2))); //	单价
+
+
+            //String str = df1.format(num);
+
+            feeinfoMap.put("price",String.valueOf(outptCostDTO.getPrice())); //	单价
             feeinfoMap.put("dosage",outptCostDTO.getTotalNum());//	用量
-            BigDecimal totalMoney = BigDecimalUtils.scale(outptCostDTO.getRealityPrice(),2);
-            feeinfoMap.put("money",String.valueOf(totalMoney));//	金额
+
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            BigDecimal inptMoney = BigDecimalUtils.convert(feeinfoMap.get("realityPrice").toString());
+            String realityPrice = df1.format(inptMoney);
+            feeinfoMap.put("money",realityPrice);//	金额
             feeinfoMap.put("usage_flag","0");//	用药标志 "0"：普通"1"：出院带药"2"：抢救
             feeinfoMap.put("usage_days","");//	出院带药天数
             feeinfoMap.put("input_staff","000");//	录入工号
@@ -339,7 +348,7 @@ public class OutptFunction {
             feeinfoMap.put("input_date",DateUtils.format(outptCostDTO.getCrteTime(),DateUtils.Y_M_DH_M_S));//	录入日期
             feeinfoMap.put("recipe_no",outptCostDTO.getOpId());//		处方号
             feeinfoMap.put("doctor_no","");//	处方医生编号
-            feeinfoMap.put("input_money",totalMoney.toString());
+            feeinfoMap.put("input_money",realityPrice);
           //  feeinfoMap.put("query_flag", "1"); // 省门特需要收（改）费标志出错（0:收费，1：改费）
             feeinfoMap.put("doctor_name",outptCostDTO.getDoctorName());// 处方医生姓名
             for (InsureItemMatchDTO insureItemMatchDTO : insureItemMatchDTOList) {
@@ -352,8 +361,8 @@ public class OutptFunction {
                         feeinfoMap.put("opp_serial_fee","");//	对应费用序列号(12位)
                         feeinfoMap.put("hos_serial",hosSerial);//	医院费用序列号（20位）
                         feeinfoMap.put("money", "0");// 金额 12 否
-                        feeinfoMap.put("input_money",totalMoney.toString());
-                        feeinfoMap.put("old_money",BigDecimalUtils.negate(totalMoney).toString());
+                        feeinfoMap.put("input_money",realityPrice);
+                        feeinfoMap.put("old_money",BigDecimalUtils.negate(inptMoney).toString());
                     } else {
                         feeinfoMap.put("opp_serial_fee","");//	对应费用序列号(12位)
                         feeinfoMap.put("hos_serial",hosSerial);//	医院费用序列号（20位）

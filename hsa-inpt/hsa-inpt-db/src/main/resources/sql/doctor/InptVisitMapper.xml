@@ -354,10 +354,10 @@
 		</if>
 		<!-- Name传过来的是科室ID-->
 		<if test="inDeptId != null and inDeptId != ''">
-			and in_dept_id = #{inDeptId}
+			and pt.in_dept_id = #{inDeptId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
-			and patient_code = #{patientCode}
+			and pt.patient_code = #{patientCode}
 		</if>
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
 			and pt.in_time BETWEEN #{Stime} and #{Etime}

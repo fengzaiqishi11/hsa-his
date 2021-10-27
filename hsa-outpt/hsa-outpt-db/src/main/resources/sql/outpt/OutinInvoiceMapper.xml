@@ -739,7 +739,7 @@
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, os.crte_name as crteName, os.crte_time as crteTime from (
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice from (
         SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
 			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
 			(select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName
@@ -747,14 +747,17 @@
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId}
         group by a.bfc_id
         ) b join outpt_settle os on os.id = #{settleId} and os.hosp_code = #{hospCode}
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
          where b.totalPrice>0
     </select>
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime,
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
         from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
          where s.hosp_code = #{hospCode} and s.id = #{outptSettleInvoiceId}
     </select>
 
@@ -1725,11 +1728,13 @@
     </select>
     
     <select id="queryPartInvoicePrint" resultType="cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime, e.receive_name as receiveName
+        select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime, e.receive_name as receiveName,
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
         from outpt_settle_invoice s
         left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
         LEFT JOIN outin_invoice e on e.hosp_code = s.hosp_code and e.id = s.invoice_id
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
         where s.hosp_code = #{hospCode} and s.settle_id = #{settleId}
     </select>
 </mapper>

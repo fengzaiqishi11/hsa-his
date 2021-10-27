@@ -368,78 +368,79 @@
 	<!--根据金额预警线分页查询患者 住院催款用 谢星宇-->
 	<select id="queryInptVisitPageByMoney" resultMap="InptVisitMap">
 		select
-		id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday,
+		a.id, a.hosp_code, profile_id, in_profile, in_no, a.name, gender_code, age, age_unit_code, birthday,
 		nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address,
 		contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code,
-		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id,
+		receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, a.status_code, in_ward_id, in_dept_id,
 		in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name,
 		in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no,
 		outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id,
 		out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id,
 		out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time,
 		archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
-		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
-		(select name from base_dept where in_ward_id = base_dept.id) as wardName,
+		insure_patient_id, insure_remark, total_advance, total_cost, total_balance, a.crte_id, a.crte_name, a.crte_time,
+		(select name from base_dept where a.in_ward_id = base_dept.id) as wardName,
 		CONCAT(
-		inpt_visit.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		inpt_visit.gender_code),'-'),'/',
-		IFNULL(inpt_visit.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		inpt_visit.age_unit_code),'')
+		a.name,'/',
+		IFNULL((select name from sys_code_detail where a.hosp_code = #{hospCode} and c_code = 'XB' and value =
+		a.gender_code),'-'),'/',
+		IFNULL(a.age,'-'),
+		IFNULL((select name from sys_code_detail where a.hosp_code = #{hospCode} and c_code = 'NLDW' and value =
+		a.age_unit_code),'')
 		) AS keyword
-		from inpt_visit
-		where hosp_code = #{hospCode}
+		from inpt_visit a
+		left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
+		where a.hosp_code = #{hospCode}
 		<if test="statusCodes != null and statusCodes.length>0">
-			and status_code not in
+			and a.status_code not in
 			 <foreach collection="statusCodes" item="statusCode" open="(" close=")" separator=",">
 				 #{statusCode}
 			 </foreach>
 		</if>
 		<if test="id != null and id != ''">
-			and id = #{id}
+			and a.id = #{id}
 		</if>
 		<if test="keyword != null and keyword != ''">
-			and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%')
-			or in_no like concat('%',#{keyword},'%') or bed_name like concat('%',#{keyword},'%'))
+			and (a.name like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%')
+			or a.in_no like concat('%',#{keyword},'%') or a.bed_name like concat('%',#{keyword},'%'))
 		</if>
 		<if test="warningMoney != null and warningMoney != ''">
-			and total_balance &lt;= #{warningMoney}
+			and a.total_balance &lt;= #{warningMoney}
 		</if>
 		<if test="startTime != null and startTime != ''">
-			and out_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+			and a.out_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
 		</if>
 		<if test="endTime != null and endTime != ''">
-			and out_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+			and a.out_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
 		</if>
 		/*入院日期*/
 		<if test="startDate != null">
-			and in_time &gt;=#{startDate}
+			and a.in_time &gt;=#{startDate}
 		</if>
 		/*出院日期*/
 		<if test="endDate != null">
-			and in_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+			and a.in_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
 		</if>
 		<if test="statusCode != null and statusCode != ''">
-			and status_code = #{statusCode}
+			and a.status_code = #{statusCode}
 		</if>
 		<if test="inDeptId != null and inDeptId != ''">
-			and in_dept_id = #{inDeptId}
+			and a.in_dept_id = #{inDeptId}
 		</if>
 		<if test="inWardId != null and inWardId != ''">
-			and in_ward_id = #{inWardId}
+			and a.in_ward_id = #{inWardId}
 		</if>
 		<if test="patientCode != null and patientCode != ''">
-			and patient_code = #{patientCode}
+			and a.patient_code = #{patientCode}
 		</if>
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
-			and in_time BETWEEN #{Stime} and #{Etime}
+			and a.in_time BETWEEN #{Stime} and #{Etime}
 		</if>
 		<if test="isOrderBy != null and isOrderBy != '' and 'Y'.toString() == isOrderBy ">
-			order by in_dept_name asc,bed_name asc,name asc,in_time desc,patient_code asc
+			order by b.seq_no asc
 		</if>
 		<if test="isOrderBy == null or isOrderBy == ''">
-			order by crte_time desc
+			order by a.in_time desc
 		</if>
 
 	</select>

@@ -338,7 +338,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
         }
         // 查看当前领药申请id是否正在进行发药
         String key = new StringBuilder(pharOutReceiveDTO.getHospCode()).append("MZFY").
-                append(pharOutReceiveDTO.getId()).append(Constants.OUTPT_FEES_REDIS_KEY).toString();
+                append(pharOutReceiveDTO.getId()).append(Constants.OUT_DISTRIBUTE_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key)) || redisUtils.hasKey(key)){
             throw new AppException("该单据正在进行发药，请不要重复发药");
         }

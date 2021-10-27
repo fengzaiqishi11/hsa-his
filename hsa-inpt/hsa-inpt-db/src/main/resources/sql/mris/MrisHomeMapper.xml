@@ -25,6 +25,10 @@
         <if test="endTime != null and endTime != '' ">
             and out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
+        <!--liuliyun 20211022 病案首页添加主管医生过滤-->
+        <if test='zgbrQuery =="1"'>
+            and zg_doctor_id = #{zgDoctorId}
+        </if>
         order by in_time desc
     </select>
 

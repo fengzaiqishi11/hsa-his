@@ -698,4 +698,76 @@ public class StatemnetController extends BaseController {
     map.put("outptVisitDTO", outptVisitDTO);
     return patientCostLedgerService_consumer.queryMedicalCostTitle(map);
   }
+
+  /**
+   * @Menthod queryMzPatientFinanceCostList
+   * @Desrciption 查询门诊财务分类明细
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/22 16:29
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/queryMzPatientFinanceCostList")
+  public WrapperResponse<PageDTO> queryMzPatientFinanceCostList(OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("outptVisitDTO", outptVisitDTO);
+    return patientCostLedgerService_consumer.queryMzPatientFinanceCostList(map);
+  }
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/22 16:28
+   * @Return WrapperResponse<Map>
+   **/
+  @PostMapping("/getMzMedicalFinanceTitle")
+  public WrapperResponse<Map> getMzMedicalFinanceTitle(@RequestBody OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("outptVisitDTO", outptVisitDTO);
+    return patientCostLedgerService_consumer.getMzMedicalFinanceTitle(map);
+  }
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption 查询住院财务分类明细
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 15:29
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/getInptFinanceList")
+  public WrapperResponse<PageDTO> getInptFinanceList(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.getInptFinanceList(map);
+  }
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询住院财务分类标题
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 15:34
+   * @Return WrapperResponse<Map>
+   **/
+  @PostMapping("/getInptFinanceTitle")
+  public WrapperResponse<Map> getInptFinanceTitle(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.getInptFinanceTitle(map);
+  }
 }

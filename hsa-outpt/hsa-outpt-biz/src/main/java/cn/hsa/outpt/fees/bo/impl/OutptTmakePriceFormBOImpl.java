@@ -1236,12 +1236,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         if (!pharOutReceiveDOList.isEmpty() || !pharOutReceiveDetailDOList.isEmpty()) {
             //生成领药申请单
-            Map<String, Object> pharOutReceiveParam = new HashMap<String, Object>();
-            pharOutReceiveParam.put("hospCode", hospCode);//医院编码
-            pharOutReceiveParam.put("pharOutReceiveDOList", pharOutReceiveDOList);
-            pharOutReceiveService_consumer.batchInsert(pharOutReceiveParam);
-            pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
-            pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
+//            Map<String, Object> pharOutReceiveParam = new HashMap<String, Object>();
+//            pharOutReceiveParam.put("hospCode", hospCode);//医院编码
+//            pharOutReceiveParam.put("pharOutReceiveDOList", pharOutReceiveDOList);
+            // pharOutReceiveService_consumer.batchInsert(pharOutReceiveParam);
+            // pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
+            // pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
+            outptCostDAO.batchPharOutReceiveInsert(pharOutReceiveDOList);  // 取消调微服务，直接调用DAO
+            outptCostDAO.batchPharOutReceiveDetailInsert(pharOutReceiveDetailDOList);
         }
     }
 

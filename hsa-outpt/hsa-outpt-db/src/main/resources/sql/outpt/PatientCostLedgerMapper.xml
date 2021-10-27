@@ -3763,7 +3763,8 @@
         base_disease
         WHERE
         id = ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) FROM outpt_prescribe WHERE id = a.op_id )
-        ) AS disease_name
+        ) AS disease_name,
+        (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName
         FROM
         outpt_settle settle
         JOIN outpt_cost a ON settle.id = a.settle_id AND a.hosp_code = settle.hosp_code
@@ -3812,7 +3813,8 @@
         b.doctor_name AS doctor_name,
         b.dept_id AS dept_id,
         b.dept_id AS exec_dept_id,
-        NULL as disease_name
+        NULL as disease_name,
+        NULL as prodName
         FROM
         outpt_register_settle settle
         join outpt_register_detail a on settle.register_id = a.register_id and a.hosp_code = settle.hosp_code
@@ -4002,7 +4004,8 @@
         a.dept_id,
         a.exec_dept_id,
         (select name from base_disease where id = (select SUBSTRING_INDEX(diagnose_ids, ',', 1) from outpt_prescribe
-        where id = b.in_disease_id)) as disease_name
+        where id = b.in_disease_id)) as disease_name,
+        (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName
         from inpt_settle settle
         join inpt_cost a on settle.id = a.settle_id and a.hosp_code = settle.hosp_code
         join inpt_visit b on a.hosp_code = b.hosp_code and settle.visit_id = b.id

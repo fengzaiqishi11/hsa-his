@@ -2228,6 +2228,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         map.put("exec_dept_id","执行科室");
         map.put("disease_name","疾病名称");
         map.put("in_no","住院号");
+        map.put("prodName","生产厂家");
 
 
         return map;

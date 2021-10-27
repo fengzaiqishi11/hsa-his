@@ -283,6 +283,12 @@ public interface Constants {
      */
     String OUT_DISTRIBUTE_REDIS_KEY = "out_distribute";
     /**
+     * @Desrciption 门诊发药redis key值（用于做门诊发药，防止同一药房同时做同一操作）
+     * @Author Ou·Mr
+     * @Date 2020/8/28 9:07
+     */
+    String INPT_DISTRIBUTE_REDIS_KEY = "inpt_distribute";
+    /**
      * @Desrciption 医院优惠配置代码key
      * @Author Ou·Mr
      * @Date 2020/8/28 15:41

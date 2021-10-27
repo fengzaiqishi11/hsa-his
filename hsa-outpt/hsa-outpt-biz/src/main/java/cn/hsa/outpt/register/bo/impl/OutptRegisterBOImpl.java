@@ -336,10 +336,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             //调用本地建档服务
             log.debug("门诊挂号调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
             //本地档案表id保持与中心端的一致
-            if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-                outptProfileFileDTO.setId(outptProfileFileExtendDTO.getProfileId());
-            }
-//            outptProfileFileDTO.setOutProfile(ghdh);
+            outptProfileFileDTO.setId(outptProfileFileExtendDTO.getProfileId());
             outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getOutProfile()); //门诊档案号
             outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getInProfile()); //住院病案号
             outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getOutptLastVisitTime()); // 门诊最后就诊时间

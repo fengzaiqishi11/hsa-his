@@ -338,7 +338,7 @@ public class OutptFunction {
             feeinfoMap.put("dosage",outptCostDTO.getTotalNum());//	用量
 
             DecimalFormat df1 = new DecimalFormat("0.00");
-            BigDecimal inptMoney = BigDecimalUtils.convert(feeinfoMap.get("realityPrice").toString());
+            BigDecimal inptMoney = BigDecimalUtils.convert(outptCostDTO.getRealityPrice().toString());
             String realityPrice = df1.format(inptMoney);
             feeinfoMap.put("money",realityPrice);//	金额
             feeinfoMap.put("usage_flag","0");//	用药标志 "0"：普通"1"：出院带药"2"：抢救

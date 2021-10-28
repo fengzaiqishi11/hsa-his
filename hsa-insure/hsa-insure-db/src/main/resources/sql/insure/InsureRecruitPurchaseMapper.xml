@@ -45,8 +45,7 @@
             t1.queryType,
             t1.visitId,
             t1.hospCode,
-            t1.name,
-            t1.patientInfo,
+            t1.name as patientInfo,
             t1.profileNo,
             t1.visitNo,
             t1.certCode,
@@ -62,14 +61,6 @@
                 c.id as visitId,
                 c.hosp_code as hospCode,
                 c.name,
-                CONCAT(
-                    c.name,
-                    '/',
-                    (case c.gender_code when '1' then '男' when '2' then '女' else '' end),
-                    '/',
-                    c.age,
-                    (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
-                ) as patientInfo,
                 c.out_profile as profileNo,
                 c.visit_no as visitNo,
                 c.cert_code as certCode,
@@ -81,9 +72,9 @@
                 c.patient_code as patientCode
             FROM
                 outpt_cost a
-            /*LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id*/
+            LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id
+            LEFT JOIN base_material bm on a.hosp_code = bm.hosp_code and a.item_id = bm.id
             LEFT JOIN outpt_visit c on a.hosp_code = c.hosp_code and a.visit_id = c.id
-            LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
             WHERE a.hosp_code = #{hospCode}
               and a.item_code = #{itemCode} /*药品/材料*/
             <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
@@ -95,10 +86,6 @@
               and a.settle_code = '2' /*已结算*/
               and a.is_upload = '0' /*未上传*/
               and c.is_visit = '1' /*已接诊*/
-              and d.audit_code = '1' /*医保项目已审核*/
-              and d.is_match = '1' /*医保项目已匹配*/
-              and d.is_trans = '1' /*医保项目已传输*/
-              and d.is_valid = '1' /*医保项目有效*/
             GROUP BY a.visit_id
 
             UNION ALL
@@ -108,14 +95,6 @@
                 c.id as visitId,
                 c.hosp_code as hospCode,
                 c.name,
-                CONCAT(
-                    c.name,
-                    '/',
-                    (case c.gender_code when '1' then '男' when '2' then '女' else '' end),
-                    '/',
-                    c.age,
-                    (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
-                ) as patientInfo,
                 c.in_profile as profileNo,
                 c.in_no as visitNo,
                 c.cert_code as certCode,
@@ -127,9 +106,9 @@
                 c.patient_code as patientCode
             FROM
                 inpt_cost a
-            /*LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id*/
+            LEFT JOIN base_drug b on a.hosp_code = b.hosp_code and a.item_id = b.id
+            LEFT JOIN base_material bm on a.hosp_code = bm.hosp_code and a.item_id = bm.id
             LEFT JOIN inpt_visit c on a.hosp_code = c.hosp_code and a.visit_id = c.id
-            LEFT JOIN insure_item_match d on a.hosp_code = d.hosp_code and a.item_id = d.hosp_item_id
             WHERE a.hosp_code = #{hospCode}
               and a.item_code = #{itemCode} /*药品/材料*/
             <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
@@ -140,10 +119,6 @@
             </if>
               and a.settle_code = '2' /*已结算*/
               and a.is_upload = '0' /*未上传*/
-              and d.audit_code = '1' /*医保项目已审核*/
-              and d.is_match = '1' /*医保项目已匹配*/
-              and d.is_trans = '1' /*医保项目已传输*/
-              and d.is_valid = '1' /*医保项目有效*/
               and (c.status_code = '2' or c.status_code = '5' or c.status_code = '6' or c.status_code = '7') /*在院病人*/
             GROUP BY a.visit_id
         ) t1
@@ -182,7 +157,7 @@
             a.item_name as itemName,
             (select name from base_dept bd where a.hosp_code = bd.hosp_code and a.dept_id = bd.id) as deptName,
             c.insure_item_code as prodCode,
-            a.item_id as fixmedinsHilistId,
+            c.insure_item_code as fixmedinsHilistId,
             c.insure_item_name as fixmedinsHilistName,
             (SELECT cert_code from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertType,
             (SELECT cert_no from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertno,
@@ -238,7 +213,7 @@
             b.code as itemCode,
             a.item_name as itemName,
             (select name from base_dept bd where a.hosp_code = bd.hosp_code and a.dept_id = bd.id) as deptName,
-            a.item_id as prodCode,
+            c.insure_item_code as prodCode,
             c.insure_item_code as fixmedinsHilistId,
             c.insure_item_name as fixmedinsHilistName,
             (SELECT cert_code from sys_user s where s.hosp_code = d.hosp_code and s.id = a.doctor_id) as prscDrCertType,

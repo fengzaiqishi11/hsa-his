@@ -2230,7 +2230,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         map.put("in_no","住院号");
         map.put("prodName","生产厂家");
 
-
         return map;
     }
 

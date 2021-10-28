@@ -2373,4 +2373,100 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         redisUtils.del(key);
       }
     }
+
+    public static void main(String args[]) {
+
+        String resultJson = "{\n" +
+                "    \"output\": {\n" +
+                "        \"setlinfo\": {\n" +
+                "            \"setl_time\": \"2021-10-27 10:59:23\", \n" +
+                "            \"cvlserv_pay\": 0, \n" +
+                "            \"cvlserv_flag\": \"0\", \n" +
+                "            \"med_type\": \"2101\", \n" +
+                "            \"naty\": \"\", \n" +
+                "            \"brdy\": \"1967-11-16\", \n" +
+                "            \"psn_cash_pay\": 2685.99, \n" +
+                "            \"certno\": \"430521196711161676\", \n" +
+                "            \"hifmi_pay\": 0, \n" +
+                "            \"psn_no\": \"43000011300000261123\", \n" +
+                "            \"act_pay_dedc\": 800, \n" +
+                "            \"mdtrt_cert_type\": \"02\", \n" +
+                "            \"balc\": 7748.98, \n" +
+                "            \"medins_setl_id\": \"H43050200156202110271059228684\", \n" +
+                "            \"psn_cert_type\": \"01\", \n" +
+                "            \"hifob_pay\": 0, \n" +
+                "            \"acct_mulaid_pay\": 0, \n" +
+                "            \"clr_way\": \"01\", \n" +
+                "            \"oth_pay\": 0, \n" +
+                "            \"medfee_sumamt\": 5792.53, \n" +
+                "            \"hifes_pay\": 0, \n" +
+                "            \"gend\": \"1\", \n" +
+                "            \"mdtrt_id\": \"17648713\", \n" +
+                "            \"fund_pay_sumamt\": 3106.54, \n" +
+                "            \"acct_pay\": 0, \n" +
+                "            \"fulamt_ownpay_amt\": 296.2, \n" +
+                "            \"setl_id\": \"11007999\", \n" +
+                "            \"hosp_part_amt\": 0, \n" +
+                "            \"psn_name\": \"周跃军\", \n" +
+                "            \"insutype\": \"310\", \n" +
+                "            \"inscp_scp_amt\": 4973.72, \n" +
+                "            \"maf_pay\": 0, \n" +
+                "            \"psn_part_amt\": 2685.99, \n" +
+                "            \"pool_prop_selfpay\": 0, \n" +
+                "            \"clr_optins\": \"430502\", \n" +
+                "            \"psn_type\": \"11\", \n" +
+                "            \"overlmt_selfpay\": 0, \n" +
+                "            \"hifp_pay\": 3106.54, \n" +
+                "            \"preselfpay_amt\": 522.61, \n" +
+                "            \"age\": 53, \n" +
+                "            \"clr_type\": \"9902\"\n" +
+                "        }, \n" +
+                "        \"setldetail\": [\n" +
+                "            {\n" +
+                "                \"fund_pay_type\": \"\", \n" +
+                "                \"fund_payamt\": \"\", \n" +
+                "                \"setl_proc_info\": \"\", \n" +
+                "                \"crt_payb_lmt_amt\": \"\", \n" +
+                "                \"inscp_scp_amt\": 4973.72, \n" +
+                "                \"fund_pay_type_name\": \"\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }, \n" +
+                "    \"infcode\": 0, \n" +
+                "    \"refmsg_time\": \"20211027105922157\", \n" +
+                "    \"message\": \"\", \n" +
+                "    \"respond_time\": \"20211027105924105\", \n" +
+                "    \"inf_refmsgid\": \"430000202110271059240128334095\"\n" +
+                "}";
+        Map<String, Object> item1 = JSONObject.parseObject(resultJson,Map.class);
+        Map<String, Object> item2 = (Map<String, Object>) item1.get("output");
+        List<Map<String,Object>> setldetailList = MapUtils.get(item2,"setldetail");
+        Map<String,Object> item = setldetailList.get(0);
+        InsureIndividualFundDTO insureIndividualFundDTO = new InsureIndividualFundDTO();
+        insureIndividualFundDTO.setFundPayType(MapUtils.get(item, "fund_pay_type"));
+        if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
+            insureIndividualFundDTO.setInscpScpAmt(null);
+        } else {
+            insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
+        }
+        // 符合政策范围金额
+        // 本次可支付限额金额
+        if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
+            insureIndividualFundDTO.setCrtPaybLmtAmt(null);
+        } else {
+            insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+        }
+        if (MapUtils.isEmpty(item, "fund_payamt")) {
+            insureIndividualFundDTO.setFundPayamt(null);
+        } else {
+            // 基金支付金额
+            insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+        }
+        // 基金支付类型名称
+        insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));
+        //结算过程信息
+        insureIndividualFundDTO.setSetlProcInfo(MapUtils.get(item, "setl_proc_info"));
+
+        System.out.println("ok");
+    }
 }

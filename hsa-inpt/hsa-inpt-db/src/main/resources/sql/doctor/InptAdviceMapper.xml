@@ -103,6 +103,9 @@
         <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
         <result property="yylx" column="yylx" jdbcType="VARCHAR"/>
         <result property="advanceDays" column="advance_days" jdbcType="VARCHAR"/>
+        <result property="technologyCode" column="technology_code" jdbcType="VARCHAR"/>
+        <result property="containerCode" column="container_code" jdbcType="VARCHAR"/>
+        <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -281,7 +284,7 @@
         if(a.item_code = '4', b.is_stop_myself,null  ) isStopMyself, a.source_ia_id source_ia_id, a.advice_prefix, a.advice_suffix, a.collect_blood_time,
         case when e.id is null then '0' else '1' end isWz, a.cancel_id, a.cancel_name, a.cancel_time, a.skin_durg_id,
         ef.good_name skinDurgName, a.skin_phar_id, a.skin_unit_code, case when a.item_code = '1' then '2' when a.item_code = '2' then '3' when a.item_code = '4' and e.id is not null then '4'
-        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx
+        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx, b.technology_code, b.container_code, b.specimen_code
         from inpt_advice a
         left join base_advice b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '4'
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'

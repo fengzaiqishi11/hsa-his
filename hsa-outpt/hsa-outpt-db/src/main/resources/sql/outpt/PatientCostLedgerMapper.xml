@@ -1606,7 +1606,7 @@
             d.name as dept_name,
             b.reality_price ,
             if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
-            FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+            FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code

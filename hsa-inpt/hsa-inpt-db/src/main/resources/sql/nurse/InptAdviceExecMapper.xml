@@ -90,7 +90,7 @@
         inpt_advice_exec c,
         inpt_advice e
         WHERE
-        e.hosp_code = e.hosp_code
+        e.hosp_code = c.hosp_code
         AND c.advice_id = e.id
         AND c.hosp_code = #{hospCode}
         <if test="visitId != null and visitId !=''">

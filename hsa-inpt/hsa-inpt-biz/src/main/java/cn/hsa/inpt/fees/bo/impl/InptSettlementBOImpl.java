@@ -1148,7 +1148,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrType = MapUtils.get(insureInptResult, "clr_type");
             BigDecimal hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
 
-            BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
+            // update by liaojiguang on 2021-10-29 紧急版本master(有时会返回int类型)
+            //BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
+            BigDecimal acctPay = BigDecimalUtils.convert(MapUtils.get(insureInptResult,"acct_pay").toString()); // 个人账户支出
+
             /**
              * 结算成功以后 更新基金信息
              */

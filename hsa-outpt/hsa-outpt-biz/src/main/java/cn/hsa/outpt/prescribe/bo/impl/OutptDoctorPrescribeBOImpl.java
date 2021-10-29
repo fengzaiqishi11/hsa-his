@@ -490,7 +490,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //就诊信息
         OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(outptRegisterDTO);
         //是否需要建档案
-        if(StringUtils.isEmpty(outptVisitDTO.getProfileId()) && (StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode()))) {
+        if(StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode())) {
             OutptProfileFileExtendDTO opf = this.getFprFileId(outptVisitDTO);
             //档案ID
             outptVisitDTO.setProfileId(opf.getProfileId());
@@ -3164,10 +3164,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //调用本地建档服务
         log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         //本地档案表id保持与中心端的一致
-        if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-            outptProfileFileDTO.setId(outptProfileFileExtendDTO.getData().getProfileId());
-        }
-//        outptProfileFileDTO.setOutProfile(outptVisitDTO.getVisitNo());
+        outptProfileFileDTO.setId(outptProfileFileExtendDTO.getData().getProfileId());
         outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getData().getOutProfile()); //门诊档案号
         outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getData().getInProfile()); //住院病案号
         outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getData().getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getOutptLastVisitTime()); // 门诊最后就诊时间

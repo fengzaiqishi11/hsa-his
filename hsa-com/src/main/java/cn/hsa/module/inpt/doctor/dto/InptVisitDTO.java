@@ -423,4 +423,9 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 剂型
      */
     private String prepCode;
+
+    //结算时间
+    private String settleStartTime;
+    //结算时间
+    private String settleEndTime;
 }

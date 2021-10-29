@@ -909,9 +909,12 @@
       </if>
       where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
       )b on 1 = 1
-      join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code and b.clf = stock.biz_id
+      left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
       <if test="pharId != null and pharId != ''">
-        and stock.biz_id = #{pharId}
+            and stock.biz_id = #{pharId}
+      </if>
+      <if test="pharId == null or pharId == ''">
+            and b.clf = stock.biz_id
       </if>
       left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
       left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code

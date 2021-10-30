@@ -146,15 +146,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
         String code = "INFUSION_BOTTLE_STICKER";
         SysParameterDTO sysParameterDTO = this.getSysParameter(code, inptVisitDTO.getHospCode());
         // 增加是否不关联领药表的系统参数，默认关联
-        String pharCode = "HLZXK_RELEVANCE_PHAR";
-        SysParameterDTO pharSysParamDTO = this.getSysParameter(pharCode, inptVisitDTO.getHospCode());
-        if (pharSysParamDTO != null && StringUtils.isNotEmpty(pharSysParamDTO.getValue()) && "1".equals(pharSysParamDTO.getValue())) {
-            // 不关联，参数值为1
-            inptVisitDTO.setIsRelevance(Constants.SF.S);
-        } else {
-            // 关联，默认关联
-            inptVisitDTO.setIsRelevance(Constants.SF.F);
-        }
+        this.relevancePharCode(inptVisitDTO);
         if ("1".equals(printType)) {
             // 输液瓶贴
             if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
@@ -355,6 +347,7 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
           List<String> dsyList = Arrays.asList(split);
           inptVisitDTO.setUsageCodeList(dsyList);
         }
+        inptVisitDTO.setIsStop(Constants.SF.F);
         List<String> strings = new ArrayList<>();
         //治疗护理执行卡
         if ("8".equals(printType) || "7".equals(printType)) {
@@ -376,6 +369,8 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
           inptVisitDTO.setIsStop(Constants.SF.S);
         }
       }
+      // 增加是否不关联领药表的系统参数，默认关联
+      this.relevancePharCode(inptVisitDTO);
       PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
       List<String> visitIds = nurseExcuteCardDAO.queryVistId(inptVisitDTO);
       if(ListUtils.isEmpty(visitIds)) {
@@ -386,5 +381,18 @@ public class NurseExcuteCardBOImpl extends HsafBO implements NurseExcuteCardBO {
       newVisit.setHospCode(inptVisitDTO.getHospCode());
       List<InptVisitDTO> inptVisitDTOS = nurseExcuteCardDAO.queryPatientByIds(newVisit);
       return PageDTO.of(inptVisitDTOS);
+    }
+
+    // 是否关联领药申请参数
+    private void relevancePharCode(InptVisitDTO inptVisitDTO) {
+        String pharCode = "HLZXK_RELEVANCE_PHAR";
+        SysParameterDTO pharSysParamDTO = this.getSysParameter(pharCode, inptVisitDTO.getHospCode());
+        if (pharSysParamDTO != null && StringUtils.isNotEmpty(pharSysParamDTO.getValue()) && "1".equals(pharSysParamDTO.getValue())) {
+            // 不关联，参数值为1
+            inptVisitDTO.setIsRelevance(Constants.SF.S);
+        } else {
+            // 关联，默认关联
+            inptVisitDTO.setIsRelevance(Constants.SF.F);
+        }
     }
 }

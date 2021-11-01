@@ -228,6 +228,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (outpt == null) {
             throw new AppException("患者就诊数据出现异常【" + visitId + "】，请联系管理员");
         }
+        // 病人类型为空 给默认值  lly 20211026
+        if (StringUtils.isEmpty(outpt.getPatientCode())){
+            outpt.setPatientCode("0");
+        }
         Integer patientCodeValue = Integer.parseInt(outpt.getPatientCode());
         if (patientCodeValue > 0) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);

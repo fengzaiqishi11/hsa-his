@@ -3395,4 +3395,109 @@
         </foreach>
     </update>
 
+    <insert id="batchPharOutReceiveInsert" parameterType="java.util.List">
+        insert into
+        phar_out_receive
+        (
+        id,
+        hosp_code,
+        visit_id,
+        settle_id,
+        total_price,
+        status_code,
+        phar_id,
+        window_id,
+        assign_user_id,
+        assign_user_name,
+        assign_time,
+        dist_user_id,
+        dist_user_name,
+        dist_time,
+        dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.windowId,jdbcType=VARCHAR},
+            #{item.assignUserId,jdbcType=VARCHAR},
+            #{item.assignUserName,jdbcType=VARCHAR},
+            #{item.assignTime,jdbcType=TIMESTAMP},
+            #{item.distUserId,jdbcType=VARCHAR},
+            #{item.distUserName,jdbcType=VARCHAR},
+            #{item.distTime,jdbcType=TIMESTAMP},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchPharOutReceiveDetailInsert" parameterType="java.util.List" >
+        insert into
+        phar_out_receive_detail
+        (
+        id,
+        hosp_code,
+        or_id,
+        op_id,
+        opd_id,
+        cost_id,
+        item_code,
+        item_id,
+        item_name,
+        spec,
+        dosage,
+        dosage_unit_code,
+        num,
+        unit_code,
+        price,
+        split_ratio,
+        split_unit_code,
+        split_num,
+        split_price,
+        total_price,
+        chinese_drug_num,
+        usage_code,
+        use_code,
+        curr_unit_code
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.orId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.costId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.unitCode,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.splitRatio,jdbcType=DECIMAL},
+            #{item.splitUnitCode,jdbcType=VARCHAR},
+            #{item.splitNum,jdbcType=DECIMAL},
+            #{item.splitPrice,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.chineseDrugNum,jdbcType=DECIMAL},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.currUnitCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
 </mapper>

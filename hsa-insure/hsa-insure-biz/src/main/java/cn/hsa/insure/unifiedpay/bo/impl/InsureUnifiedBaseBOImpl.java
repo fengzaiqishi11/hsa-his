@@ -276,9 +276,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
-        dataMap.put("setl_id", insureSettleId);
-        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        dataMap.put("setl_Id", insureSettleId);
+        dataMap.put("psn_No", insureIndividualVisitDTO.getAac001());
+        dataMap.put("mdtrt_Id", insureIndividualVisitDTO.getMedicalRegNo());
         paramMap.put("data", dataMap);
         Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), Constant.UnifiedPay.REGISTER.UP_100001, paramMap);
         List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
@@ -1355,7 +1355,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String patientCode =  MapUtils.get(map,"patientCode");
         String redisKey ="";
         if(Constants.SF.S.equals(isHospital)){
-             redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).
+             redisKey = new StringBuilder().append(hospCode).append("^").
+                     append(visitId).
                     append(Constant.UnifiedPay.INPT.UP_2305).append("^").toString();
         }else{
             redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).

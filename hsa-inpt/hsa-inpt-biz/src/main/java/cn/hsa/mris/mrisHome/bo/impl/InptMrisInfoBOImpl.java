@@ -97,18 +97,20 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
                     operInfoMap.put("F15", "");
                     operInfoMap.put("C23x01", changeData(dataMap.get("ana_name1")));
                     for (int j = 1; j < mrisOperInfo.size(); j++) {
-                        operInfoMap.put("C35x0" + j + "C", changeData(mrisOperInfo.get(j).get("oper_disease_icd9")));
-                        operInfoMap.put("C36x0" + j + "N", changeData(mrisOperInfo.get(j).get("oper_disease_name")));
-                        operInfoMap.put("C37x0" + j, changeData(mrisOperInfo.get(j).get("oper_time")));
-                        operInfoMap.put("C38x0" + j, changeData(mrisOperInfo.get(j).get("oper_code")));
-                        operInfoMap.put("F14x0" + j, "");
-                        operInfoMap.put("C39x0" + j, changeData(mrisOperInfo.get(j).get("oper_doctor_name")));
-                        operInfoMap.put("C40x0" + j, changeData(mrisOperInfo.get(j).get("assistant_name1")));
-                        operInfoMap.put("C41x0" + j, changeData(mrisOperInfo.get(j).get("assistant_name2")));
-                        operInfoMap.put("C42x0" + j + "C", changeData(mrisOperInfo.get(j).get("heal_code")));
-                        operInfoMap.put("C43x0" + j + "C", changeData(mrisOperInfo.get(j).get("ana_code")));
-                        operInfoMap.put("F16x0" + j, "");
-                        operInfoMap.put("C44x0" + j, changeData(mrisOperInfo.get(j).get("ana_name1")));
+                        if (mrisOperInfo.get(j)!=null) {
+                            operInfoMap.put("C35x0" + j + "C", changeData(mrisOperInfo.get(j).get("oper_disease_icd9")));
+                            operInfoMap.put("C36x0" + j + "N", changeData(mrisOperInfo.get(j).get("oper_disease_name")));
+                            operInfoMap.put("C37x0" + j, changeData(mrisOperInfo.get(j).get("oper_time")));
+                            operInfoMap.put("C38x0" + j, changeData(mrisOperInfo.get(j).get("oper_code")));
+                            operInfoMap.put("F14x0" + j, "");
+                            operInfoMap.put("C39x0" + j, changeData(mrisOperInfo.get(j).get("oper_doctor_name")));
+                            operInfoMap.put("C40x0" + j, changeData(mrisOperInfo.get(j).get("assistant_name1")));
+                            operInfoMap.put("C41x0" + j, changeData(mrisOperInfo.get(j).get("assistant_name2")));
+                            operInfoMap.put("C42x0" + j + "C", changeData(mrisOperInfo.get(j).get("heal_code")));
+                            operInfoMap.put("C43x0" + j + "C", changeData(mrisOperInfo.get(j).get("ana_code")));
+                            operInfoMap.put("F16x0" + j, "");
+                            operInfoMap.put("C44x0" + j, changeData(mrisOperInfo.get(j).get("ana_name1")));
+                        }
                     }
                 }
                 ma.putAll(operInfoMap);

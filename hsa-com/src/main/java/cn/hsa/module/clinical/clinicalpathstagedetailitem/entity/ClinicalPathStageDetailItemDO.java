@@ -196,6 +196,10 @@ public class ClinicalPathStageDetailItemDO extends PageDO implements Serializabl
      */
     private String isLong;
     /**
+     * 用药类型（yylx）（1：按医嘱，1：交病人）
+     */
+    private String yylx;
+    /**
      * 创建人ID
      */
     private String crteId;

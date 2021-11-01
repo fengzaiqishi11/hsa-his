@@ -1,7 +1,9 @@
 package cn.hsa.module.clinical.inptclinicalpathstage.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
+import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,19 @@ public interface InptClinicalPathStageBO {
    * @Return int
    **/
   boolean saveInptClinicalPathStage(InptClinicalPathStageDTO inptClinicalPathStageDTO);
+
+  /**
+  * @Menthod queryNotExecItem
+  * @Desrciption 查询阶段未执行项目
+  *
+  * @Param
+  * [inptClinicalPathStageDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/26 10:31
+  * @Return java.util.List<cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO>
+  **/
+  List<ClinicPathStageDetailDTO> queryNotExecItem(InptClinicalPathStageDTO inptClinicalPathStageDTO);
 
   /**
    * @Menthod deleteInptClinicalPathStage

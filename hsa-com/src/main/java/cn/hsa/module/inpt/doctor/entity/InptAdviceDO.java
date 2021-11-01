@@ -426,4 +426,9 @@ public class InptAdviceDO extends PageDO implements Serializable {
      */
     private String isInsureUpload;
 
+  // 临床路径项目明细ID
+  private String stageDetailItemId;
+
+  private String clinicalPathStageId;
+
 }

@@ -152,4 +152,5 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     // 处方总金额
     private BigDecimal printTotalPrice;
 
+
 }

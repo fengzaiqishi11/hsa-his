@@ -318,7 +318,8 @@
         plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time,
         last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
         stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time,
-        skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx
+        skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx,stage_detail_item_id,
+        clinical_path_stage_id
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -404,7 +405,9 @@
             #{item.advicePrefix},
             #{item.adviceSuffix},
             #{item.collectBloodTime},
-            #{item.yylx}
+            #{item.yylx},
+            #{item.stageDetailItemId},
+            #{item.clinicalPathStageId}
             )
         </foreach>
     </insert>

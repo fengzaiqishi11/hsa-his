@@ -348,6 +348,9 @@
           #{item}
         </foreach>
       </if>
+      <if test="visitIds !=null and visitIds != ''">
+          and find_in_set(ia.visit_id, #{visitIds})
+      </if>
       <if test="usageCodeList !=null and usageCodeList.size()>0">
         and ia.usage_code in
         <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
@@ -455,6 +458,9 @@
             <foreach collection="ids" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        </if>
+        <if test="visitIds !=null and visitIds != ''">
+            and find_in_set(ia.visit_id, #{visitIds})
         </if>
         <if test="usageCodeList !=null and usageCodeList.size()>0">
             and ia.usage_code in

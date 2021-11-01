@@ -593,7 +593,8 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     for (int j=0;j<inTimeList.size();j++){
                         Date inDate = DateUtils.parse(inTimeList.get(j),"yyyy-MM-dd");
                         int diff = DateUtil.daysBetweenDates(timeSlotDate,inDate);
-                        if (diff>0){
+                        // 术后天数只记录到术后第七天，之后不在记录
+                        if (diff>0 && diff<8){
                             shts=shts+diff+",";
                         }
                     }

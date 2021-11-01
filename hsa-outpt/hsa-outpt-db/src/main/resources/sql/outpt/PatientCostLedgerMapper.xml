@@ -1548,6 +1548,9 @@
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')
             </if>
+            <if test="itemId != null and itemId != ''">
+                and b.item_id = #{itemId}
+            </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
                 and b.doctor_id = #{userId}
             </if>
@@ -1606,7 +1609,7 @@
             d.name as dept_name,
             b.reality_price ,
             if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
-            FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code
+            FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
@@ -1621,6 +1624,9 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and b.item_id = #{itemId}
             </if>
             <if test="insureCode != null and insureCode != ''">
                 and a.patient_code = #{insureCode}
@@ -1675,6 +1681,9 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')
+            </if>
+            <if test="itemId != null and itemId != ''">
+                and b.item_id = #{itemId}
             </if>
             <if test="insureCode != null and insureCode != ''">
                 and a.patient_code = #{insureCode}
@@ -5722,14 +5731,34 @@
         )t3 on t1.settleTime = t3.settleTime and t1.visit_id = t3.visit_id
     </select>
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        select item_name from
-        (select item_name from inpt_cost
-        union
-        select item_name from outpt_cost
-        )t
-        where 1=1
+        SELECT
+            id as item_id,
+            IFNULL( usual_name, good_name ) AS item_name
+        FROM base_drug
+        WHERE hosp_code = #{hospCode}
+          AND is_valid = '1'
         <if test="keyword != null and keyword != ''">
-            and item_name like concat('%',#{keyword},'%')
+            and (usual_pym like concat('%', #{keyword}, '%') or usual_wbm like concat('%', #{keyword}, '%') or good_pym like concat('%', #{keyword}, '%') or good_wbm like concat('%', #{keyword}, '%'))
+        </if>
+        UNION ALL
+        SELECT
+            id as item_id,
+            name as item_name
+        FROM base_material
+        WHERE hosp_code = #{hospCode}
+          AND is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (pym like concat('%', #{keyword}, '%') or wbm like concat('%', #{keyword}, '%'))
+        </if>
+        UNION ALL
+        SELECT
+            id as item_id,
+            IFNULL( name, other_name ) AS item_name
+        FROM base_item
+        WHERE hosp_code = #{hospCode}
+          AND is_valid = '1'
+        <if test="keyword != null and keyword != ''">
+            and (name_pym like concat('%', #{keyword}, '%') or name_wbm like concat('%', #{keyword}, '%'))
         </if>
     </select>
 

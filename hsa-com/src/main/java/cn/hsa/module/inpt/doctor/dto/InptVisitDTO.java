@@ -428,4 +428,13 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String settleStartTime;
     //结算时间
     private String settleEndTime;
+    /**
+     * 合并结算总费用
+     */
+    private BigDecimal totalMergeCost;
+
+    /**
+     * 合并结算预交金余额
+     */
+    private BigDecimal totalMergeBalance;
 }

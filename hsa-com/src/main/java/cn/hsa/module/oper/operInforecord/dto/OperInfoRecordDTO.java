@@ -116,4 +116,10 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
      * 合并结算总余额
      */
     private BigDecimal totalMergeBalance;
+    // 术者医师代码
+    private String operDrCode;
+    // 麻醉医师代码
+    private String anstDrCode;
+    // 手术操作类别
+    private String oprnOprtType;
 }

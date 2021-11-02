@@ -4,6 +4,8 @@ import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Package_name:
  * @Class_name: DTO
@@ -17,7 +19,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureConfigurationDTO extends InsureConfigurationDO {
         private String keyword;
-        private String ids;
+        private List<String> ids;
 
         //医保费用是否上传
         private String primaryPrice;

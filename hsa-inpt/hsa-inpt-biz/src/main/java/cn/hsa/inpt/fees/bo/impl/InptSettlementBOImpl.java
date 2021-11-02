@@ -20,6 +20,7 @@ import cn.hsa.module.inpt.fees.dao.*;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.entity.*;
 import cn.hsa.module.insure.inpt.service.InptService;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dto.*;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -125,6 +127,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
 
     @Resource
     private InptBabyDAO inptBabyDAO;
+
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
+
 
     /**
      * @param inptVisitDTO 查询条件
@@ -1375,6 +1381,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
      * @Method editDischargeInpt
      * @Desrciption 医保出院办理
      *    1.出院办理前 先验证该病人是否已经医保出院登记
+     *    2.增加个人累计信息的保存
      * @Param params
      * @Author fuhui
      * @Date 2021/5/28 11:40
@@ -1417,12 +1424,16 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         /**
          * 办理医保预出院之前 需要判断医保上传费用和his费用是不是一致
          */
-
+        map.put("visitId",id);
+        map.put("medicalRegNo",medicalRegNo);
+        map.put("psnNo",insureIndividualVisitDTO.getAac001());
+        map.put("medisCode",insureIndividualVisitDTO.getMedicineOrgCode());
         checkInsureAndHisFee(map);
-
+        /**
+         * 保存个人累计信息
+         */
+        insertPatientSumInfo(map);
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
-            map.put("visitId",id);
-            map.put("medicalRegNo",medicalRegNo);
             insureUnifiedPayInptService_consumer.UP_2402(map);
             InptVisitDTO inptVisitDTO = new InptVisitDTO();
             inptVisitDTO.setId(id);
@@ -1433,6 +1444,43 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             insureIndividualVisitService.updateInsureInidivdual(map).getData();
         }
         return true;
+    }
+    
+    /**
+     * @Method 办理医保预出院之前，需要保存个人累计信息
+     * @Desrciption  
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/10/23 14:27 
+     * @Return 
+    **/
+    private void insertPatientSumInfo(Map<String, Object> map) {
+        String crteName = MapUtils.get(map,"crteName"); //  创建人姓名
+        String crteId = MapUtils.get(map,"crteId"); // 创建人id
+        String visitId = MapUtils.get(map,"visitId"); // 就诊id
+        String hospCode = MapUtils.get(map,"hospCode"); // 医院编码
+        String psnNo = MapUtils.get(map,"psnNo"); // 个人编号
+        String medisCode = MapUtils.get(map,"medisCode"); // 医疗机构编码
+        String medicalRegNo = MapUtils.get(map,"medicalRegNo");
+        Map<String, Object> dataMap = insureUnifiedBaseService_consumer.queryPatientSumInfo(map).getData();
+        List<Map<String, Object>> resultDataMap = MapUtils.get(dataMap,"resultDataMap");
+        if(!ListUtils.isEmpty(resultDataMap)){
+            resultDataMap.stream().forEach(item->{
+                item.put("id",SnowflakeUtils.getId());
+                item.put("crteName",crteName);
+                item.put("medicalRegNo",medicalRegNo);
+                item.put("crteId",crteId);
+                item.put("visitId",visitId);
+                item.put("hospCode",hospCode);
+                item.put("crteName",crteName);
+                item.put("psnNo",psnNo);
+                item.put("medisCode",medisCode);
+                item.put("crteTime",DateUtils.getNow());
+            });
+            inptVisitDAO.deletePatientSumInfo(map);
+            inptVisitDAO.insertPatientSumInfo(resultDataMap);
+        }
     }
 
     /**

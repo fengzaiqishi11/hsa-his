@@ -55,4 +55,5 @@ public class InsureItemMatchDTO extends InsureItemMatchDO implements Serializabl
         private String hospId; // HIS端ID
         private String insureId; // 医保端ID
         private List<String> itemIdCollectList;
+        private String remark;
 }

@@ -92,8 +92,15 @@
 
     <!--新增所有列-->
     <insert id="insertClinicPathExec" keyProperty="id" useGeneratedKeys="true">
-        insert into clinic_path_exec(id,hosp_code, visit_id, baby_id, clinical_path_stage_id, list_id, stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{clinicalPathStageId}, #{listId}, #{stageId}, #{detailId}, #{detailItemId}, #{isExec}, #{execTime}, #{execId}, #{execName}, #{itemType}, #{itemId}, #{crteId}, #{crteName}, #{crteTime})
+        insert into clinic_path_exec(id,hosp_code, visit_id, baby_id, clinical_path_stage_id, list_id,
+        stage_id, detail_id, detail_item_id, is_exec, exec_time, exec_id, exec_name, item_type, item_id,
+        crte_id, crte_name, crte_time)
+        values
+      <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.babyId}, #{item.clinicalPathStageId}, #{item.listId},
+         #{item.stageId}, #{item.detailId}, #{item.detailItemId}, #{item.isExec}, #{item.execTime}, #{item.execId},
+         #{item.execName}, #{item.itemType}, #{item.itemId}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+      </foreach>
     </insert>
 
     <!--通过主键修改数据-->
@@ -159,5 +166,28 @@
     <delete id="deleteClinicPathExecById">
         delete from clinic_path_exec where id = #{id} and hosp_code = #{hospCode}
     </delete>
+
+  <!--通过主键删除-->
+  <delete id="deleteClinicPathExec">
+      delete from clinic_path_exec where hosp_code = #{hospCode} and visit_id = #{visitId}
+      and clinical_path_stage_id = #{clinicalPathStageId} and detail_item_id = #{detailItemId}
+      <if test="itemType != null and itemType != ''">
+        and item_type = #{itemType}
+      </if>
+      <if test="stageId != null and stageId != ''">
+        and stage_id = #{stageId}
+      </if>
+      <if test="detailId != null and detailId != ''">
+        and detail_id = #{detailId}
+      </if>
+  </delete>
+
+  <select id="queryEmrByCode" resultType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+    select a.*
+    from emr_patient a
+    join emr_classify_template b on a.classify_template_id = b.id and a.hosp_code = b.hosp_code
+    and b.dept_id = #{deptId} and b.classify_code = #{classifyCode}
+    where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+  </select>
 
 </mapper>

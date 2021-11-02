@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.clinical.clinicalpathstage.dao.ClinicalPathStageDAO;
 import cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO;
+import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.bo.InptClinicalPathStageBO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dao.InptClinicalPathStageDAO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
@@ -123,6 +124,7 @@ public class InptClinicalPathStageBOImpl implements InptClinicalPathStageBO {
       if(nextClinicalPathStage == null) {
         throw new AppException("该阶段已是最后阶段，不能进入下一阶段");
       }
+
       /**用于更新入径病人当前阶段**/
       InptClinicalPathStateDTO inptClinicalPathStateDTO = new InptClinicalPathStateDTO();
       inptClinicalPathStateDTO.setHospCode(inptClinicalPathStageDTO.getHospCode());
@@ -174,6 +176,22 @@ public class InptClinicalPathStageBOImpl implements InptClinicalPathStageBO {
       inptClinicalPathStateDAO.updateInptClinicalPathStateByVisitId(inptClinicalPathStateDTO);
     }
     return true;
+  }
+
+  /**
+  * @Menthod queryNotExecItem
+  * @Desrciption 查询阶段未执行项目
+  *
+  * @Param
+  * [inptClinicalPathStageDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/26 10:32
+  * @Return java.util.List<cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO>
+  **/
+  @Override
+  public List<ClinicPathStageDetailDTO> queryNotExecItem(InptClinicalPathStageDTO inptClinicalPathStageDTO) {
+    return inptClinicalPathStateDAO.queryNotExecItem(inptClinicalPathStageDTO);
   }
 
   /**

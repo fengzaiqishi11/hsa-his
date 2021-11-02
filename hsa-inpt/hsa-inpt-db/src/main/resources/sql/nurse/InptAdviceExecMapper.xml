@@ -38,7 +38,8 @@
         <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
         <result property="rateRemark" column="rateRemark" jdbcType="VARCHAR"/>
         <result property="sourceIaId" column="sourceIaId" jdbcType="VARCHAR"/>
-
+        <result property="stageDetailItemId" column="stageDetailItemId" jdbcType="VARCHAR"/>
+        <result property="clinicalPathStageId" column="clinicalPathStageId" jdbcType="VARCHAR"/>
     </resultMap>
 
     <delete id="deleteByParams">
@@ -70,7 +71,7 @@
     </select>
 
     <!--分页查询医嘱相关信息-->
-    <select id="queryInptAdvicePage" resultMap="InptAdviceExecMap">
+    <select id="queryInptAdvicePage" resultType="cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO">
         select
         e.crte_name adviceDoctor,
         e.content,
@@ -84,6 +85,8 @@
         e.dosage,
         e.dosage_unit_code,
         e.usage_code,
+        e.stage_detail_item_id,
+        e.clinical_path_stage_id,
         (select te.pym from base_rate te where te.hosp_code = e.hosp_code and te.id = e.rate_id) rateRemark,e.source_ia_id sourceIaId,
         (select b.name from inpt_baby b where b.hosp_code = e.hosp_code and b.id = e.baby_id) babyName
         FROM

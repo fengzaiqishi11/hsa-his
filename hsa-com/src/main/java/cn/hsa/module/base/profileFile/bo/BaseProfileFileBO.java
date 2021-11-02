@@ -73,4 +73,6 @@ public interface BaseProfileFileBO {
     List<TreeMenuNode> getAddressTree(OutptProfileFileDTO outptProfileFileDTO);
 
     List<OutptProfileFileDTO> queryBaseProfileByIds(OutptProfileFileDTO outptProfileFileDTO);
+
+    List<OutptProfileFileDTO> queryAll(OutptProfileFileDTO outptProfileFileDTO);
 }

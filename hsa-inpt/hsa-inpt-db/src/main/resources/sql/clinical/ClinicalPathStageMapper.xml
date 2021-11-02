@@ -85,7 +85,7 @@
     <!--查询最大的序列号-->
     <select id="getMaxSortNo" resultType="cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO">
         select sort_no from clinical_path_stage
-        where hosp_code = #{hospCode}
+        where hosp_code = #{hospCode} and list_id = #{listId}
         order by sort_no desc limit 1
     </select>
     <!--根据id查询-->

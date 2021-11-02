@@ -336,4 +336,45 @@ public interface PatientCostLedgerBO {
    * @Return map
    **/
   Map queryMedicalCostTitle(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod queryMzPatientFinanceCostList
+   * @Desrciption 查询门诊财务分类明细
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/22 16:20
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO queryMzPatientFinanceCostList(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/22 16:22
+   * @Return Map
+   **/
+  Map getMzMedicalFinanceTitle(OutptVisitDTO outptVisitDTO);
+
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption 查询住院财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 11:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO getInptFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptFinanceTitle
+   * @Desrciption  查询住院财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 11:22
+   * @Return Map
+   **/
+  Map getInptFinanceTitle(InptVisitDTO inptVisitDTO);
 }

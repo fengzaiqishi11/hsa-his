@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -67,7 +68,7 @@ public class BaseNurseOrderDO extends PageDO implements Serializable {
     /**
      * 单据头距顶部高度(mm)
      */
-    private Integer topHeight;
+    private BigDecimal topHeight;
     /**
      * 创建人ID
      */

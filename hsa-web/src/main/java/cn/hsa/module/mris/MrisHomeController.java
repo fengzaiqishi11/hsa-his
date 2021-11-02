@@ -55,6 +55,7 @@ public class MrisHomeController extends BaseController {
     public WrapperResponse<PageDTO> queryOutHospPatientInfo(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        inptVisitDTO.setZgDoctorId(sysUserDTO.getId()); // liuliyun 20211022 病案首页添加主管医生过滤
         Map<String,Object> selectMap = new HashMap<>();
         if (sysUserDTO.getLoginBaseDeptDTO() != null) {
             inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());

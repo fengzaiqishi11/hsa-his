@@ -739,7 +739,7 @@
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, os.crte_name as crteName, os.crte_time as crteTime from (
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice from (
         SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
 			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
 			(select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName
@@ -747,14 +747,17 @@
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId}
         group by a.bfc_id
         ) b join outpt_settle os on os.id = #{settleId} and os.hosp_code = #{hospCode}
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
          where b.totalPrice>0
     </select>
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime,
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
         from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
          where s.hosp_code = #{hospCode} and s.id = #{outptSettleInvoiceId}
     </select>
 
@@ -867,13 +870,17 @@
             v.doctor_id as doctorId,
             u.name as doctorName,
             u.prac_certi_no as pracCertiNo,
-            (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice
+            (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice,
+            ifnull(iim.remark, '') as chrgItemLv
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
             left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
             left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
             left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
+            left join insure_individual_visit iiv on iiv.hosp_code = a.hosp_code and iiv.visit_id = v.id
+            left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim
+            on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
     </select>
 
@@ -1489,11 +1496,13 @@
         (select v.dept_name from outpt_visit v where v.id = s.visit_id) as deptName,
         (select v.gender_code from outpt_visit v where v.id = s.visit_id) as sex,
         s.settle_time, s.crte_name as crteName, bfc.name as bfcName, bfc.code as bfcCode, s.self_price as selfPrice, s.mi_price as miPrice,
-        scd.name as fpglName, scd.value as fpglKey, s.total_price as outptTotalFee
+        scd.name as fpglName, scd.value as fpglKey, s.total_price as outptTotalFee,
+        ifnull(iis.before_settle, 0.00) as beforeSettle, ifnull(iis.last_settle, 0.00) as lastSettle
         from outpt_settle s join outpt_cost c on c.settle_id = s.id
         join sys_code_detail d on c.item_code = d.value and d.hosp_code = #{hospCode} and d.c_code = 'XMLB'
         join base_finance_classify bfc on bfc.id = c.bfc_id and bfc.hosp_code = c.hosp_code
         join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        left join insure_individual_settle iis on iis.hosp_code = s.hosp_code and iis.settle_id = s.id
         where s.settle_no = #{settleNo} and s.hosp_code = #{hospCode} and s.status_code = '0'
     </select>
 
@@ -1519,12 +1528,14 @@
          s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
          s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
          scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo, s.total_price as outptTotalFee,
-         case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays
+         case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays,
+         ifnull(iis.before_settle, 0.00) as beforeSettle, ifnull(iis.last_settle, 0.00) as lastSettle
         from inpt_settle s join inpt_cost c on c.settle_id = s.id
         left join inpt_visit v on v.id = s.visit_id and v.hosp_code = s.hosp_code
         left join sys_code_detail d on c.item_code = d.value and d.hosp_code = #{hospCode} and d.c_code = 'XMLB'
         left join base_finance_classify bfc on bfc.id = c.bfc_id and bfc.hosp_code = c.hosp_code
         left join sys_code_detail scd on bfc.out_code = scd.value and scd.hosp_code = #{hospCode} and scd.c_code = 'FPGL'
+        left join insure_individual_settle iis on iis.hosp_code = s.hosp_code and iis.settle_id = s.id
         where s.settle_no = #{settleNo} and s.hosp_code = #{hospCode} and s.status_code = '0'
     </select>
 
@@ -1568,7 +1579,8 @@
         a.visit_code as visitCode,
         a.dept_name as deptName,
         '' as personalNO,
-        '' as bka006Name
+        '' as bka006Name,
+        e.receive_name as receiveName
         FROM
         outpt_register_settle b
         LEFT JOIN outpt_register a ON a.id = b.register_id
@@ -1626,7 +1638,8 @@
         c.visit_code as visitCode,
         c.dept_name as deptName,
         ifnull(iiv.aac001, '') as personalNO,
-        ifnull(iiv.bka006_name, '') as bka006Name
+        ifnull(iiv.bka006_name, '') as bka006Name,
+        e.receive_name as receiveName
         FROM
         outpt_settle_invoice b
         right JOIN outpt_settle a ON b.hosp_code = a.hosp_code AND b.visit_id = a.visit_id  and a.id = b.settle_id
@@ -1719,10 +1732,13 @@
     </select>
     
     <select id="queryPartInvoicePrint" resultType="cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime
+        select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime, e.receive_name as receiveName,
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
         from outpt_settle_invoice s
         left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
+        LEFT JOIN outin_invoice e on e.hosp_code = s.hosp_code and e.id = s.invoice_id
+        left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
         where s.hosp_code = #{hospCode} and s.settle_id = #{settleId}
     </select>
 </mapper>

@@ -30,4 +30,7 @@ public class ClinicPathStageDetailDTO extends ClinicPathStageDetailDO implements
   private String flag;
   private String describe;
   private String listName;
+  private String clinicalPathStageId; // 入径状态表id
+  private String isExec;   // 是否执行
+  private String printClunm;
 }

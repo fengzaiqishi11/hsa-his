@@ -1016,7 +1016,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setHospPrice(bka842);//医院支付
         insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额
         insureIndividualSettleDO.setLastSettle(BigDecimalUtils.isZero(bacu18) ? bacu18 : BigDecimalUtils.greater(bka831, bacu18) ? new BigDecimal(0) : BigDecimalUtils.subtract(bacu18, akb066));//结算后账户余额
-        insureIndividualSettleDO.setRestsPrice(bka840);//其他支付
+        //insureIndividualSettleDO.setRestsPrice(bka840);//其他支付
         insureIndividualSettleDO.setAssignPrice(null);//指定账户支付金额
         insureIndividualSettleDO.setStartingPrice(aka151);//起付线金额
         insureIndividualSettleDO.setTopPrice(null);//超封顶线金额
@@ -1359,12 +1359,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         if (!pharOutReceiveDOList.isEmpty() || !pharOutReceiveDetailDOList.isEmpty()) {
             //生成领药申请单
-            Map<String, Object> pharOutReceiveParam = new HashMap<String, Object>();
-            pharOutReceiveParam.put("hospCode", hospCode);//医院编码
-            pharOutReceiveParam.put("pharOutReceiveDOList", pharOutReceiveDOList);
-            pharOutReceiveService_consumer.batchInsert(pharOutReceiveParam);
-            pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
-            pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
+//            Map<String, Object> pharOutReceiveParam = new HashMap<String, Object>();
+//            pharOutReceiveParam.put("hospCode", hospCode);//医院编码
+//            pharOutReceiveParam.put("pharOutReceiveDOList", pharOutReceiveDOList);
+//            pharOutReceiveService_consumer.batchInsert(pharOutReceiveParam);
+//            pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
+//            pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
+            outptCostDAO.batchPharOutReceiveInsert(pharOutReceiveDOList);
+            outptCostDAO.batchPharOutReceiveDetailInsert(pharOutReceiveDetailDOList);
         }
     }
 

@@ -23,4 +23,8 @@ public class InsureConfigurationDTO extends InsureConfigurationDO {
 
         //医保费用是否上传
         private String primaryPrice;
+
+        private String startDate;
+        private String endDate;
+
 }

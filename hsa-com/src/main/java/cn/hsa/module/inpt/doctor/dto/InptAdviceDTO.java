@@ -88,6 +88,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String execDept; // 执行科室
     private String execDeptKsxz; // 执行科室性质
     private String dailyTimes; //频次
+    private String technologyCode; //医技类型代码
     private String containerCode; //容器类型代码
     private String specimenCode ; //标本类型代码
     private String bigTypeCode ; //药品大类
@@ -150,5 +151,6 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String idsStr;
     // 处方总金额
     private BigDecimal printTotalPrice;
+
 
 }

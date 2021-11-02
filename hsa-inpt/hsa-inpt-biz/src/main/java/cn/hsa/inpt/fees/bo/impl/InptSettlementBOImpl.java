@@ -1152,9 +1152,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrOptins = MapUtils.get(insureInptResult, "clr_optins");
             String clrWay = MapUtils.get(insureInptResult, "clr_way");
             String clrType = MapUtils.get(insureInptResult, "clr_type");
-            String hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
+            BigDecimal hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
 
-            BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
+            BigDecimal acctPay = BigDecimalUtils.convert(MapUtils.get(insureInptResult,"acct_pay").toString()); // 个人账户支出
             /**
              * 结算成功以后 更新基金信息
              */
@@ -1227,6 +1227,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             individualSettleDO.setMedicalRegNo(medicalRegNo);
             individualSettleDO.setVisitId(visitId);
             individualSettleDO.setOinfno(oinfno);
+            individualSettleDO.setHospExemAmount(hospExemAmount);
             individualSettleDO.setOmsgid(omsgid);
             Map<String, Object> map = new HashMap<>();
             map.put("hospCode", hospCode);
@@ -2419,5 +2420,191 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
       } finally {
         redisUtils.del(key);
       }
+    }
+
+    public static void main(String args[]) {
+
+        String resultJson = "{\n" +
+                "    \"output\": {\n" +
+                "        \"setlinfo\": {\n" +
+                "            \"setl_time\": \"2021-10-27 10:59:23\", \n" +
+                "            \"cvlserv_pay\": 0, \n" +
+                "            \"cvlserv_flag\": \"0\", \n" +
+                "            \"med_type\": \"2101\", \n" +
+                "            \"naty\": \"\", \n" +
+                "            \"brdy\": \"1967-11-16\", \n" +
+                "            \"psn_cash_pay\": 2685.99, \n" +
+                "            \"certno\": \"430521196711161676\", \n" +
+                "            \"hifmi_pay\": 0, \n" +
+                "            \"psn_no\": \"43000011300000261123\", \n" +
+                "            \"act_pay_dedc\": 800, \n" +
+                "            \"mdtrt_cert_type\": \"02\", \n" +
+                "            \"balc\": 7748.98, \n" +
+                "            \"medins_setl_id\": \"H43050200156202110271059228684\", \n" +
+                "            \"psn_cert_type\": \"01\", \n" +
+                "            \"hifob_pay\": 0, \n" +
+                "            \"acct_mulaid_pay\": 0, \n" +
+                "            \"clr_way\": \"01\", \n" +
+                "            \"oth_pay\": 0, \n" +
+                "            \"medfee_sumamt\": 5792.53, \n" +
+                "            \"hifes_pay\": 0, \n" +
+                "            \"gend\": \"1\", \n" +
+                "            \"mdtrt_id\": \"17648713\", \n" +
+                "            \"fund_pay_sumamt\": 3106.54, \n" +
+                "            \"acct_pay\": 0, \n" +
+                "            \"fulamt_ownpay_amt\": 296.2, \n" +
+                "            \"setl_id\": \"11007999\", \n" +
+                "            \"hosp_part_amt\": 0, \n" +
+                "            \"psn_name\": \"周跃军\", \n" +
+                "            \"insutype\": \"310\", \n" +
+                "            \"inscp_scp_amt\": 4973.72, \n" +
+                "            \"maf_pay\": 0, \n" +
+                "            \"psn_part_amt\": 2685.99, \n" +
+                "            \"pool_prop_selfpay\": 0, \n" +
+                "            \"clr_optins\": \"430502\", \n" +
+                "            \"psn_type\": \"11\", \n" +
+                "            \"overlmt_selfpay\": 0, \n" +
+                "            \"hifp_pay\": 3106.54, \n" +
+                "            \"preselfpay_amt\": 522.61, \n" +
+                "            \"age\": 53, \n" +
+                "            \"clr_type\": \"9902\"\n" +
+                "        }, \n" +
+                "        \"setldetail\": [\n" +
+                "            {\n" +
+                "                \"fund_pay_type\": \"\", \n" +
+                "                \"fund_payamt\": \"\", \n" +
+                "                \"setl_proc_info\": \"\", \n" +
+                "                \"crt_payb_lmt_amt\": \"\", \n" +
+                "                \"inscp_scp_amt\": 4973.72, \n" +
+                "                \"fund_pay_type_name\": \"\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }, \n" +
+                "    \"infcode\": 0, \n" +
+                "    \"refmsg_time\": \"20211027105922157\", \n" +
+                "    \"message\": \"\", \n" +
+                "    \"respond_time\": \"20211027105924105\", \n" +
+                "    \"inf_refmsgid\": \"430000202110271059240128334095\"\n" +
+                "}";
+        Map<String, Object> item1 = JSONObject.parseObject(resultJson,Map.class);
+        Map<String, Object> item2 = (Map<String, Object>) item1.get("output");
+        //List<Map<String,Object>> setldetailList = MapUtils.get(item2,"setldetail");
+        //MinsureSettleId = item2.get("setl_id"); // 结算id
+        //String medicalRegNo = item2.get("mdtrt_id").toString(); // 医保返回的就诊id
+        String omsgid = MapUtils.get(item2, "omsgid"); // 交易信息(原交易)中的msgid,发送方报文ID
+        String oinfno = MapUtils.get(item2, "oinfno"); // 交易信息(原交易)中的infno
+        //String visitId = item2.getId();
+        String clrOptins = MapUtils.get(item2, "clr_optins");
+        String clrWay = MapUtils.get(item2, "clr_way");
+        String clrType = MapUtils.get(item2, "clr_type");
+        BigDecimal hospExemAmount = MapUtils.get(item2, "hospExemAmount");
+
+        BigDecimal acctPay = MapUtils.get(item2,"acct_pay"); // 个人账户支出
+        /**
+         * 结算成功以后 更新基金信息
+         */
+        List<Map<String, Object>> setldetailList = MapUtils.get(item2, "setldetail");
+        if (!ListUtils.isEmpty(setldetailList)) {
+            InsureIndividualFundDTO insureIndividualFundDTO = null;
+            List<InsureIndividualFundDTO> fundDTOList = new ArrayList<>();
+            for (Map<String, Object> item : setldetailList) {
+                insureIndividualFundDTO = new InsureIndividualFundDTO();
+                insureIndividualFundDTO.setId(SnowflakeUtils.getId());
+                //insureIndividualFundDTO.setHospCode(hospCode);
+                //insureIndividualFundDTO.setInsureSettleId(insureSettleId);
+                //insureIndividualFundDTO.setVisitId(visitId);
+                //insureIndividualFundDTO.setCrteName(userName);
+                //insureIndividualFundDTO.setCrteId(userId);
+                insureIndividualFundDTO.setCrteTime(DateUtils.getNow());
+                insureIndividualFundDTO.setMibId(null);
+                insureIndividualFundDTO.setFundName(null);
+                insureIndividualFundDTO.setIndiFreezeStatus(null);
+                // 基金支付类型
+                insureIndividualFundDTO.setFundPayType(MapUtils.get(item, "fund_pay_type"));
+                if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
+                    insureIndividualFundDTO.setInscpScpAmt(null);
+                } else {
+                    insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
+                }
+                // 符合政策范围金额
+                // 本次可支付限额金额
+                if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
+                    insureIndividualFundDTO.setCrtPaybLmtAmt(null);
+                } else {
+                    insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+                }
+                if (MapUtils.isEmpty(item, "fund_payamt")) {
+                    insureIndividualFundDTO.setFundPayamt(null);
+                } else {
+                    // 基金支付金额
+                    insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+                }
+                // 基金支付类型名称
+                insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));
+                //结算过程信息
+                insureIndividualFundDTO.setSetlProcInfo(MapUtils.get(item, "setl_proc_info"));
+                fundDTOList.add(insureIndividualFundDTO);
+            }
+            //isInsureUnifiedMap.put("fundDTOList", fundDTOList);
+            //System.out.println(isInsureUnifiedMap);
+            //insureIndividualSettleService.insertBatchFund(isInsureUnifiedMap).getData();
+        }
+
+        /**
+         * 根据 就诊id， 状态为正常的数据 ，医院编码查询医保结算表的数据
+         */
+        InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+        //settleDTO.setVisitId(visitId);
+        //settleDTO.setHospCode(hospCode);
+        //settleDTO.setSettleId(settleId);
+        settleDTO.setState("0");
+        Map<String, Object> dataMap = new HashMap<>();
+        //dataMap.put("hospCode", hospCode);
+        //dataMap.put("insureIndividualSettleDTO", settleDTO);
+        //settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+        InsureIndividualSettleDO individualSettleDO = new InsureIndividualSettleDO();
+        /**
+         * 根据查询回来的医保结算主键id,医院编码  更新医保结算id ，就医登记号
+         */
+       // individualSettleDO.setHospCode(hospCode);
+        //individualSettleDO.setId(settleDTO.getId());
+        //individualSettleDO.setInsureSettleId(insureSettleId);
+        //individualSettleDO.setMedicalRegNo(medicalRegNo);
+        //individualSettleDO.setVisitId(visitId);
+        individualSettleDO.setOinfno(oinfno);
+        individualSettleDO.setHospExemAmount(hospExemAmount);
+        individualSettleDO.setOmsgid(omsgid);
+        Map<String, Object> map = new HashMap<>();
+        //map.put("hospCode", hospCode);
+        map.put("insureIndividualSettleDO", individualSettleDO);
+        //InsureIndividualCostDTO costDTO = new InsureIndividualCostDTO();
+        //costDTO.setHospCode(hospCode);
+        //costDTO.setVisitId(visitId);
+        //costDTO.setCostList(inptCostDOList);
+        //costDTO.setInsureSettleId(insureSettleId);
+        //map.put("insureIndividualCostDTO", costDTO);
+        //insureIndividualCostService.editInsureCostByCostIDS(map); // 更新费用信息
+        individualSettleDO.setClrWay(clrWay);
+        individualSettleDO.setClrType(clrType);
+        individualSettleDO.setClrOptins(clrOptins);
+        //insureIndividualSettleService.updateByPrimaryKeySelective(map); // 更新结算信息
+        //map.put("medicalRegNo",medicalRegNo);
+        //map.put("id",visitId);
+        //map.put("insureSettleId",insureSettleId);
+        //inptVisitDTO.setHospCode(hospCode);
+        //inptVisitDTO.setId(visitId);
+        //inptVisitDTO.setInsureSettleId(insureSettleId);
+        //inptVisitDTO.setMedicalRegNo(medicalRegNo);
+        //map.put("inptVisitDTO",inptVisitDTO);
+        //insureIndividualVisitService.updateInsureInidivdual(map);  // 更新就诊信息
+
+        //InptSettleDO inptSettleDO = new InptSettleDO();
+        //inptSettleDO.setId(settleId);
+        //inptSettleDO.setAcctPay(acctPay);
+        //inptSettleDO.setHospCode(hospCode);
+        System.out.println("---------------------"+ acctPay);
+        //inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO);
+
+        System.out.println("ok");
     }
 }

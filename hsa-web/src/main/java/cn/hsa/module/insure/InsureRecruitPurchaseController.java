@@ -45,10 +45,13 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @return
      * @throws
      */
-    @PostMapping("/queryHospitalInventory")
-    public WrapperResponse<Map<String,Object>> queryHospitalInventory(@RequestBody Map<String,Object> map,HttpServletRequest req, HttpServletResponse res){
+    @GetMapping("/queryHospitalInventory")
+    public WrapperResponse<PageDTO> queryHospitalInventory(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureRecruitPurchaseDTO",insureRecruitPurchaseDTO);
         return insureRecruitPurchaseService_consumer.queryAll(map);
     }
 
@@ -114,9 +117,9 @@ public class InsureRecruitPurchaseController extends BaseController {
         if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getQueryType())) {
             throw new RuntimeException("未选择查询范围，门诊1或者住院2");
         }
-        if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getInsureRegCode())) {
-            throw new RuntimeException("未选择医保机构编码，请选择");
-        }
+//        if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getInsureRegCode())) {
+//            throw new RuntimeException("未选择医保机构编码，请选择");
+//        }
         if (StringUtils.isEmpty(insureRecruitPurchaseDTO.getSellType())) {
             throw new RuntimeException("未选择业务类型，销售1或者退货2");
         }
@@ -137,8 +140,8 @@ public class InsureRecruitPurchaseController extends BaseController {
      * @Date: 2021-08-26 10:27
      * @Return: list
      **/
-    @PostMapping("/queryDrugSells")
-    public WrapperResponse<List<Map<String, Object>>> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO, HttpServletRequest req, HttpServletResponse res) {
+    @GetMapping("/queryDrugSells")
+    public WrapperResponse<PageDTO> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
         Map<String, Object> map = new HashMap<String, Object>();

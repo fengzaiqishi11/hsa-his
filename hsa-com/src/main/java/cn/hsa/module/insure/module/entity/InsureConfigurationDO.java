@@ -123,4 +123,16 @@ public class InsureConfigurationDO extends PageDO {
      * 是否走统一支付平台(1是，0/null否)
      */
     private String isUnifiedPay;
+
+    // 医院账号名称
+    private String hospAccountName;
+
+    // 帐户
+    private String hospAccount;
+
+    // 开户银行
+    private String bankAccount;
+
+    // 医疗机构名称
+    private String hospName;
 }

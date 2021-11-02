@@ -1269,6 +1269,9 @@ public class BedListBOImpl implements BedListBO {
         // 20210831 计算住院天数更新到inpt_visit表
         if (inptVisitDTO.getInTime()!=null&&inptVisitDTO.getOutTime()!=null){
             int totalInDays = DateUtils.differentDays(inptVisitDTO.getInTime(),inptVisitDTO.getOutTime());
+            if (totalInDays == 0) {
+                totalInDays = 1;
+            }
             inptVisitDTO.setTotalInDays(totalInDays);
             bedListDAO.updateInptVisitTotalDays(inptVisitDTO);
         }

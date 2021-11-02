@@ -276,7 +276,18 @@ public interface Constants {
      * @Date 2020/8/28 9:07
      */
     String INPT_FEES_REDIS_KEY = "inpt_fees";
-
+    /**
+     * @Desrciption 门诊发药redis key值（用于做门诊发药，防止同一药房同时做同一操作）
+     * @Author Ou·Mr
+     * @Date 2020/8/28 9:07
+     */
+    String OUT_DISTRIBUTE_REDIS_KEY = "out_distribute";
+    /**
+     * @Desrciption 门诊发药redis key值（用于做门诊发药，防止同一药房同时做同一操作）
+     * @Author Ou·Mr
+     * @Date 2020/8/28 9:07
+     */
+    String INPT_DISTRIBUTE_REDIS_KEY = "inpt_distribute";
     /**
      * @Desrciption 医院优惠配置代码key
      * @Author Ou·Mr
@@ -1060,5 +1071,15 @@ public interface Constants {
         public static final String QY = "0"; // 全院
         public static final String KS = "1"; // 科室
         public static final String GR = "2"; // 个人
+    }
+
+    class DZDLX {
+        public static final String CX_PT = "1"; // 城乡普通
+        public static final String CX_DBBX = "2"; // 城乡大病保险
+        public static final String CX_YWSH = "3"; // 城乡意外伤害
+
+        public static final String ZG_PT = "4"; // 职工普通
+        public static final String ZG_SYBX = "5"; // 职工生育保险
+        public static final String ZG_YWSH = "6"; // 职工意外伤害
     }
 }

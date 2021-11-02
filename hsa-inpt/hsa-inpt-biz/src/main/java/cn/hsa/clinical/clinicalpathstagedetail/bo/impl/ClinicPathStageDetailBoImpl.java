@@ -11,6 +11,7 @@ import cn.hsa.module.clinical.clinicalpathstagedetail.bo.ClinicPathStageDetailBO
 import cn.hsa.module.clinical.clinicalpathstagedetail.dao.ClinicPathStageDetailDAO;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.util.Constants;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.clinical.clinicalpathstagedetail.bo.impl
@@ -181,5 +184,26 @@ public class ClinicPathStageDetailBoImpl extends HsafBO implements ClinicPathSta
     List<TreeMenuNode> treeMenuNodeList = clinicPathStageDetailDAOl.queryClinicalPathTree(clinicPathStageDetailDTO);
     treeMenuNodeList.add(parent);
     return treeMenuNodeList;
+  }
+
+  /**
+  * @Menthod queryClinicalPrint
+  * @Desrciption 临床路径打印
+  *
+  * @Param
+  * [clinicPathStageDetailDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/28 9:24
+  * @Return java.util.Map
+  **/
+  @Override
+  public Map queryClinicalPrint(ClinicPathStageDetailDTO clinicPathStageDetailDTO) {
+    List<ClinicPathStageDetailDTO> clinicPathStageDetailDTOS = clinicPathStageDetailDAOl.queryAllClinicPathStageDetail(clinicPathStageDetailDTO);
+    if(ListUtils.isEmpty(clinicPathStageDetailDTOS)) {
+      return null;
+    }
+    Map<String, List<ClinicPathStageDetailDTO>> collect = clinicPathStageDetailDTOS.stream().collect(Collectors.groupingBy(a -> a.getStageId()));
+    return collect;
   }
 }

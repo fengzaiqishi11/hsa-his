@@ -723,7 +723,7 @@
 
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*,v.name, a.crte_name as crteName, a.crte_time as crteTime, v.visit_no as visitNo from (
+        select b.*,v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
         (select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
@@ -733,7 +733,6 @@
         WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
         group by a.bfc_id,a.visit_id
         )b join outpt_visit v on b.visit_id = v.id
-				join outpt_register_detail a on a.visit_id = v.id
 			where b.totalPrice>0
     </select>
 
@@ -870,13 +869,17 @@
             v.doctor_id as doctorId,
             u.name as doctorName,
             u.prac_certi_no as pracCertiNo,
-            (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice
+            (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice,
+            ifnull(iim.remark, '') as chrgItemLv
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
             left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
             left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
             left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
+            left join insure_individual_visit iiv on iiv.hosp_code = a.hosp_code and iiv.visit_id = v.id
+            left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim
+            on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
     </select>
 

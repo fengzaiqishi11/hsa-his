@@ -666,6 +666,20 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key))) return WrapperResponse.fail("当前患者正在结算，请稍后再试。", null);
         try {
+
+            //获取当前患者信息参数
+            InptVisitDTO inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setHospCode(hospCode);//医院编码
+            inptVisitDTO.setId(id);//就诊id
+            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
+            if (inptVisitDTO == null) {
+                return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
+            }
+            if (!Constants.BRZT.YCY.equals(inptVisitDTO.getStatusCode())) {
+                throw new AppException("病人状态已变更，非预出院状态，请刷新后重新结算！");
+            }
+
             redisUtils.set(key, id);
             Boolean isInvoice = (Boolean) param.get("isInvoice");//是否使用发票
             String userId = (String) param.get("userId");//当前登录用户id
@@ -713,15 +727,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             // if (inptCostDOList == null || inptCostDOList.isEmpty()){return WrapperResponse.fail("未找到结算费用信息，请刷新。",null);}
 
-            //获取当前患者信息参数
-            InptVisitDTO inptVisitDTO = new InptVisitDTO();
-            inptVisitDTO.setHospCode(hospCode);//医院编码
-            inptVisitDTO.setId(id);//就诊id
-            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
-            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
-            if (inptVisitDTO == null) {
-                return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
-            }
+
+
+
             Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
             if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");

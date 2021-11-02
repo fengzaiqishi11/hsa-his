@@ -109,4 +109,9 @@ public class BaseProfileFileServiceImpl extends HsafService implements BaseProfi
     public WrapperResponse<List<TreeMenuNode>> getAddressTree(Map map) {
         return WrapperResponse.success(TreeUtils.buildByRecursive(baseProfileFileBO.getAddressTree(MapUtils.get(map, "outptProfileFileDTO")), "-1"));
     }
+
+    @Override
+    public WrapperResponse<List<OutptProfileFileDTO>> queryAll(Map map) {
+        return WrapperResponse.success(baseProfileFileBO.queryAll(MapUtils.get(map, "outptProfileFileDTO")));
+    }
 }

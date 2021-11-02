@@ -52,7 +52,7 @@
         insure_item_name, insure_item_code, insure_item_type, insure_item_spec, insure_item_unit_code,
         insure_item_prep_code, insure_item_price, deductible, standard_code, check_price, manufacturer, audit_code,
         is_match, is_trans, is_valid, take_date, lose_date, pym, wbm, crte_id, crte_name, crte_time,lmt_user_flag,
-               lim_user_explain,tcmdrug_used_way,nation_code
+               lim_user_explain,tcmdrug_used_way,nation_code,remark
         from insure_item_match
         <where>
             <if test="id != null and id != ''">
@@ -860,6 +860,9 @@
                 </if>
                 <if test="nationCode != null and nationCode != ''">
                     nation_code = #{nationCode},
+                </if>
+                <if test="remark != null and remark != ''">
+                    remark = #{remark},
                 </if>
             </set>
             where id = #{id} and hosp_code = #{hospCode}

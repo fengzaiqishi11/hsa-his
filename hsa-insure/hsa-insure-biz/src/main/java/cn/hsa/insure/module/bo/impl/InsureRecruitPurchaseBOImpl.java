@@ -478,6 +478,20 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     }
 
     /**
+     * @param map
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    @Override
+    public Boolean updateToInsure(Map<String, Object> map) {
+        return null;
+    }
+
+    /**
      * @Method getOrgCode
      * @Desrciption 获取新医保医疗机构 系统参数配置
      * @Param

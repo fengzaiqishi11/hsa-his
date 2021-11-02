@@ -1672,6 +1672,7 @@
                  join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
                  join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
         where  a.visit_id = #{id} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+                and  iim.insure_illness_name is not null
         <if test="diagnoseList != null and diagnoseList.size() > 0">
             and a.type_code in
             <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">

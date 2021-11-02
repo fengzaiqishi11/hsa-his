@@ -100,6 +100,7 @@
             SELECT
                 e.insure_reg_code AS insureRegCode,
                 e.visit_id as visitId,
+                t.medicine_org_code as medicineOrgCode,
                 t.medical_reg_no AS mdtrtId,
                 e.insureSettleId AS setlId,
                 e.settle_id,
@@ -121,6 +122,7 @@
             e.hosp_code = t.hosp_code
             AND e.visit_id = t.visit_id
             AND c.hosp_code = t.hosp_code
+            and e.state ='0'
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
             and e.insureSettleId is not null

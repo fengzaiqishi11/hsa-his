@@ -95,4 +95,7 @@ public interface BaseProfileFileService {
      **/
     @GetMapping("/service/base/baseProfileFile/getAddressTree")
     WrapperResponse<List<TreeMenuNode>>getAddressTree(Map map);
+
+    @GetMapping("/service/base/baseProfileFile/queryAll")
+    WrapperResponse<List<OutptProfileFileDTO>> queryAll(Map map);
 }

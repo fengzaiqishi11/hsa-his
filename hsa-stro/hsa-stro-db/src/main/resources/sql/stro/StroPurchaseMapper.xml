@@ -500,11 +500,9 @@
       ) A
       WHERE A.hosp_code = #{hospCode} and A.is_valid = '1'
       <if test="keyword != null and keyword != ''">
-        AND type_code like concat('%',#{keyword},'%')
-        OR good_name like concat('%',#{keyword},'%')
-        OR good_pym like concat('%',#{keyword},'%')
-        OR good_wbm like concat('%',#{keyword},'%')
-        OR itemCodeName like concat('%',#{keyword},'%')
+        and (a.name like concat('%',#{keyword},'%')
+        or a.pym like concat('%',#{keyword},'%')
+        or a.wbm like concat('%',#{keyword},'%'))
       </if>
     </select>
     <!-- 查询供应商 -->

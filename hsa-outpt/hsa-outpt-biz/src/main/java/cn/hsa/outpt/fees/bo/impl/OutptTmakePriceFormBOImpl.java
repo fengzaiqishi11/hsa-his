@@ -1072,7 +1072,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 .append(Constants.OUTPT_FEES_REDIS_KEY).toString();
         //校验该用户是否在结算
         if (StringUtils.isNotEmpty(redisUtils.get(key))) {
-            return WrapperResponse.fail("划价收费提示：该患者正在别处结算；请稍后再试。", null);
+            throw new AppException("划价收费提示：该患者正在别处结算；请稍后再试。");
         }
         OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();//发票段信息
         String settleNo = "";
@@ -1109,10 +1109,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
 
             if (outptCostDTOList == null && outptCostDTOList.isEmpty()) {
-                return WrapperResponse.fail("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。", null);
+                throw new AppException("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。");
             }
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("费用数量不正确，请刷新浏览器再试", null);
+                throw new AppException("费用数量不正确，请刷新浏览器再试");
             }
 
             // 更新医技申请单状态
@@ -1145,7 +1145,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             OutptSettleDTO outptSettleDTO1 = outptSettleDAO.selectByPrimaryKey(settleId);//获取本次结算费用信息
             // 4、 校验个人支付金额，是否与本次结算的费用一致，不一致表示费用出现了问题
             if (!BigDecimalUtils.equals(realityPrice, outptSettleDTO1.getRealityPrice())) {
-                return WrapperResponse.fail("支付失败，该患者费用信息错误，请刷新后重试。", null);
+                 throw new AppException("支付失败，该患者费用信息错误，请刷新后重试。");
             }
 
             // 使用一卡通  start ========================
@@ -1221,7 +1221,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 5、 保存结算信息（支付方式与各方式金额）
             boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1, tempCardPrice);
             if (isChange) {
-                return WrapperResponse.fail("支付失败；本次账户支付金额小于当前支付金额！", null);
+                throw new AppException("支付失败；本次账户支付金额小于当前支付金额！");
             }
 
             // 6、 根据费用信息修改本次结算的费用状态

@@ -131,4 +131,14 @@ public interface InsureUnifiedPayReversalTradeBO {
      * @Return
      **/
     Map<String,Object> queryStatementInfo(Map<String, Object> paraMap);
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
+    Map<String,Object> downLoadSettleInfo(Map<String, Object> map);
 }

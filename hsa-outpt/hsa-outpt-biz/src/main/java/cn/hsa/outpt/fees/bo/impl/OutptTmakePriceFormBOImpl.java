@@ -1072,7 +1072,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 .append(Constants.OUTPT_FEES_REDIS_KEY).toString();
         //校验该用户是否在结算
         if (StringUtils.isNotEmpty(redisUtils.get(key))) {
-            return WrapperResponse.fail("划价收费提示：该患者正在别处结算；请稍后再试。", null);
+            throw new AppException("划价收费提示：该患者正在别处结算；请稍后再试。");
         }
         OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();//发票段信息
         String settleNo = "";
@@ -1109,10 +1109,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
 
             if (outptCostDTOList == null && outptCostDTOList.isEmpty()) {
-                return WrapperResponse.fail("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。", null);
+                throw new AppException("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。");
             }
             if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("费用数量不正确，请刷新浏览器再试", null);
+                throw new AppException("费用数量不正确，请刷新浏览器再试");
             }
 
             // 更新医技申请单状态
@@ -1145,7 +1145,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             OutptSettleDTO outptSettleDTO1 = outptSettleDAO.selectByPrimaryKey(settleId);//获取本次结算费用信息
             // 4、 校验个人支付金额，是否与本次结算的费用一致，不一致表示费用出现了问题
             if (!BigDecimalUtils.equals(realityPrice, outptSettleDTO1.getRealityPrice())) {
-                return WrapperResponse.fail("支付失败，该患者费用信息错误，请刷新后重试。", null);
+                 throw new AppException("支付失败，该患者费用信息错误，请刷新后重试。");
             }
 
             // 使用一卡通  start ========================
@@ -1221,7 +1221,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 5、 保存结算信息（支付方式与各方式金额）
             boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1, tempCardPrice);
             if (isChange) {
-                return WrapperResponse.fail("支付失败；本次账户支付金额小于当前支付金额！", null);
+                throw new AppException("支付失败；本次账户支付金额小于当前支付金额！");
             }
 
             // 6、 根据费用信息修改本次结算的费用状态
@@ -1751,6 +1751,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
                 }
                 outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+                map.put("medicalRegNo",medicalRegNo);
+                map.put("insureSettleId",insureSettleId);
+                outptVisitDAO.updateInsuresumPatient(map);
+
             }catch (Exception e){
                 if(StringUtils.isNotEmpty(insureSettleId)){
                     map.put("insureSettleId",insureSettleId);
@@ -3580,9 +3584,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         individualSettleDTO.setState(Constants.SF.F);
         individualSettleDTO.setSettleState(Constants.SF.S);
         individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
-        if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){
-            throw new AppException("一次门诊医保登记,只能有一笔正常的结算记录");
-        }
+//        if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){
+//            throw new AppException("一次门诊医保登记,只能有一笔正常的结算记录");
+//        }
         List<Map<String,Object>> insureCostList = MapUtils.get(feeMap,"insureCostList");
         List<OutptCostDTO> outptCostDTOList = outptVisitDTO.getOutptCostDTOList();
         if(ListUtils.isEmpty(outptCostDTOList)){
@@ -3798,11 +3802,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      */
     @Override
     public Map<String,Object> updateFeeSubmit(Map<String, Object> map) {
-        String visitId = map.get("visitId").toString();
         String hospCode = map.get("hospCode").toString();
-        String crteId = map.get("crteId").toString();
-        String crteName = map.get("crteName").toString();
-
         Map<String, Object> feeMap = commonInsureCost(map);
         List<Map<String, Object>> insureCostList = MapUtils.get(feeMap, "insureCostList");
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(feeMap, "insureIndividualVisitDTO");
@@ -3812,47 +3812,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         if(StringUtils.isNotEmpty(feeBatch)){
             batchNo = Integer.valueOf(feeBatch)+1;
         }
-        int count = 0;
-        //保存本次传输费用信息
-        List<InsureIndividualCostDO> insureIndividualCostDOList = new ArrayList<InsureIndividualCostDO>();
-        if (!ListUtils.isEmpty(insureCostList)) {
-            for (Map<String, Object> item : insureCostList) {
-                count++;
-                InsureIndividualCostDO insureIndividualCostDO = new InsureIndividualCostDO();
-                insureIndividualCostDO.setId(SnowflakeUtils.getId());//id
-                insureIndividualCostDO.setHospCode(hospCode);//医院编码
-                insureIndividualCostDO.setVisitId(visitId);//患者id
-                insureIndividualCostDO.setCostId((String) item.get("id"));//费用id
-                insureIndividualCostDO.setSettleId(null);//结算id
-                insureIndividualCostDO.setFeeBrgNo(batchNo+"");
-                insureIndividualCostDO.setIsHospital(Constants.SF.F);//是否住院 = 是
-                insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
-                insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
-                insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
-                insureIndividualCostDO.setGuestRatio((String) item.get("deductible"));//自付比例
-                insureIndividualCostDO.setPrimaryPrice((BigDecimal) item.get("realityPrice"));//原费用
-                insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
-                insureIndividualCostDO.setOrderNo(count + "");//顺序号
-                insureIndividualCostDO.setTransmitCode(Constants.SF.S);//传输标志 = 已传输
-                insureIndividualCostDO.setCrteId(crteId);//创建id
-                insureIndividualCostDO.setCrteName(crteName);//创建人姓名
-                insureIndividualCostDO.setCrteTime(new Date());//创建时间
-                insureIndividualCostDOList.add(insureIndividualCostDO);
-            }
-        }
-        if(ListUtils.isEmpty(insureIndividualCostDOList)){
-            throw new AppException("该病人可传输的费用");
-        }
         Map<String,Object> outptCostMap =new HashMap<>();
         outptCostMap.put("hospCode",hospCode);
-        outptCostMap.put("insureIndividualCostDOList",insureIndividualCostDOList);
         map.put("insureCostList",insureCostList);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         map.put("batchNo",batchNo);
         Boolean aBoolean = insureUnifiedPayOutptService_consumer.updateFeeSubmit(map).getData();
-        if(true == aBoolean){
-            insureIndividualCostService_consumer.insertInsureCost(outptCostMap);
-        }
         return map;
     }
 

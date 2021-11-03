@@ -120,4 +120,6 @@
     <dubbo:reference id="ouptCostService_consumer"  interface="cn.hsa.module.outpt.fees.service.OutptCostKeepAccountsService" check="false"/>
     <!--库存校验-->
     <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer" check="false"/>
+
+    <dubbo:reference interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" id="insureUnifiedBaseService_consumer" check="false"/>
 </beans>

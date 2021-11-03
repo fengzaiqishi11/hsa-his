@@ -382,7 +382,7 @@
             and is_valid = #{isValid}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (name like concat('%', #{keyword}, '%') or cert_no like concat('%', #{keyword}, '%') or phone like concat('%', #{keyword}, '%'))
+            and (name like concat('%', #{keyword}, '%') or pym like concat('%', #{keyword}, '%') or wbm like concat('%', #{keyword}, '%') or cert_no like concat('%', #{keyword}, '%') or phone like concat('%', #{keyword}, '%'))
         </if>
         <if test="certCode != null and certCode != ''">
             and cert_code = #{certCode}
@@ -419,5 +419,26 @@
         select value as id,value, name as label, ifnull(up_value, "-1") as parentId
         from sys_code_detail
         where c_code = 'XZQH' and is_valid = '1'
+    </select>
+
+    <select id="queryAll" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO" resultType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+        select id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation, native_place, education_code,
+               occupation_code, marry_code, cert_code, cert_no, phone, email, often_code, now_prov, now_city, now_area, now_address, now_post_code, native_prov,
+               native_city, native_area, native_address, native_post_code, contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address,
+               take_name, take_rela_code, take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease, expose_disease,
+               heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, source_tj_code, source_tj_remark,
+               pym, wbm, total_out, total_in, outpt_last_visit_time, inpt_last_visit_time, patient_code, preferential_type_id, remark, is_valid, crte_id, crte_name,
+               crte_time, age_unit_code
+        from base_profile_file
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="certCode != null and certCode != ''">
+            and cert_code = #{certCode}
+        </if>
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
     </select>
 </mapper>

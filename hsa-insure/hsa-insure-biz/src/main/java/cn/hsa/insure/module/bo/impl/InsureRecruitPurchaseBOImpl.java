@@ -56,6 +56,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
     @Resource
     private SysParameterService sysParameterService;
+
     @Resource
     private RedisUtils redisUtils;
 

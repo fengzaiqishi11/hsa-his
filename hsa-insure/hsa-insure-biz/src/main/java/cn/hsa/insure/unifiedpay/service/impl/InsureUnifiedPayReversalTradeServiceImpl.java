@@ -161,5 +161,19 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.queryStatementInfo(paraMap));
     }
 
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.downLoadSettleInfo(map));
+    }
+
 
 }

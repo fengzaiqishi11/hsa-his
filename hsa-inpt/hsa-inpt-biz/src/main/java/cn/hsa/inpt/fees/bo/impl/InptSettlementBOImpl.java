@@ -685,6 +685,14 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (!Constants.BRZT.YCY.equals(inptVisitDTO.getStatusCode())) {
                 throw new AppException("病人状态已变更，非预出院状态，请刷新后重新结算！");
             }
+            // 出院结算校验病人状态是不是预出院  lly 2021/11/01
+            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
+
+            }else {
+                if (inptVisitDTO != null && inptVisitDTO.getStatusCode() != null &&!inptVisitDTO.getStatusCode().equals(Constants.YDLX.YCY)){
+                    return WrapperResponse.fail("该患者不是预出院状态，请刷新。", null);
+                }
+            }
 
             redisUtils.set(key, id);
             Boolean isInvoice = (Boolean) param.get("isInvoice");//是否使用发票
@@ -1445,15 +1453,15 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         }
         return true;
     }
-    
+
     /**
      * @Method 办理医保预出院之前，需要保存个人累计信息
-     * @Desrciption  
-     * @Param 
-     * 
+     * @Desrciption
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/10/23 14:27 
-     * @Return 
+     * @Date   2021/10/23 14:27
+     * @Return
     **/
     private void insertPatientSumInfo(Map<String, Object> map) {
         String crteName = MapUtils.get(map,"crteName"); //  创建人姓名
@@ -1838,6 +1846,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }
+            // 出院结算校验病人状态是不是预出院  lly 2021/11/01
+            if (inptVisitDTO != null && inptVisitDTO.getStatusCode() != null &&!inptVisitDTO.getStatusCode().equals(Constants.YDLX.YCY)){
+                return WrapperResponse.fail("该患者不是预出院状态，请刷新。", null);
+            }
+
             Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
             if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");

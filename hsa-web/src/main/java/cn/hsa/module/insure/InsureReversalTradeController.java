@@ -283,4 +283,19 @@ public class InsureReversalTradeController extends BaseController {
         return insureUnifiedPayReversalTradeService_consumer.queryStatementInfo(paraMap);
     }
 
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+    **/
+    @PostMapping("/downLoadSettleInfo")
+    public WrapperResponse<Map<String,Object>> downLoadSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureUnifiedPayReversalTradeService_consumer.downLoadSettleInfo(map);
+    }
 }

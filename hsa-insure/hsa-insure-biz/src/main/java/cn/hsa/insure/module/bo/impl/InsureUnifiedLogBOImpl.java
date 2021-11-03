@@ -3,6 +3,7 @@ package cn.hsa.insure.module.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.insure.module.bo.InsureUnifiedLogBO;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureUnifiedLogDAO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.util.Constants;
@@ -42,6 +43,9 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
 
     @Resource
     private InsureUnifiedLogDAO insureUnifiedLogDAO;
+
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
     /**
      * @param insureFunctionLogDO

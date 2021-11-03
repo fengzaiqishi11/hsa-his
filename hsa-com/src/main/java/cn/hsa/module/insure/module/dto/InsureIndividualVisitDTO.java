@@ -137,4 +137,6 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private Integer  totalInDays;
         // 就医地区划
         private String mdtrtareaAdmvs;
+        private String address ; // 地址
+        private String phone; // 联系电话
 }

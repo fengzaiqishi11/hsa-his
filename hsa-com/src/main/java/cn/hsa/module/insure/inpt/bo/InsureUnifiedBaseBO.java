@@ -312,5 +312,25 @@ public interface InsureUnifiedBaseBO {
 
     Map<String,Object> querySettleDeInfo(Map<String, Object> map);
 
+    /**
+     * @Method queryPolicyInfo
+     * @Desrciption  政策项查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/23 15:47
+     * @Return
+     **/
     Map<String,Object> queryPolicyInfo(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method checkOneSettle
+     * @Desrciption 判读是否打印一站式结算单
+     * @Param map insureIndividualVisitDTO
+     * @Author fuhui
+     * @Date 2021/10/23 15:20
+     * @Return
+     */
+    Map<String,Object> checkOneSettle(Map<String, Object> map);
 }

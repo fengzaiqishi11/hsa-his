@@ -159,7 +159,13 @@
 
   <!-- 费用清单打印 -->
     <select id="queryInptCostListPrint" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        select ic.*,
+        select ic.id,ic.hosp_code,ic.visit_id,ic.baby_id,ic.iat_id,ic.iatd_group_no,ic.iatd_seq_no,ic.advice_exec_id,ic.source_code,ic.source_id,ic.old_cost_id,ic.source_dept_id,
+        ic.in_dept_id,ic.bfc_id,ic.item_code,ic.item_id,ic.item_name,ic.price,ic.spec,ic.prep_code,ic.dosage,ic.dosage_unit_code,ic.usage_code,
+        ic.rate_id,ic.speed_code,ic.use_days,ic.total_num as num,ic.total_num_unit_code as numUnitCode,ic.herb_note_code,ic.use_code,herb_num,ic.total_price,
+        ic.preferential_price,ic.reality_price as amountMoney,ic.back_num,ic.back_code,ic.doctor_id,ic.doctor_name,ic.dept_id,ic.phar_id,ic.is_dist,ic.is_give,
+        ic.is_ok,ic.ok_id,ic.ok_name,ic.ok_time,ic.settle_code,ic.settle_id,ic.is_check,ic.check_id,ic.check_name,ic.check_time,ic.zz_doctor_id,ic.zz_doctor_name,ic.jz_doctor_id,
+        ic.jz_doctor_name,ic.zg_doctor_id,ic.zg_doctor_name,ic.exec_id,ic.exec_name,ic.exec_time,ic.exec_dept_id,ic.plan_exec_time,ic.status_code,ic.is_cost,
+        ic.cost_time,DATE_FORMAT(ic.cost_time,'%Y-%m-%d') as cost_date,ic.crte_id,ic.crte_name,ic.crte_time,
         (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
         (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
         (select c.name from base_finance_classify c where c.id = ic.bfc_id and c.hosp_code = #{hospCode}) as bfcName,
@@ -241,7 +247,8 @@
     max(ic.crte_time),
     (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
     (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
-    (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode
+    (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode,
+    ifnull(max(iic.guest_ratio), '') as guestRatio
       from
      inpt_cost ic
      left join
@@ -253,6 +260,7 @@
       left join
       base_material bm
       on bm.id = ic.item_id and bm.hosp_code = ic.hosp_code
+      left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id
     where ic.hosp_code = #{hospCode} and ic.cost_time is not null and ic.status_code ='0'
     <if test="visitId != null and visitId != ''">
       AND ic.visit_id = #{visitId}

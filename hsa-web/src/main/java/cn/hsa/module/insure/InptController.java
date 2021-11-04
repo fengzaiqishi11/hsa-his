@@ -62,6 +62,8 @@ public class InptController extends BaseController {
         inptVisitDTO.setUserCode(sysUserDTO.getCode());
         inptVisitDTO.setCrteName(sysUserDTO.getName());
         param.put("inptVisitDTO",inptVisitDTO);
+        param.put("crteName",sysUserDTO.getCrteName());
+        param.put("crteId",sysUserDTO.getCrteId());
         param.put("userName",sysUserDTO.getName()); // 操作人
         param.put("medicalRegNo",inpt.getMedicalRegNo());
         param.put("code",sysUserDTO.getCode()); // 操作员编码

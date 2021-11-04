@@ -94,4 +94,6 @@ public interface BaseProfileFileDAO {
      * @Return java.util.List<cn.hsa.base.TreeMenuNode>
      **/
     List<TreeMenuNode> getAddressTree(OutptProfileFileDTO outptProfileFileDTO);
+
+    List<OutptProfileFileDTO> queryAll(OutptProfileFileDTO outptProfileFileDTO);
 }

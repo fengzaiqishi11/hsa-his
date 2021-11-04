@@ -244,4 +244,8 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String opIdList;
 
     private String isUseAccount;
+    /**
+     * 统计类型  0 统计全部费用；1 统计挂号费用
+     */
+    private String  statisticType;
 }

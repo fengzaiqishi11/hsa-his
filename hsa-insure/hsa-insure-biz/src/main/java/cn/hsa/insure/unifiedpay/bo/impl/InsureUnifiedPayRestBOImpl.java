@@ -583,17 +583,17 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     @Override
     public Map<String, Object> selectPersonTreatment(Map<String, Object> map) {
         String hospCode = map.get("hospCode").toString();
-        String orgCode = MapUtils.get(map,"orgCode");
+        String regCode = MapUtils.get(map,"regCode");
 
         /**
          * 获取访问的url地址
          */
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(orgCode); // 医疗机构编码;
+        insureConfigurationDTO.setRegCode(regCode); // 医疗机构编码;
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         if(insureConfigurationDTO == null){
-            throw new AppException("根据"+orgCode+"获取医保机构编码配置信息为空");
+            throw new AppException("根据"+regCode+"获取医保机构编码配置信息为空");
         }
         map.put("regCode",insureConfigurationDTO.getCode());
         Map<String, Object> data = insureIndividualBasicService_consumer.queryInsureInfo(map).getData();
@@ -3310,7 +3310,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
 
         List<InsureItemMatchDTO> insertList = new ArrayList<>();
-        for (InsureItemMatchDTO hospItem : resultList) {
+            for (InsureItemMatchDTO hospItem : resultList) {
             for (InsureItemDTO insureItem : insureItemDTOList) {
                 if (hospItem.getHospItemCode().equals(insureItem.getHospItemCode())
                         && hospItem.getHospItemName().equals(insureItem.getHospItemName())) {

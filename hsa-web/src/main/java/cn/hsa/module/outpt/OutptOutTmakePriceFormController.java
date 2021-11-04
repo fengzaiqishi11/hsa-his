@@ -221,6 +221,8 @@ public class OutptOutTmakePriceFormController extends BaseController {
     @PostMapping("/updateOutptRegister")
     public WrapperResponse<Boolean> updateOutptRegister(@RequestBody  Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
+        map.put("crteName",userDTO.getCrteName());
+        map.put("crteId",userDTO.getCrteId());
         map.put("hospCode",userDTO.getHospCode());
         return outptOutTmakePriceFormService_consumer.updateOutptRegister(map);
     }

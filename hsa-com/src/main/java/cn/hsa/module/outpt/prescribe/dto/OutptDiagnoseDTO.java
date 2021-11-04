@@ -45,4 +45,5 @@ public class OutptDiagnoseDTO extends OutptDiagnoseDO implements Serializable {
     // 入院科室id
     private String inDeptId;
     private String pracCertiNo; // 医师执业证书编码
+    private List<String> diagnoseList;
 }

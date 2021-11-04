@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedLogDAO">
+    <insert id="insertInsureFunctionLog">
+        insert into insure_function_log(id, hosp_code, visit_id,medis_code, msg_id, msg_info, msg_name, in_params,
+                                        out_params, code, crte_id,
+                                        crte_name, crte_time, error_msg, is_hospital, status)
+        values
+        (#{id},#{hospCode},#{visitId},#{medisCode},#{msgId},#{msgInfo},#{msgName},#{inParams},
+         #{outParams},#{code},#{crteId},#{crteName},#{crteTime},#{errorMsg},#{isHospital},
+         #{status})
+    </insert>
+    <select id="queryPage" resultType="cn.hsa.module.insure.module.entity.InsureFunctionLogDO">
+      select ifl.id, ifl.hosp_code, ifl.visit_id, ifl.msg_id, ifl.msg_info, ifl.msg_name, ifl.in_params, ifl.out_params, ifl.code,
+        ifl.crte_id, ifl.crte_name, ifl.crte_time, ifl.error_msg, ifl.is_hospital,ifl.medis_code,iv.name,iv.patient_code,
+        ifl.status from insure_function_log ifl JOIN  inpt_visit iv on ifl.visit_id = iv.id
+        where ifl.hosp_code =#{hospCode}
+        <if test="msgInfo != null and msgInfo != ''">
+            and ifl.msg_info = #{msgInfo}
+        </if>
+        <if test="medisCode != null and medisCode != ''">
+            and ifl.medis_code = #{medisCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( ifl.msg_id like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="startDate != null">
+            and date(ifl.crte_time) &gt;= date(#{startDate})
+        </if>
+        <if test="endDate != null">
+            and date(ifl.crte_time) &lt;= date(#{endDate})
+        </if>
+        union all
+        select ifl.id, ifl.hosp_code, ifl.visit_id, ifl.msg_id, ifl.msg_info, ifl.msg_name, ifl.in_params, ifl.out_params, ifl.code,
+        ifl.crte_id, ifl.crte_name, ifl.crte_time, ifl.error_msg, ifl.is_hospital,ifl.medis_code,ov.name,ov.patient_code,
+        ifl.status from insure_function_log ifl JOIN  outpt_visit ov on ifl.visit_id = ov.id
+        where ifl.hosp_code =#{hospCode}
+        <if test="msgInfo != null and msgInfo != ''">
+            and ifl.msg_info = #{msgInfo}
+        </if>
+        <if test="medisCode != null and medisCode != ''">
+            and ifl.medis_code = #{medisCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( ifl.msg_id like concat('%',#{keyword},'%')
+            or ov.name like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="startDate != null">
+            and date(ifl.crte_time) &gt;= date(#{startDate})
+        </if>
+        <if test="endDate != null">
+            and date(ifl.crte_time) &lt;= date(#{endDate})
+        </if>
+        order by crte_time desc
+    </select>
+    <select id="selectInsureUnifiedLog" resultType="cn.hsa.module.insure.module.entity.InsureFunctionLogDO">
+        select id, hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params, code,
+        error_msg, is_hospital, status, medis_code  from insure_function_log
+        where hosp_code =#{hospCode} and visit_id =#{visitId} and msg_info =#{msgInfo}
+        and code =#{code} and is_hospital =#{isHospital} order by crte_time asc limit 1;
+    </select>
+
+</mapper>

@@ -44,16 +44,26 @@
         <result property="herbUseCode" column="herb_use_code" jdbcType="VARCHAR"/>
         <result property="isGive" column="is_give" jdbcType="VARCHAR"/>
         <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="yylx" column="yylx" jdbcType="VARCHAR"/>
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"/>
+        <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
+        <result property="isExec" column="isExec" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="getClinicalPathStageDetailItemDTOById" resultMap="ClinicalPathStageDetailItemMap">
         select
-          id, hosp_code, list_id, stage_id, detail_id, item_type,classify,is_must, is_valid, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time
+          id, hosp_code, list_id, stage_id, detail_id, item_type,classify,is_must, is_valid, group_no,
+          group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id,
+          item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num,
+          unit_code, price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days,
+          use_code, is_skin, herb_note_code, remark, herb_use_code, is_give, is_long,yylx,
+          crte_id, crte_name, crte_time
         from clinical_path_stage_detail_item
         where id = #{id} and hosp_code =#{hospCode}
     </select>
@@ -65,13 +75,35 @@
           a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code,
           a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.price, a.total_price,
           a.total_num, a.total_num_unit_code, a.herb_num, a.exec_dept_id, a.use_days, a.use_code, a.is_skin, a.herb_note_code,
-          a.remark, a.herb_use_code, a.is_give, a.is_long, a.crte_id, a.crte_name, a.crte_time,
+          a.remark, a.herb_use_code, a.is_give, a.is_long, a.yylx,a.crte_id, a.crte_name, a.crte_time,ifnull(x.is_exec,'0') as isExec,
           case when a.item_code = '4' then (
           case when e.type_code = '3' then '4' when e.type_code = '10' then '5' else '6' end
           ) when a.item_code = '1' then (
           case when c.big_type_code = '2' then  '3' else '1' end
-          ) when a.item_code = '2' then '2' end type
+          ) when a.item_code = '2' then '2' end type,
+          case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+          case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
+          case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode,
+          case when a.item_code = '2' then b.clf when a.item_code = '1' then
+          (case when c.big_type_code = '2' then b.cyf when c.big_type_code = '1' then b.zcf when c.big_type_code = '0' then b.xyf end)
+          when a.item_code = '4' then '' end pharId
           from clinical_path_stage_detail_item a
+          left join(
+          select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
+          max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+          from base_dept a
+          join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+          join base_dept c on c.hosp_code = b.hosp_code
+          <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+          </if>
+          <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+          </if>
+          where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+          )b on 1 = 1
+          left join clinic_path_exec x on x.detail_item_id = a.id and x.list_id = a.list_id and
+           x.hosp_code = a.hosp_code and x.clinical_path_stage_id = #{clinicalPathStageId}
           left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1' and a.classify = '1'
           left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2' and a.classify = '1'
           left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4' and a.classify = '1'
@@ -150,7 +182,7 @@
          group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id,
          item_name, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code,
          price, total_price, total_num, total_num_unit_code, herb_num, exec_dept_id, use_days, use_code, is_skin,
-          herb_note_code, remark, herb_use_code, is_give, is_long, crte_id, crte_name, crte_time)
+          herb_note_code, remark, herb_use_code, is_give, is_long, yylx, crte_id, crte_name, crte_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
           (#{item.id},#{item.hospCode}, #{item.listId}, #{item.stageId}, #{item.detailId}, #{item.itemType},#{item.classify},#{item.isMust},
@@ -160,7 +192,7 @@
           #{item.usageCode}, #{item.rateId}, #{item.speedCode}, #{item.num}, #{item.unitCode}, #{item.price},
           #{item.totalPrice}, #{item.totalNum}, #{item.totalNumUnitCode}, #{item.herbNum}, #{item.execDeptId},
           #{item.useDays}, #{item.useCode}, #{item.isSkin}, #{item.herbNoteCode}, #{item.remark},
-          #{item.herbUseCode}, #{item.isGive}, #{item.isLong}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+          #{item.herbUseCode}, #{item.isGive}, #{item.isLong}, #{item.yylx},#{item.crteId}, #{item.crteName}, #{item.crteTime})
         </foreach>
     </insert>
 
@@ -289,6 +321,9 @@
           <if test="item.isLong != null">
             is_long = #{item.isLong},
           </if>
+          <if test="item.yylx != null">
+            yylx = #{item.yylx},
+          </if>
         </set>
         where id = #{item.id} and hosp_code = #{item.hospCode}
       </foreach>
@@ -298,10 +333,16 @@
     <delete id="deleteClinicalPathStageDetailItemDTOById">
         delete from clinical_path_stage_detail_item
         where hosp_code = #{hospCode} and list_id = #{listId} and stage_id = #{stageId}
-        and detail_id = #{detailId} and id in
-        <foreach collection="ids" item="id" separator="," open="(" close=")">
-          #{id}
-        </foreach>
+        and detail_id = #{detailId}
+        <if test="classify != null and classify != ''">
+            and classify = #{classify}
+        </if>
+        <if test="ids!=null and ids.size()> 0">
+          and id in
+          <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+          </foreach>
+        </if>
     </delete>
 
   <!--  获取最大组号 -->

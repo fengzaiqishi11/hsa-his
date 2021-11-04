@@ -107,6 +107,7 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
             return transpond.to(hospCode,regCode,Constant.FUNCTION.FC_EMD_11001,param);
 //        } else if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
         } else if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
+            param.put("isHospital",Constants.SF.F);
             Map<String, Object> resultMap = insureVisitInfoBO.getInsureVisitInfo(param);
             return resultMap;
 

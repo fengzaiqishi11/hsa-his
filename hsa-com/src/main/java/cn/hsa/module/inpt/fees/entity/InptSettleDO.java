@@ -105,4 +105,5 @@ public class InptSettleDO extends PageDO implements Serializable{
         private Date crteTime;
         //病人状态
         private String brztStatusCode;
+        private BigDecimal acctPay;
 }

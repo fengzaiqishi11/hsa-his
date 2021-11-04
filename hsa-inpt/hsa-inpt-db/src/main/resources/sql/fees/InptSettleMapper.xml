@@ -150,7 +150,8 @@
         order_no,
         crte_id,
         crte_name,
-        crte_time
+        crte_time,
+        acct_pay
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -458,7 +459,10 @@
                     crte_name,
                 </if>
                 <if test="crteTime != null">
-                    crte_time
+                    crte_time,
+                </if>
+                <if test="acctPay != null">
+                acct_pay
                 </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -562,7 +566,10 @@
                         #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                        #{crteTime,jdbcType=TIMESTAMP}
+                        #{crteTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="acctPay != null">
+                        #{acctPay,jdbcType=DECIMAL}
                 </if>
         </trim>
     </insert>
@@ -711,7 +718,10 @@
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="acctPay != null">
+                    acct_pay = #{acctPay,jdbcType=DECIMAL}
                 </if>
         </set>
         where
@@ -887,6 +897,10 @@
           AND a.hosp_code = #{hospCode}
         ORDER BY
             crte_time DESC
+    </select>
+    <select id="queryInptInsure" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select * from insure_individual_settle where hosp_code =#{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+        and state ='0' and settle_state ='1' and is_cancel ='1' and insureSettleId is not null
     </select>
 
 </mapper>

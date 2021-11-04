@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.clinical
@@ -184,5 +185,24 @@ public class ClinicPathStageDetailController extends BaseController {
     return clinicPathStageDetailService_consumer.queryClinicalPathTree(map);
   }
 
-
+  /**
+  * @Menthod queryClinicalPrint
+  * @Desrciption 临床路径打印
+  *
+  * @Param
+  * [clinicPathStageDetailDTO, req, res]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/28 9:25
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+  **/
+  @GetMapping("/queryClinicalPrint")
+  public WrapperResponse<Map> queryClinicalPrint(ClinicPathStageDetailDTO clinicPathStageDetailDTO, HttpServletRequest req, HttpServletResponse res) {
+    HashMap map = new HashMap();
+    SysUserDTO sysUserDTO = getSession(req, res);
+    clinicPathStageDetailDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("hospCode",sysUserDTO.getHospCode());
+    map.put("clinicPathStageDetailDTO",clinicPathStageDetailDTO);
+    return clinicPathStageDetailService_consumer.queryClinicalPrint(map);
+  }
 }

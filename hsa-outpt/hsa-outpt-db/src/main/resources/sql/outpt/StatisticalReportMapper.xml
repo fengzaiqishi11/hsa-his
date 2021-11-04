@@ -960,7 +960,7 @@
         a.birthday,
         a.pym,
         a.wbm,
-        a.is_food_borne,
+        ifnull(a.is_food_borne, 0) as is_food_borne,
         a.visit_no,
         a.crte_time,
         a.dept_id,
@@ -992,7 +992,7 @@
         )a group by a.hosp_code, a.visit_id
         )b on a.id = b.visit_id and a.hosp_code = b.hosp_code
         left join outpt_diagnose od on a.id = od.visit_id and a.hosp_code = od.hosp_code and od.is_main = '1'
-        left join outpt_medical_record omr on a.id = omr.visit_id and a.hosp_code = omr.hosp_code
+        LEFT JOIN (select visit_id, hosp_code, max(start_date) as start_date from outpt_medical_record where hosp_code = #{hospCode} group by visit_id, hosp_code) omr on a.id = omr.visit_id and a.hosp_code = omr.hosp_code
         ) t1
         WHERE
         t1.hosp_code = #{hospCode}

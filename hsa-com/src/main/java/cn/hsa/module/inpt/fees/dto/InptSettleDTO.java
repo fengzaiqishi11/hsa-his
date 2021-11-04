@@ -125,4 +125,6 @@ public class InptSettleDTO extends InptSettleDO implements Serializable {
 
         // 医院减免金额
         private BigDecimal hospExemAmount;
+
+        private String ywlx;
 }

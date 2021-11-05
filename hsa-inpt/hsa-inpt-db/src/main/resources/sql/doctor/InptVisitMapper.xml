@@ -95,6 +95,8 @@
 		<result property="medicalRegNo" column="medical_reg_no" jdbcType="VARCHAR"/>
 		<result property="pracCertiNo" column="pracCertiNo" jdbcType="VARCHAR"/>
 		<result property="costNumbers" column="costNumbers" jdbcType="NUMERIC"/>
+		<result property="totalMergeCost" column="totalMergeCost" jdbcType="NUMERIC"/>
+		<result property="totalMergeBalance" column="totalMergeBalance" jdbcType="NUMERIC"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
@@ -117,10 +119,11 @@
 	<select id="getInptVisitById" resultMap="InptVisitMap">
         select
           id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday, nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address, contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code, receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id, in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no, outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id, out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id, out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time, archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code, insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
-          (select name from base_dept where id = inpt_visit.in_ward_id and hosp_code = inpt_visit.hosp_code) as wardName,
-        (select su.prac_certi_no from sys_user su where su.hosp_code = inpt_visit.hosp_code and su.id = inpt_visit.zz_doctor_id ) as pracCertiNo
-
-        from inpt_visit
+          (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
+        (select su.prac_certi_no from sys_user su where su.hosp_code = a.hosp_code and su.id = a.zz_doctor_id ) as pracCertiNo,
+		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
+		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
+        from inpt_visit a
         where hosp_code = #{hospCode}
         and id = #{id}
     </select>
@@ -175,7 +178,9 @@
 		IFNULL(iv.age,'-'),
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		iv.age_unit_code),'')
-		) AS keyword
+		) AS keyword,
+		(iv.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = iv.id)) as totalMergeBalance,
+		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = iv.id) as totalMergeCost
 		from inpt_visit iv
 		left join
 		base_bed bb
@@ -387,7 +392,9 @@
 		IFNULL(a.age,'-'),
 		IFNULL((select name from sys_code_detail where a.hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		a.age_unit_code),'')
-		) AS keyword
+		) AS keyword,
+		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
+		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
 		from inpt_visit a
 		left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
 		where a.hosp_code = #{hospCode}
@@ -1589,8 +1596,32 @@
 				#{remoteMsgId,jdbcType=VARCHAR}
 				)
 	</insert>
+    <insert id="insertPatientSumInfo">
+		insert into	insure_patient_sum (id, hosp_code, medis_code, psn_no, visit_id,
+		                                medical_reg_no, insutype, year,
+		                                cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time)
+		                                values
+		<foreach collection="resultDataMap" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.hospCode},
+			#{item.medisCode},
+			#{item.psnNo},
+			#{item.visitId},
+			#{item.medicalRegNo},
+			#{item.insutype},
+			#{item.year},
+			#{item.cum_type_code},
+			#{item.cum_ym},
+			#{item.crteId},
+			#{item.cum},
+			#{item.crteName},
+			#{item.crteTime}
+			)
+		</foreach>
+	</insert>
 
-	<!-- 修改数据 -->
+    <!-- 修改数据 -->
 	<update id="updateInsureIndividualSettle" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
 		UPDATE insure_individual_settle
 		<set>
@@ -2032,7 +2063,9 @@
 		IFNULL(a.age,'-'),
 		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
 		a.age_unit_code),'')
-		) AS keyword
+		) AS keyword,
+		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
+		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
 		from inpt_visit a
 		left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
 		where a.hosp_code = #{hospCode}
@@ -2095,8 +2128,11 @@
 
         delete from inpt_bed_change where hosp_code = #{hospCode} and visit_id = #{id};
     </delete>
+    <delete id="deletePatientSumInfo">
+		delete  from insure_patient_sum where visit_id  = #{visitId} and hosp_code =#{hospCode}
+	</delete>
 
-	<update id="updateBaseBed" >
+    <update id="updateBaseBed" >
 		update base_bed set visit_id = null where hosp_code = #{hospCode} and visit_id = #{id}
 	</update>
 

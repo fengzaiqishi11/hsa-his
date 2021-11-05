@@ -2,6 +2,7 @@ package cn.hsa.module.clinical.inptclinicalpathstage.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 
 import java.util.List;
@@ -69,6 +70,19 @@ public interface InptClinicalPathStageService {
   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
   **/
   WrapperResponse<Boolean> saveInptClinicalPathStage(Map map);
+
+  /**
+  * @Menthod queryNotExecItem
+  * @Desrciption 查询阶段未执行项目
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/26 10:30
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO>>
+  **/
+  WrapperResponse<List<ClinicPathStageDetailDTO>> queryNotExecItem(Map map);
 
   /**
   * @Menthod deleteInptClinicalPathStage

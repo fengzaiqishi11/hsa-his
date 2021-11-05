@@ -83,6 +83,10 @@ public class InptClinicalPathStateDTO extends InptClinicalPathStateDO implements
     private String inDiseaseName;
     // 当前著诊断id
     private String inDiseaseId;
+    //出院时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date outTime;
     //入境开始时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

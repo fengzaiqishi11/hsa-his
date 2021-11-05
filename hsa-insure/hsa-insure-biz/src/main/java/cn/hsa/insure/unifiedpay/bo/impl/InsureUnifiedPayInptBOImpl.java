@@ -16,9 +16,6 @@ import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.insure.module.entity.InsureEntryLogDO;
-import cn.hsa.module.insure.module.entity.InsureFunctionDO;
-import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -30,17 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.ResourceTransactionManager;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -207,6 +197,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
             insureConfigurationDTO.setHospCode(hospCode);
             insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+            insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
             insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
             /**
              * 公共入参
@@ -283,7 +274,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 if("1".equals(hnFeedetlSn)){
                     if(StringUtils.isEmpty(feeNum)){
                         objectMap.put("feedetl_sn",k) ; // 费用明细流水号
-                    }else{
+                    }
+                    else{
                         k = Integer.parseInt(feeNum);
                         k+=2;
                         feeNum = k.toString();
@@ -669,6 +661,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         /**
          * 公共入参
@@ -768,6 +761,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String visitId = insureIndividualVisitDTO.getVisitId();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
         //判断医保费用是否上传
@@ -1112,6 +1106,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         String visitId = insureIndividualVisitDTO.getVisitId();
         String infno = "2305";
@@ -1545,6 +1540,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String medicineOrgCode =insureIndividualVisitDTO.getMedicineOrgCode();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(medicineOrgCode);  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         //院诊断信息参数diseinfoMap
         Map<String, Object> diseinfoMap =null;
@@ -1714,7 +1710,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String insureRegCode = MapUtils.get(map, "insureRegCode");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO.setRegCode(insureRegCode); // 医保机构编码
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         String orgCode = insureConfigurationDTO.getOrgCode();
         Map httpParam = new HashMap();
@@ -1876,6 +1873,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureInptOutFeeDTO.getHospCode());
         insureConfigurationDTO.setRegCode((String) insureInptOutFeeDTO.getInsureOrgCode());
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
         //出院信息参数dscginfo
@@ -1965,6 +1963,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         medicalRegNo  = insureIndividualVisitDTO.getMedicalRegNo();
         String psnNo= insureIndividualVisitDTO.getAac001() ;

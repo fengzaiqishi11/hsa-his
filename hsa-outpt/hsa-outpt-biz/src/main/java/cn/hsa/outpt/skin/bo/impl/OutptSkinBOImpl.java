@@ -179,7 +179,9 @@ public class OutptSkinBOImpl extends HsafBO implements OutptSkinBO {
 
         if(StringUtils.isEmpty(outptSkinDTO.getId())){
             outptSkinDTO.setId(SnowflakeUtils.getId());
-            outptSkinDTO.setExecDate(DateUtil.getDate());
+            if(StringUtils.isEmpty(String.valueOf(outptSkinDTO.getExecDate()))) {
+              outptSkinDTO.setExecDate(DateUtil.getDate());
+            }
             return outptSkinDAO.insert(outptSkinDTO) > 0;
         }else{
             return outptSkinDAO.update(outptSkinDTO) > 0;

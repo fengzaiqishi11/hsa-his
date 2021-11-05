@@ -79,4 +79,8 @@ public class InptAdviceExecDTO extends InptAdviceExecDO implements Serializable 
     private String queryBaby;
     // 婴儿名称
     private String babyName;
+
+    private String stageDetailItemId;
+
+    private String clinicalPathStageId;
 }

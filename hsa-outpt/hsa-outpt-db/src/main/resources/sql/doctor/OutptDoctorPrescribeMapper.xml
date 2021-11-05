@@ -540,7 +540,7 @@
     <!--  获取处方主表、明细表记录 -->
     <select id="getPrescribeAllDetail" resultMap="outptPrescribeDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code , a.visit_id ,
-        c.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
+        a.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
         a.dept_name , a.type_code , a.prescribe_type_code ,
         a.settle_id , a.remark , a.is_settle , a.is_cancel , a.is_print ,
         a.is_herb_hospital , a.herb_num , a.herb_use_code ,

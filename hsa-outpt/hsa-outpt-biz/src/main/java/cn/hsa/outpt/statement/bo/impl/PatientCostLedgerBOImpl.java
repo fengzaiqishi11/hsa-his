@@ -1,11 +1,8 @@
 package cn.hsa.outpt.statement.bo.impl;
 
 import cn.hsa.base.DynamicTable;
-import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.util.PageInfo;
-import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -20,16 +17,12 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -2066,6 +2059,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         if(ListUtils.isEmpty(tableList)){
             return retMap;
         }
+        boolean isChange = true;
         Map map = tableList.get(0);
         Map mapHeader = getTableHeader();
         map.forEach((k, v) -> {
@@ -2105,6 +2099,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             }
             listTableConfig.add(tableMap);
         });
+        for (Map<String, String> tempMap : listTableConfig) {
+            if (tempMap.containsValue("spec")) {
+                isChange = false;
+                break;
+            }
+        }
+        if (isChange) {
+            Map tableMap = new HashMap();
+            tableMap.put("prop","spec");
+            tableMap.put("id","spec");
+			tableMap.put("label","规格");
+            listTableConfig.add(tableMap);
+        }
         retMap.put("listTableConfig", listTableConfig);
         //  retMap.put("list", tableList);
         return retMap;

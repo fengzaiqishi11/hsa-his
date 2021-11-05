@@ -1412,13 +1412,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             for(BaseAssistCalcDetailDTO baseAssistCalcDetailDO : assistCalcDetailDTOList){
                 InptCostDTO inptCostDTO = new InptCostDTO();
                 //计费时间=计费当天日期+当前时间(时分秒)
-//                Date date = DateUtils.parse(startTime + " " + DateUtils.format(DateUtils.getNow(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
+                Date date = DateUtils.parse(startTime + " " + DateUtils.format(DateUtils.getNow(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
                 // update 计费时间=计费当天日期+核收时间(时分秒)  luoyong 2021-10-28
-                Date date = DateUtils.parse(startTime + " " + DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
+//                Date date = DateUtils.parse(startTime + " " + DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
                 // 隔天核收：计费时间<核收时间 如2021-10-26 17:00:00提交，次日2021-10-27 09:00:00核收
-                if (date.compareTo(medicalAdviceDTO.getCheckTime()) < 0) {
-                    date = DateUtils.parse(startTime + " " + DateUtils.format(adviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                }
+//                if (date.compareTo(medicalAdviceDTO.getCheckTime()) < 0) {
+//                    date = DateUtils.parse(startTime + " " + DateUtils.format(adviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
+//                }
                 if (baseAssistCalcDetailDO.getItemId() == null ){
                     throw new AppException(baseAssistCalcDetailDO.getName() +"配置项目错误!");
                 }
@@ -1523,7 +1523,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //创建人信息
                 inptCostDTO.setCrteId(medicalAdviceDTO.getCheckId());
                 inptCostDTO.setCrteName(medicalAdviceDTO.getCheckName());
-                inptCostDTO.setCrteTime(date);
+                inptCostDTO.setCrteTime(medicalAdviceDTO.getCheckTime());
                 inptCostDTO.setAttributionCode("0");
 
                 //计算优惠金额
@@ -2518,10 +2518,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //计费时间=计费当天日期+核收时间(时分秒)
                 Date date = DateUtils.parse(DateUtils.format(startTime, DateUtils.Y_M_D) + " "
                         + DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                // 计算的计费时间<核收时间
+                /*// 计算的计费时间<核收时间
                 if (date.compareTo(medicalAdviceDTO.getCheckTime()) < 0) {
                     date = DateUtils.parse(DateUtils.format(startTime, DateUtils.Y_M_D) + " " + DateUtils.format(inptAdviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                }
+                }*/
 
                 //判断当天费用是否已生成，如果已生产跳过循环
                 List<InptCostDTO> costDTOList = inptCostDAO.queryCostList(inptAdviceDTO.getHospCode(),inptAdviceDTO.getId(),inptAdviceDetailDTO.getId(),startTime);
@@ -2534,9 +2534,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
                 //判断当前集合是否已经存在对应的待领记录
-                Date finalDate = date;
+//                Date finalDate = date;
                 if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
-                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(finalDate))==0
+                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(date))==0
                         && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {
                     startTime = DateUtils.dateAdd(startTime, day);
                     continue;

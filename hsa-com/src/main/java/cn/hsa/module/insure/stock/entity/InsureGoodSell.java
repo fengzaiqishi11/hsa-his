@@ -55,4 +55,5 @@ public class InsureGoodSell   extends PageDO implements Serializable {
     private String numUnitCode;// 数量单位
     private String sellType;// 销售类型
     private String visitId;// 就诊id
+    private String keyword;
 }

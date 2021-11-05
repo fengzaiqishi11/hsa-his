@@ -102,6 +102,7 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodInfoDelete.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodInfoDelete",insureGoodInfoDelete);
         return insureStockManagerService_consumer.queryInsureGoodInfoDeletePage(map);
     }
@@ -193,7 +194,7 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.queryInsureGoodSellBackPage(map);
     }
 
-    ;
+
 
     /**
      * 上传商品销售退货信息
@@ -209,17 +210,17 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.uploadInsureGoodSellBack(map);
     }
 
-    ;
-
-
     /**
-     * 查询商品盘点信息
-     *【3501】商品盘存上传
-     * @param insureInventoryCheck
-     * @return
+     * @Meth: queryInsureInventoryCheckPage
+     * @Description: 查询需要上传的盘存信息
+     * @Param: [insureInventoryCheck, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
      */
     @GetMapping("/queryInsureInventoryCheckPage")
-    public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck,
+                                                                  HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         String hospCode = sysUserDTO.getHospCode();
@@ -229,7 +230,6 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.queryInsureInventoryCheckPage(map);
     }
 
-    ;
 
     /**
      * 上传商品盘点信息
@@ -245,7 +245,6 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.uploadInsureInventoryCheck(map);
     }
 
-    ;
 
 
     /**
@@ -264,7 +263,6 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.queryInsureInventoryStockUpdatePage(map);
     }
 
-    ;
 
     /**
      * 上传商品库存变更信息

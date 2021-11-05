@@ -142,23 +142,22 @@
             AND a.visit_id = iiv.id
         WHERE
             a.hosp_code = #{hospCode}
-
-            <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
-                and a.status_code = '0' /*正常状态*/
-            </if>
-            <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
-                and a.status_code = '2' /*冲红状态*/
-            </if>
+            and a.status_code = '0' /*正常状态*/
             AND d.is_visit = '1' /*已就诊*/
             AND a.status_code = '0' /*正常状态*/
             AND a.settle_code = '2' /*已结算*/
-            AND a.is_upload = '0' /*未上传*/
             AND c.audit_code = '1' /*医保项目已审核*/
             AND c.is_match = '1' /*医保项目已匹配*/
             AND c.is_trans = '1' /*医保项目已传输*/
             AND c.is_valid = '1' /*医保项目有效*/
             and (si.upload_insure = '0' or si.upload_insure is null)
-
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
    UNION ALL
         /*住院*/
         SELECT
@@ -205,20 +204,21 @@
         AND a.visit_id = iiv.id
         WHERE
         a.hosp_code = #{hospCode}
-        <if test="sellType != null and sellType != '' and sellType == '1'.toString()">
-            and a.status_code = '0' /*正常状态*/
-        </if>
-        <if test="sellType != null and sellType != '' and sellType == '2'.toString()">
-            and a.status_code = '2' /*冲红状态*/
-        </if>
+        and a.status_code = '0' /*正常状态*/
         and a.settle_code = '2' /*已结算*/
-        and a.is_upload = '0' /*未上传*/
         and c.audit_code = '1' /*医保项目已审核*/
         and c.is_match = '1' /*医保项目已匹配*/
         and c.is_trans = '1' /*医保项目已传输*/
         and c.is_valid = '1' /*医保项目有效*/
         AND si.outin_code in ('27','28') /*住院发药，住院退药*/
         and (si.upload_insure = '0' or si.upload_insure is null)
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
     </select>
 
     <select id="queryInsureGoodSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
@@ -227,7 +227,7 @@
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
-        isu.fixmedins_bchno AS fixmedinsBchno,
+        si.id AS fixmedinsBchno,
         a.doctor_name AS prscDrName,
         si.crte_name AS pharName,
         IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
@@ -252,7 +252,6 @@
         FROM
         outpt_cost a
         JOIN stro_invoicing si ON a.item_id = si.item_id
-        join insure_stock_upload isu on si.id = isu.fixmedins_bchno
         AND a.visit_id = si.invoicing_target_id
         LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
         AND a.item_id = b.id
@@ -267,13 +266,21 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '3505')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
         UNION ALL
         /*住院*/
         SELECT
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
-        isu.fixmedins_bchno AS fixmedinsBchno,
+        si.id AS fixmedinsBchno,
         a.doctor_name AS prscDrName,
         si.crte_name AS pharName,
         IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
@@ -298,7 +305,6 @@
         FROM
         inpt_cost a
         JOIN stro_invoicing si ON a.item_id = si.item_id
-        join insure_stock_upload isu on si.id = isu.fixmedins_bchno
         AND a.visit_id = si.invoicing_target_id
         LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
         AND a.item_id = b.id
@@ -313,6 +319,14 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '3505')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
     </select>
 
     <select id="queryInsureInventoryCheckPage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryCheck">

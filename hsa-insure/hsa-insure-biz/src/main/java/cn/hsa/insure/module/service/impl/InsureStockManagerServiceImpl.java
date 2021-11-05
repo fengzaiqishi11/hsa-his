@@ -194,4 +194,16 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
     public WrapperResponse<Boolean> uploadInsureInventoryStock(Map<String, Object> map) {
         return WrapperResponse.success(insureStockManagerBO.uploadInsureInventoryStock(map));
     }
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售或者退货人员
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map) {
+        return WrapperResponse.success(insureStockManagerBO.queryPersonList(MapUtils.get(map, "insureRecruitPurchaseDTO")));
+    }
 }

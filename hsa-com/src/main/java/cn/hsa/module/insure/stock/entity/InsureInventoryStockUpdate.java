@@ -14,7 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class InsureInventoryStockUpdate   extends PageDO implements Serializable {
+public class InsureInventoryStockUpdate extends PageDO implements Serializable {
     private String medListCodg	;//医疗目录编码	字符型	50	　	Y　	新医保
     private String invChgType	;//库存变更类型	字符型	6	Y　	Y　	新医保
     private String fixmedinsHilistId	;//定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drug_code
@@ -27,4 +27,5 @@ public class InsureInventoryStockUpdate   extends PageDO implements Serializable
     private String invChgOpterName	;//库存变更经办人姓名	字符型	50	　	　	新医保
     private String memo	;//备注	字符型	500	　	　	新医保
     private String trdnFlag	;//拆零标志	字符型	2			新医保
+    private String hospCode;
 }

@@ -136,4 +136,13 @@ public interface InsureStockManagerService {
      * @return
      */
     WrapperResponse<Boolean> uploadInsureInventoryStock(Map<String, Object> map);
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售 / 退货人员
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map);
 }

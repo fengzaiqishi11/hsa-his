@@ -138,5 +138,5 @@ public interface InsureStockManagerDAO {
      * @Author: zhangguorui
      * @Date: 2021/11/5
      */
-    int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
+    int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode") String statusCode);
 }

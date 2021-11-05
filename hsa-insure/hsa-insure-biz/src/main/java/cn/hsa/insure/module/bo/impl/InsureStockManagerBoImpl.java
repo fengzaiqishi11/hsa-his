@@ -21,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -512,6 +509,35 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     @Override
     public List<InsureInventoryStockUpdate> queryInsureInventoryStockUpdatePage(InsureInventoryStockUpdate insureInventoryStockUpdate) {
         PageHelper.startPage(insureInventoryStockUpdate.getPageNo(), insureInventoryStockUpdate.getPageSize());
+        String invChgType = insureInventoryStockUpdate.getInvChgType();
+        if (StringUtils.isEmpty(invChgType)) {
+            throw new AppException("变更类型不能为空");
+        }
+        List<String> outinCodeList = new ArrayList<>();
+        Map<String, List<String>> map = new HashMap();
+        // 封装参数 后期把数字维护到常量或者枚举类里面
+        // 调拨入库 对应 本地进销存 没有,先设置为它本身
+        map.put("101", Arrays.asList("101"));
+        // 调拨出库 对应 本地进销存 没有,先设置为它本身
+        map.put("102", Arrays.asList("102"));
+        // 盘盈 对应 本地进销存 7 盘盈盘亏
+        map.put("103", Arrays.asList("7"));
+        // 盘存 对应 本地进销存 8 报损报溢
+        map.put("104", Arrays.asList("8"));
+        // 销毁 对应 本地进销存 没有,先设置为它本身
+        map.put("105", Arrays.asList("105"));
+        // 其他入库 对应本地进销存 门诊退药、住院退药
+        map.put("106", Arrays.asList("25", "28"));
+        // 其他出库 对应本地进销存 门诊发药、住院发药
+        map.put("107", Arrays.asList("23", "27"));
+        // 初始化入库 对应 本地进销存 1,2 采购入库、直接入库
+        map.put("108", Arrays.asList("1", "2"));
+        outinCodeList = MapUtils.get(map, invChgType);
+        if (ListUtils.isEmpty(outinCodeList)) {
+            throw new AppException("请选择库存变更类型");
+        } else {
+            insureInventoryStockUpdate.setOutinCodeList(outinCodeList);
+        }
         List<InsureInventoryStockUpdate> list = insureStockManagerDAO.queryInsureInventoryStockUpdatePage(insureInventoryStockUpdate);
         return list;
     }
@@ -526,6 +552,9 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureInventoryStock(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
+        if (StringUtils.isEmpty(regCode)){
+            throw new AppException("医保机构编码不能为空!");
+        }
         String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureInventoryStockUpdate> listInsureInventoryStockUpdate = MapUtils.getEmptyErr(map, "listInsureInventoryStockUpdate", "未获取到需要上传的数据！");
         if (!ListUtils.isEmpty(listInsureInventoryStockUpdate)) {
@@ -554,19 +583,15 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
 
             listMap.add(dataMap);
         }
-        dataMap.clear();
-        dataMap.put("purcinfo", JSONObject.toJSONString(listMap));
+        Map map2 = new HashMap();
+        map2.put("purcinfo", JSONObject.toJSONString(listMap));
 
-        Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3502, dataMap);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3502, map2);
 
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
-        //上传成功数据
-        JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
-
         List<InsureInventoryStockUpdate> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureInventoryStockUpdate.class);
-
         //获取list对象 list属性 并进行去重
         List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryStockUpdate::getFixmedinsBchno).distinct().collect(Collectors.toList());
 
@@ -577,15 +602,13 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
             insureGoodInfoDelete.setHospCode(hospCode);
             insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
             insureGoodInfoDelete.setInvDataType("2");
             insureGoodInfoDelete.setCertId(certId);
             listData.add(insureGoodInfoDelete);
         }
 
-        if (!ListUtils.isEmpty(listData)) {
-            insureStockManagerDAO.insertStockUploadBatch(listData);
-        }
-        return true;
+        return this.updateStroAndSaveResultData(listData,hospCode,"1");
     }
 
     /**

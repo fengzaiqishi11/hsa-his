@@ -135,12 +135,26 @@
     </select>
 
     <select id="queryInsureUploadDataPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
-        select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId
-        from
-             insure_stock_upload
-        where 1=1
+        SELECT
+        A.id,
+        A.insure_type AS insureType,
+        A.hosp_code AS hospCode,
+        A.fixmedins_bchno AS fixmedinsBchno,
+        A.inv_data_type AS invDataType,
+        A.upload_time AS uploadTime,
+        A.cert_id AS certId,
+        B.item_name as itemName,
+        C.name AS certName
+        FROM
+        insure_stock_upload A
+        LEFT JOIN stro_invoicing B ON A.fixmedins_bchno = B.ID
+        AND A.hosp_code = B.hosp_code
+        LEFT JOIN sys_user C ON A.CERT_ID = C.ID
+        AND A.hosp_code = C.hosp_code
+        WHERE
+        A.hosp_code = #{hospCode}
         <if test="invDataType != null and invDataType != '' ">
-            and inv_data_type = #{invDataType} /*正常状态*/
+            and A.inv_data_type = #{invDataType} /*正常状态*/
         </if>
 
     </select>
@@ -328,7 +342,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
-        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '3505')
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
             or b.good_wbm like concat('%',#{keyword},'%')
@@ -381,7 +395,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
-        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '3505')
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
             or b.good_wbm like concat('%',#{keyword},'%')
@@ -396,7 +410,12 @@
         a.insure_item_code as medlistcodg,
         a.hosp_item_code as fixmedinsHilistId,
         a.hosp_item_name as fixmedinsHilistName,
-        '1'  as rx_flag,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
         si.crte_time as invdate,
         si.surplus_num as invCnt,
         DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manu_date,
@@ -406,12 +425,12 @@
         si.sell_price as price,
         ''as memo
         FROM
-        (
-        SELECT *   FROM stro_invoicing
-        where outin_code in ('7','8')
-        ) si
+         stro_invoicing si
         LEFT JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        LEFT JOIN base_material bd on bd.id = si.item_id  and si.hosp_code = bd.hosp_code
+        left join base_drug b on si.item_id = b.id  and b.hosp_code = si.hosp_code
         where si.hosp_code =#{hospCode}
+        and outin_code in ('7','8')
         <if test="fixmedinsHilistName != null and fixmedinsHilistName != ''">
             and a.hosp_item_name = #{fixmedinsHilistName}
         </if>

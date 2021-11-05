@@ -40,6 +40,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
 
     /**
      * 查询商品采购信息,并且没有上传过的数据
+     *
      * @param insureGoodBuy
      * @return
      */
@@ -68,16 +69,16 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> dataMap = null;
         for (InsureGoodBuy insureGoodBuy : listInsureGoodBuy) {
             dataMap = new HashMap<String, Object>();
-            dataMap.put("med_list_codg", StringUtils.isEmpty(insureGoodBuy.getMedListCodg())?"无":insureGoodBuy.getMedListCodg());// 医疗目录编码	字符型	50	　	Y　	新医保
-            dataMap.put("fixmedins_hilist_id", StringUtils.isEmpty(insureGoodBuy.getFixmedinsHilistId())?"无":insureGoodBuy.getFixmedinsHilistId());// 定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drug_code
-            dataMap.put("fixmedins_hilist_name", StringUtils.isEmpty(insureGoodBuy.getFixmedinsHilistName())?"无":insureGoodBuy.getFixmedinsHilistName());// 定点医药机构目录名称	字符型	200	　	Y　	新医保/核3	核3:drug_name
+            dataMap.put("med_list_codg", StringUtils.isEmpty(insureGoodBuy.getMedListCodg()) ? "无" : insureGoodBuy.getMedListCodg());// 医疗目录编码	字符型	50	　	Y　	新医保
+            dataMap.put("fixmedins_hilist_id", StringUtils.isEmpty(insureGoodBuy.getFixmedinsHilistId()) ? "无" : insureGoodBuy.getFixmedinsHilistId());// 定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drug_code
+            dataMap.put("fixmedins_hilist_name", StringUtils.isEmpty(insureGoodBuy.getFixmedinsHilistName()) ? "无" : insureGoodBuy.getFixmedinsHilistName());// 定点医药机构目录名称	字符型	200	　	Y　	新医保/核3	核3:drug_name
             dataMap.put("dynt_no", insureGoodBuy.getDyntNo());// 随货单号	字符型	50	　	　	新医保/核三	核三：aae072
             dataMap.put("fixmedins_bchno", insureGoodBuy.getFixmedinsBchno());// 定点医药机构批次流水号	字符型	30	　	Y　	新医保
-            dataMap.put("spler_name", StringUtils.isEmpty(insureGoodBuy.getSplerName())?"无":insureGoodBuy.getSplerName());// 供应商名称	字符型	200	　	Y　	新医保
+            dataMap.put("spler_name", StringUtils.isEmpty(insureGoodBuy.getSplerName()) ? "无" : insureGoodBuy.getSplerName());// 供应商名称	字符型	200	　	Y　	新医保
             dataMap.put("spler_pmtno", insureGoodBuy.getSplerPmtno());// 供应商许可证号	字符型	50	　	　	新医保
             dataMap.put("manu_lotnum", insureGoodBuy.getManuLotnum());// 生产批号	字符型	30	　	Y　	新医保
-            dataMap.put("prodentp_name", StringUtils.isEmpty(insureGoodBuy.getProdentpName())?"无":insureGoodBuy.getProdentpName());// 生产厂家名称	字符型	200	　	Y　	新医保
-            dataMap.put("aprvno", StringUtils.isEmpty(insureGoodBuy.getAprvno())?"无":insureGoodBuy.getAprvno());// 批准文号	字符型	100	　	Y　	新医保
+            dataMap.put("prodentp_name", StringUtils.isEmpty(insureGoodBuy.getProdentpName()) ? "无" : insureGoodBuy.getProdentpName());// 生产厂家名称	字符型	200	　	Y　	新医保
+            dataMap.put("aprvno", StringUtils.isEmpty(insureGoodBuy.getAprvno()) ? "无" : insureGoodBuy.getAprvno());// 批准文号	字符型	100	　	Y　	新医保
             dataMap.put("manu_date", insureGoodBuy.getManuDate());// 生产日期	日期型	　	　	Y　	新医保
             dataMap.put("expy_end", insureGoodBuy.getExpyEnd());// 有效期止	日期型	　	　	Y　	新医保
             dataMap.put("finl_trns_pric", insureGoodBuy.getFinlTrnsPric());// 最终成交单价	数值型	16,6	　	　	新医保/核三	核三：akc225
@@ -86,7 +87,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             dataMap.put("purc_invo_no", insureGoodBuy.getPurcInvoNo());// 采购发票号	字符型	50	　	　	新医保
             dataMap.put("rx_flag", insureGoodBuy.getRxFlag());// 处方药标志	字符型	3	　	Y　	新医保
             dataMap.put("purc_retn_stoin_time", insureGoodBuy.getPurcRetnStoinTime());// 采购/退货入库时间	日期时间型	　	　	Y　	新医保/核三	核三：aae036
-            dataMap.put("purc_retn_opter_name", StringUtils.isEmpty(insureGoodBuy.getPurcRetnOpterName())?"无":insureGoodBuy.getPurcRetnOpterName());// 采购/退货经办人姓名	字符型	50	　	Y　	新医保
+            dataMap.put("purc_retn_opter_name", StringUtils.isEmpty(insureGoodBuy.getPurcRetnOpterName()) ? "无" : insureGoodBuy.getPurcRetnOpterName());// 采购/退货经办人姓名	字符型	50	　	Y　	新医保
             dataMap.put("prod_geay_flag", insureGoodBuy.getProdGeayFlag());// 商品赠送标志	字符型	3	Y　	　	新医保	0-否；1-是
             dataMap.put("memo", insureGoodBuy.getMemo());// 备注	字符型	500	　	　	新医保/核3	核3：aae013
             listMap.add(dataMap);
@@ -103,7 +104,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         //上传成功数据
         JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
 
-        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureGoodBuy.class);
+        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodBuy.class);
         if (ListUtils.isEmpty(sucessDataList)) {
             throw new AppException("上传失败： 本次上传数据为0");
         }
@@ -151,30 +152,30 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
         String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
         List<InsureGoodBuyBack> listInsureGoodBuyBack = MapUtils.getEmptyErr(map, "listInsureGoodBuyBack", "未获取到需要上传的数据！");
-        if(!ListUtils.isEmpty(listInsureGoodBuyBack)){
-            listInsureGoodBuyBack = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodBuyBack),InsureGoodBuyBack.class);
+        if (!ListUtils.isEmpty(listInsureGoodBuyBack)) {
+            listInsureGoodBuyBack = JSONObject.parseArray(JSONObject.toJSONString(listInsureGoodBuyBack), InsureGoodBuyBack.class);
         }
         List<Map<String, Object>> listMap = new ArrayList<>();
         Map<String, Object> dataMap = null;
         for (InsureGoodBuyBack insureGoodBuyBack : listInsureGoodBuyBack) {
             dataMap = new HashMap<String, Object>();
-            dataMap.put("med_list_codg",StringUtils.isEmpty(insureGoodBuyBack.getMedListCodg())?"无":insureGoodBuyBack.getMedListCodg())	;// 医疗目录编码	字符型	50	　	Y　	新医保
-            dataMap.put("fixmedins_hilist_id",StringUtils.isEmpty(insureGoodBuyBack.getFixmedinsHilistId())?"无":insureGoodBuyBack.getFixmedinsHilistId())	;// 定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drug_code
-            dataMap.put("fixmedins_hilist_name",StringUtils.isEmpty(insureGoodBuyBack.getFixmedinsHilistId())?"无":insureGoodBuyBack.getFixmedinsHilistName())	;// 定点医药机构目录名称	字符型	200	　	Y　	新医保/核3	核3：drug_name
-            dataMap.put("fixmedins_bchno",insureGoodBuyBack.getFixmedinsBchno())	;// 定点医药机构批次流水号	字符型	30	　	Y　	新医保
-            dataMap.put("spler_name",StringUtils.isEmpty(insureGoodBuyBack.getSplerName())?"无":insureGoodBuyBack.getSplerName())	;// 供应商名称	字符型	200	　	Y　	新医保
-            dataMap.put("spler_pmtno",insureGoodBuyBack.getSplerPmtno())	;// 供应商许可证号	字符型	50	　	　	新医保
-            dataMap.put("manu_date",insureGoodBuyBack.getManuDate())	;// 生产日期	日期型	　	　	Y　	新医保
-            dataMap.put("expy_end",insureGoodBuyBack.getExpyEnd())	;// 有效期止	日期型	　	　	Y　	新医保
-            dataMap.put("finl_trns_pric",insureGoodBuyBack.getFinlTrnsPric())	;// 最终成交单价	数值型	16,6	　	　	新医保/核三	核三：akc225
-            dataMap.put("purc_retn_cnt",insureGoodBuyBack.getPurcRetnCnt())	;// 采购/退货数量	数值型	16,4	　	Y　	新医保/核三	核三：akc226
-            dataMap.put("purc_invo_codg",insureGoodBuyBack.getPurcInvoCodg())	;// 采购发票编码	字符型	50	　	　	新医保
-            dataMap.put("purc_invo_no",StringUtils.isEmpty(insureGoodBuyBack.getPurcInvoNo())?"无":insureGoodBuyBack.getPurcInvoNo())	;// 采购发票号	字符型	50	　	Y　	新医保
-            dataMap.put("rx_flag",insureGoodBuyBack.getRxFlag())	;// 处方药标志	字符型	3	Y　	Y　	新医保
-            dataMap.put("purc_retn_stoin_time",insureGoodBuyBack.getPurcRetnStoinTime())	;// 采购/退货入库时间	日期时间型	　	　	Y　	新医保/核三	核三：aae036
-            dataMap.put("purc_retn_opter_name",StringUtils.isEmpty(insureGoodBuyBack.getPurcRetnOpterName())?"无":insureGoodBuyBack.getPurcRetnOpterName())	;// 采购/退货经办人姓名	字符型	50	　	Y　	新医保
-            dataMap.put("memo",insureGoodBuyBack.getMemo())	;// 备注	字符型	500	　	　	新医保
-            dataMap.put("medins_prod_purc_no",insureGoodBuyBack.getMedinsProdPurcNo());// 商品采购流水号	字符型	50			新医保/核3	核3：aae072
+            dataMap.put("med_list_codg", StringUtils.isEmpty(insureGoodBuyBack.getMedListCodg()) ? "无" : insureGoodBuyBack.getMedListCodg());// 医疗目录编码	字符型	50	　	Y　	新医保
+            dataMap.put("fixmedins_hilist_id", StringUtils.isEmpty(insureGoodBuyBack.getFixmedinsHilistId()) ? "无" : insureGoodBuyBack.getFixmedinsHilistId());// 定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drug_code
+            dataMap.put("fixmedins_hilist_name", StringUtils.isEmpty(insureGoodBuyBack.getFixmedinsHilistId()) ? "无" : insureGoodBuyBack.getFixmedinsHilistName());// 定点医药机构目录名称	字符型	200	　	Y　	新医保/核3	核3：drug_name
+            dataMap.put("fixmedins_bchno", insureGoodBuyBack.getFixmedinsBchno());// 定点医药机构批次流水号	字符型	30	　	Y　	新医保
+            dataMap.put("spler_name", StringUtils.isEmpty(insureGoodBuyBack.getSplerName()) ? "无" : insureGoodBuyBack.getSplerName());// 供应商名称	字符型	200	　	Y　	新医保
+            dataMap.put("spler_pmtno", insureGoodBuyBack.getSplerPmtno());// 供应商许可证号	字符型	50	　	　	新医保
+            dataMap.put("manu_date", insureGoodBuyBack.getManuDate());// 生产日期	日期型	　	　	Y　	新医保
+            dataMap.put("expy_end", insureGoodBuyBack.getExpyEnd());// 有效期止	日期型	　	　	Y　	新医保
+            dataMap.put("finl_trns_pric", insureGoodBuyBack.getFinlTrnsPric());// 最终成交单价	数值型	16,6	　	　	新医保/核三	核三：akc225
+            dataMap.put("purc_retn_cnt", insureGoodBuyBack.getPurcRetnCnt());// 采购/退货数量	数值型	16,4	　	Y　	新医保/核三	核三：akc226
+            dataMap.put("purc_invo_codg", insureGoodBuyBack.getPurcInvoCodg());// 采购发票编码	字符型	50	　	　	新医保
+            dataMap.put("purc_invo_no", StringUtils.isEmpty(insureGoodBuyBack.getPurcInvoNo()) ? "无" : insureGoodBuyBack.getPurcInvoNo());// 采购发票号	字符型	50	　	Y　	新医保
+            dataMap.put("rx_flag", insureGoodBuyBack.getRxFlag());// 处方药标志	字符型	3	Y　	Y　	新医保
+            dataMap.put("purc_retn_stoin_time", insureGoodBuyBack.getPurcRetnStoinTime());// 采购/退货入库时间	日期时间型	　	　	Y　	新医保/核三	核三：aae036
+            dataMap.put("purc_retn_opter_name", StringUtils.isEmpty(insureGoodBuyBack.getPurcRetnOpterName()) ? "无" : insureGoodBuyBack.getPurcRetnOpterName());// 采购/退货经办人姓名	字符型	50	　	Y　	新医保
+            dataMap.put("memo", insureGoodBuyBack.getMemo());// 备注	字符型	500	　	　	新医保
+            dataMap.put("medins_prod_purc_no", insureGoodBuyBack.getMedinsProdPurcNo());// 商品采购流水号	字符型	50			新医保/核3	核3：aae072
             listMap.add(dataMap);
         }
 
@@ -189,7 +190,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         //失败数据
         JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
 
-        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureGoodBuy.class);
+        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodBuy.class);
         if (ListUtils.isEmpty(sucessDataList)) {
             throw new AppException("上传失败： 本次上传数据为0");
         }
@@ -197,8 +198,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
 
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
-        for (String fixmedinsBchno:fixmedinsBchnoList){
-            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+        for (String fixmedinsBchno : fixmedinsBchnoList) {
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
             insureGoodInfoDelete.setId(SnowflakeUtils.getId());
             insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
             insureGoodInfoDelete.setHospCode(hospCode);
@@ -241,8 +242,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         String id = MapUtils.getEmptyErr(map, "id", "记录ID不存在！");
 
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("fixmedins_bchno",fixmedinsBchno);
-        dataMap.put("inv_data_type",invDataType);
+        dataMap.put("fixmedins_bchno", fixmedinsBchno);
+        dataMap.put("inv_data_type", invDataType);
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("data", dataMap); //	交易输入
@@ -288,45 +289,45 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> dataMap = null;
         for (InsureGoodSell insureGoodSell : listInsureGoodSell) {
             dataMap = new HashMap<String, Object>();
-            if("".equals(insureGoodSell.getMedListCodg())&&StringUtils.isEmpty(insureGoodSell.getMedListCodg())){
+            if ("".equals(insureGoodSell.getMedListCodg()) && StringUtils.isEmpty(insureGoodSell.getMedListCodg())) {
                 throw new AppException("商品编码为空");
             }
-            dataMap.put("med_list_codg",insureGoodSell.getMedListCodg());//医疗目录编码
-            dataMap.put("fixmedins_hilist_id",insureGoodSell.getFixmedinsHilistId());//定点医药机构目录编号	　
-            dataMap.put("fixmedins_hilist_name",insureGoodSell.getFixmedinsHilistName());//定点医药机构目录名称
-            dataMap.put("fixmedins_bchno",insureGoodSell.getFixmedinsBchno());//定点医药机构批次流水号
-            dataMap.put("prsc_dr_cert_type",insureGoodSell.getPrscDrCertType())	;//开方医师证件类型
-            dataMap.put("prsc_dr_certno",insureGoodSell.getPrscDrCertno())	;//开方医师证件号码
-            dataMap.put("prsc_dr_name",insureGoodSell.getPrscDrName())	;//开方医师姓名
-            dataMap.put("phar_cert_type",insureGoodSell.getPharCertType())	;//药师证件类型
-            dataMap.put("phar_certno",insureGoodSell.getPharCertno())	;//药师证件号码
-            dataMap.put("phar_name",insureGoodSell.getPharName())	;//药师姓名
-            dataMap.put("phar_prac_cert_no",insureGoodSell.getPharPracCertNo())	;//药师执业资格证号
-            dataMap.put("hi_feesetl_type",insureGoodSell.getHiFeesetlType());//医保费用结算类型
-            dataMap.put("setl_id",insureGoodSell.getSetlId())	;//结算ID
-            dataMap.put("mdtrt_sn",insureGoodSell.getMdtrtSn())	;//就医流水号
-            dataMap.put("psn_no",insureGoodSell.getPsnNo())	;//人员编号
-            dataMap.put("psn_cert_type",insureGoodSell.getPsnCertType());//人员证件类型
-            dataMap.put("certno",insureGoodSell.getPharCertno())	;//证件号码
-            dataMap.put("psn_name",insureGoodSell.getPsnName())	;//人员姓名
-            dataMap.put("manu_lotnum",insureGoodSell.getManuLotnum())	;//生产批号
-            dataMap.put("manu_date",insureGoodSell.getManuDate())	;//生产日期
-            dataMap.put("expy_end",insureGoodSell.getExpyEnd())	;//有效期止
-            dataMap.put("rx_flag",insureGoodSell.getRxFlag())	;//处方药标志
-            dataMap.put("trdn_flag",insureGoodSell.getTrdnFlag())	;//拆零标志
-            dataMap.put("finl_trns_pric",insureGoodSell.getFinlTrnsPric())	;//最终成交单价
-            dataMap.put("rxno",insureGoodSell.getRxno())	;//处方号
-            dataMap.put("rx_circ_flag",insureGoodSell.getRxCircFlag())	;//外购处方标志
-            dataMap.put("rtal_docno",insureGoodSell.getRtalDocno())	;//零售单据号
-            dataMap.put("stoout_no",insureGoodSell.getStooutNo())	;//销售出库单2据号
-            dataMap.put("bchno",insureGoodSell.getBchno())	;//批次号
-            dataMap.put("drug_trac_codg",insureGoodSell.getDrugTracCodg())	;//药品追溯码
-            dataMap.put("drug_prod_barc",insureGoodSell.getDrugProdBarc())	;//药品条形码
-            dataMap.put("shelf_posi",insureGoodSell.getShelfPosi())	;//货架位
-            dataMap.put("sel_retn_cnt",insureGoodSell.getSelRetnCnt())	;//销售/退货数量
-            dataMap.put("sel_retn_time",insureGoodSell.getSelRetnTime())	;//销售/退货时间
-            dataMap.put("sel_retn_opter_name",insureGoodSell.getSelRetnOpterName())	;//销售/退货经办人姓名
-            dataMap.put("memo",insureGoodSell.getMemo())	;//备注
+            dataMap.put("med_list_codg", insureGoodSell.getMedListCodg());//医疗目录编码
+            dataMap.put("fixmedins_hilist_id", insureGoodSell.getFixmedinsHilistId());//定点医药机构目录编号	　
+            dataMap.put("fixmedins_hilist_name", insureGoodSell.getFixmedinsHilistName());//定点医药机构目录名称
+            dataMap.put("fixmedins_bchno", insureGoodSell.getFixmedinsBchno());//定点医药机构批次流水号
+            dataMap.put("prsc_dr_cert_type", insureGoodSell.getPrscDrCertType());//开方医师证件类型
+            dataMap.put("prsc_dr_certno", insureGoodSell.getPrscDrCertno());//开方医师证件号码
+            dataMap.put("prsc_dr_name", insureGoodSell.getPrscDrName());//开方医师姓名
+            dataMap.put("phar_cert_type", insureGoodSell.getPharCertType());//药师证件类型
+            dataMap.put("phar_certno", insureGoodSell.getPharCertno());//药师证件号码
+            dataMap.put("phar_name", insureGoodSell.getPharName());//药师姓名
+            dataMap.put("phar_prac_cert_no", insureGoodSell.getPharPracCertNo());//药师执业资格证号
+            dataMap.put("hi_feesetl_type", insureGoodSell.getHiFeesetlType());//医保费用结算类型
+            dataMap.put("setl_id", insureGoodSell.getSetlId());//结算ID
+            dataMap.put("mdtrt_sn", insureGoodSell.getMdtrtSn());//就医流水号
+            dataMap.put("psn_no", insureGoodSell.getPsnNo());//人员编号
+            dataMap.put("psn_cert_type", insureGoodSell.getPsnCertType());//人员证件类型
+            dataMap.put("certno", insureGoodSell.getPharCertno());//证件号码
+            dataMap.put("psn_name", insureGoodSell.getPsnName());//人员姓名
+            dataMap.put("manu_lotnum", insureGoodSell.getManuLotnum());//生产批号
+            dataMap.put("manu_date", insureGoodSell.getManuDate());//生产日期
+            dataMap.put("expy_end", insureGoodSell.getExpyEnd());//有效期止
+            dataMap.put("rx_flag", insureGoodSell.getRxFlag());//处方药标志
+            dataMap.put("trdn_flag", insureGoodSell.getTrdnFlag());//拆零标志
+            dataMap.put("finl_trns_pric", insureGoodSell.getFinlTrnsPric());//最终成交单价
+            dataMap.put("rxno", insureGoodSell.getRxno());//处方号
+            dataMap.put("rx_circ_flag", insureGoodSell.getRxCircFlag());//外购处方标志
+            dataMap.put("rtal_docno", insureGoodSell.getRtalDocno());//零售单据号
+            dataMap.put("stoout_no", insureGoodSell.getStooutNo());//销售出库单2据号
+            dataMap.put("bchno", insureGoodSell.getBchno());//批次号
+            dataMap.put("drug_trac_codg", insureGoodSell.getDrugTracCodg());//药品追溯码
+            dataMap.put("drug_prod_barc", insureGoodSell.getDrugProdBarc());//药品条形码
+            dataMap.put("shelf_posi", insureGoodSell.getShelfPosi());//货架位
+            dataMap.put("sel_retn_cnt", insureGoodSell.getSelRetnCnt());//销售/退货数量
+            dataMap.put("sel_retn_time", insureGoodSell.getSelRetnTime());//销售/退货时间
+            dataMap.put("sel_retn_opter_name", insureGoodSell.getSelRetnOpterName());//销售/退货经办人姓名
+            dataMap.put("memo", insureGoodSell.getMemo());//备注
             listMap.add(dataMap);
         }
         Map dataMap2 = new HashMap();
@@ -479,7 +480,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map<String, Object> dataMap = null;
         for (InsureInventoryCheck insureInventoryCheck : listInsureInventoryCheck) {
             dataMap = new HashMap<String, Object>();
-            if("".equals(insureInventoryCheck.getMedListCodg())&&StringUtils.isEmpty(insureInventoryCheck.getMedListCodg())){
+            if ("".equals(insureInventoryCheck.getMedListCodg()) && StringUtils.isEmpty(insureInventoryCheck.getMedListCodg())) {
                 throw new AppException("商品国家编码为空！");
             }
             dataMap.put("med_list_codg", insureInventoryCheck.getMedListCodg());//医疗目录编码	字符型	50		Y	新医保
@@ -505,15 +506,15 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传失败数据
         JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
-        List<InsureInventoryCheck> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureInventoryCheck.class);
-        if(sucessData.isEmpty()){
+        List<InsureInventoryCheck> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureInventoryCheck.class);
+        if (sucessData.isEmpty()) {
             throw new AppException("上传数据为空！");
         }
         //获取上传成功的数据
         List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
-        for (String fixmedinsBchno:fixmedinsBchnoList){
-            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
+        for (String fixmedinsBchno : fixmedinsBchnoList) {
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
             insureGoodInfoDelete.setId(SnowflakeUtils.getId());
             insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
             insureGoodInfoDelete.setHospCode(hospCode);
@@ -522,7 +523,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             insureGoodInfoDelete.setCertId(certId);
             listData.add(insureGoodInfoDelete);
         }
-        return updateStroAndSaveResultData(listData,hospCode,"1");
+        return updateStroAndSaveResultData(listData, hospCode, "1");
     }
 
     /**
@@ -577,7 +578,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public Boolean uploadInsureInventoryStock(Map<String, Object> map) {
         String hospCode = MapUtils.getEmptyErr(map, "hospCode", "医院编码不能为空！");
         String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
-        if (StringUtils.isEmpty(regCode)){
+        if (StringUtils.isEmpty(regCode)) {
             throw new AppException("医保机构编码不能为空!");
         }
         String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
@@ -633,7 +634,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             listData.add(insureGoodInfoDelete);
         }
 
-        return this.updateStroAndSaveResultData(listData,hospCode,"1");
+        return this.updateStroAndSaveResultData(listData, hospCode, "1");
     }
 
     /**

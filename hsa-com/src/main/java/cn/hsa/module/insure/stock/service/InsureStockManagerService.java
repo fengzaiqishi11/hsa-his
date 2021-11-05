@@ -105,10 +105,12 @@ public interface InsureStockManagerService {
 
 
     /**
-     * 查询商品盘点信息
-     *
-     * @param map
-     * @return
+     * @Meth: queryInsureInventoryCheckPage
+     * @Description: 查询需要上传的盘存信息
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
      */
     WrapperResponse<PageDTO> queryInsureInventoryCheckPage(Map<String, Object> map);
 

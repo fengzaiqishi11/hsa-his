@@ -21,6 +21,8 @@ public class InsureGoodInfoDelete extends PageDO implements Serializable {
     private String id;
     private String insureType;
     private String hospCode;
+    private String itemName;
     private Date uploadTime;
     private String certId;
+    private String certName;
 }

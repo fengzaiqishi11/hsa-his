@@ -34,6 +34,7 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodBuy.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodBuy",insureGoodBuy);
         return insureStockManagerService_consumer.queryInsureGoodBuyPage(map);
     }

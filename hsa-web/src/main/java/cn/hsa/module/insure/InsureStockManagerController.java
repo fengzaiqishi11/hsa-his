@@ -67,12 +67,11 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<PageDTO> queryInsureGoodBuyBackPage(InsureGoodBuyBack insureGoodBuyBack, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
+        insureGoodBuyBack.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureGoodBuyBack",insureGoodBuyBack);
         return insureStockManagerService_consumer.queryInsureGoodBuyBackPage(map);
     }
-
-    ;
 
     /**
      * 上传商品采购退货信息

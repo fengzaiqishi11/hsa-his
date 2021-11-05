@@ -139,4 +139,6 @@ public interface InsureStockManagerDAO {
      * @Date: 2021/11/5
      */
     int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
+
+    void updateStockUpload(Map<String, Object> map);
 }

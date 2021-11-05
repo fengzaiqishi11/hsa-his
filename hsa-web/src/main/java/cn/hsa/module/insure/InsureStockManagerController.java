@@ -34,6 +34,7 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodBuy.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodBuy",insureGoodBuy);
         return insureStockManagerService_consumer.queryInsureGoodBuyPage(map);
     }
@@ -67,12 +68,11 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<PageDTO> queryInsureGoodBuyBackPage(InsureGoodBuyBack insureGoodBuyBack, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
+        insureGoodBuyBack.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureGoodBuyBack",insureGoodBuyBack);
         return insureStockManagerService_consumer.queryInsureGoodBuyBackPage(map);
     }
-
-    ;
 
     /**
      * 上传商品采购退货信息
@@ -214,7 +214,7 @@ public class InsureStockManagerController extends BaseController {
 
     /**
      * 查询商品盘点信息
-     *
+     *【3501】商品盘存上传
      * @param insureInventoryCheck
      * @return
      */
@@ -233,7 +233,7 @@ public class InsureStockManagerController extends BaseController {
 
     /**
      * 上传商品盘点信息
-     *
+     *【3501】商品盘存上传
      * @param map
      * @return
      */

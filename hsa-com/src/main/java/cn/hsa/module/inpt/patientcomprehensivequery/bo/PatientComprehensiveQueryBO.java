@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQuer
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.inpt.patientcomprehensivequery
@@ -188,4 +189,17 @@ public interface PatientComprehensiveQueryBO {
    * @Return cn.hsa.base.PageDTO
    **/
     PageDTO queryCostDetail(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO);
+
+
+  /**
+   * @Method queryJS
+   * @Desrciption 查询结算信息业务类型
+   * @Param
+   * [sysUserDTO]
+   * @Author yuelong.chen
+   * @Date   2021/11/4 11:18
+   * @Return
+   *
+   * @return*/
+    List<Map<String, Object>> queryYWLX(Map map);
 }

@@ -102,10 +102,10 @@ public interface InsureStockManagerDAO {
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);
     /**
      * 批量修改商品盘点信息
-     * @param listInsureInventoryCheck
+     * @param
      * @return
      */
-    int updateInsureInventoryCheckBatch(List<InsureInventoryCheck> listInsureInventoryCheck);
+    int updateInsureInventoryCheckBatch(@Param("fixmedinsBchnoList")List<String> fixmedinsBchnoList);
 
 
     /**

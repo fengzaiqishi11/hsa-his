@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.hsa.module.insure.stock.dao.InsureStockManagerDAO">
+    <update id="updateInsureGoodSellBatch"></update>
+
+    <update id="updateInsureInventoryCheckBatch">
+        update stro_invoicing
+        set upload_insure = '1'
+        where id in
+        <foreach collection="fixmedinsBchnoList" open="(" close=")" item="fixmedinsBchno" separator=",">
+            #{fixmedinsBchno}
+        </foreach>
+    </update>
 
     <select id="queryInsureGoodBuyPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodBuy">
     select
@@ -67,7 +77,6 @@
         select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId from insure_stock_upload
 
         where 1=1
-
         <if test="insureType != null and insureType != ''">
            and  insure_type = #{insureType}
         </if>
@@ -164,24 +173,32 @@
     </select>
 
     <select id="queryInsureInventoryCheckPage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryCheck">
-    SELECT
-        e.insure_item_code  as  medListCodg,
-        case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
-        b.item_name as fixmedinsHilistName,
-        '1' as rx_flag,
-        a.crte_time as invdate,
-        b.final_num as invCnt,
-        b.batch_no as manuLotnum,
-        a.order_no as fixmedinsBchno,
-        a.crte_time  as  manuDate,
-        a.crte_time  as  expyEnd,
-        a.remark as	memo
-    FROM
-        stro_inventory a
-        JOIN stro_inventory_detail b ON a.id = b.inventory_id and a.hosp_code = b.hosp_code
-        LEFT JOIN base_material c on b.item_id = c.id  and c.hosp_code = b.hosp_code
-        left join base_drug d on b.item_id = d.id  and d.hosp_code = b.hosp_code
-        left join insure_item_match e on b.item_id = e.hosp_item_id and e.hosp_code = b.hosp_code
+        SELECT distinct
+        a.insure_item_code as medlistcodg,
+        a.hosp_item_code as fixmedinsHilistId,
+        a.hosp_item_name as fixmedinsHilistName,
+        '1'  as rx_flag,
+        si.crte_time as invdate,
+        si.surplus_num as invCnt,
+        DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manu_date,
+        si.batch_no as manuLotnum,
+        si.id as fixmedinsBchno,
+        si.expiry_date as expy_end,
+        si.sell_price as price,
+        ''as memo
+        FROM
+        (
+        SELECT *   FROM stro_invoicing
+        where outin_code in ('7','8')
+        ) si
+        LEFT JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        where si.hosp_code =#{hospCode}
+        <if test="fixmedinsHilistName != null and fixmedinsHilistName != ''">
+            and a.hosp_item_name = #{fixmedinsHilistName}
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            and si.upload_insure = #{isUpload}
+        </if>
     </select>
 
     <select id="queryInsureInventoryStockUpdatePage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">

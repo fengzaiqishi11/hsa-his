@@ -194,7 +194,7 @@ public class InsureStockManagerController extends BaseController {
 
     /**
      * 查询商品盘点信息
-     *
+     *【3501】商品盘存上传
      * @param insureInventoryCheck
      * @return
      */
@@ -213,7 +213,7 @@ public class InsureStockManagerController extends BaseController {
 
     /**
      * 上传商品盘点信息
-     *
+     *【3501】商品盘存上传
      * @param map
      * @return
      */

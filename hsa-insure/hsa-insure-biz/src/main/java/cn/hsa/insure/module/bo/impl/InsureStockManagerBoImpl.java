@@ -19,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -439,7 +436,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     @Override
     public List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck) {
         PageHelper.startPage(insureInventoryCheck.getPageNo(), insureInventoryCheck.getPageSize());
-        return insureStockManagerDAO.queryInsureInventoryCheckPage(insureInventoryCheck);
+        List<InsureInventoryCheck> insureInventoryChecks = insureStockManagerDAO.queryInsureInventoryCheckPage(insureInventoryCheck);
+        return insureInventoryChecks;
     }
 
     /**
@@ -475,22 +473,39 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             dataMap.put("memo", insureInventoryCheck.getMemo());//备注	字符型	500	　	　	新医保
             listMap.add(dataMap);
         }
-
         paramMap.put("purcinfo", listMap);
-
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3501, paramMap);
-
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
-        //上传成功数据
+        //上传失败数据
         JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
-
         List<InsureInventoryCheck> sucessDataList = JSONArray.parseArray(sucessData.toString(),InsureInventoryCheck.class);
 
-        //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        try {
+            if(!failData.isEmpty()){
+                throw new AppException("上传信息不完整！");
+            }
+        } finally {
+            if(!sucessData.isEmpty()){
+                insertStockUploadBatch(sucessDataList,hospCode,regCode,certId);
+            }
+        }
 
+        return true;
+    }
+
+    /**
+     * 保存上传入库数据
+     * @param
+     * @return
+     */
+    public void insertStockUploadBatch(List<InsureInventoryCheck> sucessDataList ,  String hospCode,  String regCode,  String certId){
+        //获取上传成功的数据
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        //将上传数据状态改变
+        int i = insureStockManagerDAO.updateInsureInventoryCheckBatch(fixmedinsBchnoList);
+        //将数据插入删除表中//遍历集合
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (String fixmedinsBchno:fixmedinsBchnoList){
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete ();
@@ -500,15 +515,13 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             insureGoodInfoDelete.setInsureType(regCode);
             insureGoodInfoDelete.setInvDataType("1");
             insureGoodInfoDelete.setCertId(certId);
+            insureGoodInfoDelete.setUploadTime(new Date());
             listData.add(insureGoodInfoDelete);
         }
-
         if (!ListUtils.isEmpty(listData)){
             insureStockManagerDAO.insertStockUploadBatch(listData);
         }
-        return true;
     }
-
     /**
      * 查询商品库存变更信息
      *
@@ -609,7 +622,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     private Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(orgCode);
+        insureConfigurationDTO.setRegCode(orgCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if(insureConfigurationDTO == null){

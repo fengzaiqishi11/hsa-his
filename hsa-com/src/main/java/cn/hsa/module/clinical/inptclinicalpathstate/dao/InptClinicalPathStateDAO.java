@@ -2,8 +2,10 @@ package cn.hsa.module.clinical.inptclinicalpathstate.dao;
 
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
+import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -64,6 +66,19 @@ public interface InptClinicalPathStateDAO {
     int insertInptClinicalPathStateByVisitId(List<InptClinicalPathStateDTO> inptClinicalPathStateDTOS);
 
     /**
+    * @Menthod queryNotExecItem
+    * @Desrciption 查询阶段未执行项目
+    *
+    * @Param
+    * [inptClinicalPathStateDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/10/26 10:33
+    * @Return java.util.List<cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO>
+    **/
+    List<ClinicPathStageDetailDTO> queryNotExecItem(InptClinicalPathStageDTO inptClinicalPathStageDTO);
+
+    /**
     * @Menthod queryDeptByClinicalPathDeptId
     * @Desrciption 查询科室
     *
@@ -102,4 +117,29 @@ public interface InptClinicalPathStateDAO {
     **/
     InptClinicalPathStateDTO getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO);
 
+    /**
+    * @Menthod quertClinicalVisitById
+    * @Desrciption 根据id查询 在径病人信息
+    *
+    * @Param
+    * [hospCode, list]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/10/25 10:18
+    * @Return java.util.List<java.lang.String>
+    **/
+    List<InptClinicalPathStateDTO> quertClinicalVisitById(@Param("hospCode") String hospCode, @Param("list") List<String> list);
+
+    /**
+    * @Menthod updateTotalPriceById
+    * @Desrciption 更新
+    *
+    * @Param
+    * [inptClinicalPathStateDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/10/25 11:16
+    * @Return java.lang.Boolean
+    **/
+    Boolean updateTotalPriceById(@Param("list") List<InptClinicalPathStateDTO> inptClinicalPathStateDTOS);
 }

@@ -5,7 +5,6 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.bo.InsurePersonnalRecordBO;
-import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
 import cn.hsa.module.insure.module.service.InsurePersonnalRecordService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;

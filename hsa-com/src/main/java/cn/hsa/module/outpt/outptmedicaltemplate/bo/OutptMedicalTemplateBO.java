@@ -96,4 +96,14 @@ public interface OutptMedicalTemplateBO {
   Boolean updateStatus(OutptMedicalTemplateDTO outptMedicalTemplateDTO);
 
   Boolean deleteById(String id);
+
+  /**
+   * @Menthod queryAllMedicalTemplate
+   * @Desrciption 查询所有门诊病历模板
+   * @Param [outptMedicalTemplateDTO]
+   * @Author liuliyun
+   * @Date   2021/10/21 15:27
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   **/
+  PageDTO queryAllMedicalTemplate(OutptMedicalTemplateDTO outptMedicalTemplateDTO);
 }

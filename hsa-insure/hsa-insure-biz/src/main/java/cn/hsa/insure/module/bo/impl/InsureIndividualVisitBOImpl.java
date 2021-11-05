@@ -325,6 +325,8 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
              */
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("hospCode", hospCode);
+            paramMap.put("crteId",crteId);
+            paramMap.put("crteName",crteName);
             paramMap.put("visitId", visitId);
             paramMap.put("jsonArray", jsonArray);
             /**
@@ -332,6 +334,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
              * 医保登记成功以后保存医保唯一返回流水号
              */
             InsureIndividualVisitDTO responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
+
             insureIndividualVisitDAO.updateByPrimaryKeySelective(responseData);
             Map<String, Object> outptVisitMap = new HashMap<>();
             outptVisitDTO = new OutptVisitDTO();
@@ -343,6 +346,9 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             outptVisitDTO.setPreferentialTypeId(preferentialTypeId);
             outptVisitMap.put("hospCode", hospCode);
             outptVisitMap.put("outptVisitDTO", outptVisitDTO);
+            paramMap.put("crteName",crteName);
+            paramMap.put("crteId",crteId);
+            paramMap.put("visitId",visitId);
             paramMap.put("outptVisitDTO", outptVisitDTO);
             outptVisitService_consumer.updateOutptVisit(outptVisitMap).getData();
             insureUnifiedPayOutptService.insureOutptVisitUpload(paramMap);

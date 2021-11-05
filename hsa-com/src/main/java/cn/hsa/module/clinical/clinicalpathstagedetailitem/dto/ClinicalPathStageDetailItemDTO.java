@@ -30,4 +30,8 @@ public class ClinicalPathStageDetailItemDTO extends ClinicalPathStageDetailItemD
   private String  bigTypeCode;
   private String  splitUnitCode;
   private String  bigUnitCode;
+  private String  isExec; // 是否执行
+  private String clinicalPathStageId;  //入径病人状态id
+  private String pharId;
+  private String loginDeptId;
 }

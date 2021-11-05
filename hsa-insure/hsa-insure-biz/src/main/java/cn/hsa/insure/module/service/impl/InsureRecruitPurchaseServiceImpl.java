@@ -39,8 +39,8 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
      * @return
      */
     @Override
-    public WrapperResponse<Map<String, Object>> queryAll(Map<String, Object> map) {
-        return WrapperResponse.success(insureRecruitPurchaseBO.queryAll(map));
+    public WrapperResponse<PageDTO> queryAll(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.queryAll(MapUtils.get(map,"insureRecruitPurchaseDTO")));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
      * @Return: list
      **/
     @Override
-    public WrapperResponse<List<Map<String, Object>>> queryDrugSells(Map<String, Object> map) {
+    public WrapperResponse<PageDTO> queryDrugSells(Map<String, Object> map) {
         return WrapperResponse.success(insureRecruitPurchaseBO.queryDrugSells(MapUtils.get(map, "insureRecruitPurchaseDTO")));
     }
 
@@ -125,4 +125,46 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
     public WrapperResponse<Boolean> deleteDrugSells(Map<String, Object> map) {
         return WrapperResponse.success(insureRecruitPurchaseBO.deleteDrugSells(map));
     }
+
+    /**
+     * @param paramMap
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> selectCommonInterfaceTest(Map<String, Object> paramMap) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.selectCommonInterfaceTest(paramMap));
+    }
+
+    /**
+     * @param paramMap
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     * @Author fuhui
+     * @Date 2021/8/26 9:43
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.getToken(paramMap));
+    }
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    @Override
+    public WrapperResponse<Boolean> updateToInsure(Map<String, Object> map) {
+        return WrapperResponse.success(insureRecruitPurchaseBO.updateToInsure(map));
+
+    }
+
 }

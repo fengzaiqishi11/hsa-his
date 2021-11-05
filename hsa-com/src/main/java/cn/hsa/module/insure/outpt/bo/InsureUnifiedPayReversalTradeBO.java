@@ -122,4 +122,13 @@ public interface InsureUnifiedPayReversalTradeBO {
     **/
     Map<String,Object> updateUP_5265(Map<String, Object> parameterMap);
 
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    Map<String,Object> queryStatementInfo(Map<String, Object> paraMap);
 }

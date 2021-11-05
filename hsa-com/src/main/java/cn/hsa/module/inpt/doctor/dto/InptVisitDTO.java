@@ -412,6 +412,7 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String clinicalListName;
     // 路径ID
     private String listId;
+    private String settleId;
     // 住院天数
     private Integer inDays;
     /**
@@ -422,4 +423,18 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 剂型
      */
     private String prepCode;
+
+    //结算时间
+    private String settleStartTime;
+    //结算时间
+    private String settleEndTime;
+    /**
+     * 合并结算总费用
+     */
+    private BigDecimal totalMergeCost;
+
+    /**
+     * 合并结算预交金余额
+     */
+    private BigDecimal totalMergeBalance;
 }

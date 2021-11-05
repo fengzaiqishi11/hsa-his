@@ -49,7 +49,7 @@
         a.preferential_type_id, a.patient_code, a.bed_id, a.bed_name,a.cert_no,a.in_disease_name,a.in_disease_id,a.in_time,
         (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,a.in_dept_id,
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
-        cp.name as listName,d.name as stageName,a.in_time as inTimestring,c.list_id,c.stage_id,c.id,
+        cp.name as listName,d.name as stageName,a.in_time as inTimestring,c.list_id,c.stage_id,c.id,a.out_time as outTime,
         CONCAT(
         a.name,'/',
         IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
@@ -226,13 +226,46 @@
 
     <select id="getPatientByVisitID" resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
       select a.id,iv.id as visitId,iv.in_no,iv.name,iv.gender_code,iv.age,iv.bed_id,iv.bed_name,iv.in_time,
-      iv.in_disease_name,a.path_crte_time,a.path_crte_name,a.list_id,a.stage_id,a.total_price,a.path_state,
+      iv.in_disease_name,a.path_crte_time,a.path_crte_name,a.list_id,a.stage_id,a.path_state,
       a.stage_name,a.start_stage_name,
       (select b.name from clinical_path_list b where b.id = a.list_id and b.hosp_code = a.hosp_code ) as listName,
-      (select c.begin_time from inpt_clinical_path_stage c where c.stage_id = a.stage_id and c.hosp_code = a.hosp_code and a.id = c.clinical_path_stage_id) as beginTime
+      (select c.begin_time from inpt_clinical_path_stage c where c.stage_id = a.stage_id and c.hosp_code = a.hosp_code and a.id = c.clinical_path_stage_id) as beginTime,
+      (select sum(ifnull(reality_price,0)) realityPrice from inpt_cost cost where cost.visit_id = #{visitId} and cost.hosp_code = a.hosp_code
+      and (cost.baby_id is null or cost.baby_id = '') and cost.cost_time &gt;= a.path_crte_time) as total_price
       from inpt_clinical_path_state a
       join inpt_visit iv on a.visit_id = iv.id and a.hosp_code = iv.hosp_code
-      where a.visit_id = #{ visitId } and a.list_id = #{listId} and a.path_state = "1"
+      where a.visit_id = #{ visitId } and a.path_state = "1"
+      <if test="id != null and id != ''">
+        and a.list_id = #{listId}
+      </if>
     </select>
 
+    <select id="quertClinicalVisitById" resultType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+      select a.visit_id,a.path_crte_time,a.id,a.hosp_code from inpt_clinical_path_state a
+      where a.hosp_code = #{hospCode} and a.path_state = '1' and a.visit_id in
+      <foreach collection="list" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </select>
+
+    <update id="updateTotalPriceById" parameterType="cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO">
+    <foreach collection="list" item="item" separator=";">
+      update inpt_clinical_path_state a, (
+      select cost.visit_id, cost.hosp_code, sum(ifnull(reality_price,0)) realityPrice from inpt_cost cost where
+      cost.visit_id = #{item.visitId} and cost.hosp_code = #{item.hospCode} and (cost.baby_id is null or cost.baby_id = '')
+      and cost.cost_time &gt;= #{item.pathCrteTime}
+      )b set a.total_price= b.realityPrice
+      where a.id=#{item.id} and a.hosp_code=#{item.hospCode} and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+    </foreach>
+  </update>
+
+  <select id="queryNotExecItem" resultType="cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO">
+    select a.item_id,c.name as itemName from clinical_path_stage_detail a
+		left join clinical_path_item c on a.item_id = c.id and a.hosp_code = c.hosp_code
+		where a.hosp_code = #{hospCode} and a.list_id = #{listId} and a.stage_id = #{stageId}
+		and a.id not in (
+		  select b.detail_id from clinic_path_exec b where b.clinical_path_stage_id = #{clinicalPathStageId}
+			and list_id = #{listId} and stage_id = #{stageId} and is_exec = '1'
+		 )
+  </select>
 </mapper>

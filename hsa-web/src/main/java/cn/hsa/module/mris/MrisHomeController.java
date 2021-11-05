@@ -54,10 +54,17 @@ public class MrisHomeController extends BaseController {
     @GetMapping(value = "/queryOutHospPatientPage")
     public WrapperResponse<PageDTO> queryOutHospPatientInfo(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
         inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        inptVisitDTO.setZgDoctorId(sysUserDTO.getId()); // liuliyun 20211022 病案首页添加主管医生过滤
         Map<String,Object> selectMap = new HashMap<>();
         if (sysUserDTO.getLoginBaseDeptDTO() != null) {
-            inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                inptVisitDTO.setInDeptId(null);
+            } else {
+                inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
         }
         selectMap.put("hospCode",sysUserDTO.getHospCode());
         selectMap.put("inptVisitDTO", inptVisitDTO);

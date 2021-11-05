@@ -161,4 +161,25 @@ public class OutptMedicalTemplateController extends BaseController {
     return outptMedicalTemplateService_consumer.updateStatus(map);
   }
 
+  /**
+   * @Menthod queryAllMedicalTemplate
+   * @Desrciption 查询所有门诊病历模板
+   * @Param [outptMedicalTemplateDTO]
+   * @Author liuliyun
+   * @Date   2021/10/21 15:27
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   **/
+  @RequestMapping(value = "/queryAllMedicalTemplate")
+  public WrapperResponse<PageDTO> queryAllMedicalTemplate(OutptMedicalTemplateDTO outptMedicalTemplateDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    map.put("hospCode",userDTO.getHospCode());
+    map.put("outptMedicalTemplateDTO",outptMedicalTemplateDTO);
+    outptMedicalTemplateDTO.setDoctorId(userDTO.getId());
+    outptMedicalTemplateDTO.setDeptId(userDTO.getLoginBaseDeptDTO() == null? null:
+            userDTO.getLoginBaseDeptDTO().getId());
+    outptMedicalTemplateDTO.setHospCode(userDTO.getHospCode());
+    return outptMedicalTemplateService_consumer.queryAllMedicalTemplate(map);
+  }
+
 }

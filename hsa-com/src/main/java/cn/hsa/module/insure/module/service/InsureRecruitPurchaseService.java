@@ -27,7 +27,7 @@ public interface InsureRecruitPurchaseService {
      * @param map
      * @return
      */
-    WrapperResponse<Map<String, Object>> queryAll(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryAll(Map<String, Object> map);
     /**
      * @Description: 获取当前医院库存列表
      * @Param: [map]
@@ -79,7 +79,7 @@ public interface InsureRecruitPurchaseService {
      * @Return: list
      **/
     @PostMapping("/service/insure/insureRecruitPurchase/queryDrugSells")
-    WrapperResponse<List<Map<String, Object>>> queryDrugSells(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryDrugSells(Map<String, Object> map);
 
     /**
      * @Menthod:
@@ -104,4 +104,35 @@ public interface InsureRecruitPurchaseService {
      **/
     @PostMapping("/service/insure/insureRecruitPurchase/deleteDrugSells")
     WrapperResponse<Boolean> deleteDrugSells(Map<String, Object> map);
+
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> selectCommonInterfaceTest(Map<String, Object> paramMap);
+
+    /**
+     * @Method selectCommonInterfaceTest
+     * @Desrciption 招采接口： 接口连通性测试
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/8/26 9:43
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> getToken(Map<String, Object> paramMap);
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    WrapperResponse<Boolean> updateToInsure(Map<String, Object> map);
 }

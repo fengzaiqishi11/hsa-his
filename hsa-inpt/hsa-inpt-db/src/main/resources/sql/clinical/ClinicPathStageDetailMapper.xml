@@ -22,6 +22,7 @@
         <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
         <result property="describe" column="describe" jdbcType="VARCHAR"/>
         <result property="listName" column="listName" jdbcType="VARCHAR"/>
+        <result property="printClunm" column="printClunm" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -37,18 +38,21 @@
           id, hosp_code, list_id, stage_id, code, item_type, item_id, item_supply_type, is_must, classify, sort_no, remarke, is_operation_day, crte_id, crte_name, crte_time
         from clinical_path_stage_detail
         where hosp_code = #{hospCode}
-      order by sort_no desc limit 1
+        order by (sort_no + 0) desc limit 1
     </select>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryAllClinicPathStageDetail" resultMap="ClinicPathStageDetailMap">
         select
           a.id, a.hosp_code, a.list_id, a.stage_id, a.code, a.item_type, a.item_id, a.item_supply_type, a.is_must, a.classify,
-        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName
+        a.sort_no, a.remarke, a.is_operation_day, a.crte_id, a.crte_name, a.crte_time,b.name as itemName,c.describe,l.name as listName,
+        l.print_colunm as printClunm,
+        ifnull((select e.is_exec from clinic_path_exec e where e.list_id = a.list_id and e.stage_id = a.stage_id and e.detail_id = a.id
+        and e.clinical_path_stage_id = #{clinicalPathStageId} and e.hosp_code = a.hosp_code limit 1 ), '0' ) AS isExec
         from clinical_path_stage_detail a
         join clinical_path_item b on a.item_id = b.id and a.hosp_code = b.hosp_code
         join clinical_path_stage c on c.id = a.stage_id and a.hosp_code = b.hosp_code
-        join clinical_path_list l on l.id = a.list_id
+        join clinical_path_list l on l.id = a.list_id and a.hosp_code = l.hosp_code
         where a.hosp_code = #{hospCode}
             <if test="id != null and id != ''">
                 and a.id = #{id}

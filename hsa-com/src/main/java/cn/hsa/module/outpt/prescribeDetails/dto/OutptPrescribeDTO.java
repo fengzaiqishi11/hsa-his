@@ -92,5 +92,6 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
      * 配药打印处方单患者信息
      */
     private Map<String, Object> singlePatInfo;
+    private List<String> diagnoseList;
 }
 

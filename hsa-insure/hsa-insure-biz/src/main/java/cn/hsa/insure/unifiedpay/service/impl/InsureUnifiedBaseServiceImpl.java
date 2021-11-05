@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
@@ -335,6 +336,110 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
     @Override
     public WrapperResponse<Map<String, Object>> queryInform(Map<String, Object> map) {
         return  WrapperResponse.success(insureUnifiedBaseBO.queryInform(map));
+    }
+
+    /**
+     * @param map
+     * @Method updateInsureInptRegisterStatus
+     * @Desrciption 更新医保登记状态（医保已经登记 而his没有登记）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/8 8:33
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateInsureInptRegisterStatus(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.updateInsureInptRegisterStatus(map));
+    }
+
+    /**
+     * @param map
+     * @Method updateInsureInptSettleStatus
+     * @Desrciption 更新医保结算状态（医保已经结算 而his没有结算）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/8 10:07
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateInsureInptSettleStatus(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.updateInsureInptSettleStatus(map));
+    }
+
+    /**
+     * @Method updateInsureInptCancelSettleStatus
+     * @Desrciption  同步取消结算状态  his和医保
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:21
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateInsureInptCancelSettleStatus(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.updateInsureInptCancelSettleStatus(map));
+    }
+
+    /**
+     * @param map
+     * @Method updateInptPatientCode
+     * @Desrciption 修改病人类型
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/8 10:21
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateInptPatientCode(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.updateInptPatientCode(map));
+    }
+
+    /**
+     * @param map
+     * @Method 查询住院医保病人类型
+     * @Desrciption
+     * @Param
+     * @Author fuhui
+     * @Date 2021/10/9 9:42
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryInptInsurePatient(Map<String,Object>map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        return  WrapperResponse.success(insureUnifiedBaseBO.queryInptInsurePatient(insureIndividualVisitDTO));
+    }
+
+    @Override
+    public WrapperResponse<Map<String,Object>> querySettleDeInfo(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.querySettleDeInfo(map));
+    }
+
+    /**
+     * @Method queryPolicyInfo
+     * @Desrciption  政策项查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/23 15:47
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryPolicyInfo(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.queryPolicyInfo(map));
+    }
+
+    /**
+     * @param map
+     * @Method checkOneSettle
+     * @Desrciption 判读是否打印一站式结算单
+     * @Param map insureIndividualVisitDTO
+     * @Author fuhui
+     * @Date 2021/10/23 15:20
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> checkOneSettle(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.checkOneSettle(map));
     }
 
 }

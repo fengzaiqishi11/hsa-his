@@ -3,6 +3,7 @@ package cn.hsa.outpt.fees.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.service.*;
@@ -100,6 +101,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private OutptRegisterDAO outptRegisterDAO;
     @Resource
     private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    @Resource
+    private RedisUtils  redisUtils;
 
 
     /**
@@ -224,8 +228,12 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (outpt == null) {
             throw new AppException("患者就诊数据出现异常【" + visitId + "】，请联系管理员");
         }
-
-        if (!Constants.BRLX.PTBR.equals(outpt.getPatientCode())) {
+        // 病人类型为空 给默认值  lly 20211026
+        if (StringUtils.isEmpty(outpt.getPatientCode())){
+            outpt.setPatientCode("0");
+        }
+        Integer patientCodeValue = Integer.parseInt(outpt.getPatientCode());
+        if (patientCodeValue > 0) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);
             if (insureIndividualBasicDTO == null) {
                 throw new AppException("未进行医保登记，医保退费失败");
@@ -332,6 +340,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     insureIndividualCostService_consumer.deleteOutptInsureCost(map);
                 }
                 InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+                individualSettleDTO.setId(insureRedSettleId);
+                individualSettleDTO.setHospCode(hospCode);
                 individualSettleDTO.setOinfno(MapUtils.get(resultMap,"funtionCode"));
                 individualSettleDTO.setOmsgid(MapUtils.get(resultMap,"msgId"));
                 individualSettleDTO.setInsureSettleId(MapUtils.get(setlInfoMap,"setl_id"));
@@ -410,7 +420,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
        // TODO 非医保病人自动退费
         // 如果有再收的费用且是普通病人，自动收费
-        if (!ListUtils.isEmpty(costDTOList) && Constants.BRLX.PTBR.equals(outpt.getPatientCode())) {
+
+        if (!ListUtils.isEmpty(costDTOList) && patientCodeValue < 1) {
         Map<String,Object> map = new HashMap<>();
         if (StringUtils.isEmpty(outptSettleDTO.getVisitId())) {
             throw new AppException("未获取到就诊信息");
@@ -581,6 +592,30 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         chargeParams.put("outptSettleDTO",newOutptSettleDTO);
         chargeParams.put("hospCode",hospCode);
         // outptTmakePriceFormService_consumer.saveOutptSettle(chargeParams);
+
+
+            /**
+             *   当取消结算的时候 出现医保和his单边账
+             *   1.医保已经取消  而his没有取消结算 这个时候就需要调用单边账（取消结算单边功能）
+             *   2.作废医保结算记录 置空医保结算id  把病人类型改完自费病人。his结算表变为自费病人
+             *   3.再把患者变成自费病人结算，结算完成以后（需要判断医保是否有作废的数据）  再修改病人类型
+             *   4.病人类型的值存在redis里面中（取消结算单边功能存入）
+             */
+            selectMap.put("settleId",settleId);
+            List<InsureIndividualSettleDTO> settleDTOList =  outptSettleDAO.queryOutptSettle(selectMap);
+            String redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).
+                    append("2208").append("^").toString();
+            if(ListUtils.isEmpty(settleDTOList)){
+                String redisValue = redisUtils.get(redisKey);
+                if(StringUtils.isNotEmpty(redisValue)){
+                    OutptVisitDTO dto = new OutptVisitDTO();
+                    dto.setHospCode(hospCode);//医院编码
+                    dto.setId(visitId);//就诊id
+                    dto.setPatientCode(redisValue);
+                    outptVisitDAO.updateOutptVisit(dto);
+                }
+            }
+
         outptTmakePriceFormService_consumer.saveOutptSettleByTf(chargeParams);
         }
        /***********End*****************非医保病人自动收费************************************/
@@ -786,7 +821,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
                             && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
 
@@ -1212,6 +1247,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         selectOutptSettleDTO.setSelfPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getSelfPrice()));
         selectOutptSettleDTO.setTotalPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTotalPrice()));
         selectOutptSettleDTO.setTruncPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTruncPrice()));
+        selectOutptSettleDTO.setAcctPay(BigDecimalUtils.negate(selectOutptSettleDTO.getAcctPay()));
 
         // 创建信息
         selectOutptSettleDTO.setCrteId(outptSettleDTO.getCrteId());

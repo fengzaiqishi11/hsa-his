@@ -103,6 +103,9 @@
         <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"/>
         <result property="yylx" column="yylx" jdbcType="VARCHAR"/>
         <result property="advanceDays" column="advance_days" jdbcType="VARCHAR"/>
+        <result property="technologyCode" column="technology_code" jdbcType="VARCHAR"/>
+        <result property="containerCode" column="container_code" jdbcType="VARCHAR"/>
+        <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -185,6 +188,8 @@
         <result property="inTimestring" column="in_time" jdbcType="TIMESTAMP"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="inNum" column="inNum" jdbcType="INTEGER"/>
+        <result property="totalMergeCost" column="totalMergeCost" jdbcType="NUMERIC"/>
+        <result property="totalMergeBalance" column="totalMergeBalance" jdbcType="NUMERIC"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
@@ -242,7 +247,9 @@
         a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
         a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
         (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
-        (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum
+        (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
+        (a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
+        (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
         from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
         where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
         <if test="id != null and id != ''">
@@ -281,7 +288,7 @@
         if(a.item_code = '4', b.is_stop_myself,null  ) isStopMyself, a.source_ia_id source_ia_id, a.advice_prefix, a.advice_suffix, a.collect_blood_time,
         case when e.id is null then '0' else '1' end isWz, a.cancel_id, a.cancel_name, a.cancel_time, a.skin_durg_id,
         ef.good_name skinDurgName, a.skin_phar_id, a.skin_unit_code, case when a.item_code = '1' then '2' when a.item_code = '2' then '3' when a.item_code = '4' and e.id is not null then '4'
-        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx
+        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx, b.technology_code, b.container_code, b.specimen_code
         from inpt_advice a
         left join base_advice b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '4'
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
@@ -318,7 +325,8 @@
         plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time,
         last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
         stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time,
-        skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx
+        skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx,stage_detail_item_id,
+        clinical_path_stage_id
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -404,7 +412,9 @@
             #{item.advicePrefix},
             #{item.adviceSuffix},
             #{item.collectBloodTime},
-            #{item.yylx}
+            #{item.yylx},
+            #{item.stageDetailItemId},
+            #{item.clinicalPathStageId}
             )
         </foreach>
     </insert>
@@ -1672,6 +1682,7 @@
                  join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
                  join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
         where  a.visit_id = #{id} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+                and  iim.insure_illness_name is not null
         <if test="diagnoseList != null and diagnoseList.size() > 0">
             and a.type_code in
             <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">

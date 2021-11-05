@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Package_name: cn.hsa.module.clinical.clinicpathexec.dto
@@ -24,4 +25,7 @@ import java.io.Serializable;
 public class ClinicPathExecDTO extends ClinicPathExecDO implements Serializable {
   private static final long serialVersionUID = 4877084765784812418L;
   private String keyword;
+  List<ClinicPathExecDTO> clinicPathExecDTOList;
+  private String typeFlag;
+  private String deptId;
 }

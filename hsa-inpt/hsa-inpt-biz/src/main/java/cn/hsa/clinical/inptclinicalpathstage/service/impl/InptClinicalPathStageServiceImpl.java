@@ -3,6 +3,7 @@ package cn.hsa.clinical.inptclinicalpathstage.service.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.bo.InptClinicalPathStageBO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService;
@@ -95,6 +96,22 @@ public class InptClinicalPathStageServiceImpl implements InptClinicalPathStageSe
   @Override
   public WrapperResponse<Boolean> saveInptClinicalPathStage(Map map) {
     return WrapperResponse.success(inptClinicalPathStageBO.saveInptClinicalPathStage(MapUtils.get(map, "inptClinicalPathStageDTO")));
+  }
+
+  /**
+  * @Menthod queryNotExecItem
+  * @Desrciption 查询阶段未执行项目
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/26 10:30
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO>>
+  **/
+  @Override
+  public WrapperResponse<List<ClinicPathStageDetailDTO>> queryNotExecItem(Map map) {
+    return WrapperResponse.success(inptClinicalPathStageBO.queryNotExecItem(MapUtils.get(map, "inptClinicalPathStageDTO")));
   }
 
   /**

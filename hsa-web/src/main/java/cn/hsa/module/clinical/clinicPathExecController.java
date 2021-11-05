@@ -9,6 +9,7 @@ import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -114,16 +115,17 @@ public class clinicPathExecController extends BaseController {
   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
   **/
   @PostMapping("/insertClinicPathExec")
-  public WrapperResponse<Boolean> insertClinicPathExec(ClinicPathExecDTO clinicPathExec, HttpServletRequest req, HttpServletResponse res) {
+  public WrapperResponse<Boolean> insertClinicPathExec(@RequestBody ClinicPathExecDTO clinicPathExec, HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req,res);
     String hospCode = sysUserDTO.getHospCode();
     clinicPathExec.setHospCode(hospCode);
+    clinicPathExec.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
     clinicPathExec.setCrteId(sysUserDTO.getId());
     clinicPathExec.setCrteName(sysUserDTO.getName());
     clinicPathExec.setCrteTime(DateUtils.getNow());
     Map map = new HashMap<>();
     map.put("hospCode",hospCode);
-    map.put("clinicPathExec",clinicPathExec);
+    map.put("clinicPathExecDTO",clinicPathExec);
     return clinicPathExecService_consumer.insertClinicPathExec(map);
   }
 

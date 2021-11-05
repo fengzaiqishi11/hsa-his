@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.hsa.module.insure.stock.dao.InsureStockManagerDAO">
+    <update id="updateInsureGoodSellBatch"></update>
+
+    <update id="updateInsureInventoryCheckBatch">
+        update stro_invoicing
+        set upload_insure = '1'
+        where id in
+        <foreach collection="fixmedinsBchnoList" open="(" close=")" item="fixmedinsBchno" separator=",">
+            #{fixmedinsBchno}
+        </foreach>
+    </update>
     <!--根据id 批量更新进销存中的上传状态-->
     <update id="updateStatus">
         update stro_invoicing set upload_insure = #{statusCode} where hosp_code = #{hospCode}
@@ -9,76 +19,130 @@
             #{item}
         </foreach>
     </update>
+    <update id="updateStockUpload">
+        update stro_invoicing set upload_insure = '0' where hosp_code = #{hospCode}
+        and id = #{fixmedinsBchno}
+    </update>
 
     <select id="queryInsureGoodBuyPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodBuy">
-    select
-        case when b.item_code ='2' then c.nation_code else d.nation_code end  as  medListCodg,
-        case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
-        b.item_name as fixmedinsHilistName,
-        a.order_no as dyntNo,
-        a.id as fixmedinsBchno ,
-        f.name as splerName,
-        '' as splerPmtno,
-        '' as manuLotnum,
-        e.name as prodentpName,
-        '' as aprvno,
-        null as manuDate,
-        null as expyEnd,
-        null as finlTrnsPric,
-        null as purcTetnCnt,
-        null as purcInvoCodg,
-        null as purcInvoNo,
-        '1' as rxFlag,
-        null as purcRetnStoinTime,
-        null as purcRetnOpterName,
-        null as prod_geayFlag,
-        null as memo
-    from
-        stro_purchase a
-        JOIN stro_purchase_detail b on a.id = b.purchase_id and a.hosp_code = b.hosp_code
-        LEFT JOIN base_material c on b.item_id = c.id  and c.hosp_code = b.hosp_code
-        left join base_drug d on b.item_id = d.id  and d.hosp_code = b.hosp_code
-        left join base_product e on b.product_id = e.id and e.hosp_code = b.hosp_code
-        left join base_supplier f on a.supplier_id = f.id and a.hosp_code = f.hosp_code
+        SELECT distinct
+        si.*,
+        si.id as fixmedins_bchno,
+        a.insure_item_code as medListCodg,
+        a.hosp_item_code as fixmedinsHilistId,
+        a.hosp_item_name as fixmedinsHilistName,
+        si.order_no AS dyntNo,
+        (
+        SELECT bs.`name`
+        FROM
+        stro_in s
+        JOIN base_supplier bs ON s.supplier_id = bs.id AND s.hosp_code = bs.hosp_code
+        WHERE
+        s.order_no = si.order_no
+        AND s.hosp_code = si.hosp_code
+        LIMIT 1
+        ) splerName,
+        (	SELECT NAME FROM
+        base_product t
+        WHERE
+        t.hosp_code = b.hosp_code
+        AND (t.CODE = b.prod_code or t.CODE = c.prod_code)
+        LIMIT 1
+        ) prodentpName,
+        b.dan AS aprvno,
+        DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manuDate,
+        NULL AS splerPmtno,
+        si.batch_no as manuLotnum,
+        si.id as fixmedinsBchno,
+        si.expiry_date as expyEnd,
+        NULL AS finlTrnsPric,
+        si.num AS purcRetnCnt,
+        NULL AS purcInvoCodg,
+        NULL AS purcInvoNo,
+        '0' AS rxFlag,
+        si.crte_time AS purcRetnStoinTime,
+        si.crte_name AS purcRetnOpterName,
+        '0' AS prod_geay_flag,
+        NULL AS memo,
+        null as medinsProdPurcNo
+        FROM
+        (
+        SELECT *   FROM stro_invoicing
+        where outin_code in ('1','2')
+        ) si
+        JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        left join base_drug b on si.item_id = b.id and b.hosp_code = si.hosp_code
+        left join base_material c on si.item_id = c.id and c.hosp_code = si.hosp_code
+        where si.hosp_code = #{hospCode} and si.upload_insure = '0'
+        <if test="keyword != null and keyword != ''">
+            and a.hosp_item_name like concat('%',#{keyword},'%')
+        </if>
     </select>
 
     <select id="queryInsureGoodBuyBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodBuyBack">
-    select
-        case when b.item_code ='2' then c.nation_code else d.nation_code end  as  medListCodg,
-        case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
-        b.item_name as fixmedinsHilistName,
-        a.id as fixmedinsBchno ,
-        f.name as splerName,
-        '' as splerPmtno,
-        null as manuDate,
-        null as expyEnd,
-        null as finlTrnsPric,
-        null as purcRetnCnt,
-        null as purcInvoCodg,
-        null as purcInvoCo,
-        '1' as rx_flag,
-        null as purcRetnStoinTime,
-        null as purcRetnOpterName,
-        null as memo,
+        SELECT distinct
+        si.*,
+        si.id as fixmedins_bchno,
+        a.insure_item_code as medListCodg,
+        a.hosp_item_code as fixmedinsHilistId,
+        a.hosp_item_name as fixmedinsHilistName,
+        si.order_no AS dyntNo,
+        (
+        SELECT bs.`name`
+        FROM
+        stro_in s
+        JOIN base_supplier bs ON s.supplier_id = bs.id AND s.hosp_code = bs.hosp_code
+        WHERE
+        s.order_no = si.order_no
+        AND s.hosp_code = si.hosp_code
+        LIMIT 1
+        ) splerName,
+        (	SELECT NAME FROM
+        base_product t
+        WHERE
+        t.hosp_code = b.hosp_code
+        AND (t.CODE = b.prod_code or t.CODE = c.prod_code)
+        LIMIT 1
+        ) prodentpName,
+        b.dan AS aprvno,
+        DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manuDate,
+        NULL AS splerPmtno,
+        si.batch_no as manuLotnum,
+        si.id as fixmedinsBchno,
+        si.expiry_date as expyEnd,
+        NULL AS finlTrnsPric,
+        si.num AS purcRetnCnt,
+        NULL AS purcInvoCodg,
+        NULL AS purcInvoNo,
+        '0' AS rxFlag,
+        si.crte_time AS purcRetnStoinTime,
+        si.crte_name AS purcRetnOpterName,
+        '0' AS prod_geay_flag,
+        NULL AS memo,
         null as medinsProdPurcNo
-    from
-        stro_purchase a
-        JOIN stro_purchase_detail b on a.id = b.purchase_id and a.hosp_code = b.hosp_code
-        LEFT JOIN base_material c on b.item_id = c.id  and c.hosp_code = b.hosp_code
-        left join base_drug d on b.item_id = d.id  and d.hosp_code = b.hosp_code
-        left join base_product e on b.product_id = e.id and e.hosp_code = b.hosp_code
-        left join base_supplier f on a.supplier_id = f.id and a.hosp_code = f.hosp_code
-
+        FROM
+        (
+        SELECT *   FROM stro_invoicing
+        where outin_code in ('1','2')
+        ) si
+        JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        left join base_drug b on si.item_id = b.id and b.hosp_code = si.hosp_code
+        left join base_material c on si.item_id = c.id and c.hosp_code = si.hosp_code
+        where si.hosp_code = #{hospCode} and si.upload_insure = '1'
+        <if test="keyword != null and keyword != ''">
+            and a.hosp_item_name like concat('%',#{keyword},'%')
+        </if>
     </select>
 
     <select id="queryInsureUploadDataPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
-        select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId from insure_stock_upload
-
+        select id,insure_type AS insureType,hosp_code AS hospCode,fixmedins_bchno AS fixmedinsBchno, inv_data_type AS invDataType, upload_time AS uploadTime,cert_id AS certId
+        from
+             insure_stock_upload
         where 1=1
-
-        <if test="insureType != null and insureType != ''">
-           and  insure_type = #{insureType}
+        <if test="invDataType != null and invDataType != '' ">
+            and inv_data_type = #{invDataType} /*正常状态*/
         </if>
+
     </select>
 
     <insert id="insertStockUploadBatch" >
@@ -95,7 +159,6 @@
         delete from insure_stock_upload  where id = #{id} and fixmedins_bchno = #{fixmedinsBchno} and hosp_code = #{hospCode}
     </delete>
 
-    <!-- 库存销售/退货 -->
     <select id="queryInsureGoodSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
         /*门诊*/
         SELECT
@@ -222,7 +285,6 @@
     </select>
 
     <select id="queryInsureGoodSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
-        /*门诊*/
         SELECT
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
@@ -330,24 +392,32 @@
     </select>
 
     <select id="queryInsureInventoryCheckPage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryCheck">
-    SELECT
-        e.insure_item_code  as  medListCodg,
-        case when b.item_code ='2' then c.code else d.code end  as  fixmedinsHilistId,
-        b.item_name as fixmedinsHilistName,
-        '1' as rx_flag,
-        a.crte_time as invdate,
-        b.final_num as invCnt,
-        b.batch_no as manuLotnum,
-        a.order_no as fixmedinsBchno,
-        a.crte_time  as  manuDate,
-        a.crte_time  as  expyEnd,
-        a.remark as	memo
-    FROM
-        stro_inventory a
-        JOIN stro_inventory_detail b ON a.id = b.inventory_id and a.hosp_code = b.hosp_code
-        LEFT JOIN base_material c on b.item_id = c.id  and c.hosp_code = b.hosp_code
-        left join base_drug d on b.item_id = d.id  and d.hosp_code = b.hosp_code
-        left join insure_item_match e on b.item_id = e.hosp_item_id and e.hosp_code = b.hosp_code
+        SELECT distinct
+        a.insure_item_code as medlistcodg,
+        a.hosp_item_code as fixmedinsHilistId,
+        a.hosp_item_name as fixmedinsHilistName,
+        '1'  as rx_flag,
+        si.crte_time as invdate,
+        si.surplus_num as invCnt,
+        DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manu_date,
+        si.batch_no as manuLotnum,
+        si.id as fixmedinsBchno,
+        si.expiry_date as expy_end,
+        si.sell_price as price,
+        ''as memo
+        FROM
+        (
+        SELECT *   FROM stro_invoicing
+        where outin_code in ('7','8')
+        ) si
+        LEFT JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        where si.hosp_code =#{hospCode}
+        <if test="fixmedinsHilistName != null and fixmedinsHilistName != ''">
+            and a.hosp_item_name = #{fixmedinsHilistName}
+        </if>
+        <if test="isUpload != null and isUpload != ''">
+            and si.upload_insure = #{isUpload}
+        </if>
     </select>
 
     <select id="queryInsureInventoryStockUpdatePage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">
@@ -482,7 +552,6 @@
         </if>
         order by t1.queryType, t1.visitNo, t1.bedName, t1.visitTime
     </select>
-
 
 
 </mapper>

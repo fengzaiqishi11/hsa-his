@@ -103,10 +103,10 @@ public interface InsureStockManagerDAO {
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);
     /**
      * 批量修改商品盘点信息
-     * @param listInsureInventoryCheck
+     * @param
      * @return
      */
-    int updateInsureInventoryCheckBatch(List<InsureInventoryCheck> listInsureInventoryCheck);
+    int updateInsureInventoryCheckBatch(@Param("fixmedinsBchnoList")List<String> fixmedinsBchnoList);
 
 
     /**
@@ -139,4 +139,6 @@ public interface InsureStockManagerDAO {
      * @Date: 2021/11/5
      */
     int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
+
+    void updateStockUpload(Map<String, Object> map);
 }

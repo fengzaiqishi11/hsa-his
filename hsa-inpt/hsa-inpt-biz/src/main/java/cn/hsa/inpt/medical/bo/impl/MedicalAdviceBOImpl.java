@@ -2538,6 +2538,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
                 //判断当前集合是否已经存在对应的待领记录
+//                Date finalDate = date;
                 if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
                         && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(date))==0
                         && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {

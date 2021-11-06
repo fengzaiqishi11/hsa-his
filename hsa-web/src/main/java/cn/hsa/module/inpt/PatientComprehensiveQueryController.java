@@ -372,5 +372,23 @@ public class PatientComprehensiveQueryController extends BaseController {
         map.put("patientCompreHensiveQueryDTO",patientCompreHensiveQueryDTO);
         return comprehensiveQueryService_consumer.queryCostDetail(map);
     }
-
+    /**
+     * @Method queryJS
+     * @Desrciption 查询结算信息业务类型
+     * @Param
+     * [sysUserDTO]
+     * @Author yuelong.chen
+     * @Date   2021/11/4 11:18
+     * @Return
+     *
+     * @return*/
+    @GetMapping("/queryYWLX")
+    public WrapperResponse<List<Map<String, Object>>> queryYWLX(HttpServletRequest req, HttpServletResponse res)
+    {
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        //封装参数
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTOSession.getHospCode());
+        return comprehensiveQueryService_consumer.queryYWLX(map);
+    }
 }

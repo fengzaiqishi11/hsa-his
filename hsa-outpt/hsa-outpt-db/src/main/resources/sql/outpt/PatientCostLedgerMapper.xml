@@ -5739,7 +5739,7 @@
           AND is_valid = '1'
         <if test="keyword != null and keyword != ''">
             and (usual_pym like concat('%', #{keyword}, '%') or usual_wbm like concat('%', #{keyword}, '%') or good_pym like concat('%', #{keyword}, '%') or good_wbm like concat('%', #{keyword}, '%')
-            or usual_name like concat('%', #{keyword}, '%') or good_name like concat('%', #{keyword}, '%'))
+                or usual_name like concat('%', #{keyword}, '%') or good_name like concat('%', #{keyword}, '%'))
         </if>
         UNION ALL
         SELECT
@@ -5759,7 +5759,7 @@
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
         <if test="keyword != null and keyword != ''">
-            and (name_pym like concat('%', #{keyword}, '%') or name_wbm like concat('%', #{keyword}, '%') or name like concat('%', #{keyword}, '%'))
+            and (name_pym like concat('%', #{keyword}, '%') or name_wbm like concat('%', #{keyword}, '%') or good_name like concat('%', #{keyword}, '%'))
         </if>
     </select>
 

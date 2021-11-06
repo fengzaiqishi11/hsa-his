@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +21,8 @@ public class InsureGoodInfoDelete extends PageDO implements Serializable {
     private String id;
     private String insureType;
     private String hospCode;
-    private String uploadTime;
+    private String itemName;
+    private Date uploadTime;
     private String certId;
+    private String certName;
 }

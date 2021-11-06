@@ -105,10 +105,12 @@ public interface InsureStockManagerService {
 
 
     /**
-     * 查询商品盘点信息
-     *
-     * @param map
-     * @return
+     * @Meth: queryInsureInventoryCheckPage
+     * @Description: 查询需要上传的盘存信息
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
      */
     WrapperResponse<PageDTO> queryInsureInventoryCheckPage(Map<String, Object> map);
 
@@ -136,4 +138,13 @@ public interface InsureStockManagerService {
      * @return
      */
     WrapperResponse<Boolean> uploadInsureInventoryStock(Map<String, Object> map);
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售 / 退货人员
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map);
 }

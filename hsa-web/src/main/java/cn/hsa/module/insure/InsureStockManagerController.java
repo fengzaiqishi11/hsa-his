@@ -3,6 +3,7 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
 import cn.hsa.module.insure.stock.entity.*;
 import cn.hsa.module.insure.stock.service.InsureStockManagerService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -33,6 +34,7 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodBuy.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodBuy",insureGoodBuy);
         return insureStockManagerService_consumer.queryInsureGoodBuyPage(map);
     }
@@ -66,12 +68,11 @@ public class InsureStockManagerController extends BaseController {
     public WrapperResponse<PageDTO> queryInsureGoodBuyBackPage(InsureGoodBuyBack insureGoodBuyBack, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
+        insureGoodBuyBack.setHospCode(sysUserDTO.getHospCode());
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureGoodBuyBack",insureGoodBuyBack);
         return insureStockManagerService_consumer.queryInsureGoodBuyBackPage(map);
     }
-
-    ;
 
     /**
      * 上传商品采购退货信息
@@ -101,6 +102,7 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodInfoDelete.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodInfoDelete",insureGoodInfoDelete);
         return insureStockManagerService_consumer.queryInsureGoodInfoDeletePage(map);
     }
@@ -135,11 +137,30 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodSell.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodSell", insureGoodSell);
         return insureStockManagerService_consumer.queryInsureGoodSellPage(map);
     }
 
-    ;
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售/退货 人员
+     * @Param: [insureRecruitPurchaseDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    @GetMapping("/queryPersonList")
+    public WrapperResponse<PageDTO> queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO,
+                                                    HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureRecruitPurchaseDTO.setHospCode(sysUserDTO.getHospCode());
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureRecruitPurchaseDTO", insureRecruitPurchaseDTO);
+        return insureStockManagerService_consumer.queryPersonList(map);
+    }
+
 
     /**
      * 上传商品销售信息
@@ -155,7 +176,6 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.uploadInsureGoodSell(map);
     }
 
-    ;
 
 
     /**
@@ -169,11 +189,12 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodSellBack.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodSellBack", insureGoodSellBack);
         return insureStockManagerService_consumer.queryInsureGoodSellBackPage(map);
     }
 
-    ;
+
 
     /**
      * 上传商品销售退货信息
@@ -182,24 +203,24 @@ public class InsureStockManagerController extends BaseController {
      * @return
      */
     @PostMapping("/uploadInsureGoodSellBack")
-    public WrapperResponse<Boolean> uploadInsureGoodSellBack(@RequestBody   Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<Boolean> uploadInsureGoodSellBack(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("certId", sysUserDTO.getId());
         return insureStockManagerService_consumer.uploadInsureGoodSellBack(map);
     }
 
-    ;
-
-
     /**
-     * 查询商品盘点信息
-     *
-     * @param insureInventoryCheck
-     * @return
+     * @Meth: queryInsureInventoryCheckPage
+     * @Description: 查询需要上传的盘存信息
+     * @Param: [insureInventoryCheck, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
      */
     @GetMapping("/queryInsureInventoryCheckPage")
-    public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck,
+                                                                  HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         String hospCode = sysUserDTO.getHospCode();
@@ -209,11 +230,10 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.queryInsureInventoryCheckPage(map);
     }
 
-    ;
 
     /**
      * 上传商品盘点信息
-     *
+     *【3501】商品盘存上传
      * @param map
      * @return
      */
@@ -225,7 +245,6 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.uploadInsureInventoryCheck(map);
     }
 
-    ;
 
 
     /**
@@ -239,11 +258,11 @@ public class InsureStockManagerController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureInventoryStockUpdate.setHospCode(sysUserDTO.getHospCode());
         map.put("insureInventoryStockUpdate",insureInventoryStockUpdate);
         return insureStockManagerService_consumer.queryInsureInventoryStockUpdatePage(map);
     }
 
-    ;
 
     /**
      * 上传商品库存变更信息

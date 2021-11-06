@@ -33,7 +33,7 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
      **/
     @Override
     public WrapperResponse<Map> insertSettleInfo(Map map) {
-        return WrapperResponse.success(insureGetInfoBO.insertSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+        return WrapperResponse.success(insureGetInfoBO.insertSettleInfo(map));
     }
 
 
@@ -47,8 +47,8 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>>
      **/
     @Override
-    public WrapperResponse<Map> getSettleInfo(Map map) {
-        return WrapperResponse.success(insureGetInfoBO.getSettleInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+    public WrapperResponse<Map<String,Object>> insertSetlInfo(Map map) {
+        return WrapperResponse.success(insureGetInfoBO.insertSetlInfo(map));
     }
 
 
@@ -161,6 +161,49 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     @Override
     public WrapperResponse<PageDTO> queryUnMatchPage(Map<String, Object> param) {
         return WrapperResponse.success(insureGetInfoBO.queryUnMatchPage(MapUtils.get(param,"insureSettleInfoDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method saveInsureSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息： 保存
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 14:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> saveInsureSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.saveInsureSettleInfo(map));
+    }
+
+    /**
+     * @param map
+     * @Method deleteSettleInfo
+     * @Desrciption 重置医疗保障结算清单信息
+     * 1.如果已经上传则不允许 清空重置
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/4 13:58
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> deleteSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.deleteSettleInfo(map));
+    }
+
+    /**
+     * @param map
+     * @Method selectLoadingSettleInfo
+     * @Desrciption 加载保存到数据库的数据信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/6 10:21
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> selectLoadingSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.selectLoadingSettleInfo(map));
     }
 
 }

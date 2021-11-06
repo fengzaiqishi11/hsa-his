@@ -41,7 +41,7 @@ public interface InsureGetInfoService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
      **/
     @PostMapping("/service/insure/insureSettleInfo/getSettleInfo")
-    WrapperResponse<Map> getSettleInfo(Map map);
+    WrapperResponse<Map<String,Object>> insertSetlInfo(Map map);
 
     /**
      * @Method getInsureCost
@@ -137,4 +137,38 @@ public interface InsureGetInfoService {
      * @Return
      **/
     WrapperResponse<PageDTO> queryUnMatchPage(Map<String, Object> param);
+
+    /**
+     * @Method saveInsureSettleInfo
+     * @Desrciption  医疗保障基金结算清单信息： 保存
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 14:54
+     * @Return
+     **/
+    WrapperResponse<Boolean> saveInsureSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Method deleteSettleInfo
+     * @Desrciption  重置医疗保障结算清单信息
+     *           1.如果已经上传则不允许 清空重置
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/4 13:58
+     * @Return
+     **/
+    WrapperResponse<Boolean> deleteSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Method selectLoadingSettleInfo
+     * @Desrciption  加载保存到数据库的数据信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/6 10:21
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> selectLoadingSettleInfo(Map<String, Object> map);
 }

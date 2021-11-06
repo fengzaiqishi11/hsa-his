@@ -801,7 +801,7 @@
         ov.doctor_id )) )
         as pracCertiNo,
         iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
-        iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,
+        iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,iib.aac004,
         if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time,
         '%Y-%m-%d' )) END)
         = 0,1,(case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format(

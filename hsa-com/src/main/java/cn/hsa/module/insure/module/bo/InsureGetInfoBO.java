@@ -25,7 +25,7 @@ public interface InsureGetInfoBO {
      * @Date   2021-04-10 11:35
      * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
      **/
-    Map insertSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
+    Map insertSettleInfo(Map<String,Object> map);
 
     /**
      * @Method getSettleInfo
@@ -36,7 +36,7 @@ public interface InsureGetInfoBO {
      * @Date   2021-08-19 11:35
      * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureSettleInfoDTO>
      **/
-    Map getSettleInfo(InsureSettleInfoDTO insureSettleInfoDTO);
+    Map<String,Object> insertSetlInfo(Map<String,Object> map);
 
     /**
      * @Method queryInsureCost
@@ -127,4 +127,38 @@ public interface InsureGetInfoBO {
      * @Return
      **/
     PageDTO queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+     * @param map
+     * @Method saveInsureSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息： 保存
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 14:54
+     * @Return
+     */
+    Boolean saveInsureSettleInfo(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method deleteSettleInfo
+     * @Desrciption 重置医疗保障结算清单信息
+     * 1.如果已经上传则不允许 清空重置
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/4 13:58
+     * @Return
+     */
+    Boolean deleteSettleInfo(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method selectLoadingSettleInfo
+     * @Desrciption 加载保存到数据库的数据信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/6 10:21
+     * @Return
+     */
+    Map<String,Object> selectLoadingSettleInfo(Map<String, Object> map);
 }

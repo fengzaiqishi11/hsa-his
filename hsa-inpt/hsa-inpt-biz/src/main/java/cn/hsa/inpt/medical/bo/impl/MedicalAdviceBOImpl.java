@@ -1572,8 +1572,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //医嘱组号(同一组号辅助计费共用,不重复生成)
         Integer groupNo = 0;
         for (InptAdviceDTO inptAdviceDTO :inptAdviceDTOList) {
-            //长期医嘱未停止，临时医嘱不交病人
-            boolean flag = (("0".equals(inptAdviceDTO.getIsLong()) && !"1".equals(inptAdviceDTO.getIsStop())) || !("1".equals(inptAdviceDTO.getIsLong()) && "1".equals(inptAdviceDTO.getIsGive())));
+            //长期医嘱未停止或者临时医嘱不交病人
+            //boolean flag = (("0".equals(inptAdviceDTO.getIsLong()) && !"1".equals(inptAdviceDTO.getIsStop())) || !("1".equals(inptAdviceDTO.getIsLong()) && "1".equals(inptAdviceDTO.getIsGive())));
+
+            //长期医嘱未停止或者临时医嘱（20211105 修改）
+            boolean flag = (("0".equals(inptAdviceDTO.getIsLong()) && !"1".equals(inptAdviceDTO.getIsStop())) || "1".equals(inptAdviceDTO.getIsLong()) );
+
             if (flag) {
                 if (groupNo!=inptAdviceDTO.getGroupNo() || inptAdviceDTO.getGroupNo()==0) {
                     //根据用法拿到辅助计费对象

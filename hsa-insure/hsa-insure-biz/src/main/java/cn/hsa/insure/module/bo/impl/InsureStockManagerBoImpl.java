@@ -537,7 +537,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         PageHelper.startPage(insureInventoryStockUpdate.getPageNo(), insureInventoryStockUpdate.getPageSize());
         String invChgType = insureInventoryStockUpdate.getInvChgType();
         if (StringUtils.isEmpty(invChgType)) {
-            throw new AppException("变更类型不能为空");
+            throw new AppException("变更类型不能为空！！！");
         }
         List<String> outinCodeList = new ArrayList<>();
         Map<String, List<String>> map = new HashMap();

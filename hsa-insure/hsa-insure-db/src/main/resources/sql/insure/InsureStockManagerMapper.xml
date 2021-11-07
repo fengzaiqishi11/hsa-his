@@ -438,7 +438,7 @@
             and si.upload_insure = #{isUpload}
         </if>
     </select>
-
+    <!--查询库存变更-->
     <select id="queryInsureInventoryStockUpdatePage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">
      SELECT
         c.insure_item_code AS medListCodg,

@@ -176,7 +176,6 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
 
     /**
      * 查询商品库存变更信息
-     *
      * @param map
      * @return
      */

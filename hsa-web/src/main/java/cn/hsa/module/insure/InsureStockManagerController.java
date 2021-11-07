@@ -249,7 +249,6 @@ public class InsureStockManagerController extends BaseController {
 
     /**
      * 查询商品库存变更信息
-     *
      * @param insureInventoryStockUpdate
      * @return
      */

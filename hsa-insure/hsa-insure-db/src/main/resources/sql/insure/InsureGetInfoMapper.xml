@@ -712,11 +712,11 @@
                (select su.prac_certi_no from sys_user su where  su.id = a.resp_nurse_id and su.hosp_code = a.hosp_code) nursePracCertiNo,
                (select su.prac_certi_no from sys_user su where  su.id = a.zz_doctor_id and su.hosp_code = a.hosp_code) doctorPracCertiNo,
                (select count(item_id) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
-                                                          and ic.item_name in ('一级护理','I级护理','1级护理') ) as lv1NurscareDays,
+                                                          and ic.item_name in ('一级护理','Ⅰ级护理','1级护理') ) as lv1NurscareDays,
                (select count(item_id) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
-                                                          and ic.item_name in ('二级护理','II级护理','2级护理')) as scdNurscareDays,
+                                                          and ic.item_name in ('二级护理','Ⅱ级护理','2级护理')) as scdNurscareDays,
                (select count(item_id) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
-                                                          and ic.item_name in ('三级护理','III级护理','3级护理')) as lv3Nursecare_Days,
+                                                          and ic.item_name in ('三级护理','IⅢ级护理','3级护理')) as lv3NursecareDays,
                (select ceil(count(item_id)/24) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
                                                                    and ic.item_name in ('特级护理')) as spgaNurscareDays,
                in_dept_name, in_time,
@@ -727,12 +727,10 @@
                out_disease_name, out_disease_icd10, out_oper_id, out_oper_name, out_oper_time, out_situation_code,
                out_remark, out_mode_code,total_advance, total_cost, total_balance, guarantee_balance,
                resp_nurse_id, resp_nurse_name, crte_id, crte_name, crte_time as inTime,  total_in_days,
-            (select ic.cost_time from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
-            and ic.status_code ='0'
-            order by a.crte_time asc limit 1) as setlBegnDate,
-            (select ic.cost_time from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
-             and ic.status_code ='0'
-             order by a.crte_time desc limit 1) as setlEndDate
+               (select min(ic.cost_time) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
+                                                             and ic.status_code ='0') as setlBegnDate,
+               (select max(ic.cost_time) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
+                                                             and ic.status_code ='0') as setlEndDate
         from inpt_visit a where a.id =#{visitId} and a.hosp_code =#{hospCode}
     </select>
     <select id="getOutptPatientInfo" resultType="java.util.Map">
@@ -754,7 +752,8 @@
     </select>
     <select id="selectItemInfo" resultType="java.util.Map">
         select id, hosp_code, visit_id, medical_reg_no, insure_settle_id, med_chrgitm medChrgitm ,
-               claa_sumfee claaSumFee , amt , clab_amt clabAmt , fulamt_ownpay_amt  fulamtOwnpayAmt ,oth_amt  othAmt from insure_iteminfo
+               claa_sumfee claaSumFee , amt , clab_amt clabAmt , fulamt_ownpay_amt  fulamtOwnpayAmt ,oth_amt  othAmt
+        from insure_iteminfo
         where  visit_id =#{visitId} and hosp_code =#{hospCode} and insure_settle_id =#{insureSettleId}
     </select>
     <select id="qureryItemInfo" resultType="java.util.Map">

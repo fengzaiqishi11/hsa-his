@@ -110,7 +110,7 @@ public interface InsureStockManagerDAO {
 
 
     /**
-     * 查询商品库存变更信息
+     * 查询商品库存变更 信息
      * @param insureInventoryStockUpdate
      * @return
      */

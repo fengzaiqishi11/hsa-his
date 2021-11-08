@@ -730,7 +730,9 @@
                (select min(ic.cost_time) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
                                                              and ic.status_code ='0') as setlBegnDate,
                (select max(ic.cost_time) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.id
-                                                             and ic.status_code ='0') as setlEndDate
+                                                             and ic.status_code ='0') as setlEndDate,
+               (select m.crte_name  from inpt_settle m where m.visit_id = a.id and m.hosp_code = a.hosp_code and m.status_code='0' and m.is_settle ='1')
+                 as feeCrteTime
         from inpt_visit a where a.id =#{visitId} and a.hosp_code =#{hospCode}
     </select>
     <select id="getOutptPatientInfo" resultType="java.util.Map">
@@ -742,7 +744,9 @@
                (select bd.nation_code from base_dept bd where bd.id =dept_id and bd.hosp_code = hosp_code ) inDeptNatinCode,
                dept_name, visit_time,
                remark, pym, wbm, is_visit, is_first_visit, tran_in_code, in_cert_time, in_dept_id, in_disease_id,
-               in_remark, advance_payment,crte_time as inTime
+               in_remark, advance_payment,crte_time as inTime,
+               (select m.crte_time  from outpt_settle m where m.visit_id = ov.id and m.hosp_code = ov.hosp_code and m.status_code='0' and m.is_settle ='1')
+                   as crteTime
         from outpt_visit ov where ov.hosp_code =#{hospCode} and ov.id =#{visitId}
     </select>
     <select id="selectHanderPayInfo" resultType="java.util.Map">

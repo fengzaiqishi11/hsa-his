@@ -570,8 +570,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("acctPay",infoDTO.getAcctPay()); // 个人账户支出
         setlinfo.put("psnCashpay",  infoDTO.getPsnCashpay()); // 个人现金支付
         setlinfo.put("hiPaymtd", infoDTO.getHiPaymtd()); // 医保支付方式
-        setlinfo.put("hsorg", infoDTO.getHsorg()); // 医保机构经办人
-        setlinfo.put("hsorgOpter", infoDTO.getHosrgOpter()); // 医保机构经办人
+        setlinfo.put("hsorg", ""); // 医保机构经办人
+        setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", infoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medinsFillPsn", infoDTO.getMedinsFillPsn()); // 医疗机构填报人
         return setlinfo;
@@ -932,10 +932,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         BigDecimal psnSelfpay = BigDecimalUtils.subtract(bigDecimal, psnOwnpay);
         setlinfo.put("psnSelfpay", psnSelfpay); // 个人自付
         setlinfo.put("hiPaymtd", MapUtils.get(setlinfoMap,"clr_way")); // 医保支付方式
-        setlinfo.put("hsorg", hospName); // 医保机构经办人
-        setlinfo.put("hsorgOpter", hospName); // 医保机构经办人
+        setlinfo.put("hsorg", ""); // 医保机构经办人
+        setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", hospName); // 医疗机构填报部门
-        setlinfo.put("medinsFillPsn", hospName); // 医疗机构填报人
+        setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap,"feeCrteTime")); // 医疗机构填报人
         return setlinfo;
     }
 

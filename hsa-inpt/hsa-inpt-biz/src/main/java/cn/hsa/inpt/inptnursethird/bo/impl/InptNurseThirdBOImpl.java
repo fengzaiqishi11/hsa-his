@@ -197,6 +197,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                 i=1;
             }
 
+            // 体温
             BigDecimal temperature = dto.getTemperature();
             if(temperature==null){
                 m.put("tiwen","");
@@ -213,6 +214,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     m.put("tiwen",a.toString());
                 }
             }
+            // 复测体温
             BigDecimal temperatureRetest=  dto.getTemperatureRetest();
             if(temperatureRetest==null){
                 m.put("fctiwen","");
@@ -229,6 +231,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     m.put("fctiwen",a.toString());
                 }
             }
+            // 脉搏
             if( dto.getPulse() == null){
                 m.put("manbo","");
             }else{
@@ -245,7 +248,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     m.put("manbo",a.toString());
                 }
             }
-
+            // 心率
             if(dto.getHeartRate()==null){
                 m.put("xinlv","");
             }else{
@@ -260,6 +263,23 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     m.put("xinlv","");
                 }else{
                     m.put("xinlv",a.toString());
+                }
+            }
+            // 血糖
+            BigDecimal bloodSugar=  dto.getBloodSugar();
+            if(bloodSugar==null){
+                m.put("bloodSugar","");
+            }else{
+                BigDecimal a = null;
+                if(new BigDecimal(bloodSugar.intValue()).compareTo(bloodSugar)==0){
+                    a =  bloodSugar.setScale(0, BigDecimal.ROUND_HALF_UP);
+                }else{
+                    a =   bloodSugar.setScale(1, BigDecimal.ROUND_HALF_UP);
+                }
+                if(a != null && a.intValue() == 0){
+                    m.put("bloodSugar","");
+                }else{
+                    m.put("bloodSugar",a.toString());
                 }
             }
 
@@ -573,7 +593,8 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                     for (int j=0;j<inTimeList.size();j++){
                         Date inDate = DateUtils.parse(inTimeList.get(j),"yyyy-MM-dd");
                         int diff = DateUtil.daysBetweenDates(timeSlotDate,inDate);
-                        if (diff>0){
+                        // 术后天数只记录到术后第七天，之后不在记录
+                        if (diff>0 && diff<8){
                             shts=shts+diff+",";
                         }
                     }

@@ -269,5 +269,20 @@ public class PatientComprehensiveQueryServiceImpl extends HsafService implements
     return WrapperResponse.success(patientComprehensiveQueryBO.queryCostDetail(MapUtils.get(map,"patientCompreHensiveQueryDTO")));
   }
 
+  /**
+   * @Method queryJS
+   * @Desrciption 查询结算信息业务类型
+   * @Param
+   * [sysUserDTO]
+   * @Author yuelong.chen
+   * @Date   2021/11/4 11:18
+   * @Return
+   *
+   * @return*/
+  @Override
+  public WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map) {
+    return WrapperResponse.success(patientComprehensiveQueryBO.queryYWLX(map));
+  }
+
 
 }

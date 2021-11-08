@@ -56,6 +56,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
     @Resource
     private SysParameterService sysParameterService;
+
     @Resource
     private RedisUtils redisUtils;
 
@@ -220,8 +221,14 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
                 // 把查询到的负数转成正数
                 BigDecimal selRetnCnt = MapUtils.get(map, "selRetnCnt");
                 BigDecimal finlTrnsPric = MapUtils.get(map, "finlTrnsPric");
-                map.put("selRetnCnt", BigDecimalUtils.negate(selRetnCnt));
-                map.put("finlTrnsPric", BigDecimalUtils.negate(finlTrnsPric));
+                if (BigDecimalUtils.lessZero(selRetnCnt)){
+                    selRetnCnt = BigDecimalUtils.negate(selRetnCnt);
+                }
+                if (BigDecimalUtils.lessZero(finlTrnsPric)){
+                    finlTrnsPric = BigDecimalUtils.negate(finlTrnsPric);
+                }
+                map.put("selRetnCnt", selRetnCnt);
+                map.put("finlTrnsPric", finlTrnsPric);
                 // 判断项目是否存在拆分比，存在则判断是否拆零并赋值
                 if (!MapUtils.isEmpty(map, "splitRatio")){
                     BigDecimal splitRatio = MapUtils.get(map, "splitRatio");
@@ -556,17 +563,41 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         Map<String, Object> httpParam = new HashMap<String, Object>();
         // 必填参数 accessToken
         httpParam.put("accessToken", token);
-        httpParam.put("invChgMedinsInfo", invChgMedinsInfoList);
         // 调医保接口 获得医保返回的库存列表 医保编号为
         Map<String, Object> resultMap = new HashMap<>();
-        if ("1".equals(isDrugOrMaterial)){
-            // 药品变更上传
-            resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
-        } else{
-            // 材料变更上传
-            resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
-        }
 
+        if (invChgMedinsInfoList.size() > 100){
+               int toIndex = 100;
+               for (int i =0; i<invChgMedinsInfoList.size();i+= 100){
+                   if (i + 100 > invChgMedinsInfoList.size()){
+                       toIndex = invChgMedinsInfoList.size() - i;
+                   }
+                   List newList = invChgMedinsInfoList.subList(i,i + toIndex);
+                   httpParam.put("invChgMedinsInfo", newList);
+                   if ("1".equals(isDrugOrMaterial)){
+                       // 药品变更上传
+                       resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
+                   } else{
+                       // 材料变更上传
+                       resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
+                   }
+                   try {
+                       // 因为调用间隔不能低于五秒，所以暂时休眠五秒
+                       Thread.sleep(1000*5);
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+               }
+        } else{
+            httpParam.put("invChgMedinsInfo", invChgMedinsInfoList);
+            if ("1".equals(isDrugOrMaterial)){
+                // 药品变更上传
+                resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
+            } else{
+                // 材料变更上传
+                resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
+            }
+        }
         //------------- 4.封装参数 调用接口上传 end --------
 
         // 5.如果上传成功 回写库存表

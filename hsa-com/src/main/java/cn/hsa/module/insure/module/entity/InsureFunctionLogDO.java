@@ -60,5 +60,8 @@ public class InsureFunctionLogDO extends PageDO {
     private Date startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+    private String patientCode;
+    private String regCode;
+
 
 }

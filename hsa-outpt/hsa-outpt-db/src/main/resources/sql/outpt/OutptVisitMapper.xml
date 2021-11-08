@@ -686,6 +686,10 @@
     <update id="updateVisitTime">
         update outpt_visit set visit_time =#{visitTime} where hosp_code =#{hospCode} and id =#{visitId}
     </update>
+    <update id="updateInsuresumPatient">
+        update insure_patient_sum set insure_settle_id =#{insureSettleId} where hosp_code =#{hospCode}
+        and visit_id =#{visitId} and medical_reg_no = #{medicalRegNo} and insure_settle_id is null;
+    </update>
 
     <!--根据就诊id查询病历信息-->
     <select id="queryMedicalRecordByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO">

@@ -3,7 +3,9 @@ package cn.hsa.module.insure.outpt.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -123,5 +125,28 @@ public interface InsureUnifiedPayReversalTradeService {
     @PutMapping("/service/insure/upOutptService/updateUP_5265")
     WrapperResponse<Map<String,Object>> updateUP_5265(Map<String,Object> parameterMap);
 
+    /**
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/service/insure/upOutptService/queryStatementInfo")
+    WrapperResponse<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap);
+
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
     WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map);
+
+
+    WrapperResponse<Map<String,Object>> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

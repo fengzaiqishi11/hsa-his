@@ -148,4 +148,6 @@ public interface OutptVisitDAO {
 
 	// 根据就诊id删除所有诊断
 	void deleteDiagnoseByVisitId(OutptVisitDTO outptVisitDTO);
+
+    void updateInsuresumPatient(Map<String, Object> map);
 }

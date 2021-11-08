@@ -53,6 +53,8 @@ public class InptNurseThirdDO extends PageDO implements Serializable {
     private Integer pulse;
     //心率
     private Integer heartRate;
+    //血糖
+    private BigDecimal bloodSugar;
     //是否使用呼吸机（SF）
     private String isVentilator;
     //呼吸

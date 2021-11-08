@@ -1,6 +1,7 @@
 package cn.hsa.module.clinical.clinicpathexec.dao;
 
 import cn.hsa.module.clinical.clinicpathexec.dto.ClinicPathExecDTO;
+import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public interface ClinicPathExecDAO {
   * @Date   2021/10/14 14:22
   * @Return int
   **/
-  int insertClinicPathExec(ClinicPathExecDTO clinicPathExecDTO);
+  int insertClinicPathExec(List<ClinicPathExecDTO> clinicPathExecDTO);
 
   /**
   * @Menthod updateClinicPathExec
@@ -69,7 +70,7 @@ public interface ClinicPathExecDAO {
 
   /**
   * @Menthod deleteClinicPathExecById
-  * @Desrciption 删除临床路径执行记录
+  * @Desrciption 删除临床路径执行记录根据主键
   *
   * @Param
   * [clinicPathExecDTO]
@@ -79,4 +80,30 @@ public interface ClinicPathExecDAO {
   * @Return int
   **/
   int deleteClinicPathExecById(ClinicPathExecDTO clinicPathExecDTO);
+
+  /**
+  * @Menthod deleteClinicPathExec
+  * @Desrciption 删除临床路径执行记录
+  *
+  * @Param
+  * [clinicPathExecDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/21 10:53
+  * @Return int
+  **/
+  int deleteClinicPathExec(ClinicPathExecDTO clinicPathExecDTO);
+
+  /**
+  * @Menthod queryEmrByCode
+  * @Desrciption 查询该患者有没有该病历
+  *
+  * @Param
+  * [emrPatientDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/22 11:30
+  * @Return java.util.List<cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO>
+  **/
+  List<EmrPatientDTO> queryEmrByCode(EmrPatientDTO emrPatientDTO);
 }

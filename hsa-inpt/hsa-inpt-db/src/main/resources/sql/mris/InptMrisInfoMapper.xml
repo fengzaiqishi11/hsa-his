@@ -869,7 +869,6 @@
         IFNULL(c.hcl01,0) as D31,
         IFNULL( c.hcl02,0) as D32,
         IFNULL(c.hcl03,0) as D33,
-        IFNULL(c.hcl03,0) as D33,
         IFNULL(c.fy06,0) as D34
        from mris_base_info b LEFT JOIN mris_cost c on c.hosp_code= #{hospCode} and  b.visit_id = c.visit_id
        left join inpt_visit v on v.hosp_code=#{hospCode} and  b.visit_id = v.id

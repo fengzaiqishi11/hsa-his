@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.util.MapUtils;
@@ -148,9 +149,36 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.updateUP_5265(parameterMap));
     }
 
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.queryStatementInfo(paraMap));
+    }
+
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
     @Override
     public WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.downLoadSettleInfo(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String,Object>> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.checkOneSettle(map,insureIndividualVisitDTO));
     }
 
 

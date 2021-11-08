@@ -138,4 +138,14 @@ public class BaseProfileFileController extends BaseController {
         map.put("outptProfileFileDTO", outptProfileFileDTO);
         return baseProfileFileService_consumer.getAddressTree(map);
     }
+
+    @GetMapping("/queryAll")
+    public WrapperResponse<List<OutptProfileFileDTO>> queryAll(OutptProfileFileDTO outptProfileFileDTO,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptProfileFileDTO.setHospCode(userDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", userDTO.getHospCode());
+        map.put("outptProfileFileDTO", outptProfileFileDTO);
+        return baseProfileFileService_consumer.queryAll(map);
+    }
 }

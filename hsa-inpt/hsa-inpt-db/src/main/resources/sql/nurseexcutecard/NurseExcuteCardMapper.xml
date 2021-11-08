@@ -286,7 +286,7 @@
       MIN(iae.plan_exec_time) as execPlaneTime1,
       MIN(iae.id) as inptAdviceExecId,
       bd.seq_no as bedSeqNo,
-        CONCAT(
+      CONCAT(
         iv.NAME,'/',
         (CASE iv.gender_code WHEN '0' THEN '未知的性别'
         WHEN '1' THEN '男' WHEN '2' THEN '女'
@@ -294,8 +294,9 @@
         '/',IFNULL( iv.age, '-' ),
         (CASE iv.age_unit_code
         WHEN '1' THEN '岁' WHEN '2' THEN '月'
-        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
-        ) AS patientInfo
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  ),
+        if(ia.baby_id is null or ia.baby_id = '', '', concat('/', (select ib.name from inpt_baby ib where ib.id = ia.baby_id and ib.hosp_code = ia.hosp_code)))
+      ) AS patientInfo
     from inpt_advice ia inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
       left join base_bed bd on iv.bed_id = bd.id and iv.hosp_code = bd.hosp_code and bd.hosp_code = #{hospCode}
@@ -346,6 +347,9 @@
         <foreach collection="ids" item="item" open="(" separator="," close=")">
           #{item}
         </foreach>
+      </if>
+      <if test="visitIds !=null and visitIds != ''">
+          and find_in_set(ia.visit_id, #{visitIds})
       </if>
       <if test="usageCodeList !=null and usageCodeList.size()>0">
         and ia.usage_code in
@@ -401,7 +405,8 @@
         '/',IFNULL( iv.age, '-' ),
         (CASE iv.age_unit_code
         WHEN '1' THEN '岁' WHEN '2' THEN '月'
-        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  )
+        WHEN '3' THEN '周'  WHEN '4' THEN '天' ELSE '' END  ),
+        if(ia.baby_id is null or ia.baby_id = '', '', concat('/', (select ib.name from inpt_baby ib where ib.id = ia.baby_id and ib.hosp_code = ia.hosp_code)))
         ) AS patientInfo
         from inpt_advice ia
         inner join inpt_visit iv on ia.hosp_code = iv.hosp_code and ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId} and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
@@ -454,6 +459,9 @@
                 #{item}
             </foreach>
         </if>
+        <if test="visitIds !=null and visitIds != ''">
+            and find_in_set(ia.visit_id, #{visitIds})
+        </if>
         <if test="usageCodeList !=null and usageCodeList.size()>0">
             and ia.usage_code in
             <foreach collection="usageCodeList" item="item" open="(" separator="," close=")">
@@ -505,17 +513,17 @@
       iae.plan_exec_time as execPlaneTime
       from inpt_advice i inner join inpt_visit iv on i.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = i.hosp_code and iv.status_code = '2'
-      <if test="keyword !=null and keyword != ''">
-        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
-        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
-      </if>
       left join base_rate br on i.rate_id= br.id and i.hosp_code= br.hosp_code
       left join base_advice ba on i.item_id = ba.id and i.hosp_code = ba.hosp_code
       join inpt_advice_exec iae on iae.hosp_code = i.hosp_code and iae.advice_id =i.id and iae.visit_id = i.visit_id
-      <if test="queryDate !=null and queryDate != ''">
-        and iae.plan_exec_time &gt; DATE_ADD(#{queryDate},INTERVAL 0 day) and iae.plan_exec_time &lt; DATE_ADD(#{queryDate},INTERVAL 1 day)
+      where i.hosp_code=#{hospCode} and i.use_code in ('2','3') and i.is_check='1'
+      <if test="keyword !=null and keyword != ''">
+          and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+          or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
       </if>
-      where i.hosp_code=#{hospCode}
+      <if test="queryDate !=null and queryDate != ''">
+          and date_format(iae.plan_exec_time, '%Y-%m-%d') = date_format(#{queryDate}, '%Y-%m-%d')
+      </if>
       <if test="printFlag != null and printFlag == '0'.toString()">
         and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
       </if>
@@ -523,7 +531,6 @@
       <if test="printFlag != null and printFlag == '1'.toString()">
         and (JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, #{printFlag})))
       </if>
-      and i.use_code in ('2','3') and i.is_check='1'
       <if test="isStop !=null and isStop != ''">
         and i.is_stop = #{isStop}
       </if>
@@ -558,18 +565,18 @@
       iae.plan_exec_time as execPlaneTime
       from inpt_advice ia inner join inpt_visit iv on ia.visit_id = iv.id and iv.in_dept_id = #{inDeptId}
       and iv.hosp_code = ia.hosp_code and iv.status_code = '2'
-      <if test="keyword !=null and keyword != ''">
-        and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
-        or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
-      </if>
       left join base_rate br on ia.rate_id= br.id and ia.hosp_code= br.hosp_code
       left join base_advice ba on ia.item_id = ba.id and ia.hosp_code = ba.hosp_code
       join inpt_advice_exec iae on iae.hosp_code = ia.hosp_code and iae.advice_id =ia.id and iae.visit_id = ia.visit_id
-      <if test="queryDate !=null and queryDate != ''">
-          and iae.plan_exec_time &gt; DATE_ADD(#{queryDate},INTERVAL 0 day) and iae.plan_exec_time &lt; DATE_ADD(#{queryDate},INTERVAL 1 day)
-      </if>
       left join phar_in_wait_receive piwr on piwr.hosp_code = ia.hosp_code and piwr.visit_id = ia.visit_id and piwr.advice_id = ia.id
       where ia.hosp_code=#{hospCode}
+      <if test="keyword !=null and keyword != ''">
+          and (iv.name like concat('%',#{keyword},'%') or iv.in_no like concat('%',#{keyword},'%')
+          or iv.bed_name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%'))
+      </if>
+      <if test="queryDate !=null and queryDate != ''">
+          and date_format(iae.plan_exec_time, '%Y-%m-%d') = date_format(#{queryDate}, '%Y-%m-%d')
+      </if>
       <if test="printFlag != null and printFlag == '0'.toString()">
         and (!JSON_CONTAINS(iae.is_print, JSON_OBJECT(#{printType}, '1')) or iae.is_print = #{printFlag})
       </if>

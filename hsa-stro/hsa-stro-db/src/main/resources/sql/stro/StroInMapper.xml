@@ -452,6 +452,9 @@
             or a.pym like concat('%',#{keyword},'%')
             or a.wbm like concat('%',#{keyword},'%'))
       </if>
+      <if test="isValid != null and isValid != ''">
+           and  a.is_valid = #{isValid}
+      </if>
     </select>
 
     <select id="queryMandB" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
@@ -553,11 +556,12 @@
   <select id="queryStroinDetailForExprot" resultType="cn.hsa.module.stro.stroin.dto.StroInDetailDTO">
     select
     a.id, a.hosp_code, a.in_id, a.item_code, a.item_id, a.item_name, a.spec, a.num, a.unit_code, a.dosage, a.dosage_unit_code, a.buy_price, a.sell_price, a.buy_price_all, a.sell_price_all, a.split_ratio, a.split_num, a.split_price, a.split_unit_code, a.batch_no, a.expiry_date,a.ndan,
-    a.prod_code,
+    a.prod_code,b.audit_time,b.crte_time,
     (select p.name from base_product p where p.hosp_code = #{hospCode} and a.prod_code = p.code) as prodName,
     case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
     case when a.item_code='2' then bm.model end model
     from stro_in_detail a
+    join stro_in b on b.id = a.in_id and b.hosp_code = a.hosp_code
     left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
     left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
     where

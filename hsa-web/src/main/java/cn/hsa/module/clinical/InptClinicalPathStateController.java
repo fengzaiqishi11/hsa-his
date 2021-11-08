@@ -4,7 +4,6 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
-import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 import cn.hsa.module.clinical.inptclinicalpathstate.service.InptClinicalPathStateService;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -133,6 +132,9 @@ public class InptClinicalPathStateController extends BaseController {
       Map map = new HashMap();
       SysUserDTO sysUserDTO = getSession(req, res);
       inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+      inptClinicalPathStateDTO.setEndCrteId(sysUserDTO.getId());
+      inptClinicalPathStateDTO.setEndCrteName(sysUserDTO.getName());
+      inptClinicalPathStateDTO.setEndCrteTime(DateUtils.getNow());
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
       return inptClinicalPathStateService_consumer.updateInptClinicalPathStateByVisitId(map);
@@ -180,6 +182,29 @@ public class InptClinicalPathStateController extends BaseController {
       map.put("hospCode",sysUserDTO.getHospCode());
       map.put("inptVisitDTO",inptVisitDTO);
       return inptClinicalPathStateService_consumer.queryPatientPage(map);
+    }
+
+
+    /**
+    * @Menthod getPatientByVisitID
+    * @Desrciption  用于出径病人信息展示
+    *
+    * @Param
+    * [inptClinicalPathStateDTO, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/9/27 15:00
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO>
+    **/
+    @RequestMapping("/getPatientByVisitID")
+    public WrapperResponse<InptClinicalPathStateDTO> getPatientByVisitID(InptClinicalPathStateDTO inptClinicalPathStateDTO, HttpServletRequest req, HttpServletResponse res) {
+      Map map = new HashMap();
+      SysUserDTO sysUserDTO = getSession(req, res);
+      inptClinicalPathStateDTO.setHospCode(sysUserDTO.getHospCode());
+      inptClinicalPathStateDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+      map.put("hospCode",sysUserDTO.getHospCode());
+      map.put("inptClinicalPathStateDTO",inptClinicalPathStateDTO);
+      return inptClinicalPathStateService_consumer.getPatientByVisitID(map);
     }
 
 }

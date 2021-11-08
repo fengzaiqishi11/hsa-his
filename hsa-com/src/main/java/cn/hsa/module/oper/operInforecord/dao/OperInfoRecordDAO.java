@@ -1,8 +1,11 @@
 package cn.hsa.module.oper.operInforecord.dao;
 
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OperInfoRecordDAO {
 
@@ -24,4 +27,8 @@ public interface OperInfoRecordDAO {
     OperInfoRecordDTO getOperAccountingByOperId(OperInfoRecordDTO operInfoRecordDTO);
 
     int updateSurgeryCompleteToCancel(OperInfoRecordDTO operInfoRecordDTO);
+
+    List<InptCostDTO> queryOperCostByVisitId(Map<String, Object> paramMap);
+
+    int updateOperStatusBatch(@Param("operList") List<OperInfoRecordDTO> applyUnScheduledList);
 }

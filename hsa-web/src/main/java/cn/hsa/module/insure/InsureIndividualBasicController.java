@@ -166,8 +166,11 @@ public class InsureIndividualBasicController extends BaseController {
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
         insureIndividualBasicDTO.setPsnCertType(psnCertType);
         insureIndividualBasicDTO.setNationECResult(nationECResult);
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
         map.put("insureRegCode",regCode);
         map.put("regCode",regCode);
+        map.put("visitId",MapUtils.get(param,"visitId"));
         map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
 
        /* // 查询医院医保配置（直接走医保还是走统一支付平台）

@@ -800,4 +800,12 @@
           ]]>
         </if>
     </select>
+
+    <select id="getOutptRegister" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select * from outpt_register where visit_id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <delete id="deleteDiagnoseByVisitId" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        delete from outpt_diagnose where hosp_code = #{hospCode} and visit_id = #{id}
+    </delete>
 </mapper>

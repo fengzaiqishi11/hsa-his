@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.oper.operInforecord.bo.OperInfoRecordBO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
@@ -150,6 +151,34 @@ public class OperInfoRecordServiceImpl extends HsafService implements OperInfoRe
     public WrapperResponse<OperInfoRecordDTO> getOperInfoById(Map map){
         OperInfoRecordDTO operInfoRecordDTO = MapUtils.get(map, "operInfoRecordDTO");
         return WrapperResponse.success(operInfoRecordBO.getOperInfoById(operInfoRecordDTO));
+    }
+
+    /**
+     * @Menthod: queryOperCostByVisitId
+     * @Desrciption: 查询个人手术补记账费用
+     * @Param: visit_id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-09 17:37
+     * @Return: List<InptCostDTO>
+     **/
+    @Override
+    public WrapperResponse<List<InptCostDTO>> queryOperCostByVisitId(Map<String, Object> paramMap) {
+        return WrapperResponse.success(operInfoRecordBO.queryOperCostByVisitId(paramMap));
+    }
+
+    /**
+     * @Menthod: cancelOper
+     * @Desrciption: 取消手术，已核收未申请的状态下取消，statusCode更改未-1
+     * @Param: operInfoRecordDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-11 20:19
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> cancelOper(Map map) {
+        return WrapperResponse.success(operInfoRecordBO.updateOperStatusCode(MapUtils.get(map, "operInfoRecordDTO")));
     }
 
 

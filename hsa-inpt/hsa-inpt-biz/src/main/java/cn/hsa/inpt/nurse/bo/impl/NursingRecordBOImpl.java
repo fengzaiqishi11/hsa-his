@@ -2,6 +2,7 @@ package cn.hsa.inpt.nurse.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO;
 import cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO;
 import cn.hsa.module.base.nurse.service.BaseNurseOrderService;
@@ -9,6 +10,8 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.nurse.bo.NursingRecordBO;
 import cn.hsa.module.inpt.nurse.dao.NursingRecordDAO;
 import cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.inpt.nurse.bo.impl
@@ -43,6 +47,11 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
      */
     @Resource
     private BaseNurseOrderService baseNurseOrderService_consumer;
+    /**
+     * 系统参数服务
+     */
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Method save
@@ -137,20 +146,36 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
             throw new RuntimeException("未选择就诊人");
         }
 
+        // 获取需要分行的护理单据列表集合
+        List<String> bnoCodeList = this.getBnoCodeList(nurseRecordDTO.getHospCode(), "HLD_BRANCH_LIST");
+
         //根据单据id查询单据类型
         BaseNurseOrderDTO baseNurseOrderDTO = this.getOrderDTO(nurseRecordDTO);
 
         List<InptNurseRecordDTO> addList = new ArrayList<>();
         List<InptNurseRecordDTO> editList = new ArrayList<>();
         List<InptNurseRecordDTO> deleteList = new ArrayList<>();
+        Map<Integer, Object> groupNoFlagMap = new HashMap<>();
 
         for (InptNurseRecordDTO inptNurseRecordDTO : saveList) {
             if (StringUtils.isEmpty(inptNurseRecordDTO.getId())) {
+                if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())){
+                    if (inptNurseRecordDTO.getGroupNo() == null || inptNurseRecordDTO.getGroupNo() <= 0 ) {
+                        throw new RuntimeException("保存的数据检测到没有组号，请刷新后重试");
+                    }
+                    //记录标志 时间，组号
+                    String recordTime = inptNurseRecordDTO.getItem039() + ":00";
+                    groupNoFlagMap.put(inptNurseRecordDTO.getGroupNo(), recordTime);
+                }
+
                 //新增
                 this.handelParam(userId, userName, addList, inptNurseRecordDTO);
             } else {
                 //编辑
-                if (("hljld".equals(baseNurseOrderDTO.getCode()) || "xsehljld".equals(baseNurseOrderDTO.getCode())  || "cqdchljld".equals(baseNurseOrderDTO.getCode())  || "chhljld".equals(baseNurseOrderDTO.getCode())) && StringUtils.isNotEmpty(baseNurseOrderDTO.getCode())) {
+                if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
+                    if (inptNurseRecordDTO.getGroupNo() == null || inptNurseRecordDTO.getGroupNo() <= 0) {
+                        throw new RuntimeException("保存的数据检测到没有组号，请刷新后重试");
+                    }
                     //护理记录单，编辑前先删除对应的同组号数据
                     if (deleteList.indexOf(inptNurseRecordDTO.getGroupNo()) == -1) {
                         deleteList.add(inptNurseRecordDTO);
@@ -162,11 +187,22 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
             }
         }
 
+        // 判断新增的addList，数据是否合格。不同时间的组号相同的为不合格数据
+        for (InptNurseRecordDTO dto : addList) {
+            if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
+                // 日期+时间 2021-10-13 13:10:00
+                Integer groupNo = dto.getGroupNo();
+                String recordTime  = dto.getItem039() + ":00";
+                if (!MapUtils.get(groupNoFlagMap, groupNo).equals(recordTime)){
+                    throw new RuntimeException("【" + recordTime + "】与【" + MapUtils.get(groupNoFlagMap, groupNo) +"】组号冲突，请刷新后再试");
+                }
+            }
+        }
         if (!ListUtils.isEmpty(addList)) {
             nursingRecordDAO.insert(addList);
         }
         if (!ListUtils.isEmpty(editList)) {
-            if (("hljld".equals(baseNurseOrderDTO.getCode()) || "xsehljld".equals(baseNurseOrderDTO.getCode())  || "cqdchljld".equals(baseNurseOrderDTO.getCode())  || "chhljld".equals(baseNurseOrderDTO.getCode())) && StringUtils.isNotEmpty(baseNurseOrderDTO.getCode())) {
+            if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
                 nursingRecordDAO.delete(deleteList);
                 nursingRecordDAO.insert(editList);
             } else {
@@ -174,6 +210,24 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
             }
         }
         return true;
+    }
+
+    private List<String> getBnoCodeList(String hospCode, String code) {
+        List<String> bnoCodeList = new ArrayList<>();
+        bnoCodeList.add("hljld");
+        bnoCodeList.add("xsehljld");
+        bnoCodeList.add("cqdchljld");
+        bnoCodeList.add("chhljld");
+        bnoCodeList.add("ckhljld");
+        Map map = new HashMap();
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+            // 已配置
+            bnoCodeList = new ArrayList<>(Arrays.asList(sysParameterDTO.getValue().split(",")));
+        }
+        return bnoCodeList;
     }
 
     private void handelParam(String userId, String userName, List<InptNurseRecordDTO> addList, InptNurseRecordDTO inptNurseRecordDTO) {
@@ -260,10 +314,13 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
             //根据单据id查询单据类型
             BaseNurseOrderDTO baseNurseOrderDTO = this.getOrderDTO(delList.get(0));
 
+            // 获取需要分行的护理单据列表集合
+            List<String> bnoCodeList = this.getBnoCodeList(hospCode, "HLD_BRANCH_LIST");
+
             List<Integer> groupNoList = new ArrayList<>();
 
             //常规护理记录单、新生儿护理记录单、产前待产护理记录单、产后护理记录单
-            if ("hljld".equals(baseNurseOrderDTO.getCode()) || "xsehljld".equals(baseNurseOrderDTO.getCode()) || "cqdchljld".equals(baseNurseOrderDTO.getCode()) || "chhljld".equals(baseNurseOrderDTO.getCode())) {
+            if (bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
                 //实际需要删除的库中数据
                 List<InptNurseRecordDTO> dtoList = new ArrayList<>();
 
@@ -326,7 +383,11 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         PageHelper.startPage(inptNurseRecordDTO.getPageNo(), inptNurseRecordDTO.getPageSize());
         //根据护理单据id查询护理单据
         BaseNurseOrderDTO orderDTO = this.getOrderDTO(inptNurseRecordDTO);
-        if ("hljld".equals(orderDTO.getCode()) || "xsehljld".equals(orderDTO.getCode()) || "cqdchljld".equals(orderDTO.getCode()) || "ckhljld".equals(orderDTO.getCode())) {
+
+        // 获取需要分行的护理单据列表集合
+        List<String> bnoCodeList = this.getBnoCodeList(inptNurseRecordDTO.getHospCode(), "HLD_BRANCH_LIST");
+
+        if (bnoCodeList.contains(orderDTO.getCode())) {
             inptNurseRecordDTO.setOrderFlag(Constants.SF.S);
         }
         List<InptNurseRecordDTO> list = nursingRecordDAO.queryNursingRecord(inptNurseRecordDTO);
@@ -346,7 +407,9 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
     public List<InptNurseRecordDTO> queryNurseRecordByPrint(InptNurseRecordDTO inptNurseRecordDTO) {
         //根据护理单据id查询护理单据
         BaseNurseOrderDTO orderDTO = this.getOrderDTO(inptNurseRecordDTO);
-        if ("hljld".equals(orderDTO.getCode()) || "xsehljld".equals(orderDTO.getCode()) || "cqdchljld".equals(orderDTO.getCode()) || "ckhljld".equals(orderDTO.getCode())) {
+        // 获取需要分行的护理单据列表集合
+        List<String> bnoCodeList = this.getBnoCodeList(inptNurseRecordDTO.getHospCode(), "HLD_BRANCH_LIST");
+        if (bnoCodeList.contains(orderDTO.getCode())) {
             inptNurseRecordDTO.setOrderFlag(Constants.SF.S);
         }
         return nursingRecordDAO.queryNursingRecord(inptNurseRecordDTO);
@@ -455,8 +518,8 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
 
         // 根据就诊id，护理单据规则查询
         Integer max = nursingRecordDAO.getMaxGroupNo(inptNurseRecordDTO);
-        if (max == 0) {
-            max = 1;
+        if (max == null) {
+            max = 0;
         }
 
         //生成日间小结护理记录dto, 进行赋值

@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptPayDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -220,6 +221,8 @@ public class OutptOutTmakePriceFormController extends BaseController {
     @PostMapping("/updateOutptRegister")
     public WrapperResponse<Boolean> updateOutptRegister(@RequestBody  Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
+        map.put("crteName",userDTO.getCrteName());
+        map.put("crteId",userDTO.getCrteId());
         map.put("hospCode",userDTO.getHospCode());
         return outptOutTmakePriceFormService_consumer.updateOutptRegister(map);
     }
@@ -256,4 +259,27 @@ public class OutptOutTmakePriceFormController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         return outptOutTmakePriceFormService_consumer.addOperAndRescue(map);
     }
+
+    /**
+     * @Menthod: getPayInfoByParams
+     * @Desrciption: 获取支付信息
+     * @Param: outptPayDTO
+     * @Author: 廖继广
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date: 2021-10-13 13:44
+     * @Return:
+     **/
+    @GetMapping("/getPayInfoByParams")
+    public WrapperResponse<OutptPayDTO> getPayInfoByParams(OutptPayDTO outptPayDTO, HttpServletRequest req, HttpServletResponse res) {
+        if (StringUtils.isEmpty(outptPayDTO.getSettleId()) || StringUtils.isEmpty(outptPayDTO.getVisitId())) {
+            throw new AppException("结算ID与就诊ID不能为空，请刷新页面重试！");
+        }
+        Map<String,Object> map = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        outptPayDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("outptPayDTO",outptPayDTO);
+        return outptOutTmakePriceFormService_consumer.getPayInfoByParams(map);
+    }
+
 }

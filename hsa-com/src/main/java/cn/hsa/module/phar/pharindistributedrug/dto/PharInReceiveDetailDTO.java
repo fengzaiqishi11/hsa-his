@@ -92,4 +92,8 @@ public class PharInReceiveDetailDTO extends PharInReceiveDetailDO implements Ser
     private List<String> ids;
 
     private List<String> itemIds;
+    /**
+     * 顺序号
+     */
+    private String seqNo;
 }

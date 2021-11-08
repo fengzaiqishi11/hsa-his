@@ -154,4 +154,14 @@ public interface BaseDrugService {
      * @Return
     **/
     WrapperResponse<PageDTO> queryUnifiedPage(Map<String, Object> map);
+    /**
+     * @Meth: queryEnableCancel
+     * @Description: 查看能否作废药品
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    @PostMapping("/service/base/baseDrug/queryEnableCancel")
+    WrapperResponse<Boolean> queryEnableCancel(Map map);
 }

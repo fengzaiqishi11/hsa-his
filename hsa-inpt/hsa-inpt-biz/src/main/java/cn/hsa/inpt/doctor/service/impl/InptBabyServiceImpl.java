@@ -98,4 +98,18 @@ public class InptBabyServiceImpl extends HsafService implements InptBabyService 
     public WrapperResponse<InptBabyDTO> getBabyCost(Map param) {
         return WrapperResponse.success(inptBabyBO.getBabyCost(param));
     }
+
+    /**
+     * @Menthod: cancelBaby
+     * @Desrciption: 新生儿取消登记
+     * @Param: inptBabyDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-10-08 11:30
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> cancelBaby(Map map) {
+        return WrapperResponse.success(inptBabyBO.updateBabyRegister(MapUtils.get(map, "inptBabyDTO")));
+    }
 }

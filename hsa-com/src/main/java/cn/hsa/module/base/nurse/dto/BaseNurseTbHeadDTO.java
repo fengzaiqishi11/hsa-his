@@ -37,4 +37,8 @@ public class BaseNurseTbHeadDTO extends BaseNurseTbHeadDO implements Serializabl
      * 数据来源方式值sourceValueList(数据库String -> 页面List<Map>)
      */
     private List<Map> sourceValueList;
+    /**
+     * 是否竖向打印(1竖向，0横向)
+     */
+    private String isVertical;
 }

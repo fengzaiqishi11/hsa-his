@@ -1,6 +1,7 @@
 package cn.hsa.outpt.infusionexec.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.infusionExec.bo.OutptInfusionExecBO;
 import cn.hsa.module.outpt.infusionExec.dao.OutptInfusionExecDAO;
@@ -31,7 +32,7 @@ import java.util.*;
  */
 @Component
 @Slf4j
-public class OutptInfusionExecBOImpl implements OutptInfusionExecBO {
+public class OutptInfusionExecBOImpl extends HsafBO implements OutptInfusionExecBO {
 
     @Resource
     private OutptInfusionExecDAO outptInfusionExecDAO;
@@ -68,14 +69,14 @@ public class OutptInfusionExecBOImpl implements OutptInfusionExecBO {
         } catch (Exception e) {
             outptPrescribeDetailsDTO.setEndTime("");
         }
-        //设置分页
-        PageHelper.startPage(outptPrescribeDetailsDTO.getPageNo(), outptPrescribeDetailsDTO.getPageSize());
 
         //获取用药方式list参数值
         Map map = new HashMap();
         //根据系统配置的输液参数值，查询出为用法为输液的List用法
         List<String> usageCodeList = findInfusionParam("DSY_YYFS", outptPrescribeDetailsDTO.getHospCode());
 
+        //设置分页
+        PageHelper.startPage(outptPrescribeDetailsDTO.getPageNo(), outptPrescribeDetailsDTO.getPageSize());
         map.put("usageCodeList", usageCodeList);
         map.put("outptPrescribeDetailsDTO", outptPrescribeDetailsDTO);
 

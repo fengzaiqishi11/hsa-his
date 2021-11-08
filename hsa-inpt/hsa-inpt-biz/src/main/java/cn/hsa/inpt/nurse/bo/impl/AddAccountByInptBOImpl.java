@@ -390,7 +390,8 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
         throw new AppException(inptCostDTO.getItemName()+":用法不能为空");
       }
       // 校验药品库存
-      if(Constants.XMLB.YP.equals(inptCostDTO.getItemCode())){
+      if(Constants.XMLB.YP.equals(inptCostDTO.getItemCode())&&
+              (Constants.YYXZ.CG.equals(inptCostDTO.getUseCode())  || Constants.YYXZ.CYDY.equals(inptCostDTO.getUseCode()))){
             Map<String,Object> params = new HashMap<String,Object>();
             params.put("hospCode",hospCode);
             params.put("pharId",inptCostDTO.getPharId());
@@ -949,16 +950,14 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                     wdto.setSpec(md.getSpec());//规格
                     wdto.setSplitRatio(md.getSplitRatio());//拆分比
                     wdto.setSplitUnitCode(md.getSplitUnitCode());//拆零单位代码
-
+                    wdto.setUnitCode(md.getUnitCode());
                     //总数量的单位等于拆零单位
                     if(dto.getTotalNumUnitCode().equals(md.getSplitUnitCode())){
                         wdto.setSplitNum(dto.getTotalNum());//拆零数量
                         wdto.setNum(BigDecimalUtils.divide(dto.getTotalNum(), md.getSplitRatio()).setScale(2,   BigDecimal.ROUND_HALF_UP));//总数量
-                        wdto.setUnitCode(md.getSplitUnitCode());
                     }else{
                         wdto.setSplitNum(BigDecimalUtils.multiply(dto.getTotalNum(),md.getSplitRatio() ));//拆零数量
                         wdto.setNum(dto.getTotalNum());//总数量
-                        wdto.setUnitCode(md.getUnitCode());
                     }
                     wdto.setSplitPrice(md.getSplitPrice());//拆零单价
                     wdto.setPrice(md.getPrice());//大单位单价

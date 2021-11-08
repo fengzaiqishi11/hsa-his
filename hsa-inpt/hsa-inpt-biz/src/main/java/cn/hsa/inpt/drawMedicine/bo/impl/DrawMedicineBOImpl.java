@@ -181,19 +181,20 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
 //        //过滤出isback = 0 的是退药的药品
 //        List<PharInWaitReceiveDTO> isNotBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "0".equals(dto.getIsBack())).collect(Collectors.toList());
         if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
-            isBackWaitReceiveList.forEach(isBackDto -> {
-                for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
+            for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
+                for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
+                    PharInWaitReceiveDTO waitDto = it.next();
                     if (isBackDto.getOldWrId().equals(waitDto.getId())) {
                         waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
                         waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
                         waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
                         if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
-                            waitReceiveListAll.remove(waitDto);
+                            it.remove();
                         }
                         break;
                     }
                 }
-            });
+            }
         }
         //
         //所有单据筛选出来的药品的集合
@@ -323,19 +324,20 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
       // 过滤掉已退费数量
       if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
-        isBackWaitReceiveList.forEach(isBackDto -> {
-          for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
-            if (isBackDto.getOldWrId().equals(waitDto.getId())) {
-              waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
-              waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
-              waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
-              if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
-                waitReceiveListAll.remove(waitDto);
+          for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
+              for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
+                  PharInWaitReceiveDTO waitDto = it.next();
+                  if (isBackDto.getOldWrId().equals(waitDto.getId())) {
+                      waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
+                      waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
+                      waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
+                      if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
+                          it.remove();
+                      }
+                      break;
+                  }
               }
-              break;
-            }
           }
-        });
       }
       //筛选出来的待领药品集合
       List<PharInWaitReceiveDTO> lyList = new ArrayList<>();
@@ -773,21 +775,36 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
         List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
 
-        if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
-            isBackWaitReceiveList.forEach(isBackDto -> {
-                for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
+//        if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
+//            isBackWaitReceiveList.forEach(isBackDto -> {
+//                for (PharInWaitReceiveDTO waitDto : waitReceiveListAll) {
+//                    if (isBackDto.getOldWrId().equals(waitDto.getId())) {
+//                        waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
+//                        waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
+//                        waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
+//                        if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
+//                            waitReceiveListAll.remove(waitDto);
+//                        }
+//                        break;
+//                    }
+//                }
+//            });
+//        }
+            // update by 2021/9/29 修改领药申请出现0的问题
+            for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
+                for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
+                    PharInWaitReceiveDTO waitDto = it.next();
                     if (isBackDto.getOldWrId().equals(waitDto.getId())) {
                         waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
                         waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
                         waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
                         if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
-                            waitReceiveListAll.remove(waitDto);
+                            it.remove();
                         }
                         break;
                     }
                 }
-            });
-        }
+            }
 
 
         //所有单据筛选出来的药品的集合

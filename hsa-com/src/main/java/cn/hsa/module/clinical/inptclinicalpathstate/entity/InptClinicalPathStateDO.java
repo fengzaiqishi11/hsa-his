@@ -2,11 +2,14 @@ package cn.hsa.module.clinical.inptclinicalpathstate.entity;
 
 import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 
@@ -43,6 +46,14 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
      */
     private String pathState;
     /**
+     * 入径开始ID(clinic_path_list.id)
+     */
+    private String startStageId;
+    /**
+     * 入径开始阶段名称
+     */
+    private String startStageName;
+    /**
      * 当前路径目录ID(clinic_path_list.id)
      */
     private String listId;
@@ -57,15 +68,25 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
     /**
      * 入径创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pathCrteTime;
     /**
      * 当前阶段ID(clinic_path_stage.id)
      */
     private String stageId;
     /**
+     * 当前阶段名称
+     */
+    private String stageName;
+    /**
      * 出径阶段ID(clinic_path_stage.id)
      */
     private String endStageId;
+    /**
+     * 出径阶段名称
+     */
+    private String endStageName;
     /**
      * 出径人ID
      */
@@ -77,6 +98,8 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
     /**
      * 出径时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endCrteTime;
     /**
      * 出径方式(CJFS)0出院；1变异
@@ -89,6 +112,6 @@ public class InptClinicalPathStateDO extends PageDO implements Serializable {
     /**
      * 路径内发生费用
      */
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
 }

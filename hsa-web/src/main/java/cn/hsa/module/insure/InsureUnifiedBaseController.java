@@ -3,6 +3,7 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -391,4 +392,78 @@ public class InsureUnifiedBaseController extends BaseController {
     }
 
 
+    /**
+     * @Method updateInsureInptRegisterStatus
+     * @Desrciption  更新医保登记状态（医保已经登记 而his没有登记）
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 8:33
+     * @Return
+    **/
+    @PostMapping("/updateInsureInptRegisterStatus")
+    public WrapperResponse<Boolean> updateInsureInptRegisterStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedBaseService_consumer.updateInsureInptRegisterStatus(map);
+    }
+
+    /**
+     * @Method updateInsureInptSettleStatus
+     * @Desrciption  更新医保结算状态（医保已经结算 而his没有结算）
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:07
+     * @Return
+    **/
+    @PostMapping("/updateInsureInptSettleStatus")
+    public WrapperResponse<Boolean> updateInsureInptSettleStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedBaseService_consumer.updateInsureInptSettleStatus(map);
+    }
+
+    /**
+     * @Method updateInsureInptCancelSettleStatus
+     * @Desrciption  同步取消结算状态  his和医保   结算单边
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:21
+     * @Return
+    **/
+    @PostMapping("/updateInsureInptCancelSettleStatus")
+    public WrapperResponse<Boolean> updateInsureInptCancelSettleStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedBaseService_consumer.updateInsureInptCancelSettleStatus(map);
+    }
+
+    /**
+     * @Method updateInptPatientCode
+     * @Desrciption  修改病人类型
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/8 10:21
+     * @Return
+     **/
+    @PostMapping("/updateInptPatientCode")
+    public WrapperResponse<Boolean> updateInptPatientCode(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedBaseService_consumer.updateInptPatientCode(map);
+    }
+
+    @GetMapping("/queryInptInsurePatient")
+    public WrapperResponse<PageDTO> queryInptInsurePatient(InsureIndividualVisitDTO insureIndividualVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        Map<String,Object> map = new HashMap<>();
+        insureIndividualVisitDTO.setHospCode(hospCode);
+        map.put("hospCode",hospCode);
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        return insureUnifiedBaseService_consumer.queryInptInsurePatient(map);
+    }
 }

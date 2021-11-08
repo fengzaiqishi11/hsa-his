@@ -99,7 +99,7 @@
     <select id="queryDataWith5261" resultType="java.util.Map">
             SELECT
                 e.insure_reg_code AS insureRegCode,
-                e.visit_id,
+                e.visit_id as visitId,
                 t.medical_reg_no AS mdtrtId,
                 e.insureSettleId AS setlId,
                 e.settle_id,
@@ -111,7 +111,8 @@
                 c.aac006 AS birthday,
                 e.crte_time AS crteTime,
                 t.visit_drpt_name,
-                e.total_price
+                e.total_price,
+                e.crte_time
             FROM
             insure_individual_settle e,
             insure_individual_visit t,
@@ -122,6 +123,7 @@
             AND c.hosp_code = t.hosp_code
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
+            and e.insureSettleId is not null
         <if test="keyword != null and keyword != ''">
           and  ( c.aac003 like concat('%',#{keyword},'%')
             or t.medical_reg_no like concat('%',#{keyword},'%')
@@ -129,15 +131,16 @@
             )
         </if>
         <if test="startDate != null and startDate != ''">
-            and t.crte_time > STR_TO_DATE(#{startDate},'%Y-%m-%d')
+            and date(e.crte_time) &gt;= date(#{startDate})
         </if>
         <if test="endDate != null and endDate != ''">
-            and t.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)
+            and date(e.crte_time) &lt;= date(#{endDate})
         </if>
         <!--业务类型选择-->
         <if test="isHospital != null and isHospital != ''">
             and  t.is_hospital =#{isHospital}
         </if>
+        order by e.crte_time desc
     </select>
 
     <!--医药机构费用结算对总账查询-->
@@ -151,7 +154,7 @@
             sum(e.person_price) as person_price,
             t.medicine_org_code fixmedins_code,
             sum(e.total_price) as medfee_sumamt,
-            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
             sum(e.personal_price) as acct_pay,
             count(1) as fixmedins_setl_cnt
         FROM
@@ -194,7 +197,7 @@
         e.clr_optins,
         sum(e.person_price) as person_price,
         sum(e.total_price) as medfee_sumamt,
-        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price)) as fund_pay_sumamt,
+        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
         sum(e.personal_price) as acct_pay,
         count(1) as fixmedins_setl_cnt
         FROM
@@ -238,7 +241,7 @@
             e.clr_optins,
             t.insure_reg_code as setl_optins,
             e.total_price as medfee_sumamt,
-            (e.total_price - e.personal_price - e.person_price) as fund_pay_sumamt,
+            (e.total_price - e.personal_price - e.person_price - e.rests_price) as fund_pay_sumamt,
             e.personal_price as acct_pay
         FROM
         insure_individual_settle e,

@@ -175,6 +175,8 @@ public class InptSettlementController extends BaseController {
         List<InptPayDO> inptPayDOList = JSONArray.parseArray(JSON.toJSONString(params.get("inptPay")), InptPayDO.class);//支付方式信息
         params.put("hospCode", sysUserDTO.getHospCode());//医院编码
         params.put("userId", sysUserDTO.getId());//当前登录用户id
+        params.put("crteId",sysUserDTO.getCrteId());
+        params.put("crteName",sysUserDTO.getCrteName());
         params.put("userName", sysUserDTO.getName());//当前登录用户名称
         params.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());//当前用户科室id
         params.put("deptName", sysUserDTO.getLoginBaseDeptDTO().getName());//当前用户科室名称
@@ -270,6 +272,8 @@ public class InptSettlementController extends BaseController {
     public WrapperResponse<Boolean> editDischargeInpt(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
         return inptSettlementService_consumer.editDischargeInpt(map);
     }
 
@@ -286,6 +290,8 @@ public class InptSettlementController extends BaseController {
     public WrapperResponse<Boolean> editCancelDischargeInpt(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
         return inptSettlementService_consumer.editCancelDischargeInpt(map);
     }
 

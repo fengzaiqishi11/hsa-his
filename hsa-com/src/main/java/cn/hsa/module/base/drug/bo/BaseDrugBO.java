@@ -133,4 +133,15 @@ public interface BaseDrugBO {
     Boolean updateBaseDrugS(BaseDrugDTO baseDrugDTO);
 
     PageDTO queryUnifiedPage(BaseDrugDTO baseDrugDTO);
+    /**
+     * @Meth: queryEnableCancel
+     * @Description: 查看是否可以作废药品
+     *   1.判断费用表是否有未发药品。
+     *   2.长期医嘱是否开了该药品.如果有,不允许作废.
+     * @Param: [baseDrugDTO]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/9/27
+     */
+    Boolean queryEnableCancel(BaseDrugDTO baseDrugDTO);
 }

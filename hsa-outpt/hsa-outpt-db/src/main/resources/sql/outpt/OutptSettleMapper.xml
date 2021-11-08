@@ -32,6 +32,7 @@
         <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
         <result column="one_settle_id" property="oneSettleId" jdbcType="VARCHAR" />
+        <result column="acct_pay" property="acctPay" jdbcType="DECIMAL" />
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -61,7 +62,8 @@
         crte_id,
         crte_name,
         crte_time,
-        card_price
+        card_price,
+        acct_pay
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -135,7 +137,8 @@
           one_settle_id,
           crte_id,
           crte_name,
-          crte_time
+          crte_time,
+         acct_pay
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -163,7 +166,8 @@
           #{oneSettleId,jdbcType=VARCHAR},
           #{crteId,jdbcType=VARCHAR},
           #{crteName,jdbcType=VARCHAR},
-          #{crteTime,jdbcType=TIMESTAMP}
+          #{crteTime,jdbcType=TIMESTAMP},
+          #{acctPay,jdbcType=DECIMAL}
         )
     </insert>
 
@@ -444,8 +448,11 @@
                 crte_name = #{crteName,jdbcType=VARCHAR},
                 </if>
                 <if test="crteTime != null">
-                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
                 </if>
+                <if test="acctPay != null">
+                acct_pay = #{acctPay,jdbcType=DECIMAL}
+             </if>
         </set>
         where
         id = #{id}
@@ -504,6 +511,7 @@
             a.crte_name,
             a.settle_time,
             a.card_price as cardPrice,
+            (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code) as preferentialName,
             CONCAT(
             b.name,'/',
                 (CASE b.gender_code WHEN '0' THEN '未知的性别'
@@ -522,7 +530,9 @@
             (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf
         FROM
         outpt_settle a JOIN outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
-        WHERE a.hosp_code = #{hospCode} and a.is_settle='1'
+        <!--存在就诊表里的就诊医生与费用表医生不一致，导致过滤的数据不正确，医生过滤修改成费用表医生 add luoyong 2021.10.4-->
+        left join outpt_cost c on a.id = c.settle_id and a.hosp_code = c.hosp_code
+        WHERE a.hosp_code = #{hospCode} and a.is_settle='1' and c.settle_code = '2'
         <if test="keyword != null and keyword != ''">
             and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
         </if>
@@ -536,8 +546,9 @@
             and a.crte_id = #{chargeId}
         </if>
         <if test="doctorId != null and doctorId != ''">
-            and b.doctor_id = #{doctorId}
+            and c.doctor_id = #{doctorId}
         </if>
+        group by a.id
         order by a.settle_no desc, a.settle_time desc
     </select>
 
@@ -931,6 +942,10 @@
 
     <select id="getById" resultMap="outptSettleDtoMap">
        SELECT * from outpt_settle  where  id = #{id} and hosp_code = #{hospCode}
+    </select>
+    <select id="queryOutptSettle" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select * from insure_individual_settle where hosp_code =#{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+        and state ='0' and settle_state ='1' and is_cancel ='1' and insureSettleId is not null
     </select>
 
     <update id="updateOutptSettleStatus" >

@@ -118,7 +118,10 @@ public class OutptInfusionRegisterDTO extends OutptInfusionRegisterDO {
     private String dosage;
     //剂量单位
     private String dosageUnitCode;
-    //剂量
+    /** 用法;
+     *  多个用法之间使用单引号括起来存入数据库码表中,
+     * 查询时去掉单引号用逗号拼接后整体传入后台
+     * **/
     private String usageCode;
     //频率id
     private String rateId;

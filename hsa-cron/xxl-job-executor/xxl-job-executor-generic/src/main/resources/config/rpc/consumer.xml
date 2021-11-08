@@ -34,6 +34,6 @@
     <!--电子病历服务-->
     <dubbo:reference id="emrArchiveLoggingService_consumer" interface="cn.hsa.module.emr.emrarchivelogging.service.EmrArchiveLoggingService" check="false"/>
     <!--医保服务-->
-    <dubbo:reference id="insureIndividualCostService_comsumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" check="false"/>
+    <dubbo:reference id="insureIndividualCostService_comsumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" retries="0" check="false"/>
 
 </beans>

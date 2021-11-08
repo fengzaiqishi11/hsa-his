@@ -283,6 +283,4 @@ public class PatientComprehensiveQueryServiceImpl extends HsafService implements
   public WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map) {
     return WrapperResponse.success(patientComprehensiveQueryBO.queryYWLX(map));
   }
-
-
 }

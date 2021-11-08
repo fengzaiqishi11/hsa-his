@@ -69,23 +69,6 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
   }
 
   /**
-   * @Method queryJS
-   * @Desrciption 查询结算信息业务类型
-   * @Param
-   * [sysUserDTO]
-   * @Author yuelong.chen
-   * @Date   2021/11/4 11:18
-   * @Return
-   *
-   * @return*/
-  @Override
-  public List<Map<String, Object>> queryYWLX(Map map) {
-    String hospCode = MapUtils.get(map, "hospCode");
-    List<Map<String, Object>> ywlx = patientComprehensiveQueryDAO.queryYWLX(hospCode);
-    return ywlx;
-  }
-
-  /**
      * @Method queryAdvice()
      * @Desrciption  查询临时医嘱和长期医嘱的信息
      * @Param inptVisitDTO：visitId：就诊id isLong：是否长期医嘱
@@ -308,6 +291,20 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
   public List<PatientCompreHensiveQueryDTO> queryCostAllDetail(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO) {
     return patientComprehensiveQueryDAO.queryCostAllDetail(patientCompreHensiveQueryDTO);
   }
-
-
+  /**
+   * @Method queryJS
+   * @Desrciption 查询结算信息业务类型
+   * @Param
+   * [sysUserDTO]
+   * @Author yuelong.chen
+   * @Date   2021/11/4 11:18
+   * @Return
+   *
+   * @return*/
+  @Override
+  public List<Map<String, Object>> queryYWLX(Map map) {
+    String hospCode = MapUtils.get(map, "hospCode");
+    List<Map<String, Object>> ywlx = patientComprehensiveQueryDAO.queryYWLX(hospCode);
+    return ywlx;
+  }
 }

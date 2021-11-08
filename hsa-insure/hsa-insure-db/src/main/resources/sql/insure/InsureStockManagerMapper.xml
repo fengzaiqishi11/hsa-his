@@ -430,7 +430,11 @@
         LEFT JOIN base_material bd on bd.id = si.item_id  and si.hosp_code = bd.hosp_code
         left join base_drug b on si.item_id = b.id  and b.hosp_code = si.hosp_code
         where si.hosp_code =#{hospCode}
-        and outin_code in ('7','8')
+        and si.outin_code in ('7','8')
+        and a.audit_code = '1' /*医保项目已审核*/
+        AND a.is_match = '1' /*医保项目已匹配*/
+        AND a.is_trans = '1' /*医保项目已传输*/
+        AND a.is_valid = '1' /*医保项目有效*/
         <if test="fixmedinsHilistName != null and fixmedinsHilistName != ''">
             and a.hosp_item_name = #{fixmedinsHilistName}
         </if>

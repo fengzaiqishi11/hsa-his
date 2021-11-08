@@ -211,4 +211,16 @@ public interface PatientComprehensiveQueryService {
    **/
   @GetMapping("/service/inpt/patientcomprehensivequery/queryCostDetail")
   WrapperResponse<PageDTO> queryCostDetail(Map map);
+  /**
+   * @Method queryJS
+   * @Desrciption 查询结算信息业务类型
+   * @Param
+   * [sysUserDTO]
+   * @Author yuelong.chen
+   * @Date   2021/11/4 11:18
+   * @Return
+   *
+   * @return*/
+  @GetMapping("/service/inpt/patientComprehensiveQuery/queryYWLX")
+  WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map);
 }

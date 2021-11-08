@@ -181,7 +181,7 @@
         ifnull(a.num,0) num,
         ifnull(a.num*a.price,0) total,
         c.bed_name AS bedName,
-        (select seq_no from base_bed where base_bed.visit_id=a.visit_id and hosp_code=a.hosp_code) seqNo,
+        ifnull((select seq_no from base_bed where base_bed.visit_id=a.visit_id and hosp_code=a.hosp_code),0) seqNo,
         c.in_no AS inNo,
         (case a.item_code when '1' then (select code from base_drug where  hosp_code=a.hosp_code and id=a.item_id )
         else (select code from base_material where id=a.item_id and a.item_code='2' and hosp_code=a.hosp_code) end) code,

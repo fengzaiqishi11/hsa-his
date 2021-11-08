@@ -75,6 +75,7 @@ public class ClinicalPathStageDetailItemController extends BaseController {
     SysUserDTO sysUserDTO = getSession(req,res);
     String hospCode = sysUserDTO.getHospCode();
     clinicalPathStageDetailItemDTO.setHospCode(hospCode);
+    clinicalPathStageDetailItemDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
     Map map = new HashMap<>();
     map.put("hospCode",hospCode);
     map.put("clinicalPathStageDetailItemDTO",clinicalPathStageDetailItemDTO);
@@ -97,6 +98,7 @@ public class ClinicalPathStageDetailItemController extends BaseController {
     SysUserDTO sysUserDTO = getSession(req,res);
     String hospCode = sysUserDTO.getHospCode();
     clinicalPathStageDetailItemDTO.setHospCode(hospCode);
+    clinicalPathStageDetailItemDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
     Map map = new HashMap<>();
     map.put("hospCode",hospCode);
     map.put("clinicalPathStageDetailItemDTO",clinicalPathStageDetailItemDTO);

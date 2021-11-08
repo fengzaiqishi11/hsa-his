@@ -228,6 +228,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (outpt == null) {
             throw new AppException("患者就诊数据出现异常【" + visitId + "】，请联系管理员");
         }
+        // 病人类型为空 给默认值  lly 20211026
+        if (StringUtils.isEmpty(outpt.getPatientCode())){
+            outpt.setPatientCode("0");
+        }
         Integer patientCodeValue = Integer.parseInt(outpt.getPatientCode());
         if (patientCodeValue > 0) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);
@@ -817,7 +821,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
                             && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
 

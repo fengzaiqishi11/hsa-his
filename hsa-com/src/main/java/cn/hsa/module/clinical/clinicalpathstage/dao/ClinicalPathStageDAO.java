@@ -64,7 +64,7 @@ public interface ClinicalPathStageDAO {
      * @Description: 根据Id查询
      * @Param: [clinicalPathStageDTO]
      * @return: cn.hsa.module.clinical.clinicalpathstage.dto.ClinicalPathStageDTO
-     * @Author: zhangguorui
+     * @Author: queryClinicalPathStageById
      * @Date: 2021/9/13
      */
     ClinicalPathStageDTO queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO);

@@ -108,6 +108,9 @@ public class ClinicalPathStageBOImpl implements ClinicalPathStageBO {
     @Override
     public ClinicalPathStageDTO queryClinicalPathStageById(ClinicalPathStageDTO clinicalPathStageDTO) {
         if ("1".equals(clinicalPathStageDTO.getIsFlag())){ // 查询最大的序列号
+            if(StringUtils.isEmpty(clinicalPathStageDTO.getListId())) {
+              throw new AppException("请先选择路径目录");
+            }
             return clinicalPathStageDAO.getMaxSortNo(clinicalPathStageDTO);
         } else{
             Optional.ofNullable(clinicalPathStageDTO.getId()).orElseThrow(()->new AppException("临床路径阶段描述主键不能为空"));

@@ -2163,6 +2163,7 @@
                  join outpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
                  join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+        and iim.insure_illness_code is not null
     </select>
 
     <!--根据visitIds，itemIds查询出对应的费用表数据-->

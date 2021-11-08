@@ -35,5 +35,9 @@ public class InsureGoodSellBack   extends PageDO implements Serializable {
     private String selRetnOpterName	;//销售/退货经办人姓名	字符型	50	　	Y　	新医保
     private String memo	;//备注	字符型	500	　	　	新医保/核3	核3：aae013
     private String medinsProdSelNo	;//商品销售流水号	字符型	50			新医保/核3	核3：aae072
-
+    private String hospCode;// 医院编码
+    private String numUnitCode;// 数量单位
+    private String sellType;// 销售类型
+    private String visitId;// 就诊id
+    private String keyword;
 }

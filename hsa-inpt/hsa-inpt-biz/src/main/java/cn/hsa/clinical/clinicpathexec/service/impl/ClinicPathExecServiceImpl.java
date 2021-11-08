@@ -96,12 +96,6 @@ public class ClinicPathExecServiceImpl implements ClinicPathExecService {
   @Override
   public WrapperResponse<Boolean> insertClinicPathExec(Map map) {
     ClinicPathExecDTO clinicPathExecDTO = MapUtils.get(map, "clinicPathExecDTO");
-    clinicPathExecDTO.setId(SnowflakeUtils.getId());
-    // 是否执行  1.是 0.否
-    clinicPathExecDTO.setIsExec("1");
-    clinicPathExecDTO.setExecTime(clinicPathExecDTO.getExecTime());
-    clinicPathExecDTO.setExecName(clinicPathExecDTO.getCrteName());
-    clinicPathExecDTO.setExecId(clinicPathExecDTO.getCrteId());
     return WrapperResponse.success(clinicPathExecBO.insertClinicPathExec(clinicPathExecDTO));
   }
 

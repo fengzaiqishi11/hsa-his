@@ -588,7 +588,9 @@
         inpt.zz_doctor_id as zzDoctorId,
         inpt.total_advance,
         inpt.total_cost,
-        inpt.total_balance
+        inpt.total_balance,
+        (inpt.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id)) as totalMergeBalance,
+        (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id) as totalMergeCost
         FROM
         inpt_visit inpt,
         oper_info_record oper
@@ -648,7 +650,9 @@
         outpt.doctor_id as zzDoctorId,
         0 as total_advance,
         0 as total_cost,
-        0 as total_balance
+        0 as total_balance,
+        0 as totalMergeBalance,
+        0 as totalMergeCost
         FROM
         outpt_visit outpt,
         oper_info_record oper

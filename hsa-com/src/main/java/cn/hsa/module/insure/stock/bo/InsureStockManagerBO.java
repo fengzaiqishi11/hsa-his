@@ -1,5 +1,7 @@
 package cn.hsa.module.insure.stock.bo;
 
+import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
 import cn.hsa.module.insure.stock.entity.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
@@ -91,6 +93,7 @@ public interface InsureStockManagerBO {
     /**
      * 查询商品盘点信息
      * @param insureInventoryCheck
+     *
      * @return
      */
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);
@@ -114,4 +117,13 @@ public interface InsureStockManagerBO {
      * @return
      */
     Boolean uploadInsureInventoryStock(Map<String, Object> map);
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售或者退货人员
+     * @Param: [map]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    PageDTO queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
 }

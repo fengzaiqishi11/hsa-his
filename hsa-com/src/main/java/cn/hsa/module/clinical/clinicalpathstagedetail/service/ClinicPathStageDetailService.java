@@ -112,4 +112,17 @@ public interface ClinicPathStageDetailService {
   **/
   WrapperResponse<List<TreeMenuNode>> queryClinicalPathTree(Map map);
 
+  /**
+  * @Menthod queryClinicalPrint
+  * @Desrciption 临床路径打印
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/28 9:20
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+  **/
+  WrapperResponse<Map> queryClinicalPrint(Map map);
+
 }

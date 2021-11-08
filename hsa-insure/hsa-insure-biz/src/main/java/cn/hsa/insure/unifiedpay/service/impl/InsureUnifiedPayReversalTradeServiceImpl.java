@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.util.MapUtils;
@@ -173,6 +174,11 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
     @Override
     public WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.downLoadSettleInfo(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String,Object>> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.checkOneSettle(map,insureIndividualVisitDTO));
     }
 
 

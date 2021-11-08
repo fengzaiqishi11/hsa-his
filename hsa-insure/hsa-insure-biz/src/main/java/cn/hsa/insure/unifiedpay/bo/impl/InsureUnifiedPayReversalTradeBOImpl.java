@@ -799,7 +799,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Date   2021/10/23 15:20
      * @Return
     **/
-    private Map<String,Object> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO) {
+    public Map<String,Object> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO) {
         Map<String,Object> infoMap = new HashMap<>();
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
        Map<String,Object> dataMap =  insureUnifiedBaseService.checkOneSettle(map).

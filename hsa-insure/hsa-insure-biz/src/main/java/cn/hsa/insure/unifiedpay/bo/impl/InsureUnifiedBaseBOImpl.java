@@ -542,7 +542,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String hospCode = MapUtils.get(map, "hospCode");
         String insureSettleId = MapUtils.get(map, "insureSettleId");
         if(StringUtils.isEmpty(insureSettleId)){
-           throw new AppException("医保结算id参数为空");
+            throw new AppException("医保结算id参数为空");
         }
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         Map<String, Object> dataMap = new HashMap<>();
@@ -911,7 +911,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Override
     public Map<String, Object> querySpecialRecord(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        String orgCode = MapUtils.get(map, "orgCode");
+        String orgCode = MapUtils.get(map, "regCode");
         String psnNo = "";
         if (StringUtils.isEmpty(MapUtils.get(map, "psnNo"))) {
             Map<String, Object> data = insureIndividualBasicService_consumer.queryInsureInfo(map).getData();
@@ -941,7 +941,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Override
     public Map<String, Object> queryMzSpecialLimitPrice(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        String orgCode = MapUtils.get(map, "orgCode");
+        String orgCode = MapUtils.get(map, "regCode");
         Map<String, Object> data = insureIndividualBasicService_consumer.queryInsureInfo(map).getData();
         String psnNo = MapUtils.get(data, "psnNo");
         String queryYear = MapUtils.get(map, "queryYear");
@@ -1312,6 +1312,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
+        dataMap.put("omsgid", settleMsgId);// 原发送方报文ID
         if(StringUtils.isEmpty(isHospital)){
             throw new AppException("请选择门诊或者住院业务类型");
         }else if(Constants.SF.S.equals(isHospital)){
@@ -1377,8 +1378,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String patientCode =  MapUtils.get(map,"patientCode");
         String redisKey ="";
         if(Constants.SF.S.equals(isHospital)){
-             redisKey = new StringBuilder().append(hospCode).append("^").
-                     append(visitId).
+            redisKey = new StringBuilder().append(hospCode).append("^").
+                    append(visitId).
                     append(Constant.UnifiedPay.INPT.UP_2305).append("^").toString();
         }else{
             redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).
@@ -1396,7 +1397,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         individualSettleDTO.setSettleState(Constants.SF.S);  // 未结算
         InsureIndividualSettleDTO settleDTO = insureIndividualSettleDAO.selectInsureSettInfo(individualSettleDTO);
         if(settleDTO == null){
-           throw  new AppException("该患者在医保结算表没有正常的结算记录,不能调用取消结算单边账功能");
+            throw  new AppException("该患者在医保结算表没有正常的结算记录,不能调用取消结算单边账功能");
         }
         String insureSettleId = settleDTO.getInsureSettleId();
         map.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());

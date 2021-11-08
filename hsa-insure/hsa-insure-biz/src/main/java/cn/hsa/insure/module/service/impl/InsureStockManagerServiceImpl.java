@@ -150,10 +150,12 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
     }
 
     /**
-     * 查询商品盘点信息
-     *
-     * @param map
-     * @return
+     * @Meth: queryInsureInventoryCheckPage
+     * @Description: 查询需要上传的盘存信息
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
      */
     @Override
     public WrapperResponse<PageDTO> queryInsureInventoryCheckPage(Map<String, Object> map) {
@@ -174,7 +176,6 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
 
     /**
      * 查询商品库存变更信息
-     *
      * @param map
      * @return
      */
@@ -193,5 +194,17 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
     @Override
     public WrapperResponse<Boolean> uploadInsureInventoryStock(Map<String, Object> map) {
         return WrapperResponse.success(insureStockManagerBO.uploadInsureInventoryStock(map));
+    }
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询销售或者退货人员
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map) {
+        return WrapperResponse.success(insureStockManagerBO.queryPersonList(MapUtils.get(map, "insureRecruitPurchaseDTO")));
     }
 }

@@ -108,15 +108,15 @@
         a.item_id,
         case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name when a.item_code = '4' then (case when e.type_code = '10' then a.item_name else e.name end ) else a.item_name end item_name,
         case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code,
-        a.num, a.unit_code,  case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
-        when a.item_code = '1' and a.unit_code = c.unit_code then c.price
-        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price
-        when a.item_code = '2' and a.unit_code = d.unit_code then d.price
+        a.num, a.unit_code,  case when a.item_code = '1' and a.total_num_unit_code = c.split_unit_code then c.split_price
+        when a.item_code = '1' and a.total_num_unit_code = c.unit_code then c.price
+        when a.item_code = '2' and a.total_num_unit_code = d.split_unit_code then d.split_price
+        when a.item_code = '2' and a.total_num_unit_code = d.unit_code then d.price
         when a.item_code = '4' then e.price end price,
-        case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price*a.total_num
-        when a.item_code = '1' and a.unit_code = c.unit_code then c.price*a.total_num
-        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price*a.total_num
-        when a.item_code = '2' and a.unit_code = d.unit_code then d.price*a.total_num
+        case when a.item_code = '1' and a.total_num_unit_code = c.split_unit_code then c.split_price*a.total_num
+        when a.item_code = '1' and a.total_num_unit_code = c.unit_code then c.price*a.total_num
+        when a.item_code = '2' and a.total_num_unit_code = d.split_unit_code then d.split_price*a.total_num
+        when a.item_code = '2' and a.total_num_unit_code = d.unit_code then d.price*a.total_num
         when a.item_code = '4' then e.price*a.total_num  end total_price, a.total_num, a.bfc_id, a.use_days, a.exec_dept_id, a.use_code, a.herb_note_code, a.is_skin, a.is_give, a.is_long, a.content,
         case when c.id is not null then c.big_type_code when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
         a.total_num_unit_code totalNumUnitCode,

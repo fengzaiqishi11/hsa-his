@@ -347,6 +347,48 @@ public interface InsureIndividualVisitDAO {
 
     void insertCommonLog(InsureFunctionLogDO insureFunctionDO);
 
+    /**
+     * @Method querySelectInsureSumInfo
+     * @Desrciption  查询个人累计信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/25 17:28
+     * @Return
+    **/
+    List<Map<String, Object>> querySelectInsureSumInfo(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
+    /**
+     * @Method selectOutDiagnose
+     * @Desrciption  查询出院诊断名称
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/26 20:07
+     * @Return
+    **/
+    String selectOutDiagnose(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method deletePatientSumInfo
+     * @Desrciption  删除个人累计信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/29 10:58
+     * @Return
+    **/
+    void deletePatientSumInfo(Map<String, Object> map);
+
+    /**
+     * @Method insertPatientSumInfo
+     * @Desrciption  费用传输时,保存个人累计信息
+     * @Param resultDataMap
+     *
+     * @Author fuhui
+     * @Date   2021/10/29 10:58
+     * @Return
+    **/
+    void insertPatientSumInfo(@Param("resultDataMap") List<Map<String, Object>> resultDataMap);
 }
 

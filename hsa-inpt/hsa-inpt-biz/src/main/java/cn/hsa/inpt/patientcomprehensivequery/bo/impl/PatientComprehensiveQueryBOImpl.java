@@ -11,12 +11,15 @@ import cn.hsa.module.inpt.patientcomprehensivequery.bo.PatientComprehensiveQuery
 import cn.hsa.module.inpt.patientcomprehensivequery.dao.PatientComprehensiveQueryDAO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO;
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
+import cn.hsa.util.MapUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.inpt.patientcomprehensivequery
@@ -287,5 +290,21 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
   @Override
   public List<PatientCompreHensiveQueryDTO> queryCostAllDetail(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO) {
     return patientComprehensiveQueryDAO.queryCostAllDetail(patientCompreHensiveQueryDTO);
+  }
+  /**
+   * @Method queryJS
+   * @Desrciption 查询结算信息业务类型
+   * @Param
+   * [sysUserDTO]
+   * @Author yuelong.chen
+   * @Date   2021/11/4 11:18
+   * @Return
+   *
+   * @return*/
+  @Override
+  public List<Map<String, Object>> queryYWLX(Map map) {
+    String hospCode = MapUtils.get(map, "hospCode");
+    List<Map<String, Object>> ywlx = patientComprehensiveQueryDAO.queryYWLX(hospCode);
+    return ywlx;
   }
 }

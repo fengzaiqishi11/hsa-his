@@ -1596,8 +1596,32 @@
 				#{remoteMsgId,jdbcType=VARCHAR}
 				)
 	</insert>
+    <insert id="insertPatientSumInfo">
+		insert into	insure_patient_sum (id, hosp_code, medis_code, psn_no, visit_id,
+		                                medical_reg_no, insutype, year,
+		                                cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time)
+		                                values
+		<foreach collection="resultDataMap" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.hospCode},
+			#{item.medisCode},
+			#{item.psnNo},
+			#{item.visitId},
+			#{item.medicalRegNo},
+			#{item.insutype},
+			#{item.year},
+			#{item.cum_type_code},
+			#{item.cum_ym},
+			#{item.crteId},
+			#{item.cum},
+			#{item.crteName},
+			#{item.crteTime}
+			)
+		</foreach>
+	</insert>
 
-	<!-- 修改数据 -->
+    <!-- 修改数据 -->
 	<update id="updateInsureIndividualSettle" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
 		UPDATE insure_individual_settle
 		<set>
@@ -2104,8 +2128,11 @@
 
         delete from inpt_bed_change where hosp_code = #{hospCode} and visit_id = #{id};
     </delete>
+    <delete id="deletePatientSumInfo">
+		delete  from insure_patient_sum where visit_id  = #{visitId} and hosp_code =#{hospCode}
+	</delete>
 
-	<update id="updateBaseBed" >
+    <update id="updateBaseBed" >
 		update base_bed set visit_id = null where hosp_code = #{hospCode} and visit_id = #{id}
 	</update>
 

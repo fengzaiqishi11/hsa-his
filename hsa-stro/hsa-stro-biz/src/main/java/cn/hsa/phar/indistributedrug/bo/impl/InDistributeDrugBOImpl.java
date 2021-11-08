@@ -129,7 +129,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
     public Map<String, List<PharInReceiveDetailDTO>> getInReviceDetail(PharInReceiveDetailDTO pharInReceiveDetailDTO) {
         List<PharInReceiveDetailDTO> inReviceDetail = inDistributeDrugDAO.getInReviceDetail(pharInReceiveDetailDTO);
 
-        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(a -> a.getSeqNo(), Collectors.toList()));
+        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getVisitId));
         collect = collect.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
                 Collectors.toMap(
                         Map.Entry::getKey,

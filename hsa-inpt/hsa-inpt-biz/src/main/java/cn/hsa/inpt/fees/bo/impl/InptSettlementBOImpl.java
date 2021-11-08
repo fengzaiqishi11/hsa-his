@@ -20,7 +20,6 @@ import cn.hsa.module.inpt.fees.dao.*;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.entity.*;
 import cn.hsa.module.insure.inpt.service.InptService;
-import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dto.*;
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -127,10 +125,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
 
     @Resource
     private InptBabyDAO inptBabyDAO;
-
-    @Resource
-    private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
-
 
     /**
      * @param inptVisitDTO 查询条件
@@ -672,28 +666,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String key = new StringBuilder(hospCode).append(id).append(Constants.INPT_FEES_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key))) return WrapperResponse.fail("当前患者正在结算，请稍后再试。", null);
         try {
-
-            //获取当前患者信息参数
-            InptVisitDTO inptVisitDTO = new InptVisitDTO();
-            inptVisitDTO.setHospCode(hospCode);//医院编码
-            inptVisitDTO.setId(id);//就诊id
-            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
-            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
-            if (inptVisitDTO == null) {
-                return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
-            }
-            if (!Constants.BRZT.YCY.equals(inptVisitDTO.getStatusCode())) {
-                throw new AppException("病人状态已变更，非预出院状态，请刷新后重新结算！");
-            }
-            // 出院结算校验病人状态是不是预出院  lly 2021/11/01
-            if (isMidWaySettle != null && "1".equals(isMidWaySettle)) {
-
-            }else {
-                if (inptVisitDTO != null && inptVisitDTO.getStatusCode() != null &&!inptVisitDTO.getStatusCode().equals(Constants.YDLX.YCY)){
-                    return WrapperResponse.fail("该患者不是预出院状态，请刷新。", null);
-                }
-            }
-
             redisUtils.set(key, id);
             Boolean isInvoice = (Boolean) param.get("isInvoice");//是否使用发票
             String userId = (String) param.get("userId");//当前登录用户id
@@ -741,9 +713,15 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             // ==================中途结算，不能查询全部费用，只能查询医保已经上传时间区间的费用  2021年7月28日16:13:29=========================================
             // if (inptCostDOList == null || inptCostDOList.isEmpty()){return WrapperResponse.fail("未找到结算费用信息，请刷新。",null);}
 
-
-
-
+            //获取当前患者信息参数
+            InptVisitDTO inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setHospCode(hospCode);//医院编码
+            inptVisitDTO.setId(id);//就诊id
+            inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+            inptVisitDTO.setIsUserInsureAccount(MapUtils.get(param,"isUserInsureAccount"));
+            if (inptVisitDTO == null) {
+                return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
+            }
             Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
             if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
@@ -1170,7 +1148,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrType = MapUtils.get(insureInptResult, "clr_type");
             BigDecimal hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
 
+            // update by liaojiguang on 2021-10-29 紧急版本master(有时会返回int类型)
+            //BigDecimal acctPay = MapUtils.get(insureInptResult,"acct_pay"); // 个人账户支出
             BigDecimal acctPay = BigDecimalUtils.convert(MapUtils.get(insureInptResult,"acct_pay").toString()); // 个人账户支出
+
             /**
              * 结算成功以后 更新基金信息
              */
@@ -1389,7 +1370,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
      * @Method editDischargeInpt
      * @Desrciption 医保出院办理
      *    1.出院办理前 先验证该病人是否已经医保出院登记
-     *    2.增加个人累计信息的保存
      * @Param params
      * @Author fuhui
      * @Date 2021/5/28 11:40
@@ -1432,16 +1412,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         /**
          * 办理医保预出院之前 需要判断医保上传费用和his费用是不是一致
          */
-        map.put("visitId",id);
-        map.put("medicalRegNo",medicalRegNo);
-        map.put("psnNo",insureIndividualVisitDTO.getAac001());
-        map.put("medisCode",insureIndividualVisitDTO.getMedicineOrgCode());
+
         checkInsureAndHisFee(map);
-        /**
-         * 保存个人累计信息
-         */
-        insertPatientSumInfo(map);
+
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
+            map.put("visitId",id);
+            map.put("medicalRegNo",medicalRegNo);
             insureUnifiedPayInptService_consumer.UP_2402(map);
             InptVisitDTO inptVisitDTO = new InptVisitDTO();
             inptVisitDTO.setId(id);
@@ -1452,43 +1428,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             insureIndividualVisitService.updateInsureInidivdual(map).getData();
         }
         return true;
-    }
-
-    /**
-     * @Method 办理医保预出院之前，需要保存个人累计信息
-     * @Desrciption
-     * @Param
-     *
-     * @Author fuhui
-     * @Date   2021/10/23 14:27
-     * @Return
-    **/
-    private void insertPatientSumInfo(Map<String, Object> map) {
-        String crteName = MapUtils.get(map,"crteName"); //  创建人姓名
-        String crteId = MapUtils.get(map,"crteId"); // 创建人id
-        String visitId = MapUtils.get(map,"visitId"); // 就诊id
-        String hospCode = MapUtils.get(map,"hospCode"); // 医院编码
-        String psnNo = MapUtils.get(map,"psnNo"); // 个人编号
-        String medisCode = MapUtils.get(map,"medisCode"); // 医疗机构编码
-        String medicalRegNo = MapUtils.get(map,"medicalRegNo");
-        Map<String, Object> dataMap = insureUnifiedBaseService_consumer.queryPatientSumInfo(map).getData();
-        List<Map<String, Object>> resultDataMap = MapUtils.get(dataMap,"resultDataMap");
-        if(!ListUtils.isEmpty(resultDataMap)){
-            resultDataMap.stream().forEach(item->{
-                item.put("id",SnowflakeUtils.getId());
-                item.put("crteName",crteName);
-                item.put("medicalRegNo",medicalRegNo);
-                item.put("crteId",crteId);
-                item.put("visitId",visitId);
-                item.put("hospCode",hospCode);
-                item.put("crteName",crteName);
-                item.put("psnNo",psnNo);
-                item.put("medisCode",medisCode);
-                item.put("crteTime",DateUtils.getNow());
-            });
-            inptVisitDAO.deletePatientSumInfo(map);
-            inptVisitDAO.insertPatientSumInfo(resultDataMap);
-        }
     }
 
     /**
@@ -1846,11 +1785,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             if (inptVisitDTO == null) {
                 return WrapperResponse.fail("未找到该患者信息，请刷新。", null);
             }
-            // 出院结算校验病人状态是不是预出院  lly 2021/11/01
-            if (inptVisitDTO != null && inptVisitDTO.getStatusCode() != null &&!inptVisitDTO.getStatusCode().equals(Constants.YDLX.YCY)){
-                return WrapperResponse.fail("该患者不是预出院状态，请刷新。", null);
-            }
-
             Integer patientValueCode = Integer.parseInt(inptVisitDTO.getPatientCode());
             if (inptCostDOList.isEmpty() && patientValueCode > 0) {
                 throw new AppException("病人没有任何费用，且已经医保登记了，请先取消医保登记再结算。");
@@ -2509,122 +2443,32 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 "}";
         Map<String, Object> item1 = JSONObject.parseObject(resultJson,Map.class);
         Map<String, Object> item2 = (Map<String, Object>) item1.get("output");
-        //List<Map<String,Object>> setldetailList = MapUtils.get(item2,"setldetail");
-        //MinsureSettleId = item2.get("setl_id"); // 结算id
-        //String medicalRegNo = item2.get("mdtrt_id").toString(); // 医保返回的就诊id
-        String omsgid = MapUtils.get(item2, "omsgid"); // 交易信息(原交易)中的msgid,发送方报文ID
-        String oinfno = MapUtils.get(item2, "oinfno"); // 交易信息(原交易)中的infno
-        //String visitId = item2.getId();
-        String clrOptins = MapUtils.get(item2, "clr_optins");
-        String clrWay = MapUtils.get(item2, "clr_way");
-        String clrType = MapUtils.get(item2, "clr_type");
-        BigDecimal hospExemAmount = MapUtils.get(item2, "hospExemAmount");
-
-        BigDecimal acctPay = MapUtils.get(item2,"acct_pay"); // 个人账户支出
-        /**
-         * 结算成功以后 更新基金信息
-         */
-        List<Map<String, Object>> setldetailList = MapUtils.get(item2, "setldetail");
-        if (!ListUtils.isEmpty(setldetailList)) {
-            InsureIndividualFundDTO insureIndividualFundDTO = null;
-            List<InsureIndividualFundDTO> fundDTOList = new ArrayList<>();
-            for (Map<String, Object> item : setldetailList) {
-                insureIndividualFundDTO = new InsureIndividualFundDTO();
-                insureIndividualFundDTO.setId(SnowflakeUtils.getId());
-                //insureIndividualFundDTO.setHospCode(hospCode);
-                //insureIndividualFundDTO.setInsureSettleId(insureSettleId);
-                //insureIndividualFundDTO.setVisitId(visitId);
-                //insureIndividualFundDTO.setCrteName(userName);
-                //insureIndividualFundDTO.setCrteId(userId);
-                insureIndividualFundDTO.setCrteTime(DateUtils.getNow());
-                insureIndividualFundDTO.setMibId(null);
-                insureIndividualFundDTO.setFundName(null);
-                insureIndividualFundDTO.setIndiFreezeStatus(null);
-                // 基金支付类型
-                insureIndividualFundDTO.setFundPayType(MapUtils.get(item, "fund_pay_type"));
-                if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
-                    insureIndividualFundDTO.setInscpScpAmt(null);
-                } else {
-                    insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
-                }
-                // 符合政策范围金额
-                // 本次可支付限额金额
-                if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
-                    insureIndividualFundDTO.setCrtPaybLmtAmt(null);
-                } else {
-                    insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
-                }
-                if (MapUtils.isEmpty(item, "fund_payamt")) {
-                    insureIndividualFundDTO.setFundPayamt(null);
-                } else {
-                    // 基金支付金额
-                    insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
-                }
-                // 基金支付类型名称
-                insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));
-                //结算过程信息
-                insureIndividualFundDTO.setSetlProcInfo(MapUtils.get(item, "setl_proc_info"));
-                fundDTOList.add(insureIndividualFundDTO);
-            }
-            //isInsureUnifiedMap.put("fundDTOList", fundDTOList);
-            //System.out.println(isInsureUnifiedMap);
-            //insureIndividualSettleService.insertBatchFund(isInsureUnifiedMap).getData();
+        List<Map<String,Object>> setldetailList = MapUtils.get(item2,"setldetail");
+        Map<String,Object> item = setldetailList.get(0);
+        InsureIndividualFundDTO insureIndividualFundDTO = new InsureIndividualFundDTO();
+        insureIndividualFundDTO.setFundPayType(MapUtils.get(item, "fund_pay_type"));
+        if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
+            insureIndividualFundDTO.setInscpScpAmt(null);
+        } else {
+            insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
         }
-
-        /**
-         * 根据 就诊id， 状态为正常的数据 ，医院编码查询医保结算表的数据
-         */
-        InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
-        //settleDTO.setVisitId(visitId);
-        //settleDTO.setHospCode(hospCode);
-        //settleDTO.setSettleId(settleId);
-        settleDTO.setState("0");
-        Map<String, Object> dataMap = new HashMap<>();
-        //dataMap.put("hospCode", hospCode);
-        //dataMap.put("insureIndividualSettleDTO", settleDTO);
-        //settleDTO = insureIndividualSettleService.findByCondition(dataMap);
-        InsureIndividualSettleDO individualSettleDO = new InsureIndividualSettleDO();
-        /**
-         * 根据查询回来的医保结算主键id,医院编码  更新医保结算id ，就医登记号
-         */
-       // individualSettleDO.setHospCode(hospCode);
-        //individualSettleDO.setId(settleDTO.getId());
-        //individualSettleDO.setInsureSettleId(insureSettleId);
-        //individualSettleDO.setMedicalRegNo(medicalRegNo);
-        //individualSettleDO.setVisitId(visitId);
-        individualSettleDO.setOinfno(oinfno);
-        individualSettleDO.setHospExemAmount(hospExemAmount);
-        individualSettleDO.setOmsgid(omsgid);
-        Map<String, Object> map = new HashMap<>();
-        //map.put("hospCode", hospCode);
-        map.put("insureIndividualSettleDO", individualSettleDO);
-        //InsureIndividualCostDTO costDTO = new InsureIndividualCostDTO();
-        //costDTO.setHospCode(hospCode);
-        //costDTO.setVisitId(visitId);
-        //costDTO.setCostList(inptCostDOList);
-        //costDTO.setInsureSettleId(insureSettleId);
-        //map.put("insureIndividualCostDTO", costDTO);
-        //insureIndividualCostService.editInsureCostByCostIDS(map); // 更新费用信息
-        individualSettleDO.setClrWay(clrWay);
-        individualSettleDO.setClrType(clrType);
-        individualSettleDO.setClrOptins(clrOptins);
-        //insureIndividualSettleService.updateByPrimaryKeySelective(map); // 更新结算信息
-        //map.put("medicalRegNo",medicalRegNo);
-        //map.put("id",visitId);
-        //map.put("insureSettleId",insureSettleId);
-        //inptVisitDTO.setHospCode(hospCode);
-        //inptVisitDTO.setId(visitId);
-        //inptVisitDTO.setInsureSettleId(insureSettleId);
-        //inptVisitDTO.setMedicalRegNo(medicalRegNo);
-        //map.put("inptVisitDTO",inptVisitDTO);
-        //insureIndividualVisitService.updateInsureInidivdual(map);  // 更新就诊信息
-
-        //InptSettleDO inptSettleDO = new InptSettleDO();
-        //inptSettleDO.setId(settleId);
-        //inptSettleDO.setAcctPay(acctPay);
-        //inptSettleDO.setHospCode(hospCode);
-        System.out.println("---------------------"+ acctPay);
-        //inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO);
+        // 符合政策范围金额
+        // 本次可支付限额金额
+        if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
+            insureIndividualFundDTO.setCrtPaybLmtAmt(null);
+        } else {
+            insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+        }
+        if (MapUtils.isEmpty(item, "fund_payamt")) {
+            insureIndividualFundDTO.setFundPayamt(null);
+        } else {
+            // 基金支付金额
+            insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+        }
+        // 基金支付类型名称
+        insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));
+        //结算过程信息
+        insureIndividualFundDTO.setSetlProcInfo(MapUtils.get(item, "setl_proc_info"));
 
         System.out.println("ok");
     }

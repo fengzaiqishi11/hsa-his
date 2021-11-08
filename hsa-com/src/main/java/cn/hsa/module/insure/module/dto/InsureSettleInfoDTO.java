@@ -314,6 +314,6 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private BigDecimal nwbBirWt; // 新生儿出生体重
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date dscgTtime;
+    private Date dscgTime;
 
 }

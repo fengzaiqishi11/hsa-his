@@ -716,7 +716,7 @@
                (select count(item_id) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
                                                           and ic.item_name in ('二级护理','Ⅱ级护理','2级护理')) as scdNurscareDays,
                (select count(item_id) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
-                                                          and ic.item_name in ('三级护理','IⅢ级护理','3级护理')) as lv3NursecareDays,
+                                                          and ic.item_name in ('三级护理','Ⅲ级护理','3级护理')) as lv3NursecareDays,
                (select ceil(count(item_id)/24) from inpt_cost ic where ic.visit_id  = a.id and ic.hosp_code = a.hosp_code and ic.status_code='0'
                                                                    and ic.item_name in ('特级护理')) as spgaNurscareDays,
                in_dept_name, in_time,
@@ -752,7 +752,7 @@
     </select>
     <select id="selectItemInfo" resultType="java.util.Map">
         select id, hosp_code, visit_id, medical_reg_no, insure_settle_id, med_chrgitm medChrgitm ,
-               claa_sumfee claaSumFee , amt , clab_amt clabAmt , fulamt_ownpay_amt  fulamtOwnpayAmt ,oth_amt  othAmt
+               claa_sumfee claaSumfee , amt , clab_amt clabAmt , fulamt_ownpay_amt  fulamtOwnpayAmt ,oth_amt  othAmt
         from insure_iteminfo
         where  visit_id =#{visitId} and hosp_code =#{hospCode} and insure_settle_id =#{insureSettleId}
     </select>
@@ -846,6 +846,12 @@
                fund_pay_type fundPayType, fund_payamt fundPayAmt from insure_payinfo
         where  visit_id =#{visitId} and hosp_code =#{hospCode}
           and insure_settle_id =#{insureSettleId}
+    </select>
+    <select id="selectRefldeptDept" resultType="java.lang.String">
+        select bd.nation_code as reflDeptCode from inpt_bed_change ibc
+        join base_dept bd on bd.id = ibc.after_dept_id
+        where ibc.visit_id =#{visitId} and ibc.hosp_code =#{hospCode}
+        and ibc.change_code ='3' order by ibc.crte_time desc limit 1;
     </select>
 
     <!-- 根据主键删除表信息 -->

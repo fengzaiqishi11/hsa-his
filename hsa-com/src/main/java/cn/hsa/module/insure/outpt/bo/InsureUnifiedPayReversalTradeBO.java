@@ -5,6 +5,7 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -122,5 +123,33 @@ public interface InsureUnifiedPayReversalTradeBO {
     **/
     Map<String,Object> updateUP_5265(Map<String, Object> parameterMap);
 
-    Map<String,Object> downLoadSettleInfo(Map<String, Object> map);
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    Map<String,Object> queryStatementInfo(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfosPage
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    PageDTO queryDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    PageDTO querySumDeclareInfosPage(Map<String, Object> paraMap);
 }

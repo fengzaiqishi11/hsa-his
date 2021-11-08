@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.outpt.dao;
 
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 
 import java.util.List;
@@ -68,5 +69,66 @@ public interface InsureReversalTradeDAO {
 
     Map<String,Object> getHisReckonInfo(Map<String,Object> map);
 
+    /**
+     * @param paraMap
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap);
 
+    /**
+     * @param paraMap
+     * @Method getStatementSumInfo
+     * @Desrciption 对账单合计金额查询
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    Map<String, Object> getStatementSumInfo(Map<String, Object> paraMap);
+
+
+    InsureConfigurationDTO getInsureConfiguration(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfosPage
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List<Map<String, Object>> queryDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List querySumDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报报表(门诊)
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List queryOutptDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表(门诊)
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List queryOutptSumDeclareInfosPage(Map<String, Object> paraMap);
 }

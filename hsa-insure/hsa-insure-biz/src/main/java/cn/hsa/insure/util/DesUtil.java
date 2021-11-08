@@ -45,6 +45,9 @@ public class DesUtil {
         String B_data = encrypt(B_KEY);
         System.out.println(A_data);
         System.out.println(B_data);
+        System.out.println(A_data);
+        System.out.println(decrypt(A_data));
+        System.out.println(decrypt(B_data));
     }
 
     /**

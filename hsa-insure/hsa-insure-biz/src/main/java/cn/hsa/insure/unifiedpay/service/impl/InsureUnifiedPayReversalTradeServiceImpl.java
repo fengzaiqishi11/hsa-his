@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,7 +151,7 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
 
     /**
      * @param paraMap
-     * @Method queryStatementInfo
+     * @Method queryDeclareInfosPage
      * @Desrciption 对账单查询打印
      * @Author liaojiguang
      * @Date 2021/10/21 09:01
@@ -159,6 +160,32 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
     @Override
     public WrapperResponse<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap) {
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.queryStatementInfo(paraMap));
+    }
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryDeclareInfosPage(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.queryDeclareInfosPage(paraMap));
+    }
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<PageDTO> querySumDeclareInfosPage(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.querySumDeclareInfosPage(paraMap));
     }
 
 

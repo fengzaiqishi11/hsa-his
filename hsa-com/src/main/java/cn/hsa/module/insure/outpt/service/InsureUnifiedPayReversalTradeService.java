@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -134,4 +135,26 @@ public interface InsureUnifiedPayReversalTradeService {
      **/
     @GetMapping("/service/insure/upOutptService/queryStatementInfo")
     WrapperResponse<Map<String, Object>> queryStatementInfo(Map<String, Object> paraMap);
+
+    /**
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/service/insure/upOutptService/queryDeclareInfosPage")
+    WrapperResponse<PageDTO> queryDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/service/insure/upOutptService/querySumDeclareInfosPage")
+    WrapperResponse<PageDTO> querySumDeclareInfosPage(Map<String, Object> paraMap);
 }

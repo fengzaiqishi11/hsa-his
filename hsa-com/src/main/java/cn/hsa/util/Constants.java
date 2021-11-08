@@ -1082,4 +1082,11 @@ public interface Constants {
         public static final String ZG_SYBX = "5"; // 职工生育保险
         public static final String ZG_YWSH = "6"; // 职工意外伤害
     }
+
+    class SBLX {
+        public static final String CZJM_ZY = "1"; // 城镇职工住院
+        public static final String CXJM_ZY = "2"; // 城乡居民住院
+        public static final String LX_ZY = "3"; // 离休住院
+        public static final String MZ = "4"; // 门诊
+    }
 }

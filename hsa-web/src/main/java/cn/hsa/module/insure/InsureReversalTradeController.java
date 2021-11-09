@@ -33,6 +33,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -284,18 +285,35 @@ public class InsureReversalTradeController extends BaseController {
     }
 
     /**
-     * @Method downLoadSettleInfo
-     * @Desrciption  HIS结算单
-     * @Param
-     *
-     * @Author fuhui
-     * @Date   2021/11/3 11:42
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
      * @Return
-    **/
-    @PostMapping("/downLoadSettleInfo")
-    public WrapperResponse<Map<String,Object>> downLoadSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+     **/
+    @GetMapping("/queryDeclareInfosPage")
+    public WrapperResponse<PageDTO> queryDeclareInfosPage(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        map.put("hospCode",sysUserDTO.getHospCode());
-        return insureUnifiedPayReversalTradeService_consumer.downLoadSettleInfo(map);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        WrapperResponse<PageDTO> pageDto = insureUnifiedPayReversalTradeService_consumer.queryDeclareInfosPage(paraMap);
+        return pageDto;
     }
+
+    /**
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/querySumDeclareInfosPage")
+    public WrapperResponse<PageDTO> querySumDeclareInfosPage(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        WrapperResponse<PageDTO> pageDto = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfosPage(paraMap);
+        return pageDto;
+    }
+
 }

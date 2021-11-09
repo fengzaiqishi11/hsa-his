@@ -17,6 +17,7 @@ import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -358,7 +359,11 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         // 判断报损报益
         List<Map<String, String>> incdecMap = stroAdjustDao.selectJudgeIncdecDruag(druagList, hospCode);
         // 入库确认、退库确认
-        List<Map<String, String>> confirmMap = stroAdjustDao.selectJudgeconfirmDruag(druagList, hospCode);
+        // 是否过滤掉科室确认 1是需要科室确认  其他是不需要
+        Map<String, String> deptConfirmMap = this.getParameterValue(hospCode,
+                new String[]{"DEPT_CONFIRM"});
+        String deptConfirm = MapUtils.get(deptConfirmMap, "DEPT_CONFIRM", "0");
+        List<Map<String, String>> confirmMap = stroAdjustDao.selectJudgeconfirmDruag(druagList, hospCode,deptConfirm);
         // 把上面所有的map 全部封装到 resultMapList中，做一个全部汇总提示
         List<Map<String,String>> resultMapList = new ArrayList<>();
         resultMapList.addAll(stoMap);
@@ -401,6 +406,23 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         }
     }
 
+    /**
+     * 获取系统参数
+     *
+     * @param hospCode
+     * @param code
+     * @return
+     */
+    public Map<String, String> getParameterValue(String hospCode, String[] code) {
+        List<SysParameterDTO> list = stroAdjustDao.getParameterValue(hospCode, code);
+        Map<String, String> retMap = new HashMap<>();
+        if (!MapUtils.isEmpty(list)) {
+            for (SysParameterDTO hit : list) {
+                retMap.put(hit.getCode(), hit.getValue());
+            }
+        }
+        return retMap;
+    }
     /**
     * @Menthod updateAdjustDetail
     * @Desrciption 回写调价单   调价总库存得总数量总金额

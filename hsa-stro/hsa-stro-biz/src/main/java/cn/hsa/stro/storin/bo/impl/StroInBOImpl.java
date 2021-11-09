@@ -128,10 +128,11 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       throw new AppException("出入库类型为空");
     }
     // 康德需求之根据药品名称过滤掉入库单
-    if (StringUtils.isNotEmpty(stroInDTO.getItemNameKey())){
+    String itemNameKey = stroInDTO.getItemNameKey();
+    if (StringUtils.isNotEmpty(itemNameKey)){
       StroInDetailDTO stroInDetailDTO = new StroInDetailDTO();
       stroInDetailDTO.setHospCode(stroInDTO.getHospCode());
-      stroInDetailDTO.setItemName(stroInDTO.getItemNameKey());
+      stroInDetailDTO.setItemName(itemNameKey);
       List<StroInDetailDTO> stroInDetailDTOS = stroInDao.queryStroInDetailAll(stroInDetailDTO);
       if (!ListUtils.isEmpty(stroInDetailDTOS)){
         List<String> inIds = stroInDetailDTOS.stream().map(StroInDetailDO::getInId).collect(Collectors.toList());
@@ -155,6 +156,7 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       StroInDetailDTO stroInDetailDTO = new StroInDetailDTO();
       stroInDetailDTO.setHospCode(stroInDTOS.get(i).getHospCode());
       stroInDetailDTO.setInId(stroInDTOS.get(i).getId());
+      stroInDetailDTO.setItemName(itemNameKey);
       List<StroInDetailDTO> stroInDetailDTOS = stroInDao.queryStroInDetailAll(stroInDetailDTO);
       stroInDTOS.get(i).setStroInDetailDTOS(stroInDetailDTOS);
     }

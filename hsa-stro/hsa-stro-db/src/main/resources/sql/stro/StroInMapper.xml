@@ -102,7 +102,7 @@
               and (order_no like concat('%',#{keyword},'%') or
               supplier_id in (select b.id from base_supplier b where (b.name like concat('%',#{keyword},'%')
               or b.abbr_pym like concat('%',#{keyword},'%') or b.abbr_wbm like concat('%',#{keyword},'%')
-              or b.name_pym like concat('%',#{keyword},'%') or b.name_wbm like concat('%',#{keyword},'%')) and b.hosp_code = #{hospCode}))
+              or b.name_pym like concat('%',#{keyword},'%') or b.name_wbm like concat('%',#{keyword},'%')) and b.hosp_code = #{hospCode})              )
             </if>
             <if test="ids != null and ids.size() > 0">
               and id in
@@ -237,7 +237,15 @@
           and a.item_id = #{itemId}
         </if>
         <if test="itemName != null and itemName != ''">
-          and a.item_name = #{itemName}
+          and (
+             a.item_name like concat('%',#{itemName},'%')
+             or bd.usual_pym like concat('%',#{itemName},'%')
+             or bd.good_pym like concat('%',#{itemName},'%')
+             or bd.good_name like concat('%',#{itemName},'%')
+             or bd.usual_name like concat('%',#{itemName},'%')
+             or bm.name like concat('%',#{itemName},'%')
+             or bm.pym like concat('%',#{itemName},'%')
+          )
         </if>
     </where>
   </select>

@@ -16,6 +16,7 @@ import cn.hsa.module.stro.stroin.dao.StroInDAO;
 import cn.hsa.module.stro.stroin.dto.StroInDTO;
 import cn.hsa.module.stro.stroin.dto.StroInDetailDTO;
 import cn.hsa.module.stro.stroin.dto.StroInRecordDTO;
+import cn.hsa.module.stro.stroin.entity.StroInDetailDO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.stro.stroout.dao.StroOutDAO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
@@ -125,6 +126,17 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
 
     if(StringUtils.isEmpty(stroInDTO.getInCode())) {
       throw new AppException("出入库类型为空");
+    }
+    // 康德需求之根据药品名称过滤掉入库单
+    if (StringUtils.isNotEmpty(stroInDTO.getItemNameKey())){
+      StroInDetailDTO stroInDetailDTO = new StroInDetailDTO();
+      stroInDetailDTO.setHospCode(stroInDTO.getHospCode());
+      stroInDetailDTO.setItemName(stroInDTO.getItemNameKey());
+      List<StroInDetailDTO> stroInDetailDTOS = stroInDao.queryStroInDetailAll(stroInDetailDTO);
+      if (!ListUtils.isEmpty(stroInDetailDTOS)){
+        List<String> inIds = stroInDetailDTOS.stream().map(StroInDetailDO::getInId).collect(Collectors.toList());
+        stroInDTO.setIds(inIds);
+      }
     }
 
     List<StroInDTO> stroInDTOS= stroInDao.queryStroInPage(stroInDTO);

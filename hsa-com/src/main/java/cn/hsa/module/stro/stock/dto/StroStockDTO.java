@@ -80,5 +80,15 @@ public class StroStockDTO extends StroStockDO implements Serializable {
      * 科室名称
      */
     private String deptName;
+    /**
+     * 批准文号
+     */
+    private String dan;
+    /**
+     * 最近入库时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date crteTime;
 
 }

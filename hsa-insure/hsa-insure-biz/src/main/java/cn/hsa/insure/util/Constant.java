@@ -830,6 +830,12 @@ public interface Constant {
 
 
         }
+
+        public static class XZLX {
+            public static final String CZZG = "310"; // 城镇职工
+            public static final String CXJM = "390"; // 城乡居民
+            public static final String LX = "340"; // 离休
+        }
     }
 
 

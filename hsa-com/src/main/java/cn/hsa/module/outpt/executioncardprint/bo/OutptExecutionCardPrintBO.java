@@ -2,6 +2,9 @@ package cn.hsa.module.outpt.executioncardprint.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
+
+import java.util.List;
 
 /**
  * @Package_name: cn.hsa.module.outpt.executioncardprint.bo
@@ -32,4 +35,6 @@ public interface OutptExecutionCardPrintBO {
      * @Return
     **/
     Boolean update(OutptInfusionRegisterDTO outptInfusionRegisterDTO);
+
+    List<OutptInfusionRegisterDTO> queryInfusionRegisterList(PharOutReceiveDTO pharOutReceiveDTO);
 }

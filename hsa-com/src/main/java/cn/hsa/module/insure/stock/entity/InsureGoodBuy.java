@@ -38,4 +38,5 @@ public class InsureGoodBuy  extends PageDO implements Serializable {
     private String memo	;// 备注	字符型	500	　	　	新医保/核3	核3：aae013
     private String hospCode;
     private String keyword;
+    private String unitCode; // 单位编码
 }

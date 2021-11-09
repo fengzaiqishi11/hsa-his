@@ -129,4 +129,76 @@
         </foreach>
     </update>
 
+
+    <!--配药后查询配药中的静脉输液打印数据-->
+    <select id="queryInfusionRegisterList" resultType="cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO">
+        SELECT
+        max(a.id) as id,
+        d.id as opId,
+        b.id as opdId,
+        b.group_no as groupNo,
+        b.group_seq_no as groupSeqNo,
+        b.visit_id as visitId,
+        max(a.crte_time) as registerTime,
+        c.name,
+        c.age,
+        c.gender_code as genderCode,
+        d.doctor_name as doctorName,
+        c.age_unit_code as ageUnitCode,
+        d.dept_name as deptName,
+        d.crte_time as crteTime,
+        b.content,
+        b.item_name as itemName,
+        b.speed_code as speedCode,
+        b.exec_name as execName,
+        b.dosage,
+        b.dosage_unit_code as dosageUnitCode,
+        b.usage_code as usageCode,
+        f.name as rateName,
+        c.visit_no as visitNo,
+        b.num,
+        b.num_unit_code as numUnitCode,
+        b.spec,
+        b.is_skin as isSkin,
+        e.is_positive,
+        e.skin_result_code,
+        f.daily_times,
+        MAX(ope.is_print) as is_print
+        FROM
+        outpt_infusion_register a
+        inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+        inner JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
+        inner JOIN outpt_prescribe d on b.op_id = d.id and a.hosp_code = d.hosp_code
+        left JOIN base_rate f on b.rate_id = f.id and a.hosp_code = f.hosp_code
+        left JOIN outpt_skin_result e on b.visit_id = e.visit_id and a.hosp_code = e.hosp_code and b.id = e.opd_id
+        LEFT JOIN outpt_prescribe_exec ope on b.hosp_code = ope.hosp_code and b.visit_id = ope.visit_id and b.id = ope.opd_id
+        where a.hosp_code = #{hospCode}
+        and d.is_settle = '1' and d.is_cancel = '0'
+        and a.opd_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        <if test="typeCode != null and typeCode != ''">
+            <if test="usageCode != null and usageCode != ''">
+                and  FIND_IN_SET(b.usage_code,#{ usageCode })
+            </if>
+        </if>
+        <!--皮试单执行卡数据查询，用法为输液用法，过滤处方不需要皮试的数据-->
+        <if test="skinPrintFlag != null and skinPrintFlag == 1">
+            and b.is_skin = #{skinPrintFlag}
+        </if>
+        group by b.id
+        <!--根据处方同顺序排序-->
+        order by a.id asc, d.id asc, b.id asc, d.crte_time DESC, a.crte_time DESC, b.group_no asc , b.group_seq_no asc
+    </select>
+
+    <!--根据领药申请ID获取领药申请明细-->
+    <select id="getOutReceiveDetailsById" resultType="cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDetailDO">
+        select a.*,p.visit_id,
+        (select ov.name from outpt_visit ov where ov.id = p.visit_id and ov.hosp_code = a.hosp_code) as invoicingTargetName
+        from phar_out_receive_detail a
+        left join phar_out_receive p on p.id = a.or_id and p.hosp_code = a.hosp_code
+        where a.or_id=#{id} and a.hosp_code=#{hospCode}
+    </select>
+
 </mapper>

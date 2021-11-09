@@ -5,11 +5,13 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.executioncardprint.bo.OutptExecutionCardPrintBO;
 import cn.hsa.module.outpt.executioncardprint.service.OutptExecutionCardPrintService;
+import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,5 +58,11 @@ public class OutptExecutionCardPrintServiceImpl implements OutptExecutionCardPri
     @Override
     public WrapperResponse<Boolean> update(Map map){
         return WrapperResponse.success(outptExecutionCardPrintBO.update(MapUtils.get(map,"outptInfusionRegisterDTO")));
+    }
+
+    @Override
+    public WrapperResponse<List<OutptInfusionRegisterDTO>> queryInfusionRegisterList(Map map) {
+        List<OutptInfusionRegisterDTO> outptInfusionRegisterDTO = outptExecutionCardPrintBO.queryInfusionRegisterList(MapUtils.get(map,"pharOutReceiveDTO"));
+        return WrapperResponse.success(outptInfusionRegisterDTO);
     }
 }

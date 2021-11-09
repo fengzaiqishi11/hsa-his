@@ -46,6 +46,7 @@
         <result property="itemName" column="itemName" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
+        <result property="isOffical" column="is_offical" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -55,7 +56,8 @@
            reg_cert_no, pym, wbm, is_valid, crte_id, crte_name, crte_time,last_buy_price,last_split_buy_price,avg_buy_price,avg_sell_price,model,other_name,
            (select count(0) from stro_stock e where e.item_code = '2' and e.item_id = base_material.id ) as stockFlag,
            (select name from base_product  where base_product.hosp_code = #{hospCode} and prod_code = code) as prodName,
-           (select id from base_finance_classify where hosp_code=base_material.hosp_code and code=base_material.bfc_code) bfcId
+           (select id from base_finance_classify where hosp_code=base_material.hosp_code and code=base_material.bfc_code) bfcId,
+           is_offical
         from base_material
         where id = #{id}  and hosp_code = #{hospCode}
     </select>
@@ -234,13 +236,19 @@
         <if test="isValid != null and isValid != ''">
         is_valid,
         </if>
-        crte_id, crte_name, crte_time,model,other_name)
+        crte_id, crte_name, crte_time,model,other_name
+        <if test="isOffical != null and isOffical != ''">
+            ,is_offical
+        </if>)
         values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{name}, #{spec}, #{price}, #{unitCode}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm},
         #{lastBuyPrice},#{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},
         <if test="isValid != null and isValid != ''">
             #{isValid},
         </if>
-        #{crteId}, #{crteName}, #{crteTime},#{model},#{otherName})
+        #{crteId}, #{crteName}, #{crteTime},#{model},#{otherName}
+        <if test="isOffical != null and isOffical != ''">
+            , #{isOffical}
+        </if>)
     </insert>
 
     <!--通过主键修改数据-->
@@ -272,7 +280,8 @@
                 wbm = #{wbm},
                 is_valid = #{isValid},
                 model = #{model},
-                other_name = #{otherName}
+                other_name = #{otherName},
+                is_offical = #{isOffical}
         </set>
             where id = #{id}  and hosp_code = #{hospCode}
     </update>
@@ -355,6 +364,9 @@
                 </if>
                 <if test="item.otherName!= null">
                    other_name = #{item.otherName}
+                </if>
+                <if test="item.isOffical!= null">
+                    is_offical = #{item.isOffical}
                 </if>
             </set>
             where id = #{item.id} and hosp_code = #{item.hospCode}

@@ -36,4 +36,7 @@ public class InsureGoodBuy  extends PageDO implements Serializable {
     private String purcRetnOpterName	;// 采购/退货经办人姓名	字符型	50	　	Y　	新医保
     private String prodGeayFlag	;// 商品赠送标志	字符型	3	Y　	　	新医保	0-否；1-是
     private String memo	;// 备注	字符型	500	　	　	新医保/核3	核3：aae013
+    private String hospCode;
+    private String keyword;
+    private String unitCode; // 单位编码
 }

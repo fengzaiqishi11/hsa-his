@@ -1,6 +1,8 @@
 package cn.hsa.module.outpt.executioncardprint.dao;
 
 import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDetailDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -48,4 +50,17 @@ public interface OutptExecutionCardPrintDAO {
     Boolean update(OutptInfusionRegisterDTO outptInfusionRegisterDTO);
 
     Boolean updatePrintFlagByType(@Param("outptInfusionRegisterDTO") List<OutptInfusionRegisterDTO> outptInfusionRegisterDTO);
+
+    List<OutptInfusionRegisterDTO> queryInfusionRegisterList(OutptInfusionRegisterDTO outptInfusionRegisterDTO);
+
+    /**
+     * @Method:
+     * @Description:
+     * @Param: 根据领药申请ID获取领药申请明细
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/04 15:49
+     * @Return:
+     **/
+    List<PharOutReceiveDetailDO> getOutReceiveDetailsById(PharOutReceiveDTO pharOutReceiveDTO);
 }

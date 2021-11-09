@@ -188,6 +188,14 @@ public class MapUtils {
         Integer i = getVI(map, key);
         return i == null ? defaultValue : i;
     }
+    public static Object getMapVS(Map map, String key, String defaultValue) {
+        if(MapUtils.isEmpty(map)){
+            return null;
+        }
+        String str = getVS(map, key);
+        return isEmpty(str) ? defaultValue : str;
+    }
+
 
     public static String getVS(Map map, String key, String defaultValue) {
         String str = getVS(map, key);

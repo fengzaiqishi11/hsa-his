@@ -212,6 +212,18 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         OutptRegisterDTO outptRegisterDTO = MapUtils.get(map,"outptRegisterDTO");
         List<OutptRegisterDetailDto> regDetailList = outptRegisterDTO.getRegDetailList();
         OutptRegisterSettleDto outptRegisterSettleDto = MapUtils.get(map,"outptRegisterSettleDto");
+        // 系统参数 是否强制选择具体医生挂号校验 liuliyun 2021/11/03
+        Map doctorParam = new HashMap();
+        doctorParam.put("hospCode", hospCode);
+        doctorParam.put("code", "SF_REGISTER_DOCTOR");
+        SysParameterDTO sysParameter = sysParameterService.getParameterByCode(doctorParam).getData();
+        if(sysParameter!=null && "1".equals(sysParameter.getValue())) {
+            if (outptRegisterDTO!=null){
+                if (StringUtils.isEmpty(outptRegisterDTO.getDoctorId())){
+                    throw  new AppException("挂号提示：请选择具体医生进行挂号！");
+                }
+            }
+        }
         String cardNo = outptRegisterDTO.getCardNo(); // 一卡通卡号
         BigDecimal price = outptRegisterDTO.getCardPrice() != null ? outptRegisterDTO.getCardPrice() : new BigDecimal(0);   // 一卡通支付金额
         Boolean SFJS = MapUtils.get(map,"SFJS");

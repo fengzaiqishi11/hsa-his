@@ -499,6 +499,7 @@
         a.ap_offset_price,
         a.settle_take_price,
         a.settle_back_price,
+        a.acct_pay as acctPay,
         a.settle_time,
         a.is_settle,
         a.status_code,
@@ -551,10 +552,13 @@
             and a.crte_id = #{crteId}
         </if>
         <if test="patientCode != null and patientCode != ''">
-            and e.patient_code = #{patientCode}
+            and a.patient_code = #{patientCode}
         </if>
         <if test="babyId != null and babyId != '' ">
             and a.baby_id =#{babyId}
+        </if>
+        <if test="ywlx != null and ywlx != '' ">
+            and  f.aka130=#{ywlx}
         </if>
         <if test='queryBaby =="N"'>
             and (a.baby_id is null or a.baby_id = '')
@@ -871,5 +875,8 @@
             </if>
         </where>
         order by cost_time desc
+    </select>
+    <select id="queryYWLX" resultType="java.util.Map">
+        SELECT DISTINCT aka130,aka130_name FROM insure_individual_visit WHERE hosp_code =#{hospCode}
     </select>
 </mapper>

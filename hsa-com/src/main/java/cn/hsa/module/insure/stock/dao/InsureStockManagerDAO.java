@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.stock.dao;
 
+import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
 import cn.hsa.module.insure.stock.entity.*;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Param;
@@ -102,14 +103,14 @@ public interface InsureStockManagerDAO {
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);
     /**
      * 批量修改商品盘点信息
-     * @param listInsureInventoryCheck
+     * @param
      * @return
      */
-    int updateInsureInventoryCheckBatch(List<InsureInventoryCheck> listInsureInventoryCheck);
+    int updateInsureInventoryCheckBatch(@Param("fixmedinsBchnoList")List<String> fixmedinsBchnoList);
 
 
     /**
-     * 查询商品库存变更信息
+     * 查询商品库存变更 信息
      * @param insureInventoryStockUpdate
      * @return
      */
@@ -120,4 +121,24 @@ public interface InsureStockManagerDAO {
      * @return
      */
     int updateInsureInventoryStockUpdateBatch(List<InsureInventoryStockUpdate> listInsureInventoryStockUpdate);
+    /**
+     * @Meth: queryPersonList
+     * @Description: 查询就诊 销售/ 退货
+     * @Param: [insureRecruitPurchaseDTO]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    List<Map<String, Object>> queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+    /**
+     * @Meth: updateStatus
+     * @Description: 根据id 批量更新进销存中的上传状态
+     * @Param: [ids, hospCode]
+     * @return: int
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
+
+    void updateStockUpload(Map<String, Object> map);
 }

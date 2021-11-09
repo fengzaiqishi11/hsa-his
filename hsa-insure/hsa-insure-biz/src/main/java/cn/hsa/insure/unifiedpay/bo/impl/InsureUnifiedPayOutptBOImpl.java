@@ -511,8 +511,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                         insureIndividualCostDTO.setBatchNo(batchNo);
                         insureIndividualCostDTO.setIsHospital(Constants.SF.F);
                         insureIndividualCostDTO.setItemType(MapUtils.get(feedetlSnObjectMap,"list_type"));
-                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"med_list_name"));
-                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnObjectMap,"med_list_codg"));
+                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"med_list_codg"));
+                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnObjectMap,"med_list_name"));
                         insureIndividualCostDTO.setCostId(MapUtils.get(feedetlSnObjectMap,"id"));//费用id
                         insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn")==null?"":MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
                         insureIndividualCostDTO.setApplyLastPrice(null);

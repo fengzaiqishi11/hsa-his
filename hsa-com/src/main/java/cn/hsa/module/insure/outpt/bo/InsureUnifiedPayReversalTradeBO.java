@@ -2,6 +2,7 @@ package cn.hsa.module.insure.outpt.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 
 import javax.servlet.http.HttpServletResponse;
@@ -131,4 +132,16 @@ public interface InsureUnifiedPayReversalTradeBO {
      * @Return
      **/
     Map<String,Object> queryStatementInfo(Map<String, Object> paraMap);
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
+    Map<String,Object> downLoadSettleInfo(Map<String, Object> map);
+
+    Map<String,Object> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

@@ -2124,8 +2124,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptCostDTO.setItemCode(Constants.XMLB.CL);
             //项目名称（药品、项目、材料、医嘱目录）
             outptCostDTO.setItemName(baseMaterialDTO.getName());
-            //单价
-            outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            //单价  基础材料信息拆零单位和单位一致时使用单价，不一致取拆零单价 lly 2021/10/03
+            if (baseMaterialDTO.getUnitCode().equals(baseMaterialDTO.getSplitUnitCode())) {
+                outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            }else {
+                outptCostDTO.setPrice(baseMaterialDTO.getSplitPrice());
+            }
             //规格
             outptCostDTO.setSpec(baseMaterialDTO.getSpec());
         }

@@ -2027,45 +2027,45 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      **/
     @Override
     public Map queryChargeDetail(Map paraMap) {
-        String outInTableType = MapUtils.get(paraMap, "outInTableType");
-        String tableType = MapUtils.get(paraMap, "tableType");
-        // 时间类型（1：按结算时间过滤，2：按记账时间过滤）
-        String timeType = MapUtils.get(paraMap, "timeType");
-        if (StringUtils.isEmpty(timeType)){
-            throw new RuntimeException("请选择时间类型");
-        }
+//        String outInTableType = MapUtils.get(paraMap, "outInTableType");
+//        String tableType = MapUtils.get(paraMap, "tableType");
+//        // 时间类型（1：按结算时间过滤，2：按记账时间过滤）
+//        String timeType = MapUtils.get(paraMap, "timeType");
+//        if (StringUtils.isEmpty(timeType)){
+//            throw new RuntimeException("请选择时间类型");
+//        }
         Map retMap = new HashMap();
         List<Map> listTableConfig = new ArrayList<>();
-        List<Map> tableList = new ArrayList<>();
-        if("1".equals(outInTableType)){
-            //门诊
-            if(Constants.SFXMCX.QBMX.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryAllChargeDetail(paraMap);
-            }else if(Constants.SFXMCX.FBXM.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryXmfbChargeDetail(paraMap);
-            } else if(Constants.SFXMCX.XM.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryXmChargeDetail(paraMap);
-            }
-        }else if("2".equals(outInTableType)){
-            //住院
-            if(Constants.SFXMCX.QBMX.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryInptAllChargeDetail(paraMap);
-            }else if(Constants.SFXMCX.FBXM.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryInptXmfbChargeDetail(paraMap);
-            } else if(Constants.SFXMCX.XM.equals(tableType)){
-                tableList = patientCostLedgerDAO.queryInptXmChargeDetail(paraMap);
-            }
-        }
-        if(ListUtils.isEmpty(tableList)){
-            return retMap;
-        }
-        boolean isChange = true;
-        Map map = tableList.get(0);
+//        List<Map> tableList = new ArrayList<>();
+//        if("1".equals(outInTableType)){
+//            //门诊
+//            if(Constants.SFXMCX.QBMX.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryAllChargeDetail(paraMap);
+//            }else if(Constants.SFXMCX.FBXM.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryXmfbChargeDetail(paraMap);
+//            } else if(Constants.SFXMCX.XM.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryXmChargeDetail(paraMap);
+//            }
+//        }else if("2".equals(outInTableType)){
+//            //住院
+//            if(Constants.SFXMCX.QBMX.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryInptAllChargeDetail(paraMap);
+//            }else if(Constants.SFXMCX.FBXM.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryInptXmfbChargeDetail(paraMap);
+//            } else if(Constants.SFXMCX.XM.equals(tableType)){
+//                tableList = patientCostLedgerDAO.queryInptXmChargeDetail(paraMap);
+//            }
+//        }
+//        if(ListUtils.isEmpty(tableList)){
+//            return retMap;
+//        }
+//        boolean isChange = true;
+//        Map map = tableList.get(0);
         Map mapHeader = getTableHeader();
-        map.forEach((k, v) -> {
+        mapHeader.forEach((k, v) -> {
             Map tableMap = new HashMap();
             tableMap.put("id", k);
-            tableMap.put("label", mapHeader.get(k));
+            tableMap.put("label", v);
             tableMap.put("prop", k);
             if("register_no".equals(k) || "settle_no".equals(k)){
                 tableMap.put("minWidth", "140");
@@ -2099,19 +2099,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             }
             listTableConfig.add(tableMap);
         });
-        for (Map<String, String> tempMap : listTableConfig) {
-            if (tempMap.containsValue("spec")) {
-                isChange = false;
-                break;
-            }
-        }
-        if (isChange) {
-            Map tableMap = new HashMap();
-            tableMap.put("prop","spec");
-            tableMap.put("id","spec");
-			tableMap.put("label","规格");
-            listTableConfig.add(tableMap);
-        }
         retMap.put("listTableConfig", listTableConfig);
         //  retMap.put("list", tableList);
         return retMap;

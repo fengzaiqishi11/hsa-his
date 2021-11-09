@@ -499,6 +499,7 @@
         a.ap_offset_price,
         a.settle_take_price,
         a.settle_back_price,
+        a.acct_pay as acctPay,
         a.settle_time,
         a.is_settle,
         a.status_code,

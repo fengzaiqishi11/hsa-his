@@ -34,4 +34,5 @@ public class InsureGoodBuyBack  extends PageDO implements Serializable {
     private String medinsProdPurcNo	;// 商品采购流水号	字符型	50			新医保/核3	核3：aae072
     private String hospCode;
     private String keyword;
+    private String unitCode; // 单位编码
 }

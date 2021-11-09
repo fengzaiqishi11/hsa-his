@@ -374,6 +374,12 @@
               <![CDATA[
                 and IF(sys.value > 0 , date(date_sub(now(), interval sys.value day)), date(now())) <= date(b.register_time)
               ]]>
+                <if test="keyword !=null and keyword !=''">
+                and (a.name like concat('%',#{keyword},'%')
+                or a.visit_no like concat('%',#{keyword},'%')
+                or a.cert_no like concat('%',#{keyword},'%')
+                or a.phone like concat('%',#{keyword},'%'))
+                </if>
             </if>
 
             <!-- 已接诊 -->
@@ -396,7 +402,7 @@
             <if test="id != null and id != ''" >
                 and a.id = #{id}
             </if>
-        ) a order by a.type, a.visitTime desc
+        ) a order by a.type, a.visitTime,a.registerNo desc
     </select>
 
     <!--  获取历史病历记录 -->
@@ -918,7 +924,7 @@
       </if>
       left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
       left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-      where a.hosp_code = #{hospCode} and a.is_valid = '1'
+      where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
       <if test="yzmlType != null and yzmlType != ''" >
         and  '3' = #{yzmlType}
       </if>

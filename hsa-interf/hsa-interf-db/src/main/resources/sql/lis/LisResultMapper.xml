@@ -103,11 +103,11 @@ FROM
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">
-        select opd_id from medic_apply where report_time is null
+        select opd_id from medic_apply where report_time is null and hosp_code = #{hospCode}
     </select>
 
     <select id="queryDXBackResult" resultType="java.lang.String">
-        select opd_id from medic_apply where document_sta in ('05','06')
+        select opd_id from medic_apply where document_sta in ('05','06') and hosp_code = #{hospCode}
     </select>
 
     <update id="updateIsIssue">
@@ -137,8 +137,8 @@ FROM
 
     <insert id="insertDXResult" keyProperty="" useGeneratedKeys="true">
         insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
-        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
-        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_valugnosis_id, diagnosis_name, crte_id,e, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, dia
         crte_name, crte_time, apply_no)
         values
         <foreach collection="list" item="entity" separator=",">
@@ -152,7 +152,7 @@ FROM
     </insert>
 
     <delete id="deleteResult">
-        delete from medic_result where bar_code in
+        delete from medic_result where advice_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
           #{entity}
         </foreach>
@@ -160,7 +160,7 @@ FROM
 
     <update id="updateApplyStatus">
         update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
-        where bar_code in
+        where advice_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
             #{entity}
         </foreach>

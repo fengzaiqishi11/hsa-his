@@ -181,4 +181,34 @@ public class OutptPrescribeTempController extends BaseController {
         // 修改
         return outptPrescribeTempService_consumer.updateOutptPrescribeTempDTO(paramMap);
     }
+
+    /**
+     * @Menthod cancelAuditPrescribeTemp
+     * @Desrciption  取消审核
+     * @param outptPrescribeTempDTO 模板信息
+     * @Author liuliyun
+     * @Date   2020/9/7 10:24
+     * @Return Boolean
+     **/
+    @PostMapping("/cancelAuditPrescribeTemp")
+    public WrapperResponse<Boolean> cancelAuditPrescribeTemp(@RequestBody OutptPrescribeTempDTO outptPrescribeTempDTO,HttpServletRequest req, HttpServletResponse res) {
+        Map paramMap = new HashMap();
+        SysUserDTO userDTO = getSession(req, res) ;
+        //医院编码
+        paramMap.put("hospCode",userDTO.getHospCode());
+        //医院编码
+        outptPrescribeTempDTO.setHospCode(userDTO.getHospCode());
+        //审核状态
+        outptPrescribeTempDTO.setAuditCode(Constants.SHZT.WSH);
+        //审核人ID
+        outptPrescribeTempDTO.setAuditId(null);
+        //审核人
+        outptPrescribeTempDTO.setAuditName(null);
+        //审核时间
+        outptPrescribeTempDTO.setAuditTime(null);
+        //模板处方信息
+        paramMap.put("outptPrescribeTempDTO", outptPrescribeTempDTO);
+        // 修改
+        return outptPrescribeTempService_consumer.updateOutptPrescribeTempDTO(paramMap);
+    }
 }

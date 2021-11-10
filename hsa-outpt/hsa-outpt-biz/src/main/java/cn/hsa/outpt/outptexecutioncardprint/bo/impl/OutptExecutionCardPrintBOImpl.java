@@ -3,9 +3,13 @@ package cn.hsa.outpt.outptexecutioncardprint.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.outpt.executioncardprint.bo.OutptExecutionCardPrintBO;
 import cn.hsa.module.outpt.executioncardprint.dao.OutptExecutionCardPrintDAO;
 import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.dao.OutDistributeDrugDAO;
+import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDetailDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.Constants;
@@ -146,6 +150,54 @@ public class OutptExecutionCardPrintBOImpl extends HsafBO implements OutptExecut
             }
         }
         /*return outptExecutionCardPrintDAO.update(outptInfusionRegisterDTO) > 0;*/
+    }
+
+    /**
+     * @Method queryPage
+     * @Desrciption  根据门诊配药打印输液执行卡
+     * @Param outptExecutionCardPrintDTO
+     * @Author liuliyun
+     * @Date   2021-11-04 10:42
+     * @Return outptExecutionCardPrintDTOS
+     **/
+    @Override
+    public  List<OutptInfusionRegisterDTO> queryInfusionRegisterList(PharOutReceiveDTO pharOutReceiveDTO) {
+        //根据领药申请ID获取领药申请明细
+        List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList = outptExecutionCardPrintDAO.getOutReceiveDetailsById(pharOutReceiveDTO);
+        if (pharOutReceiveDetailDOList!=null && pharOutReceiveDetailDOList.size()>0){
+            List<String> ids =new ArrayList<>();
+            for (PharOutReceiveDetailDO pharOutReceiveDetailDO:pharOutReceiveDetailDOList){
+                ids.add(pharOutReceiveDetailDO.getOpdId());
+            }
+            OutptInfusionRegisterDTO outptInfusionRegisterDTO =new OutptInfusionRegisterDTO();
+            outptInfusionRegisterDTO.setTypeCode("2");
+            outptInfusionRegisterDTO.setHospCode(pharOutReceiveDTO.getHospCode());
+            outptInfusionRegisterDTO.setIds(ids);
+            if (outptInfusionRegisterDTO.getIds()==null ||outptInfusionRegisterDTO.getIds().size() ==0){
+                throw new RuntimeException("处方明细id不能为空");
+            }
+            //根据执行卡单据类型查询码表对应的用药类型List
+            Map map1 = new HashMap<>();
+            SysCodeDetailDTO sysCodeDetailDTO = new SysCodeDetailDTO();
+            sysCodeDetailDTO.setCode("HLZXK");
+            sysCodeDetailDTO.setValue("2");
+            sysCodeDetailDTO.setHospCode(outptInfusionRegisterDTO.getHospCode());
+            map1.put("hospCode",outptInfusionRegisterDTO.getHospCode());
+            map1.put("sysCodeDetailDTO",sysCodeDetailDTO);
+            WrapperResponse<List<SysCodeDetailDTO>> listWrapperResponse = sysCodeService_consumer.queryCodeDetailAll(map1);
+            List<SysCodeDetailDTO> data = listWrapperResponse.getData();
+            String value = data.get(0).getRemark();
+            if (StringUtils.isNotEmpty(value)){
+                value = value.replace("'","");
+                outptInfusionRegisterDTO.setUsageCode(value);
+            }
+            //根据条件查询所得
+            List<OutptInfusionRegisterDTO> outptInfusionRegisterDTOS = outptExecutionCardPrintDAO.queryInfusionRegisterList(outptInfusionRegisterDTO);
+            return outptInfusionRegisterDTOS;
+        }else {
+            return  new ArrayList<>();
+        }
+
     }
 
 }

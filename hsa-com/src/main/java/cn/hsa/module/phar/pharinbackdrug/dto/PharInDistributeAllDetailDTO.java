@@ -46,4 +46,8 @@ public class PharInDistributeAllDetailDTO extends PharInDistributeAllDetailDO im
    * 发药药房id
    */
   private String pharId;
+  /**
+   * 病人状态
+   */
+  private String statusCode;
 }

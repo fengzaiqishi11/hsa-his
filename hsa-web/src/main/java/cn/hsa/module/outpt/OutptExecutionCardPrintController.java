@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.executioncardprint.service.OutptExecutionCardPrintService;
 import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
+import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,5 +69,24 @@ public class OutptExecutionCardPrintController extends BaseController {
         map.put("hospCode",userDTO.getHospCode());
         map.put("outptInfusionRegisterDTO",outptInfusionRegisterDTO);
         return outptExecutionCardPrintService_consumer.update(map);
+    }
+
+
+    /**
+     * @Method queryInfusionRegisterList
+     * @Desrciption  门诊配药输液执行卡查询
+     * @param pharOutReceiveDTO
+     * @Author liuliyun
+     * @Date   2021-11-04 13:51
+     * @Return WrapperResponse<List<OutptInfusionRegisterDTO>>
+     **/
+    @GetMapping("/queryInfusionRegisterList")
+    public WrapperResponse<List<OutptInfusionRegisterDTO>> queryInfusionRegisterList(PharOutReceiveDTO pharOutReceiveDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        pharOutReceiveDTO.setHospCode(userDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",userDTO.getHospCode());
+        map.put("pharOutReceiveDTO",pharOutReceiveDTO);
+        return outptExecutionCardPrintService_consumer.queryInfusionRegisterList(map);
     }
 }

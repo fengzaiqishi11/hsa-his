@@ -103,4 +103,18 @@ public class OutptPrescribeTempServiceImpl extends HsafService implements OutptP
         OutptPrescribeTempDTO outptPrescribeTempDTO = MapUtils.get(map, "outptPrescribeTempDTO");
         return WrapperResponse.success(outptPrescribeTempBO.updateOutptPrescribeTempDTO(outptPrescribeTempDTO));
     }
+
+    /**
+     * @Method updateTempAudit
+     * @Desrciption 模板取消审核
+     * @param map
+     * @Author liuliyun
+     * @Date   2021/11/10 17:16
+     * @Return boolean
+     **/
+    @Override
+    public WrapperResponse<Boolean> cancelAuditPrescribeTemp(Map map) {
+        OutptPrescribeTempDTO outptPrescribeTempDTO = MapUtils.get(map, "outptPrescribeTempDTO");
+        return WrapperResponse.success(outptPrescribeTempBO.updateTempAudit(outptPrescribeTempDTO));
+    }
 }

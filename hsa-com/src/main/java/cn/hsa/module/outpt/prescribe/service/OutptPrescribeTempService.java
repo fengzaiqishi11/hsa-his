@@ -76,4 +76,15 @@ public interface OutptPrescribeTempService {
      */
     @PostMapping("/service/outpt/prescribe/updateOutptPrescribeTempDTO")
     WrapperResponse<Boolean> updateOutptPrescribeTempDTO(Map map);
+
+    /**
+     * @Method updateTempAudit
+     * @Desrciption 模板取消审核
+     * @param map
+     * @Author liuliyun
+     * @Date   2021/11/10 17:16
+     * @Return boolean
+     **/
+    @PostMapping("/service/outpt/prescribe/cancelAuditPrescribeTemp")
+    WrapperResponse<Boolean> cancelAuditPrescribeTemp(Map map);
 }

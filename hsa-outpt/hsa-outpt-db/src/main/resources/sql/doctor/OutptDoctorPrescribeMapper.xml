@@ -838,7 +838,7 @@
       a.antibacterial_code, a.is_skin,
       a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
       case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
-      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
+      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
       ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
       <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
       '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,

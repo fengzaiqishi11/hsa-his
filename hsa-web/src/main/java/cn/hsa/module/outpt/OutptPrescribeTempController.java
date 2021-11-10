@@ -209,6 +209,6 @@ public class OutptPrescribeTempController extends BaseController {
         //模板处方信息
         paramMap.put("outptPrescribeTempDTO", outptPrescribeTempDTO);
         // 修改
-        return outptPrescribeTempService_consumer.updateOutptPrescribeTempDTO(paramMap);
+        return outptPrescribeTempService_consumer.cancelAuditPrescribeTemp(paramMap);
     }
 }

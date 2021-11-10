@@ -120,8 +120,6 @@
         <if test="stopTime != null">
           and e.long_start_time &lt;= DATE_ADD(DATE_FORMAT(#{stopTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
-
-
         <if test="execStartTime != null">
             and  c.exec_time > DATE_FORMAT(#{execStartTime},'%Y-%m-%d')
         </if>
@@ -286,7 +284,6 @@
     <foreach collection="list" item="dto" separator=";">
       update inpt_advice_exec
       <set>
-          exec_dept_id = null,
           sign_code = '1',
           exec_time = null,
           exec_id = null,

@@ -796,7 +796,8 @@
             second_exec_name = #{dto.secondExecName},
             sign_code = #{dto.signCode},
             skin_result_code = #{dto.skinResultCode},
-            content = #{dto.content}
+            content = #{dto.content},
+            last_exec_time = #{dto.lastExecTime}
             where hosp_code = #{dto.hospCode}
             and id = #{dto.id}
         </foreach>

@@ -403,7 +403,8 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 婴儿费用
     private BigDecimal babyCost;
-
+    // 查询标志
+    private String clinicalFlag;
     // 是否在路径内
     private String isClinicalList;
     // 路径状态

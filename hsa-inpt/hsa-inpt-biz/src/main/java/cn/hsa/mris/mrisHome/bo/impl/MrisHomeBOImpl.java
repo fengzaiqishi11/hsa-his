@@ -709,9 +709,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         List<MrisOperInfoDO> insertOperList = new ArrayList<>();
         if (!ListUtils.isEmpty(operList)) {
             for (MrisOperInfoDO mrisOperInfoDO : operList) {
-//                if (StringUtils.isEmpty(mrisOperInfoDO.getOperDiseaseIcd9())) {
-//                    continue;
-//                }
+                if (StringUtils.isEmpty(mrisOperInfoDO.getOperDiseaseIcd9())&&StringUtils.isEmpty(mrisOperInfoDO.getOperDiseaseName())) {
+                    continue;
+                }
                 mrisOperInfoDO.setId(SnowflakeUtils.getId());
                 mrisOperInfoDO.setVisitId(mrisBaseInfoDTO.getVisitId());
                 mrisOperInfoDO.setHospCode(mrisBaseInfoDTO.getHospCode());

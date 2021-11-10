@@ -588,10 +588,12 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       for (String loginType:loginTypeIdentity.split(",")) {
         if(loginType.contains("1")) {
           strings.add("0");
-        } else if(loginType.contains("2") || loginType.equals("4")){
+        } else if(loginType.contains("2")){
           strings.add("1");
         } else if(loginType.contains("3")){
           strings.add("2");
+        } else if(loginType.contains("4")){
+          strings.add("3");
         }
       }
       BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
@@ -646,6 +648,8 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
         strings.add("1");
       } else if(loginType.contains("3")){
         strings.add("2");
+      } else if(loginType.contains("4")){
+        strings.add("3");
       }
     }
     BaseDrugDTO baseDrugDTO = new BaseDrugDTO();

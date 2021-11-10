@@ -415,6 +415,8 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
             types.add("2");
           } else if (loginType.equals("1")) {//西药
             types.add("0");
+          } else if (loginType.equals("4")) {//藏药
+              types.add("3");
           } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
             pharApplyDetailDTO.setTypeIdentity("5");
           }

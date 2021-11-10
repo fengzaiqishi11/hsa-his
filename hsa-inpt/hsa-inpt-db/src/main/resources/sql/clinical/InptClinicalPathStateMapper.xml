@@ -213,6 +213,9 @@
               <if test="endDate != null">
                 and date(iv.in_time) &lt;= date(#{endDate})
               </if>
+              <if test="clinicalFlag == '1'.toString()">
+               and iv.in_disease_name like concat('%',#{clinicalListName},'%')
+              </if>
               <if test="keyword != null and keyword != ''">
                 and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%')
                 or iv.in_no like concat('%',#{keyword},'%'))

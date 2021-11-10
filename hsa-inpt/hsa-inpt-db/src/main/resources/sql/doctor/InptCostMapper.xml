@@ -947,8 +947,7 @@
             UPDATE inpt_cost
             SET exec_id = #{dto.execId},
             exec_name = #{dto.execName},
-            exec_time = #{dto.execTime},
-            exec_dept_id = #{dto.execDeptId}
+            exec_time = #{dto.execTime}
             WHERE
             hosp_code = #{dto.hospCode}
             AND iat_id = #{dto.adviceId}

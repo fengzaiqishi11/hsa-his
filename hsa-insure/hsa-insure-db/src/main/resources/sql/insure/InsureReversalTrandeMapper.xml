@@ -100,8 +100,12 @@
             SELECT
                 e.insure_reg_code AS insureRegCode,
                 e.visit_id as visitId,
+                t.medicine_org_code as medicineOrgCode,
+                t.medical_reg_no as  medicalRegNo,
+                t.is_hospital as isHospital,
                 t.medical_reg_no AS mdtrtId,
                 e.insureSettleId AS setlId,
+                e.settle_id settleId,
                 e.settle_id,
                 t.aka130 as med_type,
                 t.aac001 AS psnNo,
@@ -110,7 +114,7 @@
                 c.aac002 as idCard,
                 c.aac006 AS birthday,
                 e.crte_time AS crteTime,
-                t.visit_drpt_name,
+                t.visit_drpt_name as visitDrptName,
                 e.total_price,
                 e.crte_time
             FROM
@@ -121,6 +125,7 @@
             e.hosp_code = t.hosp_code
             AND e.visit_id = t.visit_id
             AND c.hosp_code = t.hosp_code
+            and e.state ='0'
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
             and e.insureSettleId is not null
@@ -190,7 +195,7 @@
         e.clr_optins,
         t.insure_reg_code AS setl_optins,
         e.total_price AS medfee_sumamt,
-        ( e.insure_price - e.personal_price ) AS fund_pay_sumamt,
+        if (t.aka130 = '2102',e.insure_price - e.personal_price - e.rests_price,e.insure_price - e.personal_price) AS fund_pay_sumamt,
         e.person_price,
         e.personal_price AS acct_pay,
         t.medicine_org_code
@@ -299,7 +304,7 @@
         e.clr_optins,
         t.insure_reg_code AS setl_optins,
         e.total_price AS medfee_sumamt,
-        ( e.insure_price - e.personal_price ) AS fund_pay_sumamt,
+        if (t.aka130 = '2102',e.insure_price - e.personal_price - e.rests_price,e.insure_price - e.personal_price) AS fund_pay_sumamt,
         e.personal_price AS acct_pay
         FROM
         insure_individual_settle e,

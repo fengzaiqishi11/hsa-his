@@ -3,6 +3,7 @@ package cn.hsa.module.insure.outpt.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -157,4 +158,18 @@ public interface InsureUnifiedPayReversalTradeService {
      **/
     @GetMapping("/service/insure/upOutptService/querySumDeclareInfosPage")
     WrapperResponse<PageDTO> querySumDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> downLoadSettleInfo(Map<String, Object> map);
+
+    WrapperResponse<Map<String,Object>> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO);
+
 }

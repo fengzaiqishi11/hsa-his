@@ -960,36 +960,30 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         /**
          * 第一部分回参
          */
-        String ake039 = outDataMap.get("hifp_pay").toString(); //医疗保险统筹基金支付
-        String ake035 = outDataMap.get("cvlserv_pay").toString(); // 公务员医疗补助基金支付
-        String ake026 = outDataMap.get("hifes_pay").toString();//企业补充医疗保险基金支付
-        String ake029 = outDataMap.get("hifob_pay").toString();//大额医疗费用补助基金支付
-        String bka841 = "";//单位支付
-        String bka842 = ""; //医院垫付 ---- 医院负担金额
-        String bka840 = "";//其他基金支付 -------- 基金支付总额
-        String bka821 = "";// //民政救助金支付
-        String bka839 = outDataMap.get("oth_pay").toString();//其他支付
-
-
+        paramMap.put("akc264", outDataMap.get("medfee_sumamt").toString());//医疗总费用
+        // 全自费费用
+        String fulamtOwnpayAmt = outDataMap.get("fulamt_ownpay_amt") == null ? "0" : outDataMap.get("fulamt_ownpay_amt").toString();
+        paramMap.put("bka825", fulamtOwnpayAmt);//全自费费用
+        paramMap.put("bka826", outDataMap.get("overlmt_selfpay").toString());//部分自费费用 ---  超限价自费费用
+        paramMap.put("preselfpayAmt", outDataMap.get("preselfpay_amt").toString());//先行自付金额
+        paramMap.put("inscpScpAmt",outDataMap.get("inscp_scp_amt").toString()); // 符合政策范围金额
         paramMap.put("aka151", outDataMap.get("act_pay_dedc").toString()); //起付线费用 -----  实际支付起付线
-        paramMap.put("akb066", outDataMap.get("acct_pay").toString());//个人账户支付 --------- 个人账户支出
-        paramMap.put("akb067", outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
-        paramMap.put("akc264", outDataMap.get("medfee_sumamt").toString());//医疗总费用akc264 = bka831 + bka832+bka842 --------医疗费总额
-        paramMap.put("ake026", ake026);  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
+        String ake039 = outDataMap.get("hifp_pay").toString(); //医疗保险统筹基金支付
+        paramMap.put("poolPropSelfpay",outDataMap.get("pool_prop_selfpay").toString());// 基本医疗保险统筹基金支付比例
+        paramMap.put("ake035", outDataMap.get("cvlserv_pay").toString());//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
+        paramMap.put("ake026", outDataMap.get("hifes_pay").toString());  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
         String hifmiPay = outDataMap.get("hifmi_pay").toString();
         String hifobPay = outDataMap.get("hifob_pay").toString();
-        paramMap.put("ake029", BigDecimalUtils.add(hifmiPay,hifobPay).toString());//大额医疗费用补助基金支付 ---- 职工大额医疗费用补助基金支出
-        paramMap.put("ake035", ake035);//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
+        paramMap.put("ake029", BigDecimalUtils.add(hifmiPay,hifobPay).toString());//大额医疗费用补助基金支付 ---- 职工+居民合计一个字段
+        paramMap.put("mafPay",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
+        //paramMap.put("bka821", outDataMap.get("maf_pay").toString());//民政救助金支付
+        String bka839 = outDataMap.get("oth_pay").toString();//其他支付
+        paramMap.put("akb066", outDataMap.get("acct_pay").toString());//个人账户支付 --------- 个人账户支出
+        paramMap.put("akb067", outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
         paramMap.put("ake039", ake039); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
-        paramMap.put("bka801", null); //床位费超额金额
-        paramMap.put("bka821", outDataMap.get("maf_pay").toString());//民政救助金支付
+        paramMap.put("hospPrice", outDataMap.get("hosp_part_amt").toString()); //医院负担金额
+        paramMap.put("acctMulaidPay", outDataMap.get("acct_mulaid_pay").toString()); //个人账户共计支付金额
 
-        Object fulamtOwnpayAmt = outDataMap.get("fulamt_ownpay_amt");
-        if (fulamtOwnpayAmt == null || "null".equals(fulamtOwnpayAmt)) {
-            fulamtOwnpayAmt = "0";
-        }
-        paramMap.put("bka825", fulamtOwnpayAmt.toString());//全自费费用     ---- 全自费金额
-        paramMap.put("bka826", outDataMap.get("overlmt_selfpay").toString());//部分自费费用 ---  超限价自费费用
         String fundPaySumamt = outDataMap.get("fund_pay_sumamt").toString(); // 医保支付
         String acctPay = outDataMap.get("acct_pay").toString(); // 个人账户
         String bka832 = fundPaySumamt;
@@ -1000,14 +994,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
 
         paramMap.put("bka831", BigDecimalUtils.subtract(outDataMap.get("medfee_sumamt").toString(), bka832).toString()); // 个人现金自付bka831 = 医疗总费用 - 医保基金 - 刷卡金额
         paramMap.put("bka832", bka832);//医保支付bka832 = ake039 + ake035 + ake026 + ake029+ bka841 + bka840 + bka821 + bka843 + bka844 + bka845
-        paramMap.put("bka838", null);//超共付段费用个人自付 ---  超限价自费费用
-        paramMap.put("bka839", bka839);//其他支付
-        paramMap.put("bka840", null);//其他基金支付 -------- 基金支付总额
-        paramMap.put("bka841", bka841);//单位支付
-        paramMap.put("bka842", bka842);//医院垫付 ---- 医院负担金额
-        paramMap.put("bka843", null);//特惠保
-        paramMap.put("bka844", outDataMap.get("hosp_part_amt").toString());//医院减免
-        paramMap.put("bka845", null);//政府兜底
         if ("settle".equals(outDataMap.get("action") == null ? "" : outDataMap.get("action").toString())) {
             paramMap.put("action", "settle");
             paramMap.put("setl_id", outDataMap.get("setl_id").toString());
@@ -1021,7 +1007,95 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             paramMap.put("setldetailList", MapUtils.get(outDataMap, "setldetailList"));
         }
         paramMap.put("aaz217", MapUtils.get(outDataMap, "aaz217"));
+
+        // 处理基金信息
+        Map<String,Object> setDetailMap = this.doResultSetdetailList(outDataMap);
+
+        // 合并
+        Map<String, Object> combineResultMap = new HashMap<>();
+        combineResultMap.putAll(paramMap);
+        combineResultMap.putAll(setDetailMap);
         return paramMap;
+    }
+
+    // 保存试算基金信息
+    private Map<String, Object> doResultSetdetailList(Map<String, Object> outDataMap) {
+        Map <String,Object> resultMap = new HashMap<>();
+        List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
+        if (!ListUtils.isEmpty(setldetailList)) {
+            for (Map<String,Object> map : setldetailList) {
+                String fundPayType = MapUtils.get(map,"fund_pay_type");
+                String fundPayamt = MapUtils.get(map,"fund_payamt");
+                switch (fundPayType) {
+                    case "630100": // 医院减免金额
+                        resultMap.put("hospExemAmount",fundPayamt);
+                        break;
+                    /*case "610100": // 医疗救助基金
+                        resultMap.put("mafPay",fundPayamt);
+                        break;*/
+                    case "330200": // 职工意外伤害基金
+                        resultMap.put("acctInjPay",fundPayamt);
+                        break;
+                    case "390400": // 居民意外伤害基金
+                        resultMap.put("retAcctInjPay",fundPayamt);
+                        break;
+                    case "640100": // 政府兜底基金
+                        resultMap.put("governmentPay",fundPayamt);
+                        break;
+                    case "620100": // 特惠保补偿金
+                        resultMap.put("thbPay",fundPayamt);
+                        break;
+                    case "999996": // 医院垫付基金
+                        resultMap.put("hospPrice",fundPayamt);
+                        break;
+                    case "610200": // 优抚对象医疗补助基金
+                        resultMap.put("carePay",fundPayamt);
+                        break;
+                    case "999109": // 农村低收入人口医疗补充保险
+                        resultMap.put("lowInPay",fundPayamt);
+                        break;
+                    case "999997": // 其他基金
+                        resultMap.put("othPay",fundPayamt);
+                        break;
+                    case "510100": // 生育基金
+                        resultMap.put("fertilityPay",fundPayamt);
+                        break;
+                    case "340100": // 离休人员医疗保障基金
+                        resultMap.put("retiredPay",fundPayamt);
+                        break;
+                    case "350100": // 一至六级残疾军人医疗补助基金
+                        resultMap.put("soldierPay",fundPayamt);
+                        break;
+                    case "340200": // 离休老工人门慢保障基金
+                        resultMap.put("retiredOutptPay",fundPayamt);
+                        break;
+                    case "410100": // 工伤保险基金
+                        resultMap.put("injuryPay",fundPayamt);
+                        break;
+                    case "320200": //  厅级干部补助基金
+                        resultMap.put("hallPay",fundPayamt);
+                        break;
+                    case "310400": //  军转干部医疗补助基金
+                        resultMap.put("soldierToPay",fundPayamt);
+                        break;
+                    case "370200": //  公益补充保险基金
+                        resultMap.put("welfarePay",fundPayamt);
+                        break;
+                    case "99999707": //  新冠肺炎核酸检测财政补助
+                        resultMap.put("COVIDPay",fundPayamt);
+                        break;
+                    case "390500": //  居民家庭账户金
+                        resultMap.put("familyPay",fundPayamt);
+                        break;
+                    case "310500": //  代缴基金（破产改制）
+                        resultMap.put("behalfPay",fundPayamt);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return resultMap;
     }
 
 

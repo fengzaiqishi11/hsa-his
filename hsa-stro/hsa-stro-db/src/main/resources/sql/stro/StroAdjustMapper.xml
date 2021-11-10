@@ -126,7 +126,7 @@
             #{item}
         </foreach>
     </select>
-    <!--查看退库确认中是否存在，通过-->
+    <!--查看退库确认中是否存在，通过,默认情况下，出库到科室不需要进行校验-->
     <select id="selectJudgeconfirmDruag" resultType="java.util.Map">
         SELECT '21' as outCode, b.item_Id as itemId, CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_out` a
         join stro_out_detail b on a.id = b.out_id
@@ -136,6 +136,18 @@
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
+        </foreach>
+        <if test = "deptConfirm != 1 ">
+            and a.out_code != '4'
+        </if>
+    </select>
+    <!--获得系统参数-->
+    <select id="getParameterValue" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select  a.id, a.hosp_code hospCode, a.name, a.code, a.remark, a.pym, a.wbm, a.value
+        from sys_parameter a
+        where  a.hosp_code = #{hospCode}  and code in
+        <foreach item="code" collection="code" separator="," open="(" close=")" index="">
+            #{code}
         </foreach>
     </select>
 

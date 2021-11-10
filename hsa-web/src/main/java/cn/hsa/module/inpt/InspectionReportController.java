@@ -60,7 +60,7 @@ public class InspectionReportController extends BaseController {
         Map map = new HashMap<>();
         ExaminationItem examinationItem = new ExaminationItem();
         examinationItem.setInNo(inspectItem.getInNo());
-        examinationItem.setAdviceId(inspectItem.getOrderNo());
+        examinationItem.setAdviceId(inspectItem.getOpdId());
         examinationItem.setApplyNo(inspectItem.getApplyNo());
         map.put("examinationItem",examinationItem);
         map.put("hospCode", sysUserDTO.getHospCode());

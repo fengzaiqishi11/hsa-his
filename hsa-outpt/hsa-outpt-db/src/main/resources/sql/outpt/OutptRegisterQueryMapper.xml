@@ -49,8 +49,10 @@
     <!--通过实体作为筛选条件分页查询-->
     <select id="queryPage" resultMap="OutptRegisterMap">
         select
-        opr.id, opr.hosp_code, opr.visit_id,opr.crte_time, opr.register_no, opr.name, opr.gender_code, opr.age, opr.cert_code, opr.cert_no, opr.phone, opr.source_bz_code, opr.visit_code, opr.source_tj_code, opr.source_tj_remark, opr.register_time, opr.cf_id, opr.cq_id, opr.dq_id, opr.dr_id,opr.dept_id, opr.dept_name, opr.doctor_id, opr.doctor_name, opr.is_cancel, opr.is_first_visit, opr.is_add,
-        ors.crte_name as chargeName,ors.status_code,ors.bill_no,ors.settle_time,ors.preferential_price,ors.reality_price,
+        opr.id, opr.hosp_code, opr.visit_id,opr.crte_time, opr.register_no, opr.name, opr.gender_code, opr.age, opr.cert_code, opr.cert_no, opr.phone, opr.source_bz_code, opr.visit_code, opr.source_tj_code, opr.source_tj_remark, opr.register_time, opr.cf_id, opr.cq_id, opr.dq_id, opr.dr_id,opr.dept_id, opr.dept_name, opr.doctor_id, opr.doctor_name, opr.is_cancel,
+        case when opr.is_first_visit ='1' then '0' else '1' end as is_first_visit,
+        opr.is_add,
+        ifnull(ors.crte_name,opr.crte_name) as chargeName,ors.status_code,ors.bill_no,ors.settle_time,ors.preferential_price,ors.reality_price,
         ov.patient_code,ov.doctor_name as outpatientName,
         ocf.name as outptClassifyName,ov.age_unit_code as ageUnitCode
         from outpt_register opr
@@ -61,6 +63,11 @@
         <if test="keyword != null and keyword != ''">
             and (opr.name like concat('%',#{keyword},'%')
             or ors.crte_name like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="crteId != null and crteId != ''">
+            and (opr.crte_id = #{crteId}
+            or ors.crte_id = #{crteId}
             )
         </if>
         <if test="deptId !=null and deptId != ''">

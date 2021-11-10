@@ -430,7 +430,8 @@
                ifnull(c.age,''),
                (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = c.age_unit_code AND hosp_code =
                c.hosp_code ), '岁' )))) as patientInfo,
-               (select bd.name from base_dept bd where bd.id = b.dept_id and bd.hosp_code = b.hosp_code) as deptName
+               (select bd.name from base_dept bd where bd.id = b.dept_id and bd.hosp_code = b.hosp_code) as deptName,
+               c.status_code
         from phar_in_distribute_all_detail a
         left join phar_in_distribute pid on a.distribute_id = pid.id and a.hosp_code = pid.hosp_code
         join inpt_advice b on a.advice_id = b.id and a.hosp_code = b.hosp_code
@@ -459,6 +460,9 @@
         </if>
         <if test="endTime!=null">
           and date(a.crte_time) &lt;= date(#{endTime})
+        </if>
+        <if test="statusCode!=null and statusCode!=''">
+            and c.status_code = #{statusCode}
         </if>
         order by a.crte_time desc
     </select>

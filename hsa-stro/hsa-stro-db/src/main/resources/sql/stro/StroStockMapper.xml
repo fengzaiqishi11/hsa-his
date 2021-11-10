@@ -24,9 +24,11 @@
         <result property="stockOccupy" column="stock_occupy" jdbcType="INTEGER"/>
         <result property="code" column="code" jdbcType="VARCHAR"/>
         <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
-        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="dan" column="dan" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
         <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crteTime" jdbcType="TIMESTAMP"/>
+
     </resultMap>
 
 
@@ -46,9 +48,23 @@
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
-        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName,
+        /*厂商名称*/
+        (select name from base_product where hosp_code=a.hosp_code and code = b.prod_code) as prodName,
+        /*批准文号*/
+        b.dan,
+        /*最近入库的生产批号*/
+        ssd.batch_no,
+        /*最近入库的购进价*/
+        ssd.buy_price,
+        /*最近入库的时间*/
+        (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
+        /*最近入库的失效时间*/
+        ssd.expiry_date
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
+        and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
         <if test="isValid != null and isValid != ''">
             and b.is_valid = #{isValid}
         </if>
@@ -127,9 +143,23 @@
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num,
          a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,
          ifnull(a.split_price,0) split_price,b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
-        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName,
+        /*厂商名称*/
+        (select name from base_product where hosp_code=a.hosp_code and code = b.prod_code) as prodName,
+        /*批准文号*/
+        '' as dan,
+        /*最近入库的生产批号*/
+        ssd.batch_no,
+        /*最近入库的购进价*/
+        ssd.buy_price,
+        /*最近入库的时间*/
+        (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
+        /*最近入库的失效时间*/
+        ssd.expiry_date
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
+        and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
         <if test="isValid != null and isValid != ''">
             and b.is_valid = #{isValid}
         </if>
@@ -199,9 +229,23 @@
         a.unit_code, ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code, ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,
         ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
         b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
-        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName,
+        /*厂商名称*/
+        (select name from base_product where hosp_code=a.hosp_code and code = b.prod_code) as prodName,
+        /*批准文号*/
+        b.dan,
+        /*最近入库的生产批号*/
+        ssd.batch_no,
+        /*最近入库的购进价*/
+        ssd.buy_price,
+        /*最近入库的时间*/
+        (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
+        /*最近入库的失效时间*/
+        ssd.expiry_date
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
+        and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
         <if test="isValid != null and isValid != ''">
             and b.is_valid = #{isValid}
         </if>
@@ -277,9 +321,23 @@
         ifnull(a.buy_price_all,0) buy_price_all, ifnull(a.sell_price_all,0) sell_price_all, ifnull(a.split_num,0) split_num, a.split_unit_code,
          ifnull(a.stock_max,0) stock_max, ifnull(a.stock_min,0) stock_min,ifnull(a.stock_occupy,0) stock_occupy,ifnull(a.split_price,0) split_price,
          b.spec as spec,b.split_ratio as split_ratio,b.price as buyPrice,b.price as sellPrice,b.code,
-        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName
+        (select name from base_dept bd where bd.id = a.biz_id and bd.hosp_code = a.hosp_code) as deptName,
+        /*厂商名称*/
+        (select name from base_product where hosp_code=a.hosp_code and code = b.prod_code) as prodName,
+        /*批准文号*/
+        '' as dan,
+        /*最近入库的生产批号*/
+        ssd.batch_no,
+        /*最近入库的购进价*/
+        ssd.buy_price,
+        /*最近入库的时间*/
+        (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
+        /*最近入库的失效时间*/
+        ssd.expiry_date
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
+        left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
+        and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
         <if test="isValid != null and isValid != ''">
             and b.is_valid = #{isValid}
         </if>

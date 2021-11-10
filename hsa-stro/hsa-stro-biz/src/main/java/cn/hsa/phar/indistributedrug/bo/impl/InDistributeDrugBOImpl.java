@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
 
 /**
 * @Package_name: cn.hsa.phar.indistributedrug.bo
@@ -128,15 +129,23 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
     @Override
     public Map<String, List<PharInReceiveDetailDTO>> getInReviceDetail(PharInReceiveDetailDTO pharInReceiveDetailDTO) {
         List<PharInReceiveDetailDTO> inReviceDetail = inDistributeDrugDAO.getInReviceDetail(pharInReceiveDetailDTO);
+        inReviceDetail = inReviceDetail.stream().sorted(Comparator.comparing(e -> Integer.parseInt(e.getSeqNo()))).collect(Collectors.toList()); ;
+        Map<String, List<PharInReceiveDetailDTO>> collect  = new LinkedHashMap<>() ;
 
-        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getVisitId));
-        collect = collect.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (oldVal, newVal) -> oldVal,
-                        LinkedHashMap::new
-                ));
+        for(PharInReceiveDetailDTO pharInReceiveDetailDTO1 : inReviceDetail){
+            if(!collect.containsKey(pharInReceiveDetailDTO1.getVisitId())){
+                collect.put(pharInReceiveDetailDTO1.getVisitId(),new ArrayList<>());
+            }
+            collect.get(pharInReceiveDetailDTO1.getVisitId()).add(pharInReceiveDetailDTO1);
+        }
+//        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getVisitId));
+//        collect = collect.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
+//                Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        Map.Entry::getValue,
+//                        (oldVal, newVal) -> oldVal,
+//                        LinkedHashMap::new
+//                ));
         return collect;
     }
 

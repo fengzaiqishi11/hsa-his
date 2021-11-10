@@ -79,7 +79,8 @@
             on m.settle_id = a.id
         where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
         <if test="keyword != null and keyword != ''">
-            and CONCAT(b.name,b.cert_no) LIKE CONCAT('%',#{keyword},'%')
+            and (b.name LIKE CONCAT('%',#{keyword},'%') or
+            b.cert_no LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="startTime != null and startTime != ''">
             and a.settle_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%s')

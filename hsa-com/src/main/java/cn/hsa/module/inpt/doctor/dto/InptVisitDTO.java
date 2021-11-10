@@ -438,4 +438,12 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 合并结算预交金余额
      */
     private BigDecimal totalMergeBalance;
+    /**
+     * 发药药房名字
+     */
+    private String pharName;
+    /**
+     * 发药药房id
+     */
+    private String pharId;
 }

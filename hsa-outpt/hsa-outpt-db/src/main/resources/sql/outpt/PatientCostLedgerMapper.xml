@@ -1934,7 +1934,8 @@
         case max(a.item_code) when '1' then max(bd.prep_code) when '2' then '' end prepCode,
         max(a.unit_code) as unitCode,
         max(a.split_unit_code) as splitUnitCode,
-        (select name from base_dept where id = b.dept_id) as deptName
+        (select name from base_dept where id = b.dept_id) as deptName,
+        (select name from base_dept where id = b.phar_id) as pharName
         from phar_in_distribute_all_detail a
         left join phar_in_distribute b on a.distribute_id = b.id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
@@ -1965,6 +1966,10 @@
         /*剂型*/
         <if test="prepCode != null and prepCode != ''">
             and bd.prep_code = #{prepCode}
+        </if>
+        /*发药药房*/
+        <if test="pharId != null and pharId != ''">
+            and b.phar_id = #{pharId}
         </if>
         group by b.dept_id, a.item_id
         ) A where A.splitNum != 0

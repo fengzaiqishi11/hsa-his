@@ -237,4 +237,18 @@
     <delete id="deletePrescribeTempDetail" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
         delete from outpt_prescribe_temp_detail  where opt_id = #{id} and hosp_code = #{hospCode}
     </delete>
+
+    <!--单个修改-->
+    <update id="updateTempAudit">
+        update outpt_prescribe_temp
+        set
+        <if test="auditCode != null and auditCode != ''">
+            audit_code = #{auditCode},
+        </if>
+        audit_id = #{auditId},
+        audit_name = #{auditName},
+        audit_time = #{auditTime}
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
 </mapper>

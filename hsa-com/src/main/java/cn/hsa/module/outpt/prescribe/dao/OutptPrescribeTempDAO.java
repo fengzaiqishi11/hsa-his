@@ -96,4 +96,14 @@ public interface OutptPrescribeTempDAO {
      * @Return int
      **/
     int deletePrescribeTempDetail(OutptPrescribeTempDTO outptPrescribeTempDTO);
+
+    /**
+     * @Method updateTempAudit
+     * @Desrciption 取消审核
+     * @param outptPrescribeTempDTO
+     * @Author liuliyun
+     * @Date   2021/11/10 17:16
+     * @Return int
+     **/
+    int updateTempAudit(OutptPrescribeTempDTO outptPrescribeTempDTO);
 }

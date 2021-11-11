@@ -100,6 +100,7 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
     StroInDetailDTO stroInDetailDTO = new StroInDetailDTO();
     stroInDetailDTO.setHospCode(byId.getHospCode());
     stroInDetailDTO.setInId(byId.getId());
+    stroInDetailDTO.setItemName(stroInDTO.getItemNameKey());
     List<StroInDetailDTO> stroInDetailDTOS = stroInDao.queryStroInDetailAll(stroInDetailDTO);
     if(byId == null){
       throw new AppException("数据错误");
@@ -122,7 +123,6 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
   @Override
   public PageDTO queryStroInPage(StroInDTO stroInDTO) {
 
-    PageHelper.startPage(stroInDTO.getPageNo(),stroInDTO.getPageSize());
 
     if(StringUtils.isEmpty(stroInDTO.getInCode())) {
       throw new AppException("出入库类型为空");
@@ -139,6 +139,7 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
         stroInDTO.setIds(inIds);
       }
     }
+    PageHelper.startPage(stroInDTO.getPageNo(),stroInDTO.getPageSize());
 
     List<StroInDTO> stroInDTOS= stroInDao.queryStroInPage(stroInDTO);
 

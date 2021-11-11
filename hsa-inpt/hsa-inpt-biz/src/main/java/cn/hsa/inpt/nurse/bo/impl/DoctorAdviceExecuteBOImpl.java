@@ -95,10 +95,10 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
     **/
     @Override
     public Boolean updateDoctorAdviceExecute(List<InptAdviceExecDTO> inptAdviceExecDTOs) {
+        List<InptAdviceExecDTO> execNeedList = new ArrayList<>();
         if (ListUtils.isEmpty(inptAdviceExecDTOs)) {
             throw new AppException("参数为空");
         }
-
         for (InptAdviceExecDTO inptAdviceExecDTO: inptAdviceExecDTOs) {
           if("2".equals(inptAdviceExecDTO.getSignCode()) && StringUtils.isEmpty(inptAdviceExecDTO.getExecName())){
             throw new AppException("执行人为空");
@@ -108,84 +108,102 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
             && StringUtils.isEmpty(inptAdviceExecDTO.getIsPositive())){
             throw new AppException("皮试结果为空");
           }else if ("2".equals(inptAdviceExecDTO.getSignCode()) && inptAdviceExecDTO.getExecTime() != null){
-
-              //判断当前执行时间是否小于医嘱时间
-              InptAdviceDTO inptAdvice = new InptAdviceDTO() ;
-              inptAdvice.setHospCode(inptAdviceExecDTO.getHospCode());
-              inptAdvice.setId(inptAdviceExecDTO.getAdviceId());
-              inptAdvice = inptAdviceDAO.getInptAdviceById(inptAdvice);
-              if(DateUtils.dateCompare(inptAdviceExecDTO.getExecTime(),inptAdvice.getLongStartTime())){
-                  throw new AppException("执行时间不能小于医嘱开始时间");
-              }
+            //判断当前执行时间是否小于医嘱时间
+            InptAdviceDTO inptAdvice = new InptAdviceDTO() ;
+            inptAdvice.setHospCode(inptAdviceExecDTO.getHospCode());
+            inptAdvice.setId(inptAdviceExecDTO.getAdviceId());
+            inptAdvice = inptAdviceDAO.getInptAdviceById(inptAdvice);
+            if(DateUtils.dateCompare(inptAdviceExecDTO.getExecTime(),inptAdvice.getLongStartTime())){
+                throw new AppException("执行时间不能小于医嘱开始时间");
+            }
+            // 把需要执行得医嘱分离出来
+            if("2".equals(inptAdviceExecDTO.getSignCode())) {
+              execNeedList.add(inptAdviceExecDTO);
+            }
           }
         }
-
-        Map map = new HashMap();
-        map.put("hospCode", inptAdviceExecDTOs.get(0).getHospCode());
-        map.put("code", "PSJG");
-        List<SysCodeSelectDTO> sysCodeSelectDTOList = sysCodeService_consumer.getByCode(map).getData().get("PSJG");
         //医嘱执行批量修改
         int eCount = inptAdviceExecDao.updateInptAdviceExecBatch(inptAdviceExecDTOs);
-        // 查出临床路径医嘱
-        List<InptAdviceExecDTO> clinicalAdviceEexecList = inptAdviceExecDTOs.stream().
-             filter(s -> StringUtils.isNotEmpty(s.getStageDetailItemId()) &&
-               StringUtils.isNotEmpty(s.getClinicalPathStageId())).collect(Collectors.toList());
-        if(!ListUtils.isEmpty(clinicalAdviceEexecList)) {
-          ClinicalAdviceExec(clinicalAdviceEexecList);
+        if(!ListUtils.isEmpty(execNeedList)) {
+          // 为执行状态时回写医嘱主表和费用表
+          updateAdviceExecute(inptAdviceExecDTOs);
         }
-        //医嘱执行批量更新费用表的执行人
-        int costCount = inptCostDAO.updateInptCostExecuteBatch(inptAdviceExecDTOs);
-        //皮试根据来源ID,获取主医嘱记录
-        List<InptAdviceDTO> adviceList = inptAdviceExecDao.queryPsList(inptAdviceExecDTOs,map.get("hospCode").toString());
+        return true;
+    }
 
-        List<InptAdviceDTO> list = new ArrayList<>();
-        Map<String,String> map1 = new HashMap();
-        inptAdviceExecDTOs.forEach(dto ->{
-            InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
-            inptAdviceDTO.setId(dto.getAdviceId());
-            inptAdviceDTO.setHospCode(dto.getHospCode());
-            inptAdviceDTO.setIsPositive(dto.getIsPositive());
-            inptAdviceDTO.setExecId(dto.getExecId());
-            inptAdviceDTO.setExecName(dto.getExecName());
-            inptAdviceDTO.setSecondExecId(dto.getSecondExecId());
-            inptAdviceDTO.setSecondExecName(dto.getSecondExecName());
-            inptAdviceDTO.setSignCode(dto.getSignCode());
-            inptAdviceDTO.setContent(dto.getContent());
-            inptAdviceDTO.setSourceIaId(dto.getSourceIaId());
-            inptAdviceDTO.setSkinResultCode(dto.getSkinResultCode()); //添加皮试结果
+    /**
+    * @Menthod updateAdviceExecute
+    * @Desrciption 执行状态医嘱修改
+    *
+    * @Param
+    * [inptAdviceExecDTOs]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/11/9 15:17
+    * @Return void
+    **/
+    public void updateAdviceExecute(List<InptAdviceExecDTO> inptAdviceExecDTOs) {
+      Map map = new HashMap();
+      map.put("hospCode", inptAdviceExecDTOs.get(0).getHospCode());
+      map.put("code", "PSJG");
+      List<SysCodeSelectDTO> sysCodeSelectDTOList = sysCodeService_consumer.getByCode(map).getData().get("PSJG");
 
-            if (!ListUtils.isEmpty(sysCodeSelectDTOList)) {
-                for (SysCodeSelectDTO codeSelectDTO:sysCodeSelectDTOList) {
-                    if (codeSelectDTO.getValue().equals(dto.getSkinResultCode())) {
-                        String newContent = "(" + codeSelectDTO.getLabel() + ")";
-                        map1.put(inptAdviceDTO.getSourceIaId(),newContent+"_"+inptAdviceDTO.getIsPositive());
-                        inptAdviceDTO.setContent(inptAdviceDTO.getContent()+ newContent);
-                    }
-                }
-            }
-            list.add(inptAdviceDTO);
-        });
-        //批量更新医嘱
-        int aCount = inptAdviceDao.updateInptAdviceBatch(list);
-        //更新原医嘱表是否阳性,医嘱内容
-          if(map1 != null && map1.size() > 0 && !ListUtils.isEmpty(adviceList)){
-          for(String key : map1.keySet()){
-            for (int j = 0; j < adviceList.size(); j++) {
-              if(!StringUtils.isEmpty(key) && key.equals(adviceList.get(j).getId())){
-                adviceList.get(j).setContent(adviceList.get(j).getContent() + map1.get(key).split("_")[0]);
-                adviceList.get(j).setIsPositive(map1.get(key).split("_")[1]);
-              }
+      // 查出临床路径医嘱
+      List<InptAdviceExecDTO> clinicalAdviceEexecList = inptAdviceExecDTOs.stream().
+        filter(s -> StringUtils.isNotEmpty(s.getStageDetailItemId()) &&
+          StringUtils.isNotEmpty(s.getClinicalPathStageId())).collect(Collectors.toList());
+      if(!ListUtils.isEmpty(clinicalAdviceEexecList)) {
+        ClinicalAdviceExec(clinicalAdviceEexecList);
+      }
+      //医嘱执行批量更新费用表的执行人
+      int costCount = inptCostDAO.updateInptCostExecuteBatch(inptAdviceExecDTOs);
+      //皮试根据来源ID,获取主医嘱记录
+      List<InptAdviceDTO> adviceList = inptAdviceExecDao.queryPsList(inptAdviceExecDTOs,map.get("hospCode").toString());
+
+      List<InptAdviceDTO> list = new ArrayList<>();
+      Map<String,String> map1 = new HashMap();
+      inptAdviceExecDTOs.forEach(dto ->{
+        InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
+        inptAdviceDTO.setId(dto.getAdviceId());
+        inptAdviceDTO.setHospCode(dto.getHospCode());
+        inptAdviceDTO.setIsPositive(dto.getIsPositive());
+        inptAdviceDTO.setExecId(dto.getExecId());
+        inptAdviceDTO.setExecName(dto.getExecName());
+        inptAdviceDTO.setSecondExecId(dto.getSecondExecId());
+        inptAdviceDTO.setSecondExecName(dto.getSecondExecName());
+        inptAdviceDTO.setSignCode(dto.getSignCode());
+        inptAdviceDTO.setContent(dto.getContent());
+        inptAdviceDTO.setSourceIaId(dto.getSourceIaId());
+        inptAdviceDTO.setSkinResultCode(dto.getSkinResultCode()); //添加皮试结果
+        if (!ListUtils.isEmpty(sysCodeSelectDTOList)) {
+          for (SysCodeSelectDTO codeSelectDTO:sysCodeSelectDTOList) {
+            if (codeSelectDTO.getValue().equals(dto.getSkinResultCode())) {
+              String newContent = "(" + codeSelectDTO.getLabel() + ")";
+              map1.put(inptAdviceDTO.getSourceIaId(),newContent+"_"+inptAdviceDTO.getIsPositive());
+              inptAdviceDTO.setContent(inptAdviceDTO.getContent()+ newContent);
             }
           }
-          inptAdviceExecDao.updateIsPositive(adviceList);
         }
-
-        //医嘱更新最近执行之间
-        if (!ListUtils.isEmpty(inptAdviceExecDTOs)) {
-            inptAdviceDAO.updateLastExeTimeByIds(inptAdviceExecDTOs);
+        list.add(inptAdviceDTO);
+      });
+      //批量更新医嘱
+      int aCount = inptAdviceDao.updateInptAdviceBatch(list);
+      //更新原医嘱表是否阳性,医嘱内容
+      if(map1 != null && map1.size() > 0 && !ListUtils.isEmpty(adviceList)){
+        for(String key : map1.keySet()){
+          for (int j = 0; j < adviceList.size(); j++) {
+            if(!StringUtils.isEmpty(key) && key.equals(adviceList.get(j).getId())){
+              adviceList.get(j).setContent(adviceList.get(j).getContent() + map1.get(key).split("_")[0]);
+              adviceList.get(j).setIsPositive(map1.get(key).split("_")[1]);
+            }
+          }
         }
-
-        return (eCount>0 && aCount>0 && costCount>0);
+        inptAdviceExecDao.updateIsPositive(adviceList);
+      }
+      //医嘱更新最近执行之间
+      if (!ListUtils.isEmpty(inptAdviceExecDTOs)) {
+        inptAdviceDAO.updateLastExeTimeByIds(inptAdviceExecDTOs);
+      }
     }
 
     /**
@@ -269,12 +287,38 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
     if (ListUtils.isEmpty(inptAdviceExecDTOs)) {
       throw new AppException("参数为空");
     }
+    List<InptAdviceExecDTO> cancleAdviceExecuteCance = new ArrayList<>();
+    //医嘱执行批量修改
+    int eCount = inptAdviceExecDao.updateInptAdviceExecBatchCancel(inptAdviceExecDTOs);
+    // 分离出已执行再取消得医嘱
+    for(InptAdviceExecDTO item : inptAdviceExecDTOs) {
+      if("2".equals(item.getSignCode())) {
+        cancleAdviceExecuteCance.add(item);
+      }
+    }
+    if(!ListUtils.isEmpty(cancleAdviceExecuteCance)){
+      // 不为空回写费用表，医嘱表
+      canceAdviceExecute(cancleAdviceExecuteCance);
+    }
+    return true;
+  }
+
+  /**
+  * @Menthod canceAdviceExecute
+  * @Desrciption 已执行医嘱取消执行
+  *
+  * @Param
+  * [inptAdviceExecDTOs]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/11/9 15:25
+  * @Return void
+  **/
+  public void canceAdviceExecute(List<InptAdviceExecDTO> inptAdviceExecDTOs){
     Map map = new HashMap();
     map.put("hospCode", inptAdviceExecDTOs.get(0).getHospCode());
     map.put("code", "PSJG");
     List<SysCodeSelectDTO> sysCodeSelectDTOList = sysCodeService_consumer.getByCode(map).getData().get("PSJG");
-    //医嘱执行批量修改
-    int eCount = inptAdviceExecDao.updateInptAdviceExecBatchCancel(inptAdviceExecDTOs);
     // 查出临床路径医嘱
     List<InptAdviceExecDTO> clinicalAdviceEexecList = inptAdviceExecDTOs.stream().
       filter(s -> StringUtils.isNotEmpty(s.getStageDetailItemId())).collect(Collectors.toList());
@@ -317,6 +361,7 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
       }
       inptAdviceDTO.setContent(dto.getContent());
       inptAdviceDTO.setSourceIaId(dto.getSourceIaId());
+      inptAdviceDTO.setLastExecTime(dto.getExecTime());
       if(!StringUtils.isEmpty(dto.getIsPositive())){
         String content = inptAdviceDTO.getContent().substring(0,inptAdviceDTO.getContent().lastIndexOf("("));
         inptAdviceDTO.setContent(content);
@@ -327,13 +372,14 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
     int aCount = inptAdviceDao.updateInptAdviceBatch(list);
     if(!ListUtils.isEmpty(adviceList)){
       for (int i = 0; i < adviceList.size(); i++) {
+        if("1".equals(adviceList.get(i).getIsSkin())) {
           String content = adviceList.get(i).getContent().substring(0,adviceList.get(i).getContent().lastIndexOf("("));
           adviceList.get(i).setContent(content);
           adviceList.get(i).setIsPositive(null);
           inptAdviceExecDao.updateIsPositive(adviceList);
+        }
       }
     }
-    return true;
   }
 
   /**

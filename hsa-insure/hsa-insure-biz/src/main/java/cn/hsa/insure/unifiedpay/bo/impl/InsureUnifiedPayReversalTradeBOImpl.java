@@ -12,11 +12,9 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
-import cn.hsa.module.insure.outpt.dto.InsureReckonDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -715,10 +713,10 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Method handSetlProcInfo
      * @Desrciption  计算处理本次综合医疗保障报销
      * @Param setldetail  基金分项数据集合
-     * 
+     *
      * @Author fuhui
-     * @Date   2021/10/26 13:48 
-     * @Return 
+     * @Date   2021/10/26 13:48
+     * @Return
     **/
     private Map<String, Object> handSetlProcInfo(List<Map<String, Object>> setldetail, Map<String, Object> setlInfoMap) {
         Map<String,Object> setlProcMap = new HashMap<>();
@@ -1456,6 +1454,84 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         insureConfInfo.setEndDate(MapUtils.get(paraMap,"endDate"));
         resultMap.put("insureConfInfo",insureConfInfo);
         return resultMap;
+    }
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public PageDTO queryDeclareInfosPage(Map<String, Object> paraMap) {
+        int pageNo = Integer.parseInt(MapUtils.get(paraMap, "pageNo") == null ? "1" : MapUtils.get(paraMap, "pageNo"));
+        int pageSize = Integer.parseInt(MapUtils.get(paraMap, "pageSize") == null ? "10" : MapUtils.get(paraMap, "pageSize"));
+
+        // 设置分页信息
+        PageHelper.startPage(pageNo, pageSize);
+        String declaraType = MapUtils.get(paraMap,"declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.CZZG);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.LX);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.MZ: // 门诊
+                paraMap.put("isHospital",Constants.SF.F);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap));
+            default:
+                break;
+
+        }
+        return PageDTO.of(insureReversalTradeDAO.queryDeclareInfosPage(paraMap));
+    }
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public PageDTO querySumDeclareInfosPage(Map<String, Object> paraMap) {
+        int pageNo = Integer.parseInt(MapUtils.get(paraMap, "pageNo") == null ? "1" : MapUtils.get(paraMap, "pageNo"));
+        int pageSize = Integer.parseInt(MapUtils.get(paraMap, "pageSize") == null ? "10" : MapUtils.get(paraMap, "pageSize"));
+
+        // 设置分页信息
+        PageHelper.startPage(pageNo, pageSize);
+        String declaraType = MapUtils.get(paraMap,"declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.CZZG);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype",Constant.UnifiedPay.XZLX.LX);
+                paraMap.put("isHospital",Constants.SF.S);
+                break;
+            case Constants.SBLX.MZ: // 门诊
+                paraMap.put("isHospital",Constants.SF.F);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            default:
+                break;
+
+        }
+        return PageDTO.of(insureReversalTradeDAO.querySumDeclareInfosPage(paraMap));
     }
 
     // 对账单（生育）

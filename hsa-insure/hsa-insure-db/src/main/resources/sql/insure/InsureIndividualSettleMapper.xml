@@ -67,7 +67,32 @@
         <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
         <result property="bka035" column="bka035" jdbcType="VARCHAR"/>
         <result property="bka035Name" column="bka035_name" jdbcType="VARCHAR"/>
-        <result property="hospExemAmount" column="hosp_exem_amount" jdbcType="VARCHAR"/>
+        <result property="hospExemAmount" column="hosp_exem_amount" jdbcType="NUMERIC"/>
+        <result property="comPay" column="com_pay" jdbcType="NUMERIC"/>
+        <result property="allPortionPrice" column="all_portion_price" jdbcType="NUMERIC"/>
+        <result property="fertilityPay" column="fertility_pay" jdbcType="NUMERIC"/>
+        <result property="overSelfPrice" column="over_self_price" jdbcType="NUMERIC"/>
+        <result property="preselfpayAmt" column="preselfpayAmt" jdbcType="NUMERIC"/>
+        <result property="inscpScpAmt" column="inscp_scp_amt" jdbcType="NUMERIC"/>
+        <result property="poolPropSelfpay" column="pool_prop_selfpay" jdbcType="NUMERIC"/>
+        <result property="coacctMulaidPaymPay" column="acct_mulaid_pay" jdbcType="NUMERIC"/>
+        <result property="acctInjPay" column="acct_inj_pay" jdbcType="NUMERIC"/>
+        <result property="retAcctInjPay" column="ret_acct_injPay" jdbcType="NUMERIC"/>
+        <result property="governmentPay" column="government_pay" jdbcType="NUMERIC"/>
+        <result property="thbPay" column="thb_pay" jdbcType="NUMERIC"/>
+        <result property="carePay" column="care_pay" jdbcType="NUMERIC"/>
+        <result property="lowInPay" column="low_in_pay" jdbcType="NUMERIC"/>
+        <result property="othPay" column="oth_pay" jdbcType="NUMERIC"/>
+        <result property="retiredPay" column="retired_pay" jdbcType="NUMERIC"/>
+        <result property="soldierPay" column="soldier_pay" jdbcType="NUMERIC"/>
+        <result property="retiredOutptPay" column="retired_outpt_pay" jdbcType="NUMERIC"/>
+        <result property="injuryPay" column="injury_pay" jdbcType="NUMERIC"/>
+        <result property="hallPay" column="hall_pay" jdbcType="NUMERIC"/>
+        <result property="soldierToPay" column="soldier_to_pay" jdbcType="NUMERIC"/>
+        <result property="welfarePay" column="welfare_pay" jdbcType="NUMERIC"/>
+        <result property="COVIDPay" column="COVID_pay" jdbcType="NUMERIC"/>
+        <result property="familyPay" column="family_pay" jdbcType="NUMERIC"/>
+        <result property="behalfPay" column="behalf_pay" jdbcType="NUMERIC"/>
     </resultMap>
 
     <!-- 表所有字段（别名） -->
@@ -129,7 +154,32 @@
         iis.ext10,
         iis.clr_type,
         iis.clr_way,
-        iis.clr_optins
+        iis.clr_optins,
+        iis.com_pay,
+        iis.all_portion_price,
+        iis.fertility_pay,
+        iis.over_self_price,
+        iis.preselfpay_amt,
+        iis.inscp_scp_amt,
+        iis.pool_prop_selfpay,
+        iis.acct_mulaid_pay,
+        iis.acct_inj_pay,
+        iis.ret_acct_inj_pay,
+        iis.government_pay,
+        iis.thb_pay,
+        iis.care_pay,
+        iis.low_in_pay,
+        iis.oth_pay,
+        iis.retired_pay,
+        iis.soldier_pay,
+        iis.retired_outpt_pay,
+        iis.injury_pay,
+        iis.hall_pay,
+        iis.soldier_to_pay,
+        iis.welfare_pay,
+        iis.COVID_pay,
+        iis.family_pay,
+        iis.behalf_pay
     </sql>
 
     <!--通过实体作为筛选条件 分页查询个人医保结算信息-->
@@ -298,7 +348,33 @@
          ext09,
          ext10,
          maf_pay,
-         hosp_exem_amount)
+         hosp_exem_amount,
+         com_pay,
+         all_portion_price,
+         fertility_pay,
+         over_self_price,
+         preselfpay_amt,
+         inscp_scp_amt,
+         pool_prop_selfpay,
+         acct_mulaid_pay,
+         acct_inj_pay,
+         ret_acct_inj_pay,
+         government_pay,
+         thb_pay,
+         care_pay,
+         low_in_pay,
+         oth_pay,
+         retired_pay,
+         soldier_pay,
+         retired_outpt_pay,
+         injury_pay,
+         hall_pay,
+         soldier_to_pay,
+         welfare_pay,
+         COVID_pay,
+         family_pay,
+         behalf_pay
+         )
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -352,7 +428,32 @@
                 #{ext09,jdbcType=VARCHAR},
                 #{ext10,jdbcType=VARCHAR},
                 #{mafPay,jdbcType=DECIMAL},
-                #{hospExemAmount,jdbcType=DECIMAL})
+                #{hospExemAmount,jdbcType=DECIMAL},
+                #{comPay,jdbcType=DECIMAL},
+                #{allPortionPrice,jdbcType=DECIMAL},
+                #{fertilityPay,jdbcType=DECIMAL},
+                #{overSelfPrice,jdbcType=DECIMAL},
+                #{preselfpayAmt,jdbcType=DECIMAL},
+                #{inscpScpAmt,jdbcType=DECIMAL},
+                #{poolPropSelfpay,jdbcType=DECIMAL},
+                #{acctMulaidPay,jdbcType=DECIMAL},
+                #{acctInjPay,jdbcType=DECIMAL},
+                #{retAcctInjPay,jdbcType=DECIMAL},
+                #{governmentPay,jdbcType=DECIMAL},
+                #{thbPay,jdbcType=DECIMAL},
+                #{carePay,jdbcType=DECIMAL},
+                #{lowInPay,jdbcType=DECIMAL},
+                #{othPay,jdbcType=DECIMAL},
+                #{retiredPay,jdbcType=DECIMAL},
+                #{soldierPay,jdbcType=DECIMAL},
+                #{retiredOutptPay,jdbcType=DECIMAL},
+                #{injuryPay,jdbcType=DECIMAL},
+                #{hallPay,jdbcType=DECIMAL},
+                #{soldierToPay,jdbcType=DECIMAL},
+                #{welfarePay,jdbcType=DECIMAL},
+                #{COVIDPay,jdbcType=DECIMAL},
+                #{familyPay,jdbcType=DECIMAL},
+                #{behalfPay,jdbcType=DECIMAL})
     </insert>
     <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
     <insert id="insertSelective" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualSettleDO">
@@ -519,7 +620,82 @@
                 maf_pay,
             </if>
             <if test="hospExemAmount != null and hospExemAmount != ''">
-                hosp_exem_amount
+                hosp_exem_amount,
+            </if>
+            <if test="comPay != null and comPay != ''">
+                com_pay,
+            </if>
+            <if test="allPortionPrice != null and allPortionPrice != ''">
+                all_portion_price,
+            </if>
+            <if test="fertilityPay != null and fertilityPay != ''">
+                fertility_pay,
+            </if>
+            <if test="overSelfPrice != null and overSelfPrice != ''">
+                over_self_price,
+            </if>
+            <if test="preselfpayAmt != null and preselfpayAmt != ''">
+                preselfpay_amt,
+            </if>
+            <if test="inscpScpAmt != null and inscpScpAmt != ''">
+                inscp_scp_amt,
+            </if>
+            <if test="poolPropSelfpay != null and poolPropSelfpay != ''">
+                pool_prop_selfpay,
+            </if>
+            <if test="acctMulaidPay != null and acctMulaidPay != ''">
+                acct_mulaid_pay,
+            </if>
+            <if test="acctInjPay != null and acctInjPay != ''">
+                acct_inj_pay,
+            </if>
+            <if test="retAcctInjPay != null and retAcctInjPay != ''">
+                ret_acct_inj_pay,
+            </if>
+            <if test="governmentPay != null and governmentPay != ''">
+                government_pay,
+            </if>
+            <if test="thbPay != null and thbPay != ''">
+                thb_pay,
+            </if>
+            <if test="carePay != null and carePay != ''">
+                care_pay,
+            </if>
+            <if test="lowInPay != null and lowInPay != ''">
+                low_in_pay,
+            </if>
+            <if test="othPay != null and othPay != ''">
+                oth_pay,
+            </if>
+            <if test="retiredPay != null and retiredPay != ''">
+                retired_pay,
+            </if>
+            <if test="soldierPay != null and soldierPay != ''">
+                soldier_pay,
+            </if>
+            <if test="retiredOutptPay != null and retiredOutptPay != ''">
+                retired_outpt_pay,
+            </if>
+            <if test="injuryPay != null and injuryPay != ''">
+                injury_pay,
+            </if>
+            <if test="hallPay != null and hallPay != ''">
+                hall_pay,
+            </if>
+            <if test="soldierToPay != null and soldierToPay != ''">
+                soldier_to_pay,
+            </if>
+            <if test="welfarePay != null and welfarePay != ''">
+                welfare_pay,
+            </if>
+            <if test="COVIDPay != null and COVIDPay != ''">
+                COVID_pay,
+            </if>
+            <if test="familyPay != null and familyPay != ''">
+                family_pay,
+            </if>
+            <if test="behalfPay != null and behalfPay != ''">
+                behalf_pay
             </if>
 
         </trim>
@@ -684,7 +860,82 @@
                 #{mafPay,jdbcType=DECIMAL},
             </if>
             <if test="hospExemAmount != null and hospExemAmount != ''">
-                #{hospExemAmount,jdbcType=DECIMAL}
+                #{hospExemAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="comPay != null and comPay != ''">
+                #{comPay,jdbcType=DECIMAL},
+            </if>
+            <if test="allPortionPrice != null and allPortionPrice != ''">
+                #{allPortionPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="fertilityPay != null and fertilityPay != ''">
+                #{fertilityPay,jdbcType=DECIMAL},
+            </if>
+            <if test="overSelfPrice != null and overSelfPrice != ''">
+                #{overSelfPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="preselfpayAmt != null and preselfpayAmt != ''">
+                #{preselfpayAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="inscpScpAmt != null and inscpScpAmt != ''">
+                #{inscpScpAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="poolPropSelfpay != null and poolPropSelfpay != ''">
+                #{poolPropSelfpay,jdbcType=DECIMAL},
+            </if>
+            <if test="acctMulaidPay != null and acctMulaidPay != ''">
+                #{acctMulaidPay,jdbcType=DECIMAL},
+            </if>
+            <if test="acctInjPay != null and acctInjPay != ''">
+                #{acctInjPay,jdbcType=DECIMAL},
+            </if>
+            <if test="retAcctInjPay != null and retAcctInjPay != ''">
+                #{retAcctInjPay,jdbcType=DECIMAL},
+            </if>
+            <if test="governmentPay != null and governmentPay != ''">
+                #{governmentPay,jdbcType=DECIMAL},
+            </if>
+            <if test="thbPay != null and thbPay != ''">
+                #{thbPay,jdbcType=DECIMAL},
+            </if>
+            <if test="carePay != null and carePay != ''">
+                #{carePay,jdbcType=DECIMAL},
+            </if>
+            <if test="lowInPay != null and lowInPay != ''">
+                #{lowInPay,jdbcType=DECIMAL},
+            </if>
+            <if test="othPay != null and othPay != ''">
+                #{othPay,jdbcType=DECIMAL},
+            </if>
+            <if test="retiredPay != null and retiredPay != ''">
+                #{retiredPay,jdbcType=DECIMAL},
+            </if>
+            <if test="soldierPay != null and soldierPay != ''">
+                #{soldierPay,jdbcType=DECIMAL},
+            </if>
+            <if test="retiredOutptPay != null and retiredOutptPay != ''">
+                #{retiredOutptPay,jdbcType=DECIMAL},
+            </if>
+            <if test="injuryPay != null and injuryPay != ''">
+                #{injuryPay,jdbcType=DECIMAL},
+            </if>
+            <if test="hallPay != null and hallPay != ''">
+                #{hallPay,jdbcType=DECIMAL},
+            </if>
+            <if test="soldierToPay != null and soldierToPay != ''">
+                #{soldierToPay,jdbcType=DECIMAL},
+            </if>
+            <if test="welfarePay != null and welfarePay != ''">
+                #{welfarePay,jdbcType=DECIMAL},
+            </if>
+            <if test="COVIDPay != null and COVIDPay != ''">
+                #{COVIDPay,jdbcType=DECIMAL},
+            </if>
+            <if test="familyPay != null and familyPay != ''">
+                #{familyPay,jdbcType=DECIMAL},
+            </if>
+            <if test="behalfPay != null and behalfPay != ''">
+                #{behalfPay,jdbcType=DECIMAL}
             </if>
         </trim>
     </insert>

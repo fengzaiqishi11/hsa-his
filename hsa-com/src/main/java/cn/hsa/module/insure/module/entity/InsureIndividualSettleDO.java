@@ -146,4 +146,30 @@ public class InsureIndividualSettleDO extends PageDO implements Serializable {
         private String clrOptins;
         private BigDecimal mafPay; // 医疗救助金额
         private BigDecimal hospExemAmount; //医院减免金额（一站式紧急基金）
+
+        private BigDecimal comPay; // 企业支付
+        private BigDecimal allPortionPrice;// 全自费金额
+        private BigDecimal fertilityPay;// 生育基金
+        private BigDecimal overSelfPrice; // 超限价
+        private BigDecimal preselfpayAmt; // 先行自付金额
+        private BigDecimal inscpScpAmt; // 符合政策范围金额
+        private BigDecimal poolPropSelfpay;// 本医疗保险统筹基金支付比例
+        private BigDecimal acctMulaidPay;// 个人账户共计支付金额
+        private BigDecimal acctInjPay;// 职工意外伤害基金
+        private BigDecimal retAcctInjPay;// 居民意外伤害基金
+        private BigDecimal governmentPay;// 政府兜底基金
+        private BigDecimal thbPay;// 特惠保补偿金
+        private BigDecimal carePay;// 优抚对象医疗补助基金
+        private BigDecimal lowInPay;// 农村低收入人口医疗补充保险
+        private BigDecimal othPay;// 其他基金
+        private BigDecimal retiredPay;// 离休人员医疗保障基金
+        private BigDecimal soldierPay;// 一至六级残疾军人医疗补助基金
+        private BigDecimal retiredOutptPay;// 离休老工人门慢保障基金
+        private BigDecimal injuryPay;// 工伤保险基金
+        private BigDecimal hallPay;// 厅级干部补助基金
+        private BigDecimal soldierToPay;// 军转干部医疗补助基金
+        private BigDecimal welfarePay;// 公益补充保险基金
+        private BigDecimal COVIDPay;// 新冠肺炎核酸检测财政补助
+        private BigDecimal familyPay;// 居民家庭账户金
+        private BigDecimal behalfPay;// 代缴基金（破产改制）
 }

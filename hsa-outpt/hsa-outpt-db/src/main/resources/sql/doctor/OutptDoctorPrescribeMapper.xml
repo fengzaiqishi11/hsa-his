@@ -1474,7 +1474,7 @@
         a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code, case when a.big_type_code = '3' then  '3' else '1' end type,
         <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
         case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end phCode,
-        '1' itemCode, case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
+        '1' itemCode, case when a.big_type_code = '2'  or a.big_type_code = '3' then b.cyf when a.big_type_code = '1'  or a.big_type_code = '3' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
         c.id rateId, d.id bfcId, ifnull(e.exec_dept_id,#{loginDeptId}) execDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, '1' typeCode, stock.num stockNum
         from base_drug a
@@ -1490,7 +1490,7 @@
         left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
         left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
         join stro_stock stock on (
-        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end
+        case when a.big_type_code = '2'  or a.big_type_code = '3'  then b.cyf when a.big_type_code = '1' or a.big_type_code = '3' then b.zcf when a.big_type_code = '0' then b.xyf end
         ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
         where a.hosp_code = #{hospCode} and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
         <if test="typeCode != null and typeCode != ''" >

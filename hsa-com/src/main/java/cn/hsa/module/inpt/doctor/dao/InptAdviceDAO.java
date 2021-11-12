@@ -821,4 +821,8 @@ public interface InptAdviceDAO {
      * @Return list
      */
     List<String> selectAdviceByDeptAndType (Map map);
+
+    InptAdviceDTO getLisInptAdvice(InptAdviceDTO inptAdviceDTO);
+
+    List<InptAdviceDTO> queryLisAdvice(InptAdviceDTO inptAdviceDTO);
 }

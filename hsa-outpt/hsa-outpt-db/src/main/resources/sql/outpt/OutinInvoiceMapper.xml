@@ -738,7 +738,7 @@
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice from (
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice,ifnull(os.acct_pay, 0.00) as acctPay from (
         SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
               ifnull(sum(a.preferential_price),0) as preferentialPrice,
 			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,

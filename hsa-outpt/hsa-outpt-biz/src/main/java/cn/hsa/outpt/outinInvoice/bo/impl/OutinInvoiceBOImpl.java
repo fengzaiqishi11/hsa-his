@@ -1063,6 +1063,8 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 				map.put("data",collect.get(key));
 				map.put("key",key);
 				map.put("sum",sum);
+				map.put("personalPrice", mid.get(0).getPersonalPrice());
+				map.put("miPrice", mid.get(0).getMiPrice());
 				list.add(map);
 			}
 		}

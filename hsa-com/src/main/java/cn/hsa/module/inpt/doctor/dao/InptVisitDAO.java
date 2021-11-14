@@ -487,4 +487,26 @@ public interface InptVisitDAO {
     BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 
     List<Map<String, Object>> queryNoMergePatients(Map<String, Object> paramMap);
+
+    /**
+     * @Method 办理医保预出院之前，需要保存个人累计信息
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/23 14:27
+     * @Return
+     **/
+    void insertPatientSumInfo(@Param("resultDataMap") List<Map<String, Object>> resultDataMap);
+
+    /**
+     * @Method deletePatientSumInfo
+     * @Desrciption  删除个人累计信息查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/26 9:37
+     * @Return
+    **/
+    void deletePatientSumInfo(Map<String, Object> map);
 }

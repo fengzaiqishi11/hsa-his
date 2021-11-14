@@ -7,6 +7,8 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
@@ -39,6 +41,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,6 +72,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     private OutptDoctorPrescribeService outptDoctorPrescribeService;
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService;
+
+    private final AtomicInteger atomicInteger = new AtomicInteger(1);
+
 
     /**
      * @Description: 门诊患者就诊信息上传，封装入参，调用统一支付平台接口，解析回参
@@ -84,6 +92,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(unifiedPayMap);
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         // 封装患者信息
@@ -153,12 +162,12 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 diagnoseMap.put("vali_flag", Constants.SF.S); // TODO 有效标志
                 mapList.add(diagnoseMap);
         }
+        JSONArray jsonArray = (JSONArray) unifiedPayMap.get("jsonArray");
         List<OutptDiagnoseDTO> collect = diagnoseDTOList.stream().filter(outptDiagnoseDTO1 -> "1".equals(outptDiagnoseDTO1.getIsMain())).collect(Collectors.toList());
-        OutptDiagnoseDTO diagnoseDTO = collect.get(0);
         if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
-            patientInfo.put("dise_code", diagnoseDTO.getInsureInllnessCode()); // TODO 病种编号
-            patientInfo.put("dise_codg", diagnoseDTO.getInsureInllnessCode()); // add by ljg 病种编号
-            patientInfo.put("dise_name", diagnoseDTO.getInsureInllnessName());  // TODO 病种名称
+            patientInfo.put("dise_code", jsonArray.getJSONObject(0).get("insureIllnessCode")); // TODO 病种编号
+            patientInfo.put("dise_codg", jsonArray.getJSONObject(0).get("insureIllnessCode")); // add by ljg 病种编号
+            patientInfo.put("dise_name", jsonArray.getJSONObject(0).get("insureIllnessName"));  // TODO 病种名称
 
         } else {
             patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006()); // TODO 病种编号
@@ -267,10 +276,12 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         unifiedPayMap.put("code", "HOSP_APPR_FLAG");
         String batchNo = MapUtils.get(unifiedPayMap, "batchNo").toString();
         String hospApprFlag = ""; // 医院审批标志
+        String hnFeedetlSn= ""; // 湖南费用流水号特有标识
         String hnSpecial = ""; // 针对海南特有的报销药
         String huNanSpecial = ""; // 针对湖南中药饮片报销
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(unifiedPayMap).getData();
@@ -285,6 +296,9 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     if ("hnSpecial".equals(key)) {
                         hnSpecial = MapUtils.get(stringObjectMap, key);
                     }
+                    if("hnFeedetlSn".equals(key)){ // 湖南省特有的费流水号标识
+                        hnFeedetlSn = MapUtils.get(stringObjectMap,key);
+                    }
                     if ("huNanSpecial".equals(key)) {
                         huNanSpecial = MapUtils.get(stringObjectMap, key);
                     }
@@ -294,6 +308,13 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         // 门诊费用明细（调统一支付平台入参）
         List<Map<String, Object>> list = new ArrayList<>();
         List<Map<String, Object>> costList = (List<Map<String, Object>>) unifiedPayMap.get("insureCostList");
+        String medinsCode = insureConfigurationDTO.getOrgCode();
+        String medicalRegNo  = insureIndividualVisitDTO.getMedicalRegNo();
+        unifiedPayMap.put("medicalRegNo",medicalRegNo);
+        unifiedPayMap.put("medinsCode",medinsCode);
+        unifiedPayMap.put("psnNo",insureIndividualVisitDTO.getAac001());
+        unifiedPayMap.put("visitId",insureIndividualVisitDTO.getVisitId());
+        String feeNum =  insureIndividualCostDAO.selectLastFeedSn(unifiedPayMap); // 判读是否是第一次传输
         if (!ListUtils.isEmpty(costList)) {
             Map<String, Object> tempMap = costList.get(0);
             String pracCertiNo = MapUtils.get(tempMap, "pracCertiNo");
@@ -306,10 +327,25 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     break;
                 }
             }
-
+            Integer k =1;
             for (Map<String, Object> map : costList) {
                 costInfoMap = new HashMap<>();
-                costInfoMap.put("feedetl_sn", MapUtils.get(map, "id")); // 费用明细流水号
+                if("1".equals(hnFeedetlSn)){
+                    if(StringUtils.isEmpty(feeNum)){
+                        atomicInteger.getAndAdd(2);
+                        costInfoMap.put("feedetl_sn", atomicInteger.get()); // 费用明细流水号
+                    }else{
+                        k = Integer.parseInt(feeNum);
+                        k+=2;
+                        feeNum = k.toString();
+                        costInfoMap.put("feedetl_sn",k) ; // 费用明细流水号
+                    }
+                }
+                else{
+                    costInfoMap.put("feedetl_sn", MapUtils.get(map, "id")); // 费用明细流水号
+                }
+                k=k+2;
+                costInfoMap.put("id", MapUtils.get(map, "id")); // 费用明细流水号
                 costInfoMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo()); // 就诊id
                 costInfoMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
                 if (StringUtils.isEmpty(batchNo)) {
@@ -327,7 +363,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("fee_ocur_time", DateUtils.format((Date) map.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
                 costInfoMap.put("med_list_codg", map.get("insureItemCode") == null ? "" : map.get("insureItemCode").toString()); // TODO 医疗目录编码
                 costInfoMap.put("medins_list_codg", map.get("hospItemCode") == null ? "" : map.get("hospItemCode").toString()); // TODO 医疗机构目录编码
-
+                costInfoMap.put("med_list_name", map.get("insureItemName") == null ? "" : map.get("insureItemName").toString()); // TODO 医疗机构目录编码
+                costInfoMap.put("lis_type", map.get("insureItemType") == null ? "" : map.get("insureItemType").toString()); // TODO 医疗机构目录编码
                 DecimalFormat df1 = new DecimalFormat("0.00");
                 String realityPrice = df1.format(BigDecimalUtils.convert(map.get("realityPrice").toString()));
                 costInfoMap.put("det_item_fee_sumamt", BigDecimalUtils.convert(realityPrice)); // 明细项目费用总额
@@ -387,6 +424,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("etip_hosp_code", null); // TODO 外检医院编码
                 costInfoMap.put("dscg_tkdrug_flag", null); // TODO 出院带药标志
                 costInfoMap.put("matn_fee_flag", null); // TODO 生育费用标志
+                costInfoMap.put("id",MapUtils.get(map, "id"));
                 list.add(costInfoMap);
             }
         }
@@ -399,7 +437,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
          */
         inputMap.put("infno", Constant.UnifiedPay.OUTPT.UP_2204);  // 交易编号
         inputMap.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());  //TODO 参保地医保区划
-        inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        inputMap.put("medins_code", medinsCode); //定点医药机构编号
         inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
@@ -422,10 +460,153 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         logger.info("统一支付平台门诊费用传输回参:" + resultJson);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "result");
-        updateInsureCost(resultDataMap, unifiedPayMap);
+        insertInsureCost(resultDataMap, unifiedPayMap,list);
+        insertPatientSumInfo(unifiedPayMap);
         return true;
     }
 
+
+
+    /**
+     * @Method updateInsureCost
+     * @Desrciption  费用传输以后：更新医保的反参数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/5/21 8:35
+     * @Return
+     **/
+    private void insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap, List<Map<String, Object>> list) {
+        String batchNo = MapUtils.get(unifiedPayMap,"batchNo").toString();
+        String hospCode  = MapUtils.get(unifiedPayMap,"hospCode");
+        String visitId = MapUtils.get(unifiedPayMap,"visitId");
+        String insureRegisterNo = MapUtils.get(unifiedPayMap,"medicalRegNo");
+        String crteName = MapUtils.get(unifiedPayMap,"crteName");
+        String crteId  = MapUtils.get(unifiedPayMap,"crteId");
+        String selfpayProp = ""; // 自付比例
+        String overlmtAmt = ""; // 超限价金额
+        String preselfpayAmt = ""; // 先行自付金额
+        String inscpScpAmt = ""; // 符合政策范围金额
+        String fulamtOwnpayAmt =  ""; // 全自费金额
+        String detItemFeeSumamt = ""; // 明细金额
+        InsureIndividualCostDTO insureIndividualCostDTO = null;
+        List<InsureIndividualCostDTO> individualCostDTOList = new ArrayList<>();
+        if(!ListUtils.isEmpty(list)){
+            Map<Object, Map<String, Object>> feedetlSnMap = list.stream().collect(Collectors.toMap(Map -> Map.get("feedetl_sn"), Map -> Map, (k1, k2) -> k1));
+            Map<Object, Map<String, Object>> newFeedetlSnMap = new HashMap<>();
+            if(!MapUtils.isEmpty(feedetlSnMap)){
+                for(Map.Entry entry : feedetlSnMap.entrySet()){
+                    newFeedetlSnMap.put(entry.getKey().toString(), (Map<String, Object>) entry.getValue());
+                }
+                if(!ListUtils.isEmpty(resultDataMap)){
+                    for(Map<String, Object> item : resultDataMap){
+                        DecimalFormat df1 = new DecimalFormat("0.00");
+                        String feedetlSn = MapUtils.get(item,"feedetl_sn");
+                        Map<String, Object> feedetlSnObjectMap = newFeedetlSnMap.get(feedetlSn);
+                        insureIndividualCostDTO = new InsureIndividualCostDTO();
+                        insureIndividualCostDTO.setId(SnowflakeUtils.getId());
+                        insureIndividualCostDTO.setHospCode(hospCode);
+                        insureIndividualCostDTO.setVisitId(visitId);//就诊id
+                        insureIndividualCostDTO.setSettleId(null);
+                        insureIndividualCostDTO.setBatchNo(batchNo);
+                        insureIndividualCostDTO.setIsHospital(Constants.SF.F);
+                        insureIndividualCostDTO.setItemType(MapUtils.get(feedetlSnObjectMap,"list_type"));
+                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"med_list_codg"));
+                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnObjectMap,"med_list_name"));
+                        insureIndividualCostDTO.setCostId(MapUtils.get(feedetlSnObjectMap,"id"));//费用id
+                        insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn")==null?"":MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
+                        insureIndividualCostDTO.setApplyLastPrice(null);
+                        insureIndividualCostDTO.setOrderNo(""); // 顺序号
+                        insureIndividualCostDTO.setTransmitCode("1"); // 是否传输标志
+                        insureIndividualCostDTO.setCrteId(crteId);
+                        insureIndividualCostDTO.setRxSn(null);
+                        insureIndividualCostDTO.setInsureSettleId(null);
+                        insureIndividualCostDTO.setCrteName(crteName);
+                        insureIndividualCostDTO.setCrteTime(DateUtils.getNow());
+                        insureIndividualCostDTO.setInsureRegisterNo(insureRegisterNo); // 就医登记号
+                        insureIndividualCostDTO.setIsHalfSettle(Constants.SF.F); // 是否中途结算
+                        insureIndividualCostDTO.setInsureIsTransmit("1");
+                        insureIndividualCostDTO.setPricUplmtAmt(null);
+                        insureIndividualCostDTO.setHiLmtpric(null);
+                        insureIndividualCostDTO.setOverlmtSelfpay(null);
+                        selfpayProp = DataTypeUtils.dataToNumString(MapUtils.get(item, "selfpay_prop")); // 自付比例
+                        overlmtAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "overlmt_amt")); // 超限价金额
+                        preselfpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "preselfpay_amt")); // 先行自付金额
+                        inscpScpAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "inscp_scp_amt")); // 符合政策范围金额
+                        fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fulamt_ownpay_amt")); // 全自费金额
+                        detItemFeeSumamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "det_item_fee_sumamt")); // 明细金额
+                        insureIndividualCostDTO.setPrimaryPrice(BigDecimalUtils.convert(MapUtils.get(feedetlSnObjectMap,"det_item_fee_sumamt")==null?"":MapUtils.get(feedetlSnObjectMap,"det_item_fee_sumamt").toString())); // 上传到医保的费用
+                        insureIndividualCostDTO.setGuestRatio(selfpayProp); // 自付比例
+                        insureIndividualCostDTO.setInscpScpAmt(BigDecimalUtils.convert(inscpScpAmt)); // 符合政策范围金额
+                        insureIndividualCostDTO.setFulamtOwnpayAmt(BigDecimalUtils.convert(fulamtOwnpayAmt));
+                        insureIndividualCostDTO.setOverlmtSelfpay(BigDecimalUtils.convert(overlmtAmt));
+                        insureIndividualCostDTO.setOverlmtAmt(BigDecimalUtils.convert(overlmtAmt));
+                        insureIndividualCostDTO.setPreselfpayAmt(BigDecimalUtils.convert(preselfpayAmt)); // 先行自付金额
+                        insureIndividualCostDTO.setDetItemFeeSumamt(BigDecimalUtils.convert(detItemFeeSumamt)); // 总金额
+                        insureIndividualCostDTO.setMedChrgitmType(MapUtils.get(item,"med_chrgitm_type")); //医疗收费项目类别
+                        insureIndividualCostDTO.setLmtUsedFlag(MapUtils.get(item,"lmt_used_flag"));
+                        insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item,"chrgitm_lv"));
+                        insureIndividualCostDTO.setSumFee(null); // 本次上传到医保的费用总金额
+                        insureIndividualCostDTO.setFeeStartTime(null);
+                        insureIndividualCostDTO.setFeeEndTime(null);
+                        insureIndividualCostDTO.setSettleCount(0); // 中途结算次数
+                        individualCostDTOList.add(insureIndividualCostDTO);
+                    }
+                }
+            }
+        }
+        if(!ListUtils.isEmpty(individualCostDTOList)){
+            insureIndividualCostDAO.batchInsertCost(individualCostDTOList);
+        }
+    }
+
+    /**
+     * @Method 门诊费用传输以后，需要保存个人累计信息
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/23 14:27
+     * @Return
+     **/
+    private void insertPatientSumInfo(Map<String, Object> map) {
+        String crteName = MapUtils.get(map,"crteName"); //  创建人姓名
+        String crteId = MapUtils.get(map,"crteId"); // 创建人id
+        String visitId = MapUtils.get(map,"visitId"); // 就诊id
+        String hospCode = MapUtils.get(map,"hospCode"); // 医院编码
+        String psnNo = MapUtils.get(map,"psnNo"); // 个人编号
+        String medisCode = MapUtils.get(map,"medinsCode"); // 医疗机构编码
+        String medicalRegNo = MapUtils.get(map,"medicalRegNo");
+        String batchNo = MapUtils.get(map,"batchNo").toString(); // 批次号
+        Map<String, Object> dataMap = insureUnifiedBaseService.queryPatientSumInfo(map).getData();
+        List<Map<String, Object>> resultDataMap = MapUtils.get(dataMap,"resultDataMap");
+        if(!ListUtils.isEmpty(resultDataMap)){
+            resultDataMap.stream().forEach(item->{
+                item.put("id",SnowflakeUtils.getId());
+                item.put("crteName",crteName);
+                item.put("medicalRegNo",medicalRegNo);
+                item.put("crteId",crteId);
+                item.put("visitId",visitId);
+                item.put("hospCode",hospCode);
+                item.put("psnNo",psnNo);
+                item.put("medisCode",medisCode);
+                item.put("batchNo",batchNo);
+                item.put("crteTime",DateUtils.getNow());
+            });
+            insureIndividualVisitDAO.deletePatientSumInfo(map);
+            insureIndividualVisitDAO.insertPatientSumInfo(resultDataMap);
+        }
+    }
+
+    /**
+     * @Method updateInsureCost
+     * @Desrciption  费用传输成功以后保留医保费用反参
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/29 8:56
+     * @Return
+    **/
     private void updateInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap) {
         String hospCode = MapUtils.get(unifiedPayMap, "hospCode");
         String visitId = MapUtils.get(unifiedPayMap, "visitId");
@@ -479,6 +660,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         String feeBatch = insureIndividualCostDAO.selectLastCostInfo(unifiedPayMap);
         // TODO 调用统一支付平台
@@ -532,7 +714,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         if (!MapUtils.get(resultMap, "infcode").equals("0")) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
-        Map<String, Object> resultDataMap = JSON.parseObject((String) resultMap.get("data")); //(Map<String, Object>) resultMap.get("data");
         return true;
 
     }
@@ -560,6 +741,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
 
         /**
@@ -778,36 +960,30 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         /**
          * 第一部分回参
          */
-        String ake039 = outDataMap.get("hifp_pay").toString(); //医疗保险统筹基金支付
-        String ake035 = outDataMap.get("cvlserv_pay").toString(); // 公务员医疗补助基金支付
-        String ake026 = outDataMap.get("hifes_pay").toString();//企业补充医疗保险基金支付
-        String ake029 = outDataMap.get("hifob_pay").toString();//大额医疗费用补助基金支付
-        String bka841 = "";//单位支付
-        String bka842 = ""; //医院垫付 ---- 医院负担金额
-        String bka840 = "";//其他基金支付 -------- 基金支付总额
-        String bka821 = "";// //民政救助金支付
-        String bka839 = outDataMap.get("oth_pay").toString();//其他支付
-
-
+        paramMap.put("akc264", outDataMap.get("medfee_sumamt").toString());//医疗总费用
+        // 全自费费用
+        String fulamtOwnpayAmt = outDataMap.get("fulamt_ownpay_amt") == null ? "0" : outDataMap.get("fulamt_ownpay_amt").toString();
+        paramMap.put("bka825", fulamtOwnpayAmt);//全自费费用
+        paramMap.put("bka826", outDataMap.get("overlmt_selfpay").toString());//部分自费费用 ---  超限价自费费用
+        paramMap.put("preselfpayAmt", outDataMap.get("preselfpay_amt").toString());//先行自付金额
+        paramMap.put("inscpScpAmt",outDataMap.get("inscp_scp_amt").toString()); // 符合政策范围金额
         paramMap.put("aka151", outDataMap.get("act_pay_dedc").toString()); //起付线费用 -----  实际支付起付线
-        paramMap.put("akb066", outDataMap.get("acct_pay").toString());//个人账户支付 --------- 个人账户支出
-        paramMap.put("akb067", outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
-        paramMap.put("akc264", outDataMap.get("medfee_sumamt").toString());//医疗总费用akc264 = bka831 + bka832+bka842 --------医疗费总额
-        paramMap.put("ake026", ake026);  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
+        String ake039 = outDataMap.get("hifp_pay").toString(); //医疗保险统筹基金支付
+        paramMap.put("poolPropSelfpay",outDataMap.get("pool_prop_selfpay").toString());// 基本医疗保险统筹基金支付比例
+        paramMap.put("ake035", outDataMap.get("cvlserv_pay").toString());//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
+        paramMap.put("ake026", outDataMap.get("hifes_pay").toString());  //企业补充医疗保险基金支付  -----企业补充医疗保险基金支出
         String hifmiPay = outDataMap.get("hifmi_pay").toString();
         String hifobPay = outDataMap.get("hifob_pay").toString();
-        paramMap.put("ake029", BigDecimalUtils.add(hifmiPay,hifobPay).toString());//大额医疗费用补助基金支付 ---- 职工大额医疗费用补助基金支出
-        paramMap.put("ake035", ake035);//公务员医疗补助基金支付  ---- 公务员医疗补助资金支出
+        paramMap.put("ake029", BigDecimalUtils.add(hifmiPay,hifobPay).toString());//大额医疗费用补助基金支付 ---- 职工+居民合计一个字段
+        paramMap.put("mafPay",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
+        //paramMap.put("bka821", outDataMap.get("maf_pay").toString());//民政救助金支付
+        String bka839 = outDataMap.get("oth_pay").toString();//其他支付
+        paramMap.put("akb066", outDataMap.get("acct_pay").toString());//个人账户支付 --------- 个人账户支出
+        paramMap.put("akb067", outDataMap.get("psn_cash_pay").toString()); //个人现金支付 ----------个人现金支出
         paramMap.put("ake039", ake039); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
-        paramMap.put("bka801", null); //床位费超额金额
-        paramMap.put("bka821", outDataMap.get("maf_pay").toString());//民政救助金支付
+        paramMap.put("hospPrice", outDataMap.get("hosp_part_amt").toString()); //医院负担金额
+        paramMap.put("acctMulaidPay", outDataMap.get("acct_mulaid_pay").toString()); //个人账户共计支付金额
 
-        Object fulamtOwnpayAmt = outDataMap.get("fulamt_ownpay_amt");
-        if (fulamtOwnpayAmt == null || "null".equals(fulamtOwnpayAmt)) {
-            fulamtOwnpayAmt = "0";
-        }
-        paramMap.put("bka825", fulamtOwnpayAmt.toString());//全自费费用     ---- 全自费金额
-        paramMap.put("bka826", outDataMap.get("overlmt_selfpay").toString());//部分自费费用 ---  超限价自费费用
         String fundPaySumamt = outDataMap.get("fund_pay_sumamt").toString(); // 医保支付
         String acctPay = outDataMap.get("acct_pay").toString(); // 个人账户
         String bka832 = fundPaySumamt;
@@ -818,14 +994,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
 
         paramMap.put("bka831", BigDecimalUtils.subtract(outDataMap.get("medfee_sumamt").toString(), bka832).toString()); // 个人现金自付bka831 = 医疗总费用 - 医保基金 - 刷卡金额
         paramMap.put("bka832", bka832);//医保支付bka832 = ake039 + ake035 + ake026 + ake029+ bka841 + bka840 + bka821 + bka843 + bka844 + bka845
-        paramMap.put("bka838", null);//超共付段费用个人自付 ---  超限价自费费用
-        paramMap.put("bka839", bka839);//其他支付
-        paramMap.put("bka840", null);//其他基金支付 -------- 基金支付总额
-        paramMap.put("bka841", bka841);//单位支付
-        paramMap.put("bka842", bka842);//医院垫付 ---- 医院负担金额
-        paramMap.put("bka843", null);//特惠保
-        paramMap.put("bka844", outDataMap.get("hosp_part_amt").toString());//医院减免
-        paramMap.put("bka845", null);//政府兜底
         if ("settle".equals(outDataMap.get("action") == null ? "" : outDataMap.get("action").toString())) {
             paramMap.put("action", "settle");
             paramMap.put("setl_id", outDataMap.get("setl_id").toString());
@@ -839,7 +1007,95 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             paramMap.put("setldetailList", MapUtils.get(outDataMap, "setldetailList"));
         }
         paramMap.put("aaz217", MapUtils.get(outDataMap, "aaz217"));
+
+        // 处理基金信息
+        Map<String,Object> setDetailMap = this.doResultSetdetailList(outDataMap);
+
+        // 合并
+        Map<String, Object> combineResultMap = new HashMap<>();
+        combineResultMap.putAll(paramMap);
+        combineResultMap.putAll(setDetailMap);
         return paramMap;
+    }
+
+    // 保存试算基金信息
+    private Map<String, Object> doResultSetdetailList(Map<String, Object> outDataMap) {
+        Map <String,Object> resultMap = new HashMap<>();
+        List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
+        if (!ListUtils.isEmpty(setldetailList)) {
+            for (Map<String,Object> map : setldetailList) {
+                String fundPayType = MapUtils.get(map,"fund_pay_type");
+                String fundPayamt = MapUtils.get(map,"fund_payamt");
+                switch (fundPayType) {
+                    case "630100": // 医院减免金额
+                        resultMap.put("hospExemAmount",fundPayamt);
+                        break;
+                    /*case "610100": // 医疗救助基金
+                        resultMap.put("mafPay",fundPayamt);
+                        break;*/
+                    case "330200": // 职工意外伤害基金
+                        resultMap.put("acctInjPay",fundPayamt);
+                        break;
+                    case "390400": // 居民意外伤害基金
+                        resultMap.put("retAcctInjPay",fundPayamt);
+                        break;
+                    case "640100": // 政府兜底基金
+                        resultMap.put("governmentPay",fundPayamt);
+                        break;
+                    case "620100": // 特惠保补偿金
+                        resultMap.put("thbPay",fundPayamt);
+                        break;
+                    case "999996": // 医院垫付基金
+                        resultMap.put("hospPrice",fundPayamt);
+                        break;
+                    case "610200": // 优抚对象医疗补助基金
+                        resultMap.put("carePay",fundPayamt);
+                        break;
+                    case "999109": // 农村低收入人口医疗补充保险
+                        resultMap.put("lowInPay",fundPayamt);
+                        break;
+                    case "999997": // 其他基金
+                        resultMap.put("othPay",fundPayamt);
+                        break;
+                    case "510100": // 生育基金
+                        resultMap.put("fertilityPay",fundPayamt);
+                        break;
+                    case "340100": // 离休人员医疗保障基金
+                        resultMap.put("retiredPay",fundPayamt);
+                        break;
+                    case "350100": // 一至六级残疾军人医疗补助基金
+                        resultMap.put("soldierPay",fundPayamt);
+                        break;
+                    case "340200": // 离休老工人门慢保障基金
+                        resultMap.put("retiredOutptPay",fundPayamt);
+                        break;
+                    case "410100": // 工伤保险基金
+                        resultMap.put("injuryPay",fundPayamt);
+                        break;
+                    case "320200": //  厅级干部补助基金
+                        resultMap.put("hallPay",fundPayamt);
+                        break;
+                    case "310400": //  军转干部医疗补助基金
+                        resultMap.put("soldierToPay",fundPayamt);
+                        break;
+                    case "370200": //  公益补充保险基金
+                        resultMap.put("welfarePay",fundPayamt);
+                        break;
+                    case "99999707": //  新冠肺炎核酸检测财政补助
+                        resultMap.put("COVIDPay",fundPayamt);
+                        break;
+                    case "390500": //  居民家庭账户金
+                        resultMap.put("familyPay",fundPayamt);
+                        break;
+                    case "310500": //  代缴基金（破产改制）
+                        resultMap.put("behalfPay",fundPayamt);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return resultMap;
     }
 
 
@@ -906,6 +1162,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         String functionCode = Constant.UnifiedPay.OUTPT.UP_2201;
         String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
@@ -1014,6 +1271,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
         /**
@@ -1092,6 +1350,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
         Map<String, Object> httpMap = new HashMap<>();

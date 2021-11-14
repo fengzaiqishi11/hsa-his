@@ -403,7 +403,8 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 婴儿费用
     private BigDecimal babyCost;
-
+    // 查询标志
+    private String clinicalFlag;
     // 是否在路径内
     private String isClinicalList;
     // 路径状态
@@ -423,4 +424,26 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 剂型
      */
     private String prepCode;
+
+    //结算时间
+    private String settleStartTime;
+    //结算时间
+    private String settleEndTime;
+    /**
+     * 合并结算总费用
+     */
+    private BigDecimal totalMergeCost;
+
+    /**
+     * 合并结算预交金余额
+     */
+    private BigDecimal totalMergeBalance;
+    /**
+     * 发药药房名字
+     */
+    private String pharName;
+    /**
+     * 发药药房id
+     */
+    private String pharId;
 }

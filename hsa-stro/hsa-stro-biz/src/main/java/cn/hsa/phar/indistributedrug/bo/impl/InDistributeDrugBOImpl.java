@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
 
 /**
 * @Package_name: cn.hsa.phar.indistributedrug.bo
@@ -63,6 +64,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
 
     @Resource
     PharInWaitReceiveDAO pharInWaitReceiveDao;
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * @Method: getInRecivePage
@@ -126,15 +129,23 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
     @Override
     public Map<String, List<PharInReceiveDetailDTO>> getInReviceDetail(PharInReceiveDetailDTO pharInReceiveDetailDTO) {
         List<PharInReceiveDetailDTO> inReviceDetail = inDistributeDrugDAO.getInReviceDetail(pharInReceiveDetailDTO);
+        inReviceDetail = inReviceDetail.stream().sorted(Comparator.comparing(e -> Integer.parseInt(e.getSeqNo()))).collect(Collectors.toList()); ;
+        Map<String, List<PharInReceiveDetailDTO>> collect  = new LinkedHashMap<>() ;
 
-        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(a -> a.getSeqNo(), Collectors.toList()));
-        collect = collect.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (oldVal, newVal) -> oldVal,
-                        LinkedHashMap::new
-                ));
+        for(PharInReceiveDetailDTO pharInReceiveDetailDTO1 : inReviceDetail){
+            if(!collect.containsKey(pharInReceiveDetailDTO1.getVisitId())){
+                collect.put(pharInReceiveDetailDTO1.getVisitId(),new ArrayList<>());
+            }
+            collect.get(pharInReceiveDetailDTO1.getVisitId()).add(pharInReceiveDetailDTO1);
+        }
+//        Map<String, List<PharInReceiveDetailDTO>> collect = inReviceDetail.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getVisitId));
+//        collect = collect.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(
+//                Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        Map.Entry::getValue,
+//                        (oldVal, newVal) -> oldVal,
+//                        LinkedHashMap::new
+//                ));
         return collect;
     }
 
@@ -341,11 +352,18 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
      **/
     @Override
     public Boolean updateInDistribute(PharInReceiveDTO pharInReceiveDTO) {
+        //校验必填信息
+        if(StringUtils.isEmpty(pharInReceiveDTO.getId())){
+            throw new AppException("领药申请ID为空,配药失败");
+        }
+        // 查看当前领药申请id是否正在进行发药
+        String key = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYFY").
+                append(pharInReceiveDTO.getId()).append(Constants.INPT_DISTRIBUTE_REDIS_KEY).toString();
+        if (StringUtils.isNotEmpty(redisUtils.get(key)) || redisUtils.hasKey(key)){
+            throw new AppException("该单据正在进行发药，请不要重复发药");
+        }
         try {
-            //校验必填信息
-            if(StringUtils.isEmpty(pharInReceiveDTO.getId())){
-                throw new AppException("领药申请ID为空,配药失败");
-            }
+            redisUtils.set(key,pharInReceiveDTO.getId(),600);
 
             //根据id获取住院领药申请对象
             PharInReceiveDO inReceiveDO = inDistributeDrugDAO.getInReceiveById(pharInReceiveDTO);
@@ -493,6 +511,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         } catch (NoSuchMethodException e) {
             log.error("发药失败",e.getMessage());
             throw new AppException("发药失败");
+        }finally {
+            redisUtils.del(key);
         }
         return true;
     }

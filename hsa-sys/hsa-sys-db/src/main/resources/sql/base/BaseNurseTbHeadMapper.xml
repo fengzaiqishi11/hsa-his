@@ -45,7 +45,8 @@
                a.crte_id,
                a.crte_name,
                a.crte_time,
-               b.is_vertical
+               b.is_vertical,
+               b.top_height
         from base_nurse_tbhead a
         left join base_nurse_order b on a.hosp_code = b.hosp_code and a.bno_code = b.code
         where a.hosp_code = #{hospCode}

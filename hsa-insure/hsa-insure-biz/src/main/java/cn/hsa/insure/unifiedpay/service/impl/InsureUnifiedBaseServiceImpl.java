@@ -414,9 +414,32 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
         return  WrapperResponse.success(insureUnifiedBaseBO.querySettleDeInfo(map));
     }
 
+    /**
+     * @Method queryPolicyInfo
+     * @Desrciption  政策项查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/10/23 15:47
+     * @Return
+     **/
     @Override
     public WrapperResponse<Map<String, Object>> queryPolicyInfo(Map<String, Object> map) {
         return  WrapperResponse.success(insureUnifiedBaseBO.queryPolicyInfo(map));
+    }
+
+    /**
+     * @param map
+     * @Method checkOneSettle
+     * @Desrciption 判读是否打印一站式结算单
+     * @Param map insureIndividualVisitDTO
+     * @Author fuhui
+     * @Date 2021/10/23 15:20
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> checkOneSettle(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.checkOneSettle(map));
     }
 
 }

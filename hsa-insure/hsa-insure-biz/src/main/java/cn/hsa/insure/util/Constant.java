@@ -587,6 +587,31 @@ public interface Constant {
 
         }
 
+        public static class YWLX {
+            public static final String PTMZ = "11"; // 普通门诊
+            public static final String GH = "12"; // 门诊挂号
+            public static final String JZ = "13"; // 急诊
+            public static final String MZMXB = "14"; // 门诊慢性病(特门)
+            public static final String MZTC = "15"; // 门诊统筹
+            public static final String MZTSB = "16"; // 门诊特殊病
+            public static final String PTZY = "21"; // 普通住院
+            public static final String WSZY = "22"; // 外伤住院
+            public static final String ZWZZZY = "22"; // 转外诊治住院
+            public static final String SYMZ = "51"; // 生育门诊
+            public static final String SYZY = "52"; // 生育住院
+            public static final String DBZZY = "2102"; // 单病种住院
+            public static final String PTZYWZM = "2101"; // 普通住院（未转码）
+            public static final String SYPCJM = "2106"; // 生育平产(居民)
+            public static final String SYPGCJM = "2107"; // 生育剖宫产(居民)
+            public static final String MXLB = "9901"; // 门诊两病
+            public static final String YWSHMZ = "9903"; // 意外伤害门诊
+            public static final String DBTY = "9904"; // 大病特药
+
+
+        }
+
+
+
         /**
          * 新医保电子凭证扫码读卡政策
          */
@@ -792,11 +817,27 @@ public interface Constant {
 
             public static final String UP_8201 = "8201"; // 获取医院库房列表
             public static final String UP_8202 = "8202"; // 药品获取挂网目录列表
+            public static final String UP_8501 = "8501"; // 药品库存查询
+            public static final String UP_8502 = "8502"; // 药品库存上传变更
             public static final String UP_8503 = "8503"; // 药品销售列表查询
             public static final String UP_8504 = "8504"; // 药品销售
             public static final String UP_8505 = "8505"; // 药品销售退货
+            public static final String UP_8506 = "8506"; // 耗材库存查询
+            public static final String UP_8507 = "8507"; // 耗材库存上传变更
+            public static final String UP_8508 = "8508"; // 耗材销售列表查询
+            public static final String UP_8509 = "8509"; // 耗材销售
+            public static final String UP_8510 = "8510"; // 耗材销售退货
+
 
         }
+
+        public static class XZLX {
+            public static final String CZZG = "310"; // 城镇职工
+            public static final String CXJM = "390"; // 城乡居民
+            public static final String LX = "340"; // 离休
+        }
     }
+
+
 
 }

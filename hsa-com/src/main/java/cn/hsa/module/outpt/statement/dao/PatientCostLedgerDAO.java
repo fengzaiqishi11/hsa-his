@@ -813,4 +813,58 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Date: 2021/10/16
    */
   List<Map> queryStroBusinessSummaryByMaterialClassification(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod getMedicalFinanceMzTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/22 15:30
+   * @Return List<OutptCostDTO>
+   **/
+  List<OutptCostDTO> getMzMedicalFinanceTitle(OutptVisitDTO outptVisitDTO);
+
+    /**
+     * @Menthod getMzMedicalFinanceList
+     * @Desrciption  查询门诊财务分类明细
+     * @Param outptVisitDTO
+     * @Author liuliyun
+     * @Date   2021/10/22 16:17
+     * @Return List<Map>
+     **/
+  List<Map> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod getMzMedicalRegisterList
+   * @Desrciption  查询门诊财务分类明细
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 8:52
+   * @Return List<Map>
+   **/
+  List<Map> getMzMedicalRegisterList(OutptVisitDTO outptVisitDTO);
+
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption  查询住院财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 10:51
+   * @Return List<Map>
+   **/
+  List<Map> getInptFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptFinanceTitle
+   * @Desrciption  查询门诊财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 10:52
+   * @Return List<Map>
+   **/
+  List<InptCostDTO> getInptFinanceTitle(InptVisitDTO inptVisitDTO);
+
+
+
 }

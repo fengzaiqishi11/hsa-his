@@ -292,6 +292,8 @@ public class StroPurchaseBOImpl extends HsafBO implements StroPurchaseBO {
             strings.add("1");
           } else if(loginType.contains("3")){
             strings.add("2");
+          } else if(loginType.contains("4")){ // 藏药
+              strings.add("3");
           }
         }
         baseDrugDTO.setBigTypeCodeLsit(strings);

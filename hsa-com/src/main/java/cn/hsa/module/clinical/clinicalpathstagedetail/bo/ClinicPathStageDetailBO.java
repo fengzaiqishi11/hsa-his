@@ -5,6 +5,7 @@ import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.clinical.clinicalpathstagedetail.dao
@@ -107,4 +108,7 @@ public interface ClinicPathStageDetailBO {
   * @Return java.util.List<cn.hsa.base.TreeMenuNode>
   **/
   List<TreeMenuNode> queryClinicalPathTree(ClinicPathStageDetailDTO clinicPathStageDetailDTO);
+
+  Map queryClinicalPrint(ClinicPathStageDetailDTO clinicPathStageDetailDTO);
+
 }

@@ -153,4 +153,21 @@ public class ClinicPathStageDetailServiceImpl extends HsafService implements Cli
     List<TreeMenuNode> treeMenuNodes = TreeUtils.buildByRecursive(treeMenuNodeList, "-2");
     return WrapperResponse.success(treeMenuNodes);
   }
+
+  /**
+  * @Menthod queryClinicalPrint
+  * @Desrciption 临床路径打印
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/28 9:25
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+  **/
+  @Override
+  public WrapperResponse<Map> queryClinicalPrint(Map map) {
+    ClinicPathStageDetailDTO clinicPathStageDetailDTO = MapUtils.get(map,"clinicPathStageDetailDTO");
+    return WrapperResponse.success(clinicPathStageDetailBO.queryClinicalPrint(clinicPathStageDetailDTO));
+  }
 }

@@ -3,8 +3,10 @@ package cn.hsa.module.clinical;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.clinical.clinicalpathstagedetail.dto.ClinicPathStageDetailDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.dto.InptClinicalPathStageDTO;
 import cn.hsa.module.clinical.inptclinicalpathstage.service.InptClinicalPathStageService;
+import cn.hsa.module.clinical.inptclinicalpathstate.dto.InptClinicalPathStateDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +123,29 @@ public class InptClinicalPathStageController extends BaseController {
     map.put("hospCode",sysUserDTO.getHospCode());
     map.put("inptClinicalPathStageDTO",inptClinicalPathStageDTO);
     return inptClinicalPathStageService_consumer.saveInptClinicalPathStage(map);
+  }
+
+
+
+  /**
+  * @Menthod queryNotExecItem
+  * @Desrciption  查询阶段未执行项目
+  *
+  * @Param
+  * [inptClinicalPathStateDTO, req, res]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/10/26 10:29
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+  **/
+  @PostMapping("/queryNotExecItem")
+  public WrapperResponse<List<ClinicPathStageDetailDTO>> queryNotExecItem(@RequestBody InptClinicalPathStageDTO inptClinicalPathStageDTO, HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO sysUserDTO = getSession(req, res);
+    inptClinicalPathStageDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("hospCode",sysUserDTO.getHospCode());
+    map.put("inptClinicalPathStageDTO",inptClinicalPathStageDTO);
+    return inptClinicalPathStageService_consumer.queryNotExecItem(map);
   }
 
   /**

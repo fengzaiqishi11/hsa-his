@@ -2,54 +2,54 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hsa.module.inpt.nurse.dao.InptAdviceExecDAO">
 
-    <resultMap type="cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO" id="InptAdviceExecMap">
-        <result property="id" column="id" jdbcType="VARCHAR"/>
-        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
-        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
-        <result property="adviceDetailId" column="advice_detail_id" jdbcType="VARCHAR"/>
-        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
-        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
-        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
-        <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
-        <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
-        <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
-        <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
-        <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
-        <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
-        <result property="secondExecId" column="second_exec_id" jdbcType="VARCHAR"/>
-        <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
-        <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
-        <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
-        <result property="remark" column="remark" jdbcType="VARCHAR"/>
-        <result property="isPrint" column="is_print" jdbcType="VARCHAR"/>
-        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
-        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
-        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
-        <result property="adviceDoctor" column="adviceDoctor" jdbcType="VARCHAR"/>
-        <result property="content" column="content" jdbcType="VARCHAR"/>
-        <result property="stopTime" column="stop_time" jdbcType="TIMESTAMP"/>
-        <result property="startTime" column="startTime" jdbcType="TIMESTAMP"/>
-        <result property="signCodeJudge" column="signCodeJudge" jdbcType="VARCHAR"/>
-        <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
-        <result property="spec" column="spec" jdbcType="VARCHAR"/>
-        <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
-        <result property="dosage" column="dosage" jdbcType="VARCHAR"/>
-        <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
-        <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
-        <result property="rateRemark" column="rateRemark" jdbcType="VARCHAR"/>
-        <result property="sourceIaId" column="sourceIaId" jdbcType="VARCHAR"/>
+  <resultMap type="cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO" id="InptAdviceExecMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+    <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+    <result property="adviceDetailId" column="advice_detail_id" jdbcType="VARCHAR"/>
+    <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+    <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+    <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+    <result property="execDeptId" column="exec_dept_id" jdbcType="VARCHAR"/>
+    <result property="signCode" column="sign_code" jdbcType="VARCHAR"/>
+    <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
+    <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
+    <result property="execId" column="exec_id" jdbcType="VARCHAR"/>
+    <result property="execName" column="exec_name" jdbcType="VARCHAR"/>
+    <result property="secondExecId" column="second_exec_id" jdbcType="VARCHAR"/>
+    <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
+    <result property="isSkin" column="is_skin" jdbcType="VARCHAR"/>
+    <result property="isPositive" column="is_positive" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="isPrint" column="is_print" jdbcType="VARCHAR"/>
+    <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+    <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    <result property="adviceDoctor" column="adviceDoctor" jdbcType="VARCHAR"/>
+    <result property="content" column="content" jdbcType="VARCHAR"/>
+    <result property="stopTime" column="stop_time" jdbcType="TIMESTAMP"/>
+    <result property="startTime" column="startTime" jdbcType="TIMESTAMP"/>
+    <result property="signCodeJudge" column="signCodeJudge" jdbcType="VARCHAR"/>
+    <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
+    <result property="spec" column="spec" jdbcType="VARCHAR"/>
+    <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+    <result property="dosage" column="dosage" jdbcType="VARCHAR"/>
+    <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
+    <result property="usageCode" column="usage_code" jdbcType="VARCHAR"/>
+    <result property="rateRemark" column="rateRemark" jdbcType="VARCHAR"/>
+    <result property="sourceIaId" column="sourceIaId" jdbcType="VARCHAR"/>
 
-    </resultMap>
+  </resultMap>
 
-    <delete id="deleteByParams">
-        <foreach collection="kcbzList" item="item" separator=";">
-            delete from inpt_advice_exec where hosp_code=#{item.hospCode}
-            and advice_id=#{item.adviceId} and DATE_FORMAT(plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{item.time},'%Y-%m-%d')
-        </foreach>
-    </delete>
+  <delete id="deleteByParams">
+    <foreach collection="kcbzList" item="item" separator=";">
+      delete from inpt_advice_exec where hosp_code=#{item.hospCode}
+      and advice_id=#{item.adviceId} and DATE_FORMAT(plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{item.time},'%Y-%m-%d')
+    </foreach>
+  </delete>
 
-    <!--单个查询-->
-    <select id="getInptAdviceExecById" resultMap="InptAdviceExecMap">
+  <!--单个查询-->
+  <select id="getInptAdviceExecById" resultMap="InptAdviceExecMap">
         select
           id, hosp_code, advice_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time, exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time
         from inpt_advice_exec
@@ -57,315 +57,321 @@
         and id = #{id}
     </select>
 
-    <!--查询指定行数据-->
-    <select id="queryInptAdviceExecPage" resultMap="InptAdviceExecMap">
-        select
-          id, hosp_code, advice_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time, exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time
-        from inpt_advice_exec
-        where hosp_code = #{hospCode}
-        <if test="visitId != null and visitId !=''">
-            and visit_id = #{visitId}
-        </if>
+  <!--查询指定行数据-->
+  <select id="queryInptAdviceExecPage" resultMap="InptAdviceExecMap">
+    select
+    id, hosp_code, advice_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time, exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time
+    from inpt_advice_exec
+    where hosp_code = #{hospCode}
+    <if test="visitId != null and visitId !=''">
+      and visit_id = #{visitId}
+    </if>
 
-    </select>
+  </select>
 
-    <!--分页查询医嘱相关信息-->
-    <select id="queryInptAdvicePage" resultMap="InptAdviceExecMap">
-        select
-        e.crte_name adviceDoctor,
-        e.content,
-        e.stop_time,
-        e.long_start_time startTime,
-        e.group_no,
-        c.id, c.hosp_code, c.advice_id, c.advice_detail_id,c.visit_id, c.baby_id, c.dept_id, c.exec_dept_id, c.sign_code, c.sign_code as signCodeJudge, c.plan_exec_time, c.exec_time,
-        c.exec_id, c.exec_name, c.second_exec_id, c.second_exec_name, c.is_skin, c.is_positive, c.remark, c.is_print,c.skin_result_code,
-        c.crte_id, c.crte_name, c.crte_time, e.spec,
-        if(e.is_long=0,'长期','临时') is_long,
-        e.dosage,
-        e.dosage_unit_code,
-        e.usage_code,
-        (select te.pym from base_rate te where te.hosp_code = e.hosp_code and te.id = e.rate_id) rateRemark,e.source_ia_id sourceIaId,
-        (select b.name from inpt_baby b where b.hosp_code = e.hosp_code and b.id = e.baby_id) babyName
-        FROM
-        inpt_advice_exec c,
-        inpt_advice e
-        WHERE
-        e.hosp_code = e.hosp_code
-        AND c.advice_id = e.id
-        AND c.hosp_code = #{hospCode}
-        <if test="visitId != null and visitId !=''">
-            and c.visit_id = #{visitId}
-        </if>
-        <if test="adviceId != null and adviceId !=''">
-            and c.advice_id = #{adviceId}
-        </if>
-        <if test="adviceDetailId != null and adviceDetailId !=''">
-            and c.advice_detail_id = #{adviceDetailId}
-        </if>
-        <if test="planExecTime != null">
-            and DATE_FORMAT(c.plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{planExecTime},'%Y-%m-%d')
-        </if>
-        <if test="signCode != null and signCode !=''">
-            and c.sign_code = #{signCode}
-        </if>
-        <if test='isLong!=null and isLong!="" and isLong != "2"'>
-            and e.is_long = #{isLong}
-        </if>
-        <if test="startTime != null">
-          and e.long_start_time >= DATE_FORMAT(#{startTime},'%Y-%m-%d')
-        </if>
-        <if test="stopTime != null">
-          and e.long_start_time &lt;= DATE_ADD(DATE_FORMAT(#{stopTime},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-
-
-        <if test="execStartTime != null">
-            and  c.exec_time > DATE_FORMAT(#{execStartTime},'%Y-%m-%d')
-        </if>
-        <if test="execEndTime != null">
-            and  c.exec_time &lt;= DATE_ADD(DATE_FORMAT(#{execEndTime},'%Y-%m-%d'),INTERVAL 1 day)
-        </if>
-        <if test='queryBaby =="Y"'>
-            and (c.baby_id is not null and c.baby_id != '')
-        </if>
-        <if test='queryBaby =="N"'>
-            and (c.baby_id is null or c.baby_id = '')
-        </if>
-        <if test="babyId != null and babyId != ''">
-            AND c.baby_id = #{babyId}
-        </if>
-        order by c.sign_code asc,c.plan_exec_time asc,e.group_no asc,e.group_seq_no asc
-    </select>
+  <!--分页查询医嘱相关信息-->
+  <select id="queryInptAdvicePage" resultMap="InptAdviceExecMap">
+    select
+    e.crte_name adviceDoctor,
+    e.content,
+    e.stop_time,
+    e.long_start_time startTime,
+    e.group_no,
+    c.id, c.hosp_code, c.advice_id, c.advice_detail_id,c.visit_id, c.baby_id, c.dept_id, c.exec_dept_id, c.sign_code, c.sign_code as signCodeJudge, c.plan_exec_time, c.exec_time,
+    c.exec_id, c.exec_name, c.second_exec_id, c.second_exec_name, c.is_skin, c.is_positive, c.remark, c.is_print,c.skin_result_code,
+    c.crte_id, c.crte_name, c.crte_time, e.spec,
+    if(e.is_long=0,'长期','临时') is_long,
+    e.dosage,
+    e.dosage_unit_code,
+    e.usage_code,
+    (select te.pym from base_rate te where te.hosp_code = e.hosp_code and te.id = e.rate_id) rateRemark,e.source_ia_id sourceIaId,
+    (select b.name from inpt_baby b where b.hosp_code = e.hosp_code and b.id = e.baby_id) babyName
+    FROM
+    inpt_advice_exec c,
+    inpt_advice e
+    WHERE
+    e.hosp_code = e.hosp_code
+    AND c.advice_id = e.id
+    AND c.hosp_code = #{hospCode}
+    <if test="visitId != null and visitId !=''">
+      and c.visit_id = #{visitId}
+    </if>
+    <if test="adviceId != null and adviceId !=''">
+      and c.advice_id = #{adviceId}
+    </if>
+    <if test="adviceDetailId != null and adviceDetailId !=''">
+      and c.advice_detail_id = #{adviceDetailId}
+    </if>
+    <if test="planExecTime != null">
+      and DATE_FORMAT(c.plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{planExecTime},'%Y-%m-%d')
+    </if>
+    <if test="signCode != null and signCode !='' and canceFlag != '1'.toString()">
+      and c.sign_code = #{signCode}
+    </if>
+    <if test="canceFlag != null and canceFlag == '1'.toString()">
+      and c.sign_code in ("2","3")
+    </if>
+    <if test='isLong!=null and isLong!="" and isLong != "2"'>
+      and e.is_long = #{isLong}
+    </if>
+    <if test="startTime != null">
+      and e.long_start_time >= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+    </if>
+    <if test="stopTime != null">
+      and e.long_start_time &lt;= DATE_ADD(DATE_FORMAT(#{stopTime},'%Y-%m-%d'),INTERVAL 1 day)
+    </if>
 
 
-    <!--单个新增-->
-    <insert id="insertInptAdviceExec" keyProperty="id" useGeneratedKeys="true">
+    <if test="execStartTime != null">
+      and  c.exec_time > DATE_FORMAT(#{execStartTime},'%Y-%m-%d')
+    </if>
+    <if test="execEndTime != null">
+      and  c.exec_time &lt;= DATE_ADD(DATE_FORMAT(#{execEndTime},'%Y-%m-%d'),INTERVAL 1 day)
+    </if>
+    <if test='queryBaby =="Y"'>
+      and (c.baby_id is not null and c.baby_id != '')
+    </if>
+    <if test='queryBaby =="N"'>
+      and (c.baby_id is null or c.baby_id = '')
+    </if>
+    <if test="babyId != null and babyId != ''">
+      AND c.baby_id = #{babyId}
+    </if>
+    order by c.sign_code asc,c.plan_exec_time asc,e.group_no asc,e.group_seq_no asc
+  </select>
+
+
+  <!--单个新增-->
+  <insert id="insertInptAdviceExec" keyProperty="id" useGeneratedKeys="true">
         insert into inpt_advice_exec(id,hosp_code, advice_id,advice_detail_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time, exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time)
         values (#{item.id}, #{hospCode}, #{adviceId}, #{adviceDetailId}, #{visitId}, #{babyId}, #{deptId}, #{execDeptId}, #{signCode}, #{planExecTime}, #{execTime}, #{execId}, #{execName}, #{secondExecId}, #{secondExecName}, #{isSkin}, #{isPositive}, #{remark}, #{isPrint}, #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
-    <!--批量新增-->
-    <insert id="insertInptAdviceExecBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into inpt_advice_exec(id,hosp_code, advice_id,advice_detail_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time,
-         exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time)
-        values
-        <foreach collection="inptAdviceExecDTOList" item="item" index="index" separator=",">
-            (#{item.id}, #{item.hospCode}, #{item.adviceId}, #{item.adviceDetailId}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.execDeptId}, #{item.signCode},
-            #{item.planExecTime}, #{item.execTime}, #{item.execId}, #{item.execName}, #{item.secondExecId}, #{item.secondExecName}, #{item.isSkin},
-            #{item.isPositive}, #{item.remark}, #{item.isPrint}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
-        </foreach>
-    </insert>
+  <!--批量新增-->
+  <insert id="insertInptAdviceExecBatch" keyProperty="id" useGeneratedKeys="true">
+    insert into inpt_advice_exec(id,hosp_code, advice_id,advice_detail_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time,
+    exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time)
+    values
+    <foreach collection="inptAdviceExecDTOList" item="item" index="index" separator=",">
+      (#{item.id}, #{item.hospCode}, #{item.adviceId}, #{item.adviceDetailId}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.execDeptId}, #{item.signCode},
+      #{item.planExecTime}, #{item.execTime}, #{item.execId}, #{item.execName}, #{item.secondExecId}, #{item.secondExecName}, #{item.isSkin},
+      #{item.isPositive}, #{item.remark}, #{item.isPrint}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+    </foreach>
+  </insert>
 
-    <!--单个修改-->
-    <update id="updateInptAdviceExec">
-        update inpt_advice_exec
-        <set>
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode},
-            </if>
-            <if test="adviceId != null and adviceId != ''">
-                advice_id = #{adviceId},
-            </if>
-            <if test="visitId != null and visitId != ''">
-                visit_id = #{visitId},
-            </if>
-            <if test="babyId != null and babyId != ''">
-                baby_id = #{babyId},
-            </if>
-            <if test="deptId != null and deptId != ''">
-                dept_id = #{deptId},
-            </if>
-            <if test="execDeptId != null and execDeptId != ''">
-                exec_dept_id = #{execDeptId},
-            </if>
-            <if test="signCode != null and signCode != ''">
-                sign_code = #{signCode},
-            </if>
-            <if test="planExecTime != null">
-                plan_exec_time = #{planExecTime},
-            </if>
-            <if test="execTime != null">
-                exec_time = #{execTime},
-            </if>
-            <if test="execId != null and execId != ''">
-                exec_id = #{execId},
-            </if>
-            <if test="execName != null and execName != ''">
-                exec_name = #{execName},
-            </if>
-            <if test="secondExecId != null and secondExecId != ''">
-                second_exec_id = #{secondExecId},
-            </if>
-            <if test="secondExecName != null and secondExecName != ''">
-                second_exec_name = #{secondExecName},
-            </if>
-            <if test="isSkin != null and isSkin != ''">
-                is_skin = #{isSkin},
-            </if>
-            <if test="isPositive != null and isPositive != ''">
-                is_positive = #{isPositive},
-            </if>
-            <if test="remark != null and remark != ''">
-                remark = #{remark},
-            </if>
-            <if test="isPrint != null and isPrint != ''">
-                is_print = #{isPrint},
-            </if>
-            <if test="crteId != null and crteId != ''">
-                crte_id = #{crteId},
-            </if>
-            <if test="crteName != null and crteName != ''">
-                crte_name = #{crteName},
-            </if>
-            <if test="crteTime != null">
-                crte_time = #{crteTime},
-            </if>
-        </set>
-        where hosp_code = #{hospCode}
-        and id = #{id}
-    </update>
+  <!--单个修改-->
+  <update id="updateInptAdviceExec">
+    update inpt_advice_exec
+    <set>
+      <if test="hospCode != null and hospCode != ''">
+        hosp_code = #{hospCode},
+      </if>
+      <if test="adviceId != null and adviceId != ''">
+        advice_id = #{adviceId},
+      </if>
+      <if test="visitId != null and visitId != ''">
+        visit_id = #{visitId},
+      </if>
+      <if test="babyId != null and babyId != ''">
+        baby_id = #{babyId},
+      </if>
+      <if test="deptId != null and deptId != ''">
+        dept_id = #{deptId},
+      </if>
+      <if test="execDeptId != null and execDeptId != ''">
+        exec_dept_id = #{execDeptId},
+      </if>
+      <if test="signCode != null and signCode != ''">
+        sign_code = #{signCode},
+      </if>
+      <if test="planExecTime != null">
+        plan_exec_time = #{planExecTime},
+      </if>
+      <if test="execTime != null">
+        exec_time = #{execTime},
+      </if>
+      <if test="execId != null and execId != ''">
+        exec_id = #{execId},
+      </if>
+      <if test="execName != null and execName != ''">
+        exec_name = #{execName},
+      </if>
+      <if test="secondExecId != null and secondExecId != ''">
+        second_exec_id = #{secondExecId},
+      </if>
+      <if test="secondExecName != null and secondExecName != ''">
+        second_exec_name = #{secondExecName},
+      </if>
+      <if test="isSkin != null and isSkin != ''">
+        is_skin = #{isSkin},
+      </if>
+      <if test="isPositive != null and isPositive != ''">
+        is_positive = #{isPositive},
+      </if>
+      <if test="remark != null and remark != ''">
+        remark = #{remark},
+      </if>
+      <if test="isPrint != null and isPrint != ''">
+        is_print = #{isPrint},
+      </if>
+      <if test="crteId != null and crteId != ''">
+        crte_id = #{crteId},
+      </if>
+      <if test="crteName != null and crteName != ''">
+        crte_name = #{crteName},
+      </if>
+      <if test="crteTime != null">
+        crte_time = #{crteTime},
+      </if>
+    </set>
+    where hosp_code = #{hospCode}
+    and id = #{id}
+  </update>
 
-    <!--医嘱执行批量修改-->
-    <update id="updateInptAdviceExecBatch">
-        <foreach collection="list" item="dto" separator=";">
-            update inpt_advice_exec
-            <set>
-                <if test="dto.deptId != null and dto.deptId != ''">
-                    dept_id = #{dto.deptId},
-                </if>
-                <if test="dto.execDeptId != null and dto.execDeptId != ''">
-                    exec_dept_id = #{dto.execDeptId},
-                </if>
-                <if test="dto.signCode != null and dto.signCode != ''">
-                    sign_code = #{dto.signCode},
-                </if>
-                <if test="dto.planExecTime != null">
-                    plan_exec_time = #{dto.planExecTime},
-                </if>
-                <if test="dto.execTime != null">
-                    exec_time = #{dto.execTime},
-                </if>
-                <if test="dto.execId != null and dto.execId != ''">
-                    exec_id = #{dto.execId},
-                </if>
-                <if test="dto.execName != null and dto.execName != ''">
-                    exec_name = #{dto.execName},
-                </if>
-                <if test="dto.secondExecId != null and dto.secondExecId != ''">
-                    second_exec_id = #{dto.secondExecId},
-                </if>
-                <if test="dto.secondExecName != null and dto.secondExecName != ''">
-                    second_exec_name = #{dto.secondExecName},
-                </if>
-                <if test="dto.isSkin != null and dto.isSkin != ''">
-                    is_skin = #{dto.isSkin},
-                </if>
-                <if test="dto.isPositive != null and dto.isPositive != ''">
-                    is_positive = #{dto.isPositive},
-                </if>
-                <if test="dto.skinResultCode != null and dto.skinResultCode != ''">
-                    skin_result_code = #{dto.skinResultCode},
-                </if>
-                <if test="dto.remark != null and dto.remark != ''">
-                    remark = #{dto.remark},
-                </if>
-                <if test="dto.isPrint != null and dto.isPrint != ''">
-                    is_print = #{dto.isPrint},
-                </if>
-            </set>
-            where hosp_code = #{dto.hospCode}
-            and id = #{dto.id}
-        </foreach>
-    </update>
-
-    <!--医嘱执行取消还原-->
-    <update id="updateInptAdviceExecBatchCancel">
+  <!--医嘱执行批量修改-->
+  <update id="updateInptAdviceExecBatch">
     <foreach collection="list" item="dto" separator=";">
       update inpt_advice_exec
       <set>
-          exec_dept_id = null,
-          sign_code = '1',
-          exec_time = null,
-          exec_id = null,
-          exec_name = null,
-          second_exec_id = null,
-          second_exec_name = null,
-          skin_result_code = null,
-          is_positive = null
+        <if test="dto.deptId != null and dto.deptId != ''">
+          dept_id = #{dto.deptId},
+        </if>
+        <if test="dto.execDeptId != null and dto.execDeptId != ''">
+          exec_dept_id = #{dto.execDeptId},
+        </if>
+        <if test="dto.signCode != null and dto.signCode != ''">
+          sign_code = #{dto.signCode},
+        </if>
+        <if test="dto.planExecTime != null">
+          plan_exec_time = #{dto.planExecTime},
+        </if>
+        <if test="dto.execTime != null">
+          exec_time = #{dto.execTime},
+        </if>
+        <if test="dto.execId != null and dto.execId != ''">
+          exec_id = #{dto.execId},
+        </if>
+        <if test="dto.execName != null and dto.execName != ''">
+          exec_name = #{dto.execName},
+        </if>
+        <if test="dto.secondExecId != null and dto.secondExecId != ''">
+          second_exec_id = #{dto.secondExecId},
+        </if>
+        <if test="dto.secondExecName != null and dto.secondExecName != ''">
+          second_exec_name = #{dto.secondExecName},
+        </if>
+        <if test="dto.isSkin != null and dto.isSkin != ''">
+          is_skin = #{dto.isSkin},
+        </if>
+        <if test="dto.isPositive != null and dto.isPositive != ''">
+          is_positive = #{dto.isPositive},
+        </if>
+        <if test="dto.skinResultCode != null and dto.skinResultCode != ''">
+          skin_result_code = #{dto.skinResultCode},
+        </if>
+        <if test="dto.remark != null and dto.remark != ''">
+          remark = #{dto.remark},
+        </if>
+        <if test="dto.isPrint != null and dto.isPrint != ''">
+          is_print = #{dto.isPrint},
+        </if>
       </set>
       where hosp_code = #{dto.hospCode}
       and id = #{dto.id}
     </foreach>
   </update>
 
-    <!--最近医嘱执行记录-->
-    <select id="queryAdviceExecLately" resultMap="InptAdviceExecMap">
-        select exec_id,exec_name,exec_time,exec_dept_id,second_exec_id,second_exec_name,sign_code from inpt_advice_exec
-        where hosp_code = #{hospCode} and advice_id = #{adviceId}
-        and id != #{id} and exec_time is not null and exec_time != ''
-        order by exec_time desc limit 1
-    </select>
+  <!--医嘱执行取消还原-->
+  <update id="updateInptAdviceExecBatchCancel">
+    <foreach collection="list" item="dto" separator=";">
+      update inpt_advice_exec
+      <set>
+        exec_dept_id = null,
+        sign_code = '1',
+        exec_time = null,
+        exec_id = null,
+        exec_name = null,
+        second_exec_id = null,
+        second_exec_name = null,
+        skin_result_code = null,
+        is_positive = null
+      </set>
+      where hosp_code = #{dto.hospCode}
+      and id = #{dto.id}
+    </foreach>
+  </update>
 
-    <!--取消医嘱执行-->
-    <update id="updateInptAdviceExecBeCancelBatch">
-        update inpt_advice_exec
-        set sign_code = '3'
-        where (hosp_code,advice_id,DATE_FORMAT( plan_exec_time, '%Y-%m-%d' )) in
-        <foreach collection="list" item="dto" open="(" close=")" separator=",">
-            (#{dto.hospCode},#{dto.iatId},DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
-        </foreach>
-    </update>
+  <!--最近医嘱执行记录-->
+  <select id="queryAdviceExecLately" resultMap="InptAdviceExecMap">
+    select exec_id,exec_name,exec_time,exec_dept_id,second_exec_id,second_exec_name,sign_code from inpt_advice_exec
+    where hosp_code = #{hospCode} and advice_id = #{adviceId}
+    and exec_time is not null and exec_time != '' and sign_code = '2'
+    <if test="id != null and id != ''">
+      and id != #{id}
+    </if>
+    order by exec_time desc limit 1
+  </select>
 
-    <update id="updateIsPositive">
-        <foreach collection="adviceList" item="item" separator=";">
-            update inpt_advice set content=#{item.content},is_positive=#{item.isPositive} where hosp_code=#{item.hospCode} and id=#{item.id}
-        </foreach>
-    </update>
+  <!--取消医嘱执行-->
+  <update id="updateInptAdviceExecBeCancelBatch">
+    update inpt_advice_exec
+    set sign_code = '3'
+    where (hosp_code,advice_id,DATE_FORMAT( plan_exec_time, '%Y-%m-%d' )) in
+    <foreach collection="list" item="dto" open="(" close=")" separator=",">
+      (#{dto.hospCode},#{dto.iatId},DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
+    </foreach>
+  </update>
 
-    <!--根据医嘱ID获取医嘱执行的记录-->
-    <select id="getExecs" resultMap="InptAdviceExecMap">
-        select * from inpt_advice_exec where hosp_code=#{hospCode}
-        <if test="adviceIds!=null and adviceIds.size>0">
-            and advice_id in
-            <foreach collection="adviceIds" item="adviceId" separator="," open="(" close=")">
-                #{adviceId}
-            </foreach>
-        </if>
-    </select>
+  <update id="updateIsPositive">
+    <foreach collection="adviceList" item="item" separator=";">
+      update inpt_advice set content=#{item.content},is_positive=#{item.isPositive} where hosp_code=#{item.hospCode} and id=#{item.id}
+    </foreach>
+  </update>
 
-    <!--获取未执行的记录-->
-    <select id="getDRNotExec" resultMap="InptAdviceExecMap">
+  <!--根据医嘱ID获取医嘱执行的记录-->
+  <select id="getExecs" resultMap="InptAdviceExecMap">
+    select * from inpt_advice_exec where hosp_code=#{hospCode}
+    <if test="adviceIds!=null and adviceIds.size>0">
+      and advice_id in
+      <foreach collection="adviceIds" item="adviceId" separator="," open="(" close=")">
+        #{adviceId}
+      </foreach>
+    </if>
+  </select>
+
+  <!--获取未执行的记录-->
+  <select id="getDRNotExec" resultMap="InptAdviceExecMap">
         select * from inpt_advice_exec where hosp_code=#{hospCode} and advice_id=#{adviceId} and visit_id=#{visitId}
         and DATE_FORMAT(plan_exec_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{planExecTime},'%Y-%m-%d')
         order by INSTR('3,1,2', sign_code) asc,plan_exec_time desc
     </select>
 
-    <!--获取停嘱时间当日未执行的记录-->
-    <select id="getDRZHNotExec" resultMap="InptAdviceExecMap">
+  <!--获取停嘱时间当日未执行的记录-->
+  <select id="getDRZHNotExec" resultMap="InptAdviceExecMap">
         select * from inpt_advice_exec where hosp_code=#{hospCode} and advice_id=#{adviceId} and visit_id=#{visitId}
         and sign_code='1' and DATE_FORMAT(plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{planExecTime},'%Y-%m-%d')
     </select>
 
-    <!--获取未签名的执行记录-->
-    <select id="queryExecEqm" resultMap="InptAdviceExecMap">
+  <!--获取未签名的执行记录-->
+  <select id="queryExecEqm" resultMap="InptAdviceExecMap">
         select a.* from inpt_advice_exec a join inpt_advice b on a.advice_id=b.id where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode}
         and a.advice_id=#{adviceId} and a.sign_code='1'
         order by a.visit_id,a.baby_id,a.advice_id,a.plan_exec_time asc
     </select>
 
-    <!--获取有每日执行次数的执行记录总数-->
-    <select id="queryExecByAdviceId" resultMap="InptAdviceExecMap">
+  <!--获取有每日执行次数的执行记录总数-->
+  <select id="queryExecByAdviceId" resultMap="InptAdviceExecMap">
         select * from inpt_advice_exec where advice_id=#{adviceId} and hosp_code=#{hospCode}
         and DATE_FORMAT(plan_exec_time,'%Y-%m-%d') = DATE_FORMAT(#{time},'%Y-%m-%d')
         order by INSTR('2,1,3', sign_code) asc,plan_exec_time asc
     </select>
 
-    <select id="queryPsList" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
-        select a.id,a.content,ifnull(a.is_positive,0) isPositive,b.source_ia_id sourceIaId,a.hosp_code hospCode
-        from inpt_advice a join inpt_advice b on a.id=b.source_ia_id and a.hosp_code=b.hosp_code
-        where b.hosp_code=#{hospCode} and b.id in
-        <foreach collection="inptAdviceExecDTOs" item="item" separator="," open="(" close=")">
-            #{item.adviceId}
-        </foreach>
-    </select>
+  <select id="queryPsList" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+    select a.id,a.content,ifnull(a.is_positive,0) isPositive,b.source_ia_id sourceIaId,a.hosp_code hospCode
+    from inpt_advice a join inpt_advice b on a.id=b.source_ia_id and a.hosp_code=b.hosp_code
+    where b.hosp_code=#{hospCode} and b.id in
+    <foreach collection="inptAdviceExecDTOs" item="item" separator="," open="(" close=")">
+      #{item.adviceId}
+    </foreach>
+  </select>
 </mapper>

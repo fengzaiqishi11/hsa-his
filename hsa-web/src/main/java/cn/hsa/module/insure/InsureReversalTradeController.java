@@ -33,6 +33,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -267,10 +268,68 @@ public class InsureReversalTradeController extends BaseController {
         }
     }
 
+    /**
+     * @Method queryStatementInfo
+     * @Desrciption 对账单查询打印
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/queryStatementInfo")
+    public WrapperResponse<Map<String,Object>> queryStatementInfo(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        paraMap.put("statistician",sysUserDTO.getName());
+        return insureUnifiedPayReversalTradeService_consumer.queryStatementInfo(paraMap);
+    }
+
+    /**
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/queryDeclareInfosPage")
+    public WrapperResponse<PageDTO> queryDeclareInfosPage(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        WrapperResponse<PageDTO> pageDto = insureUnifiedPayReversalTradeService_consumer.queryDeclareInfosPage(paraMap);
+        return pageDto;
+    }
+
+    /**
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    @GetMapping("/querySumDeclareInfosPage")
+    public WrapperResponse<PageDTO> querySumDeclareInfosPage(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        WrapperResponse<PageDTO> pageDto = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfosPage(paraMap);
+        return pageDto;
+    }
+
+    /**
+     * @Method downLoadSettleInfo
+     * @Desrciption  HIS结算单
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 11:42
+     * @Return
+     **/
     @PostMapping("/downLoadSettleInfo")
     public WrapperResponse<Map<String,Object>> downLoadSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureUnifiedPayReversalTradeService_consumer.downLoadSettleInfo(map);
     }
+
 }

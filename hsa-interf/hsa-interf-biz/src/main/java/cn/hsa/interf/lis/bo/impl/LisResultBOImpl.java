@@ -128,22 +128,23 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public Map insertDXLisResult(Map map) {
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
-        List<String> stringList = new ArrayList<>();
-        for(Map resultMap : medicalResultDTOList){
-            stringList.add(MapUtils.get(resultMap,"barCode"));
-            resultMap.put("id", SnowflakeUtils.getId());
-            resultMap.put("crteTime", DateUtils.getNow());
-            resultMap.put("crteId", "lis");
-            resultMap.put("crteName", "lis");
+        if(medicalResultDTOList.size() > 0){
+            List<String> stringList = new ArrayList<>();
+            for(Map resultMap : medicalResultDTOList){
+                stringList.add(MapUtils.get(resultMap,"adviceId"));
+                resultMap.put("id", SnowflakeUtils.getId());
+//                resultMap.put("crteTime", DateUtils.getNow());
+//                resultMap.put("crteId", "lis");
+//                resultMap.put("crteName", "lis");
+            }
+            List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
+
+            lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
+            // 新增结果
+            int num = lisResultDAO.insertDXResult(medicalResultDTOList);
+            // 更新申请单状态
+            int applyStatus = lisResultDAO.updateApplyStatus(collect);
         }
-        List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
-
-        lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
-        // 新增结果
-        int num = lisResultDAO.insertDXResult(medicalResultDTOList);
-        // 更新申请单状态
-        int applyStatus = lisResultDAO.updateApplyStatus(collect);
-
         return map;
     }
 
@@ -170,7 +171,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
      */
     @Override
     public List<String> queryDXBackResult(Map map){
-        List<String> list = lisResultDAO.queryDXBackResult();
+        List<String> list = lisResultDAO.queryDXBackResult(map);
         return list;
     }
     /** 
@@ -182,8 +183,8 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     */ 
     @Override
     public Map updateNoResultLis(Map map){
-        List<Map> mapList = lisResultDAO.queryNoResultLis();
-        List<String> backList = lisResultDAO.queryDXBackResult();
+        List<Map> mapList = lisResultDAO.queryNoResultLis(map);
+        List<String> backList = lisResultDAO.queryDXBackResult(map);
         if(mapList.size() > 0){
             lisResultDAO.updateStatusMap(mapList);
         }

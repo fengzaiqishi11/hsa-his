@@ -48,7 +48,7 @@ public class InsureGetInfoController extends BaseController {
 
     /**
      * @Method getSettleInfo
-     * @Desrciption 医疗保障基金结算清单信息上传
+     * @Desrciption 医疗保障基金结算清单信息:上传到医保
      * @Param
      * [insureSettleInfoDTO]
      * @Author zhangxuan
@@ -56,23 +56,53 @@ public class InsureGetInfoController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
      **/
     @PostMapping("/insertSettleInfo")
-    public WrapperResponse<Map> insertSettleInfo(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<Map> insertSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
-        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
-        insureSettleInfoDTO.setHosrgOpter(sysUserDTO.getName());
-        insureSettleInfoDTO.setMedinsFillDept(sysUserDTO.getBaseDeptDTO().getName());
-        insureSettleInfoDTO.setMedinsFillPsn(sysUserDTO.getName());
-        Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
         return insureGetInfoService_consumer.insertSettleInfo(map);
     }
+
+    /**
+     * @Method saveInsureSettleInfo
+     * @Desrciption  医疗保障基金结算清单信息： 保存到his本地数据库
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/11/3 14:54 
+     * @Return 
+    **/
+    @PostMapping("/saveInsureSettleInfo")
+    public WrapperResponse<Boolean> saveInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("hospName",sysUserDTO.getHospName());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime",sysUserDTO.getCrteTime());
+        return insureGetInfoService_consumer.saveInsureSettleInfo(map);
+    }
+
+    /**
+     * @Method queryPage
+     * @Desrciption  查询结算清单左侧人员类别信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/9 15:29
+     * @Return
+    **/
+    @GetMapping("/querySetlePage")
+    public WrapperResponse<PageDTO> querySetlePage(@RequestBody Map<String,Object> map, HttpServletRequest req,
+                                              HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.querySetlePage(map);
+    }
+
+
     /**
      * @Method getSettleInfo
-     * @Desrciption 医疗保障基金结算清单信息上传
+     * @Desrciption 医疗保障基金结算清单信息上传:获取加载
      * @Param
      * [insureSettleInfoDTO]
      * @Author yuelong.chen
@@ -80,17 +110,50 @@ public class InsureGetInfoController extends BaseController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
      **/
     @PostMapping("/getSettleInfo")
-    public WrapperResponse<Map> getSettleInfo(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<Map<String,Object>> getSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
-        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
-        Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureGetInfoService_consumer.getSettleInfo(map);
+        map.put("hospName",sysUserDTO.getHospName());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime",sysUserDTO.getCrteTime());
+        return insureGetInfoService_consumer.insertSetlInfo(map);
     }
+
+
+    /**
+     * @Method selectLoadingSettleInfo
+     * @Desrciption  加载保存到数据库的数据信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/6 10:21
+     * @Return
+    **/
+    @PostMapping("/selectLoadingSettleInfo")
+    public WrapperResponse<Map<String,Object>> selectLoadingSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.selectLoadingSettleInfo(map);
+    }
+
+    /**
+     * @Method deleteSettleInfo
+     * @Desrciption  重置医疗保障结算清单信息
+     *           1.如果已经上传则不允许 清空重置
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/4 13:58
+     * @Return
+    **/
+    @PostMapping("/deleteSettleInfo")
+    public WrapperResponse<Boolean> deleteSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res ){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.deleteSettleInfo(map);
+    }
+
 
     /**
      * @Method getInsureCost

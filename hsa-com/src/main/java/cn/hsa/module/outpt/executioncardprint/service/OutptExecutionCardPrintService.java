@@ -2,9 +2,11 @@ package cn.hsa.module.outpt.executioncardprint.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.infusionRegister.dto.OutptInfusionRegisterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,4 +41,16 @@ public interface OutptExecutionCardPrintService {
     **/
     @PostMapping("/service/outpt/executionCardPrint/queryPage")
     WrapperResponse<Boolean> update(Map map);
+
+    /**
+     * @Method update
+     * @Desrciption 打印后改变打印状态
+     * @Param
+     *
+     * @Author zhangxuan
+     * @Date   2020-08-26 13:51
+     * @Return
+     **/
+    @PostMapping("/service/outpt/executionCardPrint/queryInfusionRegisterList")
+    WrapperResponse<List<OutptInfusionRegisterDTO>> queryInfusionRegisterList(Map map);
 }

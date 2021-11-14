@@ -39,12 +39,15 @@ public class DesUtil {
     }
 
     public static void main(String args[]) throws Exception {
-        String A_KEY = "0091_insure_producer";
-        String B_KEY = "0091_insure_consumer";
+        String A_KEY = "0059_insure_producer";
+        String B_KEY = "0059_insure_consumer";
         String A_data = encrypt(A_KEY);
         String B_data = encrypt(B_KEY);
         System.out.println(A_data);
         System.out.println(B_data);
+        System.out.println(A_data);
+        System.out.println(decrypt(A_data));
+        System.out.println(decrypt(B_data));
     }
 
     /**

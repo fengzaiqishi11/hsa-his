@@ -5,9 +5,11 @@ package cn.hsa.module.insure.module.dao;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InsureConfigurationDAO {
 
@@ -191,4 +193,22 @@ public interface InsureConfigurationDAO {
      * @Return
      **/
     InsureConfigurationDTO queryInsureIndividualConfig(InsureConfigurationDTO insureConfigurationDTO);
+    /**
+     * @Meth: getNeedUploadStrockData
+     * @Description: 查询出库存表中变更的数据 并且转成医保接受的参数形式
+     * @Param: [stroStockDTO]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    List<Map<String, Object>> getNeedUploadStrockData(StroStockDTO stroStockDTO);
+    /**
+     * @Meth: updateByIds
+     * @Description: 回写库存表  把上传状态改成已经上传
+     * @Param: [invChgMedinsInfoList]
+     * @return: int
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    int updateByIds(@Param("invChgMedinsInfoList") List<Map<String, Object>> invChgMedinsInfoList);
 }

@@ -100,8 +100,12 @@
             SELECT
                 e.insure_reg_code AS insureRegCode,
                 e.visit_id as visitId,
+                t.medicine_org_code as medicineOrgCode,
+                t.medical_reg_no as  medicalRegNo,
+                t.is_hospital as isHospital,
                 t.medical_reg_no AS mdtrtId,
                 e.insureSettleId AS setlId,
+                e.settle_id settleId,
                 e.settle_id,
                 t.aka130 as med_type,
                 t.aac001 AS psnNo,
@@ -110,7 +114,7 @@
                 c.aac002 as idCard,
                 c.aac006 AS birthday,
                 e.crte_time AS crteTime,
-                t.visit_drpt_name,
+                t.visit_drpt_name as visitDrptName,
                 e.total_price,
                 e.crte_time
             FROM
@@ -121,6 +125,7 @@
             e.hosp_code = t.hosp_code
             AND e.visit_id = t.visit_id
             AND c.hosp_code = t.hosp_code
+            and e.state ='0'
             AND c.id = t.mib_id
             AND t.hosp_code = #{hospCode}
             and e.insureSettleId is not null
@@ -146,33 +151,71 @@
     <!--医药机构费用结算对总账查询-->
     <select id="queryDataWith3201" resultType="java.util.Map">
         SELECT
-            max(e.insure_reg_code) as insureRegCode,
-            c.aae140 as insutype,
-            t.is_hospital,
-            e.clr_type,
-            e.clr_optins,
-            sum(e.person_price) as person_price,
-            t.medicine_org_code fixmedins_code,
-            sum(e.total_price) as medfee_sumamt,
-            (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
-            sum(e.personal_price) as acct_pay,
-            count(1) as fixmedins_setl_cnt
+        A.insureRegCode AS insureRegCode,
+        A.type,
+        A.insutype AS insutype,
+        A.is_hospital AS is_hospital,
+        A.clr_type AS clr_type,
+        A.clr_optins AS clr_optins,
+        sum( A.person_price ) AS person_price,
+        A.medicine_org_code fixmedins_code,
+        sum( A.medfee_sumamt ) AS medfee_sumamt,
+        sum( A.fund_pay_sumamt ) AS fund_pay_sumamt,
+        sum( A.acct_pay ) AS acct_pay,
+        count( 1 ) AS fixmedins_setl_cnt
         FROM
-            insure_individual_settle e,
-            insure_individual_visit t,
-			insure_individual_basic c
+        (
+        SELECT DISTINCT
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+        c.aac003 AS psnName,
+        e.insure_reg_code AS insureRegCode,
+        t.aac001 AS psn_no,
+        e.settle_id,
+        e.visit_id,
+        t.medical_reg_no AS mdtrt_id,
+        e.insureSettleId AS setl_id,
+        c.aae140 AS insutype,
+        t.is_hospital,
+        e.clr_type,
+        IF
+        ( e.state = '0', '0', '1' ) AS refd_setl_flag,
+        e.state,
+        e.clr_optins,
+        t.insure_reg_code AS setl_optins,
+        e.total_price AS medfee_sumamt,
+        if (t.aka130 = '2102',e.insure_price - e.personal_price - e.rests_price,e.insure_price - e.personal_price) AS fund_pay_sumamt,
+        e.person_price,
+        e.personal_price AS acct_pay,
+        t.medicine_org_code
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c
         WHERE
-            e.hosp_code = t.hosp_code
-            AND e.visit_id = t.visit_id
-            AND c.hosp_code = t.hosp_code
-            AND c.id = t.mib_id
-            AND t.hosp_code = #{hospCode}
-            AND c.aae140 IS NOT NULL
-            AND e.settle_state = '1' and e.insureSettleId is not null
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
-
 
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -185,7 +228,17 @@
         <if test="state != null and state != ''">
             and e.state = '0'
         </if>
-        group by c.aae140,t.is_hospital,e.clr_type,t.medicine_org_code
+        GROUP BY
+        se_vi_id
+        ) A
+        GROUP BY
+        A.insutype,
+        A.is_hospital,
+        A.clr_type,
+        A.type,
+        A.medicine_org_code
+        ORDER BY
+        A.type
     </select>
 
     <select id="getHisReckonInfo" resultType="java.util.Map">
@@ -197,7 +250,7 @@
         e.clr_optins,
         sum(e.person_price) as person_price,
         sum(e.total_price) as medfee_sumamt,
-        (sum(e.total_price) - sum(e.personal_price) - sum(e.person_price) - sum(e.rests_price)) as fund_pay_sumamt,
+        (sum(e.insure_price) - sum(e.personal_price)) as fund_pay_sumamt,
         sum(e.personal_price) as acct_pay,
         count(1) as fixmedins_setl_cnt
         FROM
@@ -219,30 +272,40 @@
         group by e.clr_type,e.clr_way,t.medicine_org_code
     </select>
 
-
-
     <!--医药机构费用结算对明细账查询-->
     <select id="queryDataWith3202" resultType="java.util.Map">
-        SELECT
-            c.aac002 as name,
-            e.insure_reg_code as insureRegCode,
-            t.aac001 as psn_no,
-            e.settle_id,
-            e.visit_id,
-            t.medical_reg_no AS mdtrt_id,
-            e.insureSettleId AS setl_id,
-            e.state as refd_setl_flag,
-            (select aac003 from insure_individual_basic c where c.id = t.mib_id) as psnName,
-            c.aae140 as insutype,
-            t.is_hospital,
-            e.clr_type ,
-            if (e.state = '0','0','1') as refd_setl_flag,
-            e.state,
-            e.clr_optins,
-            t.insure_reg_code as setl_optins,
-            e.total_price as medfee_sumamt,
-            (e.total_price - e.personal_price - e.person_price - e.rests_price) as fund_pay_sumamt,
-            e.personal_price as acct_pay
+        SELECT DISTINCT
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+        c.aac003 AS psnName,
+        e.insure_reg_code AS insureRegCode,
+        t.aac001 AS psn_no,
+        e.settle_id,
+        e.visit_id,
+        t.medical_reg_no AS mdtrt_id,
+        e.insureSettleId AS setl_id,
+        c.aae140 AS insutype,
+        t.is_hospital,
+        e.clr_type,
+        IF
+        ( e.state = '0', '0', '1' ) AS refd_setl_flag,
+        e.state,
+        e.clr_optins,
+        t.insure_reg_code AS setl_optins,
+        e.total_price AS medfee_sumamt,
+        if (t.aka130 = '2102',e.insure_price - e.personal_price - e.rests_price,e.insure_price - e.personal_price) AS fund_pay_sumamt,
+        e.personal_price AS acct_pay
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -252,9 +315,11 @@
         AND e.visit_id = t.visit_id
         AND c.hosp_code = t.hosp_code
         AND c.id = t.mib_id
-        AND t.hosp_code = #{hospCode}
         AND c.aae140 IS NOT NULL
         AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
@@ -275,6 +340,626 @@
         <if test="state != null and state != ''">
             and e.state = '0'
         </if>
+        GROUP BY se_vi_id
+    </select>
+
+    <!--对帐单打印查询-->
+    <select id="queryStatementInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        A.insureRegCode AS insureRegCode,
+        A.medicine_org_code medicineOrgCode,
+        CASE
+        WHEN A.type = '本市参保' THEN
+        '0' ELSE '1'
+        END isRemote,
+        A.insutype aae140,
+        A.aka130,
+        A.aka130Name ,
+        count( 1 ) AS personNum,
+        ROUND( sum( A.medfee_sumamt ), 2 ) medfeeSumamt,
+        ROUND(
+        sum( A.plan_price ) + sum( A.serious_price ) + sum( A.civil_price ) + sum( A.acct_pay ),
+        2
+        ) planSumPrice,
+        ROUND( sum( A.plan_price ) + sum( A.acct_pay ), 2 ) planCXHJSumPrice,
+        ROUND( sum( A.person_price ), 2 ) personPrice,
+        ROUND( sum( A.plan_price ), 2 ) planPrice,
+        ROUND( sum( A.serious_price ), 2 ) seriousPrice,
+        ROUND( sum( A.civil_price ), 2 ) civilPrice,
+        ROUND( sum( A.acct_pay ), 2 ) personalPrice,
+        ROUND( sum( A.rests_price ), 2 ) restsPrice,
+        ROUND( sum( A.maf_pay ), 2 ) mafPay,
+        ROUND( sum( A.retire_price ), 2 ) retirePrice
+        FROM
+        (
+        SELECT DISTINCT
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+
+        e.insure_reg_code AS insureRegCode,
+        e.settle_id,
+        e.visit_id,
+        e.insureSettleId AS setl_id,
+        e.clr_type,
+        IF
+        ( e.state = '0', '0', '1' ) AS refd_setl_flag,
+        e.state,
+        e.clr_optins,
+        e.total_price AS medfee_sumamt,
+        ( e.insure_price - e.personal_price ) AS fund_pay_sumamt,
+        e.personal_price AS acct_pay,
+        e.person_price,
+        e.plan_price,
+        e.serious_price,
+        e.civil_price,
+        e.retire_price,
+        e.hosp_price,
+        e.rests_price,
+        e.maf_pay,
+        t.aac001 AS psn_no,
+        t.medicine_org_code,
+        t.aka130,
+        t.aka130_name aka130Name,
+        t.medical_reg_no AS mdtrt_id,
+        t.is_hospital,
+        t.insure_reg_code AS setl_optins,
+        c.aac003 AS psnName,
+        c.aae140 AS insutype
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.state = '0'
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
+        <if test="aae140 != null and aae140 != '' ">
+            and c.aae140 = #{aae140}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+
+        AND t.aka130 in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        se_vi_id
+        ) A GROUP BY A.aka130,isRemote
+    </select>
+
+    <!--合计-->
+    <select id="getStatementSumInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        count( 1 ) AS personNum,
+        ROUND( sum( A.medfee_sumamt ), 2 ) medfeeSumamt,
+        ROUND(
+        sum( A.plan_price ) + sum( A.serious_price ) + sum( A.civil_price ) + sum( A.acct_pay ),
+        2
+        ) planSumPrice,
+        ROUND( sum( A.plan_price ) + sum( A.acct_pay ), 2 ) planCXHJSumPrice,
+        ROUND( sum( A.person_price ), 2 ) personPrice,
+        ROUND( sum( A.plan_price ), 2 ) planPrice,
+        ROUND( sum( A.serious_price ), 2 ) seriousPrice,
+        ROUND( sum( A.civil_price ), 2 ) civilPrice,
+        ROUND( sum( A.acct_pay ), 2 ) personalPrice,
+        ROUND( sum( A.rests_price ), 2 ) restsPrice,
+        ROUND( sum( A.maf_pay ), 2 ) mafPay,
+        ROUND( sum( A.retire_price ), 2 ) retirePrice
+        FROM
+        (
+        SELECT DISTINCT
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+
+        e.insure_reg_code AS insureRegCode,
+        e.settle_id,
+        e.visit_id,
+        e.insureSettleId AS setl_id,
+        e.clr_type,
+        IF
+        ( e.state = '0', '0', '1' ) AS refd_setl_flag,
+        e.state,
+        e.clr_optins,
+        e.total_price AS medfee_sumamt,
+        ( e.insure_price - e.personal_price ) AS fund_pay_sumamt,
+        e.personal_price AS acct_pay,
+        e.person_price,
+        e.plan_price,
+        e.serious_price,
+        e.civil_price,
+        e.retire_price,
+        e.hosp_price,
+        e.rests_price,
+        e.maf_pay,
+        t.aac001 AS psn_no,
+        t.medicine_org_code,
+        t.aka130,
+        t.aka130_name aka130Name,
+        t.medical_reg_no AS mdtrt_id,
+        t.is_hospital,
+        t.insure_reg_code AS setl_optins,
+        c.aac003 AS psnName,
+        c.aae140 AS insutype
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.state = '0'
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
+        <if test="aae140 != null and aae140 != '' ">
+            and c.aae140 = #{aae140}
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        AND t.aka130 in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        se_vi_id
+        ) A
+    </select>
+
+    <select id="queryDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT DISTINCT
+            c.aac003 AS psnName,
+            c.aac002 AS idCard,
+            c.bka035_name AS psnType,
+            c.aka130_name AS medTypeName,
+            c.bka008 insureUnit,
+            DATE_FORMAT(tt.in_time,'%Y-%m-%d') AS inTime,
+            DATE_FORMAT(tt.out_time,'%Y-%m-%d') AS outTime,
+            tt.in_no AS inNo,
+            tt.out_disease_name outDiseaseName,
+            IF
+                (
+                LEFT ( tt.in_time, 10 ) = LEFT ( tt.out_time, 10 ),
+                    1,
+                    DATEDIFF( tt.out_time, tt.in_time )
+                ) AS inDay,
+            tt.out_dept_name outDeptName,
+            e.total_price AS totalPrice,
+            e.portion_price AS portionPrice,
+            e.starting_price AS startingPrice,
+            e.insure_price AS insurePrice,
+            e.plan_account_price AS planAccountPrice,
+            e.plan_price AS planPrice,
+            e.serious_price AS seriousPrice,
+            e.civil_price AS civilPrice,
+            e.retire_price AS retirePrice,
+            e.personal_price AS personalPrice,
+            e.person_price AS personPrice,
+            e.hosp_price AS hospPrice,
+            e.rests_price AS restsPrice,
+            ifnull(e.maf_pay,0.00) AS mafPay,
+            ( e.insure_price - e.personal_price ) AS planSumPrice,
+            e.clr_optins AS clrOptins,
+            e.medicine_org_code AS medicineOrgCode,
+            t.insure_reg_code AS setlOptins,
+            t.aac001 AS psnNo,
+            t.medical_reg_no AS mdtrtId,
+            t.is_hospital AS isHospital,
+            c.aae140 AS insutype,
+            ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+            IF
+                (
+                LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+                    '本市参保',
+                    IF
+                        (
+                        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+			AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+                            '省内异地',
+                            '跨省异地'
+                        )
+                ) type,
+            e.insure_reg_code AS insureRegCode,
+            DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
+            DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate
+        FROM
+            insure_individual_settle e,
+            insure_individual_visit t,
+            insure_individual_basic c,
+            inpt_visit tt
+        WHERE
+            e.hosp_code = t.hosp_code
+          AND e.visit_id = t.visit_id
+          AND c.hosp_code = t.hosp_code
+          AND tt.hosp_code = e.hosp_code
+          AND tt.id = e.visit_id
+          AND c.id = t.mib_id
+          AND c.aae140 IS NOT NULL
+          AND e.settle_state = '1'
+          AND e.insureSettleId IS NOT NULL
+          AND e.state = '0'
+          AND e.insure_reg_code = #{insureRegCode}
+          AND e.hosp_code = #{hospCode}
+        <if test="insutype != null and insutype != '' ">
+            and c.aae140 = #{insutype}
+        </if>
+        <if test="medType != null and medType != '' ">
+            and c.aka130 = #{medType}
+        </if>
+        <if test="isHospital != null and isHospital != '' ">
+            and t.is_hospital = #{isHospital}
+        </if>
+        <if test="deptId != null and deptId != '' ">
+            and tt.out_dept_id = #{deptId}
+        </if>
+        <if test="isRemote == '0'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        </if>
+        <if test="isRemote == '1'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+            se_vi_id
+    </select>
+
+    <!--申报表合计费用-->
+    <select id="querySumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            outDeptName,
+            A.clrOptins,
+            A.medicineOrgCode,
+            A.type,
+            sum( psnNum ) AS psnNum,
+            sum( inDay ) AS inDay,
+            sum( totalPrice ) AS totalPrice,
+            sum( portionPrice ) AS portionPrice,
+            sum( startingPrice ) AS startingPrice,
+            sum( insurePrice ) AS insurePrice,
+            sum( planAccountPrice ) AS planAccountPrice,
+            sum( planPrice ) AS planPrice,
+            sum( seriousPrice ) AS seriousPrice,
+            sum( civilPrice ) AS civilPrice,
+            sum( retirePrice ) AS retirePrice,
+            sum( personalPrice ) AS personalPrice,
+            sum( hospPrice ) AS hospPrice,
+            sum( restsPrice ) AS restsPrice,
+            sum( mafPay ) AS mafPay,
+            sum( planSumPrice ) AS planSumPrice
+        FROM
+            (
+                SELECT DISTINCT
+                    tt.out_dept_name outDeptName,
+                    e.clr_optins clrOptins,
+                    e.medicine_org_code medicineOrgCode,
+                    IF
+                    (
+                    LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+                    '本市参保',
+                    IF
+                    (
+                    LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+                    AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+                    '省内异地',
+                    '跨省异地'
+                    )
+                    ) type,
+                    count( 1 ) AS psnNum,
+                    e.total_price AS totalPrice,
+                    e.portion_price AS portionPrice,
+                    e.starting_price AS startingPrice,
+                    e.insure_price AS insurePrice,
+                    e.plan_account_price AS planAccountPrice,
+                    e.plan_price AS planPrice,
+                    e.serious_price AS seriousPrice,
+                    e.civil_price AS civilPrice,
+                    e.retire_price AS retirePrice,
+                    e.personal_price AS personalPrice,
+                    e.person_price AS personPrice,
+                    e.hosp_price AS hospPrice,
+                    e.rests_price AS restsPrice,
+                    ifnull( e.maf_pay, 0 ) AS mafPay,
+                    ( e.insure_price - e.personal_price ) AS planSumPrice,
+                    ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+                    IF
+                    (
+                    LEFT ( tt.in_time, 10 ) = LEFT ( tt.out_time, 10 ),
+                    1,
+                    DATEDIFF( tt.out_time, tt.in_time )
+                    ) AS inDay,
+                    e.insure_reg_code AS insureRegCode
+                FROM
+                    insure_individual_settle e,
+                    insure_individual_visit t,
+                    insure_individual_basic c,
+                    inpt_visit tt
+                WHERE
+                    e.hosp_code = t.hosp_code
+                  AND e.visit_id = t.visit_id
+                  AND c.hosp_code = t.hosp_code
+                  AND tt.hosp_code = e.hosp_code
+                  AND tt.id = e.visit_id
+                  AND c.id = t.mib_id
+                  AND c.aae140 IS NOT NULL
+                  AND e.settle_state = '1'
+                  AND e.insureSettleId IS NOT NULL
+                  AND e.state = '0'
+                  AND e.insure_reg_code = #{insureRegCode}
+                  AND e.hosp_code = #{hospCode}
+                <if test="insutype != null and insutype != '' ">
+                    and c.aae140 = #{insutype}
+                </if>
+                <if test="medType != null and medType != '' ">
+                    and c.aka130 = #{medType}
+                </if>
+                <if test="outDeptId != null and outDeptId != '' ">
+                    and tt.out_dept_id = #{outDeptId}
+                </if>
+                <if test="isRemote == '0'.toString()">
+                    and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+                </if>
+                <if test="isRemote == '1'.toString()">
+                    and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+                </if>
+                /*开始日期*/
+                <if test="startDate != null and startDate != '' ">
+                    and date(e.crte_time) &gt;= date(#{startDate})
+                </if>
+                /*结束日期*/
+                <if test="endDate != null and endDate != ''">
+                    and date(e.crte_time) &lt;= date(#{endDate})
+                </if>
+                GROUP BY
+                    se_vi_id
+            ) A
+        GROUP BY
+            A.outDeptName,A.clrOptins,A.medicineOrgCode,A.type
+    </select>
+
+    <select id="queryOutptDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT DISTINCT
+        c.aac003 AS psnName,
+        c.aac002 AS idCard,
+        c.bka035_name AS psnType,
+        c.aka130_name AS medTypeName,
+        c.bka008 insureUnit,
+        t.visit_icd_name visitIcdName,
+        tt.dept_name deptName,
+        e.total_price AS totalPrice,
+        e.portion_price AS portionPrice,
+        e.starting_price AS startingPrice,
+        e.insure_price AS insurePrice,
+        e.plan_account_price AS planAccountPrice,
+        e.plan_price AS planPrice,
+        e.serious_price AS seriousPrice,
+        e.civil_price AS civilPrice,
+        e.retire_price AS retirePrice,
+        e.personal_price AS personalPrice,
+        e.person_price AS personPrice,
+        e.hosp_price AS hospPrice,
+        e.rests_price AS restsPrice,
+        ifnull(e.maf_pay,0.00) AS mafPay,
+        ( e.insure_price - e.personal_price ) AS planSumPrice,
+        e.clr_optins AS clrOptins,
+        e.medicine_org_code AS medicineOrgCode,
+        t.insure_reg_code AS setlOptins,
+        t.aac001 AS psnNo,
+        t.medical_reg_no AS mdtrtId,
+        t.is_hospital AS isHospital,
+        c.aae140 AS insutype,
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+        e.insure_reg_code AS insureRegCode,
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c,
+        outpt_visit tt
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND tt.hosp_code = e.hosp_code
+        AND tt.id = e.visit_id
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.state = '0'
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
+        <if test="insutype != null and insutype != '' ">
+            and c.aae140 = #{insutype}
+        </if>
+        <if test="medType != null and medType != '' ">
+            and c.aka130 = #{medType}
+        </if>
+        <if test="isHospital != null and isHospital != '' ">
+            and t.is_hospital = #{isHospital}
+        </if>
+        <if test="deptId != null and deptId != '' ">
+            and tt.dept_id = #{deptId}
+        </if>
+        <if test="isRemote == '0'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        </if>
+        <if test="isRemote == '1'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+        se_vi_id
+    </select>
+
+    <!--申报表合计费用（门诊）-->
+    <select id="queryOutptSumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        type,
+        sum( psnNum ) AS psnNum,
+        sum( totalPrice ) AS totalPrice,
+        sum( portionPrice ) AS portionPrice,
+        sum( startingPrice ) AS startingPrice,
+        sum( insurePrice ) AS insurePrice,
+        sum( planAccountPrice ) AS planAccountPrice,
+        sum( planPrice ) AS planPrice,
+        sum( seriousPrice ) AS seriousPrice,
+        sum( civilPrice ) AS civilPrice,
+        sum( retirePrice ) AS retirePrice,
+        sum( personalPrice ) AS personalPrice,
+        sum( hospPrice ) AS hospPrice,
+        sum( restsPrice ) AS restsPrice,
+        sum( mafPay ) AS mafPay,
+        sum( planSumPrice ) AS planSumPrice
+        FROM
+        (
+        SELECT DISTINCT
+        count( 1 ) AS psnNum,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        '本市参保',
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        '省内异地',
+        '跨省异地'
+        )
+        ) type,
+        e.total_price AS totalPrice,
+        e.portion_price AS portionPrice,
+        e.starting_price AS startingPrice,
+        e.insure_price AS insurePrice,
+        e.plan_account_price AS planAccountPrice,
+        e.plan_price AS planPrice,
+        e.serious_price AS seriousPrice,
+        e.civil_price AS civilPrice,
+        e.retire_price AS retirePrice,
+        e.personal_price AS personalPrice,
+        e.person_price AS personPrice,
+        e.hosp_price AS hospPrice,
+        e.rests_price AS restsPrice,
+        ifnull( e.maf_pay, 0 ) AS mafPay,
+        ( e.insure_price - e.personal_price ) AS planSumPrice,
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        e.insure_reg_code AS insureRegCode
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c,
+        outpt_visit tt
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND tt.hosp_code = e.hosp_code
+        AND tt.id = e.visit_id
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        AND e.insureSettleId IS NOT NULL
+        AND e.state = '0'
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
+        <if test="insutype != null and insutype != '' ">
+            and c.aae140 = #{insutype}
+        </if>
+        <if test="medType != null and medType != '' ">
+            and c.aka130 = #{medType}
+        </if>
+        <if test="outDeptId != null and outDeptId != '' ">
+            and tt.out_dept_id = #{outDeptId}
+        </if>
+        <if test="isRemote == '0'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        </if>
+        <if test="isRemote == '1'.toString()">
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        </if>
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        GROUP BY
+        se_vi_id
+        ) A
+        GROUP BY type
     </select>
 
 </mapper>

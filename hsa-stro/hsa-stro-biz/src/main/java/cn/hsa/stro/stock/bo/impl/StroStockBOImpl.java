@@ -94,12 +94,14 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         }
         List<String> types = new ArrayList<>();
         for (String loginType:loginTypeIdentity.split(",")) {
-            if (loginType.equals("2") || loginType.equals("4")) {//中成药
+            if (loginType.equals("2")) {//中成药
                 types.add("1");
             } else if (loginType.equals("3")) {//中草药
                 types.add("2");
             } else if (loginType.equals("1")) {//西药
                 types.add("0");
+            } else if(loginType.contains("4")){ // 藏药
+                types.add("3");
             } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                 stroStockDTO.setTypeIdentity("5");
             } else {
@@ -135,7 +137,9 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
                     types.add("2");
                 } else if (loginType.equals("1")) {//西药
                     types.add("0");
-                } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
+                } else if (loginType.equals("4")) {// 藏药
+                    types.add("3");
+                }else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                     stroStockDetail.setTypeIdentity("5");
                 }
             }
@@ -169,6 +173,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
                     types.add("2");
                 } else if (loginType.equals("1")) {//西药
                     types.add("0");
+                } else if (loginType.equals("4")) {//藏药
+                    types.add("3");
                 } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                     stroStockDetail.setTypeIdentity("5");
                 }
@@ -212,6 +218,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
                     types.add("2");
                 } else if (loginType.equals("1")) {//西药
                     types.add("0");
+                } else if (loginType.equals("4")) {//藏药
+                    types.add("3");
                 } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                     stroStockDetail.setTypeIdentity("5");
                 }
@@ -1590,6 +1598,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
                     types.add("2");
                 } else if (loginType.equals("1")) {//西药
                     types.add("0");
+                } else if (loginType.equals("4")) {//藏药
+                    types.add("3");
                 } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                     stroStockDTO.setTypeIdentity("5");
                 } else {
@@ -1631,6 +1641,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
                     types.add("2");
                 } else if (loginType.equals("1")) {//西药
                     types.add("0");
+                } else if (loginType.equals("4")) {//藏药
+                    types.add("3");
                 } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
                     stroStockDetail.setTypeIdentity("5");
                 }

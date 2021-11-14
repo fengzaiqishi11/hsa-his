@@ -2,6 +2,7 @@ package cn.hsa.module.stro.adjust.dao;
 
 import cn.hsa.module.stro.adjust.dto.StroAdjustDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -144,5 +145,15 @@ public interface StroAdjustDao {
      * @Date   2021/8/3 17:13
      * @Return java.util.List<java.util.Map<java.lang.String,java.lang.String>>
      */
-    List<Map<String, String>> selectJudgeconfirmDruag(@Param("itemList") List<String> itemList,@Param("hospCode") String hospCode);
+    List<Map<String, String>> selectJudgeconfirmDruag(@Param("itemList") List<String> itemList, @Param("hospCode") String hospCode,
+                                                      @Param("deptConfirm") String deptConfirm);
+    /**
+     * @Meth: getParameterValue
+     * @Description: 获得系统参数
+     * @Param: [hospCode, code]
+     * @return: java.util.List<cn.hsa.module.sys.parameter.dto.SysParameterDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/11/8
+     */
+    List<SysParameterDTO> getParameterValue(String hospCode, String[] code);
 }

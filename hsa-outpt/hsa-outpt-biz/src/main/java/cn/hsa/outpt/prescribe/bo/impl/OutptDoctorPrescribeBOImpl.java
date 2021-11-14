@@ -339,6 +339,13 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             byVisitID.setIsVisit(Constants.SF.S);
             outptVisitDAO.updateOutptVisit(byVisitID);
         }
+        // 避免重复开住院证
+        if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "1".equals(byVisitID.getTranInCode())) {
+            throw new RuntimeException("【" + byVisitID.getName() + "】已开住院证，请进行入院登记");
+        }
+        if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "2".equals(byVisitID.getTranInCode())) {
+            throw new RuntimeException("【" + byVisitID.getName() + "】已进行入院登记，不可重复开住院证");
+        }
         return outptDoctorPrescribeDAO.updateVisitInHospital(outptVisitDTO) > 0;
     }
 
@@ -490,7 +497,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //就诊信息
         OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(outptRegisterDTO);
         //是否需要建档案
-        if(StringUtils.isEmpty(outptVisitDTO.getProfileId()) && (StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode()))) {
+        if(StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode())) {
             OutptProfileFileExtendDTO opf = this.getFprFileId(outptVisitDTO);
             //档案ID
             outptVisitDTO.setProfileId(opf.getProfileId());
@@ -1744,13 +1751,37 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
             //疾病ID
             outptDiagnoseDTO.setDiseaseId(diagnoseId);
-            //第一条数据，默认为主诊断(没有主诊断情况下)
-            if(i == 0 && Constants.SF.F.equals(isMain) ){
-                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-                outptDiagnoseDTO.setIsMain(Constants.SF.S);
-            }else{
-                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
-                outptDiagnoseDTO.setIsMain(Constants.SF.F);
+            // 如果是郭老板的医院并且诊断是同步过来的则固定主诊断
+            //否则第一条数据，默认为主诊断(没有主诊断情况下)
+            if(outptPrescribeDTO.getHospCode().equals("0005") || outptPrescribeDTO.getHospCode().equals("0006")) {
+                Map map = new HashMap();
+                map.put("hospCode", outptPrescribeDTO.getHospCode());
+                map.put("code", "YJ_ZDID");
+                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+                if (outptPrescribeDTO.getDiagnoseIds().equals(sysParameterDTO.getValue())) {
+                    map.put("code", "YJ_ZZD");
+                    SysParameterDTO sysParameterDTOS = sysParameterService_consumer.getParameterByCode(map).getData();
+                    if (diagnoseId.equals(sysParameterDTO.getValue())) {
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+                    }
+                } else {
+                    if(i == 0 && Constants.SF.F.equals(isMain) ){
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+                    }else{
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.F);
+                    }
+                }
+            } else {
+                if(i == 0 && Constants.SF.F.equals(isMain) ){
+                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                    outptDiagnoseDTO.setIsMain(Constants.SF.S);
+                }else{
+                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                    outptDiagnoseDTO.setIsMain(Constants.SF.F);
+                }
             }
             i++;
             //创建人ID
@@ -2093,8 +2124,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptCostDTO.setItemCode(Constants.XMLB.CL);
             //项目名称（药品、项目、材料、医嘱目录）
             outptCostDTO.setItemName(baseMaterialDTO.getName());
-            //单价
-            outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            //单价  基础材料信息拆零单位和单位一致时使用单价，不一致取拆零单价 lly 2021/10/03
+            if (baseMaterialDTO.getUnitCode().equals(baseMaterialDTO.getSplitUnitCode())) {
+                outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            }else {
+                outptCostDTO.setPrice(baseMaterialDTO.getSplitPrice());
+            }
             //规格
             outptCostDTO.setSpec(baseMaterialDTO.getSpec());
         }
@@ -3164,10 +3199,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //调用本地建档服务
         log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         //本地档案表id保持与中心端的一致
-        if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-            outptProfileFileDTO.setId(outptProfileFileExtendDTO.getData().getProfileId());
-        }
-//        outptProfileFileDTO.setOutProfile(outptVisitDTO.getVisitNo());
+        outptProfileFileDTO.setId(outptProfileFileExtendDTO.getData().getProfileId());
         outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getData().getOutProfile()); //门诊档案号
         outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getData().getInProfile()); //住院病案号
         outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getData().getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getOutptLastVisitTime()); // 门诊最后就诊时间

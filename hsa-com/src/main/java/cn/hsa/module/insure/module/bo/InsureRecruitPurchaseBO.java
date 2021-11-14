@@ -25,7 +25,7 @@ public interface InsureRecruitPurchaseBO {
      * @return
      * @throws
      */
-    Map<String,Object> queryAll(Map<String,Object> map);
+    PageDTO queryAll(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
 
     /**
      * @Method insertinvChgMedinsInfo
@@ -108,7 +108,7 @@ public interface InsureRecruitPurchaseBO {
      * @Date: 2021-08-26 10:27
      * @Return: list
      **/
-    List<Map<String, Object>> queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+    PageDTO queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
 
     /**
      * @Menthod:
@@ -152,5 +152,14 @@ public interface InsureRecruitPurchaseBO {
      * @Return
      */
     Map<String,Object> getToken(Map<String, Object> paramMap);
+    /**
+     * @Meth: uploadToInsure
+     * @Description: 药品库存上传变更
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2021/10/20
+     */
+    Boolean updateToInsure(Map<String, Object> map);
 
 }

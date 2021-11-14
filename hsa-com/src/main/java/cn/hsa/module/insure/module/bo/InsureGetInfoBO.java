@@ -161,4 +161,15 @@ public interface InsureGetInfoBO {
      * @Return
      */
     Map<String,Object> selectLoadingSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Method queryPage
+     * @Desrciption  查询结算清单左侧人员类别信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/9 15:29
+     * @Return
+     **/
+    PageDTO querySetlePage(Map<String, Object> map);
 }

@@ -50,4 +50,16 @@ public interface BackCostSureByInptService {
      * @Date: 2021/5/31 20:00
      **/
     WrapperResponse<PageDTO> queryOutpatientSurgeryCostPage(Map<String,Object> map);
+
+
+    /**
+     * @Method updateCancelBackCost
+     * @Desrciption 取消退费
+     * @param map
+     * @Author liuliyun
+     * @Date   2021/11/10
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @GetMapping("/service/inpt/nurse/updateCancelBackCost")
+    WrapperResponse<Boolean> updateCancelBackCost(Map<String,Object> map);
 }

@@ -242,11 +242,17 @@
         </foreach>
     </update>
 
-    <delete id="deleteHospDisease">
+    <delete id="deleteHospDisease" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
         delete
         from insure_disease_match
         where hosp_code = #{hospCode}
           and insure_reg_code = #{insureRegCode}
+        <if test="auditCode != null and auditCode != ''">
+            and audit_code = #{auditCode}
+        </if>
+        <if test="isMatch != null and isMatch != ''">
+            and is_match = #{isMatch}
+        </if>
     </delete>
     <delete id="deleteInsureDisease">
         delete

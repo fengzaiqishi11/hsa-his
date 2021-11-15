@@ -341,7 +341,7 @@ public class BasePreferentialBOImpl extends HsafBO implements BasePreferentialBO
                             }
                         } else { //门诊优惠
                             if ("1".equals(dto.getOutCode())) {//按比列
-                                preferentialPrice = BigDecimalUtils.multiply((new BigDecimal(1).subtract(dto.getInScale())), totalPrice);
+                                preferentialPrice = BigDecimalUtils.multiply((new BigDecimal(1).subtract(dto.getOutScale())), totalPrice);
                                 // 四舍五入保留两位小数
                                 preferentialPrice = preferentialPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
                                 realityPrice = BigDecimalUtils.subtract(totalPrice, preferentialPrice);

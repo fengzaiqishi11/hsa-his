@@ -872,6 +872,16 @@
         from insure_item_match
         where hosp_code = #{hospCode}
           and insure_reg_code = #{insureRegCode}
+        <if test="auditCode != null and auditCode != ''">
+            and audit_code = #{auditCode}
+        </if>
+        <if test="isMatch != null and isMatch != ''">
+            and is_match = #{isMatch}
+        </if>
+        <if test="isTrans != null and isTrans != ''">
+            and is_trans = #{isTrans}
+        </if>
+
     </delete>
     <delete id="deleteInsureItemMatch">
         delete  from insure_item_match where hosp_code =#{hospCode} and id =#{id}

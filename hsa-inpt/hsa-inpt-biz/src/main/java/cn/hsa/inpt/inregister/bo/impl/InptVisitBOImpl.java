@@ -998,6 +998,30 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // 处理医保回参数据
         try {
             InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+
+            // 人员身份类别判断是否一站式
+            String isOneSettle = Constants.SF.F;
+            List<Map<String,Object>> identMapList = inptVisitDTO.getIdetinList();
+            if (!ListUtils.isEmpty(identMapList)) {
+                for (Map<String,Object> identMap : identMapList) {
+                    String psnIdetType = MapUtils.get(identMap,"psn_idet_type"); // 人员身份类别
+                    String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
+                    String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
+                    if (!StringUtils.isEmpty(endtime)) {
+                        Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime,-1),DateUtils.Y_M_D);
+                        Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime,1),DateUtils.Y_M_D);
+                        if (DateUtils.getNow().before(endDate) && DateUtils.getNow().after(begnDate)) {
+                            isOneSettle = Constants.SF.S;
+                            insureIndividualVisitDTO.setPsnIdetType(psnIdetType);
+                            insureIndividualVisitDTO.setIdetStartDate(begnDate);
+                            insureIndividualVisitDTO.setIdetEndDate(endDate);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            insureIndividualVisitDTO.setIsOneSettle(isOneSettle);
             insureIndividualVisitDTO.setOmsgid(omsgid);
             insureIndividualVisitDTO.setOinfno(oinfno);
             insureIndividualVisitDTO.setId(SnowflakeUtils.getId());

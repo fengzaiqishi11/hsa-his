@@ -487,7 +487,10 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         String titleEnd = "";
         String specialName ="";// 张家界特有名称
         String aee140Str = ""; // 险种
-        Boolean specialOneSettle = null; // 张家界特有的一站式结算单判断
+        Boolean specialOneSettle = false; // 张家界特有的一站式结算单判断
+        boolean oneSettle = false; // 是否符合一站式身份
+        String psnIdetType = ""; //人员身份类别
+        Map<String,Object> oneSettleMap;
         map.put("code","HOSP_MEDICINS_INFO");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
         if(sysParameterDTO ==null || StringUtils.isEmpty(sysParameterDTO.getValue())){
@@ -543,10 +546,12 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                     append(mzOrZyName).append(titleEnd).toString();
 
         }
-        String[] split = aee140Str.split(",");
-        List<String> strings = Arrays.asList(split);
-        if("张家界".equals(specialName) && Constants.SF.S.equals(isHospital) && strings.contains(aae140)){
-            specialOneSettle = true;
+        if(StringUtils.isNotEmpty(aee140Str)){
+            String[] split = aee140Str.split(",");
+            List<String> strings = Arrays.asList(split);
+            if("张家界".equals(specialName) && Constants.SF.S.equals(isHospital) && strings.contains(aae140)){
+                specialOneSettle = true;
+            }
         }
         Map<String, Object> medisnInfMap = new HashMap<>();
         medisnInfMap.put("settleTitle",settleTitle);
@@ -564,10 +569,13 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             actPayDedc = MapUtils.get(setlInfoMap,"act_pay_dedc");
         }
         List<Map<String, Object>> setldetail  = MapUtils.get(data,"setldetail");
-
-        Map<String,Object> oneSettleMap = checkOneSettle(map, insureIndividualVisitDTO);
-        boolean oneSettle = MapUtils.get(oneSettleMap,"flag");
-        String psnIdetType = MapUtils.get(oneSettleMap,"psnIdetType");
+        if(Constants.SF.S.equals(isHospital)){
+            oneSettleMap = checkOneSettle(map, insureIndividualVisitDTO);
+            if(!MapUtils.isEmpty(oneSettleMap)){
+                oneSettle = MapUtils.get(oneSettleMap,"flag");
+                psnIdetType = MapUtils.get(oneSettleMap,"psnIdetType");
+            }
+        }
         Map<String,Object> baseInfoMap  = handlerInptSettleParam(insureIndividualVisitDTO,setlInfoMap,oneSettle,psnIdetType,specialOneSettle);
         Map<String,Object> fourPartMap =  handlerInsureSettleFee(setlInfoMap);
         BigDecimal hifpPay = MapUtils.get(setlInfoMap,"hifp_pay"); // 报销总金额
@@ -681,11 +689,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         for(Map<String, Object> item : policyMapList){
             polItemName = MapUtils.get(item,"polItemName");
             polItemPaySum = MapUtils.get(item,"polItemPaySum");
-            if("完全政策自付费用".equals(polItemName.trim())){
+            if("完全政策自付费用".equals(polItemName.trim()) || "全自费".equals(polItemName.trim())){
                 s1 = polItemPaySum;
                 continue;
             }
-            if("部分政策自付费用".equals(polItemName.trim())){
+            if("部分政策自付费用".equals(polItemName.trim())  || "乙类先自付".equals(polItemName.trim())){
                 s2 = polItemPaySum;
                 continue;
             }
@@ -833,7 +841,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }else{
             List<Map<String, Object>> collect = listMap.stream().filter(item ->
                     DateUtils.betweenDate(DateUtils.parse(MapUtils.get(item, "begntime"),DateUtils.Y_M_DH_M_S),
-                            DateUtils.parse(MapUtils.get(item, "endtime"),DateUtils.Y_M_DH_M_S), DateUtils.getNow())).collect(Collectors.toList());
+                            DateUtils.parse(MapUtils.get(item, "endtime"),DateUtils.Y_M_DH_M_S), DateUtils.getNow()) ||  StringUtils.isEmpty(MapUtils.get(item, "endtime")))
+                    .collect(Collectors.toList());
             if(ListUtils.isEmpty(collect)){
                 infoMap.put("flag", false);
             }else{
@@ -1286,6 +1295,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("tel",insureIndividualVisitDTO.getPhone()); // 地址
         map.put("setlTime",MapUtils.get(setlInfoMap,"setl_time")); // 报销时间
         map.put("brdy",MapUtils.get(setlInfoMap,"brdy")); // 出生年月
+        map.put("aae140",insureIndividualVisitDTO.getAae140()); // 险种
         /**
          * 一站式结算单需要出院诊断
          */

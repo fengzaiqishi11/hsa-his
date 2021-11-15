@@ -1139,6 +1139,7 @@
         </if>
         ) a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        order by a.crte_time desc
     </select>
 
     <select id="passStatistics"  resultType="map" parameterType="map">

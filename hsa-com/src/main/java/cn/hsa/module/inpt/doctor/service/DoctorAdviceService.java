@@ -217,4 +217,16 @@ public interface DoctorAdviceService {
      **/
     @GetMapping("/service/inpt/doctorAdviceController/updateInptAdviceDetailLmt")
     WrapperResponse<Boolean> updateInptAdviceDetailLmt(Map map);
+
+    /**
+     * @Menthod: queryLisAdvice
+     * @Desrciption: 根据合管条件查询同类型的lis医嘱，用于合并打印lis申请单
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-11 10:24
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/queryLisAdvice")
+    WrapperResponse<List<InptAdviceDTO>> queryLisAdvice(Map map);
 }

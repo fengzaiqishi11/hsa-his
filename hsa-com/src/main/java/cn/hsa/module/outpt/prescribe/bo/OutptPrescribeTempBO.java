@@ -65,4 +65,14 @@ public interface OutptPrescribeTempBO {
      * @Return boolean
      **/
     boolean updateOutptPrescribeTempDTO(OutptPrescribeTempDTO outptPrescribeTempDTO);
+
+    /**
+     * @Method updateTempAudit
+     * @Desrciption 模板取消审核
+     * @param outptPrescribeTempDTO
+     * @Author liuliyun
+     * @Date   2021/11/10 17:16
+     * @Return boolean
+     **/
+    boolean updateTempAudit(OutptPrescribeTempDTO outptPrescribeTempDTO);
 }

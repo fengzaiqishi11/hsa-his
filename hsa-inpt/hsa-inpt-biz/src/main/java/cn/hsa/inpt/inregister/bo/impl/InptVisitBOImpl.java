@@ -233,6 +233,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                                 outptVisitDTOS.get(i).setContactName(opt.getContactName());
                                 outptVisitDTOS.get(i).setContactPhone(opt.getContactPhone());
                                 outptVisitDTOS.get(i).setContactAddress(opt.getContactAddress());
+                                outptVisitDTOS.get(i).setNowAddress(opt.getNowAddress());
                             }
                         }
                     }

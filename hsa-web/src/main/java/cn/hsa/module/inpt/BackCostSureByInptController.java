@@ -97,4 +97,27 @@ public class BackCostSureByInptController extends BaseController {
         WrapperResponse<Boolean> booleanWrapperResponse = backCostSureWithInptService_consumer.updateBackCostSure(map);
         return booleanWrapperResponse;
     }
+    /**
+     * @Method updateCancelBackCost
+     * @Desrciption 取消退费
+     * @param inptCostDTO
+     * @Author liuliyun
+     * @Date   2021-11-10
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @PostMapping("/updateCancelBackCost")
+    @NoRepeatSubmit
+    WrapperResponse<Boolean> updateCancelBackCost(@RequestBody InptCostDTO inptCostDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        inptCostDTO.setHospCode(sysUserDTO.getHospCode());
+        inptCostDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        inptCostDTO.setOkId(sysUserDTO.getId());
+        inptCostDTO.setOkName(sysUserDTO.getName());
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("inptCostDTO", inptCostDTO);
+        WrapperResponse<Boolean> booleanWrapperResponse = backCostSureWithInptService_consumer.updateCancelBackCost(map);
+        return booleanWrapperResponse;
+    }
+
 }

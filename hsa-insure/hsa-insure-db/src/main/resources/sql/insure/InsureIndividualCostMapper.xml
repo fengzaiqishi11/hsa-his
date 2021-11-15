@@ -1046,6 +1046,7 @@
                rxSn,
                overlmtSelfpayAmt,
                chrgItemLv,
+               chrgItemLv as chrgitm_lv,
                fulamtOwnpayFlag,
                ownpayRea,
                hiLmtpric,

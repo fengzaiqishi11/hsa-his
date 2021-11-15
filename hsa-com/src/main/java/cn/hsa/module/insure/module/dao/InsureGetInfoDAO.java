@@ -648,4 +648,26 @@ public interface InsureGetInfoDAO {
      * @Return 
     **/
     String selectRefldeptDept(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询结算清单左侧人员类别信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    List<Map<String, Object>> querySetlePage(Map<String, Object> map);
+
+    /**
+     * @Method selectInsureIndividual
+     * @Desrciption  查询患者登记时保存的门特病种信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/9 16:07
+     * @Return
+    **/
+    InsureIndividualVisitDTO selectInsureIndividual(Map<String, Object> map);
 }

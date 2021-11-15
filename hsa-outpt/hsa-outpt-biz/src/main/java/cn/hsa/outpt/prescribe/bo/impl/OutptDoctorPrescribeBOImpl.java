@@ -1762,7 +1762,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 if (outptPrescribeDTO.getDiagnoseIds().indexOf(sysParameterDTO.getValue()) > -1) {
                     map.put("code", "YJ_ZZD");
                     SysParameterDTO sysParameterDTOS = sysParameterService_consumer.getParameterByCode(map).getData();
-                    if (diagnoseId.equals(sysParameterDTO.getValue())) {
+                    if (diagnoseId.equals(sysParameterDTOS.getValue())) {
                         outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
                         outptDiagnoseDTO.setIsMain(Constants.SF.S);
                     }

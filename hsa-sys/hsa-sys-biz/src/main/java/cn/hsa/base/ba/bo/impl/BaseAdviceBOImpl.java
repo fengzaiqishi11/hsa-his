@@ -725,19 +725,20 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
     }
 
     /**
-     *  根据页面传递参数 是否查询退费 返回申请单状态列表
+     *  根据作废状态 查询单据类型
      * @param isValid
      * @return 医技申请单据状态
      */
     private List<String> getStatusListNeed2Query(String isValid){
         List<String> list = new ArrayList<>(8);
-
-        if(Constants.SF.F.equals(isValid)){
+        // 作废状态 --- 退费单据
+        if(Constants.SF.S.equals(isValid)){
             list.add(Constants.SQDZT.Refund_Waiting_For_Response);
             list.add(Constants.SQDZT.Refund_Received);
             return list;
         }
-        if(Constants.SF.S.equals(isValid)){
+        // 非作废状态 --- 非退费单据
+        if(Constants.SF.F.equals(isValid)){
             list.add(Constants.SQDZT.Prescription_Submitted);
             list.add(Constants.SQDZT.Settlement_To_Be_Sent);
             list.add(Constants.SQDZT.Settlement_Sent);

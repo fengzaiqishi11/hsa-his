@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.inpt.consultation.dao.InptConsultationApplyDAO">
+
+    <resultMap type="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO" id="inptConsultationApplyMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
+        <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="consulNo" column="consul_no" jdbcType="VARCHAR"/>
+        <result property="consulState" column="consul_state" jdbcType="VARCHAR"/>
+        <result property="consulType" column="consul_type" jdbcType="VARCHAR"/>
+        <result property="consulTime" column="consul_time" jdbcType="TIMESTAMP"/>
+        <result property="consulAddr" column="consul_addr" jdbcType="VARCHAR"/>
+        <result property="applyDeptid" column="apply_deptid" jdbcType="VARCHAR"/>
+        <result property="applyUserid" column="apply_userid" jdbcType="VARCHAR"/>
+        <result property="applyUsername" column="apply_username" jdbcType="VARCHAR"/>
+        <result property="illness" column="illness" jdbcType="VARCHAR"/>
+        <result property="diagnoTreat" column="diagno_treat" jdbcType="VARCHAR"/>
+        <result property="consulReason" column="consul_reason" jdbcType="VARCHAR"/>
+        <result property="consulObjective" column="consul_objective" jdbcType="VARCHAR"/>
+        <result property="consulDeptidList" column="consul_deptid_list" jdbcType="VARCHAR"/>
+        <result property="consulUseridList" column="consul_userid_list" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="finishUserid" column="finish_userid" jdbcType="VARCHAR"/>
+        <result property="finishUsername" column="finish_username" jdbcType="VARCHAR"/>
+        <result property="finishTime" column="finish_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--新增所有列-->
+    <insert id="insert" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        insert into inpt_consultation_apply(id, hosp_code, visit_id, baby_id, advice_id, consul_no, consul_state,
+                                                   consul_type, consul_time, consul_addr, apply_deptid, apply_userid,
+                                                   apply_username, illness, diagno_treat, consul_reason,
+                                                   consul_objective, consul_deptid_list, consul_userid_list, remark,
+                                                   finish_userid, finish_username, finish_time, crte_id, crte_name,
+                                                   crte_time)
+        values (#{id}, #{hospCode}, #{visitId}, #{babyId}, #{adviceId}, #{consulNo}, #{consulState}, #{consulType},
+                #{consulTime}, #{consulAddr}, #{applyDeptid}, #{applyUserid}, #{applyUsername}, #{illness},
+                #{diagnoTreat}, #{consulReason}, #{consulObjective}, #{consulDeptidList}, #{consulUseridList},
+                #{remark}, #{finishUserid}, #{finishUsername}, #{finishTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        update inpt_consultation_apply
+        <set>
+            consul_state = #{consulState},
+            consul_type = #{consulType},
+            consul_time = #{consulTime},
+            consul_addr = #{consulAddr},
+            apply_deptid = #{applyDeptid},
+            apply_userid = #{applyUserid},
+            apply_username = #{applyUsername},
+            illness = #{illness},
+            diagno_treat = #{diagnoTreat},
+            consul_reason = #{consulReason},
+            consul_objective = #{consulObjective},
+            consul_deptid_list = #{consulDeptidList},
+            consul_userid_list = #{consulUseridList},
+            remark = #{remark},
+            finish_userid = #{finishUserid},
+            finish_username = #{finishUsername},
+            finish_time = #{finishTime}
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--更改状态-->
+    <update id="updateStatus" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        update inpt_consultation_apply
+        <set>
+            <if test="consulState != null and consulState != ''">
+                consul_state = #{consulState},
+            </if>
+            <if test="finishUserid != null and finishUserid != ''">
+                finish_userid = #{finishUserid},
+            </if>
+            <if test="finishUsername != null and finishUsername != ''">
+                finish_username = #{finishUsername},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and id = #{id}
+    </update>
+
+    <!--更新会诊申请表的医嘱id-->
+    <update id="updateAdviceId" parameterType="java.util.List">
+        <foreach collection="consulApplyList" item="dto" separator=";">
+            update inpt_consultation_apply
+            set advice_id = #{dto.id}
+            where hosp_code = #{dto.hospCode}
+              and id = #{dto.consulApplyInfo.id}
+        </foreach>
+    </update>
+
+    <!--查询单个-->
+    <select id="getById" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO" resultType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        select id,
+               hosp_code,
+               visit_id,
+               baby_id,
+               advice_id,
+               consul_no,
+               consul_state,
+               consul_type,
+               consul_time,
+               consul_addr,
+               apply_deptid,
+               apply_userid,
+               apply_username,
+               illness,
+               diagno_treat,
+               consul_reason,
+               consul_objective,
+               consul_deptid_list,
+               consul_userid_list,
+               remark,
+               finish_userid,
+               finish_username,
+               finish_time,
+               crte_id,
+               crte_name,
+               crte_time
+        from inpt_consultation_apply
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="adviceId != null and adviceId != ''">
+            and advice_id = #{adviceId}
+        </if>
+    </select>
+
+    <!--会诊申请列表查询-->
+    <select id="queryConsultationApply" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO" resultType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        select a.*
+        from inpt_consultation_apply a
+        join inpt_visit iv on a.visit_id = iv.id and a.hosp_code = iv.hosp_code
+        join base_bed bb on iv.bed_id = bb.id and iv.hosp_code = bb.hosp_code
+        where a.hosp_code = ''
+        <if test="keyword != null and keyword != ''">
+            and (iv.name like concat('%', #{keyword}, '%') or iv.bed_name like concat('%', #{keyword}, '%') or iv.in_no = #{keyword} or a.consul_no = #{keyword})
+        </if>
+        <if test="consulType != null and consulType != ''">
+            and a.consul_type = #{consulType}
+        </if>
+        <if test="consulState != null and consulState != ''">
+            and a.consul_state = #{consulState}
+        </if>
+        <if test="startTime != null">
+            <![CDATA[
+                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') >= date_format(#{startTime}, '%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+        <if test="endTime != null">
+            <![CDATA[
+                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') >= date_format(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+        order by bb.seq_no asc, a.consul_no asc, a.consul_time asc
+    </select>
+
+    <!--通过主键删除-->
+    <delete id="deleteById" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
+        delete
+        from inpt_consultation_apply
+        where id = #{id} and hosp_code = #{hospCode}
+    </delete>
+</mapper>

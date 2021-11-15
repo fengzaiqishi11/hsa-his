@@ -1758,7 +1758,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 map.put("hospCode", outptPrescribeDTO.getHospCode());
                 map.put("code", "YJ_ZDID");
                 SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
-                if (outptPrescribeDTO.getDiagnoseIds().equals(sysParameterDTO.getValue())) {
+//                if (outptPrescribeDTO.getDiagnoseIds().equals(sysParameterDTO.getValue())) {
+                if (outptPrescribeDTO.getDiagnoseIds().indexOf(sysParameterDTO.getValue()) > -1) {
                     map.put("code", "YJ_ZZD");
                     SysParameterDTO sysParameterDTOS = sysParameterService_consumer.getParameterByCode(map).getData();
                     if (diagnoseId.equals(sysParameterDTO.getValue())) {
@@ -1766,13 +1767,13 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                         outptDiagnoseDTO.setIsMain(Constants.SF.S);
                     }
                 } else {
-                    if(i == 0 && Constants.SF.F.equals(isMain) ){
-                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
-                    }else{
+//                    if(i == 0 && Constants.SF.F.equals(isMain) ){
+//                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+//                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+//                    }else{
                         outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
                         outptDiagnoseDTO.setIsMain(Constants.SF.F);
-                    }
+//                    }
                 }
             } else {
                 if(i == 0 && Constants.SF.F.equals(isMain) ){

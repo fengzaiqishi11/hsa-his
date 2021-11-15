@@ -162,12 +162,12 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 diagnoseMap.put("vali_flag", Constants.SF.S); // TODO 有效标志
                 mapList.add(diagnoseMap);
         }
+        JSONArray jsonArray = (JSONArray) unifiedPayMap.get("jsonArray");
         List<OutptDiagnoseDTO> collect = diagnoseDTOList.stream().filter(outptDiagnoseDTO1 -> "1".equals(outptDiagnoseDTO1.getIsMain())).collect(Collectors.toList());
-        OutptDiagnoseDTO diagnoseDTO = collect.get(0);
         if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
-            patientInfo.put("dise_code", diagnoseDTO.getInsureInllnessCode()); // TODO 病种编号
-            patientInfo.put("dise_codg", diagnoseDTO.getInsureInllnessCode()); // add by ljg 病种编号
-            patientInfo.put("dise_name", diagnoseDTO.getInsureInllnessName());  // TODO 病种名称
+            patientInfo.put("dise_code", jsonArray.getJSONObject(0).get("insureIllnessCode")); // TODO 病种编号
+            patientInfo.put("dise_codg", jsonArray.getJSONObject(0).get("insureIllnessCode")); // add by ljg 病种编号
+            patientInfo.put("dise_name", jsonArray.getJSONObject(0).get("insureIllnessName"));  // TODO 病种名称
 
         } else {
             patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006()); // TODO 病种编号

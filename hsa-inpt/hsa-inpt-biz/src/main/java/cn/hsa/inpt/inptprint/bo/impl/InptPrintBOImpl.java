@@ -1,7 +1,6 @@
 package cn.hsa.inpt.inptprint.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.inpt.drawMedicine.bo.impl.DrawMedicineBOImpl;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
@@ -13,9 +12,9 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inptprint.bo.InptPrintBO;
 import cn.hsa.module.inpt.inptprint.dao.InptPrintDAO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
+import cn.hsa.module.inpt.nurse.dao.InptAdviceExecDAO;
+import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
-import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -54,16 +53,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
 
 
   /**
-  * @Menthod queryInptCostList
-  * @Desrciption 费用清单打印
-  *
-  * @Param
-  * [inptCostDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/27 19:41
-  * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
-  **/
+   * @Menthod queryInptCostList
+   * @Desrciption 费用清单打印
+   *
+   * @Param
+   * [inptCostDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/27 19:41
+   * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
+   **/
   @Override
   public Map queryInptCostListPrint(InptCostDTO inptCostDTO) {
     List<InptCostDTO> inptCostDTOS = inptPrintDAO.queryInptCostListPrint(inptCostDTO);
@@ -125,18 +124,21 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     }
   }
 
+  @Resource
+  InptAdviceExecDAO inptAdviceExecDao;
+
 
   /*
-  * @Menthod queryDetailCostByDay
-  * @Desrciption 明细格式逐日/汇总打印
-  *
-  * @Param
-  * [inptCostDTOS]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/29 15:19
-  * @Return java.util.List<java.util.Map>
-  **/
+   * @Menthod queryDetailCostByDay
+   * @Desrciption 明细格式逐日/汇总打印
+   *
+   * @Param
+   * [inptCostDTOS]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/29 15:19
+   * @Return java.util.List<java.util.Map>
+   **/
   public Map queryDetailCostByDay(Map<String, List<InptCostDTO>> collect){
     List<Map> list= new ArrayList<>();
     Map mapdata = new HashMap();
@@ -168,16 +170,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod queryItemCostByDay
-  * @Desrciption 项目汇总打印
-  *
-  * @Param
-  * [collect]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/12/21 19:02
-  * @Return java.util.Map
-  **/
+   * @Menthod queryItemCostByDay
+   * @Desrciption 项目汇总打印
+   *
+   * @Param
+   * [collect]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/12/21 19:02
+   * @Return java.util.Map
+   **/
   public Map queryItemCostByDay(Map<String, List<InptCostDTO>> collect){
     List<Map> list= new ArrayList<>();
     Map mapdata = new HashMap();
@@ -200,16 +202,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod queryStructureByDate
-  * @Desrciption  费用清单结构格式逐日打印
-  *
-  * @Param
-  * [collect]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/29 19:21
-  * @Return java.util.Map
-  **/
+   * @Menthod queryStructureByDate
+   * @Desrciption  费用清单结构格式逐日打印
+   *
+   * @Param
+   * [collect]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/29 19:21
+   * @Return java.util.Map
+   **/
   public Map queryStructureByDate(List<InptCostDTO> inptCostDTOS,Map<String, List<InptCostDTO>> collect){
     Map mapdata = new HashMap();
     List<Map> list= new ArrayList<>();
@@ -254,16 +256,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod queryStructureByAll
-  * @Desrciption 费用清单结构格式汇总打印
-  *
-  * @Param
-  * [inptCostDTOS, collect]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/30 15:36
-  * @Return java.util.Map
-  **/
+   * @Menthod queryStructureByAll
+   * @Desrciption 费用清单结构格式汇总打印
+   *
+   * @Param
+   * [inptCostDTOS, collect]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/30 15:36
+   * @Return java.util.Map
+   **/
   public Map queryStructureByAll(List<InptCostDTO> inptCostDTOS,Map<String, BigDecimal> collect ) {
     Map mapdata = new HashMap();
     List<Map> list= new ArrayList<>();
@@ -296,16 +298,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod getApplyDetailsListPrint
-  * @Desrciption 领药申请打印按病人
-  *
-  * @Param
-  * [map]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/30 16:15
-  * @Return java.util.Map
-  **/
+   * @Menthod getApplyDetailsListPrint
+   * @Desrciption 领药申请打印按病人
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/30 16:15
+   * @Return java.util.Map
+   **/
   @Override
   public Map getApplyDetailsListPrint(Map map) {
     String flag = MapUtils.get(map, "flag");
@@ -317,16 +319,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod getApplyListPrint
-  * @Desrciption 按病人打印
-  *
-  * @Param
-  * [map]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/30 16:50
-  * @Return java.util.Map
-  **/
+   * @Menthod getApplyListPrint
+   * @Desrciption 按病人打印
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/30 16:50
+   * @Return java.util.Map
+   **/
   private Map getApplyListPrint(Map map){
     String hospCode = MapUtils.get(map, "hospCode");
     List<String> codeList = MapUtils.get(map, "codeList");
@@ -349,16 +351,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod getApplySumPrint
-  * @Desrciption 领药申请不按病人打印
-  *
-  * @Param
-  * [map]
-  *
-  * @Author jiahong.yang
-  * @Date   2020/10/31 11:27
-  * @Return java.util.Map
-  **/
+   * @Menthod getApplySumPrint
+   * @Desrciption 领药申请不按病人打印
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiahong.yang
+   * @Date   2020/10/31 11:27
+   * @Return java.util.Map
+   **/
   private Map getApplySumPrint(Map map) {
     String hospCode = MapUtils.get(map, "hospCode");
     List<String> codeList = MapUtils.get(map, "codeList");
@@ -415,6 +417,12 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     // 修改医嘱打印表数据 根据医嘱信息表
     for(InptAdvicePrintDTO inptAdvicePrintDTO1 : inptAdviceDTOS){
       if(collect.containsKey(inptAdvicePrintDTO1.getIaId())){
+        InptAdviceExecDTO inptAdviceExecDTO = new InptAdviceExecDTO();
+        inptAdviceExecDTO.setHospCode(inptAdvicePrintDTO.getHospCode());
+        inptAdviceExecDTO.setAdviceId(inptAdvicePrintDTO1.getIaId());
+        // 查询最近执行时间
+        InptAdviceExecDTO inptAdviceExecDTO1 = inptAdviceExecDao.queryAdviceExecLately(inptAdviceExecDTO);
+        inptAdvicePrintDTO1.setLastExecTime(inptAdviceExecDTO1 == null ? null:inptAdviceExecDTO1.getExecTime());
         // 主键id
         inptAdvicePrintDTO1.setId(collect.get(inptAdvicePrintDTO1.getIaId()).get(0).getId());
         // 序号
@@ -433,16 +441,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod updateAdvicePrintStatus
-  * @Desrciption 批量修改状态
-  *
-  * @Param
-  * [inptAdvicePrintDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/1/18 17:27
-  * @Return java.lang.Boolean
-  **/
+   * @Menthod updateAdvicePrintStatus
+   * @Desrciption 批量修改状态
+   *
+   * @Param
+   * [inptAdvicePrintDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/1/18 17:27
+   * @Return java.lang.Boolean
+   **/
   @Override
   public Boolean updateAdvicePrintStatus(InptAdvicePrintDTO inptAdvicePrintDTO) {
     inptAdvicePrintDTO.setIsValid("1");
@@ -477,16 +485,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod updateAdvicePrintResetStatus
-  * @Desrciption 打印状态重置为0
-  *
-  * @Param
-  * [inptAdvicePrintDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/4/21 15:01
-  * @Return java.lang.Boolean
-  **/
+   * @Menthod updateAdvicePrintResetStatus
+   * @Desrciption 打印状态重置为0
+   *
+   * @Param
+   * [inptAdvicePrintDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/4/21 15:01
+   * @Return java.lang.Boolean
+   **/
   @Override
   public Boolean updateAdvicePrintResetStatus(InptAdvicePrintDTO inptAdvicePrintDTO) {
     int i = inptPrintDAO.updateAdvicePrintResetStatus(inptAdvicePrintDTO);
@@ -494,16 +502,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod updateResetPrint
-  * @Desrciption
-  *
-  * @Param  重置医嘱打印格式
-  * [inptAdvicePrintDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/4/15 16:17
-  * @Return java.lang.Boolean
-  **/
+   * @Menthod updateResetPrint
+   * @Desrciption
+   *
+   * @Param  重置医嘱打印格式
+   * [inptAdvicePrintDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/4/15 16:17
+   * @Return java.lang.Boolean
+   **/
   @Override
   public Boolean updateResetPrint(InptAdvicePrintDTO inptAdvicePrintDTO) {
     // 删除医嘱打印表中该患者的记录
@@ -514,12 +522,19 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       return true;
     }
     for (int i = 0; i < inptAdvicePrintDTOS.size(); i++) {
+      InptAdviceExecDTO inptAdviceExecDTO = new InptAdviceExecDTO();
+      inptAdviceExecDTO.setHospCode(inptAdvicePrintDTO.getHospCode());
+      inptAdviceExecDTO.setAdviceId(inptAdvicePrintDTOS.get(i).getIaId());
+      // 查询最近执行时间
+      InptAdviceExecDTO inptAdviceExecDTO1 = inptAdviceExecDao.queryAdviceExecLately(inptAdviceExecDTO);
       // 设置默认有效
       inptAdvicePrintDTOS.get(i).setIsValid("1");
       // 设置主键
       inptAdvicePrintDTOS.get(i).setId(SnowflakeUtils.getId());
       // 设置序号
       inptAdvicePrintDTOS.get(i).setSeqNo(i);
+      // 最近执行时间
+      inptAdvicePrintDTOS.get(i).setLastExecTime(inptAdviceExecDTO1 == null ? null:inptAdviceExecDTO1.getExecTime());
     }
     // 插入医嘱打印表
     inptPrintDAO.insertAdvicePrint(inptAdvicePrintDTOS);
@@ -527,16 +542,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod saveAdvicePrint
-  * @Desrciption 保存医嘱打印格式1
-  *
-  * @Param
-  * [inptAdvicePrintDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/4/15 16:17
-  * @Return java.lang.Boolean
-  **/
+   * @Menthod saveAdvicePrint
+   * @Desrciption 保存医嘱打印格式1
+   *
+   * @Param
+   * [inptAdvicePrintDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/4/15 16:17
+   * @Return java.lang.Boolean
+   **/
   @Override
   public Boolean saveAdvicePrint(InptAdvicePrintDTO inptAdvicePrintDTO) {
     if(StringUtils.isEmpty(inptAdvicePrintDTO.getIds1())) {
@@ -578,16 +593,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
   }
 
   /**
-  * @Menthod queryAdvicePrintDTOByVisit
-  * @Desrciption 查询打印医嘱信息
-  *
-  * @Param
-  * [inptAdvicePrintDTO]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/4/20 19:23
-  * @Return java.util.List<cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO>
-  **/
+   * @Menthod queryAdvicePrintDTOByVisit
+   * @Desrciption 查询打印医嘱信息
+   *
+   * @Param
+   * [inptAdvicePrintDTO]
+   *
+   * @Author jiahong.yang
+   * @Date   2021/4/20 19:23
+   * @Return java.util.List<cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO>
+   **/
   @Override
   public List<InptAdvicePrintDTO> queryAdvicePrintDTOByVisit(InptAdvicePrintDTO inptAdvicePrintDTO) {
     if(StringUtils.isEmpty(inptAdvicePrintDTO.getVisitId())) {
@@ -596,6 +611,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     List<InptAdvicePrintDTO> inptAdvicePrintDTOS = inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
     return inptAdvicePrintDTOS;
   }
+
 
 
   /**
@@ -608,33 +624,33 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
    **/
   @Override
   public Map queryBabyInptCostListPrint(InptCostDTO inptCostDTO) {
-      Map mergeList = new HashMap();
-      List<Map> babyCostList = new ArrayList<>();
-      // 获取大人费用
-      Map patientCost=queryInptCostListPrint(inptCostDTO);
-      mergeList.put("patientCost",patientCost);
-      BigDecimal totalCost = BigDecimal.valueOf(0);
-      totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) patientCost.get("total"));
-      InptBabyDTO inptBabyDTO=new InptBabyDTO();
-      inptBabyDTO.setVisitId(inptCostDTO.getVisitId());
-      inptBabyDTO.setHospCode(inptCostDTO.getHospCode());
-      List<InptBabyDTO> inptBabyDTOS=inptBabyDAO.findByCondition(inptBabyDTO);
-      if (inptBabyDTOS!=null && inptBabyDTOS.size()>0) {
-        for (InptBabyDTO inptBabyDTO1:inptBabyDTOS) {
-          inptCostDTO.setBabyId(inptBabyDTO1.getId());
-          // 获取婴儿费用
-          Map babyCost = queryBabyCost(inptCostDTO);
-          if (babyCost.isEmpty()){
-              continue;
-          }
-          totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) babyCost.get("total"));
-          babyCostList.add(babyCost);
+    Map mergeList = new HashMap();
+    List<Map> babyCostList = new ArrayList<>();
+    // 获取大人费用
+    Map patientCost=queryInptCostListPrint(inptCostDTO);
+    mergeList.put("patientCost",patientCost);
+    BigDecimal totalCost = BigDecimal.valueOf(0);
+    totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) patientCost.get("total"));
+    InptBabyDTO inptBabyDTO=new InptBabyDTO();
+    inptBabyDTO.setVisitId(inptCostDTO.getVisitId());
+    inptBabyDTO.setHospCode(inptCostDTO.getHospCode());
+    List<InptBabyDTO> inptBabyDTOS=inptBabyDAO.findByCondition(inptBabyDTO);
+    if (inptBabyDTOS!=null && inptBabyDTOS.size()>0) {
+      for (InptBabyDTO inptBabyDTO1:inptBabyDTOS) {
+        inptCostDTO.setBabyId(inptBabyDTO1.getId());
+        // 获取婴儿费用
+        Map babyCost = queryBabyCost(inptCostDTO);
+        if (babyCost.isEmpty()){
+          continue;
         }
+        totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) babyCost.get("total"));
+        babyCostList.add(babyCost);
       }
-      mergeList.put("babyCost",babyCostList);
-      mergeList.put("totalCost",totalCost);
-      return mergeList;
     }
+    mergeList.put("babyCost",babyCostList);
+    mergeList.put("totalCost",totalCost);
+    return mergeList;
+  }
 
 
   public Map queryBabyCost(InptCostDTO inptCostDTO) {
@@ -642,7 +658,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     List<InptCostDTO> inptCostDTOS = inptPrintDAO.queryInptCostListPrint(inptCostDTO);
     Map<String, List<InptCostDTO>> collect = new TreeMap<>();
     if(ListUtils.isEmpty(inptCostDTOS)){
-       return null;
+      return null;
     }
     if("1".equals(inptCostDTO.getPrintFlag())){
       collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate,TreeMap::new,Collectors.toList()));
@@ -655,7 +671,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       return queryStructureByDate(inptCostDTOS,collect);
     } else if("4".equals(inptCostDTO.getPrintFlag())){
       Map<String, BigDecimal> collect1 = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName,
-              Collectors.mapping(InptCostDTO::getAmountMoney, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+        Collectors.mapping(InptCostDTO::getAmountMoney, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
       return queryStructureByAll(inptCostDTOS,collect1);
     } else if("5".equals(inptCostDTO.getPrintFlag())){
       List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptItemCostListPrint(inptCostDTO);
@@ -669,5 +685,4 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       return null;
     }
   }
-
 }

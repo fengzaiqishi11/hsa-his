@@ -502,5 +502,8 @@
     <!--临床路径执行情况-->
     <dubbo:reference id="clinicPathExecService_consumer" interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" check="false"/>
   <!-- *************************************************** 临床路径子系统 *************************************************************** -->
+
+    <!--会诊记录-->
+    <dubbo:reference id="inptConsultationService_consumer" interface="cn.hsa.module.inpt.consultation.service.InptConsultationApplyServcie" check="false"/>
 </beans>
 

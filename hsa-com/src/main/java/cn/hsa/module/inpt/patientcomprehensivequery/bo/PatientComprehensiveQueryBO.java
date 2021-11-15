@@ -189,8 +189,6 @@ public interface PatientComprehensiveQueryBO {
    * @Return cn.hsa.base.PageDTO
    **/
     PageDTO queryCostDetail(PatientCompreHensiveQueryDTO patientCompreHensiveQueryDTO);
-
-
   /**
    * @Method queryJS
    * @Desrciption 查询结算信息业务类型
@@ -201,5 +199,5 @@ public interface PatientComprehensiveQueryBO {
    * @Return
    *
    * @return*/
-    List<Map<String, Object>> queryYWLX(Map map);
+  List<Map<String, Object>> queryYWLX(Map map);
 }

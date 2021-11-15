@@ -400,7 +400,7 @@ FROM
         CASE
         WHEN a.big_type_code = '2' THEN b.cyf
         WHEN a.big_type_code = '1' THEN b.zcf
-        WHEN a.big_type_code = '0' THEN b.xyf
+        WHEN a.big_type_code = '0' or a.big_type_code ='3' THEN b.xyf
         END pharId,
         a.in_unit_code inUnitCode,
         CASE WHEN a.big_type_code = '2' THEN
@@ -442,7 +442,7 @@ FROM
         b.cyf
         WHEN a.big_type_code = '1' THEN
         b.zcf
-        WHEN a.big_type_code = '0' THEN
+        WHEN a.big_type_code = '0' or a.big_type_code = '3' THEN
         b.xyf
         END
         ) = stock.biz_id

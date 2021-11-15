@@ -212,4 +212,22 @@ public class OutptPrescribeTempBOImpl extends HsafBO implements OutptPrescribeTe
         }
         return true;
     }
+
+    /**
+     * @Method updateTempAudit
+     * @Desrciption 模板取消审核
+     * @param outptPrescribeTempDTO
+     * @Author liuliyun
+     * @Date   2021/11/10 17:16
+     * @Return boolean
+     **/
+    @Override
+    public boolean updateTempAudit(OutptPrescribeTempDTO outptPrescribeTempDTO) {
+        OutptPrescribeTempDTO outptPrescribeTempDTOOld =  outptPrescribeTempDAO.getOutptPrescribeTempDTOById(outptPrescribeTempDTO);
+        if(Constants.SHZT.ZF.equals(outptPrescribeTempDTOOld.getAuditCode()) && !"2".equals(outptPrescribeTempDTOOld.getTypeCode())){
+            throw new AppException("数据已作废，不能在修改");
+        }
+        return outptPrescribeTempDAO.updateTempAudit(outptPrescribeTempDTO) > 0;
+    }
+
 }

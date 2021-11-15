@@ -254,9 +254,8 @@
             rporter AS reporter,
             remark,
             content,
-            report_time AS reportTime,
-            crte_name AS crteName,
-            crte_time AS crteTime,
+            (select a.crte_time from medic_result a where opd_id = a.advice_id and hosp_code = a.hosp_code limit 1) AS reportTime,
+            (select a.crte_name from medic_result a where opd_id = a.advice_id and hosp_code = a.hosp_code limit 1) AS crteName,
             coll_blood_name AS collBloodName,
             coll_blood_time AS collBloodTime
         FROM

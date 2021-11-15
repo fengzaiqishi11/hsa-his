@@ -206,4 +206,18 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         return WrapperResponse.success(insureGetInfoBO.selectLoadingSettleInfo(map));
     }
 
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询结算清单左侧人员类别信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> querySetlePage(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.querySetlePage(map));
+    }
+
 }

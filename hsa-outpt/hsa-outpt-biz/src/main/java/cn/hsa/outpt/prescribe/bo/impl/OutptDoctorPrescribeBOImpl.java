@@ -340,12 +340,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptVisitDAO.updateOutptVisit(byVisitID);
         }
         // 避免重复开住院证
-        if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "1".equals(byVisitID.getTranInCode())) {
+        /*if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "1".equals(byVisitID.getTranInCode())) {
             throw new RuntimeException("【" + byVisitID.getName() + "】已开住院证，请进行入院登记");
         }
         if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "2".equals(byVisitID.getTranInCode())) {
             throw new RuntimeException("【" + byVisitID.getName() + "】已进行入院登记，不可重复开住院证");
-        }
+        }*/
         return outptDoctorPrescribeDAO.updateVisitInHospital(outptVisitDTO) > 0;
     }
 

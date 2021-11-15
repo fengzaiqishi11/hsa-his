@@ -746,4 +746,35 @@ public class RedisUtils {
             return 0;
         }
     }
+
+  /**
+   * 分布式缓存放入(可用来加锁)
+   *
+   * @param key
+   *            键
+   * @param value
+   *            值
+   * @return true成功 false失败
+   */
+  public boolean setIfAbsent(String key, Object value) {
+    try {
+      return  redisTemplate.opsForValue().setIfAbsent(key, value);
+    } catch (Exception e) {
+      log.error(key, e);
+      return false;
+    }
+  }
+
+  public boolean setIfAbsent(String key, Object value, long time) {
+    try {
+      boolean result = setIfAbsent(key, value);
+      if (time > 0) {
+        expire(key, time);
+      }
+      return result;
+    } catch (Exception e) {
+      log.error(key, e);
+      return false;
+    }
+  }
 }

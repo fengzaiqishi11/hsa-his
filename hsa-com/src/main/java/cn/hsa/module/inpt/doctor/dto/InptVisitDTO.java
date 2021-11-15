@@ -446,4 +446,12 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 发药药房id
      */
     private String pharId;
+    /**
+     * 是否会诊病人
+     */
+    private String isConsule;
+    /**
+     * 会诊申请科室id
+     */
+    private String applyDeptid;
 }

@@ -423,4 +423,23 @@ public class DoctorAdviceController extends BaseController {
         map.put("insureItemMatchDTOS", insureItemMatchDTOS);
         return doctorAdviceService_consumer.updateInptAdviceDetailLmt(map);
     }
+
+    /**
+     * @Menthod: queryLisAdvice
+     * @Desrciption: 根据合管条件查询同类型的lis医嘱，用于合并打印lis申请单
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-11 10:24
+     * @Return:
+     **/
+    @GetMapping("/queryLisAdvice")
+    public WrapperResponse<List<InptAdviceDTO>> queryLisAdvice(InptAdviceDTO inptAdviceDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        inptAdviceDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("inptAdviceDTO", inptAdviceDTO);
+        return doctorAdviceService_consumer.queryLisAdvice(map);
+    }
 }

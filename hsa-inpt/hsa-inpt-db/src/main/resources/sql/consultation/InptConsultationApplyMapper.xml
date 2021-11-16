@@ -198,7 +198,7 @@
         </if>
         <if test="endTime != null">
             <![CDATA[
-                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') >= date_format(#{endTime}, '%Y-%m-%d %H:%i:%s')
+                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') <= date_format(#{endTime}, '%Y-%m-%d %H:%i:%s')
             ]]>
         </if>
         order by bb.seq_no asc, a.consul_no asc, a.consul_time asc

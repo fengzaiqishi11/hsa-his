@@ -85,6 +85,7 @@ public class InptConsultationApplyController extends BaseController {
     public WrapperResponse<PageDTO> queryConsultationApply(InptConsultationApplyDTO inptConsultationApplyDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         inptConsultationApplyDTO.setHospCode(sysUserDTO.getHospCode());
+        inptConsultationApplyDTO.setApplyDeptid(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptConsultationApplyDTO", inptConsultationApplyDTO);

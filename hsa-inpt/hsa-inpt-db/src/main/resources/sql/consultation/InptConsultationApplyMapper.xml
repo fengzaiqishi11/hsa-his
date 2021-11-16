@@ -140,11 +140,48 @@
 
     <!--会诊申请列表查询-->
     <select id="queryConsultationApply" parameterType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO" resultType="cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO">
-        select a.*
+        select
+            if(a.baby_id is null or a.baby_id = '',
+                concat(
+                    iv.name, '/',
+                    (case iv.gender_code when '1' then '男' when '2' then '女' else '' end), '/',
+                    iv.age, (case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end )),
+                concat(
+                    iv.name, '/',
+                    (case iv.gender_code when '1' then '男' when '2' then '女' else '' end), '/',
+                    iv.age, (case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end ), '/',
+                    ib.name)
+            ) as patientInfo,
+            iv.bed_name,
+            iv.in_no,
+            a.apply_deptid,
+            (select bd.name from base_dept bd where a.hosp_code = bd.hosp_code and a.apply_deptid = bd.id) as apply_deptname,
+            a.apply_userid,
+            a.apply_username,
+            a.consul_no,
+            a.consul_time,
+            a.consul_state,
+            a.consul_type,
+            a.consul_deptid_list,
+            (SELECT GROUP_CONCAT(bd.name) from base_dept bd where a.hosp_code = bd.hosp_code and FIND_IN_SET(bd.id, a.consul_deptid_list) GROUP BY a.id) as consul_deptid_list_name,
+            a.consul_userid_list,
+            (SELECT GROUP_CONCAT(su.name) from sys_user su where a.hosp_code = su.hosp_code and FIND_IN_SET(su.id, a.consul_userid_list) GROUP BY a.id) as consul_userid_list_name,
+            a.consul_addr,
+            a.illness,
+            a.diagno_treat,
+            a.consul_reason,
+            a.consul_objective
         from inpt_consultation_apply a
-        join inpt_visit iv on a.visit_id = iv.id and a.hosp_code = iv.hosp_code
-        join base_bed bb on iv.bed_id = bb.id and iv.hosp_code = bb.hosp_code
-        where a.hosp_code = ''
+        join inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
+        join base_bed bb on iv.hosp_code = bb.hosp_code and iv.bed_id = bb.id
+        left join inpt_baby ib on a.hosp_code = ib.hosp_code and a.baby_id = ib.id
+        where a.hosp_code = #{hospCode}
+        <if test="applyDeptid != null and applyDeptid != ''">
+            and a.apply_deptid = #{applyDeptid}
+        </if>
+        <if test="applyUserid != null and applyUserid != ''">
+            and a.apply_userid = #{applyUserid}
+        </if>
         <if test="keyword != null and keyword != ''">
             and (iv.name like concat('%', #{keyword}, '%') or iv.bed_name like concat('%', #{keyword}, '%') or iv.in_no = #{keyword} or a.consul_no = #{keyword})
         </if>
@@ -161,7 +198,7 @@
         </if>
         <if test="endTime != null">
             <![CDATA[
-                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') >= date_format(#{endTime}, '%Y-%m-%d %H:%i:%s')
+                and date_format(a.consul_time, '%Y-%m-%d %H:%i:%s') <= date_format(#{endTime}, '%Y-%m-%d %H:%i:%s')
             ]]>
         </if>
         order by bb.seq_no asc, a.consul_no asc, a.consul_time asc

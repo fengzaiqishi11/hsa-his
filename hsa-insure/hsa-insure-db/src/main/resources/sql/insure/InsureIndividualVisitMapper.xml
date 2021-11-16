@@ -40,6 +40,11 @@
         <result column="crte_name" property="crteName" jdbcType="VARCHAR"/>
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP"/>
         <result column="akc252" property="akc252" jdbcType="VARCHAR"/>
+        <result column="idet_start_date" property="idetStartDate" jdbcType="TIMESTAMP"/>
+        <result column="idet_end_date" property="idetEndDate" jdbcType="TIMESTAMP"/>
+        <result column="psn_idet_type" property="psnIdetType" jdbcType="VARCHAR"/>
+        <result column="is_one_settle" property="isOneSettle" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -79,8 +84,12 @@
         insuplc_admdvs,
         mdtrt_cert_type,
         mdtrt_cert_no,
+        idet_start_date,
+        idet_end_date,
+        psn_idet_type,
         iiv.pay_token,
-        iiv.pay_ord_id
+        iiv.pay_ord_id,
+        is_one_settle
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -121,7 +130,11 @@
         iiv.mdtrt_cert_type,
         iiv.mdtrt_cert_no,
         iiv.pay_token,
-        iiv.pay_ord_id
+        iiv.pay_ord_id,
+        iiv.idet_start_date,
+        iiv.idet_end_date,
+        iiv.psn_idet_type,
+        iiv.is_one_settle
     </sql>
 
 
@@ -174,7 +187,11 @@
          mdtrt_cert_type,
          mdtrt_cert_no,
          oinfno,
-         omsgid)
+         omsgid,
+         idet_start_date,
+         idet_end_date,
+         psn_idet_type,
+         is_one_settle)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -211,7 +228,12 @@
                 #{mdtrtCertType,jdbcType=VARCHAR},
                 #{mdtrtCertNo,jdbcType=VARCHAR},
                 #{oinfno,jdbcType=VARCHAR},
-                #{omsgid,jdbcType=VARCHAR})
+                #{omsgid,jdbcType=VARCHAR},
+                #{idetStartDate,jdbcType=VARCHAR},
+                #{idetEndDate,jdbcType=VARCHAR},
+                #{psnIdetType,jdbcType=VARCHAR},
+                #{isOneSettle,jdbcType=VARCHAR}
+                )
     </insert>
 
     <!-- 新增表信息（实体对象值为null 为'',不进行该字段的新增） -->
@@ -346,7 +368,20 @@
                 matn_type,
             </if>
             <if test="birctrlMatnDate != null">
-                birctrl_matn_date
+                birctrl_matn_date,
+            </if>
+
+            <if test="idetStartDate != null">
+                idet_start_date,
+            </if>
+            <if test="idetEndDate != null">
+                idet_end_date,
+            </if>
+            <if test="psnIdetType != null">
+                psn_idet_type,
+            </if>
+            <if test="isOneSettle != null">
+                is_one_settle
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -477,8 +512,22 @@
                 #{matnType,jdbcType=VARCHAR},
             </if>
             <if test="birctrlMatnDate != null">
-                #{birctrlMatnDate}
+                #{birctrlMatnDate},
             </if>
+
+            <if test="idetStartDate != null">
+                #{idetStartDate,jdbcType=VARCHAR},
+            </if>
+            <if test="idetEndDate != null">
+                #{idetEndDate,jdbcType=VARCHAR},
+            </if>
+            <if test="psnIdetType != null">
+                #{psnIdetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isOneSettle != null">
+                #{isOneSettle,jdbcType=VARCHAR}
+            </if>
+
         </trim>
     </insert>
     <insert id="insertCommonLog">
@@ -552,7 +601,11 @@
             crte_time         = #{crteTime,jdbcType=TIMESTAMP},
             insuplc_admdvs    = #{insuplcAdmdvs,jdbcType=VARCHAR},
             mdtrt_cert_type   = #{bka895,jdbcType=VARCHAR},
-            mdtrt_cert_no     = #{bka896,jdbcType=VARCHAR}
+            mdtrt_cert_no     = #{bka896,jdbcType=VARCHAR},
+            idet_start_date     = #{idetStartDate,jdbcType=VARCHAR},
+            idet_end_date       = #{idetEndDate,jdbcType=VARCHAR},
+            psn_idet_type       = #{psnIdetType,jdbcType=VARCHAR},
+            is_one_settle       = #{isOneSettle,jdbcType=VARCHAR}
         where id = #{id}
     </update>
 
@@ -655,8 +708,21 @@
                 pay_ord_id = #{payOrdId,jdbcType=VARCHAR},
             </if>
             <if test="payToken != null and payToken != ''">
-                pay_token = #{payToken,jdbcType=VARCHAR}
+                pay_token = #{payToken,jdbcType=VARCHAR},
             </if>
+            <if test="idetStartDat != null and idetStartDat != ''">
+                idet_start_date = #{idetStartDate,jdbcType=VARCHAR},
+            </if>
+            <if test="idetEndDate != null and idetEndDate != ''">
+                idet_end_date = #{idetEndDate,jdbcType=VARCHAR},
+            </if>
+            <if test="psnIdetType != null and psnIdetType != ''">
+                psn_idet_type = #{psnIdetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isOneSettle != null and psnIdetType != ''">
+                is_one_settle  = #{isOneSettle,jdbcType=VARCHAR}
+            </if>
+
         </set>
         where
         visit_id = #{visitId} and hosp_code =#{hospCode}
@@ -702,7 +768,10 @@
                 is_half_settle = #{isHalfSettle},
             </if>
             <if test="settleCount != null and settleCount != ''">
-                settle_count = #{settleCount}
+                settle_count = #{settleCount},
+            </if>
+            <if test="isOneSettle != null and psnIdetType != ''">
+                is_one_settle  = #{isOneSettle,jdbcType=VARCHAR}
             </if>
         </set>
         where
@@ -1063,6 +1132,7 @@
         <if test="isHospital != null and isHospital != ''">
             and iiv.is_hospital =#{isHospital}
         </if>
+        ORDER BY iis.crte_time desc
     </select>
 
     <select id="queryAllInsureRegister" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO" parameterType="java.util.Map">

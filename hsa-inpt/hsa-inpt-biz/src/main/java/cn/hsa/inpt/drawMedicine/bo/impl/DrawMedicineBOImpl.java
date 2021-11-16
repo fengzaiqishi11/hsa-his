@@ -87,8 +87,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
    **/
   @Override
   public Boolean saveBeforehandDrawMedicine(Map map) {
-
-
     String hospCode = MapUtils.get(map, "hospCode");
     String id = MapUtils.get(map, "id");
     String deptId = MapUtils.get(map, "deptId");
@@ -97,174 +95,172 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     adviceMap.put("deptId",deptId);
     adviceMap.put("hospCode", hospCode);
     adviceMap.put("typeCode", id);
-    List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryInptAdviceAdvanceTake(adviceMap);
-    if(!ListUtils.isEmpty(inptAdviceDTOList)){
-      String key = hospCode + deptId + id + "_MEDICALADVICE" ;
-      List<String> adviceIds = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
-      TransactionStatus status = null;
-      try{
-        if(redisUtils.hasKey(key)){
-          throw  new RuntimeException("当前科室正在做提前领药申请,请耐心等待!");
-        }
-        redisUtils.set(key,key);
-
-        // 开启独立新事务
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-        status = transactionManager.getTransaction(def);
-        //根据提前领药天数,跑一遍长期费用接口
-        MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
-        medicalAdviceDTO.setHospCode(hospCode);
-        medicalAdviceDTO.setDeptId(deptId);
-        medicalAdviceDTO.setCheckTime(DateUtils.getNow());
-        medicalAdviceDTO.setCheckName(MapUtils.getVS(map,"crteName",""));
-        medicalAdviceDTO.setCheckId(MapUtils.getVS(map,"crteId",""));
-        medicalAdviceDTO.setSfTqly("1");
-        medicalAdviceDTO.setIds(adviceIds);
-        adviceMap.put("medicalAdviceDTO", medicalAdviceDTO);
-        medicalAdviceService_consumer.longCost(adviceMap);
-
-        //回写提前领药天数为0
-        adviceMap.put("advanceDays", "0");
-        this.saveAdvanceTakeMedicine(adviceMap,"ypy");
-        // 提交独立事务
-        transactionManager.commit(status);
-
-      }catch (RuntimeException e){
-        if (status != null) {
-          transactionManager.rollback(status);
-        }
-        throw new RuntimeException("提前领药异常，原因："+e.getMessage());
-      }finally {
-        redisUtils.del(key);
+    String key = hospCode + deptId + "_MEDICALADVICE";
+    try {
+      if(!redisUtils.setIfAbsent(key,deptId,600)) {
+        throw new AppException("有人正在进行预配药,请稍后再试!");
       }
-    }
+      List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryInptAdviceAdvanceTake(adviceMap);
+      if(!ListUtils.isEmpty(inptAdviceDTOList)){
+        List<String> adviceIds = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
+        TransactionStatus status = null;
+        try{
+          // 开启独立新事务
+          DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+          def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+          status = transactionManager.getTransaction(def);
+          //根据提前领药天数,跑一遍长期费用接口
+          MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
+          medicalAdviceDTO.setHospCode(hospCode);
+          medicalAdviceDTO.setDeptId(deptId);
+          medicalAdviceDTO.setCheckTime(DateUtils.getNow());
+          medicalAdviceDTO.setCheckName(MapUtils.getVS(map,"crteName",""));
+          medicalAdviceDTO.setCheckId(MapUtils.getVS(map,"crteId",""));
+          medicalAdviceDTO.setSfTqly("1");
+          medicalAdviceDTO.setIds(adviceIds);
+          adviceMap.put("medicalAdviceDTO", medicalAdviceDTO);
+          medicalAdviceService_consumer.longCost(adviceMap);
+          //回写提前领药天数为0
+          adviceMap.put("advanceDays", "0");
+          this.saveAdvanceTakeMedicine(adviceMap,"ypy");
+          // 提交独立事务
+          transactionManager.commit(status);
+        }catch (RuntimeException e){
+          if (status != null) {
+            transactionManager.rollback(status);
+          }
+          throw new RuntimeException("提前领药异常，原因："+e.getMessage());
+        }
+      }
+      Map baseOrderReceiveMap = new HashMap();
+      BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
+      baseOrderReceiveDTO.setHospCode(hospCode);
+      baseOrderReceiveDTO.setId(id);
+      baseOrderReceiveMap.put("hospCode", hospCode);
+      baseOrderReceiveMap.put("baseOrderReceiveDTO", baseOrderReceiveDTO);
+      WrapperResponse<BaseOrderReceiveDTO> response = baseOrderReceiveService.getById(baseOrderReceiveMap);
+      BaseOrderReceiveDTO orderReceiveDTO = response.getData();
+      //获取所有待领药品 按科室  请领标志0  有效标志
+      Map queryWaitReceiveMap = new HashMap();
+      PharInWaitReceiveDTO pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
+      pharInWaitReceiveDTO.setHospCode(hospCode);
+      pharInWaitReceiveDTO.setStatusCode("0");
+      pharInWaitReceiveDTO.setDeptId(MapUtils.get(map, "deptId"));
+      pharInWaitReceiveDTO.setIsBack("0");
+      queryWaitReceiveMap.put("hospCode", hospCode);
+      queryWaitReceiveMap.put("pharInWaitReceiveDTO", pharInWaitReceiveDTO);
+      //查询所有待领药品
+      WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMap);
+      List<PharInWaitReceiveDTO> waitReceiveListAll = waitResponse.getData();
+      if (ListUtils.isEmpty(waitReceiveListAll)) {
+        throw new AppException("没有可领药品");
+      }
 
-
-    Map baseOrderReceiveMap = new HashMap();
-    BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
-    baseOrderReceiveDTO.setHospCode(hospCode);
-    baseOrderReceiveDTO.setId(id);
-    baseOrderReceiveMap.put("hospCode", hospCode);
-    baseOrderReceiveMap.put("baseOrderReceiveDTO", baseOrderReceiveDTO);
-    WrapperResponse<BaseOrderReceiveDTO> response = baseOrderReceiveService.getById(baseOrderReceiveMap);
-    BaseOrderReceiveDTO orderReceiveDTO = response.getData();
-    //获取所有待领药品 按科室  请领标志0  有效标志
-    Map queryWaitReceiveMap = new HashMap();
-    PharInWaitReceiveDTO pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
-    pharInWaitReceiveDTO.setHospCode(hospCode);
-    pharInWaitReceiveDTO.setStatusCode("0");
-    pharInWaitReceiveDTO.setDeptId(MapUtils.get(map, "deptId"));
-    pharInWaitReceiveDTO.setIsBack("0");
-    queryWaitReceiveMap.put("hospCode", hospCode);
-    queryWaitReceiveMap.put("pharInWaitReceiveDTO", pharInWaitReceiveDTO);
-    //查询所有待领药品
-    WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMap);
-    List<PharInWaitReceiveDTO> waitReceiveListAll = waitResponse.getData();
-    if (ListUtils.isEmpty(waitReceiveListAll)) {
-      throw new AppException("没有可领药品");
-    }
-
-    //获取所有退费药品 按科室  请领标志0  有效标志
-    Map queryWaitReceiveMapIsBack = new HashMap();
-    PharInWaitReceiveDTO pharInWaitReceiveDTOisBack = new PharInWaitReceiveDTO();
-    pharInWaitReceiveDTOisBack.setHospCode(hospCode);
-    pharInWaitReceiveDTOisBack.setDeptId(deptId);
-    pharInWaitReceiveDTOisBack.setIsBack("1");
-    queryWaitReceiveMapIsBack.put("hospCode", hospCode);
-    queryWaitReceiveMapIsBack.put("pharInWaitReceiveDTO", pharInWaitReceiveDTOisBack);
-    //查询所有待领药品
-    WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
-    List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
-    //过滤出isback = 1 的是退药的药品
+      //获取所有退费药品 按科室  请领标志0  有效标志
+      Map queryWaitReceiveMapIsBack = new HashMap();
+      PharInWaitReceiveDTO pharInWaitReceiveDTOisBack = new PharInWaitReceiveDTO();
+      pharInWaitReceiveDTOisBack.setHospCode(hospCode);
+      pharInWaitReceiveDTOisBack.setDeptId(deptId);
+      pharInWaitReceiveDTOisBack.setIsBack("1");
+      queryWaitReceiveMapIsBack.put("hospCode", hospCode);
+      queryWaitReceiveMapIsBack.put("pharInWaitReceiveDTO", pharInWaitReceiveDTOisBack);
+      //查询所有待领药品
+      WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
+      List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
+      //过滤出isback = 1 的是退药的药品
 //        List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "1".equals(dto.getIsBack())).collect(Collectors.toList());
 //        //过滤出isback = 0 的是退药的药品
 //        List<PharInWaitReceiveDTO> isNotBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "0".equals(dto.getIsBack())).collect(Collectors.toList());
-    if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
-      for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
-        for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
-          PharInWaitReceiveDTO waitDto = it.next();
-          if (isBackDto.getOldWrId().equals(waitDto.getId())) {
-            waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
-            waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
-            waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
-            if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
+      if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
+        for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
+          for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
+            PharInWaitReceiveDTO waitDto = it.next();
+            if (isBackDto.getOldWrId().equals(waitDto.getId())) {
+              waitDto.setNum(BigDecimalUtils.add(waitDto.getNum(), isBackDto.getNum()));
+              waitDto.setSplitNum(BigDecimalUtils.add(waitDto.getSplitNum(), isBackDto.getSplitNum()));
+              waitDto.setTotalPrice(BigDecimalUtils.add(waitDto.getTotalPrice(), isBackDto.getTotalPrice()));
+              if (BigDecimalUtils.isZero(waitDto.getNum()) || BigDecimalUtils.lessZero(waitDto.getNum())) {
+                it.remove();
+              }
+              break;
+            }
+          }
+        }
+      }
+      //
+      //所有单据筛选出来的药品的集合
+      List<PharInWaitReceiveDTO> waitReceiveListListSx = new ArrayList<>();
+      //定义配药01表数据集合
+      List<PharInReceiveDTO> inReceiveList = new ArrayList<>();
+      //定义配药02表数据集合
+      List<PharInReceiveDetailDTO> inReceiveDetailList = new ArrayList<>();
+
+      //筛选出来的待领药品集合
+      List<PharInWaitReceiveDTO> lyList = new ArrayList<>();
+
+      //筛选一个单据符合条件的待领药品到lyList
+      filterWaitReceive(orderReceiveDTO, waitReceiveListAll, lyList);
+
+      //把一个单据筛选出来的药品放进筛选总集合，后续统一链接数据库更新qlbz
+      waitReceiveListListSx.addAll(lyList);
+
+      if (ListUtils.isEmpty(waitReceiveListListSx)) {
+        throw new AppException("没有符合条件的药品");
+      }
+      //按药房把lyList分组
+      Map<String, List<PharInWaitReceiveDTO>> yfidGroupMap = lyList.stream().collect(Collectors.groupingBy(PharInWaitReceiveDTO::getPharId));
+      List<PharInWaitReceiveDTO> noInventoryList = new ArrayList<>();
+      //遍历根据药房分组后的药品集合yfidGroupMap，然后组装配药01和02，存进ypzypl01List，ypzypl02List中，最后进行统一插入操作
+      yfidGroupMap.forEach((k, v) -> {
+        //组装数据插入配药表
+        buildPharReceive(map, v, inReceiveList, inReceiveDetailList, k, orderReceiveDTO,noInventoryList);
+      });
+      // 判断库存不足的药是否有同组药
+      if(!ListUtils.isEmpty(noInventoryList) && !ListUtils.isEmpty(inReceiveDetailList)) {
+        for (PharInWaitReceiveDTO noitem :noInventoryList) {
+          Iterator<PharInReceiveDetailDTO> it = inReceiveDetailList.iterator();
+          while(it.hasNext()){
+            PharInReceiveDetailDTO dto = it.next();
+            if(StringUtils.isNotEmpty(noitem.getGroupNo()) && StringUtils.isNotEmpty(dto.getGroupNo()) &&
+              !"0".equals(dto.getGroupNo()) && !"0".equals(noitem.getGroupNo()) && dto.getVisitId().equals(noitem.getVisitId()) && noitem.getGroupNo().equals(dto.getGroupNo())){
               it.remove();
             }
-            break;
           }
         }
       }
-    }
-    //
-    //所有单据筛选出来的药品的集合
-    List<PharInWaitReceiveDTO> waitReceiveListListSx = new ArrayList<>();
-    //定义配药01表数据集合
-    List<PharInReceiveDTO> inReceiveList = new ArrayList<>();
-    //定义配药02表数据集合
-    List<PharInReceiveDetailDTO> inReceiveDetailList = new ArrayList<>();
-
-    //筛选出来的待领药品集合
-    List<PharInWaitReceiveDTO> lyList = new ArrayList<>();
-
-    //筛选一个单据符合条件的待领药品到lyList
-    filterWaitReceive(orderReceiveDTO, waitReceiveListAll, lyList);
-
-    //把一个单据筛选出来的药品放进筛选总集合，后续统一链接数据库更新qlbz
-    waitReceiveListListSx.addAll(lyList);
-
-    if (ListUtils.isEmpty(waitReceiveListListSx)) {
-      throw new AppException("没有符合条件的药品");
-    }
-
-    //按药房把lyList分组
-    Map<String, List<PharInWaitReceiveDTO>> yfidGroupMap = lyList.stream().collect(Collectors.groupingBy(PharInWaitReceiveDTO::getPharId));
-    List<PharInWaitReceiveDTO> noInventoryList = new ArrayList<>();
-    //遍历根据药房分组后的药品集合yfidGroupMap，然后组装配药01和02，存进ypzypl01List，ypzypl02List中，最后进行统一插入操作
-    yfidGroupMap.forEach((k, v) -> {
-      //组装数据插入配药表
-      buildPharReceive(map, v, inReceiveList, inReceiveDetailList, k, orderReceiveDTO,noInventoryList);
-    });
-    // 判断库存不足的药是否有同组药
-    if(!ListUtils.isEmpty(noInventoryList) && !ListUtils.isEmpty(inReceiveDetailList)) {
-      for (PharInWaitReceiveDTO noitem :noInventoryList) {
-        Iterator<PharInReceiveDetailDTO> it = inReceiveDetailList.iterator();
-        while(it.hasNext()){
-          PharInReceiveDetailDTO dto = it.next();
-          if(StringUtils.isNotEmpty(noitem.getGroupNo()) && StringUtils.isNotEmpty(dto.getGroupNo()) &&
-            !"0".equals(dto.getGroupNo()) && !"0".equals(noitem.getGroupNo()) && dto.getVisitId().equals(noitem.getVisitId()) && noitem.getGroupNo().equals(dto.getGroupNo())){
-            it.remove();
-          }
+      if(ListUtils.isEmpty(inReceiveDetailList)) {
+        throw new AppException("预配药失败,配药数据为空或药品(同组)库存不足");
+      }
+      // 根据配药表主键分组
+      Map<String, List<PharInReceiveDetailDTO>> stringListMap = inReceiveDetailList.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getReceiveId));
+      // 如果明细为空则删除主表信息
+      Iterator<PharInReceiveDTO> it = inReceiveList.iterator();
+      while(it.hasNext()){
+        PharInReceiveDTO dto = it.next();
+        if(!stringListMap.containsKey(dto.getId())) {
+          it.remove();
         }
       }
+      //统一更新ypzyly表请领标志为请领（1）
+      List<String> ids = inReceiveDetailList.stream().map(PharInReceiveDetailDTO::getWrId).collect(Collectors.toList());
+      Map inwaitMap = new HashMap();
+      PharInWaitReceiveDTO updateInwait = new PharInWaitReceiveDTO();
+      updateInwait.setIds(ids);
+      updateInwait.setHospCode(hospCode);
+      updateInwait.setStatusCode("1");
+      inwaitMap.put("hospCode", hospCode);
+      inwaitMap.put("pharInWaitReceiveDTO", updateInwait);
+      pharInWaitReceiveService_consumer.updateInWaitStatus(inwaitMap);
+      //插入配药主表
+      inptCostDAO.insertPharInReceives(inReceiveList);
+      // 插入配药明细表
+      inptCostDAO.insertPharInReceiveDetails(inReceiveDetailList);
+    }catch (Exception e) {
+      log.error("配药出现问题，出错方法为：{}",e.getSuppressed());
+      throw new RuntimeException("预配药失败，原因："+e.getMessage());
+    } finally {
+      redisUtils.del(key);
     }
-    if(ListUtils.isEmpty(inReceiveDetailList)) {
-      throw new AppException("预配药失败,配药数据为空或药品(同组)库存不足");
-    }
-    // 根据配药表主键分组
-    Map<String, List<PharInReceiveDetailDTO>> stringListMap = inReceiveDetailList.stream().collect(Collectors.groupingBy(PharInReceiveDetailDTO::getReceiveId));
-    // 如果明细为空则删除主表信息
-    Iterator<PharInReceiveDTO> it = inReceiveList.iterator();
-    while(it.hasNext()){
-      PharInReceiveDTO dto = it.next();
-      if(!stringListMap.containsKey(dto.getId())) {
-        it.remove();
-      }
-    }
-    //统一更新ypzyly表请领标志为请领（1）
-    List<String> ids = inReceiveDetailList.stream().map(PharInReceiveDetailDTO::getWrId).collect(Collectors.toList());
-    Map inwaitMap = new HashMap();
-    PharInWaitReceiveDTO updateInwait = new PharInWaitReceiveDTO();
-    updateInwait.setIds(ids);
-    updateInwait.setHospCode(hospCode);
-    updateInwait.setStatusCode("1");
-    inwaitMap.put("hospCode", hospCode);
-    inwaitMap.put("pharInWaitReceiveDTO", updateInwait);
-    pharInWaitReceiveService_consumer.updateInWaitStatus(inwaitMap);
-    //插入配药主表
-    inptCostDAO.insertPharInReceives(inReceiveList);
-    // 插入配药明细表
-    inptCostDAO.insertPharInReceiveDetails(inReceiveDetailList);
     // TODO: 2020/4/16 记录操作日志表
     return true;
   }

@@ -42,4 +42,28 @@ public class InptConsultationApplyDTO extends InptConsultationApplyDO implements
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
+    /**
+     * 患者信息
+     */
+    private String patientInfo;
+    /**
+     * 床号
+     */
+    private String bedName;
+    /**
+     * 入院号
+     */
+    private String inNo;
+    /**
+     * 申请科室名称
+     */
+    private String applyDeptname;
+    /**
+     * 会诊科室名称集合
+     */
+    private String consulDeptidListName;
+    /**
+     * 会诊医生姓名集合
+     */
+    private String consulUseridListName;
 }

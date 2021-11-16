@@ -19,7 +19,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class SysUserPasswordDTO extends SysUserDO {
-    //新密码
+    /**
+     * 新密码(前端已经加密)
+     */
     private String newPassword;
     //旧密码
     private String oldPassWord;

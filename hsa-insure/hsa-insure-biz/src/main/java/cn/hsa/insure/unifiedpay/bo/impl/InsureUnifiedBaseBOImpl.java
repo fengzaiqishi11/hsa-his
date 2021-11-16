@@ -302,10 +302,14 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String hospCode = MapUtils.get(map,"hospCode");
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
-        dataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
+        String mdtrtCertType = insureIndividualVisitDTO.getMdtrtCertType();
+        if("06".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+            mdtrtCertType = "02";
+        }
+        dataMap.put("mdtrt_cert_type", mdtrtCertType);
         dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());
         dataMap.put("begntime", DateUtils.getNow());
-        dataMap.put("psn_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
+        dataMap.put("psn_cert_type", mdtrtCertType);
         dataMap.put("certno", insureIndividualVisitDTO.getMdtrtCertNo());
         paramMap.put("data", dataMap);  // 入参具体数据
         Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, "1101", paramMap);

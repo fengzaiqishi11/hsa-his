@@ -72,7 +72,7 @@ public interface LisResultDAO {
     * @Author: zhangxuan
     * @Date: 2021-09-04
     */ 
-    List<Map> queryNoResultLis();
+    List<Map> queryNoResultLis(Map map);
 
     /** 
     * @Description: 查询没有结果的lis申请单的医嘱id
@@ -90,7 +90,7 @@ public interface LisResultDAO {
      * @Author: zhangxuan
      * @Date: 2021-09-11
      */
-    List<String> queryDXBackResult();
+    List<String> queryDXBackResult(Map map);
     /**
     * @Description: 更新申请单是否上传状态
     * @Param:

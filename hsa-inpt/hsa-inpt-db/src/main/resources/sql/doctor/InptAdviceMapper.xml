@@ -190,6 +190,8 @@
         <result property="inNum" column="inNum" jdbcType="INTEGER"/>
         <result property="totalMergeCost" column="totalMergeCost" jdbcType="NUMERIC"/>
         <result property="totalMergeBalance" column="totalMergeBalance" jdbcType="NUMERIC"/>
+        <result property="isConsule" column="is_consule" jdbcType="VARCHAR"/>
+        <result property="applyDeptid" column="apply_deptid" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
@@ -250,8 +252,28 @@
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
         (a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
         (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
+        <if test="zgbrQuery == '2'.toString()">
+            , t.is_consule, t.apply_deptid
+        </if>
         from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
-        where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.in_dept_id = #{inDeptId} and a.status_code = '2'
+        <!--会诊病人，关联会诊申请表-->
+        <if test="zgbrQuery == '2'.toString()">
+            join (
+                SELECT
+                    '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
+                FROM
+                    inpt_consultation_apply ss
+                WHERE ss.hosp_code = #{hospCode}
+                    and ss.consul_state = '1'
+                    AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
+                GROUP BY ss.visit_id, ss.hosp_code
+            ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
+        </if>
+        where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.status_code = '2'
+        <!--非会诊病人，只差当前登录科室-->
+        <if test="zgbrQuery != '2'.toString()">
+            and a.in_dept_id = #{inDeptId}
+        </if>
         <if test="id != null and id != ''">
             and a.id = #{id}
         </if>
@@ -272,9 +294,11 @@
         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
-        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.teach_doctor_id, a.teach_doctor_name,
         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
         a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,
+        (select et.exec_time from inpt_advice_exec et where et.advice_id = a.id and et.hosp_code = a.hosp_code and et.exec_time
+        is not null order by exec_time limit 1) as last_exec_time,
         case when a.item_code = '4' then (
         case when b.type_code = '3' then '4' when b.type_code = '12' then '5' else '6' end
         ) when a.item_code = '1' then (
@@ -796,7 +820,8 @@
             second_exec_name = #{dto.secondExecName},
             sign_code = #{dto.signCode},
             skin_result_code = #{dto.skinResultCode},
-            content = #{dto.content}
+            content = #{dto.content},
+            last_exec_time = #{dto.lastExecTime}
             where hosp_code = #{dto.hospCode}
             and id = #{dto.id}
         </foreach>
@@ -1964,6 +1989,40 @@
             <if test="isPatient != null and isPatient == '1'.toString()">
                 or aaa.yylx ='2'
             </if>
+        </if>
+    </select>
+
+    <!--根据id查询lis医嘱信息-->
+    <select id="getLisInptAdvice" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+             a.*, b.technology_code, b.container_code, b.specimen_code
+        from inpt_advice a
+        left join base_advice b on a.hosp_code = b.hosp_code and a.item_id = b.id and b.type_code = '3'
+        where a.hosp_code = #{hospCode}
+          and a.id = #{id}
+    </select>
+
+    <!--根据合管条件查询同类型的lis医嘱，用于合并打印lis申请单-->
+    <select id="queryLisAdvice" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select a.*, b.technology_code, b.container_code, b.specimen_code
+        from inpt_advice a
+        left join base_advice b on a.hosp_code = b.hosp_code and a.item_id = b.id and b.type_code = '3'
+        where a.hosp_code = '#{hospCode}'
+          and a.is_check = '1'
+          and a.is_stop = '0'
+          and a.is_submit = '1'
+          and (a.cancel_id is null or a.cancel_id = '')
+        <if test="typeCode != null and typeCode != ''">
+            and a.type_code = #{typeCode}
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and b.technology_code = #{technologyCode}
+        </if>
+        <if test="containerCode != null and containerCode != ''">
+            and b.container_code = #{containerCode}
+        </if>
+        <if test="specimenCode != null and specimenCode != ''">
+            and b.specimen_code = #{specimenCode}
         </if>
     </select>
 

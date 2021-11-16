@@ -613,9 +613,61 @@ public interface InsureGetInfoDAO {
 
     List<Map<String, Object>> selectOpspdiseinfoForMap(Map<String, Object> map);
 
+
     List<Map<String, Object>> selectPayinfoForMap(Map<String, Object> map);
 
+    /**
+     * @Method deleteOperInfo
+     * @Desrciption  删除手术信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/8 14:24
+     * @Return
+    **/
     void deleteOperInfo(Map<String, Object> map);
 
+    /**
+     * @Method deleteSetleInfo
+     * @Desrciption  删除结算清单信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/8 14:23
+     * @Return
+    **/
     void deleteSetleInfo(Map<String, Object> setlInfoMap);
+    
+    /**
+     * @Method selectRefldeptDept
+     * @Desrciption  查询转院科室
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/11/8 14:23
+     * @Return 
+    **/
+    String selectRefldeptDept(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询结算清单左侧人员类别信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    List<Map<String, Object>> querySetlePage(Map<String, Object> map);
+
+    /**
+     * @Method selectInsureIndividual
+     * @Desrciption  查询患者登记时保存的门特病种信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/9 16:07
+     * @Return
+    **/
+    InsureIndividualVisitDTO selectInsureIndividual(Map<String, Object> map);
 }

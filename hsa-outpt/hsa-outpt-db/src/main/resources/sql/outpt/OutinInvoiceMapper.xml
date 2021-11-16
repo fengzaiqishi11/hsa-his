@@ -723,13 +723,16 @@
 
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*,v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo from (
+        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo,
+        v.visit_code as visitCode,b.pay_code as sourcePayCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
         (select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
         (select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName,
-        a.visit_id
+        a.visit_id,
+        b.pay_code
         FROM outpt_register_detail a
+        join outpt_register_settle b on a.register_id = b.register_id
         WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
         group by a.bfc_id,a.visit_id
         )b join outpt_visit v on b.visit_id = v.id
@@ -738,8 +741,9 @@
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice from (
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice,ifnull(os.acct_pay, 0.00) as acctPay from (
         SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
+              ifnull(sum(a.preferential_price),0) as preferentialPrice,
 			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
 			(select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName
         FROM outpt_cost a

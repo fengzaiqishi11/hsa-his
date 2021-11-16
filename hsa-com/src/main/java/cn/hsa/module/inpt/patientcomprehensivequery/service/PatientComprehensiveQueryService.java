@@ -221,6 +221,6 @@ public interface PatientComprehensiveQueryService {
    * @Return
    *
    * @return*/
+  @GetMapping("/service/inpt/patientComprehensiveQuery/queryYWLX")
   WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map);
 }
-

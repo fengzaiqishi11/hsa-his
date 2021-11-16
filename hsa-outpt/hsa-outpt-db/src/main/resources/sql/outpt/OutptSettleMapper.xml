@@ -507,6 +507,7 @@
             IFNULL(a.self_price,0) as self_price,
             IFNULL(a.mi_price,0) as mi_price,
             IFNULL(a.trunc_price,0) as trunc_price,
+            IFNULL(a.acct_pay,0) as acct_pay,
             a.is_settle,
             a.crte_name,
             a.settle_time,

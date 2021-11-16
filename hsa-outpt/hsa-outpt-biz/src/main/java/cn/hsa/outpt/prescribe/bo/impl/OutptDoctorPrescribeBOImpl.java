@@ -340,12 +340,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptVisitDAO.updateOutptVisit(byVisitID);
         }
         // 避免重复开住院证
-        if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "1".equals(byVisitID.getTranInCode())) {
+        /*if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "1".equals(byVisitID.getTranInCode())) {
             throw new RuntimeException("【" + byVisitID.getName() + "】已开住院证，请进行入院登记");
         }
         if (StringUtils.isNotEmpty(byVisitID.getTranInCode()) && "2".equals(byVisitID.getTranInCode())) {
             throw new RuntimeException("【" + byVisitID.getName() + "】已进行入院登记，不可重复开住院证");
-        }
+        }*/
         return outptDoctorPrescribeDAO.updateVisitInHospital(outptVisitDTO) > 0;
     }
 
@@ -1751,13 +1751,38 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
             //疾病ID
             outptDiagnoseDTO.setDiseaseId(diagnoseId);
-            //第一条数据，默认为主诊断(没有主诊断情况下)
-            if(i == 0 && Constants.SF.F.equals(isMain) ){
-                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-                outptDiagnoseDTO.setIsMain(Constants.SF.S);
-            }else{
-                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
-                outptDiagnoseDTO.setIsMain(Constants.SF.F);
+            // 如果是郭老板的医院并且诊断是同步过来的则固定主诊断
+            //否则第一条数据，默认为主诊断(没有主诊断情况下)
+            if(outptPrescribeDTO.getHospCode().equals("0005") || outptPrescribeDTO.getHospCode().equals("0006")) {
+                Map map = new HashMap();
+                map.put("hospCode", outptPrescribeDTO.getHospCode());
+                map.put("code", "YJ_ZDID");
+                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+//                if (outptPrescribeDTO.getDiagnoseIds().equals(sysParameterDTO.getValue())) {
+                if (outptPrescribeDTO.getDiagnoseIds().indexOf(sysParameterDTO.getValue()) > -1) {
+                    map.put("code", "YJ_ZZD");
+                    SysParameterDTO sysParameterDTOS = sysParameterService_consumer.getParameterByCode(map).getData();
+                    if (diagnoseId.equals(sysParameterDTOS.getValue())) {
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+                    }
+                } else {
+//                    if(i == 0 && Constants.SF.F.equals(isMain) ){
+//                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+//                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+//                    }else{
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.F);
+//                    }
+                }
+            } else {
+                if(i == 0 && Constants.SF.F.equals(isMain) ){
+                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                    outptDiagnoseDTO.setIsMain(Constants.SF.S);
+                }else{
+                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                    outptDiagnoseDTO.setIsMain(Constants.SF.F);
+                }
             }
             i++;
             //创建人ID
@@ -2100,8 +2125,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptCostDTO.setItemCode(Constants.XMLB.CL);
             //项目名称（药品、项目、材料、医嘱目录）
             outptCostDTO.setItemName(baseMaterialDTO.getName());
-            //单价
-            outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            //单价  基础材料信息拆零单位和单位一致时使用单价，不一致取拆零单价 lly 2021/10/03
+            if (baseMaterialDTO.getUnitCode().equals(baseMaterialDTO.getSplitUnitCode())) {
+                outptCostDTO.setPrice(baseMaterialDTO.getPrice());
+            }else {
+                outptCostDTO.setPrice(baseMaterialDTO.getSplitPrice());
+            }
             //规格
             outptCostDTO.setSpec(baseMaterialDTO.getSpec());
         }

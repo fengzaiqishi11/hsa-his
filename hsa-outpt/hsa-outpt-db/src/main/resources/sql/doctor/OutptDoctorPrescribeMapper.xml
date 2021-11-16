@@ -374,6 +374,12 @@
               <![CDATA[
                 and IF(sys.value > 0 , date(date_sub(now(), interval sys.value day)), date(now())) <= date(b.register_time)
               ]]>
+                <if test="keyword !=null and keyword !=''">
+                and (a.name like concat('%',#{keyword},'%')
+                or a.visit_no like concat('%',#{keyword},'%')
+                or a.cert_no like concat('%',#{keyword},'%')
+                or a.phone like concat('%',#{keyword},'%'))
+                </if>
             </if>
 
             <!-- 已接诊 -->
@@ -396,7 +402,7 @@
             <if test="id != null and id != ''" >
                 and a.id = #{id}
             </if>
-        ) a order by a.type, a.visitTime desc
+        ) a order by a.type, a.visitTime,a.registerNo desc
     </select>
 
     <!--  获取历史病历记录 -->
@@ -831,8 +837,8 @@
       case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
       a.antibacterial_code, a.is_skin,
       a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
-      case when a.big_type_code = '2' then  '3' else '1' end type, '1' itemCode,
-      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
+      case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
+      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
       ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
       <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
       '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
@@ -854,7 +860,7 @@
       where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
       )b on 1 = 1
       join stro_stock stock on (
-      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end
+      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end
       ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
       left join base_rate c on a.rate_code = c.code and a.hosp_code = c.hosp_code
       left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
@@ -918,7 +924,7 @@
       </if>
       left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
       left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-      where a.hosp_code = #{hospCode} and a.is_valid = '1'
+      where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
       <if test="yzmlType != null and yzmlType != ''" >
         and  '3' = #{yzmlType}
       </if>
@@ -1465,10 +1471,11 @@
         else a.price end price,
         a.split_ratio, a.split_unit_code,
         a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code, a.antibacterial_code, a.is_skin,
-        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code, case when a.big_type_code = '3' then  '3' else '1' end type,
+        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
+        case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type,
         <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
         case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end phCode,
-        '1' itemCode, case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
+        '1' itemCode, case when a.big_type_code = '2'  or a.big_type_code = '3' then b.cyf when a.big_type_code = '1'  or a.big_type_code = '3' then b.zcf when a.big_type_code = '0' then b.xyf end pharId,
         c.id rateId, d.id bfcId, ifnull(e.exec_dept_id,#{loginDeptId}) execDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, '1' typeCode, stock.num stockNum
         from base_drug a
@@ -1484,7 +1491,7 @@
         left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
         left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
         join stro_stock stock on (
-        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' then b.xyf end
+        case when a.big_type_code = '2'  or a.big_type_code = '3'  then b.cyf when a.big_type_code = '1' or a.big_type_code = '3' then b.zcf when a.big_type_code = '0' then b.xyf end
         ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
         where a.hosp_code = #{hospCode} and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
         <if test="typeCode != null and typeCode != ''" >

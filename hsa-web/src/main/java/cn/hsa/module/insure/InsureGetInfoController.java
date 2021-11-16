@@ -82,6 +82,22 @@ public class InsureGetInfoController extends BaseController {
         return insureGetInfoService_consumer.saveInsureSettleInfo(map);
     }
 
+    /**
+     * @Method queryPage
+     * @Desrciption  查询结算清单左侧人员类别信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/9 15:29
+     * @Return
+    **/
+    @GetMapping("/querySetlePage")
+    public WrapperResponse<PageDTO> querySetlePage(@RequestBody Map<String,Object> map, HttpServletRequest req,
+                                              HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.querySetlePage(map);
+    }
 
 
     /**

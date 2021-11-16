@@ -209,6 +209,7 @@ public interface PatientComprehensiveQueryDAO {
    **/
   List<InptSettleDTO> querySettleInvoice(InptSettleDTO inptSettleDTO);
 
+
   /**
    * @Method queryJS
    * @Desrciption 查询结算信息业务类型

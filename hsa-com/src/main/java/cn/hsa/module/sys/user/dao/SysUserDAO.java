@@ -168,7 +168,7 @@ public interface SysUserDAO {
 
     /**
      * @Method updateResetPassword
-     * @Desrciption 重置密码
+     * @Desrciption 重置密码(密码重置后需要提醒用户修改密码)
      * @Param
      * [sysUserDTO]
      * @Author liaojunjie

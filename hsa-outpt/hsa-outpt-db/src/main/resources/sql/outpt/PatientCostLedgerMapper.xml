@@ -1934,7 +1934,8 @@
         case max(a.item_code) when '1' then max(bd.prep_code) when '2' then '' end prepCode,
         max(a.unit_code) as unitCode,
         max(a.split_unit_code) as splitUnitCode,
-        (select name from base_dept where id = b.dept_id) as deptName
+        (select name from base_dept where id = b.dept_id) as deptName,
+        (select name from base_dept where id = b.phar_id) as pharName
         from phar_in_distribute_all_detail a
         left join phar_in_distribute b on a.distribute_id = b.id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = '1'
@@ -1965,6 +1966,10 @@
         /*剂型*/
         <if test="prepCode != null and prepCode != ''">
             and bd.prep_code = #{prepCode}
+        </if>
+        /*发药药房*/
+        <if test="pharId != null and pharId != ''">
+            and b.phar_id = #{pharId}
         </if>
         group by b.dept_id, a.item_id
         ) A where A.splitNum != 0
@@ -5182,7 +5187,7 @@
             join outpt_register register on settle.register_id = register.id and settle.hosp_code = register.hosp_code
             join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
-            where a.hosp_code = #{hospCode}
+            where a.hosp_code = #{hospCode} and register.is_cancel ='0'
             <if test="startDate != null ">
                 and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
@@ -5759,7 +5764,7 @@
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
         <if test="keyword != null and keyword != ''">
-            and (name_pym like concat('%', #{keyword}, '%') or name_wbm like concat('%', #{keyword}, '%') or good_name like concat('%', #{keyword}, '%'))
+            and (name_pym like concat('%', #{keyword}, '%') or name_wbm like concat('%', #{keyword}, '%') or name like concat('%', #{keyword}, '%'))
         </if>
     </select>
 

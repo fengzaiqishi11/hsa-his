@@ -294,9 +294,11 @@
         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
-        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
+        a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.teach_doctor_id, a.teach_doctor_name,
         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
         a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,
+        (select et.exec_time from inpt_advice_exec et where et.advice_id = a.id and et.hosp_code = a.hosp_code and et.exec_time
+        is not null order by exec_time limit 1) as last_exec_time,
         case when a.item_code = '4' then (
         case when b.type_code = '3' then '4' when b.type_code = '12' then '5' else '6' end
         ) when a.item_code = '1' then (
@@ -2024,5 +2026,23 @@
         </if>
     </select>
 
+    <!--同组医嘱列表查询-->
+    <select id="queryGroupAdvice" resultMap="InptAdviceMap">
+        select
+        id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no,
+        type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code,
+        phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time,
+        teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name,
+        stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time, is_stop_check, cancel_id, cancel_name, cancel_time
+        from inpt_advice
+        where hosp_code = #{hospCode}  and visit_id = #{visitId}
+        <if test="groupNos != null">
+            and group_no in
+            <foreach collection="groupNos" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 
 </mapper>

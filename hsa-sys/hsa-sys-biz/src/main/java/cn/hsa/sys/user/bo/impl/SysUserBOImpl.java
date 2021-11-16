@@ -77,6 +77,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public SysUserDTO getById(SysUserDTO sysUserDTO) {
         SysUserDTO byId = this.sysUserDAO.getById(sysUserDTO);
+        byId.setPassword(null);
         List<SysUserSystemDTO> sysUserSystemDTOS = sysUserDAO.querySysUserSystemAll(byId);
         if (!ListUtils.isEmpty(sysUserSystemDTOS)) {
             try {
@@ -350,6 +351,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public Boolean updateResetPassword(SysUserDTO sysUserDTO) {
         sysUserDTO.setPassword(MD5Utils.getMd5AndSha("888888"));
+        sysUserDTO.setIsPasswordChange(Boolean.FALSE);
         return sysUserDAO.updateResetPassword(sysUserDTO) > 0;
     }
 

@@ -233,5 +233,9 @@ public class SysUserDO extends PageDO implements Serializable {
      * 是否具有麻醉权
      */
     private String isAnaesthesia;
+    /**
+     * 近期是否修改过密码
+     */
+    private Boolean isPasswordChange;
 
 }

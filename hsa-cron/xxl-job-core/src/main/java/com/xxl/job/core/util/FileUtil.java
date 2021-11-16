@@ -53,6 +53,7 @@ public class FileUtil {
                 file.createNewFile();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                logger.error("发生错误的文件名或路径为：{},即将打印的输出为{}", fileName,content);
                 return;
             }
         }

@@ -42,4 +42,14 @@ public interface BackCostSureByInptBO {
     **/
     PageDTO queryOutpatientSurgeryCostPage(InptCostDTO inptCostDTO);
 
+    /**
+     * @Method updateCancelBackCost
+     * @Desrciption 取消退费
+     * @param inptCostDTO
+     * @Author liuliyun
+     * @Date   2021/11/10 20:15
+     * @Return java.lang.Boolean
+     **/
+    Boolean updateCancelBackCost(InptCostDTO inptCostDTO);
+
 }

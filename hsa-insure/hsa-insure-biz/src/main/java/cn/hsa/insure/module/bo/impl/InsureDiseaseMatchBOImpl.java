@@ -106,27 +106,8 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
         List<BaseDiseaseDTO> oldDiseases = baseDiseaseService.queryAll(map).getData();
         List<String> oldDiseaseIds = oldDiseases.stream().map(BaseDiseaseDTO::getId).collect(Collectors.toList());
 
-//        //需要修改的疾病
-//        List<String> temp1 = new ArrayList();
-//        temp1.addAll(oldDiseaseIds);
-//        temp1.retainAll(diseaseIds);
         //需要新增的疾病
         oldDiseaseIds.removeAll(diseaseIds);
-
-//        //需要修改的疾病
-//        List<BaseDiseaseDTO> collect1 = new ArrayList<>();
-//        if (!ListUtils.isEmpty(temp1)) {
-//            baseDiseaseDTO.setIds(temp1);
-//            map.put("baseDiseaseDTO", baseDiseaseDTO);
-//            collect1 = baseDiseaseService.queryAll(map).getData();
-//            for (BaseDiseaseDTO d : collect1) {
-//                d.setInsureRegCode(insureDiseaseMatchDTO.getInsureRegCode());
-//                d.setInsureId(SnowflakeUtils.getId());
-//                d.setCrteId(insureDiseaseMatchDTO.getCrteId());
-//                d.setCrteName(insureDiseaseMatchDTO.getCrteName());
-//            }
-//        }
-
 
         //需要新增的疾病
         List<BaseDiseaseDTO> collect2 = new ArrayList<>();
@@ -142,9 +123,6 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
             }
         }
 
-//        if (!ListUtils.isEmpty(collect1)) {
-//            saveBatchList(collect1, "update",insureDiseaseMatchDTO);
-//        }
         if (!ListUtils.isEmpty(collect2)) {
             saveBatchList(collect2);
         }
@@ -362,18 +340,7 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
     }
 
     public Boolean saveBatchList(List<BaseDiseaseDTO> dataList) {
-        List<BaseDiseaseDTO> temp = new ArrayList<>();//待提交数据
-        for (int i = 0; i < dataList.size(); i++) {
-            temp.add(dataList.get(i));
-            if ((i + 1) % 1000 == 0) {
-                insureDiseaseMatchDAO.insertHospDisease(temp);
-                //重新初始
-                temp = new ArrayList<>();
-            } else if (i == dataList.size() - 1 && i % 1000 != 0) {
-                insureDiseaseMatchDAO.insertHospDisease(temp);
-                break;
-            }
-        }
+        insureDiseaseMatchDAO.insertHospDisease(dataList);
         return true;
     }
     Boolean handNull(Object object) {

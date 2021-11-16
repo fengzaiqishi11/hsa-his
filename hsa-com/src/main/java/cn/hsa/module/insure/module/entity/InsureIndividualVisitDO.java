@@ -127,4 +127,16 @@ public class InsureIndividualVisitDO extends PageDO implements Serializable {
         @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date birctrlMatnDate ; // 计划生育手术或生育日期
+
+        // 是否一站式
+        private String isOneSettle;
+
+        // 人员身份类别
+        private String psnIdetType;
+
+        // 开始时间
+        private Date idetStartDate;
+
+        // 结算时间
+        private Date idetEndDate;
 }

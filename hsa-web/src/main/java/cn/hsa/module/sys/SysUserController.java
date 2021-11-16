@@ -404,10 +404,10 @@ public class SysUserController extends BaseController {
         }
 
         // 密码错误
-        if (!MD5Utils.verifyMd5AndSha(sysUserPasswordDTO.getOldPassWord(), sysUserDTO.getPassword())) {
+        if (!MD5Utils.verifySha(sysUserPasswordDTO.getOldPassWord(), sysUserDTO.getPassword())) {
             throw new AppException("原始密码错误！");
         }
-        String newPasswordByMd5 = MD5Utils.getMd5AndSha(sysUserPasswordDTO.getNewPassword());
+        String newPasswordByMd5 = sysUserPasswordDTO.getNewPassword();
         Map changePassWordParam = new HashMap<>();
         changePassWordParam.put("oldPassWord",sysUserPasswordDTO.getOldPassWord());
         changePassWordParam.put("newPasswordByMd5",newPasswordByMd5);

@@ -238,7 +238,6 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                         if (backReceiveDTOList != null && backReceiveDTOList.size() > 0) {
                             //有负的待领信息才需要新增一条待领记录
                             for (PharInWaitReceiveDTO dto : backReceiveDTOList) {
-                                dto.setOldWrId(dto.getId());
                                 dto.setCrteTime(DateUtils.getNow());
                                 dto.setIsBack(Constants.SF.F);//是否需要退药 用于区分是正常的还是退费的
                                 for (InptCostDTO d : normal) {
@@ -249,6 +248,7 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                                         dto.setIsBack(Constants.SF.F);
                                         dto.setCurrUnitCode(d.getTotalNumUnitCode());
                                         dto.setCostId(d.getId());
+                                        dto.setOldWrId(null);
                                         break;
                                     }
                                 }

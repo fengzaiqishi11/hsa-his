@@ -54,7 +54,7 @@
         <foreach collection="ids"  item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
-
+        order by l.id asc
     </select>
 
     <!--批量新增-->

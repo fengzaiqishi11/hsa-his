@@ -24,7 +24,10 @@
         </if>
         WHERE a.hosp_code = #{hospCode}
         <if test="keyword != null and keyword !=''">
-            and CONCAT(a.name,a.phone,a.cert_no,a.in_no) LIKE CONCAT('%',#{keyword},'%')
+            and (
+            a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
+            or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            )
         </if>
         <if test="zgbrQuery != '2'.toString()">
             <if test="inDeptId != null and inDeptId != ''">

@@ -1548,10 +1548,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     public Map<String, Object> UP_5301(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String insureRegCode = MapUtils.get(map, "insureRegCode");
-
+        String regCode = MapUtils.get(map, "regCode");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureRegCode);
+        insureConfigurationDTO.setRegCode(regCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map httpParam = new HashMap();
         httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_5301);  //交易编号

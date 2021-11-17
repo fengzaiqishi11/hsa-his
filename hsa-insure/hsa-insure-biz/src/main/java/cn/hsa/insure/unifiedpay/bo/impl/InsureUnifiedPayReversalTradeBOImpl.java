@@ -856,6 +856,58 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     }
 
     /**
+     * @param paraMap
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报合计报表打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> querySumDeclareInfoPrint(Map<String, Object> paraMap) {
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        Map<String,Object> resultMap = new HashMap<>();
+        String declaraType = MapUtils.get(paraMap,"declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                paraMap.put("isHospital", Constants.SF.S);
+                resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isHospital", Constants.SF.S);
+                resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                paraMap.put("isHospital", Constants.SF.S);
+                resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
+                break;
+            case Constants.SBLX.MZ: // 门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
+            case Constants.SBLX.YZS: // 一站式
+                resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
+            default:
+                break;
+        }
+
+        InsureConfigurationDTO insureConfInfo = new InsureConfigurationDTO();
+        insureConfInfo.setHospCode(MapUtils.get(paraMap,"hospCode"));
+        insureConfInfo.setRegCode(MapUtils.get(paraMap,"insureRegCode"));
+        insureConfInfo = insureConfigurationDAO.queryInsureIndividualConfig(insureConfInfo);
+        if (insureConfInfo == null) {
+            throw new AppException("未查询到医保机构");
+        }
+        insureConfInfo.setCrteName(MapUtils.get(paraMap,"crteName"));
+        insureConfInfo.setCrteId(MapUtils.get(paraMap,"crteId"));
+        resultMap.put("resultList",resultList);
+        resultMap.put("baseInfo",insureConfInfo);
+        return resultMap;
+    }
+
+    /**
      * @Method handlerFeeFund
      * @Desrciption  离休结算单：计算离休基金
      * @Param
@@ -1586,34 +1638,39 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     // 对账单（生育）
     private Map<String, Object> getSYBXData(Map<String, Object> paraMap) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<String> list = new ArrayList<>();
-        list.add(Constant.UnifiedPay.YWLX.SYMZ);
-        list.add(Constant.UnifiedPay.YWLX.SYZY);
-        paraMap.put("list",list);
-        List<Map<String,Object>> statementList = insureReversalTradeDAO.queryStatementInfo(paraMap);
-        if (!ListUtils.isEmpty(statementList)) {
-            for (Map<String,Object> map : statementList) {
-                String aka130 = MapUtils.get(map,"aka130"); // 医保业务类型
-                String isRemote = MapUtils.get(map,"isRemote"); // 是否异地
-                if (Constants.SF.F.equals(isRemote)) {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.SYMZ:
-                            resultMap.put("localOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.SYZY:
-                            resultMap.put("localOrdinaryInpt",map);
-                            break;
-                    }
-                } else {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.SYMZ:
-                            resultMap.put("offSiteOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.SYZY:
-                            resultMap.put("offSiteOrdinaryInpt",map);
-                            break;
-                    }
 
+        // 门诊部分
+        List<String> localOrdinaryOutptList = new ArrayList<>();
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.SYMZ);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.JBYLSYZY);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.QTSYMZ);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.ZZRSMZ);
+        paraMap.put("list",localOrdinaryOutptList);
+        List<Map<String,Object>> localOrdinaryOutptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryOutptMap)) {
+            for (Map<String,Object> map : localOrdinaryOutptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.S.equals(isRemote)) {
+                    resultMap.put("localOrdinaryOutpt",map);
+                } else {
+                    resultMap.put("offSiteOrdinaryOutpt",map);
+                }
+            }
+        }
+
+        // 住院部分
+        List<String> localOrdinaryInptList = new ArrayList<>();
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.SYZY);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.ZZRSZY);
+        paraMap.put("list",localOrdinaryInptList);
+        List<Map<String,Object>> localOrdinaryInptMapList = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryInptMapList)) {
+            for (Map<String,Object> map : localOrdinaryInptMapList) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.F.equals(isRemote)) {
+                    resultMap.put("localOrdinaryInpt",map);
+                } else {
+                    resultMap.put("offSiteOrdinaryInpt",map);
                 }
             }
         }
@@ -1624,34 +1681,35 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     // 对账单(意外伤害)
     private Map<String, Object> getYWSHData(Map<String, Object> paraMap) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<String> list = new ArrayList<>();
-        list.add(Constant.UnifiedPay.YWLX.YWSHMZ);
-        list.add(Constant.UnifiedPay.YWLX.WSZY);
-        paraMap.put("list",list);
-        List<Map<String,Object>> statementList = insureReversalTradeDAO.queryStatementInfo(paraMap);
-        if (!ListUtils.isEmpty(statementList)) {
-            for (Map<String,Object> map : statementList) {
-                String aka130 = MapUtils.get(map,"aka130"); // 医保业务类型
-                String isRemote = MapUtils.get(map,"isRemote"); // 是否异地
+        // 门诊部分
+        List<String> localOrdinaryOutptList = new ArrayList<>();
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.YWSHMZ);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.DXSWSMZ);
+        paraMap.put("list",localOrdinaryOutptList);
+        List<Map<String,Object>> localOrdinaryOutptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryOutptMap)) {
+            for (Map<String,Object> map : localOrdinaryOutptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
                 if (Constants.SF.F.equals(isRemote)) {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.YWSHMZ:
-                            resultMap.put("localOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.WSZY:
-                            resultMap.put("localOrdinaryInpt",map);
-                            break;
-                    }
+                    resultMap.put("localOrdinaryOutpt",map);
                 } else {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.YWSHMZ:
-                            resultMap.put("offSiteOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.WSZY:
-                            resultMap.put("offSiteOrdinaryInpt",map);
-                            break;
-                    }
+                    resultMap.put("offSiteOrdinaryOutpt",map);
+                }
+            }
+        }
 
+        // 住院部分
+        List<String> localOrdinaryInptList = new ArrayList<>();
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.WSZY);
+        paraMap.put("list",localOrdinaryInptList);
+        List<Map<String,Object>> localOrdinaryInptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryInptMap)) {
+            for (Map<String,Object> map : localOrdinaryInptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.F.equals(isRemote)) {
+                    resultMap.put("offSiteOrdinaryOutpt",map);
+                } else {
+                    resultMap.put("offSiteOrdinaryInpt",map);
                 }
             }
         }
@@ -1662,51 +1720,66 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     // 对账单（普通）
     private Map<String,Object> getOrdinaryData(Map<String, Object> paraMap) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<String> list = new ArrayList<>();
-        list.add(Constant.UnifiedPay.YWLX.PTMZ);
-        list.add(Constant.UnifiedPay.YWLX.MZMXB);
-        list.add(Constant.UnifiedPay.YWLX.PTZYWZM);
-        list.add(Constant.UnifiedPay.YWLX.DBTY);
-        paraMap.put("list",list);
-        List<Map<String,Object>> statementList = insureReversalTradeDAO.queryStatementInfo(paraMap);
-        if (!ListUtils.isEmpty(statementList)) {
-            for (Map<String,Object> map : statementList) {
-                String aka130 = MapUtils.get(map,"aka130"); // 医保业务类型
-                String isRemote = MapUtils.get(map,"isRemote"); // 是否异地
-                if (Constants.SF.F.equals(isRemote)) {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.PTMZ:
-                            resultMap.put("localOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.MZMXB:
-                            resultMap.put("localSpecialOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.PTZYWZM:
-                            resultMap.put("localOrdinaryInpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.DBTY:
-                            resultMap.put("localDBTY",map);
-                            break;
-                    }
-                } else {
-                    switch (aka130) {
-                        case Constant.UnifiedPay.YWLX.PTMZ:
-                            resultMap.put("offSiteOrdinaryOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.MZMXB:
-                            resultMap.put("offSiteSpecialOutpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.PTZYWZM:
-                            resultMap.put("offSitelOrdinaryInpt",map);
-                            break;
-                        case Constant.UnifiedPay.YWLX.DBTY:
-                            resultMap.put("offSiteDBTY",map);
-                            break;
-                    }
 
+        // 门诊部分
+        List<String> localOrdinaryOutptList = new ArrayList<>();
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.PTMZ);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.GH);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.JZ);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.MZTC);
+        localOrdinaryOutptList.add(Constant.UnifiedPay.YWLX.MZQJ);
+        paraMap.put("list",localOrdinaryOutptList);
+        List<Map<String,Object>> localOrdinaryOutptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryOutptMap)) {
+            for (Map<String,Object> map : localOrdinaryOutptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.F.equals(isRemote)) {
+                    resultMap.put("localOrdinaryOutpt",map);
+                } else {
+                    resultMap.put("offSiteOrdinaryOutpt",map);
                 }
             }
         }
+
+        // 门特/门慢/两病 部分
+        List<String> localSpecialOutptList = new ArrayList<>();
+        localSpecialOutptList.add(Constant.UnifiedPay.YWLX.MZTSB);
+        localSpecialOutptList.add(Constant.UnifiedPay.YWLX.MZMXB);
+        localSpecialOutptList.add(Constant.UnifiedPay.YWLX.MZLB);
+        paraMap.put("list",localSpecialOutptList);
+        List<Map<String,Object>> localSpecialOutptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localSpecialOutptMap)) {
+            for (Map<String,Object> map : localSpecialOutptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.F.equals(isRemote)) {
+                    resultMap.put("localSpecialOutpt",map);
+                } else {
+                    resultMap.put("offSiteSpecialOutpt",map);
+                }
+            }
+        }
+
+        // 住院部分
+        List<String> localOrdinaryInptList = new ArrayList<>();
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.PTZY);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.DBZZY);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.PTZYWZM);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.SYPCJM);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.SYPGCJM);
+        localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.JSBZY);
+        List<Map<String,Object>> localOrdinaryInptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
+        if (!ListUtils.isEmpty(localOrdinaryInptMap)) {
+            for (Map<String,Object> map : localOrdinaryInptMap) {
+                String isRemote = MapUtils.get(map,"isRemote");
+                if (Constants.SF.F.equals(isRemote)) {
+                    resultMap.put("localOrdinaryInpt",map);
+                } else {
+                    resultMap.put("offSitelOrdinaryInpt",map);
+                }
+            }
+        }
+
+        // 特药、没啥好统计的，肯定查不出数据
         resultMap.put("paraMap",paraMap);
         return resultMap;
     }

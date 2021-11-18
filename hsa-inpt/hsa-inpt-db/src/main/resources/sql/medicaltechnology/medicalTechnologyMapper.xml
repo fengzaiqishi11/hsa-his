@@ -39,7 +39,7 @@
         and ma.hosp_code = c.hosp_code
         and ma.hosp_code = v.hosp_code
         and ma.hosp_code = d.hosp_code
-        and ma.visit_id = c.visit_id
+        and ma.visit_id = b.visit_id
         AND b.id = c.iat_id
         AND d.id = c.dept_id
         AND ma.hosp_code = #{hospCode}

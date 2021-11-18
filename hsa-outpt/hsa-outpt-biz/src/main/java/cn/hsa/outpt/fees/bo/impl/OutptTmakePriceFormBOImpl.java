@@ -3830,7 +3830,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         //        List<Map<String,Object>> insureCostList = outptCostDAO.queryOutptInsureCostByVisit(insureCostParam);
         List<Map<String,Object>> insureCostList = insureIndividualCostService_consumer.queryOutptInsureCostByVisit(insureCostParam);
         if(ListUtils.isEmpty(insureCostList)){
-            throw new AppException("该病人没有可以上传的费用");
+            throw new AppException("该病人没有可以上传的费用,请先做好对应费用项目匹配工作");
         }
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         map.put("insureCostList",insureCostList);

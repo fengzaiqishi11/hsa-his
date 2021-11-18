@@ -711,7 +711,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 // 获取页面上修改后的用药性质
                 boolean isChange = false;
                 if (Constants.FYLYFS.ZJHJSF.equals(outptCostDTO.getSourceCode())) {
-                    if (Constants.YYXZ.CG.equals(outptCostDTO.getUsageCode()) || Constants.YYXZ.CYDY.equals(outptCostDTO.getUsageCode())) {
+                    if (Constants.YYXZ.CG.equals(outptCostDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(outptCostDTO.getUseCode())) {
                         isChange = true;
                     }
                 } else {
@@ -741,13 +741,24 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     // 直接划价收费的药品或材料需要校验库存  2021年5月26日10:50:09
                     if (Constants.FYLYFS.ZJHJSF.equals(outptCostDTO.getSourceCode())) {
                         BigDecimal num = MapUtils.get(prescribeMap.get(0), "num");  // 总库存
+                        String unitCode = MapUtils.get(prescribeMap.get(0), "unit_code"); // 单位代码
+                        BigDecimal splitNum = MapUtils.get(prescribeMap.get(0), "split_num");// 拆零数量
+                        BigDecimal splitRatio = MapUtils.get(prescribeMap.get(0), "split_ratio");// 拆分比
                         BigDecimal stockOccupy = MapUtils.get(prescribeMap.get(0), "stock_occupy");  // 占用库存
-                        if (stockOccupy==null){
-                            stockOccupy =BigDecimalUtils.nullToZero(stockOccupy);
+                        if (stockOccupy == null) {
+                            stockOccupy = BigDecimalUtils.nullToZero(stockOccupy);
                         }
-                        BigDecimal sykc = BigDecimalUtils.subtract(num, stockOccupy);  // 剩余库存
-                        if (BigDecimalUtils.greater(outptCostDTO.getTotalNum(), sykc)) {
-                            throw new AppException(outptCostDTO.getItemName() + ":指定药房库存不足");
+                        if (StringUtils.isNotEmpty(unitCode) && unitCode.equals(outptCostDTO.getNumUnitCode())) {// 如果单位和库存单位相同
+                            BigDecimal divide = BigDecimalUtils.divide(stockOccupy, splitRatio);
+                            BigDecimal sykc = BigDecimalUtils.subtract(num, divide);  // 剩余库存
+                            if (BigDecimalUtils.greater(outptCostDTO.getTotalNum(), sykc)) {
+                                throw new AppException(outptCostDTO.getItemName() + ":指定药房库存不足或者存在医生开处方的数量未失效");
+                            }
+                        } else {// 如果不相同 就根据拆零数量进行比较
+                            BigDecimal sykc = BigDecimalUtils.subtract(splitNum, stockOccupy);  // 剩余库存
+                            if (BigDecimalUtils.greater(outptCostDTO.getTotalNum(), sykc)) {
+                                throw new AppException(outptCostDTO.getItemName() + ":指定药房库存不足或者存在医生开处方的数量未失效");
+                            }
                         }
                     }
                 }

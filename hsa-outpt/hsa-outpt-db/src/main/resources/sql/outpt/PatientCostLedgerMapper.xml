@@ -4007,16 +4007,16 @@
         join inpt_visit b on a.hosp_code = b.hosp_code and settle.visit_id = b.id
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
+            and settle.settle_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
+            and settle.settle_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
+            and a.cost_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
+            and a.cost_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')

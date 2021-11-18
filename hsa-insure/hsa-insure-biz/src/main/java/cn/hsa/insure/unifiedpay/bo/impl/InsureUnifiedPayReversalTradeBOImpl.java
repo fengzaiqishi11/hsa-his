@@ -1734,7 +1734,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         if (!ListUtils.isEmpty(localOrdinaryOutptMap)) {
             for (Map<String,Object> map : localOrdinaryOutptMap) {
                 String isRemote = MapUtils.get(map,"isRemote");
-                if (Constants.SF.S.equals(isRemote)) {
+                if (Constants.SF.F.equals(isRemote)) {
                     resultMap.put("localOrdinaryOutpt",map);
                 } else {
                     resultMap.put("offSiteOrdinaryOutpt",map);
@@ -1791,7 +1791,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             for (Map<String,Object> map : localOrdinaryInptMap) {
                 String isRemote = MapUtils.get(map,"isRemote");
                 if (Constants.SF.F.equals(isRemote)) {
-                    resultMap.put("offSiteOrdinaryOutpt",map);
+                    resultMap.put("localOrdinaryInpt",map);
                 } else {
                     resultMap.put("offSiteOrdinaryInpt",map);
                 }

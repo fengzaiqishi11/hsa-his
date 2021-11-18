@@ -478,6 +478,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal familyPay = BigDecimalUtils.convert(inptInsureResult.get("familyPay"));// 居民家庭账户金
                 BigDecimal behalfPay = BigDecimalUtils.convert(inptInsureResult.get("behalfPay"));// 代缴基金（破产改制）
                 BigDecimal bka832 = BigDecimalUtils.convert(inptInsureResult.get("bka832"));//医保支付金额
+                BigDecimal psnPartAmt = new BigDecimal(0.00); // 个人负担总金额
+                if(StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
+                     psnPartAmt = BigDecimalUtils.convert(MapUtils.get(inptInsureResult,"psnPartAmt"));
+                }
                 //医保支付金额 = 医疗总费用 - 医保个人自付
                 miPrice = BigDecimalUtils.subtract(akc264, bka831);
 
@@ -582,6 +586,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 insureIndividualSettleDO.setCOVIDPay(COVIDPay);
                 insureIndividualSettleDO.setFamilyPay(familyPay);
                 insureIndividualSettleDO.setBehalfPay(behalfPay);
+                insureIndividualSettleDO.setPsnPartAmt(psnPartAmt); // 个人负担总金额
 
                 Map<String, Object> insureSettleParam = new HashMap<String, Object>();
                 insureSettleParam.put("hospCode", hospCode);//医院编码
@@ -691,6 +696,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             redisUtils.del(key);
         }
     }
+
 
     /**
      * @param param 请求参数

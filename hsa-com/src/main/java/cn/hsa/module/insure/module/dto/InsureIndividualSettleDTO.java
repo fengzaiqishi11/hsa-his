@@ -68,4 +68,5 @@ public class InsureIndividualSettleDTO extends InsureIndividualSettleDO implemen
         private Date outTime;
         private String bka035; // 人员类别编码
         private String bka035Name; // 人员类别名称
+        private BigDecimal psnPartAmt ; // 个人负担总金额
 }

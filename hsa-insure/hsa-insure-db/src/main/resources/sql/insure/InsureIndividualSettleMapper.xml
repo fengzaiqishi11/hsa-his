@@ -693,9 +693,11 @@
                 family_pay,
             </if>
             <if test="behalfPay != null and behalfPay != ''">
-                behalf_pay
+                behalf_pay,
             </if>
-
+            <if test="psnPartAmt != null ">
+                psn_part_amt
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">
@@ -933,7 +935,10 @@
                 #{familyPay,jdbcType=DECIMAL},
             </if>
             <if test="behalfPay != null and behalfPay != ''">
-                #{behalfPay,jdbcType=DECIMAL}
+                #{behalfPay,jdbcType=DECIMAL},
+            </if>
+            <if test="psnPartAmt != null">
+                #{psnPartAmt,jdbcType=DECIMAL}
             </if>
         </trim>
     </insert>

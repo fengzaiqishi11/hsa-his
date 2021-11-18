@@ -229,7 +229,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
      * @Return: java.lang.Boolean
      **/
     @Override
-    public synchronized Boolean modifyAcceptMedicalAdvices(MedicalAdviceDTO medicalAdviceDTO) {
+    public  Boolean modifyAcceptMedicalAdvices(MedicalAdviceDTO medicalAdviceDTO) {
         try {
             logger.info("====长期费用1："+DateUtils.format());
             //校验

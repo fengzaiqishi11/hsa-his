@@ -595,19 +595,30 @@ public interface Constant {
             public static final String MZTC = "15"; // 门诊统筹
             public static final String MZTSB = "16"; // 门诊特殊病
             public static final String PTZY = "21"; // 普通住院
-            public static final String WSZY = "22"; // 外伤住院
-            public static final String ZWZZZY = "22"; // 转外诊治住院
-            public static final String SYMZ = "51"; // 生育门诊
-            public static final String SYZY = "52"; // 生育住院
-            public static final String DBZZY = "2102"; // 单病种住院
             public static final String PTZYWZM = "2101"; // 普通住院（未转码）
+            public static final String MZLB = "9901"; // 门诊两病
+            public static final String DBZZY = "2102"; // 单病种住院
+            public static final String DBTY = "9904"; // 大病特药
             public static final String SYPCJM = "2106"; // 生育平产(居民)
             public static final String SYPGCJM = "2107"; // 生育剖宫产(居民)
-            public static final String MXLB = "9901"; // 门诊两病
             public static final String YWSHMZ = "9903"; // 意外伤害门诊
-            public static final String DBTY = "9904"; // 大病特药
-
-
+            public static final String ZLJB = "9912"; // 重流疾病
+            public static final String SWJXZL = "9913"; // 市外继续治疗
+            public static final String YQJJ = "9902"; // 院前急救
+            public static final String MZQJ = "9914"; // 门诊抢救
+            public static final String JSBZY = "9903"; // 精神病住院
+            public static final String ZLMZ = "9917"; // 重流门诊
+            public static final String GWYTJ = "9918"; // 公务员体检
+            public static final String JBYLSYMZ = "9918"; // 基本医疗生育门诊
+            public static final String ZZRSMZ = "9921"; // 终止妊娠门诊
+            public static final String ZZRSZY = "9931"; // 终止妊娠住院
+            public static final String DXSWSMZ = "9920"; // 大学生外伤门诊
+            public static final String WSZY = "22"; // 外伤住院
+            public static final String ZWZZZY = "23"; // 转外诊治住院
+            public static final String SYMZ = "51"; // 生育门诊
+            public static final String SYZY = "52"; // 生育住院
+            public static final String JBYLSYZY = "54"; // 基本医疗生育门诊
+            public static final String QTSYMZ = "9932"; // 其他生育门诊
         }
 
 

@@ -33,7 +33,7 @@
         IFNULL(date_format(b.in_time, '%Y-%m-%d %H:%i:%S'),'-') as B12,
         IFNULL(date_format(b.out_time, '%Y-%m-%d %H:%i:%S'),'-') as B15,
         IFNULL(b.health_card,'-')  as A47,
-        IFNULL(b.pay_way_code,'-') as A46C,
+        IFNULL(case when b.pay_way_code ='1' then '1.1' when b.pay_way_code ='2' then '2.1' when b.pay_way_code ='3' then '3.1' else b.pay_way_code end,'-') as A46C,
         IFNULL(b.`name`,'-') as A11,
         IFNULL(b.gender_code,'-') as A12C,
         IFNULL(date_format(b.birthday, '%Y-%m-%d %H:%i:%S'),'-') as A13,
@@ -45,7 +45,7 @@
         IFNULL(b.cert_code,'-') as A20N,
         IFNULL(b.cert_no,'-') as A20,
         IFNULL(b.birth_adress,'-')  as A22,
-        IFNULL(b.native_place,'-')  as A23C,
+        IFNULL(b.native_place,'无')  as A23C,
         IFNULL(b.native_adress,'-')  as A24,
         IFNULL(b.native_post_code,'-')  as A25C,
         IFNULL(b.now_adress,'-')  as A26,
@@ -60,10 +60,10 @@
         IFNULL(b.contact_phone,'-') as A35,
        '1' as B38,
         IFNULL(b.in_way,'-')  as B11C,
-        IFNULL(b.in_dept_code,'-') as B13C,
+        IFNULL((select d.mris_code from base_dept d where d.id = b.in_dept_id and d.hosp_code =#{hospCode}),'69') as B13C,
         IFNULL(b.in_bed_name,'-') as B14,
         IFNULL(b.turn_dept_ids,'-') as B21C,
-        IFNULL(b.out_dept_id,'-') as B16C,
+        IFNULL((select d.mris_code from base_dept d where d.id = b.out_dept_id and d.hosp_code =#{hospCode}),'69') as B16C,
         IFNULL(b.out_bed_name,'-') as B17,
         IFNULL(b.in_days,'-') as B20,
         IFNULL(b.disease_icd10,'-')  as C01C,
@@ -874,7 +874,8 @@
        left join inpt_visit v on v.hosp_code=#{hospCode} and  b.visit_id = v.id
        where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL
        <if test="keyword != null and keyword !=''">
-          and CONCAT(v.name,v.phone,v.cert_no,v.in_no) LIKE CONCAT('%',#{keyword},'%')
+        and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
+        or v.in_no LIKE CONCAT('%',#{keyword},'%') )
        </if>
        <if test="inDeptId!=null and inDeptId!=''">
         and v.in_dept_id = #{inDeptId}
@@ -900,8 +901,18 @@
       from mris_diagnose where visit_id =#{visitId} and hosp_code =#{hospCode}
    </select>
    <select id="getMrisOperInfo" resultType="java.util.Map" parameterType="java.util.Map">
-      select oper_disease_icd9,oper_disease_name,oper_time,oper_code,oper_doctor_name,assistant_name1,assistant_name2,
-      heal_code,ana_code,ana_name1
+      select oper_disease_icd9,oper_disease_name,DATE_ADD(oper_time,INTERVAL 1 DAY)as oper_time,oper_code,
+      ifnull((select name from sys_user where id =oper_doctor_id and hosp_code =#{hospCode}),'无') as oper_doctor_name,
+      ifnull((select name from sys_user where id =assistant_id4 and hosp_code =#{hospCode}),'无') as assistant_name1,
+      ifnull((select name from sys_user where id =assistant_id2 and hosp_code =#{hospCode}),'无') as assistant_name2,
+      case when heal_code ='1/1' then '1' when heal_code ='1/2' then '2'
+      when heal_code ='1/3' then '3' when heal_code ='1/4' then '10'
+      when heal_code ='2/1' then '4' when heal_code ='2/2' then '5'
+      when heal_code ='2/3' then '6' when heal_code ='2/4' then '20'
+      when heal_code ='3/1' then '7' when heal_code ='3/2' then '8'
+      when heal_code ='3/3' then '9' else '30' end heal_code,
+      ana_code,
+      ifnull((select name from sys_user where id =ana_id1 and hosp_code =#{hospCode}),'无') as ana_name1
       from mris_oper_info where visit_id =#{visitId} and hosp_code =#{hospCode}
    </select>
 

@@ -218,13 +218,13 @@
 
     <!-- 查询当前科室所有的病人信息 -->
     <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
-        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        select v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive
         <if test="zgbrQuery == '2'.toString()">
             , t.is_consule, t.apply_deptid
         </if>
-        from inpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        from inpt_visit v left join emr_archive_logging g on g.hosp_code = v.hosp_code and v.id = g.visit_id
         <!--会诊病人，关联会诊申请表-->
         <if test="zgbrQuery == '2'.toString()">
             join (

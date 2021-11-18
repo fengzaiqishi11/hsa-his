@@ -3847,7 +3847,7 @@
         a.spec,
         a.num_unit_code  as unit_name,
         max(a.price) as price,
-        sum(a.total_num) as num,
+        sum(a.total_num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3882,7 +3882,7 @@
         ifnull(a.spec,'') as spec,
         a.unit_code as unit_name,
         max(a.price) as price,
-        sum(a.num) as num,
+        sum(a.num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3918,7 +3918,7 @@
         a.num_unit_code as unit_name,
         a.spec,
         max(a.price) as price,
-        sum(a.total_num) as num,
+        sum(a.total_num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3951,7 +3951,7 @@
         a.unit_code  as unit_name,
         a.spec,
         max(a.price) as price,
-        sum(a.num) as num,
+        sum(a.num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3993,7 +3993,7 @@
         a.spec,
         a.num_unit_code as unit_name,
         a.price,
-        if (a.reality_price &lt; 0, -1*a.total_num, a.total_num) as total_num,
+        if (a.reality_price &lt; 0, -1*a.total_num, a.total_num) as num,
         a.total_price, a.preferential_price, a.reality_price,
         settle.crte_name as get_cost_name, DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%S') as get_cost_time,
         a.doctor_name,

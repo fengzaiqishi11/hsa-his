@@ -935,6 +935,29 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDTO.setIatIdList(Arrays.asList(inptAdviceDTO.getIatIds().split(",")));
         }
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
+        // 同组医嘱无论是否勾选，停嘱都要全停或取消 lly 2021-11-16
+        List<Integer> groupNo =new ArrayList<>(); // 组号
+        if (inptAdviceDTOList!=null &&inptAdviceDTOList.size()>0) {
+            for (InptAdviceDTO adviceDTO : inptAdviceDTOList) {
+                if (adviceDTO.getGroupNo() != null && adviceDTO.getGroupNo() > 0) {
+                    groupNo.add(adviceDTO.getGroupNo());
+                }
+            }
+            if (groupNo != null && groupNo.size() > 0) {
+                InptAdviceDTO groupAdvice = new InptAdviceDTO();
+                groupAdvice.setHospCode(inptAdviceDTO.getHospCode());
+                groupAdvice.setVisitId(inptAdviceDTOList.get(0).getVisitId());
+                groupAdvice.setGroupNos(groupNo);
+                // 查询同组医嘱
+                List<InptAdviceDTO> groupInptAdviceDTOList = inptAdviceDAO.queryGroupAdvice(groupAdvice);
+                if (groupInptAdviceDTOList != null && groupInptAdviceDTOList.size() > 0) {
+                    inptAdviceDTOList.addAll(groupInptAdviceDTOList);
+                    //获取list对象 list属性 并进行去重
+                    List<String> ids = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
+                    inptAdviceDTO.setIatIdList(ids);
+                }
+            }
+        }
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         checkInptAdviceList = inptAdviceDTOList.stream().filter(s-> Constants.SF.F.equals(s.getIsCheck())).collect(Collectors.toList());
         if(!ListUtils.isEmpty(checkInptAdviceList)){

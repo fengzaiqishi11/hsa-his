@@ -135,6 +135,26 @@ public interface InsureReversalTradeDAO {
     List queryOutptSumDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
+     * @param paraMap
+     * @Method queryYZSDeclareInfosPage
+     * @Desrciption 一站式清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List queryYZSDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 一站式清算申报合计报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List queryYZSSumDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
      * @Method selectMdOrIns
      * @Desrciption  查询全国就医地区划和参保地区划
      * @Param

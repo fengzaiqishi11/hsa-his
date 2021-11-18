@@ -308,7 +308,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         if (insureConfigurationDTO == null) {
             throw new AppException("未查询到医保配置信息！");
         }
-        dataMap.put("setl_optins", insureConfigurationDTO.getMdtrtareaAdmvs());//结算经办机构 (统筹区规划)
+        dataMap.put("setl_optins", MapUtils.get(parameterMap, "clr_optins"));//清算经办机构（严格对应）
         dataMap.put("stmt_begndate", MapUtils.get(parameterMap, "stmt_begndate"));//对账开始日期
         dataMap.put("stmt_enddate", MapUtils.get(parameterMap, "stmt_enddate"));//对账结束日期
 
@@ -1606,7 +1606,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 paraMap.put("insutype",Constant.UnifiedPay.XZLX.CZZG);
                 paraMap.put("isHospital",Constants.SF.S);
                 break;
-            case Constants.SBLX.CXJM_ZY: // 城乡居民（住院）
+            case Constants.SBLX.CXJM_ZY: // 城乡居民（非一站式住院）
                 paraMap.put("insutype",Constant.UnifiedPay.XZLX.CXJM);
                 paraMap.put("isHospital",Constants.SF.S);
                 break;
@@ -1617,6 +1617,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             case Constants.SBLX.MZ: // 门诊
                 paraMap.put("isHospital",Constants.SF.F);
                 return PageDTO.of(insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap));
+            case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
+                return PageDTO.of(insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap));
             default:
                 break;
 
@@ -1656,6 +1658,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             case Constants.SBLX.MZ: // 门诊
                 paraMap.put("isHospital",Constants.SF.F);
                 return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.YZS: // 一站式
+                return PageDTO.of(insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap));
             default:
                 break;
 

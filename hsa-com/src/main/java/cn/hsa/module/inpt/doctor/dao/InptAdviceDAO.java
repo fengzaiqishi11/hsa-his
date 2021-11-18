@@ -825,4 +825,14 @@ public interface InptAdviceDAO {
     InptAdviceDTO getLisInptAdvice(InptAdviceDTO inptAdviceDTO);
 
     List<InptAdviceDTO> queryLisAdvice(InptAdviceDTO inptAdviceDTO);
+
+    /**
+     * @Method queryGroupAdvice
+     * @Desrciption 查询同组
+     @params [inptAdviceDTO]
+      * @Author liuliyun
+     * @Date   2021/11/16 10：56
+     * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptAdviceDTO>
+     **/
+    List<InptAdviceDTO> queryGroupAdvice(InptAdviceDTO inptAdviceDTO);
 }

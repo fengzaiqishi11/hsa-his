@@ -849,6 +849,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         Set <BigDecimal> bigDecimalSet = new HashSet<>();
         BigDecimal sumBxFee = new BigDecimal(0.00);
+        bigDecimalSet.add(hifpPay);
         bigDecimalSet.add(s2);
         bigDecimalSet.add(s3);
         bigDecimalSet.add(s4);

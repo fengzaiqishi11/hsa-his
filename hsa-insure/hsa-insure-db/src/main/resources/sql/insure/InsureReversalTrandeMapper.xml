@@ -961,5 +961,25 @@
         ) A
         GROUP BY type
     </select>
+    <select id="selectMdOrIns" resultType="java.util.Map">
+        select id, hosp_code, admdvs_code, admdvs_name from insure_admdvs
+        where hosp_code =#{hospCode}
+    </select>
+    <select id="querySettleInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select id, hosp_code, visit_id, settle_id, is_hospital, visit_no, discharge_dn_code,
+               insure_org_code, insure_reg_code, medicine_org_code,settleway,total_price, insure_price, plan_price,
+               serious_price, civil_price,
+               retire_price, personal_price, person_price, hosp_price, before_settle, last_settle, rests_price,
+               assign_price, starting_price, top_price, plan_account_price, portion_price, state, settle_state,
+               costbatch, aka130, bka006, injury_borth_sn, is_account,
+               insureSettleId, medicalRegNo, omsgid,
+               oinfno, remote_msg_id, clr_type, clr_way, clr_optins, maf_pay, hosp_exem_amount, is_cancel,
+               com_pay, all_portion_price, over_self_price, preselfpay_amt, inscp_scp_amt, pool_prop_selfpay,
+               acct_mulaid_pay, acct_inj_pay, ret_acct_inj_pay, government_pay, thb_pay, care_pay, low_in_pay,
+               oth_pay, retired_pay, soldier_pay, retired_outpt_pay, injury_pay, hall_pay, soldier_to_pay,
+               welfare_pay,
+               COVID_pay, family_pay, behalf_pay, fertility_pay,psn_part_amt from insure_individual_settle  where hosp_code =#{hospCode} and
+            visit_id =#{visitId} and insureSettleId =#{insureSettleId} order by crte_time desc limit 1
+    </select>
 
 </mapper>

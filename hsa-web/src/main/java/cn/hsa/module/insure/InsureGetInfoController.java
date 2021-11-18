@@ -91,8 +91,9 @@ public class InsureGetInfoController extends BaseController {
      * @Date   2021/11/9 15:29
      * @Return
     **/
+
     @GetMapping("/querySetlePage")
-    public WrapperResponse<PageDTO> querySetlePage(@RequestBody Map<String,Object> map, HttpServletRequest req,
+    public WrapperResponse<PageDTO> querySetlePage(@RequestParam Map<String,Object> map, HttpServletRequest req,
                                               HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());

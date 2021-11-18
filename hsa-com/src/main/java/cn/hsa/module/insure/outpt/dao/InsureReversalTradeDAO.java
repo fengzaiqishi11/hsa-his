@@ -1,7 +1,9 @@
 package cn.hsa.module.insure.outpt.dao;
 
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -131,4 +133,26 @@ public interface InsureReversalTradeDAO {
      * @Return
      **/
     List queryOutptSumDeclareInfosPage(Map<String, Object> paraMap);
+
+    /**
+     * @Method selectMdOrIns
+     * @Desrciption  查询全国就医地区划和参保地区划
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/16 8:38
+     * @Return
+    **/
+    List<Map<String,Object>> selectMdOrIns(@Param("hospCode") String hospCode);
+
+    /**
+     * @Method querySettleInfo
+     * @Desrciption  查询结算信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/16 16:16
+     * @Return
+    **/
+    InsureIndividualSettleDTO querySettleInfo(Map<String, Object> map);
 }

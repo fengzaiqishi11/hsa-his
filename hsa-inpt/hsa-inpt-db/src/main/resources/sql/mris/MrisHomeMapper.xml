@@ -4,32 +4,53 @@
     <!--分页查询已出院患者信息-->
     <select id="queryOutHospPatientPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
             resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        SELECT *
-        FROM inpt_visit
-        WHERE hosp_code = #{hospCode}
-        <if test="keyword != null and keyword !=''">
-            and CONCAT(name,phone,cert_no,in_no) LIKE CONCAT('%',#{keyword},'%')
+        SELECT a.*
+        <if test="zgbrQuery == '2'.toString()">
+            , t.is_consule, t.apply_deptid
         </if>
-        <if test="inDeptId != null and inDeptId !=''">
-            and in_dept_id = #{inDeptId}
+        FROM inpt_visit a
+        <!--会诊病人，关联会诊申请表-->
+        <if test="zgbrQuery == '2'.toString()">
+            join (
+            SELECT
+            '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
+            FROM
+            inpt_consultation_apply ss
+            WHERE ss.hosp_code = #{hospCode}
+            and ss.consul_state = '1'
+            AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
+            GROUP BY ss.visit_id, ss.hosp_code
+            ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
+        </if>
+        WHERE a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword !=''">
+            and (
+            a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
+            or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test="zgbrQuery != '2'.toString()">
+            <if test="inDeptId != null and inDeptId != ''">
+                and a.in_dept_id = #{inDeptId}
+            </if>
         </if>
         <if test="patientCode != null and patientCode !=''">
-            and patient_code = #{patientCode}
+            and a.patient_code = #{patientCode}
         </if>
         <if test="statusCode != null and statusCode !=''">
-            and status_code = #{statusCode}
+            and a.status_code = #{statusCode}
         </if>
         <if test="startTime != null and startTime != ''">
-            and out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+            and a.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+            and a.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <!--liuliyun 20211022 病案首页添加主管医生过滤-->
         <if test='zgbrQuery =="1"'>
-            and zg_doctor_id = #{zgDoctorId}
+            and a.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by in_time desc
+        order by a.in_time desc
     </select>
 
     <!--分页查询已出院患者信息(珠海)-->

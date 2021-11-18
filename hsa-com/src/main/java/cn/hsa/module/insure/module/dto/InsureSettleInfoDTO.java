@@ -296,7 +296,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date admTime;
     private String acpMedinsName; // 拟接收机构名称
     private String acpMedinsCode; // 拟接收机构编码
-    private String dayRInpFlag31; // 出院31天内再住院计划标志
+    private String daysRinpFlag31; // 出院31天内再住院计划标志
     private String daysRinpPup31; // 出院31天内再住院目的
     private String zrNurseCode; // 责任护士代码
     private String currAddr; // 先住址

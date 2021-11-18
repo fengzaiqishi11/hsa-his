@@ -215,6 +215,7 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
      * @Date 2021/11/9 15:29
      * @Return
      */
+
     @Override
     public WrapperResponse<PageDTO> querySetlePage(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.querySetlePage(map));

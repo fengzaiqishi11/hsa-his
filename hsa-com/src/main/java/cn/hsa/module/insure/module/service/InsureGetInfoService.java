@@ -181,5 +181,6 @@ public interface InsureGetInfoService {
      * @Date   2021/11/9 15:29
      * @Return
      **/
+
     WrapperResponse<PageDTO> querySetlePage(Map<String, Object> map);
 }

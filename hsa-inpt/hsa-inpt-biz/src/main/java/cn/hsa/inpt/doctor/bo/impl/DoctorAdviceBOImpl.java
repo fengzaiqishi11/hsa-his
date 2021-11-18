@@ -10,6 +10,8 @@ import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.consultation.dao.InptConsultationApplyDAO;
+import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
@@ -97,6 +99,12 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
      * */
     @Resource
     private CheckStockService checkStockService_consumer;
+
+    /**
+     * 会诊申请dao
+     */
+    @Resource
+    private InptConsultationApplyDAO inptConsultationApplyDAO;
 
     /**
     * @Method updateInptAdviceBatch
@@ -350,6 +358,13 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
 
                     operInfoRecordDAO.insertSurgery(operInfoRecordDTO);
                 }
+            }
+
+            // 会诊申请医嘱list
+            List<InptAdviceDTO> consulApplyList = addInptAdviceDTOList.stream().filter(inptAdviceDTO -> inptAdviceDTO.getConsulApplyInfo() != null).collect(Collectors.toList());
+            if (!ListUtils.isEmpty(consulApplyList)) {
+                // 更新会诊申请表的医嘱id
+                inptConsultationApplyDAO.updateAdviceId(consulApplyList);
             }
         }
         return false;
@@ -833,6 +848,16 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             if(inptAdviceDTOSoure != null && Constants.SF.S.equals(inptAdviceDTOSoure.getIsCheck())){
                 throw new AppException("医嘱已核收，不能删除");
             }
+            // 医嘱删除，同时删除会诊申请记录
+            if (StringUtils.isNotEmpty(inptAdviceDTOSoure.getTypeCode()) && Constants.YZLB.YZLB17.equals(inptAdviceDTOSoure.getTypeCode())) {
+                InptConsultationApplyDTO dto = new InptConsultationApplyDTO();
+                dto.setAdviceId(inptAdviceDTOSoure.getId());
+                dto.setHospCode(inptAdviceDTOSoure.getHospCode());
+                InptConsultationApplyDTO inptConsultationApplyDTO = inptConsultationApplyDAO.getById(dto);
+                if (inptConsultationApplyDTO != null) {
+                    inptConsultationApplyDAO.deleteById(inptConsultationApplyDTO);
+                }
+            }
             //删除医嘱
             inptAdviceDAO.deleteInptAdvice(inptAdvice);
             //删除医嘱明细
@@ -910,6 +935,29 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDTO.setIatIdList(Arrays.asList(inptAdviceDTO.getIatIds().split(",")));
         }
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryAll(inptAdviceDTO);
+        // 同组医嘱无论是否勾选，停嘱都要全停或取消 lly 2021-11-16
+        List<Integer> groupNo =new ArrayList<>(); // 组号
+        if (inptAdviceDTOList!=null &&inptAdviceDTOList.size()>0) {
+            for (InptAdviceDTO adviceDTO : inptAdviceDTOList) {
+                if (adviceDTO.getGroupNo() != null && adviceDTO.getGroupNo() > 0) {
+                    groupNo.add(adviceDTO.getGroupNo());
+                }
+            }
+            if (groupNo != null && groupNo.size() > 0) {
+                InptAdviceDTO groupAdvice = new InptAdviceDTO();
+                groupAdvice.setHospCode(inptAdviceDTO.getHospCode());
+                groupAdvice.setVisitId(inptAdviceDTOList.get(0).getVisitId());
+                groupAdvice.setGroupNos(groupNo);
+                // 查询同组医嘱
+                List<InptAdviceDTO> groupInptAdviceDTOList = inptAdviceDAO.queryGroupAdvice(groupAdvice);
+                if (groupInptAdviceDTOList != null && groupInptAdviceDTOList.size() > 0) {
+                    inptAdviceDTOList.addAll(groupInptAdviceDTOList);
+                    //获取list对象 list属性 并进行去重
+                    List<String> ids = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
+                    inptAdviceDTO.setIatIdList(ids);
+                }
+            }
+        }
         List<InptAdviceDTO> checkInptAdviceList = new ArrayList();
         checkInptAdviceList = inptAdviceDTOList.stream().filter(s-> Constants.SF.F.equals(s.getIsCheck())).collect(Collectors.toList());
         if(!ListUtils.isEmpty(checkInptAdviceList)){
@@ -1407,6 +1455,25 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             count = inptAdviceDAO.updateInptAdviceDetail(detailsExtDTOS);
         }
         return count > 0;
+    }
+
+    /**
+     * @Menthod: queryLisAdvice
+     * @Desrciption: 根据合管条件查询同类型的lis医嘱，用于合并打印lis申请单
+     * @Param: inptAdviceDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-11 10:24
+     * @Return:
+     **/
+    @Override
+    public List<InptAdviceDTO> queryLisAdvice(InptAdviceDTO inptAdviceDTO) {
+        InptAdviceDTO adviceById = inptAdviceDAO.getLisInptAdvice(inptAdviceDTO);
+        List<InptAdviceDTO> list = new ArrayList<>();
+        if (adviceById != null) {
+            list = inptAdviceDAO.queryLisAdvice(adviceById);
+        }
+        return list;
     }
 
     /**

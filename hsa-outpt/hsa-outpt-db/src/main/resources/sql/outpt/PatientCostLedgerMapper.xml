@@ -3834,7 +3834,7 @@
         <if test="statusCode != null">
             and a.status_code = #{statusCode}
         </if>
-        ) aa order by name,bfc_id,get_cost_time desc
+        ) aa order by get_cost_time,bfc_id desc
 
     </select>
 
@@ -3847,7 +3847,7 @@
         a.spec,
         a.num_unit_code  as unit_name,
         max(a.price) as price,
-        sum(a.total_num) as num,
+        sum(a.total_num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3882,7 +3882,7 @@
         ifnull(a.spec,'') as spec,
         a.unit_code as unit_name,
         max(a.price) as price,
-        sum(a.num) as num,
+        sum(a.num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3918,7 +3918,7 @@
         a.num_unit_code as unit_name,
         a.spec,
         max(a.price) as price,
-        sum(a.total_num) as num,
+        sum(a.total_num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3951,7 +3951,7 @@
         a.unit_code  as unit_name,
         a.spec,
         max(a.price) as price,
-        sum(a.num) as num,
+        sum(a.num) as total_num,
         sum(a.total_price) as total_price,
         max(a.preferential_price) as preferential_price,
         sum(a.reality_price) as reality_price
@@ -3993,7 +3993,7 @@
         a.spec,
         a.num_unit_code as unit_name,
         a.price,
-        if (a.reality_price &lt; 0, -1*a.total_num, a.total_num) as total_num,
+        if (a.reality_price &lt; 0, -1*a.total_num, a.total_num) as num,
         a.total_price, a.preferential_price, a.reality_price,
         settle.crte_name as get_cost_name, DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%S') as get_cost_time,
         a.doctor_name,
@@ -4007,16 +4007,16 @@
         join inpt_visit b on a.hosp_code = b.hosp_code and settle.visit_id = b.id
         where settle.is_settle = '1' and a.hosp_code = #{hospCode}
         <if test="startTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
+            and settle.settle_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '1'.toString()">
-            and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
+            and settle.settle_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="startTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
+            and a.cost_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and timeType != null and timeType == '2'.toString()">
-            and DATE_FORMAT(a.cost_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
+            and a.cost_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="name != null and name != '' ">
             and b.name like concat('%',#{name},'%')
@@ -4024,7 +4024,7 @@
         <if test="statusCode != null and statusCode == '1'.toString()">
             and a.status_code = #{statusCode}
         </if>
-        ) aa order by name,bfc_id,get_cost_time desc
+        ) aa order by get_cost_time,bfc_id desc
     </select>
 
     <!--住院明细收费项目+费别-->
@@ -5187,7 +5187,7 @@
             join outpt_register register on settle.register_id = register.id and settle.hosp_code = register.hosp_code
             join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
-            where a.hosp_code = #{hospCode}
+            where a.hosp_code = #{hospCode} and register.is_cancel ='0'
             <if test="startDate != null ">
                 and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>

@@ -500,6 +500,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         if(!ListUtils.isEmpty(materialIdList)){
             Map queryMarMap = new HashMap();
             queryMarMap.put("idList", materialIdList.stream().map(OutptClassifyCostDTO ::getItemId).collect(Collectors.toList()));
+            queryMarMap.put("hospCode", outptClassifyDTO.getHospCode());
             WrapperResponse<List<BaseMaterialDTO>> response = baseMaterialService.queryAll(queryMarMap);
             materialList = response.getData();
 

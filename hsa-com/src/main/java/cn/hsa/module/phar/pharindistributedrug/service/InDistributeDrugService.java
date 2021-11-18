@@ -148,7 +148,7 @@ public interface InDistributeDrugService {
 
     /**
     * @Menthod updatePremedication
-    * @Desrciption 选择性取消预配药
+    * @Desrciption 选择性取消getPatientByVisitID
     *
     * @Param
     * [map]

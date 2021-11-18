@@ -875,7 +875,8 @@
         '%Y-%m-%d' )) END)
         = 0,1,(case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format(
         iv.in_time, '%Y-%m-%d' )) END))
-        as hospitalDay,iiv.settle_count,iiv.is_half_settle,ic.mdtrtarea_admvs,ic.is_remote
+        as hospitalDay,iiv.settle_count,iiv.is_half_settle,ic.mdtrtarea_admvs,ic.is_remote,
+        (select bd.nation_code from base_dept bd where bd.id = iiv.visit_drpt_id and bd.hosp_code = iiv.hosp_code) as visitNationCode
         FROM
         insure_individual_visit iiv
         left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code

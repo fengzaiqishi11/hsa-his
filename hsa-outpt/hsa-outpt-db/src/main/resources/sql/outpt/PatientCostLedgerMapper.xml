@@ -3834,7 +3834,7 @@
         <if test="statusCode != null">
             and a.status_code = #{statusCode}
         </if>
-        ) aa order by name,bfc_id,get_cost_time desc
+        ) aa order by get_cost_time,bfc_id desc
 
     </select>
 
@@ -4024,7 +4024,7 @@
         <if test="statusCode != null and statusCode == '1'.toString()">
             and a.status_code = #{statusCode}
         </if>
-        ) aa order by name,bfc_id,get_cost_time desc
+        ) aa order by get_cost_time,bfc_id desc
     </select>
 
     <!--住院明细收费项目+费别-->

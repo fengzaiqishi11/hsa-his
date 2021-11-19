@@ -719,7 +719,7 @@
             <if test="psnIdetType != null and psnIdetType != ''">
                 psn_idet_type = #{psnIdetType,jdbcType=VARCHAR},
             </if>
-            <if test="isOneSettle != null and psnIdetType != ''">
+            <if test="isOneSettle != null and isOneSettle != ''">
                 is_one_settle  = #{isOneSettle,jdbcType=VARCHAR}
             </if>
 
@@ -769,9 +769,6 @@
             </if>
             <if test="settleCount != null and settleCount != ''">
                 settle_count = #{settleCount},
-            </if>
-            <if test="isOneSettle != null and psnIdetType != ''">
-                is_one_settle  = #{isOneSettle,jdbcType=VARCHAR}
             </if>
         </set>
         where

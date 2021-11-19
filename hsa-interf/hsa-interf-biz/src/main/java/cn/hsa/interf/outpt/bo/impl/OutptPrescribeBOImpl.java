@@ -455,6 +455,24 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         if(outptptDiagnose != null){
             outptPrescribeDTO.setDiagnoseIds(outptptDiagnose.getDiseaseId());
         }
+        // 设置主诊断
+        OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+        //主键
+        outptDiagnoseDTO.setId(SnowflakeUtils.getId());
+        //医院编码
+        outptDiagnoseDTO.setHospCode(outptPrescribeDTO.getHospCode());
+        //就诊ID
+        outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
+        //疾病ID
+        map.put("code", "YJ_ZDD");
+        sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        outptDiagnoseDTO.setDiseaseId(sysParameterDTO.getValue());
+        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+        //创建人ID
+        outptDiagnoseDTO.setCrteId(outptPrescribeDTO.getCrteId());
+        //创建人
+        outptDiagnoseDTO.setCrteName(outptPrescribeDTO.getCrteName());
         //就诊号
         outptPrescribeDTO.setOrderNo(this.getOrderNo(yjRcDTO.getSign(), Constants.ORDERRULE.CFDH));
         //开方医生
@@ -605,6 +623,8 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptPrescribeDao.insertPrescribe(outptPrescribeDTO);
         //保存处方明细
         outptPrescribeDao.insertPrescribeDetail(outptPrescribeDetailsDTOList);
+        // 保存主诊断
+        outptPrescribeDao.insertDiagnose(outptDiagnoseDTO);
         Map<String,Object> mapResult = new HashMap<>();
         mapResult.put("jzid",yjRcDTO.getJzid());
         mapResult.put("cfdh",outptPrescribeDTO.getOrderNo());

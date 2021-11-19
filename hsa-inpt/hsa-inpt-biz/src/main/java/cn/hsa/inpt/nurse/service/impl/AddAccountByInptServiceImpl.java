@@ -19,6 +19,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operpatientrecord.service.OperPatientRecordService;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.Constants;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -108,7 +109,11 @@ public class AddAccountByInptServiceImpl extends HsafService implements AddAccou
     @Override
     public WrapperResponse<Boolean> saveAddSurgicalAccounting(Map<String, Object> map) {
         List<InptCostDTO> list = MapUtils.get(map,"inptCostDTOs");
-
+        for (InptCostDTO inptCostDTO : list){
+            if (BigDecimalUtils.isZero(inptCostDTO.getTotalNum())){
+                throw new AppException("保存失败："+inptCostDTO.getItemName()+"的总数量不能为0");
+            }
+        }
         String userId = MapUtils.get(map,"userId");
         String userName = MapUtils.get(map,"userName");
         InptCostDTO inptCostDTO = list.get(0);

@@ -156,4 +156,8 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
      * 会诊申请对象
      */
     private InptConsultationApplyDTO consulApplyInfo;
+    /**
+     * 医嘱组号list
+     */
+    private List<Integer> groupNos;
 }

@@ -213,6 +213,7 @@
         AND e.insureSettleId IS NOT NULL
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND e.insure_price > 0
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
@@ -321,6 +322,7 @@
         AND e.insureSettleId IS NOT NULL
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND e.insure_price > 0
         <if test="psnNo != null and psnNo != ''">
             AND t.aac001 like concat('%',#{psnNo},'%')
         </if>
@@ -432,6 +434,8 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND ifnull(t.is_one_settle,0) != '1'
+        AND e.insure_price > 0
         <if test="aae140 != null and aae140 != '' ">
             and c.aae140 = #{aae140}
         </if>
@@ -450,7 +454,7 @@
         </foreach>
         GROUP BY
         se_vi_id
-        ) A GROUP BY A.aka130,isRemote
+        ) A group by isRemote
     </select>
 
     <!--合计-->
@@ -530,6 +534,8 @@
         AND e.settle_state = '1'
         AND e.insureSettleId IS NOT NULL
         AND e.state = '0'
+        AND ifnull(t.is_one_settle,0) != '1'
+        AND e.insure_price > 0
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         <if test="aae140 != null and aae140 != '' ">
@@ -626,6 +632,8 @@
           AND e.state = '0'
           AND e.insure_reg_code = #{insureRegCode}
           AND e.hosp_code = #{hospCode}
+          AND e.insure_price > 0
+          and ifnull(t.is_one_settle,'0') != '1'
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -659,7 +667,6 @@
     <!--申报表合计费用-->
     <select id="querySumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
-            A.outDeptName,
             A.medicineOrgCode,
             A.type,
             sum( psnNum ) AS psnNum,
@@ -681,8 +688,6 @@
         FROM
             (
                 SELECT DISTINCT
-                    tt.out_dept_name outDeptName,
-                    e.clr_optins clrOptins,
                     e.medicine_org_code medicineOrgCode,
                     IF
                     (
@@ -738,6 +743,8 @@
                   AND e.state = '0'
                   AND e.insure_reg_code = #{insureRegCode}
                   AND e.hosp_code = #{hospCode}
+                  AND e.insure_price > 0
+                  and ifnull(t.is_one_settle,'0') != '1'
                 <if test="insutype != null and insutype != '' ">
                     and c.aae140 = #{insutype}
                 </if>
@@ -765,7 +772,7 @@
                     se_vi_id
             ) A
         GROUP BY
-            A.outDeptName,A.medicineOrgCode,A.type
+            A.type
     </select>
 
     <select id="queryOutptDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
@@ -833,6 +840,7 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND e.insure_price > 0
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -866,6 +874,7 @@
     <!--申报表合计费用（门诊）-->
     <select id="queryOutptSumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
+        medicineOrgCode,
         type,
         sum( psnNum ) AS psnNum,
         sum( totalPrice ) AS totalPrice,
@@ -898,6 +907,7 @@
         '跨省异地'
         )
         ) type,
+        e.medicine_org_code AS medicineOrgCode,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
         e.starting_price AS startingPrice,
@@ -931,6 +941,7 @@
         AND e.settle_state = '1'
         AND e.insureSettleId IS NOT NULL
         AND e.state = '0'
+        AND e.insure_price > 0
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         <if test="insutype != null and insutype != '' ">
@@ -961,7 +972,28 @@
         ) A
         GROUP BY type
     </select>
+    <select id="selectMdOrIns" resultType="java.util.Map">
+        select id, hosp_code, admdvs_code, admdvs_name from insure_admdvs
+        where hosp_code =#{hospCode}
+    </select>
+    <select id="querySettleInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select id, hosp_code, visit_id, settle_id, is_hospital, visit_no, discharge_dn_code,
+               insure_org_code, insure_reg_code, medicine_org_code,settleway,total_price, insure_price, plan_price,
+               serious_price, civil_price,
+               retire_price, personal_price, person_price, hosp_price, before_settle, last_settle, rests_price,
+               assign_price, starting_price, top_price, plan_account_price, portion_price, state, settle_state,
+               costbatch, aka130, bka006, injury_borth_sn, is_account,
+               insureSettleId, medicalRegNo, omsgid,
+               oinfno, remote_msg_id, clr_type, clr_way, clr_optins, maf_pay, hosp_exem_amount, is_cancel,
+               com_pay, all_portion_price, over_self_price, preselfpay_amt, inscp_scp_amt, pool_prop_selfpay,
+               acct_mulaid_pay, acct_inj_pay, ret_acct_inj_pay, government_pay, thb_pay, care_pay, low_in_pay,
+               oth_pay, retired_pay, soldier_pay, retired_outpt_pay, injury_pay, hall_pay, soldier_to_pay,
+               welfare_pay,
+               COVID_pay, family_pay, behalf_pay, fertility_pay,psn_part_amt from insure_individual_settle  where hosp_code =#{hospCode} and
+            visit_id =#{visitId} and insureSettleId =#{insureSettleId} order by crte_time desc limit 1
+    </select>
 
+    <!--一站式申报报表-->
     <select id="queryYZSDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT DISTINCT
         c.aac003 AS psnName,
@@ -985,7 +1017,7 @@
         e.thb_pay AS thbPay,
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
-        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) + ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
+        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull(e.maf_pay,0.00) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         e.clr_optins AS clrOptins,
@@ -1012,8 +1044,10 @@
         AND e.settle_state = '1'
         AND e.insureSettleId IS NOT NULL
         AND e.state = '0'
+        AND e.insure_price > 0
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND t.is_one_settle = '1'
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -1063,7 +1097,9 @@
         sum( planSumPrice ) AS planSumPrice,
         sum( hospExemAmount ) AS hospExemAmount,
         sum( planSumPay ) AS planSumPay,
-        sum( personPrice ) AS personPrice
+        sum( personPrice ) AS personPrice,
+        sum( thbPay ) AS thbPay,
+        sum( governmentPay ) AS governmentPay
         FROM
         (
         SELECT DISTINCT
@@ -1085,7 +1121,7 @@
         e.thb_pay AS thbPay,
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
-        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) + ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
+        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) +ifnull(e.hosp_exem_amount,0) + ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull( e.maf_pay, 0 ) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
@@ -1106,7 +1142,9 @@
         AND e.insureSettleId IS NOT NULL
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
+        AND e.insure_price > 0
         AND e.hosp_code = #{hospCode}
+        AND t.is_one_settle = '1'
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>

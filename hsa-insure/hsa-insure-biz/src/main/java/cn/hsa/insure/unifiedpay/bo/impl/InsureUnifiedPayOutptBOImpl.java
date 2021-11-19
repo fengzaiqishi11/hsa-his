@@ -284,6 +284,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         String hnFeedetlSn= ""; // 湖南费用流水号特有标识
         String hnSpecial = ""; // 针对海南特有的报销药
         String huNanSpecial = ""; // 针对湖南中药饮片报销
+        String patientSum = ""; // 个人累计
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(unifiedPayMap).getData();
         if (sysParameterDTO != null && !StringUtils.isEmpty(sysParameterDTO.getValue())) {
             String value = sysParameterDTO.getValue();
@@ -301,6 +302,9 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     }
                     if ("huNanSpecial".equals(key)) {
                         huNanSpecial = MapUtils.get(stringObjectMap, key);
+                    }
+                    if("patientSum".equals(key)){
+                        patientSum =  MapUtils.get(stringObjectMap, key);
                     }
                 }
             }
@@ -461,7 +465,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "result");
         insertInsureCost(resultDataMap, unifiedPayMap,list);
-        insertPatientSumInfo(unifiedPayMap);
+        // 湖南这边系统参数值设置不为1  需要保存个人累计信息 方便打印结算单
+        if(!"1".equals(patientSum)){
+            insertPatientSumInfo(unifiedPayMap);
+        }
         return true;
     }
 
@@ -677,11 +684,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         inputMap.put("msgid", omsgId);
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo()); // 就诊ID
         // 当费用批次号不为空时 撤销已经上传的费用信息  批次号为空时 撤销所有的费用的信息
-        if (!StringUtils.isEmpty(feeBatch)) {
-            dataMap.put("chrg_bchno", feeBatch);
-        } else {
-            dataMap.put("chrg_bchno", "0000");
-        }
+        dataMap.put("chrg_bchno", "0000");
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
 
         inputMap.put("input", dataMap);  // 入参具体数据
@@ -1548,10 +1551,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     public Map<String, Object> UP_5301(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String insureRegCode = MapUtils.get(map, "insureRegCode");
-
+        String regCode = MapUtils.get(map, "regCode");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureRegCode);
+        insureConfigurationDTO.setRegCode(regCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map httpParam = new HashMap();
         httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_5301);  //交易编号

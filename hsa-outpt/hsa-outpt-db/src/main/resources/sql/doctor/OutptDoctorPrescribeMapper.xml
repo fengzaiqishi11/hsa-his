@@ -1913,7 +1913,7 @@
                 when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
                 from base_material a
                 where a.hosp_code = #{hospCode} and a.id = #{itemId}
-            )a group by a.biz_id,a.item_id, a.hosp_code
+            )a where a.hosp_code = #{hospCode} group by a.biz_id,a.item_id, a.hosp_code
         )b on a.hosp_code = b.hosp_code and a.item_id = b.item_id and a.biz_id = b.biz_id
         where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId} and (a.split_num - ifnull(b.totalNum,0)) &gt;= 0
     </select>

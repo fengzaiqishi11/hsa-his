@@ -470,9 +470,9 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
         outptDiagnoseDTO.setIsMain(Constants.SF.S);
         //创建人ID
-        outptDiagnoseDTO.setCrteId(outptPrescribeDTO.getCrteId());
+        outptDiagnoseDTO.setCrteId(yjRcDTO.getJzysid());
         //创建人
-        outptDiagnoseDTO.setCrteName(outptPrescribeDTO.getCrteName());
+//        outptDiagnoseDTO.setCrteName(outptPrescribeDTO.getCrteName());
         //就诊号
         outptPrescribeDTO.setOrderNo(this.getOrderNo(yjRcDTO.getSign(), Constants.ORDERRULE.CFDH));
         //开方医生

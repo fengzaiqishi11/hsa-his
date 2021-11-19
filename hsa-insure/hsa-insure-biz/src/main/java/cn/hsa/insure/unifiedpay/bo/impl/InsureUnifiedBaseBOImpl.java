@@ -279,6 +279,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_No", insureIndividualVisitDTO.getAac001());
         dataMap.put("mdtrt_Id", insureIndividualVisitDTO.getMedicalRegNo());
         paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_100001, paramMap);
         List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
         Map<String, Object> resultDataMap = new HashMap<>();
@@ -302,10 +303,14 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String hospCode = MapUtils.get(map,"hospCode");
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
-        dataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
+        String mdtrtCertType = insureIndividualVisitDTO.getMdtrtCertType();
+        if("06".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+            mdtrtCertType = "02";
+        }
+        dataMap.put("mdtrt_cert_type", mdtrtCertType);
         dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());
         dataMap.put("begntime", DateUtils.getNow());
-        dataMap.put("psn_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
+        dataMap.put("psn_cert_type", mdtrtCertType);
         dataMap.put("certno", insureIndividualVisitDTO.getMdtrtCertNo());
         paramMap.put("data", dataMap);  // 入参具体数据
         Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, "1101", paramMap);
@@ -551,6 +556,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap);
         List<Map<String, Object>> setldetail = MapUtils.get(MapUtils.get(resultMap, "output"), "setldetail");
         Map<String, Object> setlinfo = MapUtils.get(MapUtils.get(resultMap, "output"), "setlinfo");
@@ -614,7 +620,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
          * 公共入参
          */
         inputMap.put("infno", Constant.UnifiedPay.REGISTER.UP_5206);  // 交易编号
-        inputMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());  //TODO 参保地医保区划
+        inputMap.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());  //TODO 参保地医保区划
         inputMap.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         inputMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         inputMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
@@ -634,6 +640,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             throw new AppException("无法访问医保统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
         logger.info("人员累计信息查询回参:" + resultJson);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "cuminfo");
@@ -1474,7 +1486,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         }
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
-        httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        if(StringUtils.isEmpty(MapUtils.get(paramMap,"insuplcAdmdvs"))){
+            httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        }else{
+            httpParam.put("insuplc_admdvs", MapUtils.get(paramMap,"insuplcAdmdvs")); //参保地医保区划分
+            MapUtils.remove(paramMap,"insuplcAdmdvs");
+        }
         httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());

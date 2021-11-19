@@ -148,4 +148,7 @@
     <!--临床路径病人记录-->
     <dubbo:service interface="cn.hsa.module.clinical.clinicpathexec.service.ClinicPathExecService" ref="clinicPathExecService_provider"/>
     <!-- *************************************************** 临床路径子系统 *************************************************************** -->
+
+    <!--会诊记录-->
+    <dubbo:service interface="cn.hsa.module.inpt.consultation.service.InptConsultationApplyServcie" ref="inptConsultationService_provider"/>
 </beans>

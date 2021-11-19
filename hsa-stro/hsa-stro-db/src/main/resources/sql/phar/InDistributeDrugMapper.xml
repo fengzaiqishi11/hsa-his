@@ -143,12 +143,14 @@
         (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
         a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,a.split_ratio splitRatio,
-        (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName
+        (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName,
+        a.in_no
         from (
         select a.id,a.receive_id,a.item_name,a.spec,
         a.price,max(a.split_price) split_price,a.unit_code,a.item_code,a.item_id,a.total_price,
         a.hosp_code,b.phar_id,a.visit_id,c.gender_code,c.age_unit_code,a.dosage,c.name,c.age
-        ,sum(a.num) num,a.split_unit_code,ifnull(sum(a.split_num), 0) splitNum,a.split_ratio,a.dosage_unit_code
+        ,sum(a.num) num,a.split_unit_code,ifnull(sum(a.split_num), 0) splitNum,a.split_ratio,a.dosage_unit_code,
+        c.in_no
         from phar_in_receive_detail a
         join phar_in_receive b on a.receive_id=b.id
         join inpt_visit c on a.visit_id=c.id

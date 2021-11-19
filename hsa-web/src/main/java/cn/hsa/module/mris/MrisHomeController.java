@@ -369,11 +369,20 @@ public class MrisHomeController extends BaseController {
     @GetMapping("/getTableConfig")
     public WrapperResponse<Map> getTableConfig(HttpServletRequest req, HttpServletResponse res) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
         Map param =new HashMap();
         param.put("hospCode",sysUserDTO.getHospCode());
         param.put("hospName",sysUserDTO.getHospName());
         if (sysUserDTO.getLoginBaseDeptDTO() != null) {
             param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                param.put("inDeptId",null);
+            } else {
+                param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
         }
         return mrisHomeService_consumer.getTableConfig(param);
     }
@@ -391,6 +400,7 @@ public class MrisHomeController extends BaseController {
     @GetMapping("/importCSVMrisInfo")
     public void importCSVMrisInfo(HttpServletRequest req, HttpServletResponse res,String statusCode,String keyword,String startTime,String endTime) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
         Map param =new HashMap();
         param.put("statusCode",statusCode);
         param.put("keyword",keyword);
@@ -405,7 +415,12 @@ public class MrisHomeController extends BaseController {
         param.put("hospName",sysUserDTO.getHospName());
         param.put("hospCode",sysUserDTO.getHospCode());
         if (sysUserDTO.getLoginBaseDeptDTO() != null) {
-            param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                param.put("inDeptId",null);
+            } else {
+                param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
         }
         WrapperResponse<String> returnDatas =mrisHomeService_consumer.importCSVMrisInfo(param);
         String path = returnDatas.getData();

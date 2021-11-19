@@ -172,4 +172,13 @@ public interface InsureUnifiedPayReversalTradeService {
 
     WrapperResponse<Map<String,Object>> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO);
 
+    /**
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报合计报表打印
+     * @param paraMap
+     * @Author liaojiguang
+     * @Date   2021/10/21 09:01
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> querySumDeclareInfoPrint(Map<String, Object> paraMap);
 }

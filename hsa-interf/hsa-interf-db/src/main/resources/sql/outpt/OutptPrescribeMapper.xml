@@ -349,6 +349,24 @@ WHERE
         </foreach>
     </insert>
 
+    <insert id="insertDiagnose">
+         insert into outpt_diagnose(
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        )
+        values
+        (
+         #{id},
+            #{hospCode},
+            #{diseaseId},
+            #{visitId},
+            #{typeCode},
+            #{isMain},
+            #{crteId},
+            #{crteName},
+            now()
+        )
+    </insert>
+
     <select id="getPrescribeId" resultType="java.lang.String">
         select id from outpt_prescribe where visit_id = #{jzid} and hosp_code = #{hospCode} and is_submit = '1' limit 1
     </select>
@@ -418,4 +436,7 @@ WHERE
             #{code}
         </foreach>
     </select>
+
+
+
 </mapper>

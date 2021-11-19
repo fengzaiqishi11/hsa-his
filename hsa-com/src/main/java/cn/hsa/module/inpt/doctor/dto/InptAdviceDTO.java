@@ -1,5 +1,6 @@
 package cn.hsa.module.inpt.doctor.dto;
 
+import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.entity.InptAdviceDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -151,6 +152,12 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String idsStr;
     // 处方总金额
     private BigDecimal printTotalPrice;
-
-
+    /**
+     * 会诊申请对象
+     */
+    private InptConsultationApplyDTO consulApplyInfo;
+    /**
+     * 医嘱组号list
+     */
+    private List<Integer> groupNos;
 }

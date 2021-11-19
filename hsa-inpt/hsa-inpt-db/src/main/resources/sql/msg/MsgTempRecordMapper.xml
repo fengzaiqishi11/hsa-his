@@ -33,17 +33,15 @@
         select
           a.id, a.hosp_code, a.visit_id, a.advice_id, a.type, a.item_code, a.item_id, a.item_name, a.msg, a.accept_id, a.accept_name, a.status_code, a.crte_id, a.crte_name, a.crte_time,
           b.bed_name as bedName,b.in_dept_name as inDeptName,
-          (select content from inpt_advice d where d.id = a.advice_id and d.hosp_code = a.hosp_code ) as content,
+          (select content from inpt_advice d where d.hosp_code = a.hosp_code and a.visit_id = d.visit_id and d.id = a.advice_id ) as content,
           CONCAT(
           b.name,'/',
-          IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-          b.gender_code),'-'),'/',
+          IFNULL(case b.gender_code when '1' then '男' when '2' then '女' else '' end, '-' ),'/',
           IFNULL(b.age,'-'),
-          IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-          b.age_unit_code),'')
+          IFNULL( case b.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end, '' )
           ) AS information
         from msg_temp_record a
-        join inpt_visit b on a.visit_id = b.id and b.hosp_code = a.hosp_code
+        join inpt_visit b on b.hosp_code = a.hosp_code and a.visit_id = b.id
         where a.hosp_code = #{hospCode} and a.type = '1' and a.status_code = '1'
             <if test="id != null and id != ''">
                 and a.id = #{id}

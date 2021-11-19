@@ -209,6 +209,18 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.checkOneSettle(map,insureIndividualVisitDTO));
     }
 
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报合计报表打印
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> querySumDeclareInfoPrint(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.querySumDeclareInfoPrint(paraMap));
+    }
 
 
 }

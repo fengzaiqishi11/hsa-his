@@ -82,4 +82,20 @@ public class BackCostSureByInptServiceImpl extends HsafService implements BackCo
         return WrapperResponse.success(backCostSureWithInptBO.queryOutpatientSurgeryCostPage(inptCostDTO));
     }
 
+
+    /**
+     * @Method updateCancelBackCost
+     * @Desrciption 取消退费
+     * @param map
+     * @Author liuliyun
+     * @Date   2021/11/10 20:14
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateCancelBackCost(Map<String, Object> map) {
+        InptCostDTO inptCostDTO = MapUtils.get(map, "inptCostDTO");
+        Boolean isSuccess = backCostSureWithInptBO.updateCancelBackCost(inptCostDTO);
+        return WrapperResponse.success(isSuccess);
+    }
+
 }

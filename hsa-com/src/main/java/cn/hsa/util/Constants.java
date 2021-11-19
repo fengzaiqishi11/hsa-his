@@ -656,6 +656,7 @@ public interface Constants {
         public static final String YZLB13 = "13";//护嘱
         public static final String YZLB14 = "14";//小手术
         public static final String YZLB15 = "15";//材料
+        public static final String YZLB17 = "17";//会诊
     }
 
     /**
@@ -1088,5 +1089,24 @@ public interface Constants {
         public static final String CXJM_ZY = "2"; // 城乡居民住院
         public static final String LX_ZY = "3"; // 离休住院
         public static final String MZ = "4"; // 门诊
+        public static final String YZS = "5"; // 一站式
+    }
+
+    /**
+     * 会诊申请状态（HZZT）
+     */
+    class HZZT {
+        public static final String BC = "0"; // 保存
+        public static final String SH = "1"; // 审核
+        public static final String WC = "2"; // 完成
+        public static final String ZF = "3"; // 作废
+    }
+
+    /**
+     * 会诊类型（HZLX）
+     */
+    class HZLX {
+        public static final String CGHZ = "0"; // 常规会诊
+        public static final String JHZ = "1"; // 急会诊
     }
 }

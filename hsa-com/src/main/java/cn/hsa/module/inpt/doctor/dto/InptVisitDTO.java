@@ -201,6 +201,9 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     private InsureIndividualBasicDTO insureIndividualBasicDTO;
 
+    // 人员身份类别
+    private List<Map<String,Object>> idetinList;
+
     //动态sql
     private String sqlStr;
 
@@ -446,4 +449,12 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 发药药房id
      */
     private String pharId;
+    /**
+     * 是否会诊病人
+     */
+    private String isConsule;
+    /**
+     * 会诊申请科室id
+     */
+    private String applyDeptid;
 }

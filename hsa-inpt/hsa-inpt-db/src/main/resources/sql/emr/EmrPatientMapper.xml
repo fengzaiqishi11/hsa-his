@@ -218,13 +218,31 @@
 
     <!-- 查询当前科室所有的病人信息 -->
     <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
-        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        select v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive
-        from inpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        <if test="zgbrQuery == '2'.toString()">
+            , t.is_consule, t.apply_deptid
+        </if>
+        from inpt_visit v left join emr_archive_logging g on g.hosp_code = v.hosp_code and v.id = g.visit_id
+        <!--会诊病人，关联会诊申请表-->
+        <if test="zgbrQuery == '2'.toString()">
+            join (
+            SELECT
+            '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
+            FROM
+            inpt_consultation_apply ss
+            WHERE ss.hosp_code = #{hospCode}
+            and ss.consul_state = '1'
+            AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
+            GROUP BY ss.visit_id, ss.hosp_code
+            ) t on v.hosp_code = t.hosp_code and v.id = t.visit_id
+        </if>
         where v.hosp_code = #{hospCode}
-        <if test="inDeptId != null and inDeptId != ''">
-            and v.in_dept_id = #{inDeptId}
+        <if test="zgbrQuery != '2'.toString()">
+            <if test="inDeptId != null and inDeptId != ''">
+                and v.in_dept_id = #{inDeptId}
+            </if>
         </if>
         <if test="ryStartTime != null and ryEndTime != null">
             and DATE_FORMAT(v.in_time,'%Y-%m-%d') &gt;= #{ryStartTime} and DATE_FORMAT(v.in_time,'%Y-%m-%d') &lt;= #{ryEndTime}

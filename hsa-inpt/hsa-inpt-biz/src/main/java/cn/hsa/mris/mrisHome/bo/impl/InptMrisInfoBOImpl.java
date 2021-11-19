@@ -3,7 +3,11 @@ package cn.hsa.mris.mrisHome.bo.impl;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.mris.mrisHome.bo.InptMrisInfoBO;
 import cn.hsa.module.mris.mrisHome.dao.InptMrisInfoDAO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +31,26 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
     InptMrisInfoDAO inptMrisInfoDAO;
     private final Pattern pattern = Pattern.compile(".+?(\\{.+?\\})");
 
+    @Resource
+    SysParameterService sysParameterService_consumer;
+
     @Override
     public List<LinkedHashMap<String, Object>> importMrisInfo(Map map) throws Exception {
 //        map.put("type","N042");
 //        List<Map<String, Object>> uploadTypeList = inptMrisInfoDAO.queryUploadType(map);
         List<LinkedHashMap<String, Object>> data =inptMrisInfoDAO.getMrisBaseInfo(map);
+        SysParameterDTO sysParameterDTO =null;
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", map.get("hospCode"));
+        isInsureUnifiedMap.put("code", "BASFBM");
+        sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        Map sfMaps =null;
+        // 开启大人婴儿合并结算
+        if(sysParameterDTO !=null) {
+            if (StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                sfMaps = (Map) JSON.parse(sysParameterDTO.getValue());
+            }
+        }
 //        Map<String, Object> uploadTypeMap =uploadTypeList.get(0);
 //        //获取查询对应上报数据的sql配置文本,并且将where条件参数替换成对应值 如：{hospCode}
 //        String sql_str = (String) uploadTypeMap.get("sql_str");
@@ -49,6 +68,14 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
                 Map diagnoseParam = new HashMap();
                 diagnoseParam.put("hospCode", (String) map.get("hospCode"));
                 diagnoseParam.put("visitId", ma.get("visit_id"));
+                if (!MapUtils.isEmpty(sfMaps)) {
+                    String key = (String) ma.get("A23C");
+                    if (StringUtils.isNotEmpty(key)) {
+                        ma.put("A23C", sfMaps.get(key)!=null?sfMaps.get(key):"18");
+                    }
+                }else {
+                    ma.put("A23C", "18");
+                }
                 List<Map<String, Object>> mrisDiagnose = inptMrisInfoDAO.getMrisDiagnose(diagnoseParam);
                 LinkedHashMap<String, Object> diagnoseMap = new LinkedHashMap<>();
                 diagnoseMap.put("C03C", "");

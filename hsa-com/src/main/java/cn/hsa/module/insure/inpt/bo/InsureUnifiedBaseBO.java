@@ -81,7 +81,7 @@ public interface InsureUnifiedBaseBO {
      * @Date 2021/4/23 12:47
      * @Return
      */
-    Map<String,Object>  querySettleInfo(Map<String, Object> map);
+    Map<String,Object>  updateSettleInfo(Map<String, Object> map);
 
     /**
      * @param map

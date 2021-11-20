@@ -320,7 +320,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     /**
      * @param
-     * @Method querySettleInfo
+     * @Method updateSettleInfo
      * @Desrciption 结算信息查询
      * 1.判断是异地还是非异地
      * 2.如果是非异地住院的，直接调用5204接口获取费用明细
@@ -336,7 +336,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return DateUtils.differentDays(date1, date2);
     }
 
-    public Map<String, Object> querySettleInfo(Map<String, Object> map) {
+    public Map<String, Object> updateSettleInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String insureSettleId = MapUtils.get(map, "insureSettleId");
 
@@ -465,6 +465,21 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         else {
             Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap);
             outptMap = MapUtils.get(resultMap, "output");
+            Map<String,Object> setlinfo = MapUtils.get(outptMap,"setlinfo");
+            InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
+            insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());
+            insureIndividualSettleDTO.setHospCode(hospCode);
+            insureIndividualSettleDTO.setInsureSettleId(MapUtils.get(setlinfo,"setl_id"));
+            insureIndividualSettleDTO.setAllPortionPrice(MapUtils.get(setlinfo,"fulamt_ownpay_amt"));
+            insureIndividualSettleDTO.setOverSelfPrice(MapUtils.get(setlinfo,"overlmt_selfpay"));
+            insureIndividualSettleDTO.setInscpScpAmt(MapUtils.get(setlinfo,"inscp_scp_amt"));
+            insureIndividualSettleDTO.setPreselfpayAmt(MapUtils.get(setlinfo,"preselfpay_amt"));
+            insureIndividualSettleDTO.setPoolPropSelfpay(MapUtils.get(setlinfo,"pool_prop_selfpay"));
+            insureIndividualSettleDTO.setPlanPrice(MapUtils.get(setlinfo,"hifp_pay"));
+            BigDecimal hifmi_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifmi_pay").toString());
+            BigDecimal hifob_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifob_pay").toString());
+            insureIndividualSettleDTO.setSeriousPrice(BigDecimalUtils.add(hifmi_pay,hifob_pay));
+            insureIndividualSettleDAO.updateByInsureSettleId(insureIndividualSettleDTO);
             map.put("outptMap", outptMap);
         }
         List<Map<String, Object>> feeDetailMapList = new ArrayList<>();

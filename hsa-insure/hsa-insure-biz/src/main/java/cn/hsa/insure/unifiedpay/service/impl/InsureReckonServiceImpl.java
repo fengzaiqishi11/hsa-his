@@ -272,5 +272,20 @@ public class InsureReckonServiceImpl extends HsafService implements InsureReckon
         return WrapperResponse.success(insureReckonBO.queryInsureTotlStmtInfo(MapUtils.get(selectMap,"insureReckonDTO")));
     }
 
+    /**
+     * 获取拨付单信息 - 3701
+     *
+     * @param selectMap
+     * @Method queryInsureAccountInfo
+     * @Desrciption 中心对账信息查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<List<Map<String,Object>>> queryInsureAccountInfo(Map<String, Object> selectMap) {
+        return WrapperResponse.success(insureReckonBO.queryInsureAccountInfo(MapUtils.get(selectMap,"insureReckonDTO")));
+    }
+
 
 }

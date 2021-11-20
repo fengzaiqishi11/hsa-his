@@ -208,5 +208,7 @@ public interface InsureIndividualSettleDAO {
      * @Return
     **/
     void updateInsureSettleValue(Map<String, Object> map);
+
+    int updateByInsureSettleId(InsureIndividualSettleDTO insureIndividualSettleDTO);
 }
 

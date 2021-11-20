@@ -1309,7 +1309,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             throw new AppException("处方已结算，不能操作");
         }
         //删除诊断
-        outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
+//        outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
         //删除手术申请
         outptDoctorPrescribeDAO.deleteOperInfoRecord(outptPrescribeDTO);
         //删除申请明细

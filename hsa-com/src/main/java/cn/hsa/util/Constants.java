@@ -911,6 +911,8 @@ public interface Constants {
         public static final String PARAMETER ="PARAMETER";
         /** 缓存中码表类型数据的后缀 **/
         public static final String CODEDETAIL ="CODEDETAIL";
+        /** 中心端配置信息map的key名称 **/
+        public static final String CENTER_GLOBAL_CONFIG_KEY = "CENTER_GLOBAL_CONFIG";
     }
 
     /**

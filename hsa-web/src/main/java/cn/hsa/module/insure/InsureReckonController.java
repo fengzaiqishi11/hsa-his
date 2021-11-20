@@ -295,6 +295,25 @@ public class InsureReckonController extends BaseController {
         return insureReckonService_consumer.queryInsureAppropriationList(selectMap);
     }
 
+    /** 获取拨付单信息 - 3701
+     * @param insureReckonDTO
+     * @Method queryInsureAccountInfo
+     * @Desrciption 中心对账信息查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @GetMapping("/queryInsureAccountInfo")
+    public WrapperResponse<List<Map<String,Object>>> queryInsureAccountInfo(InsureReckonDTO insureReckonDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+
+        Map<String,Object> selectMap = new HashMap();
+        insureReckonDTO.setHospCode(sysUserDTO.getHospCode());
+        selectMap.put("hospCode",sysUserDTO.getHospCode());
+        selectMap.put("insureReckonDTO",insureReckonDTO);
+        return insureReckonService_consumer.queryInsureAccountInfo(selectMap);
+    }
+
     /** 获取基金明细信息 - 3702
      * @param insureReckonDTO
      * @Method queryInsureDetailFundList

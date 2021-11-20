@@ -1360,6 +1360,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         if (!ListUtils.isEmpty(list)) {
             returnMap.put("name", list.get(0).get("name"));
             returnMap.put("sex", list.get(0).get("sex"));
+            returnMap.put("age",list.get(0).get("age"));
+            returnMap.put("ageUnitCode",list.get(0).get("ageUnitCode"));
             returnMap.put("address", list.get(0).get("address"));
             returnMap.put("outDeptName", list.get(0).get("outDeptName"));
             returnMap.put("inNo", list.get(0).get("inNo"));

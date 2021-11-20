@@ -84,7 +84,7 @@ public interface InsureUnifiedBaseService {
      * @Date   2021/4/23 12:47
      * @Return
      **/
-    WrapperResponse<Map<String, Object>> querySettleInfo(Map<String, Object> map);
+    WrapperResponse<Map<String, Object>> updateSettleInfo(Map<String, Object> map);
 
     /**
      * @Method queryFeeDetailInfo

@@ -1082,6 +1082,8 @@ public interface Constants {
         public static final String ZG_PT = "4"; // 职工普通
         public static final String ZG_SYBX = "5"; // 职工生育保险
         public static final String ZG_YWSH = "6"; // 职工意外伤害
+
+        public static final String YZS = "7"; // 一站式对账单
     }
 
     class SBLX {

@@ -507,6 +507,44 @@ public class InsureReckonBOImpl extends HsafBO implements InsureReckonBO {
     }
 
     /**
+     * 获取拨付单信息 - 3701
+     *
+     * @param insureReckonDTO
+     * @Method queryInsureAccountInfo
+     * @Desrciption 中心对账信息查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    @Override
+    public List<Map<String,Object>> queryInsureAccountInfo(InsureReckonDTO insureReckonDTO) {
+        String hospCode = insureReckonDTO.getHospCode();
+        String insureRegCode = insureReckonDTO.getInsureRegCode();
+
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("医保配置信息为空！");
+        }
+        String fixmedinsCode = insureConfigurationDTO.getOrgCode();
+
+        Map<String,Object> dataMap = new HashMap<>();
+        String startDate  = insureReckonDTO.getStartDate();
+        String endDate  = insureReckonDTO.getEndDate();
+        dataMap.put("fixmedinsCode",fixmedinsCode);	 // 医疗机构编码
+        dataMap.put("begnTime",DateUtils.parse(startDate,DateUtils.Y_M_DH_M_S)); // 开始时间
+        dataMap.put("endTime",DateUtils.parse(endDate,DateUtils.Y_M_DH_M_S)); // 结束时间
+        Map<String,Object> inptMap = new HashMap<>();
+        inptMap.put("data",dataMap);
+        Map<String,Object> resultMap = this.invokingUpay(hospCode, insureRegCode, "3701", dataMap);
+        Map<String,Object> outptMap =  (Map)resultMap.get("output");
+        List<Map<String,Object>> resultList = MapUtils.get(outptMap,"data");
+        return resultList;
+    }
+
+    /**
      * 调用医保统一支付，返回调用结果
      *
      * @param hospCode      医院编码

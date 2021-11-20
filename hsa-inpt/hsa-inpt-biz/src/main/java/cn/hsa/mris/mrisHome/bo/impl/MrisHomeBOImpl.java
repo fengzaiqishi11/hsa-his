@@ -848,7 +848,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 insertDiagnoseList.add(mrisDiagnoseDO);
                 if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())){
                     MrisDiagnoseDO diagnoseDO =new MrisDiagnoseDTO();
-                    if ("1".equals(mrisDiagnoseDO.getDiseaseCode())) {
+                    if ("1".equals(mrisDiagnoseDO.getDiseaseCode2())) {
                         diagnoseDO.setDiseaseName("主要诊断");
                     } else {
                         diagnoseDO.setDiseaseName("其他诊断");
@@ -1165,6 +1165,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);
             // 删除病案诊断信息
             mrisHomeDAO.deleteMrisDiagnoseByVisitId(map);
+            // 删除分行病案诊断信息
+            mrisHomeDAO.deleteRowMrisDiagnoseByVisitId(map);
         }else{
             // 删除基本信息表
             mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);

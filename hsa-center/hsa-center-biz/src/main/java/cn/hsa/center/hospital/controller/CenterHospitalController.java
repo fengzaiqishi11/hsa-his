@@ -9,6 +9,7 @@ import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import cn.hsa.module.center.parameter.service.CenterParameterService;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.FileUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -112,6 +113,18 @@ public class CenterHospitalController extends CenterBaseController {
     public WrapperResponse<Boolean> insert(@RequestBody CenterHospitalDTO centerHospitalDTO){
         centerHospitalDTO.setCrteId(userId);
         centerHospitalDTO.setCrteName(userName);
+        String strStartDate = DateUtils.format(centerHospitalDTO.getStartDate(),DateUtils.Y_M_DH_M_S);
+        String strEndDate = DateUtils.format(centerHospitalDTO.getEndDate(),DateUtils.Y_M_DH_M_S);
+        String strStartDate2Encrypted = strStartDate+'&'+centerHospitalDTO.getCode();
+        String strEndDate2Encrypted = strEndDate+'&'+centerHospitalDTO.getCode();
+        try {
+            strStartDate = RSAUtil.encryptByPublicKey(strStartDate2Encrypted.getBytes(), rsaPublicKey);
+            strEndDate = RSAUtil.encryptByPublicKey(strEndDate2Encrypted.getBytes(), rsaPublicKey);
+            centerHospitalDTO.setEncryptStartDate(strStartDate);
+            centerHospitalDTO.setEncryptEndDate(strEndDate);
+        } catch (Exception e) {
+            throw new AppException("获取服务时间失败,原因："+e.getMessage());
+        }
         return centerHospitalService.insert(centerHospitalDTO);
     }
 

@@ -156,4 +156,17 @@ public class CenterHospitalDO extends PageDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
+    /**
+     *  加密后的服务开始时间
+     * **/
+    private String encryptStartDate;
+    /**
+     *  加密后的服务结束时间
+     * **/
+    private String encryptEndDate;
+
+    /**
+     *  访问ip白名单,未配置的话默认全部允许访问
+     */
+    private String accessIps;
 }

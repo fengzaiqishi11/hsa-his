@@ -314,11 +314,12 @@
 
   <!--取消医嘱执行-->
   <update id="updateInptAdviceExecBeCancelBatch">
-    update inpt_advice_exec
-    set sign_code = '3'
-    where (hosp_code,advice_id,DATE_FORMAT( plan_exec_time, '%Y-%m-%d' )) in
-    <foreach collection="list" item="dto" open="(" close=")" separator=",">
-      (#{dto.hospCode},#{dto.iatId},DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
+    <foreach collection="list" item="dto" separator=";">
+        update inpt_advice_exec
+        set sign_code = '3'
+        where hosp_code = #{dto.hospCode}
+          and advice_id = #{dto.iatId}
+          and date(plan_exec_time) = date(#{dto.planExecTime})
     </foreach>
   </update>
 

@@ -20,7 +20,6 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import org.omg.CORBA.portable.ApplicationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -170,6 +169,26 @@ public class OutptTmakePriceFormController extends BaseController {
         SysUserDTO userDTO = getSession(req, res) ;
         param.put("hospCode",userDTO.getHospCode());//医院编码
         return outptTmakePriceFormService_consumer.queryOutptCostList(param);
+    }
+
+    /**
+     * @Description: 查询患者的费用信息，同一个项目出现多次时，统计为一条数据，整合次数，用于体检
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/22 20:20
+     * @Return
+     */
+    @GetMapping(value = "/queryOutptCostListTJ")
+    public WrapperResponse queryOutptCostListTJ(@RequestParam Map param,HttpServletRequest req, HttpServletResponse res) {
+        /* 校验必要参数；判断就诊id参数 */
+        if (!param.containsKey("visitId") && StringUtils.isEmpty((String) param.get("visitId"))
+                && !param.containsKey("preferentialTypeId") && StringUtils.isEmpty((String) param.get("preferentialTypeId"))){
+            return WrapperResponse.error(WrapperResponse.FAIL,"参数错误。",null);
+        }
+        SysUserDTO userDTO = getSession(req, res) ;
+        param.put("hospCode",userDTO.getHospCode());//医院编码
+        return outptTmakePriceFormService_consumer.queryOutptCostListTJ(param);
     }
 
 

@@ -360,6 +360,7 @@ public class RequestInsure {
             httpParam.put("activityCode",activityCode);
             httpParam.put("url",url);
             httpParam.put("param",paramObj);
+            System.out.println(JSON.toJSONString(paramObj));
             Map<String,Object> httpResult = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
             Integer code = (Integer) httpResult.get("code");
             if (code < 0){

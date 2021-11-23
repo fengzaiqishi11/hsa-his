@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.consultation.dao;
 
 import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public interface InptConsultationApplyDAO {
     int updateAdviceId(@Param("consulApplyList") List<InptAdviceDTO> consulApplyList);
 
     int deleteById(InptConsultationApplyDTO inptConsultationApplyDTO);
+
+    InptVisitDTO getInptVisit(InptAdviceDTO inptAdviceDTO);
 }

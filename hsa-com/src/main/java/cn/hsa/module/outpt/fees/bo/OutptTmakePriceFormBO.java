@@ -57,6 +57,16 @@ public interface OutptTmakePriceFormBO {
     WrapperResponse queryOutptCostList(Map param);
 
     /**
+     * @Description: 查询患者费用，用于体检
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/22 20:23
+     * @Return
+     */
+    WrapperResponse queryOutptCostListTJ(Map param);
+
+    /**
      * @param param 请求参数
      * @Menthod queryBaseByPage
      * @Desrciption 获取医院 项目、材料、药品 信息

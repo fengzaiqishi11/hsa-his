@@ -4,7 +4,6 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
@@ -390,5 +389,15 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     void insertPatientSumInfo(@Param("resultDataMap") List<Map<String, Object>> resultDataMap);
+
+    /**
+     * @Description: 根据科室id查询科室信息
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/12 13:58
+     * @Return
+     */
+    Map<String, Object> getBaseDeptById(Map<String, String> map);
 }
 

@@ -1,8 +1,6 @@
 package cn.hsa.insure.module.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.bo.InsureIndividualVisitBO;
@@ -18,16 +16,13 @@ import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
-import scala.App;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -131,7 +126,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();*/
         // 满足条件 说明不是走医保统一支付平台
 //        if (sysParameterDTO == null || !Constants.SF.S.equals(sysParameterDTO.getValue())) {
-        if (StringUtils.isEmpty(isUnifiedPay) || "0".equals(isUnifiedPay) || !"1".equals(isUnifiedPay)) {
+        if (StringUtils.isEmpty(isUnifiedPay) || "0".equals(isUnifiedPay) || "qrcode".equals(info.get("bka895")) || !"1".equals(isUnifiedPay)) {
             //根据就诊id删除医保就诊信息
             insureIndividualVisitDAO.deleteByVisitId(visitId);
         }
@@ -333,9 +328,10 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
              * 对接医保统一支付平台： 门诊挂号、登记
              * 医保登记成功以后保存医保唯一返回流水号
              */
-            InsureIndividualVisitDTO responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
-
-            insureIndividualVisitDAO.updateByPrimaryKeySelective(responseData);
+            if (!"qrcode".equals(info.get("bka895"))) {  // 不是电子凭证才执行
+                InsureIndividualVisitDTO responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
+                insureIndividualVisitDAO.updateByPrimaryKeySelective(responseData);
+            }
             Map<String, Object> outptVisitMap = new HashMap<>();
             outptVisitDTO = new OutptVisitDTO();
             outptVisitDTO.setHospCode(hospCode);
@@ -351,7 +347,9 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             paramMap.put("visitId",visitId);
             paramMap.put("outptVisitDTO", outptVisitDTO);
             outptVisitService_consumer.updateOutptVisit(outptVisitMap).getData();
-            insureUnifiedPayOutptService.insureOutptVisitUpload(paramMap);
+            if (!"qrcode".equals(info.get("bka895"))) {
+                insureUnifiedPayOutptService.insureOutptVisitUpload(paramMap);
+            }
         }
         return insureIndividualVisitDO;
     }

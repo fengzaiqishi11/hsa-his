@@ -619,6 +619,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
             isRemote = true;
         }
+        if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
+            snRemote = true;
+        }
         fourPartMap =  handlerInsureSettleFee(setlInfoMap,isRemote,individualSettleDTO,setldetail);
 
         /**

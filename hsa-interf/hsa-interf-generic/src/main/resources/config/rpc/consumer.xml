@@ -28,5 +28,7 @@
 
     <!-- 分诊系统业务接口 -->
     <dubbo:reference id="outptTriageVisitService_consumer" interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" check="false" />
+    <!-- 门诊收费服务 -->
+    <dubbo:reference id="outptTmakePriceFormService_consumer" interface="cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService" check="false" />
 </beans>
 

@@ -840,7 +840,7 @@
 
     <!--获取住院发票数据-->
     <select id="querySettle" resultType="java.util.Map">
-        select e.name, d.miPrice, d.selfPrice, d.settleRealityPrice, d.settleTime,e.patient_code as patientCode,
+        select e.name, d.miPrice, d.selfPrice, d.settleRealityPrice, d.settleTime,e.patient_code as patientCode, e.age,e.age_unit_code as ageUnitCode,
             (select name from sys_code_detail where c_code='XB' and value=e.gender_code and hosp_code=d.hospCode) sex,
             e.address,e.out_dept_name outDeptName,e.in_no inNo,YEAR(e.in_time) inYear,
             MONTH(e.in_time) inMonth,DAY(e.in_time) inDay,YEAR(e.out_time) outYear,

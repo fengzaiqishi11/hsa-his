@@ -1,33 +1,23 @@
 package cn.hsa.insure.hainansheng.emd;
 
-import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.RequestInsure;
-import cn.hsa.module.dzpz.hainan.RxList;
-import cn.hsa.module.dzpz.hainan.UploadFee;
-import cn.hsa.module.insure.inpt.entity.InsureInptCostTransmitFeeDetailDO;
-import cn.hsa.module.insure.module.dao.InsureDirectoryDownLoadDAO;
-import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dao.InsureItemMatchDAO;
-import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.outpt.fees.dao.OutptSettleDAO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.*;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @Package_name: cn.hsa.insure.hainansheng.emd
@@ -51,7 +41,8 @@ public class OutptElectronicBillFunction {
     @Resource
     private InsureItemMatchDAO insureItemMatchDAO;
 
-
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
 
 
@@ -84,7 +75,7 @@ public class OutptElectronicBillFunction {
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
         httpResult.put("app",param.get("nationECResult"));
         Map<String,Object> extData = (Map<String, Object>) httpResult.get("extData");//医保扩展数据
-        Map<String,Object> baseinfo = (Map<String, Object>) httpResult.get("baseinfo");//患者基本信息
+        Map<String,Object> baseinfo = (Map<String, Object>) extData.get("baseinfo");//患者基本信息
         List<Map<String,Object>> insuList = (List<Map<String, Object>>) httpResult.get("insuList");//参保险种
         List<Map<String,Object>> condList = (List<Map<String, Object>>) httpResult.get("condList");//特殊病种登记信息
         List<Map<String,Object>> mdtrtprovList = (List<Map<String, Object>>) httpResult.get("mdtrtprovList");//异地就医登记信息
@@ -106,6 +97,7 @@ public class OutptElectronicBillFunction {
                     itemObj.put("bka035",item.get("psnType"));   // 人员类别
                     itemObj.put("aae140",item.get("insutype"));   // 险种
                     personinfoList.add(itemObj);
+                    break;
                 }
             }else{
                 Map<String,Object> item = (Map<String, Object>) insuList.get(0);
@@ -155,6 +147,7 @@ public class OutptElectronicBillFunction {
     public Map addPatientCost(HashMap<String, Object> param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
+        String medOrgOrd = (String) param.get("medOrgOrd");//医院结算id
         List<OutptCostDTO> outptCostDTOList = (List<OutptCostDTO>) param.get("outptCostDTOList");//患者费用
         OutptVisitDTO outptVisitDTO = (OutptVisitDTO) param.get("outptVisitDTO");//个人基本信息
         //查询医保就诊信息
@@ -166,34 +159,34 @@ public class OutptElectronicBillFunction {
         insureIndividualVisitDTO = insureIndividualVisitDTOList.get(0);
         if (StringUtils.isNotEmpty(insureIndividualVisitDTO.getPayOrdId())){
             //注销费用
-            HashMap<String,Object> deletePatientParam = new HashMap<String,Object>();
-            deletePatientParam.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-            deletePatientParam.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-            deletePatientParam.put("hospCode",hospCode);//医院编码
-            deletePatientParam.put("insureRegCode",regCode);//机构编码
-            this.deletePatientCost(deletePatientParam);
+//            HashMap<String,Object> deletePatientParam = new HashMap<String,Object>();
+//            deletePatientParam.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+//            deletePatientParam.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+//            deletePatientParam.put("hospCode",hospCode);//医院编码
+//            deletePatientParam.put("insureRegCode",regCode);//机构编码
+//            this.deletePatientCost(deletePatientParam);
+            throw new AppException("电子凭证已经上传了费用，请撤销费用后重新登记再上传");
         }
         //费用传输
         JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
         Map<String,Object> httpParam = new HashMap<String,Object>();
         JSONObject data = new JSONObject();
         data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
-        data.put("orgCodg",regCode);//机构编码，不可空
+        data.put("orgCodg",insureIndividualVisitDTO.getMedicineOrgCode());//机构编码，不可空
         data.put("orgId",app.get("insuOrg"));//电子凭证机构号，可空
         data.put("ecToken",app.get("ecToken"));//电子凭证授权 ecToken，可空
         data.put("insuCode",app.get("insuOrg"));//参保人所在统筹区编码
         data.put("idNo",app.get("idNo"));//证件号码
         data.put("userName",app.get("userName"));//用户姓名
         data.put("idType",app.get("idType"));//证件类别
-        String medOrgOrd = SnowflakeUtils.getId();
         data.put("medOrgOrd",medOrgOrd);//医疗机构订单号，不可空
         data.put("initRxOrd","");//要续方的原处方流水，可空
         data.put("erFlag","0");//急诊标志，可空
         data.put("trumFlag","0");//外伤标志，可空
 
-        data.put("feeType","");//费用类型，不可空 todo
-        data.put("otpType","");//门诊类别，不可空 todo
-        data.put("medType","");//诊疗类别，不可空 todo
+        data.put("feeType", "01");  // 费用类型，目前写死门诊就诊 不可为空 TODO
+        data.put("otpType","1");//门诊类别，不可空 todo
+        data.put("medType",insureIndividualVisitDTO.getAka130());//诊疗类别，不可空 todo
         Date now = new Date();
         data.put("chrgDate", DateUtils.format(now,DateUtils.YMD));//收费日期，不可空
         data.put("chrgTime",DateUtils.format(now,"HHmmss"));//收费时间,不可空
@@ -210,20 +203,23 @@ public class OutptElectronicBillFunction {
         Matcher m = p.matcher(String.valueOf(outptResult.get("register_no")));
         data.put("rgstSn", m.replaceAll("").trim());//医保挂号流水号*/
         data.put("rgstSn", "");//医保挂号流水号，可空
-        data.put("rgstFee","");//挂号费用，不可空 todo
+        data.put("rgstFee",String.valueOf(outptResult.get("rgstFee")));//挂号费用，不可空 todo
         data.put("rgstDeptName",outptResult.get("dept_name"));//挂号科室名称，可空
         data.put("drName",outptResult.get("doctor_name"));//医生姓名，不可空
-        data.put("medreformDot","");//是否医改网点，不可空
+        if (outptResult.get("doctor_name") == null || "".equals(outptResult.get("doctor_name"))) {
+            throw new AppException("挂号医生不能为空");
+        }
+        data.put("medreformDot","Y");//是否医改网点，不可空
 
         Map<String,String> certParam = new HashMap<String,String>();
         certParam.put("hospCode",hospCode);
         certParam.put("id",outptVisitDTO.getDoctorId());
         Map<String,Object> sysUser = insureIndividualVisitDAO.selectSysUserByid(certParam);
         data.put("drDeptCodg",sysUser.get("dept_code"));//医生科室编号，不可空
-        data.put("drCertNo",sysUser.get("cert_no"));//医生证件号码，不可空
+        data.put("drCertNo",sysUser.get("prac_certi_no"));//医生证件号码，不可空
         data.put("rxItemVal",outptCostDTOList.size());//明细上传数量，不可空
         data.put("iptType","");//住院类别，可空
-        data.put("iptOpNo","");//住院/门诊号，不可空
+        data.put("iptOpNo",outptVisitDTO.getVisitNo());//住院/门诊号，不可空
         data.put("iptDeptCodg","");//住院科室编码，可空
         data.put("iptDeptName","");//住院科室名称，可空
         data.put("iptBegnDate","");//住院起始日期，可空
@@ -246,8 +242,8 @@ public class OutptElectronicBillFunction {
         data.put("midSetlFlag","");//中途结算标志，可空
         String chrgBchnoId = SnowflakeUtils.getId();//获取收费批次号
         data.put("chrgBchno",chrgBchnoId);//收费批次号，不可空 todo
-        data.put("psnSetlway","");//结算方式,不可空 todo
-        data.put("rxCircFlag","");//电子处方流转标志，可空
+        data.put("psnSetlway","01");//结算方式,不可空 todo
+        data.put("rxCircFlag","0");//电子处方流转标志，可空 1：电子处方 ，0不是电子处方，默认0，
         JSONObject extData = new JSONObject();
         extData.put("opter",outptVisitDTO.getCrteName());//经办人
         extData.put("psnNum",insureIndividualVisitDTO.getAac001());//个人编号
@@ -285,7 +281,7 @@ public class OutptElectronicBillFunction {
            for (int i = 0; i < diseaseIdArr.length; i++){
                 JSONObject diseItem = new JSONObject();
                 diseItem.put("diseDetlType","1");//诊断类别
-                diseItem.put("diseDetlSrtNo",i+1);//诊断排序号
+                diseItem.put("diseDetlSrtNo",String.valueOf(i+1));//诊断排序号
                 diseItem.put("diseDetlCodg",diseaseIdArr[i]);//诊断或症状明细编码
                 diseItem.put("diseDetlName",diseaseNameArr[i]);//诊断或症状名称
                if(i<1){
@@ -330,11 +326,11 @@ public class OutptElectronicBillFunction {
             //计算单价（优惠后总金额 / 数量 = 单价）
             BigDecimal price = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(),outptCostDTO.getTotalNum());
             totalPrice = BigDecimalUtils.add(outptCostDTO.getRealityPrice(),totalPrice);
-            rxItem.put("itemPric",price);//项目单价
+            rxItem.put("itemPric",String.valueOf(price));//项目单价
             rxItem.put("itemEmp",outptCostDTO.getNumUnitCode());//项目单位
             rxItem.put("itemSpec",outptCostDTO.getSpec());//项目规格
-            rxItem.put("itemCnt",outptCostDTO.getTotalNum());//项目数量
-            rxItem.put("itemAmt",outptCostDTO.getRealityPrice());//项目金额
+            rxItem.put("itemCnt",String.valueOf(outptCostDTO.getTotalNum()));//项目数量
+            rxItem.put("itemAmt",String.valueOf(outptCostDTO.getRealityPrice()));//项目金额
             rxItem.put("prodBarc","");//商品条形编码s
             rxItem.put("drugFrqu","");//药品频率
             rxItem.put("drugDos","");//药品用量
@@ -351,20 +347,25 @@ public class OutptElectronicBillFunction {
             itemCertParam.put("hospCode",hospCode);
             itemCertParam.put("id",outptCostDTO.getDoctorId());
             Map<String,Object> itemCert = insureIndividualVisitDAO.selectSysUserByid(itemCertParam);
-            rxItem.put("drCertNo",itemCert.get("CODE"));//医生证件号码
+            rxItem.put("drCertNo",itemCert.get("prac_certi_no"));//医生证件号码
 
             rxItem.put("rxDate", DateUtils.format(outptCostDTO.getCrteTime(),DateUtils.Y_M_D));//处方日期
             rxItem.put("rxTime",DateUtils.format(now,"HHmmss"));//处方时间
-            rxItem.put("rsDeptCodg",itemCert.get("dept_code"));//处方科室编码
-            rxItem.put("rxDept",outptCostDTO.getDeptName());//处方科室
+            // 根据科室id查询科室信息
+            itemCertParam.put("id", outptCostDTO.getDeptId());
+            Map<String,Object> dept = insureIndividualVisitDAO.getBaseDeptById(itemCertParam);
+            rxItem.put("rxDeptCodg",dept.get("code"));//处方科室编码
+            rxItem.put("rxDept",dept.get("name"));//处方科室
 
-
-            rxItem.put("rxCircFlag","");//外购处方标志 todo,RxList中无此属性值
-            rxItem.put("acordDeptCodg","");//受单科室编码
-            rxItem.put("acordDeptName","");//受单科室名称
+            // 根据科室id查询科室信息
+            itemCertParam.put("id", outptCostDTO.getExecDeptId());
+            Map<String,Object> execDept = insureIndividualVisitDAO.getBaseDeptById(itemCertParam);
+            rxItem.put("rxCircFlag","0");//外购处方标志 todo,RxList中无此属性值
+            rxItem.put("acordDeptCodg",execDept.get("code"));//受单科室编码
+            rxItem.put("acordDeptName",execDept.get("name"));//受单科室名称
             rxItem.put("ordersDrCode","");//受单医生编码
             rxItem.put("ordersDrName","");//受单医生姓名
-            rxItem.put("hospApprFlag","");//医院审批标志 todo,RxList中无此属性值
+            rxItem.put("hospApprFlag","1");//医院审批标志 todo,RxList中无此属性值
             rxItem.put("tcmdrugUsedWay","");//中药使用方式
             rxItem.put("etipFlag","");//外检标志
             rxItem.put("etipHospCode","");//外检医院编码
@@ -373,7 +374,7 @@ public class OutptElectronicBillFunction {
             rxList.add(rxItem);
         }
         data.put("rxList",rxList);//费用明细
-        data.put("feeSumamt",totalPrice);//费用总金额，不可空
+        data.put("feeSumamt",String.valueOf(totalPrice));//费用总金额，不可空
 
         JSONArray condList = new JSONArray();
         JSONObject condItem = new JSONObject();
@@ -386,8 +387,10 @@ public class OutptElectronicBillFunction {
         data.put("condList",condList);//病情编码列表
 
         httpParam.put("data",data);
-        httpParam.put("orgId",hospCode);
+        httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
         httpParam.put("transType",Constant.hainan.FUNCTION.hosUploadFee);
+        // 查询医保访问路径
+
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
         httpResult.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         return httpResult;
@@ -405,22 +408,24 @@ public class OutptElectronicBillFunction {
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
         InsureIndividualVisitDTO insureIndividualVisitDTO = (InsureIndividualVisitDTO) param.get("insureIndividualVisitDTO");//个人基本信息
-        JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
+        //JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
         Map<String,Object> httpParam = new HashMap<String,Object>();
         JSONObject data = new JSONObject();
         data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
         data.put("payOrdId",insureIndividualVisitDTO.getPayOrdId());//支付订单号
-        data.put("orgCodg",regCode);//机构编号
-        data.put("payToken",app.get("ecToken"));//支付 token，可空
-        data.put("idNo",app.get("idNo"));//证件号码
-        data.put("userName",app.get("userName"));//用户姓名
-        data.put("idType",app.get("idType"));//证件类别
+        data.put("orgCodg",insureIndividualVisitDTO.getMedicineOrgCode());//机构编号
+        data.put("payToken",insureIndividualVisitDTO.getPayToken());//支付 token，可空
+        // data.put("idNo",app.get("idNo"));//证件号码
+        // data.put("userName",app.get("userName"));//用户姓名
+        // data.put("idType",app.get("idType"));//证件类别
         JSONObject extData = new JSONObject();
         extData.put("systemNo",hospCode);//所属系统标识
         data.put("extData",extData);//医保扩展数据
         httpParam.put("data",data);//请求参数
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRevokeOrder);//操作类型
-        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
+        httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
+
+        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode, regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
 
         return httpResult;
     }

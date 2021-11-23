@@ -628,4 +628,39 @@ public interface MrisHomeDAO {
      * @Return: java.lang.Integer
      **/
     BigDecimal getInptCostTotalPrice(Map<String, Object> map);
+
+    int insertMrisInptDiagnoseBatch(List<MrisDiagnoseDO> mrisDiagnoseDOList);
+
+    /**
+     * @Method: queryMrisDiagnoseRowPage
+     * @Description: 查询分行病案诊断信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/18/01 18:46
+     * @Return: java.util.List<cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO>
+     **/
+    List<MrisDiagnoseDO> queryMrisDiagnoseRowPage(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Method: deleteRowMrisDiagnoseByVisitId
+     * @Description: 删除分行病案诊断信息
+     * @Param: [map]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/18 19:06
+     * @Return: 影响行数
+     **/
+    int deleteRowMrisDiagnoseByVisitId(Map<String,Object> map);
+
+    /**
+     * @Method: updateRowMrisDiagnose
+     * @Description: 修改分行病案诊断信息
+     * @Param: [mrisDiagnoseDOList]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/18 19:07
+     * @Return: Boolean
+     **/
+    int updateRowMrisDiagnose(List<MrisDiagnoseDO> mrisDiagnoseDOList);
 }

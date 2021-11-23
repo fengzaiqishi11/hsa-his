@@ -8,6 +8,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  *  重写ServletHttpRequet请求对象用以确保 getInputStream()
@@ -17,9 +18,7 @@ import java.io.*;
  * @Author: luonianxin
  * @Date: 2021-10-25
  */
-@Configuration
-@Slf4j
-@Order(Integer.MIN_VALUE + 49)
+
 public class BodyReaderRequestFilter implements Filter {
 
     @Override
@@ -60,7 +59,7 @@ public class BodyReaderRequestFilter implements Filter {
             BufferedReader isr = null;
             try{
                 if(ins != null){
-                    isr = new BufferedReader(new InputStreamReader(ins));
+                    isr = new BufferedReader(new InputStreamReader(ins, StandardCharsets.UTF_8));
                     char[] charBuffer = new char[128];
                     int readCount = 0;
                     while((readCount = isr.read(charBuffer)) != -1){

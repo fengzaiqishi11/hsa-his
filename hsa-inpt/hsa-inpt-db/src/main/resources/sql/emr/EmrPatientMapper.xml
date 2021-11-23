@@ -218,13 +218,13 @@
 
     <!-- 查询当前科室所有的病人信息 -->
     <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
-        if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
+        select v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive
         <if test="zgbrQuery == '2'.toString()">
             , t.is_consule, t.apply_deptid
         </if>
-        from inpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        from inpt_visit v left join emr_archive_logging g on g.hosp_code = v.hosp_code and v.id = g.visit_id
         <!--会诊病人，关联会诊申请表-->
         <if test="zgbrQuery == '2'.toString()">
             join (
@@ -275,7 +275,7 @@
         select v.*,if((select count(*) from emr_patient where visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
         if((select count(*) from emr_patient where visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive, v.dept_name as inDeptName, v.crte_time as inTime
-        from outpt_visit v left join emr_archive_logging g on v.id = g.visit_id
+        from outpt_visit v left join emr_archive_logging g on v.id = g.visit_id and g.hosp_code=v.hosp_code
         where v.hosp_code = #{hospCode}
         <if test="deptId != null and deptId != ''">
             and v.dept_id = #{deptId}
@@ -284,16 +284,16 @@
             and v.doctor_name = #{doctorName}
         </if>-->
         <if test="ryStartTime != null and ryEndTime != null">
-            and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &gt;= #{ryStartTime} and DATE_FORMAT(v.visit_time,'%Y-%m-%d') &lt;= #{ryEndTime}
+            and v.visit_time &gt;= #{ryStartTime} and v.visit_time &lt;= #{ryEndTime}
         </if>
         <if test="ryStartTime == null and ryEndTime != null">
             <![CDATA[
-                and DATE_FORMAT(v.visit_time, '%Y-%m-%d') <= #{ryEndTime}
+                and v.visit_time <= #{ryEndTime}
             ]]>
         </if>
         <if test="ryStartTime != null and ryEndTime == null">
             <![CDATA[
-                and DATE_FORMAT(v.visit_time, '%Y-%m-%d') >= #{ryStartTime}
+                and v.visit_time >= #{ryStartTime}
             ]]>
         </if>
         <if test="name != null and name != ''">

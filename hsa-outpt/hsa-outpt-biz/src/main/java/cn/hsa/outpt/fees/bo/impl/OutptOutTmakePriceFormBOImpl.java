@@ -691,11 +691,15 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 		SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
 
 		List<OutptCostDTO> list = new ArrayList<>();
-		if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
-			list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
-		} else {
-			list = outptSettleDAO.queryOutptPrescribes(outptSettleDTO);
-		}
+        if (outptSettleDTO.getIsPhys() == null || "".equals(outptSettleDTO.getIsPhys())) {  // 如果患者信息中不是体检患者，按医院配置走，如果是体检患者，则必须要走申请 2021年11月23日16:14:03
+            if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
+                list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
+            } else {
+                list = outptSettleDAO.queryOutptPrescribes(outptSettleDTO);
+            }
+        } else {
+            list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
+        }
         return WrapperResponse.success(list);
     }
 

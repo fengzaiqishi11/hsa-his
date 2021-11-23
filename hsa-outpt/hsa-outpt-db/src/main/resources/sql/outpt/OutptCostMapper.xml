@@ -3521,7 +3521,7 @@
         select a.id,a.hosp_code,a.visit_id,a.op_id,a.opd_id,a.ope_id,a.source_code,a.source_id,a.old_cost_id,a.source_dept_id,
         a.bfc_id,a.item_code,a.item_id,a.item_name,a.price,sum(a.num) as num,a.spec,a.prep_code,a.dosage,a.dosage_unit_code,a.usage_code,
         a.rate_id,a.use_days,a.num_unit_code,sum(a.total_num) as totalNum,a.herb_note_code,a.use_code,a.herb_num,sum(a.total_price) as totalPrice,sum(a.preferential_price) as preferentialPrice,
-        sum(a.reality_price),max(a.status_code) as statusCode,a.phar_id,max(a.is_dist) as isDist,sum(a.back_num) as backNum,max(a.settle_id) as settleId,max(a.settle_code) as settleCode,a.self_ratio,a.is_technology_ok,
+        sum(a.reality_price) as realityPrice,max(a.status_code) as statusCode,a.phar_id,max(a.is_dist) as isDist,sum(a.back_num) as backNum,max(a.settle_id) as settleId,max(a.settle_code) as settleCode,a.self_ratio,a.is_technology_ok,
         a.technology_ok_id,a.technology_ok_name,a.technology_ok_time,a.avg_buy_price,a.avg_sell_price,max(a.doctor_id) as doctorId,a.doctor_name,
         a.dept_id,a.exec_dept_id,a.crte_id,a.crte_name,a.crte_time
         from outpt_cost a where a.hosp_code = #{hospCode}

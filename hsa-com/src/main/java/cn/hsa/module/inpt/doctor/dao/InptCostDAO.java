@@ -479,4 +479,10 @@ public interface InptCostDAO {
      * @Return
     **/
     List<InptCostDTO> checkInsureAndHisFee(Map<String, Object> map);
+
+    PharInWaitReceiveDTO queryPharInWaitReceiveOrg(Map<String, Object> map);
+
+    int updatePharInWaitReceiveOrg(PharInWaitReceiveDTO receiveDTO);
+
+    int deletePharInWaitReceive(PharInWaitReceiveDTO receiveDTO);
 }

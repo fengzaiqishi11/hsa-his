@@ -1340,7 +1340,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outinInvoiceDTO1.setInvoiceType(Constants.PJLX.MZ);//发票类型 = 门诊
             outinInvoiceDTO1.setSettleId(settleId);//结算id
             outInvoiceParam.put("outinInvoiceDTO", outinInvoiceDTO1);
-            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
             // 12、 如果是医保病人，做医保结算操作。
             Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
             if (patientValueCode > 0) {
@@ -1349,6 +1348,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
             // 13、 将优惠发票总金额返回给前端（优惠后总金额）
             outptVisitDTO.setRealityPrice(realityPrice);
+            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
         } catch (Exception e) {
             throw e;
         } finally {

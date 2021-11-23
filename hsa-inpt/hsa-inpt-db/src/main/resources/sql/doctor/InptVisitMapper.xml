@@ -2440,4 +2440,19 @@
 		)
 		order by in_time desc, px asc
 	</select>
+	<select id="queryPrintInpt" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+		SELECT id,hosp_code,register_no,`name`,gender_code,age,in_dept_id,visit_no,
+		visit_code,visit_time,dept_id,dept_name,advance_payment,cert_code,marry_code,nation_code,in_dept_id,
+		marry_code,
+		birthday,nation_code,cert_code,cert_no,phone,is_visit,in_remark,doctor_name,
+		(SELECT `name` FROM base_disease where base_disease.id = outpt_visit.in_disease_id) as inDiseaseName
+		FROM
+		outpt_visit
+		where
+		hosp_code =#{hospCode}
+		<if test="id != null and id !=''">
+			and id = #{id}
+		</if>
+	</select>
+
 </mapper>

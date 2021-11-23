@@ -100,6 +100,8 @@ public class BaseItemDTO extends BaseItemDO implements Serializable {
     private String isTrans;
     //是否有效（SF）
     private String isValid;
+    //是否生成医嘱（SF）
+    private String isAdvice;
     //生效日期
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,6 +112,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     public List<OutptProfileFileDTO> queryAll(OutptProfileFileDTO outptProfileFileDTO) {
         return baseProfileFileDAO.queryAll(outptProfileFileDTO);
     }
+
 
     /**
      * @Method isCertNoExist
@@ -313,4 +315,19 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     public List<TreeMenuNode> getAddressTree(OutptProfileFileDTO outptProfileFileDTO){
         return baseProfileFileDAO.getAddressTree(outptProfileFileDTO);
     }
+
+    /**
+     * @Method isCertNoExist
+     * @Desrciption 删除档案
+     * @Param
+     * [id]
+     * @Author yuelong.chen
+     * @Date   2021/11/23 12:57
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @Override
+    public Boolean deleteProfileFile(Map map) {
+        return baseProfileFileDAO.deleteProfileFile(map);
+    }
+
 }

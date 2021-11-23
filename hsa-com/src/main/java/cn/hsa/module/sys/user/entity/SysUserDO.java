@@ -234,8 +234,8 @@ public class SysUserDO extends PageDO implements Serializable {
      */
     private String isAnaesthesia;
     /**
-     * 近期是否修改过密码
+     * 近期是否修改过密码 0表示未修改,1表示已修改 -2 表示密码为弱密码,需要强制修改密码
      */
-    private Boolean isPasswordChange;
+    private String isPasswordChange;
 
 }

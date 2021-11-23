@@ -1842,4 +1842,144 @@
         and b.id is null
     </select>
 
+    <!--根据条件查询出待领信息集合-->
+    <select id="queryPharInWaitReceiveOrg" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO">
+        select
+        id, hosp_code, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name, assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency, is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time
+        from phar_in_wait_receive
+        where hosp_code = #{hospCode} and is_back ='0' and id =#{oldWrId}
+    </select>
+
+    <delete id="deletePharInWaitReceive">
+        delete from phar_in_wait_receive
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--单个修改-->
+    <update id="updatePharInWaitReceiveOrg">
+        update phar_in_wait_receive
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="adviceId != null and adviceId != ''">
+                advice_id = #{adviceId},
+            </if>
+            <if test="groupNo != null and groupNo != ''">
+                group_no = #{groupNo},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="babyId != null and babyId != ''">
+                baby_id = #{babyId},
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                item_code = #{itemCode},
+            </if>
+            <if test="itemId != null and itemId != ''">
+                item_id = #{itemId},
+            </if>
+            <if test="itemName != null and itemName != ''">
+                item_name = #{itemName},
+            </if>
+            <if test="spec != null and spec != ''">
+                spec = #{spec},
+            </if>
+            <if test="dosage != null">
+                dosage = #{dosage},
+            </if>
+            <if test="dosageUnitCode != null and dosageUnitCode != ''">
+                dosage_unit_code = #{dosageUnitCode},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="splitRatio != null">
+                split_ratio = #{splitRatio},
+            </if>
+            <if test="splitUnitCode != null and splitUnitCode != ''">
+                split_unit_code = #{splitUnitCode},
+            </if>
+            <if test="splitNum != null">
+                split_num = #{splitNum},
+            </if>
+            <if test="splitPrice != null">
+                split_price = #{splitPrice},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="chineseDrugNum != null">
+                chinese_drug_num = #{chineseDrugNum},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="pharId != null and pharId != ''">
+                phar_id = #{pharId},
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                assign_user_id = #{assignUserId},
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                assign_user_name = #{assignUserName},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime},
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                dist_user_id = #{distUserId},
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                dist_user_name = #{distUserName},
+            </if>
+            <if test="distTime != null">
+                dist_time = #{distTime},
+            </if>
+            <if test="usageCode != null and usageCode != ''">
+                usage_code = #{usageCode},
+            </if>
+            <if test="useCode != null and useCode != ''">
+                use_code = #{useCode},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId},
+            </if>
+            <if test="isEmergency != null and isEmergency != ''">
+                is_emergency = #{isEmergency},
+            </if>
+            <if test="isBack != null and isBack != ''">
+                is_back = #{isBack},
+            </if>
+            <if test="costId != null and costId != ''">
+                cost_id = #{costId},
+            </if>
+            <if test="oldWrId != null and oldWrId != ''">
+                old_wr_id = #{oldWrId},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </update>
+
 </mapper>

@@ -6,19 +6,13 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.fees.bo.OutptTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
-import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.MapUtils;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +71,19 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     @Override
     public WrapperResponse queryOutptCostList(Map param) {
         return outptTmakePriceFormBO.queryOutptCostList(param);
+    }
+
+    /**
+     * @Description: 查询患者费用，用于体检
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/22 20:22
+     * @Return
+     */
+    @Override
+    public WrapperResponse queryOutptCostListTJ(Map param) {
+        return outptTmakePriceFormBO.queryOutptCostListTJ(param);
     }
 
     /**

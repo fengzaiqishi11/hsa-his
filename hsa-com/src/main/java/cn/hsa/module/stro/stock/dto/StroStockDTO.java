@@ -28,6 +28,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class StroStockDTO extends StroStockDO implements Serializable {
     private static final long serialVersionUID = -41069628269023745L;
+    private List<StroStockDTO> stroStockDTOS;
     //是否为零
     private Boolean isMun ;
     //是否报警
@@ -70,7 +71,7 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     private Date warDate;
     // 根据有效期降序或者升序 0--降序 1--升序，默认降序
     private String isSort;
-    // 是否作废  
+    // 是否作废
     private String isValid;
     /**
      * 查看药品还是材料,0:材料 1：药品，默认全部
@@ -90,5 +91,8 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date crteTime;
-
+    /**
+     * 库存上下限查询条件
+     */
+    private String stockLimitsFlag;
 }

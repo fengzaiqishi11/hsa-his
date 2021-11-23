@@ -2096,7 +2096,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
         if("1".equals(adviceDTO.getIsLong())){
             inptCostDTO.setTotalNum(adviceDTO.getTotalNum());
-            inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+            if(Constants.XMLB.XM.equals(inptAdviceDetailDTO.getItemCode())){
+                inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
+            } else {
+                inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+            }
             //药品
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (inptCostDTO.getTotalNumUnitCode().equals(drugDTO.getUnitCode())) {

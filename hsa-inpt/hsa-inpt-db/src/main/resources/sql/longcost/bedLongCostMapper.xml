@@ -30,6 +30,7 @@
         <result property="pharId" column="phar_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="ilc_crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="ilc_crte_time" jdbcType="TIMESTAMP"/>
+        <result property="attributionCode" column="attribution_code" jdbcType="TIMESTAMP"/>
 
         <!-- 一对一映射床位项目 -->
         <association property="baseItem" javaType="cn.hsa.module.base.bi.dto.BaseItemDTO">
@@ -188,7 +189,7 @@
         ilc.phar_id,
         ilc.crte_name ilc_crte_name,
         ilc.crte_time ilc_crte_time,
-        ilc.attribution_code  attribution_code,
+        ilc.attribution_code attribution_code,
         iv.id iv_id,
         iv.hosp_code iv_hosp_code,
         iv.profile_id iv_profile_id,

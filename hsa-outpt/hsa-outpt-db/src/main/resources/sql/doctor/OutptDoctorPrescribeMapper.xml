@@ -410,7 +410,7 @@
         select a.id, a.hosp_code hospCode, a.visit_id visitId, a.profile_id profileId, a.disease_id diseaseId, c.name diagnoseName,
         a.start_date startDate, a.chief_complaint chiefComplaint, a.present_illness presentIllness,
         a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
-        a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion,
+        a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion, a.specialty_check specialtyCheck,
         a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
         a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke
         from  outpt_medical_record a
@@ -424,7 +424,7 @@
         select a.id, a.hosp_code hospCode, a.visit_id visitId, a.profile_id profileId, a.disease_id diseaseId, a.start_date startDate, a.chief_complaint chiefComplaint, a.present_illness presentIllness,
         a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
         a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion,
-        a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
+        a.specialty_check specialtyCheck, a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
         a.breath, a.height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, c.name diagnoseName,
         (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke
         from  outpt_medical_record a
@@ -436,12 +436,12 @@
     <insert id="insertMedicalRecord" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO" >
         insert into outpt_medical_record (
             id, hosp_code, visit_id, profile_id, disease_id, start_date, chief_complaint, present_illness, past_history, oneself_history, family_history,
-            allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, temperature, min_blood_pressure, max_blood_pressure,
+            allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure,
             breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time
         )
         values (
             #{id}, #{hospCode}, #{visitId}, #{profileId}, #{diseaseId}, #{startDate}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory},
-            #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
+            #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
             #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now()
         )
     </insert>
@@ -461,6 +461,7 @@
             auxiliary_inspect = #{auxiliaryInspect},
             disease_analysis = #{diseaseAnalysis},
             handle_suggestion = #{handleSuggestion},
+            specialty_check = #{specialtyCheck},
             temperature = #{temperature},
             min_blood_pressure = #{minBloodPressure},
             max_blood_pressure = #{maxBloodPressure},

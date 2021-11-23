@@ -1105,7 +1105,7 @@
         <if test='queryBaby =="N"'>
             and (a.baby_id is null or a.baby_id = '')
         </if>
-        ORDER BY a.check_time DESC
+        order by a.long_start_time asc, a.id asc, a.check_time DESC
     </select>
 
     <!--通过就诊id查询医嘱记录条数-->

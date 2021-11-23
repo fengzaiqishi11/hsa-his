@@ -148,4 +148,21 @@ public class BaseProfileFileController extends BaseController {
         map.put("outptProfileFileDTO", outptProfileFileDTO);
         return baseProfileFileService_consumer.queryAll(map);
     }
+
+    /**
+     * @Method isCertNoExist
+     * @Desrciption 删除档案
+     * @Param[id]
+     * @Author yuelong.chen
+     * @Date   2021/11/23 12:57
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @GetMapping("/deleteProfileFile")
+    public WrapperResponse<Boolean> deleteProfileFile(@RequestParam("id") String id, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("id",id);
+        return baseProfileFileService_consumer.deleteProfileFile(map);
+    }
 }

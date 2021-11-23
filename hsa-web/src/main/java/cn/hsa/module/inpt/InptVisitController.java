@@ -139,7 +139,22 @@ public class InptVisitController extends BaseController {
         map.put("inptVisitDTO", inptVisitDTO);
         return inptVisitService_consumer.deleteRegister(map);
     }
-
+    /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [OutptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @GetMapping(value = "/queryPrintInpt")
+    public WrapperResponse<OutptVisitDTO> queryPrintInpt(@RequestParam("id") String id, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("id", id);
+        return inptVisitService_consumer.queryPrintInpt(map);
+    }
     /**
      * @Method deleteInsureRegister
      * @Desrciption 取消医保入院登记

@@ -186,6 +186,20 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     }
 
     /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [inptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @Override
+    public OutptVisitDTO queryPrintInpt(Map map) {
+        OutptVisitDTO outptVisitDTO = inptVisitDAO.queryPrintInpt(map);
+        return  outptVisitDTO;
+    }
+
+    /**
      * @Method queryUnregisteredPage
      * @Desrciption 1.查询出所有门诊就诊表的信息
      * 2.根据门诊就诊表的ID查出档案中需要的信息

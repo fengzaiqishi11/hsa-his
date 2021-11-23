@@ -5030,7 +5030,7 @@
         <if test="type == null or type == '' or type == '1'.toString() ">
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_1') prop, '总金额' labelBfc, 'true' showSummary,'2' toFixed
             from outpt_settle settle
-            join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode} and a.settle_code = '2'
             <if test="startDate != null ">
@@ -5043,7 +5043,7 @@
             union
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_2') prop, '优惠金额' labelBfc, 'true' showSummary,'2' toFixed
             from outpt_settle settle
-            join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode} and a.settle_code = '2'
             <if test="startDate != null ">
@@ -5056,7 +5056,7 @@
             union
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_3') prop, '优惠后总金额' labelBfc, 'true' showSummary,'2' toFixed
             from outpt_settle settle
-            join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
@@ -5077,40 +5077,40 @@
         <if test="type == null or type == '' or type == '2'.toString() ">
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_1') prop, '总金额' labelBfc, 'true' showSummary,'2' toFixed
             from inpt_settle settle
-            join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join inpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+                and settle.crte_time &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+                and settle.crte_time &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_2') prop, '优惠金额' labelBfc, 'true' showSummary,'2' toFixed
             from inpt_settle settle
-            join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join inpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+                and settle.crte_time &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+                and settle.crte_time &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
             union
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_3') prop, '优惠后总金额' labelBfc, 'true' showSummary,'2' toFixed
             from inpt_settle settle
-            join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code
+            join inpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startDate}
+                and settle.crte_time &gt;= #{startDate}
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+                and settle.crte_time &lt;= #{endDate}
             </if>
             group by a.bfc_id, b.name
         </if>

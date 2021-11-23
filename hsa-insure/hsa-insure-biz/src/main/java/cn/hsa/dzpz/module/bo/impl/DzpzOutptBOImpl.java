@@ -145,7 +145,7 @@ public class DzpzOutptBOImpl extends HsafBO implements DzpzOutptBo {
             param.put("payOrdId",byVisitNo.getPayOrdId());
             param.put("payOrdToken",byVisitNo.getPayOrdId());
 
-            String url = "http://10.102.12.216/mpc-local/test/pmc/api";
+            String url = "http://10.103.161.181:8082/pmc/api";
 
             Map patientInfo = MapUtils.get(param, "patientInfo");
 

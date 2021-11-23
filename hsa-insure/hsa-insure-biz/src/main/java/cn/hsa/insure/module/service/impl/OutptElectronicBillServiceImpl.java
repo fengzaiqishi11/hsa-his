@@ -90,4 +90,5 @@ public class OutptElectronicBillServiceImpl extends HsafService implements Outpt
     public WrapperResponse getPayEffect(Map<String, Object> param) {
         return outptElectronicBillBO.getPayEffect(param);
     }
+
 }

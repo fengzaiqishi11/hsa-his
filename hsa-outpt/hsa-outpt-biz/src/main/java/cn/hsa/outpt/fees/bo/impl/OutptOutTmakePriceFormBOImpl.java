@@ -636,7 +636,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         String visitId =  MapUtils.get(map,"visitId");
         String insureRegCode =  MapUtils.get(map,"insureRegCode");
         //判断是否有传输费用信息
-        Map<String,String> insureCostParam = new HashMap<String,String>();
+        Map<String,Object> insureCostParam = new HashMap<String,Object>();
         insureCostParam.put("hospCode",hospCode);//医院编码
         insureCostParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId",visitId);//就诊id

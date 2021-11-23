@@ -313,6 +313,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_cert_type", mdtrtCertType);
         dataMap.put("certno", insureIndividualVisitDTO.getMdtrtCertNo());
         paramMap.put("data", dataMap);  // 入参具体数据
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, "1101", paramMap);
         return stringObjectMap;
     }

@@ -93,7 +93,7 @@ public interface InsureIndividualCostService {
      * @Return
      **/
     @GetMapping("/service/insure/insureIndividualCost/queryOutptInsureCostByVisit")
-    List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, String> insureCostParam);
+    List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, Object> insureCostParam);
 
     /**
      * @Method insertInsureCost()

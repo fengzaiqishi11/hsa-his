@@ -551,6 +551,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("insuplc", infoDTO.getInsuplc()); // 参保地 *******
         setlinfo.put("spPsnType", infoDTO.getSpPsnType()); // 特殊人员类型
         setlinfo.put("nwbAdmType", infoDTO.getNwbAdmType()); // 新生儿入院类型
+
         setlinfo.put("nwbBirWt", infoDTO.getNwbBirWt()); // 新生儿出生体重 *******
         setlinfo.put("nwbAdmWt", infoDTO.getNwbAdmWt()); // 新生儿入院体重 *******
         if(Constants.SF.F.equals(isHospital)){
@@ -672,6 +673,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         getEmptyErr(setlInfoMap,"setlEndDate","结算期间结束时间不能为空");
         getEmptyErr(setlInfoMap,"medinsFillDept","医疗机构填报部门不能为空");
         getEmptyErr(setlInfoMap,"medinsFillPsn","医疗机构填报人不能为空");
+
+
+        Object objNwbBirWt = MapUtils.get(setlInfoMap,"nwbBirWt"); // 新生儿出生体重
+        if(objNwbBirWt instanceof String || objNwbBirWt == null){
+            setlInfoMap.put("nwbBirWt",null); // 新生儿出生体重
+        }
+
+        Object objNwbAdmWt = MapUtils.get(setlInfoMap,"nwbAdmWt"); //新生儿入院体重
+        if(objNwbAdmWt instanceof String || objNwbAdmWt == null){
+            setlInfoMap.put("nwbAdmWt",null); // 新生儿入院体重
+        }
         if(Constants.SF.S.equals(isHospital)){
              getEmptyErr(setlInfoMap,"daysRinpFlag31","出院31天内再住院计划标志不能为空");
              getEmptyErr(setlInfoMap,"chfpdrName","主诊医师姓名不能为空");
@@ -1065,16 +1077,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         String billNo = "";
         String billCode = "" ;
         Map<String,Object> dataMap;
-//        if(Constants.SF.S.equals(isHospital)){
-//            dataMap = insureGetInfoDAO.selectInptBillNo(map);
-//        }else{
-//            dataMap = insureGetInfoDAO.selectOutptBillNo(map);
-//        }
-//        if(MapUtils.isEmpty(dataMap)){
-//            throw new AppException("该患者未产生发票信息");
-//        }
-//        billNo = MapUtils.get(dataMap,"invoice_no");
-//        billCode = MapUtils.get(dataMap,"prefix") ;
+        if(Constants.SF.S.equals(isHospital)){
+            dataMap = insureGetInfoDAO.selectInptBillNo(map);
+        }else{
+            dataMap = insureGetInfoDAO.selectOutptBillNo(map);
+        }
+        if(MapUtils.isEmpty(dataMap)){
+            throw new AppException("该患者未产生发票信息");
+        }
+        billNo = MapUtils.get(dataMap,"invoice_no");
+        billCode = MapUtils.get(dataMap,"prefix") ;
         map.put("billNo",billNo);
         map.put("billCode",billCode);
         return map ;
@@ -1381,7 +1393,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                                     (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
                                             MapUtils.get(item, "det_item_fee_sumamt").toString()))));
                     if("01".equals(MapUtils.get(item, "chrgitm_lv"))){
-                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt") == null ? "" : MapUtils.get(item, "inscp_scp_amt").toString()))));
+                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
                     }
                     if("02".equals(MapUtils.get(item, "chrgitm_lv"))){
                         BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
@@ -1596,7 +1608,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         String insureRegCode = insureSettleInfoDTO.getOrgCode();
         //判断是否有传输费用信息
-        Map<String, String> insureCostParam = new HashMap<String, String>();
+        Map<String, Object> insureCostParam = new HashMap<String, Object>();
         insureCostParam.put("hospCode", insureSettleInfoDTO.getHospCode());//医院编码
         insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId", insureSettleInfoDTO.getId());//就诊id

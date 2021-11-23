@@ -232,7 +232,13 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (StringUtils.isEmpty(outpt.getPatientCode())){
             outpt.setPatientCode("0");
         }
-        Integer patientCodeValue = Integer.parseInt(outpt.getPatientCode());
+
+        // add 退费时获取病人结算记录中病人类型进行退费，而不是取就诊信息表中的病人类型，防止复诊时出现异常情况
+        // by liaojiguang on 2021-11-23
+        if (StringUtils.isEmpty(oldOutptSettleDTO.getPatientCode())){
+            oldOutptSettleDTO.setPatientCode("0");
+        }
+        Integer patientCodeValue = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
         if (patientCodeValue > 0) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);
             if (insureIndividualBasicDTO == null) {

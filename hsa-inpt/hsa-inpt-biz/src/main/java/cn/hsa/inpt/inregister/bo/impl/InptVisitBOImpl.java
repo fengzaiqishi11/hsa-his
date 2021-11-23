@@ -1009,8 +1009,16 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                     String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
                     String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
                     if (!StringUtils.isEmpty(endtime)) {
+                        if (StringUtils.isEmpty(begntime)) {
+                            continue;
+                        }
                         Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime,-1),DateUtils.Y_M_D);
+
+                        if (StringUtils.isEmpty(endtime)) {
+                            endtime = "2099-12-31 00:00:00";
+                        }
                         Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime,1),DateUtils.Y_M_D);
+
                         if (DateUtils.getNow().before(endDate) && DateUtils.getNow().after(begnDate)) {
                             isOneSettle = Constants.SF.S;
                             insureIndividualVisitDTO.setPsnIdetType(psnIdetType);

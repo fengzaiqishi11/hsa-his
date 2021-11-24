@@ -897,7 +897,10 @@
        </if>
     </select>
    <select id="getMrisDiagnose" resultType="java.util.Map" parameterType="java.util.Map">
-      select disease_code,disease_code2,in_situation_code1,in_situation_code2,disease_icd10_1,disease_icd10_2,disease_icd10_name1,disease_icd10_name2
+      select disease_code,disease_code2,in_situation_code1,in_situation_code2,
+      ifnull((select platform_code from base_disease where code = disease_icd10_1 and hosp_code =#{hospCode} limit 1),disease_icd10_1) as disease_icd10_1,
+      ifnull((select platform_code from base_disease where code = disease_icd10_2 and hosp_code =#{hospCode} limit 1),disease_icd10_2) as disease_icd10_2,
+      disease_icd10_name1,disease_icd10_name2
       from mris_diagnose where visit_id =#{visitId} and hosp_code =#{hospCode}
    </select>
    <select id="getMrisOperInfo" resultType="java.util.Map" parameterType="java.util.Map">

@@ -723,7 +723,7 @@
 
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo,
+        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo, b.totalPrice as invoiceTotalPrice,
         v.visit_code as visitCode,b.pay_code as sourcePayCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,

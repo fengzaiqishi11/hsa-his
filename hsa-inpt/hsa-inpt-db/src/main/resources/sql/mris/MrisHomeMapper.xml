@@ -899,10 +899,12 @@
             a.address as nowAdress,
             a.phone as phone,
             a.outpt_disease_name as diseaseIcd10Name,
-            a.in_mode_code as inWay,
+            case when a.in_mode_code='0' then '9' else a.in_mode_code end as inWay,
             bf.native_place as nativePlace,
             bf.native_address as nativeAdress,
-            code_9.remark as payWayCode
+            code_9.remark as payWayCode,
+            a.outpt_doctor_id as outptDoctorId,
+            a.outpt_doctor_name as outptDoctorName
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

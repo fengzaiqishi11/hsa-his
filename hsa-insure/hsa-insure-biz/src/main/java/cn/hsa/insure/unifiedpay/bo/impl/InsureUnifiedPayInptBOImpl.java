@@ -231,6 +231,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             String zhSpecial ="";
             String hnFeedetlSn ="";
             String huNanSpecial = "";
+            String guangZhouSpecial = "";
             Map<String,Object> codeMap = new HashMap<>();
             codeMap.put("code","HOSP_APPR_FLAG");
             codeMap.put("hospCode",hospCode);
@@ -251,6 +252,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         }
                         if ("huNanSpecial".equals(key)) {
                             huNanSpecial = MapUtils.get(stringObjectMap,key);
+                        }
+                        if ("guangZhouSpecial".equals(key)) {
+                            guangZhouSpecial = MapUtils.get(stringObjectMap,key);
                         }
                     }
                 }
@@ -356,6 +360,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     objectMap.put("tcmdrug_used_way","2");
                 }else if("1".equals(huNanSpecial) && "0".equals(isReimburse)){
                     objectMap.put("hosp_appr_flag", "0");
+                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(MapUtils.get(map, "insureItemType"))) {
+                    // 广州的102是中药饮片
+                    objectMap.put("hosp_appr_flag", "1");
+                    objectMap.put("tcmdrug_used_way","1");
                 }
 
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志

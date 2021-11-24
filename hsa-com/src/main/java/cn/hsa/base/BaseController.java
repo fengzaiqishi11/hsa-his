@@ -142,11 +142,8 @@ public class BaseController extends HsafController {
 
 
     protected <T> T getAndRemoveSession(HttpServletRequest req, HttpServletResponse res) {
-       Session sesion = redisSessionRepository.findById(req.getRequestedSessionId()) ;
-        Object value = sesion.getAttribute(SESSION_AUTH_CODE);
-        if (value != null) {
-            sesion.removeAttribute(SESSION_AUTH_CODE);
-        }
+        Object value = req.getSession().getAttribute(SESSION_AUTH_CODE);
+        req.getSession().removeAttribute(SESSION_AUTH_CODE);
         return (T)value;
     }
 

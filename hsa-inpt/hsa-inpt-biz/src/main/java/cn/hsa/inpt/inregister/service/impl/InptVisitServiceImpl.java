@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inregister.bo.InptVisitBO;
 import cn.hsa.module.inpt.inregister.service.InptVisitService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,19 @@ public class InptVisitServiceImpl extends HsafService implements InptVisitServic
     public WrapperResponse<InptVisitDTO> queryByCertNo(Map map) {
         return WrapperResponse.success(inptVisitBO.queryByCertNo(MapUtils.get(map,"inptVisitDTO")));
     }
+    /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [OutptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @Override
+    public WrapperResponse<OutptVisitDTO> queryPrintInpt(Map map) {
+        return WrapperResponse.success(inptVisitBO.queryPrintInpt(map));
+    }
+
     /**
      * @Method deleteRegister
      * @Desrciption 取消入院登记

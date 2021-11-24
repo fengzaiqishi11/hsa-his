@@ -586,7 +586,8 @@
         a.one_settle_id,
         a.card_price as cardPrice,
         c.card_no as cardNo,
-        b.profile_id as profileId
+        b.profile_id as profileId,
+        b.is_phys as isPhys
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id

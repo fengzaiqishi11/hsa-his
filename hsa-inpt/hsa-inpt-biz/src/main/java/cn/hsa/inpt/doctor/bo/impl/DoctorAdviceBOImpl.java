@@ -247,8 +247,11 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             }
         }
 
+        // 查询是否存在会诊记录
+        InptVisitDTO visitDTO = inptConsultationApplyDAO.getInptVisit(inptAdviceDTOList.get(0));
+
         InptVisitDTO inptVisitDTO = inptAdviceDAO.getInptVisit(inptAdviceDTOList.get(0));
-        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTOList.get(0).getDeptId())){
+        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTOList.get(0).getDeptId()) && visitDTO == null){
             throw new AppException("入院科室与开嘱科室不一致，请检查");
         }
         //获取组号

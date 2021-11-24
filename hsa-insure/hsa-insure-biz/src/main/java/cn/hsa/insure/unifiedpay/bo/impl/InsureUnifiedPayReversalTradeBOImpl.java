@@ -360,6 +360,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         selectDataListMap.put("startDate", stmtBegndate);
         selectDataListMap.put("endDate", stmtEnddate);
         selectDataListMap.put("clrType", MapUtils.get(parameterMap, "clr_type"));
+        selectDataListMap.put("clrOptins", MapUtils.get(parameterMap, "clr_optins"));//结算经办机构
         selectDataListMap.put("hospCode", hospCode);
         selectDataListMap.put("insureRegCode", insureRegCode);
         selectDataListMap.put("refdSetlFlag", MapUtils.get(parameterMap, "refdSetlFlag"));
@@ -1857,6 +1858,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.SYPCJM);
         localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.SYPGCJM);
         localOrdinaryInptList.add(Constant.UnifiedPay.YWLX.JSBZY);
+        paraMap.put("list",localOrdinaryInptList);
         List<Map<String,Object>> localOrdinaryInptMap = insureReversalTradeDAO.queryStatementInfo(paraMap);
         if (!ListUtils.isEmpty(localOrdinaryInptMap)) {
             for (Map<String,Object> map : localOrdinaryInptMap) {

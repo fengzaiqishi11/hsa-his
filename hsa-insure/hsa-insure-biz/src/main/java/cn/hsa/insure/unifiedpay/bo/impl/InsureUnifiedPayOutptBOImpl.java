@@ -285,6 +285,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         String hnSpecial = ""; // 针对海南特有的报销药
         String huNanSpecial = ""; // 针对湖南中药饮片报销
         String patientSum = ""; // 个人累计
+        String guangZhouSpecial = "";//针对广州的中药饮片报销
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(unifiedPayMap).getData();
         if (sysParameterDTO != null && !StringUtils.isEmpty(sysParameterDTO.getValue())) {
             String value = sysParameterDTO.getValue();
@@ -306,6 +307,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     if("patientSum".equals(key)){
                         patientSum =  MapUtils.get(stringObjectMap, key);
                     }
+                    if ("guangZhouSpecial".equals(key)) {
+                        guangZhouSpecial = MapUtils.get(stringObjectMap, key);
+                    }
+
                 }
             }
         }
@@ -421,6 +426,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     costInfoMap.put("tcmdrug_used_way","2");
                 }else if("1".equals(huNanSpecial) && "0".equals(lmtUserFlag)){
                     costInfoMap.put("hosp_appr_flag", "0");
+                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(MapUtils.get(map, "insureItemType"))) {
+                    // 广州的102是中药饮片
+                    costInfoMap.put("hosp_appr_flag", "1");
+                    costInfoMap.put("tcmdrug_used_way","1");
                 }
 
                 costInfoMap.put("tcmdrug_used_way", null); // TODO 中药使用方式

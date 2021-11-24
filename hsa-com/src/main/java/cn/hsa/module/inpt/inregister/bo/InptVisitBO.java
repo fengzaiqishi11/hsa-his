@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +73,15 @@ public interface InptVisitBO {
      * @Return java.lang.Boolean
      **/
     String save(InptVisitDTO inptVisitDTO);
+    /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [inptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+     OutptVisitDTO queryPrintInpt(Map map);
 
     /**
      * @Method queryByCertNo

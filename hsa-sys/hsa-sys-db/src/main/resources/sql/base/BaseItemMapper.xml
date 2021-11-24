@@ -304,6 +304,14 @@
 					#{item}
 				</foreach>
 			</if>
+			<if test="isAdvice == '1'.toString()">
+				and EXISTS
+				(SELECT base_advice_detail.id FROM base_advice_detail where base_advice_detail.item_code  = a.code)
+			</if>
+			<if test="isAdvice == '0'.toString()">
+				and not EXISTS
+				(SELECT base_advice_detail.id FROM base_advice_detail where base_advice_detail.item_code  = a.code)
+			</if>
 		</where>
 		order by a.code asc
 	</select>

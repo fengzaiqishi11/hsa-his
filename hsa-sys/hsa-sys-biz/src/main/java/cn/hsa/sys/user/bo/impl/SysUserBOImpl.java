@@ -350,7 +350,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public Boolean updateResetPassword(SysUserDTO sysUserDTO) {
         sysUserDTO.setPassword(MD5Utils.getMd5AndSha("888888"));
-        sysUserDTO.setIsPasswordChange(Boolean.FALSE);
+        sysUserDTO.setIsPasswordChange(Constants.SF.F);
         return sysUserDAO.updateResetPassword(sysUserDTO) > 0;
     }
 

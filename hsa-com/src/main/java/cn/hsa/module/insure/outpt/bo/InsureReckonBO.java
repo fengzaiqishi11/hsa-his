@@ -201,4 +201,15 @@ public interface InsureReckonBO {
      * @Return
      * */
     PageDTO queryInsureTotlStmtInfo(InsureReckonDTO insureReckonDTO);
+
+    /**
+     * 获取拨付单信息 - 3701
+     * @param insureReckonDTO
+     * @Method queryInsureAccountInfo
+     * @Desrciption 中心对账信息查询
+     * @Author liaojiguang
+     * @Date 2021/9/22 09:15
+     * @Return
+     **/
+    List<Map<String,Object>> queryInsureAccountInfo(InsureReckonDTO insureReckonDTO);
 }

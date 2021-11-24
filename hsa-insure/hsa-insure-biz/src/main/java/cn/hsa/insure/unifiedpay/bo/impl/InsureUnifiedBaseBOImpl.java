@@ -321,7 +321,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     /**
      * @param
-     * @Method querySettleInfo
+     * @Method updateSettleInfo
      * @Desrciption 结算信息查询
      * 1.判断是异地还是非异地
      * 2.如果是非异地住院的，直接调用5204接口获取费用明细
@@ -337,7 +337,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return DateUtils.differentDays(date1, date2);
     }
 
-    public Map<String, Object> querySettleInfo(Map<String, Object> map) {
+    public Map<String, Object> updateSettleInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String insureSettleId = MapUtils.get(map, "insureSettleId");
 
@@ -466,6 +466,97 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         else {
             Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap);
             outptMap = MapUtils.get(resultMap, "output");
+            Map<String,Object> setlinfo = MapUtils.get(outptMap,"setlinfo");
+            InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
+            insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());
+            insureIndividualSettleDTO.setHospCode(hospCode);
+            insureIndividualSettleDTO.setInsureSettleId(MapUtils.get(setlinfo,"setl_id"));
+            insureIndividualSettleDTO.setAllPortionPrice(MapUtils.get(setlinfo,"fulamt_ownpay_amt"));
+            insureIndividualSettleDTO.setOverSelfPrice(MapUtils.get(setlinfo,"overlmt_selfpay"));
+            insureIndividualSettleDTO.setInscpScpAmt(MapUtils.get(setlinfo,"inscp_scp_amt"));
+            insureIndividualSettleDTO.setPreselfpayAmt(MapUtils.get(setlinfo,"preselfpay_amt"));
+            insureIndividualSettleDTO.setPoolPropSelfpay(MapUtils.get(setlinfo,"pool_prop_selfpay"));
+            insureIndividualSettleDTO.setPlanPrice(MapUtils.get(setlinfo,"hifp_pay"));
+            BigDecimal hifmi_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifmi_pay").toString());
+            BigDecimal hifob_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifob_pay").toString());
+            insureIndividualSettleDTO.setSeriousPrice(BigDecimalUtils.add(hifmi_pay,hifob_pay));
+            insureIndividualSettleDTO.setMafPay(MapUtils.get(setlinfo,"maf_pay"));
+            List <Map<String,Object>> setldetailList = MapUtils.get(outptMap,"setldetail");
+            if (!ListUtils.isEmpty(setldetailList)) {
+                for (Map<String, Object> detailMap : setldetailList) {
+                    String fundPayType = MapUtils.get(detailMap, "fund_pay_type");
+                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt").toString();
+                    switch (fundPayType) {
+                        case "630100": // 医院减免金额
+                            insureIndividualSettleDTO.setHospExemAmount(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                    /*case "610100": // 医疗救助基金
+                        resultMap.put("mafPay",fundPayamt);
+                        break;*/
+                        case "330200": // 职工意外伤害基金
+                            insureIndividualSettleDTO.setAcctInjPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "390400": // 居民意外伤害基金
+                            insureIndividualSettleDTO.setRetAcctInjPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "640100": // 政府兜底基金
+                            insureIndividualSettleDTO.setGovernmentPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "620100": // 特惠保补偿金
+                            insureIndividualSettleDTO.setThbPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "999996": // 医院垫付基金
+                            insureIndividualSettleDTO.setHospPrice(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "610200": // 优抚对象医疗补助基金
+                            insureIndividualSettleDTO.setCarePay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "999109": // 农村低收入人口医疗补充保险
+                            insureIndividualSettleDTO.setLowInPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "999997": // 其他基金
+                            insureIndividualSettleDTO.setOthPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "510100": // 生育基金
+                            insureIndividualSettleDTO.setFertilityPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "340100": // 离休人员医疗保障基金
+                            insureIndividualSettleDTO.setRetiredPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "350100": // 一至六级残疾军人医疗补助基金
+                            insureIndividualSettleDTO.setSoldierPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "340200": // 离休老工人门慢保障基金
+                            insureIndividualSettleDTO.setRetiredOutptPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "410100": // 工伤保险基金
+                            insureIndividualSettleDTO.setInjuryPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "320200": //  厅级干部补助基金
+                            insureIndividualSettleDTO.setHallPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "310400": //  军转干部医疗补助基金
+                            insureIndividualSettleDTO.setSoldierToPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "370200": //  公益补充保险基金
+                            insureIndividualSettleDTO.setWelfarePay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "99999707": //  新冠肺炎核酸检测财政补助
+                            insureIndividualSettleDTO.setCOVIDPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "390500": //  居民家庭账户金
+                            insureIndividualSettleDTO.setFamilyPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "310500": //  代缴基金（破产改制）
+                            insureIndividualSettleDTO.setBehalfPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            insureIndividualSettleDAO.updateByInsureSettleId(insureIndividualSettleDTO);
             map.put("outptMap", outptMap);
         }
         List<Map<String, Object>> feeDetailMapList = new ArrayList<>();

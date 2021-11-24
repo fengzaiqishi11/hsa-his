@@ -594,8 +594,18 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 	 */
 	@Override
 	public PageDTO getOuptVisit(OutptVisitDTO outptVisitDTO) {
+		final long millisecondsOfDay = 86399000L; // 23小时59分59秒所代表的毫秒数
+		final String startOfDay = " 00:00:00";
 		// 设置分页信息
 		PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+		if(null != outptVisitDTO.getRyEndTime()) {
+			long millisecondsOfRyEndTime = DateUtils.parse(outptVisitDTO.getRyEndTime(), DateUtils.Y_M_D).getTime();
+			long endOfDayRyTime = millisecondsOfRyEndTime + millisecondsOfDay;
+			outptVisitDTO.setRyEndTime(DateUtils.format(new Date(endOfDayRyTime), DateUtils.Y_M_DH_M_S));
+		}
+		if(null != outptVisitDTO.getRyStartTime()) {
+			outptVisitDTO.setRyStartTime(outptVisitDTO.getRyStartTime() + startOfDay);
+		}
 		List<OutptVisitDTO> list = emrPatientDAO.selectOutptVisits(outptVisitDTO);
 		return PageDTO.of(list);
 	}

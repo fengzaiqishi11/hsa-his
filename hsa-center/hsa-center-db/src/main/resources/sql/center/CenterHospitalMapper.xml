@@ -28,6 +28,8 @@
         <result property="longLat" column="long_lat" jdbcType="VARCHAR"/>
         <result property="startDate" column="start_date" jdbcType="DATE"/>
         <result property="endDate" column="end_date" jdbcType="DATE"/>
+        <result property="encryptStartDate" column="encrypt_start_date" jdbcType="DATE"/>
+        <result property="encryptEndDate" column="encrypt_end_date" jdbcType="DATE"/>
         <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
@@ -39,7 +41,7 @@
     <!--查询单个-->
     <select id="getByHospCode" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
         select
-          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time
+          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time,encrypt_start_date,encrypt_end_date,access_ips
         from center_hospital
         where code = #{code}
     </select>
@@ -79,7 +81,9 @@
                 wbm = #{wbm},
                 long_lat = #{longLat},
                 start_date = #{startDate},
-                end_date = #{endDate}
+                end_date = #{endDate},
+            encrypt_end_date = #{encryptEndDate},
+            encrypt_start_date = #{encrypt_start_date}
         </set>
         where id = #{id}
     </update>

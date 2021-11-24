@@ -758,13 +758,24 @@ public class RedisUtils {
    */
   public boolean setIfAbsent(String key, Object value) {
     try {
-      return  redisTemplate.opsForValue().setIfAbsent(key, value);
+        Boolean result =  redisTemplate.opsForValue().setIfAbsent(key, value);
+      return result != null && result;
     } catch (Exception e) {
       log.error(key, e);
       return false;
     }
   }
 
+    /**
+     *  设置key值如果设置失败返回false,重载后的方法可以设置过期时间,但这整个操作是非原子性
+     *  操作,所有还是有可能出现”分布式锁“已经设置成功后，程序异常退出并未执行设置过期时间的
+     *  操作而导致"分布式死锁"。解决办法是升级redisTemplate版本
+     *  <p>分布式锁解决方案参考链接：https://mp.weixin.qq.com/s/3oNqFwci2nKQgCkm7Du9MA</p>
+     * @param key 需要设置的key值
+     * @param value 需要存储的value值
+     * @param time 设置的超时释放时间,以秒 为单位
+     * @return 获取分布式锁是否成功, true表示成功,false表示失败
+     */
   public boolean setIfAbsent(String key, Object value, long time) {
     try {
       boolean result = setIfAbsent(key, value);

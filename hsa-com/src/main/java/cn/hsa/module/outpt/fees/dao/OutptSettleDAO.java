@@ -1,7 +1,5 @@
 package cn.hsa.module.outpt.fees.dao;
 
-import cn.hsa.base.PageDTO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.dzpz.hainan.DiseList;
 import cn.hsa.module.dzpz.hainan.ExtDataList;
 import cn.hsa.module.dzpz.hainan.RxList;
@@ -16,7 +14,6 @@ import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -243,4 +240,14 @@ public interface OutptSettleDAO {
     OutptSettleDTO getById(Map<String, Object> selectMap);
 
     List<InsureIndividualSettleDTO> queryOutptSettle(Map selectMap);
+
+    /**
+     * @Description: 删除医保费用表记录，（未结算的）
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/15 19:51
+     * @Return
+     */
+    int deleteInsureCost(Map<String, String> map);
 }

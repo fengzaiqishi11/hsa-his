@@ -113,8 +113,8 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
      * @Return
      */
     @Override
-    public WrapperResponse<Map<String, Object>> querySettleInfo(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedBaseBO.querySettleInfo(map));
+    public WrapperResponse<Map<String, Object>> updateSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedBaseBO.updateSettleInfo(map));
     }
 
     /**

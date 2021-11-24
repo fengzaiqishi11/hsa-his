@@ -594,7 +594,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
          * 如果参保地和就医地前四位不相等 且是住院则需要打印异地结算单
          * 1.当是异地结算单是需要获取对应的参保地和区划地名称
          */
-        if(!mdtrtareaAdmvs.substring(0,2).equals(insuplcAdmdvs.substring(0,2)) && Constants.SF.S.equals(isHospital)){
+        if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
             List<Map<String,Object>> mapList =  insureReversalTradeDAO.selectMdOrIns(hospCode);
             if(!ListUtils.isEmpty(mapList)){
                 String insuplcAdmdvsName =""; // 对应参保地区划名称
@@ -823,6 +823,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 //            handlerPolicyMap.put("divideFormat",divideFormat); // 百分比
 //        }
         handlerPolicyMap.put("divideFormat",""); // 百分比
+        if (BigDecimalUtils.isZero(hifpPay)){
+            s5 = hifpPay; // 如果报销金额等于0  则提高10%的报销金额还是为0
+            handlerPolicyMap.put("divideFormat","0.00%"); // 百分比
+        }
+        else{
+            s5 = BigDecimalUtils.multiply(sumBxFeeNumber,new BigDecimal(0.10));
+            BigDecimal divide = BigDecimalUtils.divide(sumBxFeeNumber, medfeeSumamt);
+            DecimalFormat decimalFormat = new DecimalFormat("0.00%");
+            String divideFormat = decimalFormat.format(divide);
+            handlerPolicyMap.put("divideFormat",divideFormat); // 百分比
+        }
         List<Map<String, Object>> sumInfo = insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
         String cumTypeCode ="";
         BigDecimal cum = new BigDecimal(0.00);
@@ -1120,9 +1131,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             if(!ListUtils.isEmpty(setldetail)){
                 BigDecimal fundSumAmt = new BigDecimal(0.00);
                 String fundPayamt = "" ; // 基金支付金额
-                for(Map<String,Object> item : setldetail){
-                    fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
-                    fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
+             for(Map<String,Object> item : setldetail){
+                 fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
+                 fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
                 }
                 partFourMap.put("fundSumAmt",fundSumAmt); // 基金支付
                 partFourMap.put("fundSumAmtCN",numberToCN.number2CNMontrayUnit(fundSumAmt)); // 基金支付

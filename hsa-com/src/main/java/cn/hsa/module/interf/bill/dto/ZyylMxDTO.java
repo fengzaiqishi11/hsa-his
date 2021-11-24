@@ -21,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Accessors(chain = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ZyylMxDTO extends ZyylMxDO {
 
     private static final long serialVersionUID = 8533313949742688418L;

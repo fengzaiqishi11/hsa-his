@@ -33,14 +33,12 @@ public class BillBOImpl implements BillBO{
 
     @Override
     public List<MzpjFyDTO> queryMzFyView(Map<String, Object> map) {
-        List<String> pjhmList = (List<String>)MapUtils.get(map, "pjhmList");
-        return billDAO.listMzpjFyByPjhm(pjhmList);
+        return billDAO.listMzpjFyByPjhm(map);
     }
 
     @Override
     public List<MzylMxDTO> queryMzYlView(Map<String, Object> map) {
-        List<String> pjhmList = (List<String>)MapUtils.get(map, "pjhmList");
-        return billDAO.listMzpjMxByPjhm(pjhmList);
+        return billDAO.listMzpjMxByPjhm(map);
     }
 
     @Override
@@ -50,13 +48,11 @@ public class BillBOImpl implements BillBO{
 
     @Override
     public List<ZypjFyDTO> queryZyFyView(Map<String, Object> map) {
-        List<String> pjhmList = (List<String>)MapUtils.get(map, "pjhmList");
-        return billDAO.listZypjFyByPjhm(pjhmList);
+        return billDAO.listZypjFyByPjhm(map);
     }
 
     @Override
     public List<ZyylMxDTO> queryZyYlView(Map<String, Object> map) {
-        List<String> pjhmList = (List<String>)MapUtils.get(map, "pjhmList");
-        return billDAO.listZypjMxByPjhm(pjhmList);
+        return billDAO.listZypjMxByPjhm(map);
     }
 }

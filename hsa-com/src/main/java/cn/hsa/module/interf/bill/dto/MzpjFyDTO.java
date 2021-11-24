@@ -21,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Accessors(chain = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MzpjFyDTO extends MzpjFyDO {
 
     private static final long serialVersionUID = 6062885635878683499L;

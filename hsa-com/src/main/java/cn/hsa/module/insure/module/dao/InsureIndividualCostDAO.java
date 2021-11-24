@@ -162,7 +162,7 @@ public interface InsureIndividualCostDAO {
      * @Date 2021/3/4 9:32
      * @Return
      */
-    List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, String> insureCostParam);
+    List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, Object> insureCostParam);
 
     /**
      * @param insureVisitParam

@@ -28,6 +28,7 @@ import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -492,7 +493,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         Boolean specialOneSettle = false; // 张家界特有的一站式结算单判断
         boolean oneSettle = false; // 是否符合一站式身份
         String psnIdetType = ""; //人员身份类别
-        boolean isRemote = false; // 用来判断异地结算单
+        boolean isRemote = false; // 用来判断省外异地结算单
+        boolean snRemote = false; // 用了判断省内异地结算单
         Map<String,Object> oneSettleMap;
         Map<String,Object> fourPartMap ;
         map.put("code","HOSP_MEDICINS_INFO");
@@ -618,7 +620,40 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
             isRemote = true;
         }
+        if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
+            snRemote = true;
+        }
         fourPartMap =  handlerInsureSettleFee(setlInfoMap,isRemote,individualSettleDTO,setldetail);
+
+        /**
+         * 计算预交金
+         *
+         */
+        BigDecimal totalAdvance = insureIndividualVisitDTO.getTotalAdvance(); // 累计预交金
+        Object psnCashPay = MapUtils.get(fourPartMap, "psnCashPay"); // 个人现金支付
+
+        BigDecimal psnCashPayBigDecimal;
+        if( ObjectUtils.isEmpty(psnCashPay)){
+            psnCashPayBigDecimal  = new BigDecimal(0.00);
+        }
+        else if(psnCashPay instanceof String){
+            psnCashPayBigDecimal =BigDecimalUtils.convert((String) psnCashPay);
+        }else{
+            psnCashPayBigDecimal = (BigDecimal) psnCashPay;
+        }
+        BigDecimal price =  BigDecimalUtils.subtract(psnCashPayBigDecimal,totalAdvance);
+        if(BigDecimalUtils.greater(psnCashPayBigDecimal,totalAdvance)){
+            baseInfoMap.put("yjyjj",price); // 应交预交金
+            baseInfoMap.put("yjyjjCN",numberToCN.number2CNMontrayUnit(price)); // 应交预交金
+            baseInfoMap.put("ytyjjCN","零元"); // 应退预交金
+            baseInfoMap.put("ytyjj",new BigDecimal(0.00)); // 应退预交金
+        }else{
+            baseInfoMap.put("ytyjj",price); // 应交预交金
+            baseInfoMap.put("ytyjjCN",numberToCN.number2CNMontrayUnit(price)); // 应交预交金
+            baseInfoMap.put("yjyjjCN","零元"); // 应退预交金
+            baseInfoMap.put("yjyjj",new BigDecimal(0.00)); // 应退预交金
+        }
+
         BigDecimal hifpPay = MapUtils.get(setlInfoMap,"hifp_pay"); // 报销总金额
         BigDecimal medfeeSumamt = MapUtils.get(setlInfoMap,"medfee_sumamt"); // 费用总金额
         List<Map<String, Object>> sumInfoMapList ;
@@ -711,6 +746,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }else if(isRemote){
             settleTitle = "湖南省社会医疗保险异地就医住院医疗费用结算单";
             medisnInfMap.put("settleTitle",settleTitle);
+        }else if(snRemote){
+            settleTitle = "湖南省省内异地住院医疗费用结算单";
+            medisnInfMap.put("settleTitle",settleTitle);
         }
         else{
             map.put("oneSettle",false); //  如果符合一站式结算要去，前端打印一站式结算单
@@ -728,7 +766,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     /**
      * @Method handlerPolicy
      * @Desrciption  一站式结算单处理政策项费用
-     * @Param
+     * @Param   medfeeSumamt：医疗总费用   sumBxFeeNumber：合计报销总金额  hifpPay;基本报销金额
+     *          insureIndividualVisitDTO：医保就诊表DTO actPayDedc:起付线
+     *          hospName：医院名称  policyMapList;政策内费用集合
      *
      * @Author fuhui
      * @Date   2021/10/26 19:10
@@ -772,6 +812,18 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         handlerPolicyMap.put("hospName",hospName); // 核算机构名称 核算人
         handlerPolicyMap.put("hifpPayNumber",hifpPay); // 基本医保报销金额（大写）
         handlerPolicyMap.put("hifpPay",numberToCN.number2CNMontrayUnit(hifpPay)); // 基本医保报销金额（大写）
+//        if (BigDecimalUtils.isZero(hifpPay)){
+//            s5 = hifpPay; // 如果报销金额等于0  则提高10%的报销金额还是为0
+//            handlerPolicyMap.put("divideFormat","0.00%"); // 百分比
+//        }
+//        else{
+//            s5 = BigDecimalUtils.multiply(sumBxFeeNumber,new BigDecimal(0.10));
+//            BigDecimal divide = BigDecimalUtils.divide(sumBxFeeNumber, medfeeSumamt);
+//            DecimalFormat decimalFormat = new DecimalFormat("0.00%");
+//            String divideFormat = decimalFormat.format(divide);
+//            handlerPolicyMap.put("divideFormat",divideFormat); // 百分比
+//        }
+        handlerPolicyMap.put("divideFormat",""); // 百分比
         if (BigDecimalUtils.isZero(hifpPay)){
             s5 = hifpPay; // 如果报销金额等于0  则提高10%的报销金额还是为0
             handlerPolicyMap.put("divideFormat","0.00%"); // 百分比
@@ -825,7 +877,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         BigDecimal s7 = new BigDecimal(0.00);  // 财政兜底报销金额
         BigDecimal s9 = new BigDecimal(0.00); // 其它报销金额
         for(Map<String, Object> map : setldetail){
-            setlProcInfo = MapUtils.get(map,"fund_pay_type");
+            setlProcInfo = MapUtils.get(map,"setl_proc_info");
             if(MapUtils.get(map,"fund_payamt") instanceof String){
                 fundPayamt = BigDecimalUtils.convert(MapUtils.get(map,"fund_payamt"));
             }else{
@@ -1080,9 +1132,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             if(!ListUtils.isEmpty(setldetail)){
                 BigDecimal fundSumAmt = new BigDecimal(0.00);
                 String fundPayamt = "" ; // 基金支付金额
-                for(Map<String,Object> item : setldetail){
-                    fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
-                    fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
+             for(Map<String,Object> item : setldetail){
+                 fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
+                 fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
                 }
                 partFourMap.put("fundSumAmt",fundSumAmt); // 基金支付
                 partFourMap.put("fundSumAmtCN",numberToCN.number2CNMontrayUnit(fundSumAmt)); // 基金支付
@@ -1306,22 +1358,20 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                         "F0000_BIZ52".equals(cumTypeCode)){
                     s2  = BigDecimalUtils.add(s2,cum); // 累计医疗总费用
                 }
-                if("D390201_BIZ22".equals(cumTypeCode)||
-                        "D390201_BIZ2101".equals(cumTypeCode) ||
-                        "D390201_BIZ2102".equals(cumTypeCode)){
+                if("D390201".equals(cumTypeCode)){
                     s3  = BigDecimalUtils.add(s3,cum);  // 累计大病保险报销金额
                 }
                 if("D620101".equals(cumTypeCode)){
                     s4  = BigDecimalUtils.add(s4,cum); // 累计扶贫特惠保报销金额
                 }
-                if("TS610101_BIZ2101".equals(cumTypeCode) || "TS610101_BIZ2102".equals(cumTypeCode))
+                if("D610101".equals(cumTypeCode))
                 {
                     s5  = BigDecimalUtils.add(s5,cum); // 累计医疗救助金额
                 }
-                if("TS630101".equals(cumTypeCode)){ // 累计医院减免金额
+                if("D630101".equals(cumTypeCode)){ // 累计医院减免金额
                     s6  = BigDecimalUtils.add(s6,cum);
                 }
-                if("TS640101".equals(cumTypeCode)){
+                if("D640101".equals(cumTypeCode)){
                     s7  = BigDecimalUtils.add(s7,cum); // 累计财政兜底报销金额
                 }
                 if("D999996".equals(cumTypeCode)){  // 累计其它报销金额
@@ -1385,7 +1435,15 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("mdtrtId",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊号
         map.put("psnName",MapUtils.get(setlInfoMap,"psn_name")); // 人员姓名
         map.put("gend",MapUtils.get(setlInfoMap,"gend")); // 性别
-        map.put("age",MapUtils.get(setlInfoMap,"age")); // 年龄
+        Object ageObj = MapUtils.get(setlInfoMap, "age");
+        if(ageObj == null ){
+            map.put("age",insureIndividualVisitDTO.getAge()); // 年龄
+        }
+        else if(ageObj instanceof  String && StringUtils.isEmpty((String) ageObj)){
+            map.put("age",insureIndividualVisitDTO.getAge()); // 年龄
+        }else{
+            map.put("age",MapUtils.get(setlInfoMap,"age")); // 年龄
+        }
         map.put("psnNo",MapUtils.get(setlInfoMap,"psn_no")); // 个人编号
         if(StringUtils.isEmpty(MapUtils.get(setlInfoMap,"psn_idet_type"))){
             map.put("psnIdetType","无"); //补助类别
@@ -1426,6 +1484,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("setlTime",MapUtils.get(setlInfoMap,"setl_time")); // 报销时间
         map.put("brdy",MapUtils.get(setlInfoMap,"brdy")); // 出生年月
         map.put("aae140",insureIndividualVisitDTO.getAae140()); // 险种
+        map.put("totalAdvance",insureIndividualVisitDTO.getTotalAdvance()); // 累计预交金
+        map.put("totalAdvanceCN",numberToCN.number2CNMontrayUnit(insureIndividualVisitDTO.getTotalAdvance())); // 累计预交金
         map.put("inDiseaseName",insureIndividualVisitDTO.getInDiseaseName()); // 入院第一诊断
         map.put("outDiseaseName",insureIndividualVisitDTO.getOutDiseaseName()); // 出院第一诊断
         map.put("visitNationCode",insureIndividualVisitDTO.getVisitNationCode()); // 科别

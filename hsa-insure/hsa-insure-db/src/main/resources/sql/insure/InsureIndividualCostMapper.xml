@@ -884,6 +884,12 @@
           AND IFNULL(iim.`is_match`, '0') = #{isMatch}
           AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
           AND iim.insure_reg_code = #{insureRegCode}
+        <if test="opIds != null and opIds.size() > 0">
+            and ic.op_id in
+            <foreach collection="opIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
         order by ic.crte_time desc
     </select>
     <delete id="deleteOutptInsureCost">

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.bill.dao.BillDAO">
+
+	<!--从视图里面查询门诊主体数据信息,过滤时间段,已抽取的主体数据 -->
+	<select id="listMzpjZtDTOsInView" resultType="cn.hsa.module.interf.bill.dto.MzpjZtDTO">
+		SELECT
+		zzjgdm,
+		xzqhdm,
+		dwbm,
+		czqhbm,
+		dwmc,
+		pjdm,
+		pjhm,
+		zjhm,
+		pjjym,
+		xm,
+		t.kprq,
+		ywlsh,
+		yljglx,
+		xb,
+		mzlsh,
+		jzrq,
+		yblx,
+		ybbh,
+		jjzf,
+		qt,
+		grzhzf,
+		grxjzf,
+		grzf,
+		grzf_1,
+		zje,
+		fhrxm,
+		skrxm,
+		sfzf
+		FROM
+		sendpjmzsfzt t
+		where 1=1
+		and t.pjdm is not null
+		<if test="startTime != null and startTime !=''">
+			and date_format (t.kprq,'%Y-%m-%d') &gt;= date_format (#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and date_format (t.kprq,'%Y-%m-%d') &lt;= date_format (#{endTime},'%Y-%m-%d')
+		</if>
+		<if test="pjhms != null and pjhms != '' and pjhmj != null and pjhmj != ''">
+			and CONVERT(pjhm,SIGNED) &gt;= CONVERT(#{pjhms},SIGNED) and CONVERT(pjhm,SIGNED) &lt;= CONVERT(#{pjhmj},SIGNED)
+		</if>
+		/*如果关键字不为空则根据关键字查询是否存在该*/
+		<if test="queryStr != null and queryStr != ''">
+			and t.pjhm like concat('%',#{queryStr},'%')
+		</if>
+		<if test="pjhmList != null and pjhmList.size()>0">
+			and t.pjhm in
+			<foreach collection="pjhmList" item="pjhm" open="(" close=")"
+					 separator=",">
+				#{pjhm}
+			</foreach>
+		</if>
+		order by pjhm
+	</select>
+
+	<!-- 门诊票据费用信息表查询 -->
+	<select id="listMzpjFyByPjhm" resultType="cn.hsa.module.interf.bill.dto.MzpjFyDTO">
+		select
+		zzjgdm,
+		pjdm,
+		pjhm,
+		kprq,
+		czsfxmbm,
+		czsfxmmc,
+		xmsl,
+		xmdw,
+		xmje,
+		xmbz,
+		ywlsh
+		from sendpjmzsfxm
+		WHERE pjhm in
+		<foreach collection="pjhmList" item="str" open="(" close=")"
+			separator=",">
+			#{str}
+		</foreach>
+	</select>
+
+	<!-- 门诊医疗明细数据表查询 -->
+	<select id="listMzpjMxByPjhm" resultType="cn.hsa.module.interf.bill.dto.MzylMxDTO">
+		select
+		zzjgdm,
+		pjdm,
+		pjhm,
+		xm,
+		kprq,
+		xmbm,
+		xmmc,
+		czsfxmbm,
+		sfsj,
+		xmsl,
+		xmdw,
+		xmje,
+		xmbz,
+		ywlsh
+		from sendpjmzsfxmmx
+		WHERE pjhm in
+		<foreach collection="pjhmList" item="str" open="(" close=")"
+			separator=",">
+			#{str}
+		</foreach>
+	</select>
+
+
+	<!--住院票据主体表信息查询 -->
+	<select id="listZypjZtDTOsInView" resultType="cn.hsa.module.interf.bill.dto.ZypjZtDTO">
+		SELECT
+		zzjgdm,
+		xzqhdm,
+		dwbm,
+		czqhbm,
+		dwmc,
+		pjdm,
+		pjhm,
+		zjhm,
+		pjjym,
+		xm,
+		t.kprq,
+		ywlsh,
+		yljglx,
+		xb,
+		blh,
+		zyh,
+		ksbm,
+		ksmc,
+		rysj,
+		cysj,
+		yjje,
+		bjje,
+		tfje,
+		yblx,
+		ybbh,
+		ybtcjjzf,
+		qtzf,
+		grzhzf,
+		grxjzf,
+		grzf,
+		grzf_1,
+		zje,
+		fhrxm,
+		skrxm,
+		sfzf
+		FROM
+		sendpjzysfzt t
+		where  1=1
+		and t.pjdm is not null
+		<if test="startTime != null and startTime !=''">
+			and date_format (t.kprq,'%Y-%m-%d') &gt;= date_format(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and date_format (t.kprq,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+		</if>
+		<if test="pjhms != null and pjhms != '' and pjhmj != null and pjhmj != ''">
+			and CONVERT(pjhm,SIGNED) &gt;= CONVERT(#{pjhms},SIGNED) and CONVERT(pjhm,SIGNED) &lt;= CONVERT(#{pjhmj},SIGNED)
+		</if>
+		/*如果关键字不为空则根据关键字查询是否存在该*/
+		<if test="queryStr != null and queryStr != ''">
+			and t.pjhm like concat('%',#{queryStr},'%')
+		</if>
+		<if test="pjhmList != null and pjhmList.size()>0">
+			and t.pjhm in
+			<foreach collection="pjhmList" item="pjhm" open="(" close=")"
+					 separator=",">
+				#{pjhm}
+			</foreach>
+		</if>
+		order by t.pjhm
+	</select>
+
+	<!-- 住院票据费用信息表查询 -->
+	<select id="listZypjFyByPjhm" resultType="cn.hsa.module.interf.bill.dto.ZypjFyDTO">
+		select
+		zzjgdm,
+		pjdm,
+		pjhm,
+		kprq,
+		czsfxmbm,
+		czsfxmmc,
+		xmsl,
+		xmdw,
+		xmje,
+		xmbz,
+		ywlsh
+		from sendpjzysfxm
+		WHERE pjhm in
+		<foreach collection="pjhmList" item="str" open="(" close=")"
+			separator=",">
+			#{str}
+		</foreach>
+	</select>
+
+	<!-- 住院医疗明细数据表查询 -->
+	<select id="listZypjMxByPjhm" resultType="cn.hsa.module.interf.bill.dto.ZyylMxDTO">
+		select
+		zzjgdm,
+		pjdm,
+		pjhm,
+		xm,
+		kprq,
+		xmbm,
+		xmmc,
+		czsfxmbm,
+		sfsj,
+		xmsl,
+		xmdw,
+		xmje,
+		xmbz,
+		ywlsh
+		from sendpjzysfxmmx
+		WHERE pjhm in
+		<foreach collection="pjhmList" item="str" open="(" close=")"
+			separator=",">
+			#{str}
+		</foreach>
+	</select>
+
+</mapper>

@@ -324,8 +324,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
             //}
             logger.info("====长期费用13："+DateUtils.format());
-        } catch (AppException e) {
-            throw new AppException("核收失败:"+e.getMessage());
+        } catch (Exception e) {
+            AppException tmp = new AppException("核收失败:"+e.getMessage());
+            // 保存堆栈信息避免被覆盖
+            tmp.setStackTrace(e.getStackTrace());
+            // 保存被抑制的异常信息
+            for(Throwable t : e.getSuppressed()){
+                tmp.addSuppressed(t);
+            }
+            throw tmp;
         }
         return true;
     }
@@ -1040,8 +1047,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
             }
             logger.info("====长期费用6："+DateUtils.format());
-        } catch (AppException e) {
-            throw new AppException("长期费用计算失败:"+e.getMessage());
+        } catch (Exception e) {
+            AppException tmp = new AppException("长期费用计算失败:"+e.getMessage());;
+            tmp.setStackTrace(e.getStackTrace());
+            // 保存被抑制的异常信息
+            for(Throwable t : e.getSuppressed()){
+                tmp.addSuppressed(t);
+            }
+            throw tmp;
         }
         return true;
     }

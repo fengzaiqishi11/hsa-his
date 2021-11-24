@@ -1497,7 +1497,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                inptCostDTO.setUseCode(inptAdviceDTO.getUseCode());
 //                inptCostDTO.setHerbNum(inptAdviceDTO.getHerbNum());
                 //总金额 总数量*单价
-                inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptCostDTO.getNum(),inptCostDTO.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptCostDTO.getTotalNum(),inptCostDTO.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 //优惠金额默认给0,后续统一做优惠处理,再更新
                 inptCostDTO.setPreferentialPrice(BigDecimal.valueOf(0));
                 //优惠后总金额 = 总金额-优惠金额

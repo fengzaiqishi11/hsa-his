@@ -509,4 +509,14 @@ public interface InptVisitDAO {
      * @Return
     **/
     void deletePatientSumInfo(Map<String, Object> map);
+
+    /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [inptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    OutptVisitDTO queryPrintInpt(Map map);
 }

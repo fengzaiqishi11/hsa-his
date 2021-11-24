@@ -42,6 +42,9 @@ public class SysUserController extends BaseController {
     @Resource
     private SysUserService sysUserService_consumer;
 
+    /** default weak password **/
+    private static final String DEFAULT_PASSWORD = MD5Utils.getMd5AndSha("888888");
+
     /**
      * @Method getById
      * @Desrciption 通过id获取值
@@ -59,7 +62,12 @@ public class SysUserController extends BaseController {
         Map map = new HashMap();
         map.put("hospCode",sysUserDTOSession.getHospCode());
         map.put("sysUserDTO",sysUserDTO);
-        return sysUserService_consumer.getById(map);
+        sysUserDTO = getData(sysUserService_consumer.getById(map));
+        if(DEFAULT_PASSWORD.equals(sysUserDTO.getPassword())) {
+            sysUserDTO.setIsPasswordChange("-2");
+        }
+        sysUserDTO.setPassword(null);
+        return WrapperResponse.success(sysUserDTO);
     }
 
     /**

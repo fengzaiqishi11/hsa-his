@@ -9,6 +9,7 @@ import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
@@ -79,6 +80,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureIndividualBasicService insureIndividualBasicService;
     @Resource
     private InsureUnifiedLogDAO insureUnifiedLogDAO;
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
 
     @Resource
     private RedisUtils redisUtils;
@@ -554,14 +557,53 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                     }
                 }
             }
-
             insureIndividualSettleDAO.updateByInsureSettleId(insureIndividualSettleDTO);
+
+            map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+            String setlTime = MapUtils.get(setlinfo,"setl_time");
+            Map<String,Object> resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
+            Map<String, Object> outputMap = MapUtils.get(resultBaseMap, "output");
+            List<Map<String, Object>> listMap =   MapUtils.get(outputMap,"idetinfo");
+
+            // 人员身份类别判断是否一站式
+            String isOneSettle = Constants.SF.F;
+            if (!ListUtils.isEmpty(listMap)) {
+                for (Map<String,Object> identMap : listMap) {
+                    String psnIdetType = MapUtils.get(identMap,"psn_idet_type"); // 人员身份类别
+                    String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
+                    String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
+                    if (!StringUtils.isEmpty(endtime)) {
+                        if (StringUtils.isEmpty(begntime)) {
+                            continue;
+                        }
+
+                        if (StringUtils.isEmpty(endtime)) {
+                            endtime = "2099-12-31 00:00:00";
+                        }
+
+                        Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime,-1),DateUtils.Y_M_D);
+                        Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime,1),DateUtils.Y_M_D);
+                        Date setDate = DateUtils.parse(setlTime,DateUtils.Y_M_D);
+                        if (setDate.before(endDate) && setDate.after(begnDate)) {
+                            isOneSettle = Constants.SF.S;
+                            insureIndividualVisitDTO.setPsnIdetType(psnIdetType);
+                            insureIndividualVisitDTO.setIdetStartDate(begnDate);
+                            insureIndividualVisitDTO.setIdetEndDate(endDate);
+                            break;
+                        }
+                    }
+                }
+            }
+            insureIndividualVisitDTO.setIsOneSettle(isOneSettle);
+            insureIndividualVisitDAO.updateByPrimaryKeySelective(insureIndividualVisitDTO);
             map.put("outptMap", outptMap);
         }
         List<Map<String, Object>> feeDetailMapList = new ArrayList<>();
         if ("1".equals(insureIndividualVisitDTO.getIsHospital())) {
             feeDetailMapList = insureIndividualCostDAO.selectIsSetlleFee(map);
         } else {
+            map.put("opter_name",MapUtils.get(map,"crteName"));
+            map.put("opter_type","1");
             Map<String, Object> stringObjectMap = queryFeeDetailInfo(map);
             feeDetailMapList = MapUtils.get(stringObjectMap, "outptMap");
         }
@@ -612,12 +654,15 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     public Map<String, Object> queryFeeDetailInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String insureSettleId = MapUtils.get(map, "insureSettleId");
+        String crteName = MapUtils.get(map, "crteName");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("setl_id", insureSettleId);
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        dataMap.put("opter_name", crteName);
+        dataMap.put("opter_type", "1");
         paramMap.put("data", dataMap);
         Map<String, Object> resultMap = commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5204, paramMap);
         List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");

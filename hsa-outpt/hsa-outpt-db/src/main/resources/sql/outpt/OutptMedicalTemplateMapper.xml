@@ -28,6 +28,7 @@
         <result property="auxiliaryInspect" column="auxiliary_inspect" jdbcType="VARCHAR"/>
         <result property="diseaseAnalysis" column="disease_analysis" jdbcType="VARCHAR"/>
         <result property="handleSuggestion" column="handle_suggestion" jdbcType="VARCHAR"/>
+        <result property="specialtyCheck" column="specialty_check" jdbcType="VARCHAR"/>
         <result property="temperature" column="temperature" jdbcType="VARCHAR"/>
         <result property="minBloodPressure" column="min_blood_pressure" jdbcType="VARCHAR"/>
         <result property="maxBloodPressure" column="max_blood_pressure" jdbcType="VARCHAR"/>
@@ -47,7 +48,7 @@
     <!--查询单个-->
     <select id="getById" resultMap="OutptMedicalTemplateMap">
         select
-          id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke
+          id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke
         from outpt_medical_template
         where id = #{id} and hosp_code = #{hospCode}
     </select>
@@ -58,7 +59,7 @@
           a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.is_valid, a.pym, a.wbm,
           a.audit_code, a.audit_id, a.audit_name, a.audit_time,a.chief_complaint, a.present_illness, a.past_history,
           a.oneself_history, a.family_history, a.allergy_history, a.vaccination_history, a.auxiliary_inspect, a.disease_analysis,
-          a.handle_suggestion, a.temperature, a.min_blood_pressure, a.max_blood_pressure, a.breath, a.height, a.blood_sugar, a.pulse,
+          a.handle_suggestion, a.specialty_check ,a.temperature, a.min_blood_pressure, a.max_blood_pressure, a.breath, a.height, a.blood_sugar, a.pulse,
           a.weight, a.bmi, a.entrust, a.crte_id, a.crte_name, a.crte_time,a.disease_id,
           c.name diseaseName,
           remarke
@@ -134,6 +135,9 @@
             <if test="handleSuggestion != null and handleSuggestion != ''">
                 and a.handle_suggestion = #{handleSuggestion}
             </if>
+            <if test="specialtyCheck != null and specialtyCheck != ''">
+                and a.specialty_check = #{specialtyCheck}
+            </if>
             <if test="temperature != null and temperature != ''">
                 and a.temperature = #{temperature}
             </if>
@@ -181,8 +185,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into outpt_medical_template(id,hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke)
-        values (#{id},#{hospCode}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isValid}, #{pym}, #{wbm}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory}, #{allergyHistory}, #{vaccinationHistory}, #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure}, #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust}, #{crteId}, #{crteName}, #{crteTime},#{diseaseId},#{remarke})
+        insert into outpt_medical_template(id,hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke)
+        values (#{id},#{hospCode}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isValid}, #{pym}, #{wbm}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory}, #{allergyHistory}, #{vaccinationHistory}, #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure}, #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust}, #{crteId}, #{crteName}, #{crteTime},#{diseaseId},#{remarke})
     </insert>
 
     <!--通过主键修改数据-->
@@ -207,6 +211,7 @@
             auxiliary_inspect = #{auxiliaryInspect},
             disease_analysis = #{diseaseAnalysis},
             handle_suggestion = #{handleSuggestion},
+            specialty_check = #{specialtyCheck},
             temperature = #{temperature},
             min_blood_pressure = #{minBloodPressure},
             max_blood_pressure = #{maxBloodPressure},

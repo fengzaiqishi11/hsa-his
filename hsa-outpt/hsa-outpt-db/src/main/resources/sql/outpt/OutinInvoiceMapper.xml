@@ -723,7 +723,7 @@
 
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo,
+        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo, b.totalPrice as invoiceTotalPrice,
         v.visit_code as visitCode,b.pay_code as sourcePayCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
@@ -1537,7 +1537,10 @@
     <!-- 根据结算单号查询费用明细(住院) -->
     <select id="getZyCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select c.*, d.name as xmName, v.name as patientName, v.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode,
-         s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
+         s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,
+         (case when s.settle_take_price > 0 then (s.ap_total_price + s.settle_take_price) else
+          (case when s.settle_back_price > 0 then (s.ap_total_price - s.settle_back_price) else (s.self_price + s.ap_total_price) end) end) as selfPrice,
+         s.mi_price as miPrice,
          s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
          scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo, s.total_price as outptTotalFee,
          case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays,

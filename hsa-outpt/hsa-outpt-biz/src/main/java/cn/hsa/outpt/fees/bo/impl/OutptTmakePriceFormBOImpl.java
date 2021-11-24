@@ -308,6 +308,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         JSONObject obj = new JSONObject();
         obj.put("outptCost", outptCostDTOList);
+        obj.put("isCFpatient", false);
         return WrapperResponse.success(obj);
     }
 
@@ -403,9 +404,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
             // ====================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    end ===============
 
-
-            if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
+            // 如果患者为体检患者，则不需要校验费用条数
+            if (outptVisitDTO.getIsPhys() == null || "".equals(outptVisitDTO.getIsPhys())) {
+                if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
+                    return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
+                }
             }
 
             // 2判断人员信息是选择还是手动录入；
@@ -1184,8 +1187,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             if (outptCostDTOList == null && outptCostDTOList.isEmpty()) {
                 throw new AppException("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。");
             }
-            if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                throw new AppException("费用数量不正确，请刷新浏览器再试");
+            // 如果患者是体检患者，则不需要校验费用条数
+            if (outptVisitDTO.getIsPhys() == null || "".equals(outptVisitDTO.getIsPhys())) {
+                if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
+                    throw new AppException("费用数量不正确，请刷新浏览器再试");
+                }
             }
 
             // 更新医技申请单状态
@@ -1359,7 +1365,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outinInvoiceDTO1.setInvoiceType(Constants.PJLX.MZ);//发票类型 = 门诊
             outinInvoiceDTO1.setSettleId(settleId);//结算id
             outInvoiceParam.put("outinInvoiceDTO", outinInvoiceDTO1);
-            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
             // 12、 如果是医保病人，做医保结算操作。
             Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
             if (patientValueCode > 0) {
@@ -1368,6 +1373,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
             // 13、 将优惠发票总金额返回给前端（优惠后总金额）
             outptVisitDTO.setRealityPrice(realityPrice);
+            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
         } catch (Exception e) {
             throw e;
         } finally {

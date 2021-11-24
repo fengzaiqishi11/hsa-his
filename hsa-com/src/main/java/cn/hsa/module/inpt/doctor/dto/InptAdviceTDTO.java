@@ -68,4 +68,8 @@ public class InptAdviceTDTO implements Serializable {
      * 操作部门
      */
     private String deptId;
+    /**
+     * 婴儿id
+     */
+    private String babyId;
 }

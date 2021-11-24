@@ -6,9 +6,6 @@
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 生产者：暴露接口 -->
-
-    <!--电子票据服务生产者-->
-    <dubbo:service interface="cn.hsa.module.interf.bill.service.BillService" ref="billService_provider"/>
     <!-- 门急诊挂号子系统 -> 班次信息维护生产者 -->
     <dubbo:service interface="cn.hsa.module.outpt.classes.service.OutptClassesService" ref="outptClassesService_provider"/>
     <!-- 挂号类别设置 -->

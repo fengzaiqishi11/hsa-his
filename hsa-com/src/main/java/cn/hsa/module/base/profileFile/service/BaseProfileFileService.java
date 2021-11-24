@@ -98,4 +98,15 @@ public interface BaseProfileFileService {
 
     @GetMapping("/service/base/baseProfileFile/queryAll")
     WrapperResponse<List<OutptProfileFileDTO>> queryAll(Map map);
+
+    /**
+     * @Method isCertNoExist
+     * @Desrciption 删除档案
+     * @Param[id]
+     * @Author yuelong.chen
+     * @Date   2021/11/23 12:57
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @GetMapping("/service/base/baseProfileFile/deleProfileFile")
+    WrapperResponse<Boolean> deleteProfileFile(Map map);
 }

@@ -219,7 +219,7 @@
         br.remark as rateRemark,
         d.herb_num as chineseDrugNum,
         opd.speed_code as speedCode,
-        opd.group_no groupNo
+        opd.group_no groupNo, opd.is_skin as isSkin, opd.use_days as useDays, d.doctor_name as doctorName
         from phar_out_distribute_all_detail a
         join phar_out_distribute b on a.distribute_id=b.id
         left join outpt_prescribe_detail opd on a.opd_id = opd.id and a.hosp_code = opd.hosp_code

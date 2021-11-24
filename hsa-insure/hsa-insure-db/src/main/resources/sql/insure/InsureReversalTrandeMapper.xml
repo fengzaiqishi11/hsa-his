@@ -343,6 +343,10 @@
         <if test="state != null and state != ''">
             and e.state = '0'
         </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            and e.clr_optins = #{clrOptins}
+        </if>
+
         GROUP BY se_vi_id
     </select>
 

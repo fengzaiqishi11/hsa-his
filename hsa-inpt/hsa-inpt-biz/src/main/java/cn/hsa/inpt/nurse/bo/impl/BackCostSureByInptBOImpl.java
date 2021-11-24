@@ -170,6 +170,9 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                     if (StringUtils.isNotEmpty(dto.getIsOk()) && Constants.SF.S.equals(dto.getIsOk())) {
                         throw new AppException("取消退费提示：有已确费数据,不能进行取消退费");
                     }
+                    if (Constants.COST_TYZT.TFYTY.equals(dto.getBackCode())){
+                        throw new AppException("取消退费提示:"+dto.getItemName()+"已退药,不能进行取消退费");
+                    }
                     // if (Constants.COST_TYZT.TFBTY.equals(dto.getBackCode())) {
                     for (PharInWaitReceiveDTO receiveDTO : pharInWaitReceiveDTOs) {
                         if (dto.getId().equals(receiveDTO.getCostId())) {
@@ -178,7 +181,10 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                             } else if (Constants.FYZT.PY.equals(receiveDTO.getStatusCode())) {
                                 pYInptcost.add(dto);
                             } else if (Constants.FYZT.FY.equals(receiveDTO.getStatusCode())) {
-                                fYInptcost.add(dto);
+                                dto.setBackCode(Constants.COST_TYZT.TFYTY);
+                                dto.setIsOk(Constants.SF.S);
+                                dto.setOkTime(DateUtils.getNow());
+                                cancelIds.add(dto);
                             } else if (Constants.FYZT.DL.equals(receiveDTO.getStatusCode())) {
                                 dto.setIsOk(Constants.SF.S);
                                 dto.setOkTime(DateUtils.getNow());
@@ -191,21 +197,21 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                 if (waitInptcost != null && waitInptcost.size() > 0) {
                     String message = getErrorMessage(waitInptcost);
                     if (StringUtils.isNotEmpty(message)) {
-                        throw new AppException("取消退费提示：" + message + "已做领药申请，不能取消退费");
+                        throw new AppException("取消退费提示：" + message + "请先去药房取消预配药,再进行取消退费");
                     }
                 }
                 if (pYInptcost != null && pYInptcost.size() > 0) {
                     String message = getErrorMessage(pYInptcost);
                     if (StringUtils.isNotEmpty(message)) {
-                        throw new AppException("取消退费提示：" + message + "已配药，不能取消退费");
+                        throw new AppException("取消退费提示：" + message + "请先去药房取消配药，再进行取消退费");
                     }
                 }
-                if (fYInptcost != null && fYInptcost.size() > 0) {
-                    String message = getErrorMessage(fYInptcost);
-                    if (StringUtils.isNotEmpty(message)) {
-                        throw new AppException("取消退费提示：" + message + "已发药，不能取消退费");
-                    }
-                }
+//                if (fYInptcost != null && fYInptcost.size() > 0) {
+//                    String message = getErrorMessage(fYInptcost);
+//                    if (StringUtils.isNotEmpty(message)) {
+//                        throw new AppException("取消退费提示：" + message + "已发药，不能取消退费");
+//                    }
+//                }
                 List<InptCostDTO> normal = new ArrayList<>();
                 // 取消退费
                 if (cancelIds != null && cancelIds.size() > 0) {
@@ -234,6 +240,8 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                         PharInWaitReceiveDTO backReceiveDTO = new PharInWaitReceiveDTO();
                         backReceiveDTO.setHospCode(hospCode);
                         backReceiveDTO.setCostIds(inptCostDTO.getIds());
+                        List<String> deleteIds =new ArrayList<>();
+                        List<PharInWaitReceiveDTO> newReceiveDTOList =new ArrayList<>();
                         List<PharInWaitReceiveDTO> backReceiveDTOList = pharInWaitReceiveService_consumer.queryPharInWaitReceiveToIsBack(HandParamMap(hospCode, "pharInWaitReceiveDTO", backReceiveDTO)).getData();
                         if (backReceiveDTOList != null && backReceiveDTOList.size() > 0) {
                             //有负的待领信息才需要新增一条待领记录
@@ -248,15 +256,55 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                                         dto.setIsBack(Constants.SF.F);
                                         dto.setCurrUnitCode(d.getTotalNumUnitCode());
                                         dto.setCostId(d.getId());
-                                        dto.setOldWrId(null);
                                         break;
                                     }
                                 }
+                                /** 已发药状态的退费
+                                * 1、新增一条正的发药记录
+                                * 2、找到原始发药记录将数量、拆零数量、总金额减去新增的发药记录更新，如全退删除原始纪录
+                                * 3、删除负的发药记录
+                                */
+                                if (Constants.FYZT.FY.equals(dto.getStatusCode())){
+                                    deleteIds.add(dto.getId());
+                                    Map param = new HashMap();
+                                    param.put("hospCode",hospCode);
+                                    param.put("oldWrId",dto.getOldWrId());
+                                    // 获取原始发药记录
+                                    PharInWaitReceiveDTO ReceiveDTO = inptCostDAO.queryPharInWaitReceiveOrg(param);
+                                    if (ReceiveDTO!=null){
+                                        PharInWaitReceiveDTO inWaitReceiveParam =new PharInWaitReceiveDTO();
+                                        inWaitReceiveParam.setId(ReceiveDTO.getId());
+                                        inWaitReceiveParam.setHospCode(hospCode);
+                                        inWaitReceiveParam.setNum(BigDecimalUtils.subtract(ReceiveDTO.getNum(), dto.getNum()));
+                                        inWaitReceiveParam.setSplitNum(BigDecimalUtils.subtract(ReceiveDTO.getSplitNum(), dto.getSplitNum()));
+                                        inWaitReceiveParam.setTotalPrice(BigDecimalUtils.subtract(ReceiveDTO.getTotalPrice(), dto.getTotalPrice()));
+                                        if (BigDecimalUtils.isZero(inWaitReceiveParam.getNum())){
+                                            // 全退删除原始发药记录
+                                            PharInWaitReceiveDTO inWaitReceiveDTO = new PharInWaitReceiveDTO();
+                                            inWaitReceiveDTO.setHospCode(hospCode);
+                                            List<String> orgId =new ArrayList<>();
+                                            orgId.add(inWaitReceiveParam.getId());
+                                            inWaitReceiveDTO.setIds(orgId);
+                                            inptCostDAO.deletePharInWaitReceive(inWaitReceiveDTO);
+                                        }else {
+                                            inptCostDAO.updatePharInWaitReceiveOrg(inWaitReceiveParam);
+                                        }
+                                    }
+                                }
+                                dto.setOldWrId(null);
                                 dto.setId(SnowflakeUtils.getId());
+                                newReceiveDTOList.add(dto);
                             }
-                            if (!ListUtils.isEmpty(backReceiveDTOList)) {
+                            if (!ListUtils.isEmpty(newReceiveDTOList)) {
                                 //新增待领记录
-                                inptCostDAO.insertPharInWaitReceiveBatch(backReceiveDTOList);
+                                inptCostDAO.insertPharInWaitReceiveBatch(newReceiveDTOList);
+                            }
+                            if (deleteIds!=null &&deleteIds.size()>0) {
+                                // 删除退药记录
+                                PharInWaitReceiveDTO inWaitReceiveDTO = new PharInWaitReceiveDTO();
+                                inWaitReceiveDTO.setHospCode(hospCode);
+                                inWaitReceiveDTO.setIds(deleteIds);
+                                inptCostDAO.deletePharInWaitReceive(inWaitReceiveDTO);
                             }
                         }
                     }

@@ -1037,6 +1037,9 @@
         crte_id,
         crte_name,
         crte_time
+        <if test="visitId !='' and visitId !=null ">
+            , (select sum(reality_price) from outpt_register_detail where hosp_code = #{hospCode} and visit_id = #{visitId}) as rgstFee
+        </if>
         from
         outpt_register
         where
@@ -1368,5 +1371,10 @@
         a.disease_id = b.hosp_illness_id
         where a.hosp_code =#{hospCode} and a.visit_id =#{visitId} and b.insure_reg_code =#{insureRegCode}
         and a.type_code ='204' and a.is_main ='1'
+    </select>
+
+    <select id="getBaseDeptById" resultType="java.util.Map">
+        select code, name
+        from base_dept where hosp_code = #{hospCode} and id = #{id}
     </select>
 </mapper>

@@ -442,6 +442,12 @@
             and cert_no = #{certNo}
         </if>
     </select>
+    <select id="queryPatient" resultType="java.lang.String">
+        SELECT COUNT(1) FROM(
+         SELECT id ,register_no as `profile` FROM outpt_visit where profile_id = #{profileId} and is_visit = '0'
+        UNION all
+        SELECT id ,in_no as `profile` from inpt_visit where profile_id =  #{profileId}and status_code not in ('7','8')) a
+    </select>
     <delete id="deleteProfileFile">
         delete from base_profile_file
         where hosp_code = #{hospCode}

@@ -327,6 +327,10 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      **/
     @Override
     public Boolean deleteProfileFile(Map map) {
+        String profileId = MapUtils.get(map,"id");
+        if(!"0".equals(baseProfileFileDAO.queryPatient(profileId))){
+                throw new AppException("当前档案病人正在就诊，不允许删除！");
+        }
         return baseProfileFileDAO.deleteProfileFile(map);
     }
 

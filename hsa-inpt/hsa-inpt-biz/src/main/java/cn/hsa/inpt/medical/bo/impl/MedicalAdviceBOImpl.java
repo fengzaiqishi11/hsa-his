@@ -3182,6 +3182,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     }
 
                     BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(),inptAdviceDTO.getItemId());
+                    // 没有配置默认 1：单次向上取整
+                    if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
+                        adviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(adviceDetailDTO.getNum().doubleValue())));
+                    }
                     //-----------------------------------------------
                     //计算停嘱当天的费用数量
                     tzNum = BigDecimalUtils.multiply(BigDecimal.valueOf(inptAdviceDTO.getEndExecNum()==null?0:inptAdviceDTO.getEndExecNum()),

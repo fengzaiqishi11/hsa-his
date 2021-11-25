@@ -107,4 +107,14 @@ public interface BaseProfileFileDAO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     Boolean deleteProfileFile(Map map);
+    /**
+     * @Method isCertNoExist
+     * @Desrciption 查询校验
+     * @Param
+     * [id]
+     * @Author yuelong.chen
+     * @Date   2021/11/23 12:57
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    String queryPatient(String profileId);
 }

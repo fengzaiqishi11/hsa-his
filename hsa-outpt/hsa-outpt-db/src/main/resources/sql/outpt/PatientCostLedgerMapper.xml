@@ -6521,7 +6521,7 @@
         c.reality_price totalCost,
         og.register_time registerTime,
         a.dept_name deptName,
-        b.doctorName,
+        a.doctor_name as doctorName,
         c.settle_time settleTime,
         ogs.reality_price as registerPrice,
         b.*
@@ -6552,7 +6552,6 @@
         <if test="deptId !=null and deptId !=''">
             and d.dept_id =#{deptId}
         </if>
-        group by d.id,a.doctor_name
         ) b on c.visit_id = b.visistID
         where a.hosp_code = #{hospCode} and c.is_settle = '1'
         <if test="settleStartTime != null and settleStartTime !=''">

@@ -24,7 +24,6 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 @Accessors(chain = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MzpjZtDO extends PageDO implements Serializable {
 
     private static final long serialVersionUID = 1L;

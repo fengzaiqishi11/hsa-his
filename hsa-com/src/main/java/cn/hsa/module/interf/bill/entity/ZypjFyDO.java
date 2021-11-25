@@ -22,7 +22,6 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 @Accessors(chain = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ZypjFyDO extends PageDO implements Serializable {
 
     private static final long serialVersionUID = 7945501564917353098L;

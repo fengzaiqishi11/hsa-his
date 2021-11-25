@@ -2135,6 +2135,17 @@
     <update id="updateBaseBed" >
 		update base_bed set visit_id = null where hosp_code = #{hospCode} and visit_id = #{id}
 	</update>
+	<update id="updateFeeDate">
+		update inpt_cost set cost_time = #{feeDate}
+		where hosp_code =#{hospCode}
+		<if test="ids != null and ids.size()>0">
+				and id in
+			<foreach collection="ids" item="item" separator="," open="(" close=")">
+				 #{item}
+			</foreach>
+		</if>
+	</update>
+
 
 	<!--查询全部病人信息  liuliyun 2021/09/04-->
 	<select id="queryMergeInptVisitPage" resultMap="InptVisitMap">

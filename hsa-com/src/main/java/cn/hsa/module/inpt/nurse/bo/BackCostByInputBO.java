@@ -45,5 +45,14 @@ public interface BackCostByInputBO {
     * @Return java.lang.Boolean
     **/
     Boolean saveBackCostWithInpt(Map<String,Object> map);
+    /**
+     * @Method updateFeeDate
+     * @Desrciption 费用改变
+     * @param
+     * @Author yuelong.chen
+     * @Date   2021/11/25 14:41
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    Boolean updateFeeDate(Map<String,Object> map);
 
 }

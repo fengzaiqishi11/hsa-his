@@ -289,6 +289,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());
             insureIndividualSettleDO.setSettleState("1");
             insureIndividualSettleDO.setCrteTime(outptVisitDTO.getCrteTime());
+            insureIndividualSettleDO.setPsnPartAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getPsnPartAmt()));// 个人负担总金额
+            insureIndividualSettleDO.setBeforeSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getBeforeSettle()));// 结算后余额
+            insureIndividualSettleDO.setLastSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getLastSettle()));// 结算后余额
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);
             insertMap.put("insureIndividualSettleDO",insureIndividualSettleDO);
@@ -642,7 +645,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         String visitId =  MapUtils.get(map,"visitId");
         String insureRegCode =  MapUtils.get(map,"insureRegCode");
         //判断是否有传输费用信息
-        Map<String,String> insureCostParam = new HashMap<String,String>();
+        Map<String,Object> insureCostParam = new HashMap<String,Object>();
         insureCostParam.put("hospCode",hospCode);//医院编码
         insureCostParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId",visitId);//就诊id

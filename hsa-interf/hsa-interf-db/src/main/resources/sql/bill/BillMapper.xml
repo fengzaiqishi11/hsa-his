@@ -36,6 +36,7 @@
 		FROM
 		sendpjmzsfzt t
 		where 1=1
+		and hosp_code = #{hospCode}
 		and t.pjdm is not null
 		<if test="startTime != null and startTime !=''">
 			and date_format (t.kprq,'%Y-%m-%d') &gt;= date_format (#{startTime},'%Y-%m-%d')
@@ -46,7 +47,6 @@
 		<if test="pjhms != null and pjhms != '' and pjhmj != null and pjhmj != ''">
 			and CONVERT(pjhm,SIGNED) &gt;= CONVERT(#{pjhms},SIGNED) and CONVERT(pjhm,SIGNED) &lt;= CONVERT(#{pjhmj},SIGNED)
 		</if>
-		/*如果关键字不为空则根据关键字查询是否存在该*/
 		<if test="queryStr != null and queryStr != ''">
 			and t.pjhm like concat('%',#{queryStr},'%')
 		</if>
@@ -57,7 +57,7 @@
 				#{pjhm}
 			</foreach>
 		</if>
-		order by pjhm
+		order by t.pjhm
 	</select>
 
 	<!-- 门诊票据费用信息表查询 -->
@@ -75,7 +75,9 @@
 		xmbz,
 		ywlsh
 		from sendpjmzsfxm
-		WHERE pjhm in
+		WHERE
+		hosp_code = #{hospCode}
+	    and pjhm in
 		<foreach collection="pjhmList" item="str" open="(" close=")"
 			separator=",">
 			#{str}
@@ -100,7 +102,9 @@
 		xmbz,
 		ywlsh
 		from sendpjmzsfxmmx
-		WHERE pjhm in
+		WHERE
+		hosp_code = #{hospCode}
+		and pjhm in
 		<foreach collection="pjhmList" item="str" open="(" close=")"
 			separator=",">
 			#{str}
@@ -149,6 +153,7 @@
 		FROM
 		sendpjzysfzt t
 		where  1=1
+		and hosp_code = #{hospCode}
 		and t.pjdm is not null
 		<if test="startTime != null and startTime !=''">
 			and date_format (t.kprq,'%Y-%m-%d') &gt;= date_format(#{startTime},'%Y-%m-%d')
@@ -188,7 +193,9 @@
 		xmbz,
 		ywlsh
 		from sendpjzysfxm
-		WHERE pjhm in
+		WHERE
+		hosp_code = #{hospCode}
+		and pjhm in
 		<foreach collection="pjhmList" item="str" open="(" close=")"
 			separator=",">
 			#{str}
@@ -213,7 +220,9 @@
 		xmbz,
 		ywlsh
 		from sendpjzysfxmmx
-		WHERE pjhm in
+		WHERE
+		hosp_code = #{hospCode}
+		and pjhm in
 		<foreach collection="pjhmList" item="str" open="(" close=")"
 			separator=",">
 			#{str}

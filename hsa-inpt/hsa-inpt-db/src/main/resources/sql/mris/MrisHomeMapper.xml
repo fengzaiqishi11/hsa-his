@@ -84,7 +84,7 @@
     <select id="getMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
             resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
             SELECT  mbi.id,  mbi.hosp_code,  mbi.visit_id, in_profile, in_blh,
-                   in_no, name, gender_code, gender_name, age, age_unit_code,
+                   in_no, name, gender_code, gender_name, age, ifnull(age_unit_code,'1') as age_unit_code,
                    age_unit_name, birthday, cert_code, cert_name, cert_no, nationality_cation,
                    nationality_name, nation_code, nation_name, native_place, occupation_code,
                    occupation_name, marry_code, marry_name, work, work_phone, work_post_code,

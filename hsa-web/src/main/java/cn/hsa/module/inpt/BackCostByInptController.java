@@ -8,6 +8,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.nurse.service.BackCostByInputService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
+import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -104,4 +105,22 @@ public class BackCostByInptController extends BaseController {
         return booleanWrapperResponse;
     }
 
+    /**
+     * @Method updateFeeDate
+     * @Desrciption 费用改变
+     * @param
+     * @Author yuelong.chen
+     * @Date   2021/11/25 14:41
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @PostMapping("/updateFeeDate")
+    WrapperResponse<Boolean> updateFeeDate(@RequestBody Map<String, Object> feeMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("ids", MapUtils.get(feeMap,"costDataParams"));
+        map.put("feeDate", MapUtils.get(feeMap,"feeDate"));
+        WrapperResponse<Boolean> booleanWrapperResponse = backCostByInputService_consumer.updateFeeDate(map);
+        return booleanWrapperResponse;
+    }
 }

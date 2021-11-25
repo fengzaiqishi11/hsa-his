@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -44,6 +45,7 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
     private String rateName;
     private String dosage;
     private String dosageUnitCode;
+    private BigDecimal herbNum;
     /**
      * 婴儿Id
      */

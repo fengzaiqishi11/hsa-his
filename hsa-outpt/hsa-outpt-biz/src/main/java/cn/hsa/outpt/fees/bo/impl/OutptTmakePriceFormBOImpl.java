@@ -2910,7 +2910,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setSettleState("1");
 
         // 1、更新医保结算表
-        outptSettleDAO.insertInsureIndividualSettle(insureIndividualSettleDO);
+        // outptSettleDAO.insertInsureIndividualSettle(insureIndividualSettleDO);
+        Map<String, Object> insureSettleParam = new HashMap<String, Object>();
+        insureSettleParam.put("hospCode", hospCode);//医院编码
+        insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
+        insureIndividualSettleService.insertSelective(insureSettleParam);
         // 3、生成领药申请单，医技确费等信息，更新个人支付，医保支付金额
         this.saveMzPharHaiNanDZPZ(hospCode, insureIndividualSettleDO);
         // 4、再次调用医保，告知结算成功

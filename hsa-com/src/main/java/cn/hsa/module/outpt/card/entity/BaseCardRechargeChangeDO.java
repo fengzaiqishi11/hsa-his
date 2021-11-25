@@ -2,7 +2,6 @@ package cn.hsa.module.outpt.card.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,11 +44,11 @@ public class BaseCardRechargeChangeDO extends PageDO implements Serializable {
 
 	private BigDecimal startBalance;
 
-	private BigDecimal startBalanceEncryption;
+	private String startBalanceEncryption;
 
 	private BigDecimal endBalance;
 
-	private BigDecimal endBalanceEncryption;
+	private String endBalanceEncryption;
 
 	private String settleType;
 

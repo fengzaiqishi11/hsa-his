@@ -1377,4 +1377,9 @@
         select code, name
         from base_dept where hosp_code = #{hospCode} and id = #{id}
     </select>
+
+    <select id="selectSysParameter" resultType="java.util.Map">
+        select value
+        from sys_parameter where hosp_code = #{hospCode} and code = #{code}
+    </select>
 </mapper>

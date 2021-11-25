@@ -226,8 +226,16 @@
 
     <!-- 门诊 - 发票表 -->
     <select id="queryOutptSettleInvoice" resultType="java.util.Map">
-        select count(distinct osi.invoice_no) num, CONCAT(min(CAST(osi.invoice_no as SIGNED)), '') start_no, CONCAT(max(CAST(osi.invoice_no as SIGNED)), '') end_no, sum(osi.total_price) total_price from outpt_settle_invoice osi
-        where osi.hosp_code = #{hospCode} and osi.invoice_no is not null and osi.settle_id in (
+        select count( osi.invoice_no) num, sum(osi.total_price) total_price,
+
+        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as zfnum,
+	    (select count(invoice_no) from outpt_settle_invoice where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as tfnum,
+        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as start_no,
+        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as end_no,
+        (select count(invoice_no) from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as usenum
+
+        from outpt_settle_invoice osi
+        where osi.hosp_code = #{hospCode} and osi.status_code = '0' and osi.invoice_no is not null and osi.settle_id in (
 	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
 	    )
 	    group by invoice_id
@@ -272,8 +280,16 @@
 
     <!-- 住院 - 发票表 -->
     <select id="queryInptSettleInvoice" resultType="java.util.Map">
-        select count(distinct isi.invoice_no) num, CONCAT(min(CAST(isi.invoice_no as SIGNED)), '') start_no, CONCAT(max(CAST(isi.invoice_no as SIGNED)), '') end_no, sum(isi.total_price) total_price from inpt_settle_invoice isi
-        where isi.hosp_code = #{hospCode} and isi.invoice_no is not null and isi.settle_id in (
+        select count( isi.invoice_no) num, sum(isi.total_price) total_price,
+
+        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as zfnum,
+	    (select count(invoice_no) from inpt_settle_invoice where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as tfnum,
+        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as start_no,
+        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime} )) as end_no,
+        (select count(invoice_no) from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as usenum
+
+        from inpt_settle_invoice isi
+        where isi.hosp_code = #{hospCode} and isi.status_code = '0' and isi.settle_id in (
             select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
         )
         group by isi.invoice_id
@@ -307,10 +323,10 @@
 
     <!-- 新增日结缴款发票表 -->
     <insert id="insertOutinDailyInvoiceList">
-        insert into outin_daily_invoice(id, hosp_code, daily_id, daily_no, type_code, num, start_no, end_no, total_price)
+        insert into outin_daily_invoice(id, hosp_code, daily_id, daily_no, type_code, num, start_no, end_no, total_price, tf_num, zf_num, use_num)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.num}, #{item.startNo}, #{item.endNo}, #{item.totalPrice})
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.num}, #{item.startNo}, #{item.endNo}, #{item.totalPrice}, #{item.tfNum}, #{item.zfNum}, #{item.useNum})
         </foreach>
     </insert>
 

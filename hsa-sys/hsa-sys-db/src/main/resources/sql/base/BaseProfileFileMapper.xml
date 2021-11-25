@@ -74,6 +74,7 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+
     <!--    判断身份证是否已经存在-->
     <select id="isCertNoExist" resultMap="baseProfileFileMap">
         select
@@ -441,4 +442,9 @@
             and cert_no = #{certNo}
         </if>
     </select>
+    <delete id="deleteProfileFile">
+        delete from base_profile_file
+        where hosp_code = #{hospCode}
+        and id = #{id}
+    </delete>
 </mapper>

@@ -1,6 +1,7 @@
 package cn.hsa.util;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
@@ -592,4 +593,41 @@ public class DateUtils {
         int c = (int) ((start - end) / (1000*60*60));
         return c;
     }
+
+    /**
+     *  获取指定日期的当天的开始时间
+     *  <p>例如:给定：2021-11-24 15:43:32 返回的则是2021-11-24 00:00:00 </p>
+     * @param startDate 开始时间
+     * @return
+     */
+    public static String getStartOfADayWithDateTimeFormatted(Date startDate){
+        if(null == startDate) return null;
+        return getStartOfADayWithDateTimeFormatted(format(startDate,Y_M_D));
+    }
+
+    public static String getStartOfADayWithDateTimeFormatted(String startDate){
+        if(null == startDate) return null;
+        long millisecondsOfTime = parse(startDate, Y_M_D).getTime();
+        return format(new Date(millisecondsOfTime),Y_M_DH_M_S);
+    }
+
+    /**
+     *  获取指定日期的当天最晚时间
+     *  <p>例如:给定：2021-11-24 15:43:32 返回的则是2021-11-24 23:59:59 </p>
+     * @param endDate 需要获取的时间参数
+     * @return 指定时间的当天最晚时间
+     */
+    public static String getEndOfADayWithDateTimeFormatted(String endDate){
+       if( null == endDate) return null;
+        final long millisecondsOfDay = 86399000L; // 23小时59分59秒所代表的毫秒数
+        long millisecondsOfRyEndTime = parse(endDate, Y_M_D).getTime();
+        long endOfDayRyTime = millisecondsOfRyEndTime + millisecondsOfDay;
+        return format(new Date(endOfDayRyTime), Y_M_DH_M_S);
+    }
+
+    public static String getEndOfADayWithDateTimeFormatted(Date endDate){
+        if( null == endDate) return null;
+        return getEndOfADayWithDateTimeFormatted(format(endDate, Y_M_D));
+    }
+
 }

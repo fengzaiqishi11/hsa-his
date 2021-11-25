@@ -128,6 +128,8 @@ public class MrisCostDO implements java.io.Serializable {
     /** 血液和血液制品类： 细胞因子类费 */
     private BigDecimal xyzpl05;
 
+    private BigDecimal xyzpl06; // 细胞因子类制品费
+
     /** 耗材类：检查用一次性医用材料费 */
     private BigDecimal hcl01;
 

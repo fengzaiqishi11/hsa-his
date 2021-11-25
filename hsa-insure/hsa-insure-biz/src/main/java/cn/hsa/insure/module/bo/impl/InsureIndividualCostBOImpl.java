@@ -461,7 +461,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
      * @Return
      */
     @Override
-    public List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, String> insureCostParam) {
+    public List<Map<String, Object>> queryOutptInsureCostByVisit(Map<String, Object> insureCostParam) {
         return insureIndividualCostDAO.queryOutptInsureCostByVisit(insureCostParam);
     }
 

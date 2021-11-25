@@ -186,6 +186,20 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     }
 
     /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [inptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @Override
+    public OutptVisitDTO queryPrintInpt(Map map) {
+        OutptVisitDTO outptVisitDTO = inptVisitDAO.queryPrintInpt(map);
+        return  outptVisitDTO;
+    }
+
+    /**
      * @Method queryUnregisteredPage
      * @Desrciption 1.查询出所有门诊就诊表的信息
      * 2.根据门诊就诊表的ID查出档案中需要的信息
@@ -1009,8 +1023,16 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                     String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
                     String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
                     if (!StringUtils.isEmpty(endtime)) {
+                        if (StringUtils.isEmpty(begntime)) {
+                            continue;
+                        }
                         Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime,-1),DateUtils.Y_M_D);
+
+                        if (StringUtils.isEmpty(endtime)) {
+                            endtime = "2099-12-31 00:00:00";
+                        }
                         Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime,1),DateUtils.Y_M_D);
+
                         if (DateUtils.getNow().before(endDate) && DateUtils.getNow().after(begnDate)) {
                             isOneSettle = Constants.SF.S;
                             insureIndividualVisitDTO.setPsnIdetType(psnIdetType);

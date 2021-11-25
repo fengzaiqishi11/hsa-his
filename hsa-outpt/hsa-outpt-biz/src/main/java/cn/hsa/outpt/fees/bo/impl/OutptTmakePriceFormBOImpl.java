@@ -11,7 +11,6 @@ import cn.hsa.module.dzpz.hainan.ExtData;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
 import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
@@ -293,6 +292,27 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     }
 
     /**
+     * @Description: 查询患者费用，用于体检
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/22 20:24
+     * @Return
+     */
+    @Override
+    public WrapperResponse queryOutptCostListTJ(Map param) {
+        String hospCode = (String) param.get("hospCode");//医院编码
+        String visitId = (String) param.get("visitId");//患者id
+        String isPhys = (String) param.get("isPhys") == null ? "" : (String) param.get("isPhys");//是否为体检信息
+        List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryCostVisitIdTJ(param);
+
+        JSONObject obj = new JSONObject();
+        obj.put("outptCost", outptCostDTOList);
+        obj.put("isCFpatient", false);
+        return WrapperResponse.success(obj);
+    }
+
+    /**
      * @Menthod queryBaseByPage
      * @Desrciption  获取医院 项目、材料、药品 信息
      * @param param 请求参数
@@ -384,9 +404,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
             // ====================2021年7月21日15:53:52  官红强 如果前端删除了非处方费用，此时需要删除非处方费用（未结算的）    end ===============
 
-
-            if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
+            // 如果患者为体检患者，则不需要校验费用条数
+            if (outptVisitDTO.getIsPhys() == null || "".equals(outptVisitDTO.getIsPhys())) {
+                if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
+                    return WrapperResponse.fail("划价收费提示：该患者费用数量不一致；请刷新浏览器再试，（如果是退款重收时，当前患者存在未结算费用，请先结算再退费或医生删除处方未结算处方后再退费）", null);
+                }
             }
 
             // 2判断人员信息是选择还是手动录入；
@@ -1165,8 +1187,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             if (outptCostDTOList == null && outptCostDTOList.isEmpty()) {
                 throw new AppException("支付失败，未找到本次结算费用信息，请确认是否已经结算或者刷新后重试。");
             }
-            if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
-                throw new AppException("费用数量不正确，请刷新浏览器再试");
+            // 如果患者是体检患者，则不需要校验费用条数
+            if (outptVisitDTO.getIsPhys() == null || "".equals(outptVisitDTO.getIsPhys())) {
+                if (outptCostDTOList.size() != outptVisitDTO.getOutptCostDTOList().size()) {
+                    throw new AppException("费用数量不正确，请刷新浏览器再试");
+                }
             }
 
             // 更新医技申请单状态
@@ -1340,7 +1365,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outinInvoiceDTO1.setInvoiceType(Constants.PJLX.MZ);//发票类型 = 门诊
             outinInvoiceDTO1.setSettleId(settleId);//结算id
             outInvoiceParam.put("outinInvoiceDTO", outinInvoiceDTO1);
-            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
             // 12、 如果是医保病人，做医保结算操作。
             Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
             if (patientValueCode > 0) {
@@ -1349,6 +1373,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
             // 13、 将优惠发票总金额返回给前端（优惠后总金额）
             outptVisitDTO.setRealityPrice(realityPrice);
+            outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
         } catch (Exception e) {
             throw e;
         } finally {
@@ -1774,6 +1799,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
                 Object object =  MapUtils.get(payinfo,"acct_pay");
                 InsureIndividualSettleDO individualSettleDO  = new InsureIndividualSettleDO();
+                Object balcObject = MapUtils.get(payinfo, "balc");// 结算后个人账户余额
+                BigDecimal balcPrice = new BigDecimal(0.00);
+                if(balcObject == null || (balcObject instanceof String && StringUtils.isEmpty(balcObject.toString()))){
+                    individualSettleDO.setLastSettle(balcPrice);
+                }else{
+                    individualSettleDO.setLastSettle(BigDecimalUtils.convert((balcObject.toString())));
+                }
+                // 更新门诊结算表的个人账户支付
+                OutptSettleDO outptSettleDO = new OutptSettleDO();
+                outptSettleDO.setHospCode(hospCode);
+                outptSettleDO.setId(settleId);
+                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+                if(object == null){
+                    outptSettleDO.setAcctPay(new BigDecimal(0.00));
+                }
+                if(object instanceof String){
+                    outptSettleDO.setAcctPay(BigDecimalUtils.convert(MapUtils.get(payinfo,"acct_pay")));
+                }else{
+                    outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
+                }
+                // 结算前个人账户余额 =  个人账户支出+结算后个人账户余额
+                individualSettleDO.setBeforeSettle(BigDecimalUtils.add(outptSettleDO.getAcctPay(),individualSettleDO.getLastSettle()));
                 individualSettleDO.setInsureSettleId(insureSettleId);
                 individualSettleDO.setMedicalRegNo(medicalRegNo);
                 individualSettleDO.setHospCode(hospCode);
@@ -1795,16 +1842,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 insureIndividualCostDTO.setInsureSettleId(insureSettleId);
                 map.put("insureIndividualCostDTO",insureIndividualCostDTO);
                 insureIndividualCostService_consumer.updateInsureSettleCost(map).getData();
-                // 更新门诊结算表的个人账户金额
-                OutptSettleDO outptSettleDO = new OutptSettleDO();
-                outptSettleDO.setHospCode(hospCode);
-                outptSettleDO.setId(settleId);
-                if(object instanceof String){
-                    outptSettleDO.setAcctPay(BigDecimalUtils.convert(MapUtils.get(payinfo,"acct_pay")));
-                }else{
-                    outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
-                }
-                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+
                 map.put("medicalRegNo",medicalRegNo);
                 map.put("insureSettleId",insureSettleId);
                 outptVisitDAO.updateInsuresumPatient(map);
@@ -1838,7 +1876,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         String visitId =  MapUtils.get(map,"visitId");
         String insureRegCode =  MapUtils.get(map,"visitId");
         //判断是否有传输费用信息
-        Map<String,String> insureCostParam = new HashMap<String,String>();
+        Map<String,Object> insureCostParam = new HashMap<String,Object>();
         insureCostParam.put("hospCode",hospCode);//医院编码
         insureCostParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId",visitId);//就诊id
@@ -2737,26 +2775,37 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         extData.setList(outptSettleDAO.getInsureFeeExtDataList(fee));
         uploadFee.setCondList(condList);
         uploadFee.setExtData(extData);
+        uploadFee.setAppId("37B0389095E640F89DEE9F5C8D763E17");
         JSONObject request = new JSONObject();
-        request.put("url", "http://10.102.12.216/mpc-local/test/pmc/api");
+        request.put("url", "http://10.103.161.181:8082/pmc/api");
         request.put("data", JSONArray.toJSON(uploadFee));
         request.put("transType", "hos.upload.fee");
         request.put("orgId", uploadFee.getOrgId());
         //费用上传
-        JSONObject jsonObject = this.callNeusoft(request.toJSONString());
+        //JSONObject jsonObject = this.callNeusoft(request.toJSONString());
+        Map<String,Object> outptElectronicParam = new HashMap<String,Object>();
+        outptElectronicParam.put("hospCode",outptVisitDTO.getHospCode());//医院编码
+        outptElectronicParam.put("insureRegCode",uploadFee.getOrgId());//医保编码
+        outptElectronicParam.put("outptCostDTOList",outptVisitDTO.getOutptCostDTOList());//费用信息
+        outptElectronicParam.put("outptVisitDTO",outptVisitDTO);//个人信息
+        outptElectronicParam.put("medOrgOrd", outptSettleDO.getId()); // 结算id
+        Map<String,Object> httpResult = (Map<String, Object>) outptElectronicBillService.addPatientCost(outptElectronicParam).getData();
+        JSONObject jsonObject = JSONObject.parseObject(String.valueOf(httpResult));
         //保存费用
-        this.getReturnValue(feeOrg, jsonObject);
+        this.getReturnValue(feeOrg, jsonObject, outptVisitDTO);
         return JSONArray.toJSON(uploadFee).toString();
     }
 
 
-    public boolean getReturnValue(UploadFee feeOrg, JSONObject jsonObject) {
+    public boolean getReturnValue(UploadFee feeOrg, JSONObject jsonObject, OutptVisitDTO outptVisitDTO) {
 //        JSONObject jsonObject  = JSONObject.parseObject(returnValue);
-        JSONObject jsonFee = (JSONObject) jsonObject.get("data");
-        JSONObject extData = (JSONObject) jsonFee.get("extData");
+//        JSONObject jsonFee = (JSONObject) jsonObject.get("data");
+        JSONObject extData = (JSONObject) jsonObject.get("extData");
         JSONArray jsonArray = extData.getJSONArray("result");
-        String payOrdId = jsonFee.getString("payOrdId");
-        String payToken = jsonFee.getString("payToken");
+//        String payOrdId = jsonFee.getString("payOrdId");
+//        String payToken = jsonFee.getString("payToken");
+        String payOrdId = (String) jsonObject.get("payOrdId");
+        String payToken = (String) jsonObject.get("payToken");
         Map map = new HashMap();
         map.put("payToken", payToken);
         map.put("payOrdId", payOrdId);
@@ -2766,20 +2815,26 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         List<InsureIndividualCostDTO> insureIndividualCostDTOList = outptSettleDAO.getInsureIndividualCost(feeOrg);
         for (InsureIndividualCostDTO insureIndividualCostDTO : insureIndividualCostDTOList) {
             insureIndividualCostDTO.setId(SnowflakeUtils.getId());
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
-                if (insureIndividualCostDTO.getCostId().equals(object.get("hosRxDetlNo").toString())) {
-                    insureIndividualCostDTO.setRxSn(object.get("rxSn").toString());
-                    insureIndividualCostDTO.setOverlmtSelfpayAmt(object.get("overlmtSelfpayAmt").toString());
-                    insureIndividualCostDTO.setChrgItemLv(object.get("chrgItemLv").toString());
-                    insureIndividualCostDTO.setFulamtOwnpayFlag(object.get("fulamtOwnpayFlag").toString());
-                    insureIndividualCostDTO.setOwnpayRea(object.get("ownpayRea").toString());
-                    insureIndividualCostDTO.setHiLmtpric(object.get("hiLmtpric").toString());
-                    insureIndividualCostDTO.setGuestRatio(object.get("selfpayProp").toString());
-                    insureIndividualCostDTO.setApplyLastPrice(new BigDecimal(object.get("pfoAmt").toString()));
-                    break;
-                }
-            }
+//            for (int i = 0; i < jsonArray.size(); i++) {
+//                JSONObject object = jsonArray.getJSONObject(i);
+//                if (insureIndividualCostDTO.getCostId().equals(object.get("hosRxDetlNo").toString())) {
+//                    insureIndividualCostDTO.setRxSn(object.get("rxSn").toString());
+//                    insureIndividualCostDTO.setOverlmtSelfpayAmt(object.get("overlmtSelfpayAmt").toString());
+//                    insureIndividualCostDTO.setChrgItemLv(object.get("chrgItemLv").toString());
+//                    insureIndividualCostDTO.setFulamtOwnpayFlag(object.get("fulamtOwnpayFlag").toString());
+//                    insureIndividualCostDTO.setOwnpayRea(object.get("ownpayRea").toString());
+//                    insureIndividualCostDTO.setHiLmtpric(object.get("hiLmtpric").toString());
+//                    insureIndividualCostDTO.setGuestRatio(object.get("selfpayProp").toString());
+//                    insureIndividualCostDTO.setApplyLastPrice(new BigDecimal(object.get("pfoAmt").toString()));
+//                    break;
+//                }
+//            }
+            insureIndividualCostDTO.setIsHospital("0");  // 是否住院费用
+            insureIndividualCostDTO.setTransmitCode("1"); // 传输标志，1：已传输
+            insureIndividualCostDTO.setCrteId(outptVisitDTO.getCrteId());
+            insureIndividualCostDTO.setCrteName(outptVisitDTO.getCrteName());
+            insureIndividualCostDTO.setCrteTime(outptVisitDTO.getCrteTime() == null ? DateUtils.getNow() : outptVisitDTO.getCrteTime());
+            insureIndividualCostDTO.setInsureIsTransmit("1");
         }
         outptSettleDAO.insertInsureCost(insureIndividualCostDTOList);
         return true;
@@ -2797,25 +2852,35 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         if (StringUtils.isEmpty(feeOrg.getPayToken()) || StringUtils.isEmpty(feeOrg.getPayOrdId())) {
             return true;
         }
-        JSONObject jsonObject = new JSONObject();
-        JSONObject jsonObjectData = new JSONObject();
-        JSONObject jsonObjectExtData = new JSONObject();
-        jsonObjectData.put("payOrdId", feeOrg.getPayOrdId());
-        jsonObjectData.put("orgCodg", feeOrg.getOrgCodg());
-        jsonObjectData.put("payToken", feeOrg.getPayToken());
-        jsonObjectData.put("idNo", feeOrg.getIdNo());
-        jsonObjectData.put("userName", feeOrg.getUserName());
-        jsonObjectData.put("idType", feeOrg.getIdType());
-        jsonObjectExtData.put("systemNo", "7");
-        jsonObjectData.put("extData", jsonObjectExtData);
-        jsonObject.put("url", "http://10.102.12.216/mpc-local/test/pmc/api");
-        jsonObject.put("orgId", feeOrg.getOrgId());
-        jsonObject.put("transType", "hos.revoke.order");
-        jsonObject.put("data", jsonObjectData);
-        Object obj = JSONArray.toJSON(jsonObject);
+        Map<String,Object> jsonObject = new HashMap<>();
+//        Map<String,Object> jsonObjectData = new HashMap<>();
+//        Map<String,Object> jsonObjectExtData = new HashMap<>();
+//        jsonObjectData.put("appId", "37B0389095E640F89DEE9F5C8D763E17");
+//        jsonObjectData.put("payOrdId", feeOrg.getPayOrdId());
+//        jsonObjectData.put("orgCodg", feeOrg.getOrgCodg());
+//        jsonObjectData.put("payToken", feeOrg.getPayToken());
+//        jsonObjectData.put("idNo", feeOrg.getIdNo());
+//        jsonObjectData.put("userName", feeOrg.getUserName());
+//        jsonObjectData.put("idType", feeOrg.getIdType());
+//        jsonObjectExtData.put("systemNo", "7");
+//        jsonObjectData.put("extData", jsonObjectExtData);
+//        jsonObject.put("url", "http://10.103.161.181:8082/pmc/api");
+//        jsonObject.put("orgId", feeOrg.getOrgCodg());
+//        jsonObject.put("transType", "hos.revoke.order");
+//        jsonObject.put("data", jsonObjectData);
+        jsonObject.put("hospCode", outptVisitDTO.getHospCode());
+        jsonObject.put("insureRegCode", feeOrg.getOrgId());
+        // Object obj = JSONArray.toJSON(jsonObject);
         //费用上传
-        JSONObject jsonObjectRe = this.callNeusoft(obj.toString());
-        String success = jsonObjectRe.getString("success");
+        // JSONObject jsonObjectRe = this.callNeusoft(obj.toString());
+        //获取个人信息
+        Map<String, Object> insureVisitParam = new HashMap<>();
+        insureVisitParam.put("id",outptVisitDTO.getId());
+        insureVisitParam.put("hospCode",outptVisitDTO.getHospCode());
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        jsonObject.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        Map<String,Object> httpResult = (Map<String, Object>) outptElectronicBillService.deletePatientCost(jsonObject).getData();
+        String success = (String) httpResult.get("data");
         if ("false".equals(success)) {
             return false;
         }
@@ -2824,30 +2889,126 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("payOrdId", "");
         map.put("hospCode", feeOrg.getHospCode());
         map.put("visitId", feeOrg.getVisitId());
+        outptSettleDAO.deleteInsureCost(map); // 删除his的医保费用表数据
         return outptSettleDAO.updateIndividualVisitToken(map) > 0;
     }
 
     @Override
     public boolean saveSeltSucCallback(Map map) {
         String hospCode = map.get("hospCode").toString();
-        map.put("id", map.get("medOrgOrd").toString());
-        map.put("hospCode", hospCode);
-        InsureIndividualSettleDO insureIndividualSettleDO = outptSettleDAO.getInsureInsureIndividualSettle(map);
-        if (null != outptSettleDAO.getById(map)) {
-            outptSettleDAO.updateOutptSettleStatus(map);
-        } else {
+        Map<String, Object> tempMap = (Map<String, Object>) map.get("data");
+        tempMap.put("id", tempMap.get("medOrgOrd").toString()); // 结算id
+        tempMap.put("hospCode", hospCode);
+        InsureIndividualSettleDO insureIndividualSettleDO = outptSettleDAO.getInsureInsureIndividualSettle(tempMap);
 
-        }
         insureIndividualSettleDO.setId(SnowflakeUtils.getId());
-        insureIndividualSettleDO.setTotalPrice(new BigDecimal(map.get("feeSumamt").toString()));
-        insureIndividualSettleDO.setPersonalPrice(new BigDecimal(map.get("ownpayAmt").toString()));
-        insureIndividualSettleDO.setPersonPrice(new BigDecimal(map.get("psnAcctPay").toString()));
-        insureIndividualSettleDO.setRetirePrice(new BigDecimal(map.get("fundPay").toString()));
+        insureIndividualSettleDO.setTotalPrice(new BigDecimal(tempMap.get("feeSumamt").toString()));
+        insureIndividualSettleDO.setPersonalPrice(new BigDecimal(tempMap.get("ownpayAmt").toString()));
+        insureIndividualSettleDO.setPersonPrice(new BigDecimal(tempMap.get("psnAcctPay").toString()));
+        insureIndividualSettleDO.setRetirePrice(new BigDecimal(tempMap.get("fundPay").toString()));
         insureIndividualSettleDO.setState("0");
         insureIndividualSettleDO.setSettleState("1");
-        outptSettleDAO.insertInsureIndividualSettle(insureIndividualSettleDO);
+
+        // 1、更新医保结算表
+        // outptSettleDAO.insertInsureIndividualSettle(insureIndividualSettleDO);
+        Map<String, Object> insureSettleParam = new HashMap<String, Object>();
+        insureSettleParam.put("hospCode", hospCode);//医院编码
+        insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
+        insureIndividualSettleService.insertSelective(insureSettleParam);
+        // 3、生成领药申请单，医技确费等信息，更新个人支付，医保支付金额
+        this.saveMzPharHaiNanDZPZ(hospCode, insureIndividualSettleDO);
+        // 4、再次调用医保，告知结算成功
+        // outptElectronicBillService.addPatientCost(outptElectronicParam)
         return true;
     }
+
+    /**
+     * @Description: 海南电子凭证移动支付完成回调时，需要生成领药申请
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/16 14:44
+     * @Return
+     */
+    private void saveMzPharHaiNanDZPZ(String hospCode, InsureIndividualSettleDO insureIndividualSettleDO){
+        String settleId = insureIndividualSettleDO.getSettleId();
+        String visitId = insureIndividualSettleDO.getVisitId();
+        String crteId = insureIndividualSettleDO.getCrteId();
+        String crteName = insureIndividualSettleDO.getCrteName();
+        Map<String, Object> visitMap = new HashMap<String, Object>();
+        visitMap.put("hospCode", hospCode);
+        visitMap.put("visitId", visitId);
+        OutptVisitDTO outptVisitDTO = outptVisitDAO.getVisitByParams(visitMap);
+
+        // 2、 校验费用信息是否正确（根据当前结算id，查询费用表）
+        Map<String, Object> param = new HashMap<String, Object>();
+        //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
+        param.put("hospCode", hospCode);//hospCode（医院编码）
+        param.put("statusCode", Constants.ZTBZ.ZC);//statusCode（状态标志 = 正常）
+        param.put("settleCode", Constants.JSZT.YUJS);//settleCode（结算状态 = 预结算）
+        param.put("settleId", settleId);//settleId（结算id）
+        List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
+
+        // 更新医技申请单状态
+        if (!ListUtils.isEmpty(outptCostDTOList)) {
+            outptCostDAO.updateMedicApply(visitId, hospCode, "02", outptCostDTOList);
+        }
+
+        /* 生成领药申请单，校验库存、领药申请单明细 */
+        Map<String, Object> queryParam = new HashMap<String, Object>();
+        queryParam.put("hospCode", hospCode);//医院编码
+        queryParam.put("pfTypeCode", outptVisitDTO.getPreferentialTypeId());//优惠类型
+        queryParam.put("items", outptCostDTOList);//当前用户的费用信息
+        List<OutptCostDTO> outptCostDTOS = outptCostDAO.queryDrugMaterialListByIds(queryParam);
+
+        //统计优惠总金额
+        BigDecimal realityPrice = new BigDecimal(0);//优惠后总费用
+        List<String> ids = new ArrayList<String>();//修改费用状态费用id
+        List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList = new ArrayList<PharOutReceiveDetailDO>();//领药申请明细参数接收
+        Map<String, Map<String, Object>> pharOutReceiveMap = new HashMap<String, Map<String, Object>>();
+        List<String> outptPrescribeIds = new ArrayList<String>();//存储处方id
+
+        // 3、 校验药品、材料库存，并生成领药申请单明细
+        Map<String, Object> tempMap = this.checkStockAndCreatePharOutReceiveDetail(outptCostDTOList, outptCostDTOS, hospCode);
+        realityPrice = (BigDecimal) tempMap.get("realityPrice");
+        ids = (List<String>) tempMap.get("ids");
+        pharOutReceiveDetailDOList = (List<PharOutReceiveDetailDO>) tempMap.get("pharOutReceiveDetailDOList");
+        pharOutReceiveMap = (Map<String, Map<String, Object>>) tempMap.get("pharOutReceiveMap");
+        outptPrescribeIds = (List<String>) tempMap.get("outptPrescribeIds");
+
+        // 6、 根据费用信息修改本次结算的费用状态
+        Map<String, Object> costParam = new HashMap<String, Object>();
+        costParam.put("settleCode", Constants.JSZT.YIJS);//费用状态 = 已结算
+        costParam.put("ids", ids);//费用id
+        outptCostDAO.editCostSettleCodeByIDS(costParam);
+
+        // 7、 修改门诊结算表此次结算信息状态
+        OutptSettleDO outptSettleDO = new OutptSettleDO();//修改参数
+        outptSettleDO.setId(settleId);//结算id
+        // SysParameterDO sysParameterDO = getSysParameter(hospCode, Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
+        // BigDecimal ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+        outptSettleDO.setActualPrice(realityPrice);//实收金额
+        outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
+        outptSettleDO.setSourcePayCode("4");  // 0:HIS 1:微信  2：支付宝   3：自助机 4：电子凭证支付
+        outptSettleDO.setSelfPrice(insureIndividualSettleDO.getPersonalPrice()); // 个人现金支付
+        outptSettleDO.setMiPrice(insureIndividualSettleDO.getRetirePrice()); // 基金支付
+        //outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
+        outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+
+        // 8、 修改处方表结算信息
+        if (!outptPrescribeIds.isEmpty()) {
+            Map<String, Object> outptPrescribeParam = new HashMap<String, Object>();
+            outptPrescribeParam.put("hospCode", hospCode);//医院编码
+            outptPrescribeParam.put("ids", outptPrescribeIds);//处方ids
+            outptPrescribeParam.put("settleId", settleId);//结算id
+            outptPrescribeParam.put("isSettle", Constants.SF.S);//是否结算 = 是
+            outptCostDAO.updateOutptPrescribeByIds(outptPrescribeParam);
+        }
+        // 10、 取最佳领药窗口，生成领药申请单（主单），保存领药申请单与领药申请单详单
+        this.savePharOutReceive(hospCode, visitId, outptVisitDTO.getDeptId(), crteId, crteName, settleId,
+                pharOutReceiveMap, outptCostDTOList, pharOutReceiveDetailDOList);
+    }
+
 
     /**
      * @Description: 根据费用id、优惠类别、默认数量为1来计算费用优惠金额(直接划价收费时，添加一条费用项目，立马计算当前项目优惠金额)
@@ -3631,28 +3792,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          * 费用验证之前，删除脏数据
          */
         insureIndividualCostService_consumer.deleteOutptInsureCost(map);
-        Map<String, Object> feeMap = commonInsureCost(map);
-        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
-        individualSettleDTO.setHospCode(hospCode);
-        individualSettleDTO.setVisitId(visitId);
-        individualSettleDTO.setState(Constants.SF.F);
-        individualSettleDTO.setSettleState(Constants.SF.S);
-        individualSettleDTO = insureIndividualSettleService.querySettle(map).getData();
-//        if(individualSettleDTO !=null && !StringUtils.isEmpty(individualSettleDTO.getInsureSettleId())){
-//            throw new AppException("一次门诊医保登记,只能有一笔正常的结算记录");
-//        }
-        List<Map<String,Object>> insureCostList = MapUtils.get(feeMap,"insureCostList");
+
         List<OutptCostDTO> outptCostDTOList = outptVisitDTO.getOutptCostDTOList();
         if(ListUtils.isEmpty(outptCostDTOList)){
             throw new RuntimeException("该患者没有产生费用信息");
         }
-        else{
-            // 直接化解的费用信息
-            List<OutptCostDTO> collect = outptCostDTOList.stream().filter(outptCostDTO ->
-                    !StringUtils.isEmpty(outptCostDTO.getOpId())).collect(Collectors.toList());
-//            insertNotOutPrescibleFee(collect,outptVisitDTO);
+        List<String> opIds = outptCostDTOList.stream().map(outptCostDTO -> outptCostDTO.getOpId()).collect(Collectors.toList());
+        // 获取系统参数 是否开启分处方结算 0: 不开启分处方结算;  1: 开启分处方结算
+        map.put("code", "SF_DIVIDED_PRRESCIBE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+            if (!ListUtils.isEmpty(opIds)) {
+                map.put("opIds", opIds);
+            }
         }
-        String insureRegCode = MapUtils.get(feeMap,"insureRegCode");
+        Map<String, Object> feeMap = commonInsureCost(map);
+        List<Map<String,Object>> insureCostList = MapUtils.get(feeMap,"insureCostList");
+//        else{
+//            // 直接化解的费用信息
+//            List<OutptCostDTO> collect = outptCostDTOList.stream().filter(outptCostDTO ->
+//                    !StringUtils.isEmpty(outptCostDTO.getOpId())).collect(Collectors.toList());
+////            insertNotOutPrescibleFee(collect,outptVisitDTO);
+//        }
         BigDecimal sumRealityPrice = new BigDecimal(0.00);
         if(!ListUtils.isEmpty(insureCostList)){
             for(Map<String,Object> item :insureCostList){
@@ -3662,17 +3823,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("statusCode",Constants.SF.F);  // 正常
         map.put("settleCode",Constants.JSZT.YIJS); // 未结算，预结算
         map.put("isHospital",Constants.SF.F);
-        // 获取系统参数 是否开启分处方结算 0: 不开启分处方结算;  1: 开启分处方结算
-        Map<String, Object> isMergeParam = new HashMap<>();
-        isMergeParam.put("hospCode", hospCode);
-        isMergeParam.put("code", "SF_DIVIDED_PRRESCIBE");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
-        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
-            List<String> opIds = outptVisitDTO.getOpIds(); // 处方id集合
-            if (opIds != null && opIds.size() > 0) {
-                map.put("opIds", opIds);
-            }
-        }
         List<OutptCostDTO> outptCostList = outptCostDAO.queryOutptCost(map);
 //        List<OutptCostDTO> outptCostList =  outptCostDAO.queryIsSubmitOutptCost(map);
         BigDecimal outptTotalFee = new BigDecimal(0.00);
@@ -3819,7 +3969,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         }
         String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
         //判断是否有传输费用信息
-        Map<String,String> insureCostParam = new HashMap<String,String>();
+        Map<String,Object> insureCostParam = new HashMap<String,Object>();
         insureCostParam.put("hospCode",hospCode);//医院编码
         insureCostParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId",visitId);//就诊id
@@ -3827,6 +3977,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureCostParam.put("transmitCode",Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode",insureRegCode);// 医保机构编码
         insureCostParam.put("isHospital",Constants.SF.F); // 区分门诊还是住院
+        List<String> opIds = MapUtils.get(map, "opIds");
+        if(!ListUtils.isEmpty(opIds)){
+            insureCostParam.put("opIds",opIds); // 处方id
+        }
         //        List<Map<String,Object>> insureCostList = outptCostDAO.queryOutptInsureCostByVisit(insureCostParam);
         List<Map<String,Object>> insureCostList = insureIndividualCostService_consumer.queryOutptInsureCostByVisit(insureCostParam);
         if(ListUtils.isEmpty(insureCostList)){
@@ -3857,6 +4011,17 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     @Override
     public Map<String,Object> updateFeeSubmit(Map<String, Object> map) {
         String hospCode = map.get("hospCode").toString();
+
+        List<OutptCostDTO> outptCostDTOList = MapUtils.get(map,"outptCostDTOList");
+        List<String> opIds = outptCostDTOList.stream().map(outptCostDTO -> outptCostDTO.getOpId()).collect(Collectors.toList());
+        // 获取系统参数 是否开启分处方结算 0: 不开启分处方结算;  1: 开启分处方结算
+        map.put("code", "SF_DIVIDED_PRRESCIBE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())) {
+            if (!ListUtils.isEmpty(opIds)) {
+                map.put("opIds", opIds);
+            }
+        }
         Map<String, Object> feeMap = commonInsureCost(map);
         List<Map<String, Object>> insureCostList = MapUtils.get(feeMap, "insureCostList");
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(feeMap, "insureIndividualVisitDTO");

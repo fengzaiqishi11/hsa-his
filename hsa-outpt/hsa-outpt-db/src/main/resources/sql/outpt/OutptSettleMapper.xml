@@ -586,7 +586,8 @@
         a.one_settle_id,
         a.card_price as cardPrice,
         c.card_no as cardNo,
-        b.profile_id as profileId
+        b.profile_id as profileId,
+        b.is_phys as isPhys
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id
@@ -776,6 +777,8 @@
         from outpt_cost a
         join insure_item_match b on a.item_id = b.hosp_item_id AND a.item_code = b.hosp_item_type
         AND b.is_valid = '1'
+        and b.audit_code = '1'
+		and b.is_match = '1'
         AND a.hosp_code = b.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
@@ -954,4 +957,7 @@
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
+    <delete id="deleteInsureCost" >
+        delete from insure_individual_cost where visit_id = #{visit_id} and hosp_code = #{hospCode} and settle_id is null and insure_settle_id is null
+    </delete>
 </mapper>

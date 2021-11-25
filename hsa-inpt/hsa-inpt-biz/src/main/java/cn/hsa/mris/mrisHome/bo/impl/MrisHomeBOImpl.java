@@ -30,6 +30,7 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -388,6 +389,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisBaseInfo",mrisBaseInfoDTO);
         resultMap.put("mrisCost", mrisHomeDAO.getMrisCost(inptVisitDTO));
         resultMap.put("mrisDiagnoseList",mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO));
+        resultMap.put("mrisInptDiagnose",mrisHomeDAO.queryMrisDiagnoseRowPage(inptVisitDTO));
         resultMap.put("mrisOperInfo",mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO));
         resultMap.put("mrisControl",mrisHomeDAO.getMrisControl(inptVisitDTO));
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
@@ -809,6 +811,62 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 mrisHomeDAO.insertMrisDiagnoseBatch(insertList);
             }
         }
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", mrisBaseInfoDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "SHOW_GDSBASY");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        // 存入分行表
+        List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
+        if (!ListUtils.isEmpty(diagnoseList)) {
+            for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
+                if(sysParameterDTO !=null&& "1".equals(sysParameterDTO.getValue())) {
+                    if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10())) {
+                        continue;
+                    }
+                }else {
+                    if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd101())) {
+                        continue;
+                    }
+                }
+                if ("1".equals(mrisDiagnoseDO.getDiseaseCode())) {
+                    mrisDiagnoseDO.setDiseaseName("主要诊断");
+                } else {
+                    mrisDiagnoseDO.setDiseaseName("其他诊断");
+                }
+                mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                mrisDiagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
+                mrisDiagnoseDO.setMbiId(mbiId);
+                mrisDiagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                // 是否珠海
+                if(sysParameterDTO !=null&& "1".equals(sysParameterDTO.getValue())) {
+
+                }else {
+                    mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
+                    mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
+                    mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                }
+                insertDiagnoseList.add(mrisDiagnoseDO);
+                if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())){
+                    MrisDiagnoseDO diagnoseDO =new MrisDiagnoseDTO();
+                    if ("1".equals(mrisDiagnoseDO.getDiseaseCode2())) {
+                        diagnoseDO.setDiseaseName("主要诊断");
+                    } else {
+                        diagnoseDO.setDiseaseName("其他诊断");
+                    }
+                    diagnoseDO.setId(SnowflakeUtils.getId());
+                    diagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
+                    diagnoseDO.setMbiId(mbiId);
+                    diagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                    diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
+                    diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
+                    diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    insertDiagnoseList.add(diagnoseDO);
+                }
+            }
+            if (!ListUtils.isEmpty(insertDiagnoseList)) {
+                mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);
+            }
+        }
         return mbiId;
     }
 
@@ -1071,6 +1129,28 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             }
             mrisHomeDAO.insertMrisDiagnoseBatch(mrisDiagnoseDOList);
         }
+        // 分行存入
+        List<MrisDiagnoseDO> mrisDiagnoseDOList2 = new ArrayList<>();
+        if (!ListUtils.isEmpty(inptDiagnoseList)) {
+            for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseList) {
+                MrisDiagnoseDO mrisDiagnoseDO = new MrisDiagnoseDO();
+                mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                mrisDiagnoseDO.setMbiId(String.valueOf(map.get("mrisId")));
+                mrisDiagnoseDO.setVisitId(String.valueOf(map.get("visitId")));
+                mrisDiagnoseDO.setHospCode(String.valueOf(map.get("hospCode")));
+                mrisDiagnoseDO.setDiseaseCode(inptDiagnoseDTO.getIsMain());
+                if ("1".equals(inptDiagnoseDTO.getIsMain())) {
+                    mrisDiagnoseDO.setDiseaseName("主要诊断");
+                } else {
+                    mrisDiagnoseDO.setDiseaseName("其他诊断");
+                }
+                mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
+                mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
+                mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
+                mrisDiagnoseDOList2.add(mrisDiagnoseDO);
+                mrisHomeDAO.insertMrisInptDiagnoseBatch(mrisDiagnoseDOList2);
+            }
+        }
     }
 
     /**
@@ -1085,12 +1165,17 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);
             // 删除病案诊断信息
             mrisHomeDAO.deleteMrisDiagnoseByVisitId(map);
+            // 删除分行病案诊断信息
+            mrisHomeDAO.deleteRowMrisDiagnoseByVisitId(map);
         }else{
             // 删除基本信息表
             mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);
 
             // 删除病案诊断信息
             mrisHomeDAO.deleteMrisDiagnoseByVisitId(map);
+
+            // 删除分行病案诊断信息
+            mrisHomeDAO.deleteRowMrisDiagnoseByVisitId(map);
 
             // 删除病案费用信息
             mrisHomeDAO.deleteMrisCostByVisitId(map);
@@ -1143,6 +1228,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         mrisBaseInfoDTO.setNativeAdress(mrisBaseInfoDTO.getNativeAdress());
         mrisBaseInfoDTO.setInWay(mrisBaseInfoDTO.getInWay());
         mrisBaseInfoDTO.setDiseaseIcd10Name(mrisBaseInfoDTO.getDiseaseIcd10Name());
+        mrisBaseInfoDTO.setDiseaseIcd10(mrisBaseInfoDTO.getDiseaseIcd10());
+        mrisBaseInfoDTO.setBabyBirthWeight(mrisBaseInfoDTO.getBabyWeight());
+        mrisBaseInfoDTO.setOutptDoctorId(mrisBaseInfoDTO.getOutptDoctorId());
+        mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);

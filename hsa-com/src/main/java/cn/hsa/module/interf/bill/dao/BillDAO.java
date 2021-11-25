@@ -27,7 +27,7 @@ public interface BillDAO {
 	 * @param pjhmList
 	 * @return
 	 */
-	List<MzpjFyDTO> listMzpjFyByPjhm(@Param("pjhmList")List<String> pjhmList);
+	List<MzpjFyDTO> listMzpjFyByPjhm(Map <String,Object> map);
 
 	/**
 	 * 从视图里面查询门诊明细数据,根据PJHM
@@ -35,7 +35,7 @@ public interface BillDAO {
 	 * @param pjhmList
 	 * @return
 	 */
-	List<MzylMxDTO> listMzpjMxByPjhm(@Param("pjhmList")List<String> pjhmList);
+	List<MzylMxDTO> listMzpjMxByPjhm(Map <String,Object> map);
 	
 	/**
 	 * 从视图里面查询住院主体数据信息,过滤时间段,已抽取的主体数据
@@ -50,13 +50,13 @@ public interface BillDAO {
 	 * @param pjhmList
 	 * @return
 	 */
-	List<ZypjFyDTO> listZypjFyByPjhm(@Param("pjhmList")List<String> pjhmList);
+	List<ZypjFyDTO> listZypjFyByPjhm(Map <String,Object> map);
 	/**
 	 * 从视图里面查询住院明细数据,根据PJHM
 	 * 
 	 * @param pjhmList
 	 * @return
 	 */
-	List<ZyylMxDTO> listZypjMxByPjhm(@Param("pjhmList")List<String> pjhmList);
+	List<ZyylMxDTO> listZypjMxByPjhm(Map <String,Object> map);
 
 }

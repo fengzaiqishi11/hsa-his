@@ -289,6 +289,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());
             insureIndividualSettleDO.setSettleState("1");
             insureIndividualSettleDO.setCrteTime(outptVisitDTO.getCrteTime());
+            insureIndividualSettleDO.setPsnPartAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getPsnPartAmt()));// 个人负担总金额
+            insureIndividualSettleDO.setBeforeSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getBeforeSettle()));// 结算后余额
+            insureIndividualSettleDO.setLastSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getLastSettle()));// 结算后余额
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);
             insertMap.put("insureIndividualSettleDO",insureIndividualSettleDO);

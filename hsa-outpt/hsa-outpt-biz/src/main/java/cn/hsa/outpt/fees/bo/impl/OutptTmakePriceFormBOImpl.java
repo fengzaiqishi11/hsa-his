@@ -1799,6 +1799,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
                 Object object =  MapUtils.get(payinfo,"acct_pay");
                 InsureIndividualSettleDO individualSettleDO  = new InsureIndividualSettleDO();
+                Object balcObject = MapUtils.get(payinfo, "balc");// 结算后个人账户余额
+                BigDecimal balcPrice = new BigDecimal(0.00);
+                if(balcObject == null || (balcObject instanceof String && StringUtils.isEmpty(balcObject.toString()))){
+                    individualSettleDO.setLastSettle(balcPrice);
+                }else{
+                    individualSettleDO.setLastSettle(BigDecimalUtils.convert((balcObject.toString())));
+                }
+                // 更新门诊结算表的个人账户支付
+                OutptSettleDO outptSettleDO = new OutptSettleDO();
+                outptSettleDO.setHospCode(hospCode);
+                outptSettleDO.setId(settleId);
+                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+                if(object == null){
+                    outptSettleDO.setAcctPay(new BigDecimal(0.00));
+                }
+                if(object instanceof String){
+                    outptSettleDO.setAcctPay(BigDecimalUtils.convert(MapUtils.get(payinfo,"acct_pay")));
+                }else{
+                    outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
+                }
+                // 结算前个人账户余额 =  个人账户支出+结算后个人账户余额
+                individualSettleDO.setBeforeSettle(BigDecimalUtils.add(outptSettleDO.getAcctPay(),individualSettleDO.getLastSettle()));
                 individualSettleDO.setInsureSettleId(insureSettleId);
                 individualSettleDO.setMedicalRegNo(medicalRegNo);
                 individualSettleDO.setHospCode(hospCode);
@@ -1820,16 +1842,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 insureIndividualCostDTO.setInsureSettleId(insureSettleId);
                 map.put("insureIndividualCostDTO",insureIndividualCostDTO);
                 insureIndividualCostService_consumer.updateInsureSettleCost(map).getData();
-                // 更新门诊结算表的个人账户金额
-                OutptSettleDO outptSettleDO = new OutptSettleDO();
-                outptSettleDO.setHospCode(hospCode);
-                outptSettleDO.setId(settleId);
-                if(object instanceof String){
-                    outptSettleDO.setAcctPay(BigDecimalUtils.convert(MapUtils.get(payinfo,"acct_pay")));
-                }else{
-                    outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
-                }
-                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+
                 map.put("medicalRegNo",medicalRegNo);
                 map.put("insureSettleId",insureSettleId);
                 outptVisitDAO.updateInsuresumPatient(map);

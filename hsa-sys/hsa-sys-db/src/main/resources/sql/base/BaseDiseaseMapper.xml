@@ -19,6 +19,7 @@
 		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
 		<result property="isCrb" column="is_infectious" jdbcType="VARCHAR"/>
 		<result property="crbName" column="infectious_name" jdbcType="VARCHAR"/>
+		<result property="platformCode" column="platform_code" jdbcType="VARCHAR"/>
 		<result property="crbInterval" column="infectious_interval_days" jdbcType="INTEGER"/>
 		<result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
 	</resultMap>
@@ -34,7 +35,7 @@
 	<select id="getById" resultMap="BaseDiseaseMap">
 		select
 		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
-		crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no
+		crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no,platform_code
 		from base_disease
 		<where>
 			hosp_code = #{hospCode}
@@ -176,8 +177,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no)
-        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{usualName}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo})
+        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no,platform_code)
+        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{usualName}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo},#{platformCode})
     </insert>
 
 	<!--新增疾病规则-->
@@ -214,7 +215,8 @@
 			is_infectious = #{isCrb},
 			infectious_name = #{crbName},
 			infectious_interval_days = #{crbInterval},
-		    seq_no = #{seqNo}
+		    seq_no = #{seqNo},
+			platform_code =#{platformCode}
 		</set>
 		where id = #{id} and hosp_code = #{hospCode}
 	</update>
@@ -386,7 +388,7 @@
     <select id="queryAllInfectious" resultMap="BaseDiseaseMap">
         select
         id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
-        crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days
+        crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,platform_code
         from base_disease
         where hosp_code = #{hospCode} and is_infectious='1'
         <if test="ids != null and ids.size > 0">

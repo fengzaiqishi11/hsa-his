@@ -599,19 +599,19 @@
         </if>
         <if test="isHalfSettle == '1'.toString() ">
             <if test="feeStartDate != null and feeStartDate != '' ">
-                and date(ic.cost_time) &gt;= STR_TO_DATE(#{feeStartDate},'%Y-%m-%d')
+                and ic.cost_time &gt;= #{feeStartDate}
             </if>
             /*结束日期*/
             <if test="feeEndDate != null and feeEndDate != ''">
-                and date(ic.cost_time) &lt;= STR_TO_DATE(#{feeEndDate},'%Y-%m-%d')
+                and ic.cost_time &lt;= #{feeEndDate}
             </if>
         </if>
         <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">
           AND ic.attribution_code = #{attributionCode}
         </if>
         <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">
-        AND (ic.attribution_code = '0' or ic.attribution_code is null or ic.attribution_code = '')
-      </if>
+        AND ic.attribution_code = '0'
+        </if>
         order by ic.total_price desc
     </select>
     <select id="queryLastestOrderNo" resultType="java.lang.String">

@@ -595,7 +595,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
          * 如果参保地和就医地前四位不相等 且是住院则需要打印异地结算单
          * 1.当是异地结算单是需要获取对应的参保地和区划地名称
          */
-        if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
+        if(!mdtrtareaAdmvs.substring(0,2).equals(insuplcAdmdvs.substring(0,2)) && Constants.SF.S.equals(isHospital)){
             List<Map<String,Object>> mapList =  insureReversalTradeDAO.selectMdOrIns(hospCode);
             if(!ListUtils.isEmpty(mapList)){
                 String insuplcAdmdvsName =""; // 对应参保地区划名称
@@ -641,13 +641,14 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }else{
             psnCashPayBigDecimal = (BigDecimal) psnCashPay;
         }
-        BigDecimal price =  BigDecimalUtils.subtract(psnCashPayBigDecimal,totalAdvance);
         if(BigDecimalUtils.greater(psnCashPayBigDecimal,totalAdvance)){
+            BigDecimal price =  BigDecimalUtils.subtract(psnCashPayBigDecimal,totalAdvance);
             baseInfoMap.put("yjyjj",price); // 应交预交金
             baseInfoMap.put("yjyjjCN",numberToCN.number2CNMontrayUnit(price)); // 应交预交金
             baseInfoMap.put("ytyjjCN","零元"); // 应退预交金
             baseInfoMap.put("ytyjj",new BigDecimal(0.00)); // 应退预交金
         }else{
+            BigDecimal price =  BigDecimalUtils.subtract(totalAdvance,psnCashPayBigDecimal);
             baseInfoMap.put("ytyjj",price); // 应交预交金
             baseInfoMap.put("ytyjjCN",numberToCN.number2CNMontrayUnit(price)); // 应交预交金
             baseInfoMap.put("yjyjjCN","零元"); // 应退预交金
@@ -678,6 +679,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         else{
             if(Constants.SF.F.equals(isHospital)){
                 insureIndividualVisitDTO.setInsureSettleId(insureSettleId);
+            }else{
+                insureIndividualVisitDTO.setInsureSettleId(null);
             }
             sumInfoMapList =  insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
         }
@@ -1089,6 +1092,78 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         return partThreeMap;
     }
 
+//    public static void main(String[] args) {
+//        String resultStr ="{\t\"output\":{\t\t\"setlinfo\":{\t\t\t\"setl_time\":\"2021-11-24 15:11:05\",\t\t\t\"cvlserv_pay\":0,\t\t\t\"cvlserv_flag\":\"0\",\t\t\t\"med_type\":\"2101\",\t\t\t\"naty\":\"\",\t\t\t\"brdy\":\"1960-12-06\",\t\t\t\"psn_cash_pay\":568.47,\t\t\t\"certno\":\"432502196012060043\",\t\t\t\"hifmi_pay\":0,\t\t\t\"psn_no\":\"43000011300000666847\",\t\t\t\"act_pay_dedc\":200,\t\t\t\"mdtrt_cert_type\":\"03\",\t\t\t\"balc\":1920.94,\t\t\t\"medins_setl_id\":\"H43010500209202111241511034181\",\t\t\t\"psn_cert_type\":\"90\",\t\t\t\"hifob_pay\":0,\t\t\t\"acct_mulaid_pay\":0,\t\t\t\"clr_way\":\"01\",\t\t\t\"oth_pay\":0,\t\t\t\"medfee_sumamt\":3338.1,\t\t\t\"hifes_pay\":0,\t\t\t\"gend\":\"2\",\t\t\t\"mdtrt_id\":\"31369850\",\t\t\t\"fund_pay_sumamt\":2769.63,\t\t\t\"acct_pay\":0,\t\t\t\"fulamt_ownpay_amt\":30.0,\t\t\t\"setl_id\":\"19712772\",\t\t\t\"hosp_part_amt\":0,\t\t\t\"psn_name\":\"刘桂华\",\t\t\t\"insutype\":\"310\",\t\t\t\"inscp_scp_amt\":3225.27,\t\t\t\"maf_pay\":0,\t\t\t\"psn_part_amt\":568.47,\t\t\t\"pool_prop_selfpay\":0,\t\t\t\"clr_optins\":\"430105\",\t\t\t\"psn_type\":\"12\",\t\t\t\"overlmt_selfpay\":0.0,\t\t\t\"hifp_pay\":2769.63,\t\t\t\"preselfpay_amt\":82.83,\t\t\t\"age\":60.0,\t\t\t\"clr_type\":\"9902\"\t\t},\t\t\"setldetail\":[\t\t\t{\t\t\t\t\"fund_pay_type\":\"\",\t\t\t\t\"fund_payamt\":\"\",\t\t\t\t\"setl_proc_info\":\"\",\t\t\t\t\"crt_payb_lmt_amt\":\"\",\t\t\t\t\"inscp_scp_amt\":3225.27,\t\t\t\t\"fund_pay_type_name\":\"\"\t\t\t}\t\t]\t},\t\"infcode\":\"0\",\t\"refmsg_time\":\"20211124151103785\",\t\"message\":\"\",\t\"respond_time\":\"20211124151106437\",\t\"inf_refmsgid\":\"430000202111241511060268275085\"}";
+//        Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
+//        if ("999".equals(MapUtils.get(resultMap,"code"))) {
+//            throw new AppException((String) resultMap.get("msg"));
+//        }
+//        if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+//            Object resultMsg = resultMap.get("err_msg");
+//            if (resultMsg == null) {
+//                resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";
+//            }
+//            throw new AppException(resultMsg.toString());
+//        }
+//        Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
+//        Map <String,Object> setlInfoMap = (Map<String, Object>) outMap.get("setlinfo");
+//        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+//        List<Map<String,Object>> setldetail = MapUtils.get(outMap,"setldetail");
+//        Map<String,Object> partFourMap = new HashMap<>();
+//        Boolean isRemote = true;
+//        BigDecimal hospPrice = new BigDecimal(0.00);
+//        DecimalFormat df1 = new DecimalFormat("0.00");
+//
+//        BigDecimal s1= BigDecimalUtils.convert( df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"medfee_sumamt")))));
+//        BigDecimal s2 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifp_pay")))));
+//        BigDecimal s3 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"cvlserv_pay")))));
+//        BigDecimal s4 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifob_pay")))));
+//        BigDecimal s5 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifmi_pay")))));
+//        BigDecimal s6= BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifob_pay")))));
+//        BigDecimal s7 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"acct_pay")))));
+//        BigDecimal s8 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
+//        BigDecimal s9 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
+//        BigDecimal s10 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"balc")))));
+//        partFourMap.put("medfeeSumamt",s1); // 本次医疗费总额
+//        partFourMap.put("hifpPay",s2); // 统筹基金支付
+//        partFourMap.put("cvlservPay",s3); // 公务员补助支付
+//        partFourMap.put("hifobPay",s4); // 大额基金支付
+//        partFourMap.put("hifmiPay",s5); // 大病保险支付
+//        partFourMap.put("hifobPay",s6); // 大额基金支付
+//        partFourMap.put("acctPay",s7); // 个人账户支付金额
+//        partFourMap.put("actPayDedc",s8); // 实际支付起付线
+//        partFourMap.put("psnCashPay",s9); // 现金支付金额
+//        if(individualSettleDTO !=null){
+//            partFourMap.put("hospPrice",individualSettleDTO.getHospPrice()); // 医院支付
+//        }else{
+//            partFourMap.put("hospPrice",new BigDecimal(0.00)); // 医院支付
+//        }
+//        partFourMap.put("balc",s10); // 个人账户余额
+//        if(isRemote){
+//            if(!ListUtils.isEmpty(setldetail)){
+//                BigDecimal fundSumAmt = new BigDecimal(0.00);
+//                String fundPayamt = "" ; // 基金支付金额
+//                for(Map<String,Object> item : setldetail){
+//                    fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
+//                    fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
+//                }
+//                partFourMap.put("fundSumAmt",fundSumAmt); // 基金支付
+//                partFourMap.put("fundSumAmtCN",numberToCN.number2CNMontrayUnit(fundSumAmt)); // 基金支付
+//            }
+//            partFourMap.put("medfeeSumamtCN",numberToCN.number2CNMontrayUnit(s1)); // 本次医疗费总额
+//            partFourMap.put("hifpPayCN",numberToCN.number2CNMontrayUnit(s2)); // 统筹基金支付
+//            partFourMap.put("cvlservPayCN",numberToCN.number2CNMontrayUnit(s3)); // 公务员补助支付
+//            partFourMap.put("hifobPayCN",numberToCN.number2CNMontrayUnit(s4)); // 大额基金支付
+//            partFourMap.put("hifmipPayCN",numberToCN.number2CNMontrayUnit(s5)); // 大病保险支付
+//            partFourMap.put("hifobPayCN",numberToCN.number2CNMontrayUnit(s6)); // 大额基金支付
+//            partFourMap.put("acctPayCN",numberToCN.number2CNMontrayUnit(s7)); // 个人账户支付金额
+//            partFourMap.put("actPayDedcCN",numberToCN.number2CNMontrayUnit(s8)); // 实际支付起付线
+//            partFourMap.put("hospPriceCN",numberToCN.number2CNMontrayUnit(hospPrice)); // 现金支付金额
+//            partFourMap.put("psnCashPayCN",numberToCN.number2CNMontrayUnit(s9)); // 现金支付金额
+//            partFourMap.put("balcCN",numberToCN.number2CNMontrayUnit(s10)); // 个人账户余额
+//        }
+//
+//    }
     /**
      * @Method handlerInsureSettleFee
      * @Desrciption  结算单公共部分 尾部  结算信息
@@ -1101,18 +1176,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     private Map<String, Object> handlerInsureSettleFee(Map<String, Object> setlInfoMap, boolean isRemote, InsureIndividualSettleDTO individualSettleDTO, List<Map<String, Object>> setldetail) {
         Map<String,Object> partFourMap = new HashMap<>();
         BigDecimal hospPrice = new BigDecimal(0.00);
-        BigDecimal s1= MapUtils.get(setlInfoMap,"medfee_sumamt") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"medfee_sumamt");
-        BigDecimal s2 = MapUtils.get(setlInfoMap,"hifp_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"hifp_pay");
-        BigDecimal s3 =MapUtils.get(setlInfoMap,"cvlserv_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"cvlserv_pay");
-        BigDecimal s4 = MapUtils.get(setlInfoMap,"hifob_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"hifob_pay");
-        BigDecimal s5 = MapUtils.get(setlInfoMap,"hifmi_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"hifmi_pay");
-
-        BigDecimal s6= MapUtils.get(setlInfoMap,"hifob_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"hifob_pay");
-        BigDecimal s7 = MapUtils.get(setlInfoMap,"acct_pay") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"acct_pay");
-        BigDecimal s8 = MapUtils.get(setlInfoMap,"act_pay_dedc") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"act_pay_dedc");
-        BigDecimal s9 = MapUtils.get(setlInfoMap,"cash_payamt")== null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"cash_payamt");
-        BigDecimal s10 = MapUtils.get(setlInfoMap,"balc") == null ? new BigDecimal(0.00) : MapUtils.get(setlInfoMap,"balc");
-
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        BigDecimal s1= BigDecimalUtils.convert( df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"medfee_sumamt")))));
+        BigDecimal s2 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifp_pay")))));
+        BigDecimal s3 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"cvlserv_pay")))));
+        BigDecimal s4 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifob_pay")))));
+        BigDecimal s5 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifmi_pay")))));
+        BigDecimal s6= BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifob_pay")))));
+        BigDecimal s7 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"acct_pay")))));
+        BigDecimal s8 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
+        BigDecimal s9 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
+        BigDecimal s10 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"balc")))));
         partFourMap.put("medfeeSumamt",s1); // 本次医疗费总额
         partFourMap.put("hifpPay",s2); // 统筹基金支付
         partFourMap.put("cvlservPay",s3); // 公务员补助支付
@@ -1485,7 +1559,13 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("brdy",MapUtils.get(setlInfoMap,"brdy")); // 出生年月
         map.put("aae140",insureIndividualVisitDTO.getAae140()); // 险种
         map.put("totalAdvance",insureIndividualVisitDTO.getTotalAdvance()); // 累计预交金
-        map.put("totalAdvanceCN",numberToCN.number2CNMontrayUnit(insureIndividualVisitDTO.getTotalAdvance())); // 累计预交金
+
+        if(insureIndividualVisitDTO.getTotalAdvance() ==null || BigDecimalUtils.isZero(insureIndividualVisitDTO.getTotalAdvance())){
+            map.put("totalAdvanceCN","零元"); // 累计预交金
+            insureIndividualVisitDTO.setTotalAdvance(new BigDecimal(0.00)); // 累计预交金
+        }else{
+            map.put("totalAdvanceCN",numberToCN.number2CNMontrayUnit(insureIndividualVisitDTO.getTotalAdvance())); // 累计预交金
+        }
         map.put("inDiseaseName",insureIndividualVisitDTO.getInDiseaseName()); // 入院第一诊断
         map.put("outDiseaseName",insureIndividualVisitDTO.getOutDiseaseName()); // 出院第一诊断
         map.put("visitNationCode",insureIndividualVisitDTO.getVisitNationCode()); // 科别

@@ -10,6 +10,9 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.nurse.bo.AddAccountByInptBO;
 import cn.hsa.module.inpt.nurse.bo.BackCostSureByInptBO;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeAllDetailDTO;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeDetailDTO;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
@@ -197,13 +200,13 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                 if (waitInptcost != null && waitInptcost.size() > 0) {
                     String message = getErrorMessage(waitInptcost);
                     if (StringUtils.isNotEmpty(message)) {
-                        throw new AppException("取消退费提示：" + message + "请先去药房取消预配药,再进行取消退费");
+                        throw new AppException("取消退费提示：" + message + "请先去取消预配药,再进行取消退费");
                     }
                 }
                 if (pYInptcost != null && pYInptcost.size() > 0) {
                     String message = getErrorMessage(pYInptcost);
                     if (StringUtils.isNotEmpty(message)) {
-                        throw new AppException("取消退费提示：" + message + "请先去药房取消配药，再进行取消退费");
+                        throw new AppException("取消退费提示：" + message + "请先去取消配药，再进行取消退费");
                     }
                 }
 //                if (fYInptcost != null && fYInptcost.size() > 0) {
@@ -242,6 +245,9 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                         backReceiveDTO.setCostIds(inptCostDTO.getIds());
                         List<String> deleteIds =new ArrayList<>();
                         List<PharInWaitReceiveDTO> newReceiveDTOList =new ArrayList<>();
+                        List<PharInReceiveDetailDTO> newPharInReceiveDetailList=new ArrayList<>();
+                        List<PharInDistributeAllDetailDTO> newPharInDistributeAllDetailList=new ArrayList<>();
+                        List<PharInDistributeDetailDTO> newPharInDistributeDetailList=new ArrayList<>();
                         List<PharInWaitReceiveDTO> backReceiveDTOList = pharInWaitReceiveService_consumer.queryPharInWaitReceiveToIsBack(HandParamMap(hospCode, "pharInWaitReceiveDTO", backReceiveDTO)).getData();
                         if (backReceiveDTOList != null && backReceiveDTOList.size() > 0) {
                             //有负的待领信息才需要新增一条待领记录
@@ -291,13 +297,111 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                                         }
                                     }
                                 }
-                                dto.setOldWrId(null);
                                 dto.setId(SnowflakeUtils.getId());
+                                if (Constants.FYZT.FY.equals(dto.getStatusCode())) {
+                                    // 获取原始领药明细
+                                    Map pharInReceiveParam = new HashMap();
+                                    pharInReceiveParam.put("hospCode", hospCode);
+                                    pharInReceiveParam.put("wrId", dto.getOldWrId());
+                                    PharInReceiveDetailDTO pharInReceiveDetailDTO = inptCostDAO.getPharInReceiveDetailByWrId(pharInReceiveParam);
+                                    if (pharInReceiveDetailDTO != null) {
+                                        PharInReceiveDetailDTO inReceiveDetailDTO = new PharInReceiveDetailDTO();
+                                        inReceiveDetailDTO.setId(pharInReceiveDetailDTO.getId());
+                                        inReceiveDetailDTO.setHospCode(hospCode);
+                                        inReceiveDetailDTO.setNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getNum(), dto.getNum()));
+                                        inReceiveDetailDTO.setSplitNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getSplitNum(), dto.getSplitNum()));
+                                        inReceiveDetailDTO.setTotalPrice(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getTotalPrice(), dto.getTotalPrice()));
+                                        // 更新或删除领药明细
+                                        if (BigDecimalUtils.isZero(inReceiveDetailDTO.getNum())) {
+                                            inptCostDAO.deletePharInReceiveDetailOrg(inReceiveDetailDTO);
+                                        } else {
+                                            inptCostDAO.updatePharInReceiveDetailOrg(inReceiveDetailDTO);
+                                        }
+                                        // 新增领药明细
+                                        PharInReceiveDetailDTO newPharInReceiveDetailDTO = new PharInReceiveDetailDTO();
+                                        newPharInReceiveDetailDTO = DeepCopy.deepCopy(pharInReceiveDetailDTO);//深度复制
+                                        newPharInReceiveDetailDTO.setId(SnowflakeUtils.getId());
+                                        newPharInReceiveDetailDTO.setHospCode(hospCode);
+                                        newPharInReceiveDetailDTO.setWrId(dto.getId());
+                                        newPharInReceiveDetailDTO.setNum(dto.getNum());
+                                        newPharInReceiveDetailDTO.setSplitNum(dto.getSplitNum());
+                                        newPharInReceiveDetailDTO.setTotalPrice(dto.getTotalPrice());
+                                        newPharInReceiveDetailList.add(newPharInReceiveDetailDTO);
+                                        Map distributeDetailAll = new HashMap();
+                                        distributeDetailAll.put("hospCode", hospCode);
+                                        distributeDetailAll.put("receiveId", pharInReceiveDetailDTO.getReceiveId());
+                                        distributeDetailAll.put("id", pharInReceiveDetailDTO.getId());
+                                        PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO = inptCostDAO.queryAllPharDistributeOrg(distributeDetailAll);
+                                        PharInDistributeDetailDTO pharInDistributeDetailDTO = inptCostDAO.getPharInDistributeDetailByWrId(distributeDetailAll);
+                                        if (pharInDistributeAllDetailDTO != null) {
+                                            PharInDistributeAllDetailDTO phar = new PharInDistributeAllDetailDTO();
+                                            phar.setId(pharInDistributeAllDetailDTO.getId());
+                                            phar.setHospCode(hospCode);
+                                            phar.setNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getNum(), dto.getNum()));
+                                            phar.setSplitNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getSplitNum(), dto.getSplitNum()));
+                                            phar.setTotalPrice(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getTotalPrice(), dto.getTotalPrice()));
+                                            // 更新或删除药房住院分批发药明细
+                                            if (BigDecimalUtils.isZero(phar.getNum())) {
+                                                inptCostDAO.deleteInDistributeAllDetailOrg(phar);
+                                            } else {
+                                                inptCostDAO.updateAllPharDistributeOrg(phar);
+                                            }
+                                            // 新增药房住院分批发药明细
+                                            PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO1 = new PharInDistributeAllDetailDTO();
+                                            pharInDistributeAllDetailDTO1 = DeepCopy.deepCopy(pharInDistributeAllDetailDTO);//深度复制
+                                            pharInDistributeAllDetailDTO1.setId(SnowflakeUtils.getId());
+                                            pharInDistributeAllDetailDTO1.setHospCode(hospCode);
+                                            pharInDistributeAllDetailDTO1.setIrdId(newPharInReceiveDetailDTO.getId());
+                                            pharInDistributeAllDetailDTO1.setNum(dto.getNum());
+                                            pharInDistributeAllDetailDTO1.setSplitNum(dto.getSplitNum());
+                                            pharInDistributeAllDetailDTO1.setTotalPrice(dto.getTotalPrice());
+                                            newPharInDistributeAllDetailList.add(pharInDistributeAllDetailDTO1);
+                                        }
+                                        if (pharInDistributeDetailDTO != null) {
+                                            PharInDistributeDetailDTO phar = new PharInDistributeDetailDTO();
+                                            phar.setId(pharInDistributeDetailDTO.getId());
+                                            phar.setHospCode(hospCode);
+                                            phar.setNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getNum(), dto.getNum()));
+                                            phar.setSplitNum(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getSplitNum(), dto.getSplitNum()));
+                                            phar.setTotalPrice(BigDecimalUtils.subtract(pharInReceiveDetailDTO.getTotalPrice(), dto.getTotalPrice()));
+                                            // 更新或删除发药明细
+                                            if (BigDecimalUtils.isZero(phar.getNum())) {
+                                                inptCostDAO.deleteInDistributeDetailOrg(phar);
+                                            } else {
+                                                inptCostDAO.updatePharInDistributeDetailOrg(phar);
+                                            }
+                                            // 新增发药明细
+                                            PharInDistributeDetailDTO pharInDistributeDetailDTO1 = new PharInDistributeDetailDTO();
+                                            pharInDistributeDetailDTO1 = DeepCopy.deepCopy(pharInDistributeDetailDTO);//深度复制
+                                            pharInDistributeDetailDTO1.setId(SnowflakeUtils.getId());
+                                            pharInDistributeDetailDTO1.setHospCode(hospCode);
+                                            pharInDistributeDetailDTO1.setIrdId(newPharInReceiveDetailDTO.getId());
+                                            pharInDistributeDetailDTO1.setNum(dto.getNum());
+                                            pharInDistributeDetailDTO1.setSplitNum(dto.getSplitNum());
+                                            pharInDistributeDetailDTO1.setTotalPrice(dto.getTotalPrice());
+                                            newPharInDistributeDetailList.add(pharInDistributeDetailDTO1);
+                                        }
+                                    }
+                                }
+                                dto.setOldWrId(null);
                                 newReceiveDTOList.add(dto);
                             }
                             if (!ListUtils.isEmpty(newReceiveDTOList)) {
                                 //新增待领记录
                                 inptCostDAO.insertPharInWaitReceiveBatch(newReceiveDTOList);
+                            }
+
+                            if (!ListUtils.isEmpty(newPharInReceiveDetailList)) {
+                                // 新增领药明细
+                                inptCostDAO.insertPharInReceiveDetail(newPharInReceiveDetailList);
+                            }
+                            if (!ListUtils.isEmpty(newPharInDistributeAllDetailList)) {
+                                // 新增药房住院分批发药明细
+                                inptCostDAO.insertInDistributeAllDetail(newPharInDistributeAllDetailList);
+                            }
+                            if (!ListUtils.isEmpty(newPharInDistributeDetailList)) {
+                                // 新增发药明细
+                                inptCostDAO.insertInDistributeDetail(newPharInDistributeDetailList);
                             }
                             if (deleteIds!=null &&deleteIds.size()>0) {
                                 // 删除退药记录

@@ -1982,4 +1982,114 @@
         and id = #{id}
     </update>
 
+    <!--根据条件查询发药明细-->
+    <select id="queryAllPharDistributeOrg" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeAllDetailDTO">
+        select
+        id, hosp_code, distribute_id, ir_id, ird_id, advice_id,
+        group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage,
+        dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num,
+        usage_code, curr_unit_code,crte_id,crte_name,crte_time,old_dist_id
+        from phar_in_distribute_all_detail
+        where hosp_code = #{hospCode} and ir_id =#{receiveId} and ird_id =#{id}
+    </select>
+
+    <update id="updateAllPharDistributeOrg">
+        update phar_in_distribute_all_detail
+        set num =#{num},total_price =#{totalPrice},split_num = #{splitNum}
+        where hosp_code = #{hospCode} and id =#{id}
+    </update>
+
+    <!--根据条件查询发药明细-->
+    <select id="getPharInReceiveDetailByWrId" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO">
+        select
+          id, hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code,
+          item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code,
+          split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code
+        from phar_in_receive_detail
+        where hosp_code = #{hospCode}
+         and wr_id = #{wrId}
+    </select>
+
+    <update id="updatePharInReceiveDetailOrg">
+        update phar_in_receive_detail
+        set num =#{num},total_price =#{totalPrice},split_num = #{splitNum}
+        where hosp_code = #{hospCode} and id =#{id}
+    </update>
+
+    <!--单个查询-->
+    <select id="getPharInDistributeDetailByWrId" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeDetailDTO">
+        select
+          id, hosp_code, distribute_id, ir_id, ird_id, advice_id, group_no, visit_id, baby_id,
+          item_code, item_id, item_name, num, price, unit_code, spec, dosage, dosage_unit_code, total_price,
+          split_ratio, split_unit_code, split_num, split_price, chinese_drug_num,
+          usage_code, stock_detail_id, batch_no, up_batch_surplus_num, batch_surplus_num,
+          up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all
+        from phar_in_distribute_detail
+        where hosp_code = #{hospCode}
+        and ir_id =#{receiveId} and ird_id =#{id}
+    </select>
+
+    <update id="updatePharInDistributeDetailOrg">
+        update phar_in_distribute_detail
+        set num =#{num},total_price =#{totalPrice},split_num = #{splitNum}
+        where hosp_code = #{hospCode} and id =#{id}
+    </update>
+
+
+    <!--单个新增-->
+    <insert id="insertPharInReceiveDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_receive_detail(id,hosp_code, wr_id, receive_id, advice_id, group_no, visit_id, baby_id, item_code, item_id, item_name, price, num, spec, unit_code, total_price, dosage, dosage_unit_code, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num, usage_code)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+         (#{item.id},#{item.hospCode}, #{item.wrId}, #{item.receiveId}, #{item.adviceId}, #{item.groupNo}, #{item.visitId}, #{item.babyId},
+         #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.price}, #{item.num}, #{item.spec}, #{item.unitCode}, #{item.totalPrice}, #{item.dosage},
+         #{item.dosageUnitCode}, #{item.splitRatio}, #{item.splitUnitCode}, #{item.splitNum}, #{item.splitPrice}, #{item.chineseDrugNum}, #{item.usageCode})
+        </foreach>
+    </insert>
+
+    <!--插入住院发药明细表-->
+    <insert id="insertInDistributeDetail" keyProperty="id" useGeneratedKeys="true">
+        insert into phar_in_distribute_detail(id,hosp_code,distribute_id,ir_id,ird_id,advice_id,group_no,
+        visit_id,baby_id,item_code,item_id,item_name,num,price,unit_code,spec,dosage,dosage_unit_code,total_price,
+        split_ratio,split_unit_code,split_num,split_price,chinese_drug_num,usage_code,stock_detail_id,batch_no,
+        up_batch_surplus_num,batch_surplus_num,up_buy_price_all,buy_price_all,up_sell_price_all,sell_price_all,curr_unit_code,distribute_all_detail_id,old_dist_id)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id},#{item.hospCode}, #{item.distributeId}, #{item.irId}, #{item.irdId}, #{item.adviceId}, #{item.groupNo},
+            #{item.visitId}, #{item.babyId}, #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.num},
+            #{item.price}, #{item.unitCode}, #{item.spec}, #{item.dosage}, #{item.dosageUnitCode}, #{item.totalPrice}, #{item.splitRatio}
+            , #{item.splitUnitCode}, #{item.splitNum}, #{item.splitPrice}, #{item.chineseDrugNum}, #{item.usageCode}, #{item.stockDetailId}
+            , #{item.batchNo}, #{item.upBatchSurplusNum}, #{item.batchSurplusNum}, #{item.upBuyPriceAll}
+            , #{item.buyPriceAll}, #{item.upSellPriceAll}, #{item.sellPriceAll}, #{item.currUnitCode},#{item.distributeAllDetailId},#{item.oldDistId})
+        </foreach>
+    </insert>
+
+    <insert id="insertInDistributeAllDetail">
+        insert into phar_in_distribute_all_detail(id, hosp_code, distribute_id, ir_id, ird_id, advice_id,
+        group_no, visit_id, baby_id, item_code, item_id, item_name, num, price, unit_code, spec, dosage,
+        dosage_unit_code, total_price, split_ratio, split_unit_code, split_num, split_price, chinese_drug_num,
+        usage_code, curr_unit_code,crte_id,crte_name,crte_time,old_dist_id)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id}, #{item.hospCode}, #{item.distributeId}, #{item.irId}, #{item.irdId}, #{item.adviceId},
+            #{item.groupNo}, #{item.visitId}, #{item.babyId}, #{item.itemCode}, #{item.itemId}, #{item.itemName},
+            #{item.num}, #{item.price}, #{item.unitCode}, #{item.spec},#{item.dosage}, #{item.dosageUnitCode},
+            #{item.totalPrice}, #{item.splitRatio}, #{item.splitUnitCode}, #{item.splitNum},#{item.splitPrice},
+            #{item.chineseDrugNum}, #{item.usageCode}, #{item.currUnitCode},#{item.crteId},#{item.crteName},
+            #{item.crteTime},#{item.oldDistId})
+        </foreach>
+    </insert>
+
+    <delete id="deletePharInReceiveDetailOrg">
+        delete from phar_in_receive_detail where hosp_code = #{hospCode} and id =#{id}
+    </delete>
+
+    <delete id="deleteInDistributeAllDetailOrg">
+        delete from phar_in_distribute_all_detail where hosp_code = #{hospCode} and id =#{id}
+    </delete>
+
+    <delete id="deleteInDistributeDetailOrg">
+        delete from phar_in_distribute_detail where hosp_code = #{hospCode} and id =#{id}
+    </delete>
+
 </mapper>

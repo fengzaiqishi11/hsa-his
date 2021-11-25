@@ -995,7 +995,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("ake039", ake039); //医疗保险统筹基金支付      - --- 基本医疗保险统筹基金支出
         paramMap.put("hospPrice", outDataMap.get("hosp_part_amt").toString()); //医院负担金额
         paramMap.put("acctMulaidPay", outDataMap.get("acct_mulaid_pay").toString()); //个人账户共计支付金额
-
         String fundPaySumamt = outDataMap.get("fund_pay_sumamt").toString(); // 医保支付
         String acctPay = outDataMap.get("acct_pay").toString(); // 个人账户
         String bka832 = fundPaySumamt;
@@ -1015,6 +1014,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             paramMap.put("acct_pay",outDataMap.get("acct_pay").toString());
             paramMap.put("clr_optins", MapUtils.get(outDataMap, "clr_optins"));
             paramMap.put("clr_way", MapUtils.get(outDataMap, "clr_way"));
+            paramMap.put("balc",MapUtils.get(outDataMap,"balc"));// 余额账户
             paramMap.put("clr_type", MapUtils.get(outDataMap, "clr_type"));
             paramMap.put("setldetailList", MapUtils.get(outDataMap, "setldetailList"));
         }

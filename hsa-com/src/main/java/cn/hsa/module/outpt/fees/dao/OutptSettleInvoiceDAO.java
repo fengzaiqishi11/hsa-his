@@ -119,6 +119,16 @@ public interface OutptSettleInvoiceDAO {
     int updateOutptSettleInvoices(List<OutptSettleInvoiceDTO> outptSettleInvoiceDTOList);
 
     /**
+     * @Description: 更新发票明细表发票状态作废
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/24 17:35
+     * @Return
+     */
+    int updateOutinInvoicesDetail(List<OutptSettleInvoiceDTO> outptSettleInvoiceDTOList);
+
+    /**
      * @Menthod getSetteleInvoiceByParams
      * @Desrciption 门诊结算发票信息批量冲红
      * @param outptSettleInvoiceDTOList

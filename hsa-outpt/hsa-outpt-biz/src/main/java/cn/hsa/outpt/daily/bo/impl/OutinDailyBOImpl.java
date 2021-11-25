@@ -431,6 +431,9 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 outinDailyInvoiceDTO.setEndNo(MapUtils.get(map, "end_no"));
                 // 发票费用合计
                 outinDailyInvoiceDTO.setTotalPrice(MapUtils.get(map, "total_price"));
+                outinDailyInvoiceDTO.setZfNum(((Long)MapUtils.get(map, "zfnum")).intValue());   // 作废数量
+                outinDailyInvoiceDTO.setTfNum(((Long)MapUtils.get(map, "tfnum")).intValue());   // 退费数量
+                outinDailyInvoiceDTO.setUseNum(((Long)MapUtils.get(map, "usenum")).intValue()); // 使用数量
                 odiList.add(outinDailyInvoiceDTO);
             }
         }
@@ -598,6 +601,9 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 outinDailyInvoiceDTO.setEndNo(MapUtils.get(map, "end_no"));
                 // 发票费用合计
                 outinDailyInvoiceDTO.setTotalPrice(MapUtils.get(map, "total_price"));
+                outinDailyInvoiceDTO.setZfNum(((Long)MapUtils.get(map, "zfnum")).intValue());   // 作废数量
+                outinDailyInvoiceDTO.setTfNum(((Long)MapUtils.get(map, "tfnum")).intValue());   // 退费数量
+                outinDailyInvoiceDTO.setUseNum(((Long)MapUtils.get(map, "usenum")).intValue()); // 使用数量
                 odiList.add(outinDailyInvoiceDTO);
             }
         }
@@ -744,6 +750,12 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyInvoiceDTO.setEndNo("");
         // 发票费用合计
         outinDailyInvoiceDTO.setTotalPrice(new BigDecimal(0));
+        // 发票退费数
+        outinDailyInvoiceDTO.setTfNum(0);
+        // 发票作废数
+        outinDailyInvoiceDTO.setZfNum(0);
+        // 发票使用数
+        outinDailyInvoiceDTO.setUseNum(0);
 
         return outinDailyInvoiceDTO;
     }
@@ -1059,7 +1071,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 } else {
                     StringBuffer RT_040204 = new StringBuffer("门诊挂号发票：");
                     MZ_05_MZGH.forEach(m -> {
-                        RT_040204.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
+                        RT_040204.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  ) 共使用").append(m.get("num")).append("张");
                         RT_040204.append("，");
                     });
                     RT_040204.deleteCharAt(RT_040204.length() - 1);
@@ -1134,7 +1146,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 } else {
                     StringBuffer RT_040205 = new StringBuffer("门诊收费发票：");
                     MZ_05_MZSF.forEach(m -> {
-                        RT_040205.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
+                        RT_040205.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  ) 共使用").append(m.get("use_num")).append("张,其中(正常").append(m.get("num")).append("张，作废").append(m.get("zf_num")).append("张，退费").append(m.get("tf_num")).append("张)");
                         RT_040205.append("，");
                     });
                     RT_040205.deleteCharAt(RT_040205.length() - 1);
@@ -1319,7 +1331,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             } else {
                 StringBuffer RT_0405 = new StringBuffer("住院收费发票：");
                 TMP_0405.forEach(m -> {
-                    RT_0405.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  )").append(m.get("num")).append("张");
+                    RT_0405.append("(  ").append(m.get("start_no")).append("  -  ").append(m.get("end_no")).append("  ) 共使用").append(m.get("use_num")).append("张,其中(正常").append(m.get("num")).append("张，作废").append(m.get("zf_num")).append("张，退费").append(m.get("tf_num")).append("张)");
                     RT_0405.append("，");
                 });
                 RT_0405.deleteCharAt(RT_0405.length() - 1);

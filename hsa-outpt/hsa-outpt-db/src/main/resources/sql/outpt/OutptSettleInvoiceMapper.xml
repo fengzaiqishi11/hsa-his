@@ -428,6 +428,13 @@
         </foreach>
     </update>
 
+    <update id="updateOutinInvoicesDetail" >
+        <foreach collection="list" index="index" item="item" separator=";">
+            update outin_invoice_detail set status_code = '2'
+            where hosp_code = #{item.hospCode} and invoice_no = #{item.invoiceNo}
+        </foreach>
+    </update>
+
     <!-- 批量插入数据 -->
     <insert id="insertOutptSettleInvoices" parameterType="list">
         INSERT INTO outpt_settle_invoice (

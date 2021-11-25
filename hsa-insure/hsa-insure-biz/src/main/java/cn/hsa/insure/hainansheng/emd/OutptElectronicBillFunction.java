@@ -72,7 +72,16 @@ public class OutptElectronicBillFunction {
         httpParam.put("data",data);
         httpParam.put("orgId",regCode);
         httpParam.put("transType", Constant.hainan.FUNCTION.hosQueryInsu);
-        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
+
+        // 查询电子凭证地址
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("hospCode", hospCode);
+        parameterMap.put("code", "DZPZ_URL");
+        Map<String, String> resultMap = insureIndividualVisitDAO.selectSysParameter(parameterMap);
+        if (resultMap.isEmpty() || "".equals(resultMap.get("value"))) {
+            throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
+        }
+        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
         httpResult.put("app",param.get("nationECResult"));
         Map<String,Object> extData = (Map<String, Object>) httpResult.get("extData");//医保扩展数据
         Map<String,Object> baseinfo = (Map<String, Object>) extData.get("baseinfo");//患者基本信息
@@ -390,8 +399,15 @@ public class OutptElectronicBillFunction {
         httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
         httpParam.put("transType",Constant.hainan.FUNCTION.hosUploadFee);
         // 查询医保访问路径
-
-        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
+        // 查询电子凭证地址
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("hospCode", hospCode);
+        parameterMap.put("code", "DZPZ_URL");
+        Map<String, String> resultMap = insureIndividualVisitDAO.selectSysParameter(parameterMap);
+        if (resultMap.isEmpty() || "".equals(resultMap.get("value"))) {
+            throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
+        }
+        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
         httpResult.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         return httpResult;
     }
@@ -425,7 +441,15 @@ public class OutptElectronicBillFunction {
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRevokeOrder);//操作类型
         httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
 
-        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode, regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
+        // 查询电子凭证地址
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("hospCode", hospCode);
+        parameterMap.put("code", "DZPZ_URL");
+        Map<String, String> resultMap = insureIndividualVisitDAO.selectSysParameter(parameterMap);
+        if (resultMap.isEmpty() || "".equals(resultMap.get("value"))) {
+            throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
+        }
+        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode, regCode,resultMap.get("value"),httpParam);
 
         return httpResult;
     }
@@ -460,7 +484,16 @@ public class OutptElectronicBillFunction {
         data.put("extData",extData);//医保扩展数据
         httpParam.put("data",data);//
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRefundSetl);//操作类型
-        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,"http://10.103.161.181:8082/pmc/api",httpParam);
+
+        // 查询电子凭证地址
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("hospCode", hospCode);
+        parameterMap.put("code", "DZPZ_URL");
+        Map<String, String> resultMap = insureIndividualVisitDAO.selectSysParameter(parameterMap);
+        if (resultMap.isEmpty() || "".equals(resultMap.get("value"))) {
+            throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
+        }
+        Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
 
         return null;
     }

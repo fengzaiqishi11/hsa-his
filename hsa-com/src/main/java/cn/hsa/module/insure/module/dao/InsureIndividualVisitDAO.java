@@ -399,5 +399,15 @@ public interface InsureIndividualVisitDAO {
      * @Return
      */
     Map<String, Object> getBaseDeptById(Map<String, String> map);
+
+    /**
+     * @Description: 查询系统参数值
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/24 11:06
+     * @Return
+     */
+    Map<String, String> selectSysParameter(Map<String, String> map);
 }
 

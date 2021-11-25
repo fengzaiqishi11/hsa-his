@@ -50,4 +50,10 @@ public class OutinDailyInsureDO implements Serializable {
     * 统筹支付总金额
     */
     private BigDecimal totalPrice;
+
+    // 医保支付总金额
+    private BigDecimal insurePrice;
+
+    // 个人账户支付总金额
+    private BigDecimal personalPrice;
 }

@@ -1421,7 +1421,7 @@
     </select>
 
 
-    <!--抗菌类住院发药汇总统计-->
+    <!--抗菌类住院发药汇总统 计-->
     <select id="queryInSumAntibiosisDrug" resultType="java.util.Map">
         SELECT
         concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,

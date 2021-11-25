@@ -1421,7 +1421,7 @@
     </select>
 
 
-    <!--抗菌类住院发药汇总统计-->
+    <!--抗菌类住院发药汇总统 计-->
     <select id="queryInSumAntibiosisDrug" resultType="java.util.Map">
         SELECT
         concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
@@ -1447,7 +1447,7 @@
         </if>
         <if test="endDate != null and endDate != ''">
             and b.crte_time &lt;= #{endDate}
-        </if>hd
+        </if>
         <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
         <if test='statisWay == "5"'>
             and g.prep_code in ('241','16','138')

@@ -48,4 +48,16 @@ public interface BackCostByInputService {
     **/
     @GetMapping("/service/inpt/nurse/saveBackCostWithInpt")
     WrapperResponse<Boolean> saveBackCostWithInpt(Map<String,Object> map);
+
+
+    /**
+     * @Method updateFeeDate
+     * @Desrciption 费用改变
+     * @param
+     * @Author yuelong.chen
+     * @Date   2021/11/25 14:41
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @GetMapping("/service/inpt/nurse/updateFeeDate")
+    WrapperResponse<Boolean> updateFeeDate(Map<String,Object> map);
 }

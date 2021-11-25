@@ -435,6 +435,22 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
         }
         return true;
     }
+    /**
+     * @Method updateFeeDate
+     * @Desrciption 费用改变
+     * @param
+     * @Author yuelong.chen
+     * @Date   2021/11/25 14:41
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @Override
+    public Boolean updateFeeDate(Map<String, Object> map) {
+        List<String> ids = MapUtils.get(map,"ids");
+        String hospCode =  MapUtils.get(map,"hospCode");
+        String feeDate = MapUtils.get(map,"feeDate");
+        Boolean aBoolean = inptVisitDAO.updateFeeDate(ids,hospCode,feeDate);
+        return aBoolean;
+    }
 
     /**
      * @Method: buildDTCost

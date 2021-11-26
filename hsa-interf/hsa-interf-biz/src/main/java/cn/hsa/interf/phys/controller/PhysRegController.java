@@ -8,7 +8,7 @@ import cn.hsa.module.interf.phys.dto.PhysRegisterDTO;
 import cn.hsa.module.interf.phys.dto.PhysSettleDTO;
 import cn.hsa.module.interf.phys.service.PhysRegService;
 import cn.hsa.util.ListUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,5 +84,33 @@ public class PhysRegController extends BaseController {
         map.put("hospCode", hospCode);
         map.put("settleDTOS", settleDTOS);
         return physRegService.addOrUpdateOutptCost(map);
+    }
+
+    /**
+     * @Description: 同步体检项目到his项目表
+     * @Param: [baseItemDTOS]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @PostMapping("/insertPhysGroup")
+    public WrapperResponse<Boolean> insertPhysGroup(@RequestBody Map map){
+        List<Map> list = MapUtils.get(map, "result");
+        map.put("hospCode",MapUtils.get(list.get(0),"hosp_code"));
+        return physRegService.insertPhysGroup(map);
+    }
+
+    /**
+     * @Description: 插入退费申请
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @PostMapping("/insertReturn")
+    public WrapperResponse<Boolean> insertReturn(@RequestBody Map map){
+        List<Map> list = MapUtils.get(map, "lisResult");
+        map.put("hospCode",MapUtils.get(list.get(0),"hospCode"));
+        return physRegService.insertReturn(map);
     }
 }

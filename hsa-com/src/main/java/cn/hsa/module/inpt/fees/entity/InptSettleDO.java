@@ -106,4 +106,7 @@ public class InptSettleDO extends PageDO implements Serializable{
         //病人状态
         private String brztStatusCode;
         private BigDecimal acctPay;
+
+        // 挂账金额
+        private BigDecimal creditPrice;
 }

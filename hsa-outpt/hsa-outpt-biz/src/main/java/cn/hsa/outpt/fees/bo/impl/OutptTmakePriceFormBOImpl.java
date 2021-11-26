@@ -1318,6 +1318,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
             outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+            // 2021年11月25日20:13:53  添加挂账金额，挂账支付方式必须为8
+            for (OutptPayDO dto : outptPayDOList) {
+                if ( "8".equals(dto.getPayCode())) {
+                    outptSettleDO.setCreditPrice(dto.getPrice());
+                }
+            }
             outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
             // 7.1 结算后需要将结算单号返回给前端
             Map<String, Object> settleMap = new HashMap<>();

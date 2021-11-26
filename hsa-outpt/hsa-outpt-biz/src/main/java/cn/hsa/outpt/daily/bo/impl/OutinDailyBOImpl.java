@@ -257,6 +257,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setRealityTotalPrice(MapUtils.get(allMap, "reality_price"));
         // 一卡通支付总金额 = 汇总【门诊挂号结算表（正常）.一卡通支付总金额】
         outinDailyDTO.setCardTotalPrice(MapUtils.get(allMap, "card_price"));
+        // 挂账总金额 = 汇总【门诊结算表（正常）.挂账金额】
+        outinDailyDTO.setCreditTotalPrice(MapUtils.get(allMap, "credit_price"));
         // 挂号结算记录
         Map<String, Map<String, Object>> orsMap = outinDailyDAO.queryOutptRegisterSettle(dto);
         if (MapUtils.isEmpty(orsMap)) {
@@ -402,6 +404,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setRealityTotalPrice(MapUtils.get(mzMap, "actual_price"));
         // 一卡通支付总金额 = 汇总【门诊结算表（正常）.一卡通支付总金额】
         outinDailyDTO.setCardTotalPrice(MapUtils.get(mzMap, "card_price"));
+        // 挂账总金额 = 汇总【门诊结算表（正常）.挂账金额】
+        outinDailyDTO.setCreditTotalPrice(MapUtils.get(mzMap, "credit_price"));
 
         // 门诊结算记录
         Map<String, Map<String, Object>>  osMap = outinDailyDAO.queryOutptSettle(dto);
@@ -579,6 +583,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 outinDailyDTO.setRoundTotalPrice(MapUtils.get(allMap, "trunc_price", new BigDecimal(0)));
                 // 实缴总金额 = 汇总【总费用合计 - 舍入金额】
                 outinDailyDTO.setRealityTotalPrice(BigDecimalUtils.subtract(MapUtils.get(allMap, "reality_price", new BigDecimal(0)), MapUtils.get(allMap, "trunc_price", new BigDecimal(0))));
+                // 挂账金额
+                outinDailyDTO.setCreditTotalPrice(MapUtils.get(allMap, "credit_price", new BigDecimal(0)));
             }
 
 
@@ -723,6 +729,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
         outinDailyDTO.setCrteName(dto.getCrteName());
         // 创建时间
         outinDailyDTO.setCrteTime(new Date());
+        // 挂账总金额
+        outinDailyDTO.setCreditTotalPrice(new BigDecimal(0));
 
         return outinDailyDTO;
     }
@@ -1176,12 +1184,14 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             BigDecimal mzSfSS = odMzSF != null ? odMzSF.getRealityTotalPrice() : new BigDecimal(0);
             // 医保金额
             BigDecimal mzYb = odMzSF != null ? odMzSF.getInsureTotalPrice() : new BigDecimal(0);
+            // 挂账金额
+            BigDecimal mzGz = odMzSF != null ? odMzSF.getCreditTotalPrice() : new BigDecimal(0);
             // 一卡通实收
             BigDecimal yktczTotalPrice = odMzSF != null ? odMzSF.getYktczTotalPrice() != null ? odMzSF.getYktczTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             BigDecimal ykttkTotalPrice = odMzSF != null ? odMzSF.getYkttkTotalPrice() != null ? odMzSF.getYkttkTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             BigDecimal mzYKTSS = BigDecimalUtils.subtract(yktczTotalPrice, ykttkTotalPrice);
             // 实缴金额
-            BigDecimal RT_040201 = mzGhSS.add(mzSfSS).add(mzYKTSS).subtract(mzYb);
+            BigDecimal RT_040201 = mzGhSS.add(mzSfSS).add(mzYKTSS).subtract(mzYb).subtract(mzGz);
             StringBuffer RT_0401 = new StringBuffer();
             // 门诊、挂号合并
             if ("0".equals(value)) {
@@ -1192,6 +1202,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0401.append("门诊一卡通实收：").append(mzYKTSS).append("元");
                 RT_0401.append(" - ");
                 RT_0401.append("医保金额：").append(mzYb).append("元");
+                RT_0401.append(" - ");
+                RT_0401.append("挂账金额：").append(mzGz).append("元");
             }
             // 门诊、挂号分开
             else {
@@ -1206,6 +1218,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                     RT_0401.append("门诊一卡通实收：").append(mzYKTSS).append("元");
                     RT_0401.append(" - ");
                     RT_0401.append("医保金额：").append(mzYb).append("元");
+                    RT_0401.append(" - ");
+                    RT_0401.append("挂账金额：").append(mzGz).append("元");
                 }
             }
             RT_0401.append(" = ");
@@ -1311,7 +1325,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
 
             // *******************************住院日结 - 结算详情*******************************
             // 实缴金额
-            BigDecimal TMP_0401 = BigDecimalUtils.nullToZero(TMP_0102.getRealityTotalPrice()).add(TMP_0102.getYjssTotalPrice()).subtract(BigDecimalUtils.nullToZero(TMP_0102.getInsureTotalPrice())).subtract(TMP_0102.getYjjsTotalPrice());
+            BigDecimal TMP_0401 = BigDecimalUtils.nullToZero(TMP_0102.getRealityTotalPrice()).add(TMP_0102.getYjssTotalPrice()).subtract(BigDecimalUtils.nullToZero(TMP_0102.getInsureTotalPrice())).subtract(TMP_0102.getYjjsTotalPrice()).subtract(TMP_0102.getCreditTotalPrice());
             StringBuffer RT_0401 = new StringBuffer();
             RT_0401.append("(住院收入实收：").append(BigDecimalUtils.nullToZero(TMP_0102.getRealityTotalPrice())).append("元");
             RT_0401.append(" + ");
@@ -1320,6 +1334,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             RT_0401.append("医保报销金额：").append(BigDecimalUtils.nullToZero(TMP_0102.getInsureTotalPrice())).append("元");
             RT_0401.append(" - ");
             RT_0401.append("预交结算金额：").append(TMP_0102.getYjjsTotalPrice()).append("元");
+            RT_0401.append(" - ");
+            RT_0401.append("挂账金额：").append(TMP_0102.getCreditTotalPrice()).append("元");
             RT_0401.append(" = ");
             RT_0401.append("实缴金额：").append(TMP_0401).append("元");
             resultMap.put("RT_0401", RT_0401);

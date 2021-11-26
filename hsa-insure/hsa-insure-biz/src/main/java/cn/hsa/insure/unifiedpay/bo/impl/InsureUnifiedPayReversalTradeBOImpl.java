@@ -895,7 +895,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             if("620101".equals(setlProcInfo)){  // 大病补充特惠保
                 s4 = BigDecimalUtils.add(s4,fundPayamt);
             }
-            if("610100".equals(setlProcInfo)){  // 医疗救助金额
+            if("610101".equals(setlProcInfo)){  // 医疗救助金额
                 s5 = BigDecimalUtils.add(s5,fundPayamt);
             }
             if("630101".equals(setlProcInfo)){  // 医院减免金额
@@ -1185,7 +1185,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         BigDecimal s6= BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"hifob_pay")))));
         BigDecimal s7 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"acct_pay")))));
         BigDecimal s8 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
-        BigDecimal s9 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"act_pay_dedc")))));
+        BigDecimal s9 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"cash_payamt")))));
         BigDecimal s10 = BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(setlInfoMap,"balc")))));
         partFourMap.put("medfeeSumamt",s1); // 本次医疗费总额
         partFourMap.put("hifpPay",s2); // 统筹基金支付

@@ -112,8 +112,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
         insureCostParam.put("queryBaby", MapUtils.get(map,"queryBaby"));// 医保机构编码
         insureCostParam.put("isHalfSettle", isHalfSettle);// 是否中途结算
-        insureCostParam.put("feeStartDate", DateUtils.getStartOfADayWithDateTimeFormatted(feeStartDate));
-        insureCostParam.put("feeEndDate", DateUtils.getEndOfADayWithDateTimeFormatted(feeEndDate));
+        insureCostParam.put("feeStartDate", feeStartDate);
+        insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算
         List<Map<String,Object>> insureCostList =  insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
         if(ListUtils.isEmpty(insureCostList)){
             throw new AppException("没有可以上传的的医保匹配费用数据");

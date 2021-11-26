@@ -723,6 +723,9 @@
                 <if test="acctPay != null">
                     acct_pay = #{acctPay,jdbcType=DECIMAL}
                 </if>
+                <if test="creditPrice != null">
+                    credit_price = #{creditPrice,jdbcType=DECIMAL}
+                </if>
         </set>
         where
         id = #{id}

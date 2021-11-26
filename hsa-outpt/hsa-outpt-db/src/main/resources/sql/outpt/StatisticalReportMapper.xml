@@ -1367,7 +1367,7 @@
         crte_time ASC
     </select>
 
-    <!--抗菌类住院发药统计-->
+    <!--抗菌类住院发药统计2-->
     <select id="queryInAntibiosisDrug" resultType="java.util.Map">
         SELECT
         type_code,

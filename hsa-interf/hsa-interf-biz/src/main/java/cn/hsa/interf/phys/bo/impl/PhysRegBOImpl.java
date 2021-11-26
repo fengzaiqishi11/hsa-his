@@ -93,6 +93,14 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             outptCostDTO.setItemName(x.getGroupName());
             // 原价
             outptCostDTO.setTotalPrice(x.getTotalPrice());
+            // 单价
+            outptCostDTO.setPrice(x.getTotalPrice());
+            // 总数量
+            outptCostDTO.setTotalNum(BigDecimalUtils.convert("1"));
+            // 数量
+            outptCostDTO.setNum(BigDecimalUtils.convert("1"));
+            // 计费id ************************ 暂时写死
+            outptCostDTO.setBfcId("1000000000000000012");
             // 优惠价格
             outptCostDTO.setPreferentialPrice(x.getPreferentialPrice());
             // 优惠后价格
@@ -146,15 +154,15 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
      */
     @Override
     public Boolean insertReturn(Map map) {
-        List<Map> list = MapUtils.get(map, "lisResult");
+        List<Map> list = MapUtils.get(map, "result");
         for (Map resultMap : list){
             resultMap.put("id", SnowflakeUtils.getId());
-            resultMap.put("oneSettleId", MapUtils.get(map, "settleId"));
             resultMap.put("status", "2");
             resultMap.put("crteId", "phys");
             resultMap.put("crteName", "体检");
             resultMap.put("crteTime", DateUtils.getNow());
         }
+        physRegDAO.updateRCodt(list);
         physRegDAO.insertReturn(list);
         return null;
     }

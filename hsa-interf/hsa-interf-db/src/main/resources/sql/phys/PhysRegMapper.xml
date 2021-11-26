@@ -22,12 +22,14 @@
     </insert>
     <insert id="addBatchPhys">
         insert into outpt_cost(id,hosp_code,visit_id,item_id,item_name,total_price,
-        preferential_price,reality_price,status_code,item_code,crte_Time,settle_code,source_code)
+        preferential_price,reality_price,status_code,item_code,crte_Time,settle_code,source_code,
+        price,bfc_id,num,total_num)
         values
         <foreach collection="outptCostDTOS" separator=","  item="item" index="index" >
             (#{item.id},#{item.hospCode},#{item.visitId},#{item.itemId},#{item.itemName},#{item.totalPrice},
             #{item.preferentialPrice},#{item.realityPrice},#{item.statusCode},#{item.itemCode},#{item.crteTime}
-            ,#{item.settleCode},#{item.sourceCode})
+            ,#{item.settleCode},#{item.sourceCode},
+            #{item.price},#{item.bfcId},#{item.num},#{item.totalNum})
         </foreach>
     </insert>
 
@@ -69,11 +71,16 @@
             #{dto.crteName},
             #{dto.crteTime},
             #{dto.status},
-            #{dto.oneSettleId},
-            #{dto.settleId}
+            #{dto.hisSettleId},
+            #{dto.hisSettleId}
             )
         </foreach>
     </insert>
+    <update id="updateRCodt">
+        <foreach collection="list" item="item" index="index" separator=",">
+        update outpt_cost set back_num = 1 where visit_id = #{item.registerId} and item_id = #{item.groupId} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
 
     <delete id="deleteBatchPhys" >
         delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode}

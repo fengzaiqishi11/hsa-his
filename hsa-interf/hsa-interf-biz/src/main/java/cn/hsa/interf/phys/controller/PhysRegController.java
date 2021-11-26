@@ -109,7 +109,7 @@ public class PhysRegController extends BaseController {
      */
     @PostMapping("/insertReturn")
     public WrapperResponse<Boolean> insertReturn(@RequestBody Map map){
-        List<Map> list = MapUtils.get(map, "lisResult");
+        List<Map> list = MapUtils.get(map, "result");
         map.put("hospCode",MapUtils.get(list.get(0),"hospCode"));
         return physRegService.insertReturn(map);
     }

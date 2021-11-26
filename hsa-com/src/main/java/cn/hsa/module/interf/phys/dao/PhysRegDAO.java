@@ -54,4 +54,6 @@ public interface PhysRegDAO {
     * @Date: 2021-11-25
     */ 
     int deleteBatchPhys(OutptCostDTO outptCostDTO);
+
+    void updateRCodt(@Param("list") List<Map> list);
 }

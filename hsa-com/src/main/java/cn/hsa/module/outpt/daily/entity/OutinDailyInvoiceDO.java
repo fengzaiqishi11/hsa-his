@@ -58,4 +58,13 @@ public class OutinDailyInvoiceDO implements Serializable {
     * 发票费用合计
     */
     private BigDecimal totalPrice;
+
+    // 使用数量
+    private Integer useNum;
+
+    // 作废发票数量
+    private Integer zfNum;
+
+    // 退费发票数量
+    private Integer tfNum;
 }

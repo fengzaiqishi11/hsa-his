@@ -204,6 +204,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		if("14".equals(medType)) {
 			params.put("psnNo",baseInfoMap.get("psn_no"));
 			params.put("insureRegCode",insureConfigurationDTO.getOrgCode()); // 医疗机构编码
+			params.put("regCode",insureConfigurationDTO.getRegCode()); // 医疗机构编码
 			Map<String,Object> outptMap = insureUnifiedPayOutptService.UP_5301(params).getData();
 			mapList =(List<Map<String,Object>>) MapUtils.get(outptMap,"mapList");
 			if(ListUtils.isEmpty(mapList)){

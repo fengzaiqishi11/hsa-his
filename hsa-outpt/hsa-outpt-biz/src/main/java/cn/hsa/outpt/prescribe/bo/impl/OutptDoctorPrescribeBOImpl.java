@@ -1309,7 +1309,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             throw new AppException("处方已结算，不能操作");
         }
         //删除诊断
-        outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
+//        outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
         //删除手术申请
         outptDoctorPrescribeDAO.deleteOperInfoRecord(outptPrescribeDTO);
         //删除申请明细
@@ -1751,38 +1751,13 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptDiagnoseDTO.setVisitId(outptPrescribeDTO.getVisitId());
             //疾病ID
             outptDiagnoseDTO.setDiseaseId(diagnoseId);
-            // 如果是郭老板的医院并且诊断是同步过来的则固定主诊断
-            //否则第一条数据，默认为主诊断(没有主诊断情况下)
-            if(outptPrescribeDTO.getHospCode().equals("0005") || outptPrescribeDTO.getHospCode().equals("0006")) {
-                Map map = new HashMap();
-                map.put("hospCode", outptPrescribeDTO.getHospCode());
-                map.put("code", "YJ_ZDID");
-                SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
-//                if (outptPrescribeDTO.getDiagnoseIds().equals(sysParameterDTO.getValue())) {
-                if (outptPrescribeDTO.getDiagnoseIds().indexOf(sysParameterDTO.getValue()) > -1) {
-                    map.put("code", "YJ_ZZD");
-                    SysParameterDTO sysParameterDTOS = sysParameterService_consumer.getParameterByCode(map).getData();
-                    if (diagnoseId.equals(sysParameterDTOS.getValue())) {
-                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
-                    }
-                } else {
-//                    if(i == 0 && Constants.SF.F.equals(isMain) ){
-//                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-//                        outptDiagnoseDTO.setIsMain(Constants.SF.S);
-//                    }else{
-                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
-                        outptDiagnoseDTO.setIsMain(Constants.SF.F);
-//                    }
-                }
-            } else {
-                if(i == 0 && Constants.SF.F.equals(isMain) ){
-                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
-                    outptDiagnoseDTO.setIsMain(Constants.SF.S);
-                }else{
-                    outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
-                    outptDiagnoseDTO.setIsMain(Constants.SF.F);
-                }
+            //第一条数据，默认为主诊断(没有主诊断情况下)
+            if(i == 0 && Constants.SF.F.equals(isMain) ){
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.S);
+            }else{
+                outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZCZD);
+                outptDiagnoseDTO.setIsMain(Constants.SF.F);
             }
             i++;
             //创建人ID

@@ -723,7 +723,7 @@
 
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo,
+        select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo, b.totalPrice as invoiceTotalPrice,
         v.visit_code as visitCode,b.pay_code as sourcePayCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
@@ -741,7 +741,16 @@
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
-        select b.*, os.crte_name as crteName, os.crte_time as crteTime, ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00)as miPrice,ifnull(os.acct_pay, 0.00) as acctPay from (
+        select b.*, os.crte_name as crteName, os.crte_time as crteTime,
+          os.self_price as selfPrice,
+          ifnull(iis.last_settle, 0.00) as lastSettle,
+          os.source_pay_code as sourcePayCode,
+          ifnull(os.mi_price, 0.00)as miPrice,
+          v.visit_code as visitCode,
+          v.visit_no as visitNo,
+          '-' as personalNo,
+          case when v.patient_code>0 then '医保病人' else '自费病人' end as bka006Name,
+          ifnull(os.acct_pay, 0.00) as personalPrice from (
         SELECT ifnull(sum(a.reality_price),0) as totalPrice, -- 实收总金额
               ifnull(sum(a.preferential_price),0) as preferentialPrice,
 			(select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
@@ -751,13 +760,14 @@
         group by a.bfc_id
         ) b join outpt_settle os on os.id = #{settleId} and os.hosp_code = #{hospCode}
         left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
+        join outpt_visit v on os.visit_id = v.id and v.hosp_code =#{hospCode}
          where b.totalPrice>0
     </select>
 
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime,
-        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle
         from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
         left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
@@ -1315,7 +1325,6 @@
     <update id="updateOutptSettleInvoiceInfo" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO">
         UPDATE outpt_settle_invoice
         <set>
-            invoice_no = '',
             print_num = '0',
         </set>
         WHERE id=#{id} and hosp_code = #{hospCode}
@@ -1528,7 +1537,10 @@
     <!-- 根据结算单号查询费用明细(住院) -->
     <select id="getZyCostInventory" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select c.*, d.name as xmName, v.name as patientName, v.gender_code as sex, v.age as age, v.age_unit_code as ageUnitCode,
-         s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,s.self_price as selfPrice, s.mi_price as miPrice,
+         s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,
+         (case when s.settle_take_price > 0 then (s.ap_total_price + s.settle_take_price) else
+          (case when s.settle_back_price > 0 then (s.ap_total_price - s.settle_back_price) else (s.self_price + s.ap_total_price) end) end) as selfPrice,
+         s.mi_price as miPrice,
          s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
          scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo, s.total_price as outptTotalFee,
          case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays,
@@ -1742,7 +1754,7 @@
     
     <select id="queryPartInvoicePrint" resultType="cn.hsa.module.outpt.outinInvoice.entity.OutinPartInvoiceDO" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select s.id,s.invoice_no as invoiceNo,b.reality_price as realityPrice,s.total_price as invoiceTotalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime, e.receive_name as receiveName,
-        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle
         from outpt_settle_invoice s
         left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code

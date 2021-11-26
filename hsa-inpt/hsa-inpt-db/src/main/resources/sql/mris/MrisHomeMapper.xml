@@ -24,7 +24,10 @@
         </if>
         WHERE a.hosp_code = #{hospCode}
         <if test="keyword != null and keyword !=''">
-            and CONCAT(a.name,a.phone,a.cert_no,a.in_no) LIKE CONCAT('%',#{keyword},'%')
+            and (
+            a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
+            or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            )
         </if>
         <if test="zgbrQuery != '2'.toString()">
             <if test="inDeptId != null and inDeptId != ''">
@@ -81,7 +84,7 @@
     <select id="getMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
             resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
             SELECT  mbi.id,  mbi.hosp_code,  mbi.visit_id, in_profile, in_blh,
-                   in_no, name, gender_code, gender_name, age, age_unit_code,
+                   in_no, name, gender_code, gender_name, age, ifnull(age_unit_code,'1') as age_unit_code,
                    age_unit_name, birthday, cert_code, cert_name, cert_no, nationality_cation,
                    nationality_name, nation_code, nation_name, native_place, occupation_code,
                    occupation_name, marry_code, marry_name, work, work_phone, work_post_code,
@@ -106,7 +109,9 @@
                    is_monitor, monitor_day, monitor_hour, is_dzb, lclj_status, drg_status, is_kss, is_xjsj,
                    is_cry, zl_level, apgar_num, aim, is_inpt, inpt_before_day, inpt_before_hour,
                    inpt_before_minute, inpt_last_day, inpt_last_hour, inpt_last_minute, yljg_code,iiv.medical_reg_no,
-                   iiv.medicine_org_code
+                   iiv.medicine_org_code,
+                   turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
+                   outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count
             FROM mris_base_info mbi left join insure_individual_visit iiv on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
 
             WHERE  mbi.hosp_code = #{hospCode}
@@ -134,7 +139,9 @@
             id_card, phone, work_info, in_way, in_ward, damage_reason, jx_doctor_id, sx_doctor_id,
             jx_doctor_name, sx_doctor_name, doctor_coder_id, doctor_coder_name, in_ward2, disease_icd10_other, turn_dept_ids,
             case_classification, is_monitor, monitor_day, monitor_hour, is_dzb, lclj_status, drg_status, is_kss,
-            is_xjsj, is_cry, zl_level, apgar_num,is_inpt,aim,inpt_before_day,inpt_before_hour,inpt_before_minute,inpt_last_day,inpt_last_hour,inpt_last_minute,yljg_code
+            is_xjsj, is_cry, zl_level, apgar_num,is_inpt,aim,inpt_before_day,inpt_before_hour,inpt_before_minute,inpt_last_day,inpt_last_hour,inpt_last_minute,yljg_code,
+            turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
+            outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count
         ) VALUES (
             #{id},
             #{hospCode},
@@ -283,7 +290,19 @@
             #{inptLastDay},
             #{inptLastHour},
             #{inptLastMinute},
-            #{yljgCode}
+            #{yljgCode},
+            #{turnTime1},
+            #{turnTime2},
+            #{turnTime3},
+            #{turnDept1},
+            #{turnDept2},
+            #{turnDept3},
+            #{outptDoctorId},
+            #{outptDoctorName},
+            #{caseClassify},
+            #{clinicalPathCase},
+            #{rescueCount},
+            #{rescueSuccessCount}
         )
     </insert>
 
@@ -729,6 +748,42 @@
             <if test="apgarNum != null">
                 apgar_num = #{apgarNum}
             </if>
+            <if test="turnTime1 != null">
+                turn_time1 = #{turnTime1}
+            </if>
+            <if test="turnTime2 != null">
+                turn_time2 = #{turnTime2}
+            </if>
+            <if test="turnTime3 != null">
+                turn_time2 = #{turnTime3}
+            </if>
+            <if test="turnDept1 != null">
+                turn_dept1 = #{turnDept1}
+            </if>
+            <if test="turnDept2 != null">
+                turn_dept2 = #{turnDept2}
+            </if>
+            <if test="turnDept3 != null">
+                turn_dept3 = #{turnDept3}
+            </if>
+            <if test="outptDoctorId != null">
+            outpt_doctor_id = #{outptDoctorId}
+            </if>
+            <if test="outptDoctorName != null">
+                outpt_doctor_name = #{outptDoctorName}
+            </if>
+            <if test="caseClassify != null">
+                case_classify = #{caseClassify}
+            </if>
+            <if test="clinicalPathCase != null">
+                clinical_path_case = #{clinicalPathCase}
+            </if>
+            <if test="rescueCount != null">
+                rescue_count = #{rescueCount}
+            </if>
+            <if test="rescueSuccessCount != null">
+                rescue_success_count = #{rescueSuccessCount}
+            </if>
         </set>
         WHERE id = #{id} AND hosp_code = #{hospCode}
     </update>
@@ -844,10 +899,12 @@
             a.address as nowAdress,
             a.phone as phone,
             a.outpt_disease_name as diseaseIcd10Name,
-            a.in_mode_code as inWay,
+            case when a.in_mode_code='0' then '9' else a.in_mode_code end as inWay,
             bf.native_place as nativePlace,
             bf.native_address as nativeAdress,
-            code_9.remark as payWayCode
+            code_9.remark as payWayCode,
+            a.outpt_doctor_id as outptDoctorId,
+            a.outpt_doctor_name as outptDoctorName
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id
@@ -1020,7 +1077,7 @@
         id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
         notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
         assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
-        ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,columns_num
+        ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,columns_num,other_oper_time
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -1056,7 +1113,8 @@
             #{item.operName},
             #{item.operPosition},
             #{item.operPositionName},
-            #{item.columnsNum}
+            #{item.columnsNum},
+            #{item.otherOperTime}
             )
         </foreach>
     </insert>
@@ -1172,7 +1230,7 @@
             zhylfwl06, zdl01, zdl02, zdl03, zdl04, zll01, zll02, zll03,
             zll04, zll05, kfl01, xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03,
             xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01, zyl02, zyl03,
-            zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11
+            zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06
         ) VALUES (
             #{id},
             #{hospCode},
@@ -1221,7 +1279,8 @@
             #{zyl08},
             #{zyl09},
             #{zyl10},
-            #{zyl11}
+            #{zyl11},
+            #{xyzpl06}
         )
     </insert>
 
@@ -1367,6 +1426,9 @@
             <if test="zyl11 != null">
                 zyl11 = #{zyl11}
             </if>
+            <if test="xyzpl06 != null">
+                xyzpl06 = #{xyzpl06}
+            </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}
     </update>
@@ -1461,7 +1523,7 @@
             id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
             notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
             assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
-            ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name
+            ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,other_oper_time
         ) VALUES (
             #{id},
             #{hospCode},
@@ -1494,7 +1556,8 @@
             #{operCode},
             #{operName},
             #{operPosition},
-            #{operPositionName}
+            #{operPositionName},
+            #{otherOperTime}
         )
     </insert>
 
@@ -1590,7 +1653,10 @@
                 oper_position = #{operPosition},
             </if>
             <if test="operPositionName != null">
-                oper_position_name = #{operPositionName}
+                oper_position_name = #{operPositionName},
+            </if>
+            <if test="otherOperTime != null">
+                other_oper_time = #{otherOperTime}
             </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}
@@ -1701,7 +1767,7 @@
                fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05, zhylfwl06, zdl01,
                zdl02, zdl03, zdl04, zll01, zll02, zll03, zll04, zll05, kfl01,
                xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03, xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01,
-               zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11 from mris_cost
+               zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06 from mris_cost
                 where hosp_code = #{hospCode} and visit_id = #{visitId}
     </select>
 
@@ -1755,4 +1821,73 @@
     <delete id="deleteMrisBabyInfoByVisitId" parameterType="java.util.Map">
         DELETE FROM mris_obstetrics WHERE hosp_code = #{hospCode} AND visit_id = #{visitId}
     </delete>
+
+    <!--病案诊断数据批量插入-->
+    <insert id="insertMrisInptDiagnoseBatch" parameterType="list">
+        INSERT INTO mris_inpt_diagnose (
+        id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version,
+         disease_icd10, disease_icd10_name, in_situation_code
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.mbiId},
+            #{item.visitId},
+            #{item.diseaseCode},
+            #{item.diseaseName},
+            #{item.icdVersion},
+            #{item.diseaseIcd10},
+            #{item.diseaseIcd10Name},
+            #{item.inSituationCode}
+            )
+        </foreach>
+    </insert>
+
+    <!--查询分行病案诊断信息-->
+    <select id="queryMrisDiagnoseRowPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
+            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
+                   md.icd_version, md.disease_icd10, md.disease_icd10_name,md.in_situation_code
+            FROM mris_inpt_diagnose md join mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id}
+    </select>
+
+    <!-- 删除数据 分行病案诊断信息 -->
+    <delete id="deleteRowMrisDiagnoseByVisitId" parameterType="java.util.Map">
+        DELETE FROM mris_inpt_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 修改数据 病案诊断信息更新-->
+    <update id="updateRowMrisDiagnose" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
+        UPDATE mris_inpt_diagnose
+        <set>
+            <if test="mbiId != null">
+                mbi_id = #{mbiId},
+            </if>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="diseaseCode != null">
+                disease_code = #{diseaseCode},
+            </if>
+            <if test="diseaseName != null">
+                disease_name = #{diseaseName},
+            </if>
+            <if test="icdVersion != null">
+                icd_version = #{icdVersion},
+            </if>
+            <if test="diseaseIcd10 != null">
+                disease_icd10 = #{diseaseIcd10},
+            </if>
+            <if test="diseaseIcd10Name != null">
+                disease_icd10_name = #{diseaseIcd10Name}
+            </if>
+            <if test="inSituationCode != null">
+                in_situation_code = #{inSituationCode}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
 </mapper>

@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -230,6 +231,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             String zhSpecial ="";
             String hnFeedetlSn ="";
             String huNanSpecial = "";
+            String guangZhouSpecial = "";
             Map<String,Object> codeMap = new HashMap<>();
             codeMap.put("code","HOSP_APPR_FLAG");
             codeMap.put("hospCode",hospCode);
@@ -250,6 +252,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         }
                         if ("huNanSpecial".equals(key)) {
                             huNanSpecial = MapUtils.get(stringObjectMap,key);
+                        }
+                        if ("guangZhouSpecial".equals(key)) {
+                            guangZhouSpecial = MapUtils.get(stringObjectMap,key);
                         }
                     }
                 }
@@ -355,6 +360,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     objectMap.put("tcmdrug_used_way","2");
                 }else if("1".equals(huNanSpecial) && "0".equals(isReimburse)){
                     objectMap.put("hosp_appr_flag", "0");
+                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(MapUtils.get(map, "insureItemType"))) {
+                    // 广州的102是中药饮片
+                    objectMap.put("hosp_appr_flag", "1");
+                    objectMap.put("tcmdrug_used_way","1");
                 }
 
                 objectMap.put("etip_flag",Constants.SF.F); // 外检标志
@@ -1014,7 +1023,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("hifobPay",outDataMap.get("hifob_pay").toString()); // 职工大额医疗费用补助基金支出
         paramMap.put("mafPay",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
         paramMap.put("bka839",outDataMap.get("oth_pay").toString());//其他支付
-        paramMap.put("psnPartAmt",outDataMap.get("psn_part_amt").toString());// 个人负担总金额
+        paramMap.put("psnPartAmt",outDataMap.get("psn_part_amt") ==null ?"":outDataMap.get("psn_part_amt").toString());// 个人负担总金额
         paramMap.put("akb066",outDataMap.get("acct_pay").toString());// 个人账户支出
         paramMap.put("akb067",outDataMap.get("psn_cash_pay").toString()); // 个人现金支出
         paramMap.put("hospPrice",outDataMap.get("hosp_part_amt").toString());// 医院负担金额

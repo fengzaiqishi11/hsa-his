@@ -174,4 +174,7 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         // 优惠类别名称
         private String preferentialName;
 
+        // 患者是否为体检患者
+        private String isPhys;
+
 }

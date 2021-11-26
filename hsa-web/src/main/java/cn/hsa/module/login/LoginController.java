@@ -1,11 +1,14 @@
 package cn.hsa.module.login;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
+import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
+import cn.hsa.module.center.config.service.CenterGlobalConfigService;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -16,14 +19,14 @@ import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.session.web.http.SessionRepositoryFilter;
+import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -31,6 +34,9 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+
+import static cn.hsa.util.Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY;
+import static cn.hsa.util.IPWhiteListUtil.checkLoginIP;
 
 /**
  * @Package_name: cn.hsa.module.login
@@ -55,29 +61,35 @@ public class LoginController extends BaseController {
     private BaseDeptService baseDeptService;
     @Resource
     private SysParameterService sysParameterService_consumer;
+    @Resource
+    private CenterGlobalConfigService globalConfigService;
     // 错误次数应从系统参数中获取
     private static final int PWD_ERROR_CNT = 5;
     @Value("${rsa.private.key}")
     private String privateKey;
 
     private final ReentrantLock rnLock = new ReentrantLock(true);
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * @Method 云HIS V2.0 统一登录接口
      * @Description
      * 1、必填参数校验
      * 2、验证码：校验验证码是否正确
      * 3、医院编码：校验医院是否有效、是否在服务期限内
+     * 4、校验访问ip是否在允许范围内(中心端医院信息中如果未配置则默认允许所有ip访问),如果需要
      * 4、用户信息：校验用户名密码是否错误、是否停用、是否锁定
      * 5、获取子系统和操作科室信息，用户自行选择登陆哪个子系统和操作科室（单只有一个子系统和一个操作科室时，不让选择直接登陆）
      *
-     * @Param hospCode 医院编码
-     * @Param username 用户名
-     * @Param password 密码（明文）
-     * @Param authCode 验证码
+     * @param hospCode 医院编码
+     * @param userCode 用户名
+     * @param password 密码（明文）
+     * @param authCode 验证码
      *
      * @Author zhongming
      * @Date 2020/8/5 17:31
-     * @Return
+     * @return
      **/
     @PostMapping("/doLogin")
     public WrapperResponse<List<Map<String, Object>>> doLogin(@RequestParam(required = true) String hospCode, @RequestParam(required = true) String userCode,
@@ -107,14 +119,9 @@ public class LoginController extends BaseController {
             if (hospitalDTOto == null) {
                 throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
             }
-
+           // checkAccessIP(getIP(req,res),hospitalDTOto);
             // 校验服务有效期
-            if (!DateUtils.betweenDate(hospitalDTOto.getStartDate(), hospitalDTOto.getEndDate())) {
-                String startDate = DateUtils.format(hospitalDTOto.getStartDate(), DateUtils.Y_M_DH_M_S);
-                String endDate = DateUtils.format(hospitalDTOto.getEndDate(), DateUtils.Y_M_DH_M_S);
-                throw new AppException("医院编码【" + hospCode + "】：未在有效服务期内，服务开始时间【" + startDate + "】，服务结束时间【" + endDate + "】");
-            }
-
+           //  checkServiceTimeout(hospitalDTOto);
             // 指定医院数据源查询用户信息
             Map paramMap = new HashMap<>();
             paramMap.put("hospCode", hospCode);
@@ -143,15 +150,12 @@ public class LoginController extends BaseController {
             if (!MD5Utils.verifySha(password, sysUserDTO.getPassword())) {
                 throw new AppException(updatePwdErrorInfo(sysUserDTO));
             }
-
             // 获取用户可操作子系统和对应子系统操作科室
             // key -->> 基础数据子系统
             // value -->> {id:"1", deptName:"内科"}
             List<Map<String, Object>> resultList = convertSystemListToMap(paramMap);
-
             // 记录最后登陆信息
             updateLoginInfo(sysUserDTO, req, res);
-
             // 所属科室信息 -- add by zhongming begin
             BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
             baseDeptDTO.setHospCode(hospCode);
@@ -179,6 +183,7 @@ public class LoginController extends BaseController {
 
             // 添加定制化发票，收据样式（界面路径） 官红强  2021-3-26 09:25:53    start=======
             parameterMap.put("code", "PAGE_PATH");
+
             SysParameterDTO sysParameterDTOByPagePath = sysParameterService_consumer.getParameterByCode(parameterMap).getData();
             if (sysParameterDTOByPagePath != null && StringUtils.isNotEmpty(sysParameterDTOByPagePath.getValue())) {
                 sysUserDTO.setPagePath(sysParameterDTOByPagePath.getValue());
@@ -193,6 +198,63 @@ public class LoginController extends BaseController {
         }finally{
             rnLock.unlock();
         }
+    }
+
+    /**
+     *  校验登录IP白名单
+     * @param requestIp 请求的ip地址
+     * @param hospitalDTOto 中心端医院的信息
+     */
+    private void checkAccessIP(String requestIp, CenterHospitalDTO hospitalDTOto) {
+        String whiteIps = hospitalDTOto.getAccessIps();
+        if(null == whiteIps || "127.0.0.1".equals(requestIp)){
+            return;
+        }
+
+        String accessIpOfGlobalConfig = getGlobalAccessIpConfig();
+
+        if(!IPWhiteListUtil.checkLoginIP(requestIp,whiteIps) &&
+                !IPWhiteListUtil.checkLoginIP(requestIp,accessIpOfGlobalConfig)){
+            throw new AppException("您的IP: "+requestIp+" ,不在允许访问的范围内,请联系系统管理员!");
+        };
+    }
+
+    /**
+     *  获取全局配置中访问ip的配置信息
+     * @return
+     */
+    private String getGlobalAccessIpConfig() {
+        Map<String,String> result = null;
+        if(redisUtils.hasKey(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY)){
+           return redisUtils.hget(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY,"global_access_ip_config");
+        }
+        CenterGlobalConfigDTO  configDTO = new CenterGlobalConfigDTO();
+        Map<String,Object> configInfo = globalConfigService.refreshGlobalConfig(configDTO);
+        return (String)configInfo.get("global_access_ip_config");
+    }
+
+    /**
+     *  检查医院服务是否在有效时间内
+     * @param hospitalDTOto 医院信息DTO
+     */
+    private void checkServiceTimeout(CenterHospitalDTO hospitalDTOto){
+        String encryptStartDate = Optional.ofNullable(hospitalDTOto.getEncryptStartDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务开始时间"));
+        String encryptEndDate = Optional.ofNullable(hospitalDTOto.getEncryptEndDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务结束时间"));;
+        try {
+            encryptStartDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptStartDate.getBytes()), privateKey);
+            encryptEndDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptEndDate.getBytes()), privateKey);
+        } catch (Exception e) {
+            throw new AppException("解析服务时间出现错误,请联系管理员！" + e.getMessage() + "11-" + hospitalDTOto.getCode());
+        }
+        encryptStartDate = encryptStartDate.split("&")[0];
+        encryptEndDate = encryptEndDate.split("&")[0];
+        Date startDate = DateUtils.parse(encryptStartDate,DateUtils.Y_M_DH_M_S);
+        Date endDate =  DateUtils.parse(encryptEndDate,DateUtils.Y_M_DH_M_S);
+        if (!DateUtils.betweenDate(startDate, endDate)) {
+            throw new AppException("医院编码【" + hospitalDTOto.getCode() + "】：未在有效服务期内，服务开始时间【" + encryptStartDate + "】，服务结束时间【" + encryptEndDate + "】");
+        }
+        hospitalDTOto.setEncryptEndDate("");
+        hospitalDTOto.setEncryptStartDate("");
     }
 
     /**
@@ -228,6 +290,8 @@ public class LoginController extends BaseController {
         sysUserService_consumer.save(paramMap);
         return errMsg;
     }
+
+
 
     /**
      * @Method 修改登陆信息：密码错误、登陆成功
@@ -403,9 +467,12 @@ public class LoginController extends BaseController {
      * @Return
      **/
     @GetMapping("/doLogout")
-    public void doLogout(HttpServletRequest req) {
-        req.getSession().removeAttribute(SESSION_USER_INFO);
-        req.getSession().invalidate();
+    public WrapperResponse<String> doLogout(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if(session != null){
+            session.invalidate();
+        }
+        return WrapperResponse.success("退出成功!");
     }
 
     /**
@@ -505,6 +572,4 @@ public class LoginController extends BaseController {
         int b = fc + random.nextInt(bc - fc);
         return new Color(r,g,b);
     }
-
-
 }

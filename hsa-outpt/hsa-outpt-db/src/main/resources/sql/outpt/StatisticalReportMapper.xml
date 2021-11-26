@@ -920,107 +920,76 @@
     </select>-->
     <select id="queryOutptWorkLog" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
-        t1.id,
-        t1.visit_no AS visitNo,
-        t1.crte_time AS visitTime,
-        t1.name,
-        t1.patientInfo,
-        t1.gender_code AS genderCode,
-        t1.age,
-        t1.age_unit_code AS ageUnitCode,
-        t1.birthday,
-        t1.cert_no AS certNo,
-        t1.is_food_borne as isFoodBorne,
-        t1.phone,
-        t1.patient_code AS patientCode,
-        t1.visit_dept_name AS visitDeptName,
-        t1.doctor_name as doctorName,
-        t1.is_first_visit as isFirstVisit,
-        t1.profile_id as profileId,
-        t1.dept_id,
-        t1.doctor_id,
-        t1.now_address as nowAddress,
-        t1.diagnose_ids AS diagnoseIds,
-        t1.diagnose_time as diagnoseTime,
-        t1.start_date as startDate,
-        (SELECT bd.name FROM base_disease bd WHERE bd.id = t1.diagnose_ids and bd.hosp_code = t1.hosp_code) AS
-        diagnoseName,
-        t1.total_price AS totalPrice
+            a.id,
+            a.hosp_code,
+            a.visit_time as visitTime,
+            (CONCAT(
+                a.name,'/',
+                case a.gender_code when '1' then '男' when '2' then '女' else '' end, '/',
+                a.age,
+                case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end
+            )) AS patientInfo,
+            a.cert_no as certNo,
+            a.phone,
+            ifnull( a.is_first_visit, '0' ) AS isFirstVisit,
+            a.visit_no as visitNo,
+            a.doctor_name as doctorName,
+            a.dept_name AS visitDeptName,
+            a.patient_code as patientCode,
+            (SELECT name from base_disease bd where od.hosp_code = bd.hosp_code and od.disease_id = bd.id) as diagnoseName,
+            od.crte_time as diagnoseTime,
+            omr.start_date as startDate,
+            ifnull( a.is_food_borne, 0 ) AS isFoodBorne,
+            b.reality_price as totalPrice,
+            a.now_address as nowAddress
         FROM
-        (
-        SELECT
-        a.id,
-        a.hosp_code,
-        a.name,
-        a.gender_code,
-        a.age,
-        a.cert_no,
-        a.phone,
-        a.age_unit_code,
-        a.birthday,
-        a.pym,
-        a.wbm,
-        ifnull(a.is_food_borne, 0) as is_food_borne,
-        a.visit_no,
-        a.crte_time,
-        a.dept_id,
-        a.doctor_id,
-        a.doctor_name,
-        a.now_address,
-        a.dept_name AS visit_dept_name,
-        ifnull(a.is_first_visit,'0') as is_first_visit,
-        a.profile_id,
-        (CONCAT(a.name,'/',
-        (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = a.gender_code and e.hosp_code = a.hosp_code AND
-        e.c_code = 'XB' ), '' )),'/',
-        a.age,
-        (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = a.age_unit_code AND hosp_code =
-        a.hosp_code ), '岁' )))) as patientInfo,
-        a.patient_code,
-        od.disease_id diagnose_ids,
-        od.crte_time as diagnose_time,
-        ifnull(omr.start_date, a.visit_time) as start_date,
-        b.reality_price total_price
-        FROM
-        outpt_visit a
-        join(
-        select a.hosp_code, a.visit_id, SUM(a.reality_price) reality_price from (
-        select a.hosp_code, b.visit_id, a.reality_price reality_price from outpt_register_settle a
-        join outpt_register b on a.register_id = b.id and a.hosp_code = b.hosp_code
-        union all
-        select a.hosp_code, a.visit_id, a.reality_price reality_price from outpt_settle a where a.is_settle = '1'
-        )a group by a.hosp_code, a.visit_id
-        )b on a.id = b.visit_id and a.hosp_code = b.hosp_code
-        left join outpt_diagnose od on a.id = od.visit_id and a.hosp_code = od.hosp_code and od.is_main = '1'
-        LEFT JOIN (select visit_id, hosp_code, max(start_date) as start_date from outpt_medical_record where hosp_code = #{hospCode} group by visit_id, hosp_code) omr on a.id = omr.visit_id and a.hosp_code = omr.hosp_code
-        ) t1
-        WHERE
-        t1.hosp_code = #{hospCode}
+            outpt_visit a
+        JOIN (
+            SELECT
+                t.hosp_code,
+                t.visit_id,
+                SUM(t.reality_price) as reality_price
+            FROM
+            (
+                SELECT
+                    ors.hosp_code, org.visit_id, ors.reality_price
+                FROM outpt_register_settle ors
+                JOIN outpt_register org ON ors.hosp_code = org.hosp_code AND ors.register_id = org.id
+                where ors.hosp_code = #{hospCode}
+                  and ors.status_code = '0'
+                UNION ALL
+                SELECT
+                    hosp_code, visit_id, reality_price
+                FROM outpt_settle
+                WHERE hosp_code = #{hospCode}
+                and is_settle = '1'
+                and status_code = '0'
+            ) t
+            GROUP BY t.hosp_code, t.visit_id
+        ) b ON  a.hosp_code = b.hosp_code AND a.id = b.visit_id
+        LEFT JOIN outpt_diagnose od ON a.hosp_code = od.hosp_code AND a.id = od.visit_id AND od.is_main = '1'
+        LEFT JOIN ( SELECT visit_id, hosp_code, max( start_date ) AS start_date FROM outpt_medical_record WHERE hosp_code = #{hospCode} GROUP BY visit_id, hosp_code ) omr ON a.hosp_code = omr.hosp_code and a.id = omr.visit_id
+        WHERE a.hosp_code = #{hospCode}
         <if test="typeCode != null and typeCode != ''">
-            and t1.patient_code = #{typeCode}
+            and a.patient_code = #{typeCode}
         </if>
         <if test="startDate != null">
-            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d %H:%i%s') >= #{startDate}
+            AND DATE_FORMAT(a.visit_time, '%Y-%m-%d %H:%i%s') >= date_format(#{startDate}, '%Y-%m-%d %H:%i%s')
         </if>
         <if test="endDate != null">
-            AND DATE_FORMAT(t1.crte_time, '%Y-%m-%d %H:%i%s') &lt;= #{endDate}
+            AND DATE_FORMAT(a.visit_time, '%Y-%m-%d %H:%i%s') &lt;= date_format(#{endDate}, '%Y-%m-%d %H:%i%s')
         </if>
         <if test="keyword != null and keyword != ''">
-            AND (
-            t1.name LIKE CONCAT('%', #{keyword}, '%')
-            OR t1.visit_no LIKE CONCAT('%', #{keyword}, '%')
-            OR t1.pym LIKE CONCAT('%', #{keyword}, '%')
-            OR t1.wbm LIKE CONCAT('%', #{keyword}, '%')
-            OR t1.cert_no LIKE CONCAT('%', #{keyword}, '%'))
+            AND ( a.name LIKE CONCAT('%', #{keyword}, '%') OR a.visit_no LIKE CONCAT('%', #{keyword}, '%') OR a.pym LIKE CONCAT('%', #{keyword}, '%')
+            OR a.wbm LIKE CONCAT('%', #{keyword}, '%') OR a.cert_no LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="doctorId != null and doctorId != ''">
-            and t1.doctor_id = #{doctorId}
+            and a.doctor_id = #{doctorId}
         </if>
         <if test="deptId != null and deptId != ''">
-            and t1.dept_id = #{deptId}
+            and a.dept_id = #{deptId}
         </if>
-        ORDER BY
-        t1.crte_time DESC
+        ORDER BY a.visit_time DESC
     </select>
 
 
@@ -1398,7 +1367,7 @@
         crte_time ASC
     </select>
 
-    <!--抗菌类住院发药统计-->
+    <!--抗菌类住院发药统计2-->
     <select id="queryInAntibiosisDrug" resultType="java.util.Map">
         SELECT
         type_code,
@@ -1478,7 +1447,7 @@
         </if>
         <if test="endDate != null and endDate != ''">
             and b.crte_time &lt;= #{endDate}
-        </if>hd
+        </if>
         <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
         <if test='statisWay == "5"'>
             and g.prep_code in ('241','16','138')

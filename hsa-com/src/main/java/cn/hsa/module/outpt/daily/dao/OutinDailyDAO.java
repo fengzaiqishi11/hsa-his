@@ -606,4 +606,14 @@ public interface OutinDailyDAO {
      * @Return
      */
     List<Map<String, Object>> queryOutinDailyPayAndAdvancePay(OutinDailyDTO dto);
+
+    /**
+     * @Description: 查询医保支付信息
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/25 16:02
+     * @Return
+     */
+    Map<String, Object> getOutinDailyInsure(OutinDailyDTO dto);
 }

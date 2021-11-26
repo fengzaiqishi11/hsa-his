@@ -66,6 +66,9 @@ public class InptConsultationApplyBOImpl extends HsafBO implements InptConsultat
             return inptConsultationApplyDTO.getId();
         } else {
             InptConsultationApplyDTO byId = inptConsultationApplyDAO.getById(inptConsultationApplyDTO);
+            if (Constants.HZZT.SH.equals(byId.getConsulState())) {
+                throw new RuntimeException("【" + byId.getConsulNo() + "】已审核，不可修改！");
+            }
             if (Constants.HZZT.WC.equals(byId.getConsulState())) {
                 throw new RuntimeException("【" + byId.getConsulNo() + "】已完成，不可修改！");
             }

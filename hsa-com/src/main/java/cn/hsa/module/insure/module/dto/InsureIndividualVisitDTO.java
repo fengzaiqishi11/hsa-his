@@ -139,4 +139,6 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String mdtrtareaAdmvs;
         private String address ; // 地址
         private String phone; // 联系电话
+        private String visitNationCode;  // 就诊科别
+        private BigDecimal  totalAdvance; // 累计预交金
 }

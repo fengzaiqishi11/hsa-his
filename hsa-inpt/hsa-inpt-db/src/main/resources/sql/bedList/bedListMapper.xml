@@ -352,7 +352,7 @@
 
         union all
         select if(count(1) > 0, concat('[',group_concat(ia.content),']未填写皮试结果'), '' ) errMsg from inpt_advice ia,
-        (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where a.id = b.advice_id ) ic
+        (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
         where ic.source_ia_id = ia.id
         and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
         and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
@@ -373,7 +373,7 @@
             where oir.hosp_code = #{hospCode} and oir.visit_id = #{visitId} and oir.status_code != '3' and oir.status_code != '-1'    <!-- 手术状态：3、已完成，-1、手术取消 -->
             union all
             <!-- 住院手术计费方式：1、开医嘱计费，2、手术补记账 -->
-            select if((select value from sys_parameter sp where sp.code = 'ZY_SSJFFS') = '0', '', if(count(1) > 0, concat('[',group_concat(oir.oper_disease_name),']手术未补记账'), '')) errMsg from oper_info_record oir
+            select if((select value from sys_parameter sp where sp.hosp_code = #{hospCode} and sp.code = 'ZY_SSJFFS') = '0', '', if(count(1) > 0, concat('[',group_concat(oir.oper_disease_name),']手术未补记账'), '')) errMsg from oper_info_record oir
             where oir.hosp_code = #{hospCode} and oir.visit_id = #{visitId} and oir.status_code = '3' and ifnull(oir.is_cost, '0') = '0'
         </if>
     </select>

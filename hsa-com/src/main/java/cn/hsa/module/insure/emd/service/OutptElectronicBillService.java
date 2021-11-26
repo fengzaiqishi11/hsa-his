@@ -73,4 +73,5 @@ public interface OutptElectronicBillService {
      */
     @GetMapping("/service/insure/outptElectronicBill/getPayEffect")
     WrapperResponse getPayEffect(Map<String,Object> param);
+
 }

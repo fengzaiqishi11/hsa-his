@@ -288,7 +288,6 @@
     </select>
 
     <select id="queryAll" resultMap="StroStockDetailMap">
-        select f.* from (
         select
         min(a.id) as id, a.hosp_code, a.biz_id, a.item_code, a.item_id, min(a.item_name)as item_name, min(a.unit_code)
         as unit_code, sum(a.num) as num, min(a.buy_price) as buy_price , min(a.sell_price) as sell_price,
@@ -404,7 +403,7 @@
             </if>
         </where>
         group by a.item_id,a.hosp_code,a.biz_id,a.hosp_code,a.item_code,a.batch_no
-        ) f order by f.locationNo is null,f.locationNo,f.code
+        order by locationNo is null,locationNo,code
     </select>
 
     <select id="queryAllCancleNo" resultMap="StroStockDetailMap">

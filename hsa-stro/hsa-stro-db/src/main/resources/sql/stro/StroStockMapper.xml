@@ -121,6 +121,15 @@
             <if test="stockOccupy != null">
                 and ifnull(a.stock_occupy,0) = #{stockOccupy}
             </if>
+            <if test="stockLimitsFlag == '0'.toString()">
+              and ifnull(a.stock_min,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '1'.toString()">
+              and ifnull(a.stock_min,0) &lt; a.num and ifnull(a.stock_max,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '2'.toString()">
+              and ifnull(a.stock_max,0) &lt; a.num
+            </if>
             <if test="!isMun">
                 and ifnull(a.split_num,0)>0
             </if>
@@ -220,6 +229,15 @@
             <if test="!isDate">
                 and ifnull(a.num,0) > ifnull(a.stock_min,0)
             </if>
+            <if test="stockLimitsFlag == '0'.toString()">
+              and ifnull(a.stock_min,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '1'.toString()">
+              and ifnull(a.stock_min,0) &lt; a.num and ifnull(a.stock_max,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '2'.toString()">
+              and ifnull(a.stock_max,0) &lt; a.num
+            </if>
         </where>
     </select>
 
@@ -314,6 +332,15 @@
                     #{type}
                 </foreach>
             </if>
+            <if test="stockLimitsFlag == '0'.toString()">
+              and ifnull(a.stock_min,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '1'.toString()">
+              and ifnull(a.stock_min,0) &lt; a.num and ifnull(a.stock_max,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '2'.toString()">
+              and ifnull(a.stock_max,0) &lt; a.num
+            </if>
         </where>
         union all
         select
@@ -397,6 +424,15 @@
             </if>
             <if test="!isDate">
                 and ifnull(a.num,0) > ifnull(a.stock_min,0)
+            </if>
+            <if test="stockLimitsFlag == '0'.toString()">
+              and ifnull(a.stock_min,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '1'.toString()">
+              and ifnull(a.stock_min,0) &lt; a.num and ifnull(a.stock_max,0) > a.num
+            </if>
+            <if test="stockLimitsFlag == '2'.toString()">
+              and ifnull(a.stock_max,0) &lt; a.num
             </if>
         </where>
     </select>

@@ -527,6 +527,9 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
         selectEntity.setHospPrice(BigDecimalUtils.negate(selectEntity.getHospPrice()));
         selectEntity.setPlanAccountPrice(BigDecimalUtils.negate(selectEntity.getPlanAccountPrice()));
         selectEntity.setPortionPrice(BigDecimalUtils.negate(selectEntity.getPortionPrice()));
+        selectEntity.setPsnPartAmt(BigDecimalUtils.negate(selectEntity.getPsnPartAmt()));// 个人负担总金额
+        selectEntity.setLastSettle(BigDecimalUtils.negate(selectEntity.getLastSettle()));// 结算后余额
+        selectEntity.setBeforeSettle(BigDecimalUtils.negate(selectEntity.getBeforeSettle()));// 结算后余额
         inptVisitDAO.insertInsureIndividualSettle(selectEntity);
     }
 }

@@ -75,4 +75,16 @@ public class BackCostByInptServiceImpl extends HsafService implements BackCostBy
         Boolean isSuccess = backCostByInputBO.saveBackCostWithInpt(map);
         return WrapperResponse.success(isSuccess);
     }
+    /**
+     * @Method updateFeeDate
+     * @Desrciption 费用改变
+     * @param
+     * @Author yuelong.chen
+     * @Date   2021/11/25 14:41
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateFeeDate(Map<String, Object> map) {
+        return WrapperResponse.success(backCostByInputBO.updateFeeDate(map));
+    }
 }

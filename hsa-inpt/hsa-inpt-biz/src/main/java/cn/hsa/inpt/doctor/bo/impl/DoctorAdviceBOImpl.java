@@ -247,8 +247,11 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             }
         }
 
+        // 查询是否存在会诊记录
+        InptVisitDTO visitDTO = inptConsultationApplyDAO.getInptVisit(inptAdviceDTOList.get(0));
+
         InptVisitDTO inptVisitDTO = inptAdviceDAO.getInptVisit(inptAdviceDTOList.get(0));
-        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTOList.get(0).getDeptId())){
+        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTOList.get(0).getDeptId()) && visitDTO == null){
             throw new AppException("入院科室与开嘱科室不一致，请检查");
         }
         //获取组号
@@ -384,7 +387,12 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         inptAdviceDTO.setVisitId(inptAdviceTDTO.getVisitId());
         inptAdviceDTO.setHospCode(inptAdviceTDTO.getHospCode());
         InptVisitDTO inptVisitDTO = inptAdviceDAO.getInptVisit(inptAdviceDTO);
-        if(!inptVisitDTO.getInDeptId().equals(inptAdviceTDTO.getDeptId())){
+
+        // 查询是否存在会诊记录
+        inptAdviceDTO.setBabyId(inptAdviceTDTO.getBabyId());
+        InptVisitDTO visitDTO = inptConsultationApplyDAO.getInptVisit(inptAdviceDTO);
+        // 过滤掉会诊病人
+        if(!inptVisitDTO.getInDeptId().equals(inptAdviceTDTO.getDeptId()) && visitDTO == null){
             throw new AppException("入院科室与开嘱科室不一致，请检查");
         }
         if(!ListUtils.isEmpty(inptAdviceTDTO.getInptAdviceDTOList())){
@@ -1192,7 +1200,10 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             throw new AppException("保存失败,未获取到医嘱信息!");
         }
         inptVisitDTO = inptAdviceDAO.getInptVisit(inptAdviceDTO);
-        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTO.getDeptId())){
+        // 查询是否存在会诊记录
+        InptVisitDTO visitDTO = inptConsultationApplyDAO.getInptVisit(inptAdviceDTO);
+        // 过滤掉会诊病人
+        if(!inptVisitDTO.getInDeptId().equals(inptAdviceDTO.getDeptId()) && visitDTO == null){
             throw new AppException("入院科室与开嘱科室不一致，请检查");
         }
 

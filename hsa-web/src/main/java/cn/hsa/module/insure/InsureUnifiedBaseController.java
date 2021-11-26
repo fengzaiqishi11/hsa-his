@@ -123,11 +123,12 @@ public class InsureUnifiedBaseController extends BaseController {
      * @Date   2021/4/23 12:47
      * @Return
      **/
-    @PostMapping("/querySettleInfo")
-    public WrapperResponse<Map<String,Object>> querySettleInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+    @PostMapping("/updateSettleInfo")
+    public WrapperResponse<Map<String,Object>> updateSettleInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
-        return insureUnifiedBaseService_consumer.querySettleInfo(map);
+        map.put("crteName",sysUserDTO.getName());
+        return insureUnifiedBaseService_consumer.updateSettleInfo(map);
     }
 
     /**
@@ -143,6 +144,7 @@ public class InsureUnifiedBaseController extends BaseController {
     public WrapperResponse<Map<String,Object>> queryFeeDetailInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteName",sysUserDTO.getName());
         return insureUnifiedBaseService_consumer.queryFeeDetailInfo(map);
     }
 

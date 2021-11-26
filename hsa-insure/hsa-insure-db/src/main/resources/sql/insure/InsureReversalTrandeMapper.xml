@@ -343,6 +343,10 @@
         <if test="state != null and state != ''">
             and e.state = '0'
         </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            and e.clr_optins = #{clrOptins}
+        </if>
+
         GROUP BY se_vi_id
     </select>
 
@@ -613,7 +617,12 @@
                 ) type,
             e.insure_reg_code AS insureRegCode,
             DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
-            DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate
+            DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
+            e.all_portion_price as allPortionPrice,
+            e.over_self_price as overSelfPrice,
+            e.preselfpay_amt as preselfpayAmt,
+            e.inscp_scp_amt as inscpScpAmt,
+            e.pool_prop_selfpay as poolPropSelfpay
         FROM
             insure_individual_settle e,
             insure_individual_visit t,
@@ -681,10 +690,16 @@
             sum( civilPrice ) AS civilPrice,
             sum( retirePrice ) AS retirePrice,
             sum( personalPrice ) AS personalPrice,
+            sum( personPrice ) AS personPrice,
             sum( hospPrice ) AS hospPrice,
             sum( restsPrice ) AS restsPrice,
             sum( mafPay ) AS mafPay,
-            sum( planSumPrice ) AS planSumPrice
+            sum( planSumPrice ) AS planSumPrice,
+            sum(allPortionPrice) as allPortionPrice,
+            sum(overSelfPrice) as overSelfPrice,
+            sum(preselfpayAmt) as preselfpayAmt,
+            sum(inscpScpAmt) as inscpScpAmt,
+            sum(poolPropSelfpay) as poolPropSelfpay
         FROM
             (
                 SELECT DISTINCT
@@ -724,7 +739,12 @@
                     1,
                     DATEDIFF( tt.out_time, tt.in_time )
                     ) AS inDay,
-                    e.insure_reg_code AS insureRegCode
+                    e.insure_reg_code AS insureRegCode,
+                    e.all_portion_price as allPortionPrice,
+                    e.over_self_price as overSelfPrice,
+                    e.preselfpay_amt as preselfpayAmt,
+                    e.inscp_scp_amt as inscpScpAmt,
+                    e.pool_prop_selfpay as poolPropSelfpay
                 FROM
                     insure_individual_settle e,
                     insure_individual_visit t,
@@ -821,7 +841,12 @@
         ) type,
         e.insure_reg_code AS insureRegCode,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
-        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
+        e.all_portion_price as allPortionPrice,
+        e.over_self_price as overSelfPrice,
+        e.preselfpay_amt as preselfpayAmt,
+        e.inscp_scp_amt as inscpScpAmt,
+        e.pool_prop_selfpay as poolPropSelfpay
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -887,10 +912,16 @@
         sum( civilPrice ) AS civilPrice,
         sum( retirePrice ) AS retirePrice,
         sum( personalPrice ) AS personalPrice,
+        sum( personPrice ) AS personPrice,
         sum( hospPrice ) AS hospPrice,
         sum( restsPrice ) AS restsPrice,
         sum( mafPay ) AS mafPay,
-        sum( planSumPrice ) AS planSumPrice
+        sum( planSumPrice ) AS planSumPrice,
+        sum(allPortionPrice) as allPortionPrice,
+        sum(overSelfPrice) as overSelfPrice,
+        sum(preselfpayAmt) as preselfpayAmt,
+        sum(inscpScpAmt) as inscpScpAmt,
+        sum(poolPropSelfpay) as poolPropSelfpay
         FROM
         (
         SELECT DISTINCT
@@ -924,7 +955,12 @@
         ifnull( e.maf_pay, 0 ) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
-        e.insure_reg_code AS insureRegCode
+        e.insure_reg_code AS insureRegCode,
+        e.all_portion_price as allPortionPrice,
+        e.over_self_price as overSelfPrice,
+        e.preselfpay_amt as preselfpayAmt,
+        e.inscp_scp_amt as inscpScpAmt,
+        e.pool_prop_selfpay as poolPropSelfpay
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1030,7 +1066,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         e.insure_reg_code AS insureRegCode,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
-        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
+        e.all_portion_price as allPortionPrice,
+        e.over_self_price as overSelfPrice,
+        e.preselfpay_amt as preselfpayAmt,
+        e.inscp_scp_amt as inscpScpAmt,
+        e.pool_prop_selfpay as poolPropSelfpay
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1099,7 +1140,12 @@
         sum( planSumPay ) AS planSumPay,
         sum( personPrice ) AS personPrice,
         sum( thbPay ) AS thbPay,
-        sum( governmentPay ) AS governmentPay
+        sum( governmentPay ) AS governmentPay,
+        sum(allPortionPrice) as allPortionPrice,
+        sum(overSelfPrice) as overSelfPrice,
+        sum(preselfpayAmt) as preselfpayAmt,
+        sum(inscpScpAmt) as inscpScpAmt,
+        sum(poolPropSelfpay) as poolPropSelfpay
         FROM
         (
         SELECT DISTINCT
@@ -1127,7 +1173,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         e.clr_optins AS clrOptins,
         e.medicine_org_code AS medicineOrgCode,
-        e.insure_reg_code AS insureRegCode
+        e.insure_reg_code AS insureRegCode,
+        e.all_portion_price as allPortionPrice,
+        e.over_self_price as overSelfPrice,
+        e.preselfpay_amt as preselfpayAmt,
+        e.inscp_scp_amt as inscpScpAmt,
+        e.pool_prop_selfpay as poolPropSelfpay
         FROM
         insure_individual_settle e,
         insure_individual_visit t,

@@ -3,10 +3,7 @@ package cn.hsa.module.outpt.fees.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
-import com.github.pagehelper.Page;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +56,17 @@ public interface OutptTmakePriceFormService {
      */
     @GetMapping(value = "/service/outpt/tmakePriceForm/queryOutptCostList")
     WrapperResponse queryOutptCostList(Map param);
+
+    /**
+     * @Description: 体检
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/11/22 20:21
+     * @Return
+     */
+    @GetMapping(value = "/service/outpt/tmakePriceForm/queryOutptCostListTJ")
+    WrapperResponse queryOutptCostListTJ(Map param);
 
 
     /**

@@ -11,10 +11,7 @@ import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 import cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.util.BigDecimalUtils;
-import cn.hsa.util.Constants;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -181,12 +178,42 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         }
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
+            if(beforeChange.getEndBalanceEncryption() == null || "".equals(beforeChange.getEndBalanceEncryption())) {
+                throw new AppException("充值获取一卡通剩余金额密文失败，请联系管理员");
+            }
+            String moneyEncryption = AesUtil.decodeWithDefaultKey(beforeChange.getEndBalanceEncryption());
+            if (!moneyEncryption.contains(":")) {
+                throw new AppException("一卡通余额密文解析不包含(:)，请联系管理员");
+            }
+            BigDecimal startMoneyMWHY = new BigDecimal(moneyEncryption.split(":")[1]);
+            if (!BigDecimalUtils.equals(beforeChange.getEndBalance(), startMoneyMWHY)) {
+                throw new AppException("一卡通余额密文解析金额与明文金额不一致，请联系管理员");
+            }
+            if (!BigDecimalUtils.equals(startMoneyMWHY, cardRechargeChangeDO.getEndBalance())) {
+                throw new AppException("一卡通主表中 账户余额 与一卡通异动表最后一条数据中异动后密文中金额不一致，请联系管理员");
+            }
             cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+            // 异动前金额加密定义
+            StringBuilder startBalanceJM = new StringBuilder();
+            startBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getStartBalance());
+            cardRechargeChangeDO.setStartBalanceEncryption(AesUtil.encodeWithDefaultKey(startBalanceJM.toString())); // 异动前加密金额
             BigDecimal end= BigDecimalUtils.add(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice());
             cardRechargeChangeDO.setEndBalance(end);
+            // 异动后金额加密定义
+            StringBuilder endBalanceJM = new StringBuilder();
+            endBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getEndBalance());
+            cardRechargeChangeDO.setEndBalanceEncryption(AesUtil.encodeWithDefaultKey(endBalanceJM.toString()));
         }else {
             cardRechargeChangeDO.setStartBalance(new BigDecimal(0));
+            // 异动前金额加密定义
+            StringBuilder startBalanceJM = new StringBuilder();
+            startBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getStartBalance());
+            cardRechargeChangeDO.setStartBalanceEncryption(AesUtil.encodeWithDefaultKey(startBalanceJM.toString())); // 异动前加密金额
             cardRechargeChangeDO.setEndBalance(cardRechargeChangeDO.getPrice());
+            // 异动后金额加密定义
+            StringBuilder endBalanceJM = new StringBuilder();
+            endBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getEndBalance());
+            cardRechargeChangeDO.setEndBalanceEncryption(AesUtil.encodeWithDefaultKey(endBalanceJM.toString()));
         }
         if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
             cardRechargeChangeDO.setId(SnowflakeUtils.getId());
@@ -222,10 +249,37 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
         BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
         if (beforeChange!=null){
             cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+            // 判断异动后金额
+            // ========================2021年10月22日17:11:14  加密=====================
+            if(beforeChange.getEndBalanceEncryption() == null || "".equals(beforeChange.getEndBalanceEncryption())) {
+                throw new AppException("退费获取一卡通剩余金额密文失败，请联系管理员");
+            }
+            String moneyEncryption = AesUtil.decodeWithDefaultKey(beforeChange.getEndBalanceEncryption());
+            if (!moneyEncryption.contains(":")) {
+                throw new AppException("退费一卡通余额密文解析不包含(:)，请联系管理员");
+            }
+            BigDecimal startMoneyMWHY = new BigDecimal(moneyEncryption.split(":")[1]);
+            if (!BigDecimalUtils.equals(beforeChange.getEndBalance(), startMoneyMWHY)) {
+                throw new AppException("退费一卡通余额密文解析金额与明文金额不一致，请联系管理员");
+            }
+            if (!BigDecimalUtils.equals(startMoneyMWHY, cardRechargeChangeDO.getEndBalance())) {
+                throw new AppException("一卡通主表中 账户余额 与一卡通异动表最后一条数据中异动后密文中金额不一致，请联系管理员");
+            }
+            // 异动前金额加密定义
+            StringBuilder startBalanceJM = new StringBuilder();
+            startBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getStartBalance());
+            cardRechargeChangeDO.setStartBalanceEncryption(AesUtil.encodeWithDefaultKey(startBalanceJM.toString())); // 异动前加密金额
+            // ========================2021年10月22日17:11:30    加密==========
+
             if (BigDecimalUtils.greater(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice())) {
                 BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice());
                 cardRechargeChangeDO.setEndBalance(end);
                 cardRechargeChangeDO.setPrice(BigDecimalUtils.negate(cardRechargeChangeDO.getPrice()));
+
+                // 异动后金额加密定义
+                StringBuilder endBalanceJM = new StringBuilder();
+                endBalanceJM.append(cardRechargeChangeDO.getCardId()).append(":").append(cardRechargeChangeDO.getEndBalance());
+                cardRechargeChangeDO.setEndBalanceEncryption(AesUtil.encodeWithDefaultKey(endBalanceJM.toString()));
             }else {
                 throw new AppException("退费金额不能大于一卡通余额！");
             }

@@ -60,10 +60,10 @@
         IFNULL(b.contact_phone,'-') as A35,
        '1' as B38,
         IFNULL(b.in_way,'-')  as B11C,
-        IFNULL((select d.mris_code from base_dept d where d.id = b.in_dept_id and d.hosp_code =#{hospCode}),'69') as B13C,
+        IFNULL((select d.nation_code from base_dept d where d.id = b.in_dept_id and d.hosp_code =#{hospCode}),'69') as B13C,
         IFNULL(b.in_bed_name,'-') as B14,
         IFNULL(b.turn_dept_ids,'-') as B21C,
-        IFNULL((select d.mris_code from base_dept d where d.id = b.out_dept_id and d.hosp_code =#{hospCode}),'69') as B16C,
+        IFNULL((select d.nation_code from base_dept d where d.id = b.out_dept_id and d.hosp_code =#{hospCode}),'69') as B16C,
         IFNULL(b.out_bed_name,'-') as B17,
         IFNULL(b.in_days,'-') as B20,
         IFNULL(b.disease_icd10,'-')  as C01C,
@@ -897,7 +897,10 @@
        </if>
     </select>
    <select id="getMrisDiagnose" resultType="java.util.Map" parameterType="java.util.Map">
-      select disease_code,disease_code2,in_situation_code1,in_situation_code2,disease_icd10_1,disease_icd10_2,disease_icd10_name1,disease_icd10_name2
+      select disease_code,disease_code2,in_situation_code1,in_situation_code2,
+      ifnull((select platform_code from base_disease where code = disease_icd10_1 and hosp_code =#{hospCode} limit 1),disease_icd10_1) as disease_icd10_1,
+      ifnull((select platform_code from base_disease where code = disease_icd10_2 and hosp_code =#{hospCode} limit 1),disease_icd10_2) as disease_icd10_2,
+      disease_icd10_name1,disease_icd10_name2
       from mris_diagnose where visit_id =#{visitId} and hosp_code =#{hospCode}
    </select>
    <select id="getMrisOperInfo" resultType="java.util.Map" parameterType="java.util.Map">

@@ -1393,4 +1393,264 @@
         and status_code ='0'
     </select>
 
+    <!-- 修改数据 -->
+    <update id="updateByInsureSettleId" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        UPDATE insure_individual_settle
+        <set>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="settleId != null">
+                settle_id = #{settleId},
+            </if>
+            <if test="isHospital != null">
+                is_hospital = #{isHospital},
+            </if>
+            <if test="visitNo != null">
+                visit_no = #{visitNo},
+            </if>
+            <if test="dischargeDnCode != null">
+                discharge_dn_code = #{dischargeDnCode},
+            </if>
+            <if test="insureOrgCode != null">
+                insure_org_code = #{insureOrgCode},
+            </if>
+            <if test="medicineOrgCode != null">
+                medicine_org_code = #{medicineOrgCode},
+            </if>
+            <if test="dischargeDnName != null">
+                discharge_dn_name = #{dischargeDnName},
+            </if>
+            <if test="dischargedDate != null">
+                discharged_date = #{dischargedDate},
+            </if>
+            <if test="dischargedCase != null">
+                discharged_case = #{dischargedCase},
+            </if>
+            <if test="settleway != null">
+                settleway = #{settleway},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="insurePrice != null">
+                insure_price = #{insurePrice},
+            </if>
+            <if test="planPrice != null">
+                plan_price = #{planPrice},
+            </if>
+            <if test="seriousPrice != null">
+                serious_price = #{seriousPrice},
+            </if>
+            <if test="civilPrice != null">
+                civil_price = #{civilPrice},
+            </if>
+            <if test="retirePrice != null">
+                retire_price = #{retirePrice},
+            </if>
+            <if test="personalPrice != null">
+                personal_price = #{personalPrice},
+            </if>
+            <if test="personPrice != null">
+                person_price = #{personPrice},
+            </if>
+            <if test="hospPrice != null">
+                hosp_price = #{hospPrice},
+            </if>
+            <if test="beforeSettle != null">
+                before_settle = #{beforeSettle},
+            </if>
+            <if test="lastSettle != null">
+                last_settle = #{lastSettle},
+            </if>
+            <if test="restsPrice != null">
+                rests_price = #{restsPrice},
+            </if>
+            <if test="assignPrice != null">
+                assign_price = #{assignPrice},
+            </if>
+            <if test="startingPrice != null">
+                starting_price = #{startingPrice},
+            </if>
+            <if test="topPrice != null">
+                top_price = #{topPrice},
+            </if>
+            <if test="planAccountPrice != null">
+                plan_account_price = #{planAccountPrice},
+            </if>
+            <if test="portionPrice != null">
+                portion_price = #{portionPrice},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="settleState != null">
+                settle_state = #{settleState},
+            </if>
+            <if test="costbatch != null">
+                costbatch = #{costbatch},
+            </if>
+            <if test="aka130 != null">
+                aka130 = #{aka130},
+            </if>
+            <if test="bka006 != null">
+                bka006 = #{bka006},
+            </if>
+            <if test="injuryBorthSn != null">
+                injury_borth_sn = #{injuryBorthSn},
+            </if>
+            <if test="isAccount != null">
+                is_account = #{isAccount},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="insureSettleId != null">
+                insureSettleId = #{insureSettleId},
+            </if>
+            <if test="medicalRegNo != null">
+                medicalRegNo = #{medicalRegNo},
+            </if>
+            <if test="ext03 != null">
+                ext03 = #{ext03},
+            </if>
+            <if test="ext04 != null">
+                ext04 = #{ext04},
+            </if>
+            <if test="ext05 != null">
+                ext05 = #{ext05},
+            </if>
+            <if test="ext06 != null">
+                ext06 = #{ext06},
+            </if>
+            <if test="ext07 != null">
+                ext07 = #{ext07},
+            </if>
+            <if test="ext08 != null">
+                ext08 = #{ext08},
+            </if>
+            <if test="ext09 != null">
+                ext09 = #{ext09},
+            </if>
+            <if test="ext10 != null">
+                ext10 = #{ext10},
+            </if>
+            <if test="omsgid != null">
+                omsgid = #{omsgid},
+            </if>
+            <if test="oinfno != null">
+                oinfno = #{oinfno},
+            </if>
+            <if test="remoteMsgId != null">
+                remote_msg_id = #{remoteMsgId},
+            </if>
+            <if test="clrType != null">
+                clr_type = #{clrType},
+            </if>
+            <if test="clrWay != null">
+                clr_way = #{clrWay},
+            </if>
+            <if test="clrOptins != null">
+                clr_optins = #{clrOptins},
+            </if>
+            <if test="mafPay != null">
+                maf_pay = #{mafPay},
+            </if>
+            <if test="hospExemAmount != null">
+                hosp_exem_amount = #{hospExemAmount},
+            </if>
+            <if test="isCancel != null">
+                is_cancel = #{isCancel},
+            </if>
+            <if test="comPay != null">
+                com_pay = #{comPay},
+            </if>
+            <if test="allPortionPrice != null">
+                all_portion_price = #{allPortionPrice},
+            </if>
+            <if test="overSelfPrice != null">
+                over_self_price = #{overSelfPrice},
+            </if>
+            <if test="preselfpayAmt != null">
+                preselfpay_amt = #{preselfpayAmt},
+            </if>
+            <if test="inscpScpAmt != null">
+                inscp_scp_amt = #{inscpScpAmt},
+            </if>
+            <if test="poolPropSelfpay != null">
+                pool_prop_selfpay = #{poolPropSelfpay},
+            </if>
+            <if test="acctMulaidPay != null">
+                acct_mulaid_pay = #{acctMulaidPay},
+            </if>
+            <if test="acctInjPay != null">
+                acct_inj_pay = #{acctInjPay},
+            </if>
+            <if test="retAcctInjPay != null">
+                ret_acct_inj_pay = #{retAcctInjPay},
+            </if>
+            <if test="governmentPay != null">
+                government_pay = #{governmentPay},
+            </if>
+            <if test="thbPay != null">
+                thb_pay = #{thbPay},
+            </if>
+            <if test="carePay != null">
+                care_pay = #{carePay},
+            </if>
+            <if test="lowInPay != null">
+                low_in_pay = #{lowInPay},
+            </if>
+            <if test="othPay != null">
+                oth_pay = #{othPay},
+            </if>
+            <if test="retiredPay != null">
+                retired_pay = #{retiredPay},
+            </if>
+            <if test="soldierPay != null">
+                soldier_pay = #{soldierPay},
+            </if>
+            <if test="retiredOutptPay != null">
+                retired_outpt_pay = #{retiredOutptPay},
+            </if>
+            <if test="injuryPay != null">
+                injury_pay = #{injuryPay},
+            </if>
+            <if test="hallPay != null">
+                hall_pay = #{hallPay},
+            </if>
+            <if test="soldierToPay != null">
+                soldier_to_pay = #{soldierToPay},
+            </if>
+            <if test="welfarePay != null">
+                welfare_pay = #{welfarePay},
+            </if>
+            <if test="COVIDPay != null">
+                COVID_pay = #{COVIDPay},
+            </if>
+            <if test="familyPay != null">
+                family_pay = #{familyPay},
+            </if>
+            <if test="behalfPay != null">
+                behalf_pay = #{behalfPay},
+            </if>
+            <if test="fertilityPay != null">
+                fertility_pay = #{fertilityPay},
+            </if>
+            <if test="psnPartAmt != null">
+                psn_part_amt = #{psnPartAmt}
+            </if>
+        </set>
+        WHERE insureSettleId = #{insureSettleId} and hosp_code = #{hospCode} and insure_reg_code = #{insureRegCode}
+    </update>
+
 </mapper>

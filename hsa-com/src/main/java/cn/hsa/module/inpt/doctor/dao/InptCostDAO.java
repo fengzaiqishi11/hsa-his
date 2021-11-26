@@ -6,9 +6,9 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
-import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO;
-import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
-import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
+import cn.hsa.module.phar.pharinbackdrug.dto.*;
+import cn.hsa.module.phar.pharinbackdrug.entity.PharInDistributeDO;
+import cn.hsa.module.phar.pharinbackdrug.entity.PharInDistributeDetailDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -479,4 +479,49 @@ public interface InptCostDAO {
      * @Return
     **/
     List<InptCostDTO> checkInsureAndHisFee(Map<String, Object> map);
+
+    PharInWaitReceiveDTO queryPharInWaitReceiveOrg(Map<String, Object> map);
+
+    int updatePharInWaitReceiveOrg(PharInWaitReceiveDTO receiveDTO);
+
+    int deletePharInWaitReceive(PharInWaitReceiveDTO receiveDTO);
+
+    // 发药批次
+    PharInDistributeAllDetailDTO queryAllPharDistributeOrg(Map map);
+
+    int updateAllPharDistributeOrg(PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO);
+
+    // 发药明细
+    PharInReceiveDetailDTO getPharInReceiveDetailByWrId(Map map);
+    // 发药明细
+    int updatePharInReceiveDetailOrg(PharInReceiveDetailDTO pharInReceiveDetailDTO);
+
+    //发药明细表记录
+    PharInDistributeDetailDTO getPharInDistributeDetailByWrId(Map map);
+
+    int updatePharInDistributeDetailOrg(PharInDistributeDetailDTO pharInDistributeDetailDTO);
+
+    /**
+     * @Method: insertPharInReceiveDetail
+     * @Description:
+     **/
+    int insertPharInReceiveDetail(List<PharInReceiveDetailDTO> list);
+
+    /**
+     * @Method: insertInDistributeDetail
+     * @Description: 插入住院发药明细表
+     **/
+    int insertInDistributeDetail(List<PharInDistributeDetailDTO> list);
+
+    /**
+     * @Menthod insertInDistributeAllDetail
+     * @Desrciption 住院发药批次汇总表入库
+     **/
+    int insertInDistributeAllDetail(List<PharInDistributeAllDetailDTO> list);
+
+    int deletePharInReceiveDetailOrg(PharInReceiveDetailDTO pharInReceiveDetailDTO);
+
+    int deleteInDistributeAllDetailOrg(PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO);
+
+    int deleteInDistributeDetailOrg(PharInDistributeDetailDTO pharInDistributeDetailDTO);
 }

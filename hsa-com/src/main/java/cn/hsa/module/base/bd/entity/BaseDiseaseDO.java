@@ -100,4 +100,6 @@ public class BaseDiseaseDO extends PageDO implements Serializable {
      *  传染病间隔
      */
     private Integer crbInterval;
+    // 病案平台编码
+    private String platformCode;
 }

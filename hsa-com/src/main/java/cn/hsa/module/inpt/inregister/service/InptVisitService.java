@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,6 +70,18 @@ public interface InptVisitService {
      **/
     @PostMapping(value = "/queryByCertNo")
     WrapperResponse<InptVisitDTO> queryByCertNo(Map map);
+
+
+    /**
+     * @Method queryPrintInpt
+     * @Desrciption 查询打印住院证
+     * @Param [inptVisitDTO]
+     * @Author yuelong.chen
+     * @Date 2021/11/22 16:08
+     * @Return cn.hsa.base.PageDTO
+     **/
+    @GetMapping(value = "/queryPrintInpt")
+    WrapperResponse<OutptVisitDTO> queryPrintInpt(Map map);
 
     /**
      * @Method deleteRegister

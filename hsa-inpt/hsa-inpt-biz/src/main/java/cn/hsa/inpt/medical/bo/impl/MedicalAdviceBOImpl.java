@@ -324,8 +324,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
             //}
             logger.info("====长期费用13："+DateUtils.format());
-        } catch (AppException e) {
-            throw new AppException("核收失败:"+e.getMessage());
+        } catch (Exception e) {
+            AppException tmp = new AppException("核收失败:"+e.getMessage());
+            // 保存堆栈信息避免被覆盖
+            tmp.setStackTrace(e.getStackTrace());
+            // 保存被抑制的异常信息
+            for(Throwable t : e.getSuppressed()){
+                tmp.addSuppressed(t);
+            }
+            throw tmp;
         }
         return true;
     }
@@ -1040,8 +1047,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
             }
             logger.info("====长期费用6："+DateUtils.format());
-        } catch (AppException e) {
-            throw new AppException("长期费用计算失败:"+e.getMessage());
+        } catch (Exception e) {
+            AppException tmp = new AppException("长期费用计算失败:"+e.getMessage());;
+            tmp.setStackTrace(e.getStackTrace());
+            // 保存被抑制的异常信息
+            for(Throwable t : e.getSuppressed()){
+                tmp.addSuppressed(t);
+            }
+            throw tmp;
         }
         return true;
     }
@@ -1484,7 +1497,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                inptCostDTO.setUseCode(inptAdviceDTO.getUseCode());
 //                inptCostDTO.setHerbNum(inptAdviceDTO.getHerbNum());
                 //总金额 总数量*单价
-                inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptCostDTO.getNum(),inptCostDTO.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                inptCostDTO.setTotalPrice(BigDecimalUtils.multiply(inptCostDTO.getTotalNum(),inptCostDTO.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 //优惠金额默认给0,后续统一做优惠处理,再更新
                 inptCostDTO.setPreferentialPrice(BigDecimal.valueOf(0));
                 //优惠后总金额 = 总金额-优惠金额
@@ -2096,7 +2109,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
         if("1".equals(adviceDTO.getIsLong())){
             inptCostDTO.setTotalNum(adviceDTO.getTotalNum());
-            inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+            if(Constants.XMLB.XM.equals(inptAdviceDetailDTO.getItemCode())){
+                inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
+            } else {
+                inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+            }
             //药品
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (inptCostDTO.getTotalNumUnitCode().equals(drugDTO.getUnitCode())) {
@@ -3165,6 +3182,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     }
 
                     BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(),inptAdviceDTO.getItemId());
+                    // 没有配置默认 1：单次向上取整
+                    if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
+                        adviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(adviceDetailDTO.getNum().doubleValue())));
+                    }
                     //-----------------------------------------------
                     //计算停嘱当天的费用数量
                     tzNum = BigDecimalUtils.multiply(BigDecimal.valueOf(inptAdviceDTO.getEndExecNum()==null?0:inptAdviceDTO.getEndExecNum()),

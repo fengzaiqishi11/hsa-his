@@ -6,6 +6,7 @@ import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.base.profileFile.bo
@@ -75,4 +76,14 @@ public interface BaseProfileFileBO {
     List<OutptProfileFileDTO> queryBaseProfileByIds(OutptProfileFileDTO outptProfileFileDTO);
 
     List<OutptProfileFileDTO> queryAll(OutptProfileFileDTO outptProfileFileDTO);
+    /**
+     * @Method isCertNoExist
+     * @Desrciption 删除档案
+     * @Param
+     * [id]
+     * @Author yuelong.chen
+     * @Date   2021/11/23 12:57
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    Boolean deleteProfileFile(Map map);
 }

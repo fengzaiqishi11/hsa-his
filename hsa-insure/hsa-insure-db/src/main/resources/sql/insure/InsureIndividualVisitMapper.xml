@@ -864,8 +864,8 @@
         inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,iv.total_in_days,
         (IF(iiv.is_hospital ='1', (select su.prac_certi_no from sys_user su where su.hosp_code = iv.hosp_code and su.id
         = iv.zz_doctor_id ), (select su.prac_certi_no from sys_user su where su.hosp_code = ov.hosp_code and su.id =
-        ov.doctor_id )) )
-        as pracCertiNo,
+        ov.doctor_id )) )as pracCertiNo,iv.total_advance as totalAdvance,
+        (IF(iiv.is_hospital ='1', iv.age, ov.age) )as age,
         iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
         iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,iib.aac004,
         if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time,
@@ -1037,6 +1037,9 @@
         crte_id,
         crte_name,
         crte_time
+        <if test="visitId !='' and visitId !=null ">
+            , (select sum(reality_price) from outpt_register_detail where hosp_code = #{hospCode} and visit_id = #{visitId}) as rgstFee
+        </if>
         from
         outpt_register
         where
@@ -1368,5 +1371,15 @@
         a.disease_id = b.hosp_illness_id
         where a.hosp_code =#{hospCode} and a.visit_id =#{visitId} and b.insure_reg_code =#{insureRegCode}
         and a.type_code ='204' and a.is_main ='1'
+    </select>
+
+    <select id="getBaseDeptById" resultType="java.util.Map">
+        select code, name
+        from base_dept where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+    <select id="selectSysParameter" resultType="java.util.Map">
+        select value
+        from sys_parameter where hosp_code = #{hospCode} and code = #{code}
     </select>
 </mapper>

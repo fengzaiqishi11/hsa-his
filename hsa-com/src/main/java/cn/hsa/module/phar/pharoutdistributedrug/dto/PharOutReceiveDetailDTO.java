@@ -90,4 +90,8 @@ public class PharOutReceiveDetailDTO extends PharOutReceiveDetailDO implements S
      * 速度(SD)
      */
     private String speedCode;
+    // 是否皮试
+    private String isSkin;
+    // 开方医生
+    private String doctorName;
 }

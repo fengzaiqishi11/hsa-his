@@ -74,4 +74,7 @@
     <dubbo:service interface="cn.hsa.module.center.nationstandardItem.service.NationStandardItemService" ref="nationStandardItemService_provider"/>
 
     <!-- ########################################### 信息中心服务consumer end ########################################### -->
+    <!-- 中心端全局配置信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" ref="centerGlobalConfigService_provider"/>
+
 </beans>

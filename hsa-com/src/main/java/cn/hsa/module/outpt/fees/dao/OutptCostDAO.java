@@ -642,4 +642,13 @@ public interface OutptCostDAO {
 	 */
 	int batchPharOutReceiveDetailInsert(List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList);
 
+	/**
+	 * @Description: 查询体检患者费用数据
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/11/22 20:27
+	 * @Return
+	 */
+	List<OutptCostDTO> queryCostVisitIdTJ(Map param);
 }

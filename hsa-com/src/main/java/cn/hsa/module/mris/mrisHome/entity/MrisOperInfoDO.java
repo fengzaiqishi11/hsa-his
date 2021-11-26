@@ -154,4 +154,6 @@ public class MrisOperInfoDO implements Serializable {
 
     private String columnsNum;
 
+    private String otherOperTime; //择期手术时间
+
 }

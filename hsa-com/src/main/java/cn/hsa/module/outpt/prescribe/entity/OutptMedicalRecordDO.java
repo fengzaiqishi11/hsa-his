@@ -95,6 +95,10 @@ public class OutptMedicalRecordDO extends PageDO implements Serializable {
      */
     private String handleSuggestion;
     /**
+     * 专科检查
+     */
+    private String specialtyCheck;
+    /**
      * 体温
      */
     private String temperature;

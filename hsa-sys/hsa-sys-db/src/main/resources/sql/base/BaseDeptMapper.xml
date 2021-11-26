@@ -246,7 +246,7 @@
         left join base_dept mDept on bd.mg_dept_code = mDept.code and bd.hosp_code = mDept.hosp_code
         left join base_dept wDept on bd.ward_code = wDept.code and bd.hosp_code = wDept.hosp_code
         where bd.hosp_code=#{hospCode}  and bd.code not in (select DISTINCT up_dept_code from
-        base_dept where up_dept_code is not null)
+        base_dept where up_dept_code is not null and is_valid = '1')
         <if test="id != null and id != ''">
             and bd.id = #{id}
         </if>
@@ -452,7 +452,7 @@
           and a.is_valid = #{isValid}
           and a.hosp_code = #{hospCode}
     </select>
-    
+
     <select id="getDeptTypeIdentity" resultMap="BaseDeptMap">
       select c.id, c.name , c.hosp_code,c.type_code,c.type_identity,c.code,c.up_dept_code
           from base_dept a

@@ -470,4 +470,32 @@ public class MrisBaseInfoDO implements Serializable {
     private String isInpt;
 
     private String yljgCode; // 医疗机构编码
+
+    /** 转科时间1 */
+    private Date turnTime1;
+    /** 转科时间2 */
+    private Date turnTime2;
+    /** 转科时间3 */
+    private Date turnTime3;
+
+    /** 转科3 */
+    private String turnDept1;
+    /** 转科3 */
+    private String turnDept2;
+    /** 转科3 */
+    private String turnDept3;
+
+    /** 门急诊医生Id */
+    private String outptDoctorId;
+    /** 门急诊医生名称 */
+    private String outptDoctorName;
+    /** 病例分型 */
+    private String caseClassify;
+    /** 临床路径病例 */
+    private String clinicalPathCase;
+    /** 抢救次数 */
+    private String rescueCount;
+    /** 成功次数 */
+    private String rescueSuccessCount;
+
 }

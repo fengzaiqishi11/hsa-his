@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.config.dao.CenterGlobalConfigDAO">
+
+    <resultMap type="cn.hsa.module.center.config.dto.CenterGlobalConfigDTO" id="centerConfigResultMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="configName" column="config_name" jdbcType="VARCHAR"/>
+        <result property="configValue" column="config_value" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="DATE"/>
+        <result property="updateTime" column="update_time" jdbcType="DATE"/>
+    </resultMap>
+
+    <select id="queryCenterGlobalConfig" resultMap="centerConfigResultMap">
+        select * from center_global_config
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="configName != null and configName != ''">
+                and config_name = #{configName}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and is_valid = #{isValid}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCenterGlobalConfig" parameterType="cn.hsa.module.center.config.dto.CenterGlobalConfigDTO">
+        INSERT INTO `center_global_config`(`id`, `config_name`, `config_value`, `crte_id`, `crte_name`,
+                                           `crte_time`, `update_time`, `remark`)
+    VALUES (#{id}, #{configName}, #{configValue},#{crteId} , #{crteName} , #{crteTime},#{updateTime},#{remark})
+    </insert>
+
+    <update id="updateCenterGlobalConfig" parameterType="cn.hsa.module.center.config.dto.CenterGlobalConfigDTO">
+        update center_global_config set config_name = #{configName},config_value = #{configValue},crte_id = #{crteId},
+             update_time = #{updateTime},remark = #{remark}
+            where id = #{id}
+    </update>
+
+    <delete id="deleteCenterGlobalConfig" parameterType="cn.hsa.module.center.config.dto.CenterGlobalConfigDTO">
+        delete from center_global_config where id = #{id}
+    </delete>
+
+    <update id="modifyValidStatus">
+        update center_global_config set is_valid = #{isValid} where id = #{id}
+    </update>
+
+    <select id="getGlobalConfigById" parameterType="java.lang.String" resultMap="centerConfigResultMap">
+        select * from center_global_config where id = #{id}
+    </select>
+</mapper>

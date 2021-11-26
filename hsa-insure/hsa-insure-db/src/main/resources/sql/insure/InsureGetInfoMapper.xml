@@ -1533,6 +1533,7 @@
         iis.aka130 as med_type
         from insure_individual_settle iis
         join insure_individual_visit iiv on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
         join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
         left join insure_setl_info isi on iis.insureSettleId = isi.insure_settle_id and iis.hosp_code = isi.hosp_code
         and iis.visit_id = iiv.visit_id
@@ -1546,6 +1547,9 @@
         <if test="isTransmit == '1'.toString()">
             and isi.settle_no is not null
         </if>
+        <if test="isTransmit == '0'.toString()">
+            and ifnull(isi.settle_no,'0') ='0'
+        </if>
         <if test="startDate != null and startDate != ''">
             and date(iis.crte_time) &gt;= date(#{startDate})
         </if>
@@ -1553,9 +1557,11 @@
             and date(iis.crte_time) &lt;= date(#{endDate})
         </if>
         <!--业务类型选择-->
-        <!--业务类型选择-->
         <if test="isHospital != null and isHospital != ''">
             and  iis.is_hospital =#{isHospital}
+        </if>
+        <if test="isHospital == '0'.toString()">
+            and  iiv.aka130 = '14'
         </if>
     </select>
     <select id="selectInsureIndividual" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">

@@ -232,7 +232,13 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (StringUtils.isEmpty(outpt.getPatientCode())){
             outpt.setPatientCode("0");
         }
-        Integer patientCodeValue = Integer.parseInt(outpt.getPatientCode());
+
+        // add 退费时获取病人结算记录中病人类型进行退费，而不是取就诊信息表中的病人类型，防止复诊时出现异常情况
+        // by liaojiguang on 2021-11-23
+        if (StringUtils.isEmpty(oldOutptSettleDTO.getPatientCode())){
+            oldOutptSettleDTO.setPatientCode("0");
+        }
+        Integer patientCodeValue = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
         if (patientCodeValue > 0) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);
             if (insureIndividualBasicDTO == null) {
@@ -283,6 +289,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());
             insureIndividualSettleDO.setSettleState("1");
             insureIndividualSettleDO.setCrteTime(outptVisitDTO.getCrteTime());
+            insureIndividualSettleDO.setPsnPartAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getPsnPartAmt()));// 个人负担总金额
+            insureIndividualSettleDO.setBeforeSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getBeforeSettle()));// 结算后余额
+            insureIndividualSettleDO.setLastSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getLastSettle()));// 结算后余额
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);
             insertMap.put("insureIndividualSettleDO",insureIndividualSettleDO);
@@ -636,7 +645,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         String visitId =  MapUtils.get(map,"visitId");
         String insureRegCode =  MapUtils.get(map,"insureRegCode");
         //判断是否有传输费用信息
-        Map<String,String> insureCostParam = new HashMap<String,String>();
+        Map<String,Object> insureCostParam = new HashMap<String,Object>();
         insureCostParam.put("hospCode",hospCode);//医院编码
         insureCostParam.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId",visitId);//就诊id
@@ -685,11 +694,15 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 		SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
 
 		List<OutptCostDTO> list = new ArrayList<>();
-		if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
-			list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
-		} else {
-			list = outptSettleDAO.queryOutptPrescribes(outptSettleDTO);
-		}
+        if (outptSettleDTO.getIsPhys() == null || "".equals(outptSettleDTO.getIsPhys())) {  // 如果患者信息中不是体检患者，按医院配置走，如果是体检患者，则必须要走申请 2021年11月23日16:14:03
+            if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
+                list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
+            } else {
+                list = outptSettleDAO.queryOutptPrescribes(outptSettleDTO);
+            }
+        } else {
+            list = outptSettleDAO.queryOutptPrescribesandRefundApply(outptSettleDTO);
+        }
         return WrapperResponse.success(list);
     }
 

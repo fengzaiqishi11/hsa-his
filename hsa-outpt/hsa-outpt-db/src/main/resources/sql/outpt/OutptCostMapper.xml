@@ -1287,8 +1287,11 @@
         <if test="genderCode != null and genderCode != ''">
             AND v.gender_code = #{genderCode}
         </if>
+        <if test="isPhys == null || isPhys == ''">
+            AND (v.is_phys is null or v.is_phys = '')
+        </if>
         <if test="isPhys != null and isPhys != ''">
-            AND v.is_phys =#{isPhys}
+            AND v.is_phys = #{isPhys}
         </if>
         <if test="keyword != null and keyword != ''">
             AND(
@@ -1310,7 +1313,14 @@
                 outpt_cost
                 where
                 hosp_code = #{hospCode}
-                and source_code = '1'
+                <choose>
+                    <when test="isPhys != null and isPhys == '1'.toString()">
+                        and source_code = '9'
+                    </when>
+                    <otherwise>
+                        and source_code = '1'
+                    </otherwise>
+                </choose>
                 and visit_id = v.id
                 and status_code = '0'
                 and settle_code in ('0','1')
@@ -3133,6 +3143,12 @@
             AND os.settle_time &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY )
         </if>
         AND ov.is_visit = '1'
+        <if test="isPhys == null || isPhys == ''">
+            AND (ov.is_phys is null or ov.is_phys = '')
+        </if>
+        <if test="isPhys != null and isPhys != ''">
+            AND ov.is_phys = #{isPhys}
+        </if>
         <if test="keyword != null and keyword != ''">
             AND(
             ov.name LIKE CONCAT('%',#{keyword},'%')
@@ -3194,7 +3210,7 @@
         a.rate_id,a.use_days,a.num_unit_code,a.total_num,a.herb_note_code,a.use_code,a.herb_num,a.total_price,a.preferential_price,
         a.reality_price,a.status_code,a.phar_id,a.is_dist,a.back_num,a.settle_id,a.settle_code,a.self_ratio,a.is_technology_ok,
         a.technology_ok_id,a.technology_ok_name,a.technology_ok_time,a.avg_buy_price,a.avg_sell_price,a.doctor_id,a.doctor_name,
-        a.dept_id,a.exec_dept_id,a.crte_id,a.crte_name,a.crte_time,b.name cwfl_bm , (select name  from sys_code_detail  where c_code='FPGL' and value =b.out_code and hosp_code=b.hosp_code)  mz_fpnr
+        a.dept_id,a.exec_dept_id,a.crte_id,a.crte_name,a.crte_time,b.code cwfl_bm , (select name  from sys_code_detail  where c_code='FPGL' and value =b.out_code and hosp_code=b.hosp_code)  mz_fpnr
          from outpt_cost a left join base_finance_classify b  on a.bfc_id=b.id and a.hosp_code=b.hosp_code
          where a.hosp_code = #{hospCode}  and a.visit_id =#{visit_id} and a.settle_id=#{settle_id}
 
@@ -3500,4 +3516,16 @@
             )
         </foreach>
     </insert>
+
+    <select id="queryCostVisitIdTJ" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" >
+        select a.id,a.hosp_code,a.visit_id,a.op_id,a.opd_id,a.ope_id,a.source_code,a.source_id,a.old_cost_id,a.source_dept_id,
+        a.bfc_id,a.item_code,a.item_id,a.item_name,a.price,sum(a.num) as num,a.spec,a.prep_code,a.dosage,a.dosage_unit_code,a.usage_code,
+        a.rate_id,a.use_days,a.num_unit_code,sum(a.total_num) as totalNum,a.herb_note_code,a.use_code,a.herb_num,sum(a.total_price) as totalPrice,sum(a.preferential_price) as preferentialPrice,
+        sum(a.reality_price) as realityPrice,max(a.status_code) as statusCode,a.phar_id,max(a.is_dist) as isDist,sum(a.back_num) as backNum,max(a.settle_id) as settleId,max(a.settle_code) as settleCode,a.self_ratio,a.is_technology_ok,
+        a.technology_ok_id,a.technology_ok_name,a.technology_ok_time,a.avg_buy_price,a.avg_sell_price,max(a.doctor_id) as doctorId,a.doctor_name,
+        a.dept_id,a.exec_dept_id,a.crte_id,a.crte_name,a.crte_time
+        from outpt_cost a where a.hosp_code = #{hospCode}
+        and a.visit_id = #{visitId} and a.settle_code &lt;&gt; '2' group by a.item_id
+    </select>
+
 </mapper>

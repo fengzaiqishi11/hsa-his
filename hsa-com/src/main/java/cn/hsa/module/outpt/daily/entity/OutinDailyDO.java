@@ -139,4 +139,7 @@ public class OutinDailyDO extends PageDO implements Serializable {
     // 一卡通退款总金额
     private BigDecimal ykttkTotalPrice;
 
+    // 挂账总金额
+    private BigDecimal creditTotalPrice;
+
 }

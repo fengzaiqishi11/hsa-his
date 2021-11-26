@@ -202,7 +202,7 @@
 
     <!-- 门诊 - 结算表 -->
     <select id="queryOutptSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price
+        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_settle
         where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
     </select>
@@ -258,7 +258,7 @@
 
     <!-- 住院 - 结算表 -->
     <select id="queryInptSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price from inpt_settle
+        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price, sum(credit_price) credit_price from inpt_settle
         where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
     </select>
 
@@ -311,10 +311,10 @@
 
     <!-- 新增日结缴款主表 -->
     <insert id="insertOutinDailyList">
-        insert into outin_daily(id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, yktcz_total_price, ykttk_total_price, back_total_price, preferential_total_price, round_total_price, card_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time)
+        insert into outin_daily(id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, yktcz_total_price, ykttk_total_price, back_total_price, preferential_total_price, round_total_price, card_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time, credit_total_price)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id}, #{item.hospCode}, #{item.dailyNo}, #{item.startTime}, #{item.endTime}, #{item.typeCode}, #{item.totalPrice}, #{item.insureTotalPrice}, #{item.yjssTotalPrice}, #{item.yjtkTotalPrice}, #{item.yjjsTotalPrice}, #{item.yjcdTotalPrice}, #{item.yktczTotalPrice}, #{item.ykttkTotalPrice}, #{item.backTotalPrice}, #{item.preferentialTotalPrice}, #{item.roundTotalPrice}, #{item.cardTotalPrice}, #{item.realityTotalPrice}, #{item.isOk}, #{item.okId}, #{item.okName}, #{item.okTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+            (#{item.id}, #{item.hospCode}, #{item.dailyNo}, #{item.startTime}, #{item.endTime}, #{item.typeCode}, #{item.totalPrice}, #{item.insureTotalPrice}, #{item.yjssTotalPrice}, #{item.yjtkTotalPrice}, #{item.yjjsTotalPrice}, #{item.yjcdTotalPrice}, #{item.yktczTotalPrice}, #{item.ykttkTotalPrice}, #{item.backTotalPrice}, #{item.preferentialTotalPrice}, #{item.roundTotalPrice}, #{item.cardTotalPrice}, #{item.realityTotalPrice}, #{item.isOk}, #{item.okId}, #{item.okName}, #{item.okTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.creditTotalPrice})
         </foreach>
 
     </insert>

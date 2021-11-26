@@ -895,7 +895,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             if("620101".equals(setlProcInfo)){  // 大病补充特惠保
                 s4 = BigDecimalUtils.add(s4,fundPayamt);
             }
-            if("610100".equals(setlProcInfo)){  // 医疗救助金额
+            if("610101".equals(setlProcInfo)){  // 医疗救助金额
                 s5 = BigDecimalUtils.add(s5,fundPayamt);
             }
             if("630101".equals(setlProcInfo)){  // 医院减免金额

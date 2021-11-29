@@ -22,12 +22,67 @@
     </insert>
     <insert id="addBatchPhys">
         insert into outpt_cost(id,hosp_code,visit_id,item_id,item_name,total_price,
-        preferential_price,reality_price,status_code,item_code,crte_Time,settle_code,source_code)
+        preferential_price,reality_price,status_code,item_code,crte_Time,settle_code,source_code,
+        price,bfc_id,num,total_num)
         values
         <foreach collection="outptCostDTOS" separator=","  item="item" index="index" >
             (#{item.id},#{item.hospCode},#{item.visitId},#{item.itemId},#{item.itemName},#{item.totalPrice},
             #{item.preferentialPrice},#{item.realityPrice},#{item.statusCode},#{item.itemCode},#{item.crteTime}
-            ,#{item.settleCode},#{item.sourceCode})
+            ,#{item.settleCode},#{item.sourceCode},
+            #{item.price},#{item.bfcId},#{item.num},#{item.totalNum})
         </foreach>
     </insert>
+
+    <insert id="insertPhysGroup">
+        insert into base_item
+        (id, hosp_code, nation_code, type_code, bfc_code,
+        code, name, abbr, spec, price,
+        one_price, two_price, three_price, unit_code, intension,
+        prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm,
+        is_valid, crte_id, crte_name, crte_time,other_name)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hosp_code}, #{item.nation_code}, #{item.type_code}, #{item.bfc_code},
+            #{item.code}, #{item.group_name}, #{item.abbr}, #{item.spec}, #{item.price},
+            #{item.one_price}, #{item.two_price}, #{item.three_price}, #{item.unit_code}, #{item.intension},
+            #{item.prompt}, #{item.except}, #{item.remark}, #{item.isOut}, #{item.isIn}, #{item.isCg}, #{item.isMs}, #{item.isSuppCurtain}, #{item.outDeptCode}, #{item.inDeptCode}, #{item.namePym}, #{item.nameWbm}, #{item.abbrPym}, #{item.abbrWbm},
+            '0', #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.otherName})
+        </foreach>
+    </insert>
+
+    <insert id="insertReturn">
+        insert into outpt_refund_apply
+        (id, hosp_code, cost_id, item_code, item_id, item_name, price, num, num_unit_code, refund_xplain, refund_code, crte_id, crte_name, crte_time, status, one_settle_id, settle_id)
+        values
+        <foreach collection="list" item="dto" index="index" separator=",">
+            (
+            #{dto.id},
+            #{dto.hospCode},
+            #{dto.costId},
+            #{dto.itemCode},
+            #{dto.itemId},
+            #{dto.itemName},
+            #{dto.price},
+            #{dto.num},
+            #{dto.numUnitCode},
+            #{dto.refundXplain},
+            #{dto.refundCode},
+            #{dto.crteId},
+            #{dto.crteName},
+            #{dto.crteTime},
+            #{dto.status},
+            #{dto.hisSettleId},
+            #{dto.hisSettleId}
+            )
+        </foreach>
+    </insert>
+    <update id="updateRCodt">
+        <foreach collection="list" item="item" index="index" separator=",">
+        update outpt_cost set back_num = 1 where visit_id = #{item.registerId} and item_id = #{item.groupId} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <delete id="deleteBatchPhys" >
+        delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </delete>
 </mapper>

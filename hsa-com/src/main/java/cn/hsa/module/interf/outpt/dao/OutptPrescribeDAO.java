@@ -229,4 +229,5 @@ public interface OutptPrescribeDAO {
     List<Map<String, Object>> checkStock(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 
     int insertDiagnose(OutptDiagnoseDTO outptDiagnoseDTO);
+
 }

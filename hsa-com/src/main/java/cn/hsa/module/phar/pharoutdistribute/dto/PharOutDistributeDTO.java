@@ -77,7 +77,7 @@ public class PharOutDistributeDTO extends PharOutDistributeDO implements Seriali
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date refundTime; // 领药申请时间
     private String statusCode;// 住院状态
-    private String deptId;  // 开方/开嘱科室id
+    private String deptToldId;  // 开方/开嘱科室id
     private String deptName; // 开方/开嘱科室名称
 
 }

@@ -36,4 +36,25 @@ public interface PhysRegService {
      */
     @PostMapping("/service/interf/phys/addOrUpdateOutptCost")
     WrapperResponse<Boolean> addOrUpdateOutptCost(Map map);
+
+    /**
+     * @Description: 体检组合同步到his项目表
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @PostMapping("/service/interf/phys/insertPhysGroup")
+    WrapperResponse<Boolean> insertPhysGroup(Map map);
+
+
+    /**
+     * @Description: 插入退费申请
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @PostMapping("/service/interf/phys/insertReturn")
+    WrapperResponse<Boolean> insertReturn(Map map);
 }

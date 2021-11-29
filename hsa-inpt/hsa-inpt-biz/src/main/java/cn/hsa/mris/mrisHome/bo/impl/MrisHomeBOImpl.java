@@ -1148,8 +1148,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
                 mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
                 mrisDiagnoseDOList2.add(mrisDiagnoseDO);
-                mrisHomeDAO.insertMrisInptDiagnoseBatch(mrisDiagnoseDOList2);
             }
+            mrisHomeDAO.insertMrisInptDiagnoseBatch(mrisDiagnoseDOList2);
         }
     }
 

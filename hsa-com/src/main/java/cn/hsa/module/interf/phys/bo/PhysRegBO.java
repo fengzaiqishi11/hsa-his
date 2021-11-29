@@ -32,4 +32,22 @@ public interface PhysRegBO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     Boolean addOrUpdateOutptCost(Map map);
+
+    /**
+     * @Description: 同步体检收费组合到项目表
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    Boolean insertPhysGroup(Map map);
+
+    /**
+     * @Description: 插入退费申请
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    Boolean insertReturn(Map map);
 }

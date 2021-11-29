@@ -710,11 +710,11 @@
             <if test="payToken != null and payToken != ''">
                 pay_token = #{payToken,jdbcType=VARCHAR},
             </if>
-            <if test="idetStartDate != null and idetStartDate != ''">
-                idet_start_date = #{idetStartDate,jdbcType=VARCHAR},
+            <if test="idetStartDate != null">
+                idet_start_date = #{idetStartDate,jdbcType=TIMESTAMP},
             </if>
-            <if test="idetEndDate != null and idetEndDate != ''">
-                idet_end_date = #{idetEndDate,jdbcType=VARCHAR},
+            <if test="idetEndDate != null">
+                idet_end_date = #{idetEndDate,jdbcType=TIMESTAMP},
             </if>
             <if test="psnIdetType != null and psnIdetType != ''">
                 psn_idet_type = #{psnIdetType,jdbcType=VARCHAR},

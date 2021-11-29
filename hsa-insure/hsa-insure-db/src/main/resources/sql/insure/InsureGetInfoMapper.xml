@@ -1533,6 +1533,7 @@
         iis.aka130 as med_type
         from insure_individual_settle iis
         join insure_individual_visit iiv on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
         join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
         left join insure_setl_info isi on iis.insureSettleId = isi.insure_settle_id and iis.hosp_code = isi.hosp_code
         and iis.visit_id = iiv.visit_id

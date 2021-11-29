@@ -32,7 +32,10 @@ import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -52,6 +55,8 @@ import java.util.*;
  */
 @Component
 public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
@@ -628,6 +633,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         outptTmakePriceFormService_consumer.saveOutptSettleByTf(chargeParams);
         }
        /***********End*****************非医保病人自动收费************************************/
+        // 体检回调
+        if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+            phyIsCallBack(allCostDTOList);
+        }
         return WrapperResponse.success(true);
     }
 
@@ -1527,6 +1536,40 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
     }
 
+    // 退费成功后，调用体检接口
+    public void phyIsCallBack(List<OutptCostDTO> outptCostDTOS){
+        Map<String, Object> stringObjectMap = new HashMap<>();
+        Map queryMap = new HashMap();
+        queryMap.put("hospCode", outptCostDTOS.get(0).getHospCode());
+        queryMap.put("code", "TJ_URL");
+        SysParameterDTO sysParameterDTO= sysParameterService_consumer.getParameterByCode(queryMap).getData();
+        String url ="";
+        if(sysParameterDTO!=null){
+            url = sysParameterDTO.getValue() +"/updateReturnCost";
+        }else {
+            url ="http://172.26.62.219:8899/hsa-phys/web/phys/interface/his/updateReturnCost";
+        }
+        stringObjectMap.put("url",url);
+        List<Map> maps =new ArrayList<>();
+        if(outptCostDTOS!=null && outptCostDTOS.size()>0) {
+            for (OutptCostDTO outptCostDTO:outptCostDTOS) {
+                Map<String, Object> item =new HashMap<>();
+                if (BigDecimalUtils.less(new BigDecimal(0),outptCostDTO.getBackNum())) {
+                    item.put("HospCode", outptCostDTO.getHospCode());
+                    item.put("VisitId", outptCostDTO.getVisitId());
+                    item.put("ItemId", outptCostDTO.getItemId());
+                    item.put("returnPrice", outptCostDTO.getRealityPrice());
+                    item.put("SettleId", outptCostDTO.getSettleId());
+                    maps.add(item);
+                }
+            }
+        }
+        String json = JSONObject.toJSONString(maps);
+        stringObjectMap.put("param",json);
+        logger.info("体检退费入参:" + json);
+        String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        logger.info("体检退费反参:" + resultStr);
+    }
 
 
 }

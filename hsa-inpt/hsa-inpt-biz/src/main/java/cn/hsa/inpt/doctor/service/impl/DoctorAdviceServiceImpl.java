@@ -288,4 +288,18 @@ public class DoctorAdviceServiceImpl extends HsafService implements DoctorAdvice
     public WrapperResponse<List<InptAdviceDTO>> queryLisAdvice(Map map) {
         return WrapperResponse.success(doctorAdviceBO.queryLisAdvice(MapUtils.get(map, "inptAdviceDTO")));
     }
+
+    /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<InptAdviceDTO>> getZyAdviceByVisitId(Map map) {
+        return WrapperResponse.success(doctorAdviceBO.getZyAdviceByVisitId(MapUtils.get(map, "inptVisitDTO")));
+    }
 }

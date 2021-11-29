@@ -229,4 +229,16 @@ public interface DoctorAdviceService {
      **/
     @GetMapping("/service/inpt/doctorAdviceController/queryLisAdvice")
     WrapperResponse<List<InptAdviceDTO>> queryLisAdvice(Map map);
+
+    /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/getZyAdviceByVisitId")
+    WrapperResponse<List<InptAdviceDTO>> getZyAdviceByVisitId(Map map);
 }

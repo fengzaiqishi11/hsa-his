@@ -22,6 +22,7 @@
         <result property="preferentialTotalPrice" column="preferential_total_price" jdbcType="NUMERIC"/>
         <result property="roundTotalPrice" column="round_total_price" jdbcType="NUMERIC"/>
         <result property="realityTotalPrice" column="reality_total_price" jdbcType="NUMERIC"/>
+        <result property="creditTotalPrice" column="credit_total_price" jdbcType="NUMERIC"/>
         <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
         <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
         <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
@@ -68,7 +69,8 @@
             sum( card_total_price ) AS card_total_price,
             sum( preferential_total_price ) AS preferential_total_price,
             sum( round_total_price ) AS round_total_price,
-            sum( reality_total_price) + sum(yjss_total_price) - sum(yjjs_total_price) - sum(insure_total_price) + ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) AS reality_total_price,
+            sum( reality_total_price) + sum(yjss_total_price) - sum(yjjs_total_price) - sum(insure_total_price) + ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) - ifnull(sum(credit_total_price), 0) AS reality_total_price,
+            sum(credit_total_price) as credit_total_price,
             min(is_ok) as is_ok,
             min(ok_name) as ok_name,
             min(ok_time) as ok_time,
@@ -162,7 +164,7 @@
 
     <!-- 根据缴款开始、结束时间查询挂号结算记录 -->
     <select id="queryOutptRegisterSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price
+        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_register_settle
         where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
     </select>
@@ -410,7 +412,7 @@
 
     <!-- 根据日结单号、日结类型查询日结支付方式表 -->
     <select id="queryOutinDailyPay" resultType="java.util.Map">
-         select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
+         select t.name, ifnull( t1.total_price, 0 ) total_price, t1.pay_code from sys_code_detail t
             left join (
                 SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
                 WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}

@@ -47,4 +47,6 @@ public class OutinPartInvoiceDO extends PageDO implements java.io.Serializable {
     private BigDecimal miPrice;
     // 结算后个人账户剩余金额
     private BigDecimal lastSettle;
+    // 挂账金额
+    private BigDecimal creditPrice;
 }

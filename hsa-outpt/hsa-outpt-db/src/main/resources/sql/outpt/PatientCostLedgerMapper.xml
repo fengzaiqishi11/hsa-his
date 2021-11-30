@@ -764,11 +764,14 @@
         case when a.curr_unit_code = a.unit_code then a.num else a.split_num end num,a.crte_time as crteTime,a.crte_name as crteName,
         a.item_code as itemCode, a.item_id as itemId,"门诊退药" as retrunType,
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
+        (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
+        '门诊病人' as statusCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',ifnull(v.age,''),
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
+        left join outpt_prescribe op on op.id = a.op_id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where
@@ -779,6 +782,9 @@
         </if>
         <if test="endTime != null">
             and a.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and op.dept_id = #{deptToldId}
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
@@ -798,11 +804,13 @@
     <!--药房住院退药报表查询-->
     <select id="queryReturnInDrugLedger" resultType="java.util.Map" parameterType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO">
         select
+        v.status_code as statusCode,
         e.id as id,e.item_name as itemName,e.spec,e.price,e.split_price as splitPrice,
         e.curr_unit_code as currUnitCode,e.unit_code as unitCode,e.split_unit_code as splitUnitCode,e.split_num as splitNum,
         case when e.curr_unit_code = e.unit_code then e.num else e.split_num end num,e.crte_time as crteTime,
         e.crte_name as crteName,e.item_code as itemCode, e.item_id as itemId,"住院退药" as retrunType,
         (select name from base_dept where hosp_code = d.hosp_code and id = d.phar_id) as pharName,
+        (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail where value = v.gender_code and c_code='XB' and hosp_code = e.hosp_code),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'岁')))) patientInfo
         from phar_in_distribute_all_detail e
@@ -810,15 +818,22 @@
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
         left join base_drug b on e.item_id = b.id and e.hosp_code = b.hosp_code and e.item_code = "1"
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
+        left join inpt_advice ia on ia.id = e.advice_id
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
             and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and ia.dept_id = #{deptToldId}
         </if>
         <if test="endTime != null">
             and e.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and v.status_code = #{statusCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -841,6 +856,8 @@
         case when e.curr_unit_code = e.unit_code then e.num else e.split_num end num,e.crte_time as crteTime,
         e.crte_name as crteName,e.item_code as itemCode, e.item_id as itemId,"住院退药" as retrunType,
         (select name from base_dept where hosp_code = d.hosp_code and id = d.phar_id) as pharName,
+        (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
+        v.status_code as statusCode,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail sc where hosp_code = v.hosp_code and sc.value=v.gender_code and sc.c_code='XB'),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         FROM phar_in_distribute_all_detail e
@@ -848,6 +865,7 @@
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
         left join base_drug b on e.item_id = b.id and e.hosp_code = b.hosp_code and e.item_code = "1"
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
+        left join inpt_advice ia on ia.id = e.advice_id
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
             and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
@@ -857,6 +875,12 @@
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and ia.dept_id = #{deptToldId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and v.status_code = #{statusCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -874,6 +898,8 @@
         case when a.curr_unit_code = a.unit_code then a.num else a.split_num end num,a.crte_time as crteTime,a.crte_name as crteName,
         a.item_code as itemCode, a.item_id as itemId,"门诊退药" as retrunType,
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
+        (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
+        '门诊病人' as statusCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a
@@ -890,6 +916,9 @@
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and ia.dept_id = #{deptToldId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (

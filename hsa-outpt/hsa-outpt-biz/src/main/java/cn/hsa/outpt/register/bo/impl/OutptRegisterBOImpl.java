@@ -1335,6 +1335,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterSettleDO.setPreferentialPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getPreferentialPrice()));
             outptRegisterSettleDO.setRealityPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getRealityPrice()));
             outptRegisterSettleDO.setCardPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getCardPrice()));
+            outptRegisterSettleDO.setCreditPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getCreditPrice()));
 
             // 日结缴款id为空
             outptRegisterSettleDO.setDailySettleId("");

@@ -160,4 +160,12 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
      * 医嘱组号list
      */
     private List<Integer> groupNos;
+    // 病人类型
+    private String patientCode;
+    // 入院诊断
+    private String inDiseaseName;
+    // 居住地
+    private String address;
+    // 联系电话
+    private String phone;
 }

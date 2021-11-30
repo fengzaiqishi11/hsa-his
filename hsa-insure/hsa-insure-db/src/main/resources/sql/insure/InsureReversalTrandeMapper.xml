@@ -622,7 +622,8 @@
             e.over_self_price as overSelfPrice,
             e.preselfpay_amt as preselfpayAmt,
             e.inscp_scp_amt as inscpScpAmt,
-            e.pool_prop_selfpay as poolPropSelfpay
+            e.pool_prop_selfpay as poolPropSelfpay,
+            t.insuplc_admdvs as insuplcAdmdvs
         FROM
             insure_individual_settle e,
             insure_individual_visit t,
@@ -677,7 +678,6 @@
     <select id="querySumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
             A.medicineOrgCode,
-            A.type,
             sum( psnNum ) AS psnNum,
             sum( inDay ) AS inDay,
             sum( totalPrice ) AS totalPrice,
@@ -744,7 +744,8 @@
                     e.over_self_price as overSelfPrice,
                     e.preselfpay_amt as preselfpayAmt,
                     e.inscp_scp_amt as inscpScpAmt,
-                    e.pool_prop_selfpay as poolPropSelfpay
+                    e.pool_prop_selfpay as poolPropSelfpay,
+                    t.insuplc_admdvs as insuplcAdmdvs
                 FROM
                     insure_individual_settle e,
                     insure_individual_visit t,
@@ -791,8 +792,6 @@
                 GROUP BY
                     se_vi_id
             ) A
-        GROUP BY
-            A.type
     </select>
 
     <select id="queryOutptDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
@@ -846,7 +845,8 @@
         e.over_self_price as overSelfPrice,
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
-        e.pool_prop_selfpay as poolPropSelfpay
+        e.pool_prop_selfpay as poolPropSelfpay,
+        t.insuplc_admdvs as insuplcAdmdvs
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -900,7 +900,6 @@
     <select id="queryOutptSumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
         medicineOrgCode,
-        type,
         sum( psnNum ) AS psnNum,
         sum( totalPrice ) AS totalPrice,
         sum( portionPrice ) AS portionPrice,
@@ -960,7 +959,8 @@
         e.over_self_price as overSelfPrice,
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
-        e.pool_prop_selfpay as poolPropSelfpay
+        e.pool_prop_selfpay as poolPropSelfpay,
+        t.insuplc_admdvs insuplcAdmdvs
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1006,7 +1006,6 @@
         GROUP BY
         se_vi_id
         ) A
-        GROUP BY type
     </select>
     <select id="selectMdOrIns" resultType="java.util.Map">
         select id, hosp_code, admdvs_code, admdvs_name from insure_admdvs
@@ -1071,7 +1070,8 @@
         e.over_self_price as overSelfPrice,
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
-        e.pool_prop_selfpay as poolPropSelfpay
+        e.pool_prop_selfpay as poolPropSelfpay,
+        t.insuplc_admdvs as insuplcAdmdvs
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1121,6 +1121,7 @@
         clrOptins,
         medicineOrgCode,
         medTypeName,
+        insuplcAdmdvs,
         sum( psnNum ) AS psnNum,
         sum( totalPrice ) AS totalPrice,
         sum( portionPrice ) AS portionPrice,
@@ -1178,7 +1179,8 @@
         e.over_self_price as overSelfPrice,
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
-        e.pool_prop_selfpay as poolPropSelfpay
+        e.pool_prop_selfpay as poolPropSelfpay,
+        t.insuplc_admdvs as insuplcAdmdvs
         FROM
         insure_individual_settle e,
         insure_individual_visit t,

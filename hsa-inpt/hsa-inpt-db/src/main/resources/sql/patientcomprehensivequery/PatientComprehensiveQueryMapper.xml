@@ -524,7 +524,8 @@
         e.outpt_doctor_name,-- 门诊医生
         e.jz_doctor_name,-- 经治医生
         e.zg_doctor_name,-- 主管医生
-        ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount
+        ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount,
+        ifnull(a.credit_price, 0) as creditPrice
         FROM
         inpt_settle a
         left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code

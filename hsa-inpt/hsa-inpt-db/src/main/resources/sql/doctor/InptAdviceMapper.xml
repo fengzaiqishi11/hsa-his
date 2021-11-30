@@ -1463,7 +1463,10 @@
                 join phar_in_receive_detail a on receive.id = a.receive_id and receive.hosp_code = a.hosp_code
                 left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
                 left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
-                where receive.hosp_code = #{hospCode} and receive.status_code in ('0','1') and date_sub(receive.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and receive.phar_id = #{pharId} and a.item_id = #{itemId}
+                where receive.hosp_code = #{hospCode} and receive.status_code in ('0','1') and receive.phar_id = #{pharId} and a.item_id = #{itemId}
+                <if test="wjsykc != null and wjsykc != ''">
+                  and DATE_ADD(receive.crte_time, INTERVAL #{wjsykc} hour) &gt; now()
+                </if>
                 union all
                 select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
                 from stro_stock a

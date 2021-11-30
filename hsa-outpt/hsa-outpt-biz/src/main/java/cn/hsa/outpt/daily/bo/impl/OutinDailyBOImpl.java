@@ -1180,13 +1180,13 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             // 结算情况
             // 门诊挂号实收
             BigDecimal mzGhSS = odMzGh != null ? odMzGh.getRealityTotalPrice() : new BigDecimal(0);
-            BigDecimal mzGhGz = odMzGh != null ? odMzGh.getCreditTotalPrice() : new BigDecimal(0);
+            BigDecimal mzGhGz = odMzGh != null ? odMzGh.getCreditTotalPrice() != null ? odMzGh.getCreditTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             // 门诊收费实收
             BigDecimal mzSfSS = odMzSF != null ? odMzSF.getRealityTotalPrice() : new BigDecimal(0);
             // 医保金额
             BigDecimal mzYb = odMzSF != null ? odMzSF.getInsureTotalPrice() : new BigDecimal(0);
             // 门诊结算挂账金额  挂账金额小于0时取0
-            BigDecimal mzGz = odMzSF != null ? odMzSF.getCreditTotalPrice() : new BigDecimal(0);
+            BigDecimal mzGz = odMzSF != null ? odMzSF.getCreditTotalPrice() != null ? odMzSF.getCreditTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             // 一卡通实收
             BigDecimal yktczTotalPrice = odMzSF != null ? odMzSF.getYktczTotalPrice() != null ? odMzSF.getYktczTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             BigDecimal ykttkTotalPrice = odMzSF != null ? odMzSF.getYkttkTotalPrice() != null ? odMzSF.getYkttkTotalPrice() : new BigDecimal(0) : new BigDecimal(0);

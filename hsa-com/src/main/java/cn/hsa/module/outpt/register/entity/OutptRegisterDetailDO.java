@@ -95,6 +95,14 @@ public class OutptRegisterDetailDO extends PageDO implements java.io.Serializabl
     // 一卡通支付金额
     private BigDecimal cardPrice;
 
+    private BigDecimal creditPrice;
+
+    public BigDecimal getCreditPrice() {return creditPrice; }
+
+    public void setCreditPrice(BigDecimal creditPrice) {
+        this.creditPrice = creditPrice;
+    }
+
     public BigDecimal getCardPrice() {
         return cardPrice;
     }

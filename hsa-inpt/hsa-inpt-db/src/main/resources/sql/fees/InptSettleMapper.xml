@@ -462,7 +462,10 @@
                     crte_time,
                 </if>
                 <if test="acctPay != null">
-                acct_pay
+                acct_pay,
+                </if>
+                <if test="creditPrice != null">
+                    credit_price
                 </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -569,7 +572,10 @@
                         #{crteTime,jdbcType=TIMESTAMP},
                 </if>
                 <if test="acctPay != null">
-                        #{acctPay,jdbcType=DECIMAL}
+                        #{acctPay,jdbcType=DECIMAL},
+                </if>
+                <if test="creditPrice != null">
+                    #{creditPrice,jdbcType=DECIMAL}
                 </if>
         </trim>
     </insert>

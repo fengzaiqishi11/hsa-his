@@ -61,6 +61,7 @@ public class InsureUnifiedCommonUtil {
         if(insureConfigurationDTO ==null){
             throw new AppException("查询医保机构配置信息为空");
         }
+        StringBuilder stringBuilder = new StringBuilder();
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
@@ -108,5 +109,31 @@ public class InsureUnifiedCommonUtil {
             throw new AppException("未查找到医保就诊信息，请做医保登记。");
         }
         return insureIndividualVisitDTO;
+    }
+
+    /**
+     * @Method getInsureInsureConfiguration
+     * @Desrciption  根据医院编码和医保机构编码查找医保机构配置信息
+     * @Param hospCode:医院编码 regCode:医保机构配置编码
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 13:54
+     * @Return
+    **/
+    public InsureConfigurationDTO getInsureInsureConfiguration(String hospCode,String regCode){
+        if(StringUtils.isEmpty(hospCode)){
+            throw new AppException("医院编码参数为空");
+        }
+        if(StringUtils.isEmpty(regCode)){
+            throw new AppException("医保机构编码参数为空");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setCode(regCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(insureConfigurationDTO == null){
+            throw new AppException("根据医保机构编码未查找到医保机构配置信息");
+        }
+        return insureConfigurationDTO;
     }
 }

@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
+import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
 import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
 import cn.hsa.module.insure.module.service.InsurePersonnalRecordService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -296,5 +297,72 @@ public class InsurePersonnalRecordController extends BaseController {
     }
     
 
+    /**
+     * @Method insertSpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+    **/
+    @PostMapping("/insertSpecialOutptRecord")
+    public WrapperResponse<Boolean> insertSpecialOutptRecord(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insurePersonnalRecordService_consumer.insertSpecialOutptRecord(map);
+    }
+
+    /**
+     * @Method insertSpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案撤销
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+     **/
+    @PostMapping("/deleteSpecialOutptRecord")
+    public WrapperResponse<Boolean> deleteSpecialOutptRecord(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insurePersonnalRecordService_consumer.deleteSpecialOutptRecord(map);
+    }
+
+    /**
+     * @Method querySpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案登记查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+     **/
+    @GetMapping("/querySpecialOutptRecord")
+    public WrapperResponse<PageDTO> querySpecialOutptRecord(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insurePersonnalRecordService_consumer.querySpecialOutptRecord(map);
+    }
+
+    /**
+     * @Method queryPageSpecialRecord
+     * @Desrciption  江西省：门诊单病种备案分页查询（his）
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/29 10:24
+     * @Return
+    **/
+    @GetMapping("/queryPageSpecialRecord")
+    public WrapperResponse<PageDTO> queryPageSpecialRecord(InsureSpecialRecordDTO insureSpecialRecordDTO, HttpServletRequest req, HttpServletResponse res){
+        Map<String,Object> map = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        insureSpecialRecordDTO.setHospCode(hospCode);
+        map.put("hospCode",hospCode);
+        map.put("insureSpecialRecordDTO",insureSpecialRecordDTO);
+        return insurePersonnalRecordService_consumer.queryPageSpecialRecord(map);
+    }
 
 }

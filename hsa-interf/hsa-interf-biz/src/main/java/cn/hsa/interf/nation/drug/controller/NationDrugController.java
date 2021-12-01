@@ -9,11 +9,13 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ public class NationDrugController {
      * @Date: 2021/6/11 14:07
      **/
     @GetMapping("/queryCenterNationStandardDrugPage")
-    public WrapperResponse<PageDTO> queryCenterNationStandardDrugPage(NationStandardDrugDTO nationStandardMaterialDTO){
+    public WrapperResponse<PageDTO> queryCenterNationStandardDrugPage(NationStandardDrugDTO nationStandardMaterialDTO, HttpServletRequest req, HttpServletResponse res){
         if (StringUtils.isEmpty(nationStandardMaterialDTO.getHospCode())) {
             throw new AppException("未传入医院编码，请退出后重进");
         }
@@ -59,6 +61,9 @@ public class NationDrugController {
         // 省份代码
         String provinceCode = sysParameterDTO.getValue();
         nationStandardMaterialDTO.setProvinceCode(provinceCode);
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
         return nationDrugService_consumer.queryNationStandardDrugPage(nationStandardMaterialDTO);
     }
 }

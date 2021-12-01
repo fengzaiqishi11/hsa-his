@@ -384,7 +384,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
        if(insureSettleInfoDTO !=null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())){
             throw  new AppException("该结算清单信息已经上传至医保,不能重置内容");
        }
-        insureGetInfoDAO.deleteSettleInfo(map);
+        /**
+         *重置的话  清单setleinfo节点不重置
+         */
+//        insureGetInfoDAO.deleteSettleInfo(map);
         insureGetInfoDAO.deleteIcuInfo(map);
         insureGetInfoDAO.deleteOpspdiseinfo(map);
         insureGetInfoDAO.deletePayInfo(map);
@@ -717,8 +720,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             date.setTime(MapUtils.get(setlInfoMap,"dclaTime"));
             setlInfoMap.put("dclaTime",simpleDateFormat.format(date));
         }
-        if(MapUtils.get(setlInfoMap,"brdy") instanceof  Long){
-            date.setTime(MapUtils.get(setlInfoMap,"brdy"));
+        /**
+         * 前端传的日期时间型  有可能是Integer  和  Long
+         */
+        Object brdy = MapUtils.get(map,"brdy");
+        if(brdy instanceof  Long ){
+            date.setTime((Long) brdy);
+            setlInfoMap.put("brdy",dateFormat.format(date)); // 出生日期
+        }
+        if(brdy instanceof Integer){
+            date.setTime( ((Integer) brdy).longValue());
             setlInfoMap.put("brdy",dateFormat.format(date)); // 出生日期
         }
         if(MapUtils.get(setlInfoMap,"setlBegnDate") instanceof  Long){
@@ -920,9 +931,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("age", MapUtils.get(baseInfoMap,"age")); // 年龄
         setlinfo.put("ntly", MapUtils.getMapVS(mriBaseInfo,"nationality_cation",MapUtils.get(baseInfoMap,"ntly"))); // 国籍
         setlinfo.put("nwbAge", null); // （年龄不足1周岁）年龄
-        setlinfo.put("naty",  MapUtils.getMapVS(map,"nation_code",MapUtils.get(baseInfoMap,"naty"))); // 民族
-        setlinfo.put("patnCertType",  MapUtils.getMapVS(mriBaseInfo,"cert_code",insureIndividualVisitDTO.getMdtrtCertType())); // 患者证件类别
-        setlinfo.put("certno", MapUtils.getMapVS(map,"cert_code",insureIndividualVisitDTO.getMdtrtCertNo())); // 证件号码
+        // his的名族码表是0  1 2 3 医保码表是01 02 03
+        Object  mapVS = MapUtils.getMapVS(mriBaseInfo, "nation_code", MapUtils.get(baseInfoMap, "naty"));
+        if(mapVS == null){
+            setlinfo.put("naty",  ""); // 民族
+        }else{
+            setlinfo.put("naty",  "0"+mapVS); // 民族
+        }
+        setlinfo.put("patnCertType",  MapUtils.getMapVS(mriBaseInfo,"cert_code", (String) MapUtils.getMapVS(baseInfoMap,"cert_code","02"))); // 患者证件类别
+        setlinfo.put("certno", MapUtils.getMapVS(mriBaseInfo,"cert_no", (String) MapUtils.getMapVS(baseInfoMap,"cert_no",insureIndividualVisitDTO.getMdtrtCertNo()))); // 证件号码
         setlinfo.put("prfs", MapUtils.getMapVS(mriBaseInfo,"occupation_code",MapUtils.get(baseInfoMap,"occupation_code"))); // 职业
         setlinfo.put("currAddr", MapUtils.getMapVS(mriBaseInfo,"native_place",MapUtils.get(map,"address"))); // 现住址
         setlinfo.put("empName", MapUtils.getMapVS(mriBaseInfo,"work",null)); // 单位名称
@@ -930,7 +947,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("empTel", MapUtils.getMapVS(mriBaseInfo,"work_phone",null)); // 单位电话
         setlinfo.put("poscode", MapUtils.getMapVS(mriBaseInfo,"work_post_code",null)); // 邮编
         setlinfo.put("conerName", MapUtils.getMapVS(mriBaseInfo,"contact_name",MapUtils.get(baseInfoMap,"contact_name"))); // 联系人姓名
-        setlinfo.put("patnRlts", MapUtils.getMapVS(mriBaseInfo,"contact_rela_code",MapUtils.get(baseInfoMap,"contact_rela_code"))); // 与患者关系
+        Object patnRlts =  MapUtils.getMapVS(mriBaseInfo,"contact_rela_code",MapUtils.get(baseInfoMap,"contact_rela_code"));
+        if(patnRlts == null || StringUtils.isEmpty(patnRlts.toString()) || "0".equals(patnRlts.toString())){
+            setlinfo.put("patnRlts", "1"); // 与患者关系  默认患者本人
+        }
         setlinfo.put("conerAddr", MapUtils.getMapVS(mriBaseInfo,"contact_address",MapUtils.get(baseInfoMap,"contact_address"))); // 联系人地址
         setlinfo.put("conerTel", MapUtils.getMapVS(mriBaseInfo,"contact_phone",MapUtils.get(baseInfoMap,"contact_phone"))); // 联系人电话
         setlinfo.put("hiType", insureIndividualVisitDTO.getAae140()); // 医保类型  也就是险种   sp_psn_type
@@ -951,7 +971,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         setlinfo.put("iptMedTpe", null); // 住院医疗类型
         setlinfo.put("admWay", MapUtils.getMapVS(mriBaseInfo,"in_way",MapUtils.get(baseInfoMap,"adm_way"))); // 入院途径 *******
-        setlinfo.put("trtType", null); // 治疗类别
+        setlinfo.put("trtType", "10"); // 治疗类别
         setlinfo.put("admTime", MapUtils.get(baseInfoMap,"inTime")); // 入院时间 *******
 
         String refldeptDept =  selectRefldeptDept(map);
@@ -993,7 +1013,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("spgaNurscareDays",MapUtils.get(baseInfoMap,"spgaNurscareDays")); // 特级护理天数 *******
         setlinfo.put("lv1NurscareDays", MapUtils.get(baseInfoMap,"lv1NurscareDays")); // 一级护理天数 *******
         setlinfo.put("scdNurscareDays", MapUtils.get(baseInfoMap,"scdNurscareDays")); // 二级护理天数 *******
-        setlinfo.put("lv3NurscareDays",MapUtils.get(baseInfoMap,"lv3NursecareDays")); // 三级护理天数 *******
+        Object nursecareDays = MapUtils.get(baseInfoMap, "lv3NursecareDays");
+        if(nursecareDays == null){
+            setlinfo.put("lv3NurscareDays",0); // 三级护理天数 *******
+        }else{
+            setlinfo.put("lv3NurscareDays",MapUtils.get(baseInfoMap,"lv3NursecareDays")); // 三级护理天数 *******
+        }
         setlinfo.put("dscgWay",MapUtils.get(baseInfoMap,"out_mode_code")); // 离院方式 *******
         setlinfo.put("acpMedinsName", ""); // 拟接收机构名称 *******
         setlinfo.put("acpMedinsCode", ""); // 拟接收机构代码 ******
@@ -1027,7 +1052,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         BigDecimal bigDecimal = BigDecimalUtils.add(acctPay, cashPayamt);
         BigDecimal psnSelfpay = BigDecimalUtils.subtract(bigDecimal, psnOwnpay);
         setlinfo.put("psnSelfpay", psnSelfpay); // 个人自付
-        setlinfo.put("hiPaymtd", MapUtils.get(setlinfoMap,"clr_way")); // 医保支付方式
+        setlinfo.put("hiPaymtd", "3"); // 医保支付方式  // 默认是按病种分值
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", hospName); // 医疗机构填报部门

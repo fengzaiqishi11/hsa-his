@@ -48,4 +48,24 @@ public interface OutptRefundApplyBO {
 	 * @Return
 	 */
 	Boolean updateOutptRefundAppyStatus(Map<String, Object> param);
+
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:43
+	 * @Return
+	 */
+	Boolean updateUnconfirmedOutptRefundAppy(Map<String, Object> param);
+
+	/**
+	 * @Description: deleteOutptRefundAppy
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 15:50
+	 * @Return
+	 */
+	Boolean deleteOutptRefundAppy(Map<String, Object> param);
 }

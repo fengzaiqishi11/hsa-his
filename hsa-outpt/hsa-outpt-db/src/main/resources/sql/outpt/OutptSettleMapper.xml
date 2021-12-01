@@ -138,7 +138,8 @@
           crte_id,
           crte_name,
           crte_time,
-         acct_pay
+         acct_pay,
+         credit_price
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -167,7 +168,8 @@
           #{crteId,jdbcType=VARCHAR},
           #{crteName,jdbcType=VARCHAR},
           #{crteTime,jdbcType=TIMESTAMP},
-          #{acctPay,jdbcType=DECIMAL}
+          #{acctPay,jdbcType=DECIMAL},
+          #{creditPrice,jdbcType=DECIMAL}
         )
     </insert>
 
@@ -511,6 +513,7 @@
             IFNULL(a.mi_price,0) as mi_price,
             IFNULL(a.trunc_price,0) as trunc_price,
             IFNULL(a.acct_pay,0) as acct_pay,
+            ifnull(a.credit_price, 0) as creditPrice,
             a.is_settle,
             a.crte_name,
             a.settle_time,
@@ -590,7 +593,8 @@
         a.card_price as cardPrice,
         c.card_no as cardNo,
         b.profile_id as profileId,
-        b.is_phys as isPhys
+        b.is_phys as isPhys,
+        a.credit_price as creditPrice
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id

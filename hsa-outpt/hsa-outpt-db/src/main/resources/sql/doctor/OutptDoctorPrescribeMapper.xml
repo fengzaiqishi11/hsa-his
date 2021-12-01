@@ -704,12 +704,13 @@
         ( CASE WHEN a.item_code = '1' THEN c.usual_name WHEN a.item_code = '2' THEN g.other_name WHEN a.item_code = '3' THEN it.other_name WHEN a.item_code = '4' THEN ad.other_name END ) bName,
         case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
         case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
-        i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark
+        i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
         from  outpt_prescribe_detail a
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
         left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'
         left join base_item it on a.item_id = it.id  and a.hosp_code = it.hosp_code  and a.item_code = '3'
 	    left join base_advice ad on a.item_id = ad.id  and a.hosp_code = ad.hosp_code  and a.item_code = '4'
+        left join base_rate br on a.hosp_code = br.hosp_code and a.rate_id = br.id
         left join (
             select a.hosp_code, a.visit_id, a.op_id, sum(ifnull(a.reality_price, 0)) cfje,max(b.crte_id) settleCrteId,max(b.crte_name) settleCrteName
             from outpt_cost a
@@ -1594,7 +1595,7 @@
             max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
             from base_dept a
             join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            join base_dept c on c.hosp_code = b.hosp_code and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
             where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
         )dd on 1 = 1
         left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'

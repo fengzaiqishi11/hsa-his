@@ -93,6 +93,14 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             outptCostDTO.setItemName(x.getGroupName());
             // 原价
             outptCostDTO.setTotalPrice(x.getTotalPrice());
+            // 单价
+            outptCostDTO.setPrice(x.getTotalPrice());
+            // 总数量
+            outptCostDTO.setTotalNum(BigDecimalUtils.convert("1"));
+            // 数量
+            outptCostDTO.setNum(BigDecimalUtils.convert("1"));
+            // 计费id ************************ 暂时写死
+            outptCostDTO.setBfcId("1000000000000000012");
             // 优惠价格
             outptCostDTO.setPreferentialPrice(x.getPreferentialPrice());
             // 优惠后价格
@@ -110,8 +118,53 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
 
             outptCostDTOS.add(outptCostDTO);
         });
+        // 删除之前的费用信息
+        physRegDAO.deleteBatchPhys(outptCostDTOS.get(0));
+        // 新增费用信息
         int result = physRegDAO.addBatchPhys(outptCostDTOS);
         return result > 0;
+    }
+
+    /**
+     * @Description: 同步体检收费组合到项目表
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @Override
+    public Boolean insertPhysGroup(Map map) {
+        List<Map> list = MapUtils.get(map, "result");
+        for (Map resultMap : list){
+            resultMap.put("remark", "phys");
+            resultMap.put("crteId", "phys");
+            resultMap.put("crteName", "体检");
+            resultMap.put("crteTime", DateUtils.getNow());
+        }
+        physRegDAO.insertPhysGroup(list);
+        return true;
+    }
+
+    /**
+     * @Description: 插入退费申请
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2021-11-25
+     */
+    @Override
+    public Boolean insertReturn(Map map) {
+        List<Map> list = MapUtils.get(map, "result");
+        for (Map resultMap : list){
+            resultMap.put("id", SnowflakeUtils.getId());
+            resultMap.put("status", "2");
+            resultMap.put("crteId", "phys");
+            resultMap.put("crteName", "体检");
+            resultMap.put("crteTime", DateUtils.getNow());
+        }
+        physRegDAO.updateRCodt(list);
+        physRegDAO.insertReturn(list);
+        return null;
     }
 
 

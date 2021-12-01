@@ -27,7 +27,6 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
@@ -200,6 +199,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
             inptSettleDO.setHospDfPrice(BigDecimalUtils.negate(inptSettleDO.getHospDfPrice()));//医院垫付金额 = -医院垫付金额
             inptSettleDO.setHospJmPrice(BigDecimalUtils.negate(inptSettleDO.getHospJmPrice()));//医院减免金额 = -医院减免金额
             inptSettleDO.setAcctPay(BigDecimalUtils.negate(inptSettleDO.getAcctPay()));//个人账户金额 = -个人账户金额
+            inptSettleDO.setCreditPrice(BigDecimalUtils.negate(inptSettleDO.getCreditPrice()));
             inptSettleDO.setCrteId(userId);//创建人id
             inptSettleDO.setCrteName(userName);//创建人姓名
             inptSettleDO.setCrteTime(new Date());//创建时间

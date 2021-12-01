@@ -294,6 +294,12 @@ public interface Constants {
      * @Date 2020/8/28 15:41
      */
     String HOSPCODE_DISCOUNTS_KEY = "JG_SF_SRFS";
+    /**
+     * @Desrciption 住院配药key
+     * @Author zhangguorui
+     * @Date 2021/11/22 15:41
+     */
+    String INPT_DISPENSE_REDIS_KEY = "inpt_dispense";
 
     /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
@@ -452,6 +458,8 @@ public interface Constants {
         public static final String ZZ = "4"; // 转帐
         public static final String WX = "5"; // 微信
         public static final String ZFB = "6"; // 支付宝
+
+        public static final String GZ = "8"; // 挂账
     }
 
     /**

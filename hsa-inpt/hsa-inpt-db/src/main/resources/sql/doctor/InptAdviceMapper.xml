@@ -1463,7 +1463,10 @@
                 join phar_in_receive_detail a on receive.id = a.receive_id and receive.hosp_code = a.hosp_code
                 left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
                 left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
-                where receive.hosp_code = #{hospCode} and receive.status_code in ('0','1') and date_sub(receive.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and receive.phar_id = #{pharId} and a.item_id = #{itemId}
+                where receive.hosp_code = #{hospCode} and receive.status_code in ('0','1') and receive.phar_id = #{pharId} and a.item_id = #{itemId}
+                <if test="wjsykc != null and wjsykc != ''">
+                  and DATE_ADD(receive.crte_time, INTERVAL #{wjsykc} hour) &gt; now()
+                </if>
                 union all
                 select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
                 from stro_stock a
@@ -2044,6 +2047,52 @@
                 #{item}
             </foreach>
         </if>
+    </select>
+
+    <!--根据就诊id查询中药医嘱列表-->
+    <select id="getZyAdviceByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        SELECT
+            iv.name,
+            iv.patient_code,
+            iv.gender_code,
+            iv.age,
+            iv.age_unit_code,
+            iv.in_no,
+            iv.in_dept_name,
+            iv.bed_name,
+            iv.in_disease_name,
+            a.long_start_time,
+            iv.address,
+            iv.phone,
+            a.item_name,
+            a.spec,
+            a.prep_code,
+            a.dosage,
+            a.dosage_unit_code,
+            a.usage_code,
+            a.use_days,
+            a.num,
+            a.unit_code,
+            a.total_num,
+            a.total_num_unit_code,
+            a.herb_num,
+            a.herb_note_code,
+            a.price,
+            a.total_price,
+            a.use_code,
+            a.is_give,
+            a.remark,
+            a.crte_name
+        FROM inpt_advice a
+        JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
+        LEFT JOIN base_drug bd on a.hosp_code = bd.hosp_code and a.item_id = bd.id
+        WHERE a.hosp_code = #{hospCode}
+          and a.visit_id = #{id}
+          and bd.big_type_code = '2'
+          and a.is_submit = '1'
+          and a.is_stop = '0'
+          and (a.cancel_id is null or a.cancel_id = '')
+        ORDER BY a.long_start_time asc, a.group_no asc, a.group_seq_no asc
     </select>
 
 </mapper>

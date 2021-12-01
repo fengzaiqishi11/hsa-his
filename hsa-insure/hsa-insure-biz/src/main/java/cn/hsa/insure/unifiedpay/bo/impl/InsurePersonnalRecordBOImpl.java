@@ -5,12 +5,14 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.insure.module.bo.InsurePersonnalRecordBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureDiseaseRecordDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
+import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
@@ -49,6 +51,13 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
 
     @Resource
     private InsureIndividualVisitDAO  insureIndividualVisitDAO;
+
+    @Resource
+    private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
+
+    @Resource
+    private InsureUnifiedLogService insureUnifiedLogService_consumer;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -753,6 +762,100 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         return map;
     }
 
+    /**
+     * @param map
+     * @Method insertSpecialOutptRecord
+     * @Desrciption 江西省：门诊单病种备案
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/25 10:33
+     * @Return
+     */
+    @Override
+    public Boolean insertSpecialOutptRecord(Map<String, Object> map) {
+        String hospCode  = MapUtils.get(map,"hospCode");
+        String insureRegCode = MapUtils.get(map,"regCode");
+        InsureConfigurationDTO insureConfigurationDTO = insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, insureRegCode);
+        map.put("evt_type","");
+        map.put("dcla_souc","");
+        map.put("expContent","");
+        map.put("fixmedins_code",insureConfigurationDTO.getOrgCode());
+        map.put("fix_blng_admdvs",insureConfigurationDTO.getMdtrtareaAdmvs());
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("data",map);
+        Map<String, Object> resultDataMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), "2585", paramMap);
+        Map<String,Object> outptMap = MapUtils.get(resultDataMap, "output");
+        Map<String,Object> dataMap = MapUtils.get(outptMap, "data");
+        map.put("id",SnowflakeUtils.getId());
+        map.put("evtsn",MapUtils.get(dataMap,"evtsn")); // 事件流水号
+        map.put("serv_matt_inst_id",MapUtils.get(dataMap,"serv_matt_inst_id")); // 服务事项实例ID
+        map.put("serv_matt_node_inst_id",MapUtils.get(dataMap,"serv_matt_node_inst_id")); // 服务事项环节实例ID
+        map.put("evt_inst_id",MapUtils.get(dataMap,"evt_inst_id")); // 事件实例ID
+        map.put("trt_dcla_detl_sn",MapUtils.get(dataMap,"trt_dcla_detl_sn")); // 待遇申报明细流水号
+        insureDiseaseRecordDAO.insertSpecialOutptRecord(map);
+        return true;
+    }
 
+    /**
+     * @param map
+     * @Method insertSpecialOutptRecord
+     * @Desrciption 江西省：门诊单病种备案撤销
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/25 10:33
+     * @Return
+     */
+    @Override
+    public Boolean deleteSpecialOutptRecord(Map<String, Object> map) {
+        String hospCode  = MapUtils.get(map,"hospCode");
+        String insureRegCode = MapUtils.get(map,"insureRegCode");
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("data",map);
+        insureUnifiedCommonUtil.commonInsureUnified(hospCode,insureRegCode, "2586", dataMap);
+        insureDiseaseRecordDAO.deleteSpecialOutptRecord(map);
+        return true;
+    }
+
+    /**
+     * @param map
+     * @Method querySpecialOutptRecord
+     * @Desrciption 江西省：门诊单病种备案登记查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/25 10:33
+     * @Return
+     */
+    @Override
+    public PageDTO querySpecialOutptRecord(Map<String, Object> map) {
+        String hospCode  = MapUtils.get(map,"hospCode");
+        String insureRegCode = MapUtils.get(map,"regCode");
+        InsureConfigurationDTO insureInsureConfiguration = insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, insureRegCode);
+        Map<String,Object> dataMap = new HashMap<>();
+        map.put("fixmedins_code",insureInsureConfiguration.getOrgCode());
+        dataMap.put("data",map);
+        Map<String,Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode,insureRegCode, "5385", dataMap);
+        Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
+        List<Map<String,Object> > dataMapList = MapUtils.get(outptMap,"data");
+        if(ListUtils.isEmpty(dataMapList)){
+            throw  new AppException("没有查询到备案信息");
+        }
+        return PageDTO.of(dataMapList);
+    }
+
+    /**
+     * @param insureSpecialRecordDTO
+     * @Method queryPage
+     * @Desrciption 江西省：门诊单病种备案分页查询（his）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/29 10:24
+     * @Return
+     */
+    @Override
+    public PageDTO queryPageSpecialRecord(InsureSpecialRecordDTO insureSpecialRecordDTO) {
+        PageHelper.startPage(insureSpecialRecordDTO.getPageNo(),insureSpecialRecordDTO.getPageSize());
+        List<InsureSpecialRecordDTO> list = insureDiseaseRecordDAO.queryPageSpecialRecord(insureSpecialRecordDTO);
+        return PageDTO.of(list);
+    }
 
 }

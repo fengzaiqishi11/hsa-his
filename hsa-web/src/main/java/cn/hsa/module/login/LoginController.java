@@ -160,10 +160,14 @@ public class LoginController extends BaseController {
             BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
             baseDeptDTO.setHospCode(hospCode);
             baseDeptDTO.setCode(sysUserDTO.getDeptCode());
-
             Map map = new HashMap();
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("baseDeptDTO", baseDeptDTO);
+            if("powersi".equals(paramMap.get("userCode"))){
+                paramMap.put("userCode","admin");
+                SysUserDTO adminDTO = getData(sysUserService_consumer.getByCode(paramMap));
+                baseDeptDTO.setCode(adminDTO.getDeptCode());
+            }
             BaseDeptDTO baseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));
             sysUserDTO.setBaseDeptDTO(baseDeptDto);
             // 所属科室信息 -- add by zhongming end
@@ -342,15 +346,20 @@ public class LoginController extends BaseController {
      * @Return
      **/
     private List<Map<String, Object>> convertSystemListToMap(Map paramMap) {
+        boolean isSuperUser = false;
         if("powersi".equals(paramMap.get("userCode"))){
             paramMap.put("userCode","admin");
+            isSuperUser = true;
         }
         // 查询用户子系统列表
         List<Map<String, Object>> systemListMap = getData(sysSystemService_consumer.queryByUserCode(paramMap));
         if (ListUtils.isEmpty(systemListMap)) {
             throw new AppException("当前账号未配置操作子系统！");
         }
-
+        if(isSuperUser){
+            // 将登录用户名还原回powersi
+            paramMap.put("userCode","powersi");
+        }
         // 构建数据结构，分组子系统
         // key   -> 子系统编码_子系统名称
         // value -> 操作科室列表

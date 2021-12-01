@@ -153,4 +153,48 @@ public interface InsurePersonnalRecordService {
      * @Date: 2021-04-30
      */
     WrapperResponse<Map<String, Object>> queryOutptTwoDiseInfo(Map<String, Object> map);
+
+    /**
+     * @Method insertSpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+     **/
+    WrapperResponse<Boolean> insertSpecialOutptRecord(Map<String, Object> map);
+
+    /**
+     * @Method insertSpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案撤销
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+     **/
+    WrapperResponse<Boolean> deleteSpecialOutptRecord(Map<String, Object> map);
+
+    /**
+     * @Method querySpecialOutptRecord
+     * @Desrciption  江西省：门诊单病种备案登记查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 10:33
+     * @Return
+     **/
+    WrapperResponse<PageDTO> querySpecialOutptRecord(Map<String, Object> map);
+
+    /**
+     * @Method queryPageSpecialRecord
+     * @Desrciption  江西省：门诊单病种备案分页查询（his）
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/29 10:24
+     * @Return
+     **/
+    WrapperResponse<PageDTO> queryPageSpecialRecord(Map<String, Object> map);
 }

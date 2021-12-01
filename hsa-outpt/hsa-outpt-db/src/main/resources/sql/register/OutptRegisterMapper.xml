@@ -544,7 +544,8 @@
         ifnull(d.is_visit,'0') as isVisit,
         e.register_code AS registerCode,  -- 挂号类型名称
         b.card_price as cardPrice,
-        bc.card_no as cardNo
+        bc.card_no as cardNo,
+        b.credit_price as creditPrice
         FROM
         outpt_register a
         inner JOIN outpt_register_settle b ON a.id = b.register_id
@@ -725,6 +726,7 @@
             total_price,
             preferential_price,
             card_price,
+            credit_price,
             reality_price,
             settle_time,
             daily_settle_id,
@@ -744,6 +746,7 @@
                      #{totalPrice,jdbcType=DECIMAL},
                      #{preferentialPrice,jdbcType=DECIMAL},
                      #{cardPrice,jdbcType=DECIMAL},
+                     #{creditPrice,jdbcType=DECIMAL},
                      #{realityPrice,jdbcType=DECIMAL},
                      #{settleTime,jdbcType=TIMESTAMP},
                      #{dailySettleId,jdbcType=VARCHAR},
@@ -821,7 +824,7 @@
     <insert id="insertRegDetail" parameterType="list">
         INSERT INTO outpt_register_detail (
         id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id,
-        price, num, use_code, spec, preferential_id, total_price, preferential_price, card_price, reality_price,
+        price, num, use_code, spec, preferential_id, total_price, preferential_price, card_price, credit_price, reality_price,
         unit_code, status_code, origin_id, crte_id, crte_name, crte_time
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
@@ -842,6 +845,7 @@
             #{item.totalPrice},
             #{item.preferentialPrice},
             #{item.cardPrice},
+            #{item.creditPrice},
             #{item.realityPrice},
             #{item.unitCode},
             #{item.statusCode},
@@ -864,6 +868,7 @@
             total_price,
             preferential_price,
             card_price,
+            credit_price,
             reality_price,
             settle_time,
             daily_settle_id,
@@ -883,6 +888,7 @@
                      #{totalPrice,jdbcType=DECIMAL},
                      #{preferentialPrice,jdbcType=DECIMAL},
                      #{cardPrice,jdbcType=DECIMAL},
+                     #{creditPrice,jdbcType=DECIMAL},
                      #{realityPrice,jdbcType=DECIMAL},
                      #{settleTime,jdbcType=TIMESTAMP},
                      #{dailySettleId,jdbcType=VARCHAR},

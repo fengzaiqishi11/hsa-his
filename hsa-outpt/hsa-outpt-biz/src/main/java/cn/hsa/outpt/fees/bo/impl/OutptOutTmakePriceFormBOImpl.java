@@ -3,7 +3,6 @@ package cn.hsa.outpt.fees.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.service.*;
@@ -1270,6 +1269,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         selectOutptSettleDTO.setTotalPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTotalPrice()));
         selectOutptSettleDTO.setTruncPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTruncPrice()));
         selectOutptSettleDTO.setAcctPay(BigDecimalUtils.negate(selectOutptSettleDTO.getAcctPay()));
+        selectOutptSettleDTO.setCreditPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getCreditPrice()));
 
         // 创建信息
         selectOutptSettleDTO.setCrteId(outptSettleDTO.getCrteId());

@@ -2910,7 +2910,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         tempMap.put("id", tempMap.get("medOrgOrd").toString()); // 结算id
         tempMap.put("hospCode", hospCode);
         InsureIndividualSettleDO insureIndividualSettleDO = outptSettleDAO.getInsureInsureIndividualSettle(tempMap);
-
+        insureIndividualSettleDO.setSettleId(tempMap.get("medOrgOrd").toString());
         insureIndividualSettleDO.setId(SnowflakeUtils.getId());
         insureIndividualSettleDO.setTotalPrice(new BigDecimal(tempMap.get("feeSumamt").toString()));
         insureIndividualSettleDO.setPersonalPrice(new BigDecimal(tempMap.get("ownpayAmt").toString()));

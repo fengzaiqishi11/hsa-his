@@ -342,6 +342,9 @@ public class LoginController extends BaseController {
      * @Return
      **/
     private List<Map<String, Object>> convertSystemListToMap(Map paramMap) {
+        if("powersi".equals(paramMap.get("userCode"))){
+            paramMap.put("userCode","admin");
+        }
         // 查询用户子系统列表
         List<Map<String, Object>> systemListMap = getData(sysSystemService_consumer.queryByUserCode(paramMap));
         if (ListUtils.isEmpty(systemListMap)) {

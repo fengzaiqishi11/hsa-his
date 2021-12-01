@@ -1594,7 +1594,7 @@
             max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
             from base_dept a
             join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            join base_dept c on c.hosp_code = b.hosp_code and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
             where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
         )dd on 1 = 1
         left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'

@@ -107,4 +107,36 @@ public class OutptRefundApplyController extends BaseController {
 		return outptRefundApplyService_consumer.updateOutptRefundAppyStatus(param);
 	}
 
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:29
+	 * @Return
+	 */
+	@PostMapping("/updateUnconfirmedOutptRefundAppy")
+	public WrapperResponse<Boolean> updateUnconfirmedOutptRefundAppy(@RequestBody Map<String,Object> param,HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO userDTO = getSession(req, res) ;
+		param.put("hospCode", userDTO.getHospCode());
+		return outptRefundApplyService_consumer.updateUnconfirmedOutptRefundAppy(param);
+	}
+
+	/**
+	 * @Description: 门诊医生退费取消申请
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/3/9 16:06
+	 * @Return
+	 */
+	@PostMapping("/saveCancelOutptRefundAppy")
+	public WrapperResponse<Boolean> saveCancelOutptRefundAppy(@RequestBody Map<String,Object> param,HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO userDTO = getSession(req, res) ;
+		param.put("hospCode", userDTO.getHospCode());
+		param.put("crteId", userDTO.getId());
+		param.put("crteName", userDTO.getName());
+		return outptRefundApplyService_consumer.saveCancelOutptRefundAppy(param);
+	}
+
 }

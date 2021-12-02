@@ -52,4 +52,28 @@ public interface OutptRefundApplyService {
 	 */
 	@PostMapping(value = "/service/outpt/outptRefundApply/updateOutptRefundAppyStatus")
 	WrapperResponse<Boolean> updateOutptRefundAppyStatus(Map<String, Object> param);
+
+
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:30
+	 * @Return
+	 */
+	@PostMapping(value = "/service/outpt/outptRefundApply/updateUnconfirmedOutptRefundAppy")
+	WrapperResponse<Boolean> updateUnconfirmedOutptRefundAppy(Map<String, Object> param);
+
+	/**
+	 * @Description: 门诊医生取消退费申请
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 15:51
+	 * @Return
+	 */
+	@PostMapping(value = "/service/outpt/outptRefundApply/saveCancelOutptRefundAppy")
+	WrapperResponse<Boolean> saveCancelOutptRefundAppy(Map<String, Object> param);
+
 }

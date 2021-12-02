@@ -275,7 +275,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         // 在挂号处直接收费 直接插入数据进挂号结算表
         if (SFJS){
             // 处理挂号结算数据
-            settleId = disposeGhjs(outptRegisterSettleDto, ghid, jzid, hospCode, docId, docName, sysdate, profileId, cardNo, price);
+            settleId = disposeGhjs(outptRegisterSettleDto, ghid, jzid, hospCode, docId, docName, sysdate, profileId, cardNo, price,isInvoice);
             // 门诊划价处再收费 则插入数据进费用表
         } else {
             List<OutptCostDTO> outptCostDTOS = this.directOutptCost(outptVisitDTO, regDetailList);
@@ -697,7 +697,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
     }
 
 
-    private String disposeGhjs(OutptRegisterSettleDto outptRegisterSettleDto, String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, String profileId, String cardNo, BigDecimal  price) {
+    private String disposeGhjs(OutptRegisterSettleDto outptRegisterSettleDto, String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, String profileId, String cardNo, BigDecimal  price,boolean isInvoice) {
         // 获取最新发票号码
         if (outptRegisterSettleDto.getCurrNo() != null && !"".equals(outptRegisterSettleDto.getCurrNo())) {
             outptRegisterSettleDto.setHospCode(hospCode);
@@ -901,6 +901,11 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterSettleDto.setRealityPrice(BigDecimalUtils.subtract(outptRegisterSettleDto.getRealityPrice(), tsxj));
             if (!BigDecimalUtils.isZero(price)) {
                 outptRegisterSettleDto.setRealityPrice(BigDecimalUtils.subtract(outptRegisterSettleDto.getRealityPrice(), price));
+            }
+            if(!isInvoice){
+                outptRegisterSettleDto.setBillId("");
+                outptRegisterSettleDto.setBillNo("");
+                outptRegisterSettleDto.setCurrNo("");
             }
             outptRegisterDAO.batchInsertRegisterSettle(outptRegisterSettleDto);
         }

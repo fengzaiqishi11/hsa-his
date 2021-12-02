@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
 * @Package_name: cn.hsa.module.outpt.fees.dto
@@ -176,5 +177,7 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
 
         // 患者是否为体检患者
         private String isPhys;
+        // 退费费用id
+        private List<String> costIdList;
 
 }

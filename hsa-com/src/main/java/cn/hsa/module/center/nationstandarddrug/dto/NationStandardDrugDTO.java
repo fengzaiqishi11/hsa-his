@@ -26,4 +26,5 @@ public class NationStandardDrugDTO extends NationStandardDrugDO implements Seria
   private String flag;
   private String keyword;
   private String usageDosage;
+  private String hospCode;
 }

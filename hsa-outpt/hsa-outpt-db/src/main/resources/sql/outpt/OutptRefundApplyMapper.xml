@@ -124,4 +124,21 @@
         update outpt_refund_apply set status = '2' where settle_id = #{id} and hosp_code = #{hospCode}
     </update>
 
+    <update id="updateUnconfirmedOutptRefundAppy" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" >
+        update outpt_refund_apply set status = '1' where settle_id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <delete id="deleteOutptRefundAppy" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" >
+        delete from outpt_refund_apply  where settle_id = #{id} and hosp_code = #{hospCode} and status ='1'
+    </delete>
+
+    <select id="queryUncostList" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select * from outpt_cost where settle_id =#{id} and hosp_code = #{hospCode}
+        and id in
+        <foreach collection="costIdList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and status_code ='0'
+    </select>
+
 </mapper>

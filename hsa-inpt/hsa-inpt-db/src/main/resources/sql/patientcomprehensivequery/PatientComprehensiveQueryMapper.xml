@@ -881,6 +881,6 @@
         order by cost_time desc
     </select>
     <select id="queryYWLX" resultType="java.util.Map">
-        SELECT DISTINCT aka130,aka130_name FROM insure_individual_visit WHERE hosp_code =#{hospCode}
+        SELECT  `name`,`value` FROM insure_dict WHERE hosp_code =#{hospCode} and code = 'YWLX_ZY'
     </select>
 </mapper>

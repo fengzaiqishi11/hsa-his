@@ -66,4 +66,30 @@ public class OutptRefundApplyServiceImpl extends HsafService implements OutptRef
 	public WrapperResponse<Boolean> updateOutptRefundAppyStatus(Map<String, Object> param) {
 		return WrapperResponse.success(outptRefundApplyBO.updateOutptRefundAppyStatus(param));
 	}
+
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:30
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> updateUnconfirmedOutptRefundAppy(Map<String, Object> param) {
+		return WrapperResponse.success(outptRefundApplyBO.updateUnconfirmedOutptRefundAppy(param));
+	}
+
+	/**
+	 * @Description: 门诊医生取消退费申请
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 15:50
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> saveCancelOutptRefundAppy(Map<String, Object> param) {
+		return WrapperResponse.success(outptRefundApplyBO.deleteOutptRefundAppy(param));
+	}
 }

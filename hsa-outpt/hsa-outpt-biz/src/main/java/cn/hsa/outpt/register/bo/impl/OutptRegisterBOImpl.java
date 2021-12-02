@@ -226,6 +226,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         }
         String cardNo = outptRegisterDTO.getCardNo(); // 一卡通卡号
         BigDecimal price = outptRegisterDTO.getCardPrice() != null ? outptRegisterDTO.getCardPrice() : new BigDecimal(0);   // 一卡通支付金额
+        BigDecimal creditPrice = outptRegisterDTO.getCreditPrice() != null ? outptRegisterDTO.getCreditPrice() : new BigDecimal(0);  // 挂账金额
         Boolean SFJS = MapUtils.get(map,"SFJS");
         Boolean isInvoice = MapUtils.get(map, "isInvoice");
         String docId = outptVisitDTO.getCrteId();
@@ -269,12 +270,12 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         // 处理his挂号数据
         disposeHisGh(outptRegisterDTO, outptVisitDTO, ghid, ghdh, jzid, sysdate, hospCode, docId, docName);
         // 处理门诊挂号费用
-        disposeGhfy(regDetailList, outptRegisterDTO, ghid, jzid, hospCode, docId, docName, sysdate, price);
+        disposeGhfy(regDetailList, outptRegisterDTO, ghid, jzid, hospCode, docId, docName, sysdate, price, creditPrice);
         String settleId = "";
         // 在挂号处直接收费 直接插入数据进挂号结算表
         if (SFJS){
             // 处理挂号结算数据
-            settleId = disposeGhjs(outptRegisterSettleDto, ghid, jzid, hospCode, docId, docName, sysdate, profileId, cardNo, price);
+            settleId = disposeGhjs(outptRegisterSettleDto, ghid, jzid, hospCode, docId, docName, sysdate, profileId, cardNo, price,isInvoice);
             // 门诊划价处再收费 则插入数据进费用表
         } else {
             List<OutptCostDTO> outptCostDTOS = this.directOutptCost(outptVisitDTO, regDetailList);
@@ -669,7 +670,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         outptRegisterDAO.insert(outptRegisterDTO);
     }
 
-    private void disposeGhfy(List<OutptRegisterDetailDto> regDetaiolList,OutptRegisterDTO outptRegisterDTO,  String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, BigDecimal cardPrice) {
+    private void disposeGhfy(List<OutptRegisterDetailDto> regDetaiolList,OutptRegisterDTO outptRegisterDTO,  String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, BigDecimal cardPrice, BigDecimal creditPrice) {
         // 处理挂号费用数据
         if (!ListUtils.isEmpty(regDetaiolList)) {
             for (OutptRegisterDetailDto dto : regDetaiolList) {
@@ -688,6 +689,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 dto.setCrteName(docName);
                 dto.setCrteTime(sysdate);
                 dto.setCardPrice(cardPrice);
+                dto.setCreditPrice(creditPrice);
             }
             // TODO 插入挂号费用数据
             outptRegisterDAO.insertRegDetail(regDetaiolList);
@@ -695,7 +697,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
     }
 
 
-    private String disposeGhjs(OutptRegisterSettleDto outptRegisterSettleDto, String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, String profileId, String cardNo, BigDecimal  price) {
+    private String disposeGhjs(OutptRegisterSettleDto outptRegisterSettleDto, String registerId, String visitId, String hospCode, String docId, String docName, Date sysdate, String profileId, String cardNo, BigDecimal  price,boolean isInvoice) {
         // 获取最新发票号码
         if (outptRegisterSettleDto.getCurrNo() != null && !"".equals(outptRegisterSettleDto.getCurrNo())) {
             outptRegisterSettleDto.setHospCode(hospCode);
@@ -717,6 +719,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         BigDecimal xjzf = outptRegisterSettleDto.getXjZf();
         // 实收现金支付
         BigDecimal zzzf = outptRegisterSettleDto.getZzZf();
+        // 挂账金额
+        BigDecimal creditPrice = outptRegisterSettleDto.getCreditPrice();
         // 退款金额
         BigDecimal tsxj = outptRegisterSettleDto.getTsxj();
         List<OutptRegisterPayDto> payList = new ArrayList<>();
@@ -765,6 +769,19 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterPayDto.setVisitId(visitId);
             outptRegisterPayDto.setPayCode(Constants.ZFFS.WX);
             outptRegisterPayDto.setPrice(wx_zf);
+            payList.add(outptRegisterPayDto);
+        }
+        // 微信支付
+        if (null != creditPrice && !BigDecimalUtils.isZero(creditPrice) && creditPrice.compareTo(BigDecimal.ZERO) == 1) {
+//            outptRegisterSettleDto.setRealityPrice(wx_zf);
+            outptRegisterSettleDto.setPayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+            OutptRegisterPayDto outptRegisterPayDto = new OutptRegisterPayDto();
+            outptRegisterPayDto.setId(SnowflakeUtils.getId());
+            outptRegisterPayDto.setHospCode(hospCode);
+            outptRegisterPayDto.setRsId(settleId);
+            outptRegisterPayDto.setVisitId(visitId);
+            outptRegisterPayDto.setPayCode(Constants.ZFFS.GZ);
+            outptRegisterPayDto.setPrice(creditPrice);
             payList.add(outptRegisterPayDto);
         }
         // 支付宝支付
@@ -884,6 +901,11 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterSettleDto.setRealityPrice(BigDecimalUtils.subtract(outptRegisterSettleDto.getRealityPrice(), tsxj));
             if (!BigDecimalUtils.isZero(price)) {
                 outptRegisterSettleDto.setRealityPrice(BigDecimalUtils.subtract(outptRegisterSettleDto.getRealityPrice(), price));
+            }
+            if(!isInvoice){
+                outptRegisterSettleDto.setBillId("");
+                outptRegisterSettleDto.setBillNo("");
+                outptRegisterSettleDto.setCurrNo("");
             }
             outptRegisterDAO.batchInsertRegisterSettle(outptRegisterSettleDto);
         }
@@ -1318,6 +1340,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptRegisterSettleDO.setPreferentialPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getPreferentialPrice()));
             outptRegisterSettleDO.setRealityPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getRealityPrice()));
             outptRegisterSettleDO.setCardPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getCardPrice()));
+            outptRegisterSettleDO.setCreditPrice(BigDecimalUtils.negate(outptRegisterSettleDO.getCreditPrice()));
 
             // 日结缴款id为空
             outptRegisterSettleDO.setDailySettleId("");

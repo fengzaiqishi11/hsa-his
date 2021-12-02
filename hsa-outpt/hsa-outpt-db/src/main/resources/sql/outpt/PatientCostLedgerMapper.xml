@@ -3684,10 +3684,10 @@
         on a.visit_id = d.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d-%H-%i-%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d-%H-%i-%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}
@@ -3717,10 +3717,10 @@
         on a.visit_id = d.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d-%H-%i-%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d-%H-%i-%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}
@@ -3748,10 +3748,10 @@
         on a.bill_id = c.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d-%H-%i-%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d-%H-%i-%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d-%H-%i-%S')
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}

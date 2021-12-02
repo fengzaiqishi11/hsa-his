@@ -207,4 +207,15 @@ public interface DoctorAdviceBO {
      * @Return:
      **/
     List<InptAdviceDTO> queryLisAdvice(InptAdviceDTO inptAdviceDTO);
+
+    /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    List<InptAdviceDTO> getZyAdviceByVisitId(InptVisitDTO inptVisitDTO);
 }

@@ -387,7 +387,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         /**
          *重置的话  清单setleinfo节点不重置
          */
-//        insureGetInfoDAO.deleteSettleInfo(map);
+        insureGetInfoDAO.deleteSettleInfo(map);
         insureGetInfoDAO.deleteIcuInfo(map);
         insureGetInfoDAO.deleteOpspdiseinfo(map);
         insureGetInfoDAO.deletePayInfo(map);
@@ -671,6 +671,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         getEmptyErr(setlInfoMap,"hiType","医保类型不能为空");
         getEmptyErr(setlInfoMap,"insuplc","参保地不能为空");
         getEmptyErr(setlInfoMap,"billNo","票据号码不能为空");
+        getEmptyErr(setlInfoMap,"billCode","票据代码不能为空");
         getEmptyErr(setlInfoMap,"bizSn","业务流水号不能为空");
         getEmptyErr(setlInfoMap,"setlBegnDate","结算期间开始时间不能为空");
         getEmptyErr(setlInfoMap,"setlEndDate","结算期间结束时间不能为空");
@@ -691,8 +692,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
              getEmptyErr(setlInfoMap,"daysRinpFlag31","出院31天内再住院计划标志不能为空");
              getEmptyErr(setlInfoMap,"chfpdrName","主诊医师姓名不能为空");
              getEmptyErr(setlInfoMap,"chfpdrCode","主诊医师代码不能为空");
+             String chfpdrCodeStr = MapUtils.get(setlInfoMap,"chfpdrCode");
+             if(!"D".equals(chfpdrCodeStr.substring(0,1))){
+                 throw new AppException("主诊断医师代码必须是D开头的国家贯标码");
+             }
              getEmptyErr(setlInfoMap,"zrNurseName","责任护士姓名不能为空");
              getEmptyErr(setlInfoMap,"zrNurseCode","责任护士代码不能为空");
+            String zrNurseCodeStr = MapUtils.get(setlInfoMap,"zrNurseCode");
+            if(!"N".equals(zrNurseCodeStr.substring(0,1))){
+                throw new AppException("责任护士代码必须是N开头的国家贯标码");
+            }
              getEmptyErr(setlInfoMap,"dscgWay","离院方式不能为空");
              getEmptyErr(setlInfoMap,"dscgCaty","出院科别不能为空");
              getEmptyErr(setlInfoMap,"admTime","入院时间不能为空");
@@ -723,7 +732,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         /**
          * 前端传的日期时间型  有可能是Integer  和  Long
          */
-        Object brdy = MapUtils.get(map,"brdy");
+        Object brdy = MapUtils.get(setlInfoMap,"brdy");
         if(brdy instanceof  Long ){
             date.setTime((Long) brdy);
             setlInfoMap.put("brdy",dateFormat.format(date)); // 出生日期
@@ -1206,11 +1215,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<OperInfoRecordDTO> handerOperInfo(Map<String, Object> map) {
-        List <OperInfoRecordDTO> infoRecordDTOList;
-        infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
-        if(ListUtils.isEmpty(infoRecordDTOList)){
-            infoRecordDTOList = insureGetInfoDAO.selectOperInfo(map);
-        }
+        List <OperInfoRecordDTO> infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
+        infoRecordDTOList.get(0).setOprnOprtType("1");
         return infoRecordDTOList;
     }
 

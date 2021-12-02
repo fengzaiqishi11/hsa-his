@@ -798,11 +798,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 continue;
             }
             if("部分政策自付费用".equals(polItemName.trim())  || "乙类先自付".equals(polItemName.trim())){
-                s2 = BigDecimalUtils.add(s4,polItemPaySum);
+                s2 = BigDecimalUtils.add(s2,polItemPaySum);
                 continue;
             }
             if("县外就医转外自付费用".equals(polItemName.trim())){
-                s3 =BigDecimalUtils.add(s4,polItemPaySum);
+                s3 =BigDecimalUtils.add(s3,polItemPaySum);
                 continue;
             }
             if("大病起付线".equals(polItemName.trim())){

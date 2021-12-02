@@ -1,13 +1,16 @@
 package cn.hsa.module.oper.operInforecord.dto;
 
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 
@@ -124,5 +127,11 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     private String oprnOprtType;
     private String anstWay; // 手术麻醉方式
     private String anstDrName; // 麻醉医师姓名
-    private String operDoctorName; // 术者医师姓名
+    private String operDrName; // 术者医师姓名
+    private String oprnOprtName; // 手术操作名称
+    private String oprnOprtCode; // 手术操作代码
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date oprnOprtDate;
+
 }

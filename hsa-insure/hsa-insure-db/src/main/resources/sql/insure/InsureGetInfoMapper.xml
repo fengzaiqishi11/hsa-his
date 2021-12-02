@@ -559,7 +559,7 @@
             (#{item.id},#{item.hospCode},#{item.visitId},#{item.medicalRegNo},#{item.insureSettleId},
             #{item.oprnOprtType},#{item.oprnOprtName},#{item.oprnOprtCode},
             #{item.oprnOprtDate},#{item.anstWay},#{item.operDrName},#{item.operDrCode},
-            #{item.anstDrName},{item.anstDrCode})
+            #{item.anstDrName},#{item.anstDrCode})
         </foreach>
     </insert>
     <insert id="insertIcuInfo">
@@ -1028,43 +1028,47 @@
 
     <select id="selectMriOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
 
-        select ''                                                                                                  as oprn_oprt_type,
-               oper_disease_name,
-               oper_disease_icd9,
-               oper_time                                                                                           as oper_end_time,
-               ana_code                                                                                            as anst_way,
+        select '2'  as oprn_oprt_type,
+               moi.oper_disease_name as oprnOprtName,
+               moi.oper_disease_icd9,
+               moi.oper_time as oprnOprtDate,
+              ''  as anst_way,
                (select prac_certi_no
                 from sys_user su
                 where su.hosp_code = #{hospCode}
-                  and oper_doctor_id = su.id)                                                                      as oper_dr_code,
-               oper_doctor_name,
+                  and oper_doctor_id = su.id)   as oper_dr_code,
+               moi.oper_doctor_name as operDrName,
                (select prac_certi_no
                 from sys_user su
                 where su.hosp_code = #{hospCode}
-                  and ana_id1 = su.id)                                                                             as anst_dr_code,
-               ana_name1                                                                                           as anst_dr_name
-        from mris_oper_info
-        where visit_id = #{visitId}
-          and hosp_code = #{hospCode}
+                  and ana_id1 = su.id) as anst_dr_code,
+               moi.ana_name1   as anst_dr_name,
+               moi.oper_time as oprnOprtDate,
+               idm.insure_illness_code as oprnOprtCode
+        from mris_oper_info moi
+        left join insure_disease_match idm on moi.oper_disease_id = idm.hosp_illness_id
+        and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+        and moi.hosp_code = #{hospCode}  and idm.insure_reg_code =#{insureRegCode} and idm.audit_code ='1'
 
     </select>
 
     <select id="selectOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
-        select ''                                                                                                 as oprn_oprt_type,
+        select '2'  as oprn_oprt_type,
                oir.oper_disease_name,
                oir.oper_disease_icd9,
                oir.oper_end_time,
-               oir.ana_code                                                                                       as anst_way,
+               ''   as anst_way,
                (select prac_certi_no
                 from sys_user su
                 where su.hosp_code = #{hospCode}
-                  and oir.doctor_id = su.id)                                                                      as oper_dr_code,
-               doctor_name                                                                                        as oper_dr_name,
+                  and oir.doctor_id = su.id)   as oper_dr_code,
+               doctor_name   as oper_dr_name,
                (select prac_certi_no
                 from sys_user su
                 where su.hosp_code = #{hospCode}
-                  and oir.ana_id1 = su.id)                                                                        as anst_dr_code,
-               ana_name1                                                                                          as anst_dr_name
+                  and oir.ana_id1 = su.id)   as anst_dr_code,
+               ana_name1 as anst_dr_name
         from oper_info_record oir
         where oir.visit_id = #{visitId}
           and oir.hosp_code = #{hospCode}

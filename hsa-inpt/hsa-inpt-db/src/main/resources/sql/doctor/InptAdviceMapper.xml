@@ -2046,4 +2046,13 @@
         </if>
     </select>
 
+    <update id="newUpdateLastExeTime">
+        <foreach item="value" index="key" collection="adviceMap.entrySet()" separator=";" >
+            update inpt_advice set
+            last_exec_time=#{value}
+            where hosp_code=#{medicalAdviceDTO.hospCode}
+            and id = #{key}
+        </foreach>
+    </update>
+
 </mapper>

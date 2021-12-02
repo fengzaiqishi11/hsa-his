@@ -835,4 +835,12 @@ public interface InptAdviceDAO {
      * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptAdviceDTO>
      **/
     List<InptAdviceDTO> queryGroupAdvice(InptAdviceDTO inptAdviceDTO);
+
+    /**
+     * 医嘱最近执行时间更新（最外面的更新执行时间方法（updateLastExeTime）替换成下面这个） - 解决周期费用生成问题
+     * @param medicalAdviceDTO
+     * @param adviceIdCostTime
+     */
+    void newUpdateLastExeTime(@Param("medicalAdviceDTO")MedicalAdviceDTO medicalAdviceDTO, @Param("adviceMap")Map<String, Date> adviceIdCostTime);
+
 }

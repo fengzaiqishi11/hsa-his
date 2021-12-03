@@ -905,6 +905,7 @@
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
+        left join outpt_prescribe op on op.id = a.op_id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where ifnull(a.num,0) &lt; 0 and a.hosp_code = #{hospCode}
@@ -917,8 +918,11 @@
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
         </if>
+        <if test="statusCode != null and statusCode != ''">
+            and 1=-1
+        </if>
         <if test="deptToldId != null and deptToldId != ''">
-            and ia.dept_id = #{deptToldId}
+            and op.dept_id = #{deptToldId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -5474,7 +5478,9 @@
         from(
         <include refid="getOutRegisterCostBig"></include>
         where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
-        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s'))
+        or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+         or
         (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
         and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by b.up_code

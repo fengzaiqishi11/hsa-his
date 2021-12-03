@@ -459,6 +459,20 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 outptService.setOutptCostUploadAndTrial(outFeeMap);
             }
         }
+
+        // 2021年12月2日14:35:38 查询系统参数是否自动重收  如果没有配置会自动重收，配置为0不自动重收
+        Map<String, String> sysMap = new HashMap<>();
+        sysMap.put("code", "SF_AUTO_SETTLE");
+        sysMap.put("hospCode", hospCode);
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if(sysParameterDTO !=null && "0".equals(sysParameterDTO.getValue())) {
+            // 体检回调
+            if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+                phyIsCallBack(allCostDTOList);
+            }
+            return WrapperResponse.success(true);
+        }
+
         /**END*****************医保病人处理********************************************************************/
 
        // TODO 非医保病人自动退费

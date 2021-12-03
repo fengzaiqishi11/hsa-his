@@ -960,6 +960,78 @@
         where
         id = #{id} and hosp_code = #{hospCode,jdbcType=VARCHAR}
     </update>
+    <update id="updateDetailById">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE outpt_register_detail
+            <set>
+                <if test="item.registerId != null">
+                    register_id = #{item.registerId},
+                </if>
+                <if test="item.visitId != null">
+                    visit_id = #{item.visitId},
+                </if>
+                <if test="item.itemCode != null">
+                    item_code = #{item.itemCode},
+                </if>
+                <if test="item.itemId != null">
+                    item_id = #{item.itemId},
+                </if>
+                <if test="item.itemName != null">
+                    item_name = #{item.itemName},
+                </if>
+                <if test="item.bfcId!= null">
+                    bfc_id = #{item.bfcId},
+                </if>
+                <if test="item.price != null">
+                    price = #{item.price},
+                </if>
+                <if test="item.num != null">
+                    num = #{item.num},
+                </if>
+                <if test="item.useCode != null">
+                    use_code = #{item.useCode},
+                </if>
+                <if test="item.spec != null">
+                    spec = #{item.spec},
+                </if>
+                <if test="item.preferentialId != null">
+                    preferential_id = #{item.preferentialId},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice},
+                </if>
+                <if test="item.preferentialPrice != null">
+                    preferential_price = #{item.preferentialPrice},
+                </if>
+                <if test="item.realityPrice != null">
+                    reality_price = #{item.realityPrice},
+                </if>
+                <if test="item.unitCode != null">
+                    unit_code = #{item.unitCode},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode},
+                </if>
+                <if test="item.originId != null">
+                    origin_id = #{item.originId},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE 1=1
+            and id = #{item.id}
+            and hosp_code = #{item.hospCode}
+            and visit_id = #{item.visitId}
+        </foreach>
+
+    </update>
 
     <!-- 新增表信息 -->
     <insert id="insertDoctouRegisterIsAdd" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto" >

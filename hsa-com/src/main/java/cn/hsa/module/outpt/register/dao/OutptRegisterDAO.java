@@ -7,6 +7,7 @@ import cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto;
 import cn.hsa.module.outpt.register.dto.*;
 import cn.hsa.module.outpt.register.entity.*;
 import cn.hsa.module.outpt.visit.entity.OutptVisitDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -208,4 +209,6 @@ public interface OutptRegisterDAO {
      * @Return
      */
     OutinInvoiceDTO getMaxInvoiceNo(OutptRegisterSettleDto outptRegisterSettleDto);
+
+    int updateDetailById(@Param("list") List<OutptRegisterDetailDO> list);
 }

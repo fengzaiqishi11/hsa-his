@@ -2114,9 +2114,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptCostDTO.setTotalNum(BigDecimalUtils.multiply(numBig,BigDecimal.valueOf(adviceDTO.getUseDays())));
             }
             if(Constants.XMLB.XM.equals(inptAdviceDetailDTO.getItemCode())){
-                inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
-            } else {
-                inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+              inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
+              inptCostDTO.setTotalNumUnitCode(inptAdviceDetailDTO.getUnitCode());
             }
             //药品
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {

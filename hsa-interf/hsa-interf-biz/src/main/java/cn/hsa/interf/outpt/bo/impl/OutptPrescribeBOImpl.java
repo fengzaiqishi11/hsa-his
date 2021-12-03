@@ -394,7 +394,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptProfileFileDTO.setCertNo(outptVisitDTO.getCertNo());
         outptProfileFileDTO.setPhone(outptVisitDTO.getPhone());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
-        outptProfileFileDTO.setType("1");
+        outptProfileFileDTO.setType("2");
         WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
 
         //调用本地建档服务

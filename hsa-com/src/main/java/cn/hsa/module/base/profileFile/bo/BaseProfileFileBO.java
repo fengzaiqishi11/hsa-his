@@ -27,7 +27,7 @@ public interface BaseProfileFileBO {
      * @Date: 2021-04-30 15:38
      * @Return: Boolean
      **/
-    Boolean save(OutptProfileFileDTO outptProfileFileDTO);
+    OutptProfileFileDTO save(OutptProfileFileDTO outptProfileFileDTO);
 
     /**
      * @Menthod: queryPage

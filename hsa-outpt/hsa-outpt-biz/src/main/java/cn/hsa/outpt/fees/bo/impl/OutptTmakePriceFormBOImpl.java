@@ -1820,7 +1820,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 OutptSettleDO outptSettleDO = new OutptSettleDO();
                 outptSettleDO.setHospCode(hospCode);
                 outptSettleDO.setId(settleId);
-                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
                 if(object == null){
                     outptSettleDO.setAcctPay(new BigDecimal(0.00));
                 }
@@ -1829,6 +1828,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 }else{
                     outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
                 }
+                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
                 // 结算前个人账户余额 =  个人账户支出+结算后个人账户余额
                 individualSettleDO.setBeforeSettle(BigDecimalUtils.add(outptSettleDO.getAcctPay(),individualSettleDO.getLastSettle()));
                 individualSettleDO.setInsureSettleId(insureSettleId);

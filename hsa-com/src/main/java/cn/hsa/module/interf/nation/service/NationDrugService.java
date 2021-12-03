@@ -20,6 +20,7 @@ public interface NationDrugService {
 
     /**
      * 根据省份编码查询中心端的基础项目数据
+     * 分页查询所有国家标准药品
      * @Author: luonianxin
      * @Email: nianxin.luo@powersi.com
      * @Date: 2021/6/11 14:07

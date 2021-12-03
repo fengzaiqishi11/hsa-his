@@ -179,17 +179,13 @@
                 AND ic.status_code = #{statusCode}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-                and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
+                and ic.cost_time &gt;= #{costStartTime} and ic.cost_time &lt;= #{costStopTime}
             </if>
             <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
-                <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
-                ]]>
+                and ic.cost_time &lt;= #{costStopTime}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
-                <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
-                ]]>
+                and ic.cost_time &gt;= #{costStartTime}
             </if>
         <if test='queryBaby =="N"'>
             and (ic.baby_id is null or ic.baby_id = '')
@@ -275,17 +271,13 @@
         AND ic.baby_id = #{babyId}
     </if>
       <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-          and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d') &lt;= #{costStopTime}
+          and ic.cost_time &gt;= #{costStartTime} and ic.cost_time &lt;= #{costStopTime}
       </if>
       <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
-          <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
-                ]]>
+         and ic.cost_time &lt;= #{costStopTime}
       </if>
       <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
-          <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
-                ]]>
+         and ic.cost_time >= #{costStartTime}
       </if>
     group by ic.item_id,ic.price
     order by max(ic.crte_time),max(ic.bfc_id)

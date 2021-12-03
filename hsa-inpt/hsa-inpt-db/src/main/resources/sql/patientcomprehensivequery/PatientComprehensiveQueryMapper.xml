@@ -564,9 +564,6 @@
         <if test='queryBaby =="N"'>
             and (a.baby_id is null or a.baby_id = '')
         </if>
-        <if test="ywlx != null and ywlx != ''">
-            and f.aka130 = #{ywlx}
-        </if>
         order by a.settle_no desc, a.crte_time desc
     </select>
 

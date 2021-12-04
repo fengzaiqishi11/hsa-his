@@ -1269,7 +1269,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             for (OutptRegisterDetailDO outptRegisterDetailDO : list) {
                 outptRegisterDetailDO.setStatusCode(Constants.ZTBZ.BCH);
             }
-            outptRegisterDAO.updateDetailByRegisterId(list);
+            outptRegisterDAO.updateDetailById(list);
 
             // 新增一条冲红数据
             for (OutptRegisterDetailDO outptRegisterDetailDO : list) {

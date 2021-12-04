@@ -999,6 +999,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         BigDecimal aka151 = BigDecimalUtils.convert(payinfo.get("aka151"));//起付线费用
         BigDecimal akb067 = BigDecimalUtils.convert(payinfo.get("akb067"));//个人现金支付
         BigDecimal akb066 = BigDecimalUtils.convert(payinfo.get("akb066"));//个人账户支付
+
+        /**
+         * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         */
+        if(BigDecimalUtils.equals(akb067,akc264)){
+            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+        }
+
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
         BigDecimal ake039 = BigDecimalUtils.convert(payinfo.get("ake039"));//医疗保险统筹基金支付
         BigDecimal ake035 = BigDecimalUtils.convert(payinfo.get("ake035"));//公务员医疗补助基金支付

@@ -439,6 +439,13 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal akb066 = BigDecimalUtils.convert(inptInsureResult.get("akb066"));//个人账户支付
                 BigDecimal akb067 = BigDecimalUtils.convert(inptInsureResult.get("akb067"));//个人现金支付
                 BigDecimal akc264 = BigDecimalUtils.convert(inptInsureResult.get("akc264"));//医疗总费用akc264 = bka831 + bka832+bka842
+
+                /**
+                 * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+                 */
+                if(BigDecimalUtils.equals(akb067,akc264)){
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
                 BigDecimal ake026 = BigDecimalUtils.convert(inptInsureResult.get("ake026"));//企业补充医疗保险基金支付
                 BigDecimal ake029 = BigDecimalUtils.convert(inptInsureResult.get("ake029"));//大额医疗费用补助基金支付
                 BigDecimal ake035 = BigDecimalUtils.convert(inptInsureResult.get("ake035"));//公务员医疗补助基金支付

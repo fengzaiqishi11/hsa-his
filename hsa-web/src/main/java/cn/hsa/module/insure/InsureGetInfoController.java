@@ -10,6 +10,7 @@ import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
 import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +60,9 @@ public class InsureGetInfoController extends BaseController {
     public WrapperResponse<Map> insertSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         return insureGetInfoService_consumer.insertSettleInfo(map);
     }
 

@@ -357,7 +357,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
           itemNum.getAndIncrement();
           check.setCheckFlag(true);
-          if(itemNum.get() <= 4 && !itemMap.containsKey(dto.getId())) {
+          if(itemNum.get() <= 8 && !itemMap.containsKey(dto.getId())) {
             itemMap.put(dto.getId(),dto.getItemName());
             message.append("【");
             message.append(dto.getItemName());
@@ -923,7 +923,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       }
     }
     for(PharInWaitReceiveDTO dto:inReceiveList){
-      // 库存不足的药品 并且是同一个药房的过滤调
+      // 库存不足的药品 并且是同一个药房的过滤掉
       if(stockMap.containsKey(dto.getItemId()) && stockMap.get(dto.getItemId()).equals(dto.getPharId())) {
         noInventoryList.add(dto);
         continue;

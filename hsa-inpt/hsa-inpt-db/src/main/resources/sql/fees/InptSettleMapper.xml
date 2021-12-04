@@ -151,7 +151,8 @@
         crte_id,
         crte_name,
         crte_time,
-        acct_pay
+        acct_pay,
+        credit_price
     </sql>
 
     <!-- 表所有字段（别名） -->

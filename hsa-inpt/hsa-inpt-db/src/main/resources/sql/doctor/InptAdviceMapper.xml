@@ -2095,4 +2095,13 @@
         ORDER BY a.long_start_time asc, a.group_no asc, a.group_seq_no asc
     </select>
 
+    <update id="newUpdateLastExeTime">
+        <foreach item="value" index="key" collection="adviceMap.entrySet()" separator=";" >
+            update inpt_advice set
+            last_exec_time=#{value}
+            where hosp_code=#{medicalAdviceDTO.hospCode}
+            and id = #{key}
+        </foreach>
+    </update>
+
 </mapper>

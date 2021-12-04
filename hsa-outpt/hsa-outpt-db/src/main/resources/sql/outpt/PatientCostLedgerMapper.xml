@@ -905,6 +905,7 @@
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
+        left join outpt_prescribe op on op.id = a.op_id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where ifnull(a.num,0) &lt; 0 and a.hosp_code = #{hospCode}
@@ -917,8 +918,11 @@
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
         </if>
+        <if test="statusCode != null and statusCode != ''">
+            and 1=-1
+        </if>
         <if test="deptToldId != null and deptToldId != ''">
-            and ia.dept_id = #{deptToldId}
+            and op.dept_id = #{deptToldId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -1640,7 +1644,7 @@
             b.dept_id,
             d.name as dept_name,
             b.reality_price ,
-            if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
+            b.total_num AS num
             FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
@@ -1696,10 +1700,10 @@
             a.dept_id,
             d.name as dept_name,
             b.reality_price,
-            if (b.reality_price &lt; 0,-b.num,b.num) AS num
+            b.num AS num
             FROM
             outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
-            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code and b.status_code = c.status_code
             join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
             where 1=1
@@ -3774,7 +3778,7 @@
         a.spec,
         a.num_unit_code AS unit_name,
         a.price,
-        if(a.reality_price &lt; 0, -1*a.total_num, a.total_num) as total_num,
+        a.total_num as total_num,
         a.total_price,
         a.preferential_price,
         a.reality_price,
@@ -5474,7 +5478,9 @@
         from(
         <include refid="getOutRegisterCostBig"></include>
         where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
-        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s'))
+        or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+         or
         (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
         and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by b.up_code

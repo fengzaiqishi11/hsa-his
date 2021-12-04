@@ -834,7 +834,7 @@
       case when #{operType} = '1' and a.out_unit_code = a.unit_code then a.price when #{operType} = '1' and a.out_unit_code = a.split_unit_code then a.split_price
       when #{operType} = '2' and a.in_unit_code = a.unit_code then a.price when #{operType} = '2' and a.in_unit_code = a.split_unit_code then a.split_price end price,
       a.split_ratio, a.split_unit_code,
-      a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code,
+      a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code, a.nation_code,
       <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
       case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
       a.antibacterial_code, a.is_skin,
@@ -896,7 +896,7 @@
       antibacterial_code, null is_skin,
       null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code, '2' type, '2' itemCode,
       b.clf pharId, null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
-      a.split_unit_code ouUtnitCode,
+      a.split_unit_code ouUtnitCode, a.nation_code,
       a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
       drugRemark, '' drugImgPath,
       f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
@@ -942,7 +942,7 @@
       a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
       a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
       '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-      usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code
+      usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code
       from base_advice a
       left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
       left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code

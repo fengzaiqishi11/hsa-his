@@ -3224,6 +3224,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 返回值定义
         Map<String, Object> retMap = new HashMap<>();
 
+        //pengbo   20211203 结算更新费用结算发票ID
+        outptCostDAO.batchUpdateSettleInvoiceId(outotCost);
+
         if (!UtilFunc.isEmpty(pjList)) {
             retMap.put("jspjJsonList", pjList);
         }
@@ -3503,7 +3506,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             pjList.add(outptSettleInvoiceDO);
         }
-
+        /**
+         * 设置发票结算ID到费用表
+         */
+        outptCostDTO.setSettleInvoiceId(outptSettleInvoiceDO.getId());
         return outptSettleInvoiceDO;
     }
 

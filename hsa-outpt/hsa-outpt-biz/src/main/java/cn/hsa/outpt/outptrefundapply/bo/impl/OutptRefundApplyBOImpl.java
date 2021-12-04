@@ -118,4 +118,74 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 		}
 		return outptRefundApplyDAO.updateOutptRefundAppyStatus(outptSettleDTO) > 0;
 	}
+
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:52
+	 * @Return
+	 */
+	@Override
+	public Boolean updateUnconfirmedOutptRefundAppy(Map<String, Object> param) {
+		OutptSettleDTO outptSettleDTO = JSON.parseObject(JSON.toJSONString(param.get("outptSettleDTO")),OutptSettleDTO.class);
+		List<OutptCostDTO> outptCostDTOList = JSON.parseArray(JSON.toJSONString(param.get("outptCostDTOList")),OutptCostDTO.class);
+		outptSettleDTO.setHospCode(MapUtils.get(param, "hospCode"));
+		if (outptSettleDTO == null) {
+			throw new AppException("门诊医生取消退费确认失败");
+		}
+		List<String> costIdList = new ArrayList();
+		if (outptCostDTOList != null && outptCostDTOList.size() > 0) {
+			for (OutptCostDTO dto : outptCostDTOList) {
+				if (!BigDecimalUtils.isZero(dto.getBackNum())) {
+					costIdList.add(dto.getId());
+				}
+			}
+		}
+		if (costIdList==null || costIdList.size() ==0){
+			throw new AppException("该申请已进行退费，不能取消申请");
+		}
+		outptSettleDTO.setCostIdList(costIdList);
+		List<OutptCostDTO> outptCostDTOS =outptRefundApplyDAO.queryUncostList(outptSettleDTO);
+		if (outptCostDTOS==null || outptCostDTOS.size() ==0){
+			throw new AppException("该申请已进行退费，不能取消确认");
+		}
+		return outptRefundApplyDAO.updateUnconfirmedOutptRefundAppy(outptSettleDTO) > 0;
+	}
+
+	/**
+	 * @Description: 门诊医生取消退费申请
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 15:47
+	 * @Return
+	 */
+	@Override
+	public Boolean deleteOutptRefundAppy(Map<String, Object> param) {
+		OutptSettleDTO outptSettleDTO = JSON.parseObject(JSON.toJSONString(param.get("outptSettleDTO")),OutptSettleDTO.class);
+		List<OutptCostDTO> outptCostDTOList = JSON.parseArray(JSON.toJSONString(param.get("outptCostDTOList")),OutptCostDTO.class);
+		outptSettleDTO.setHospCode(MapUtils.get(param, "hospCode"));
+		if (outptSettleDTO == null) {
+			throw new AppException("门诊医生取消退费申请失败");
+		}
+		List<String> costIdList = new ArrayList();
+		if (outptCostDTOList != null && outptCostDTOList.size() > 0) {
+			for (OutptCostDTO dto : outptCostDTOList) {
+				if (!BigDecimalUtils.isZero(dto.getBackNum())) {
+					costIdList.add(dto.getId());
+				}
+			}
+		}
+		if (costIdList==null || costIdList.size() ==0){
+			throw new AppException("该申请已进行退费，不能取消申请");
+		}
+		outptSettleDTO.setCostIdList(costIdList);
+		List<OutptCostDTO> outptCostDTOS =outptRefundApplyDAO.queryUncostList(outptSettleDTO);
+		if (outptCostDTOS==null || outptCostDTOS.size() ==0){
+			throw new AppException("该申请已进行退费，不能取消申请");
+		}
+		return outptRefundApplyDAO.deleteOutptRefundAppy(outptSettleDTO) > 0;
+	}
 }

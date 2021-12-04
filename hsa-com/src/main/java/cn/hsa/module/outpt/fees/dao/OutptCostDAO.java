@@ -651,4 +651,10 @@ public interface OutptCostDAO {
 	 * @Return
 	 */
 	List<OutptCostDTO> queryCostVisitIdTJ(Map param);
+
+    /**
+     * 修改费用发票ID
+     * @param outotCost
+     */
+    void batchUpdateSettleInvoiceId(List<OutptCostDTO> outotCost);
 }

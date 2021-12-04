@@ -1344,7 +1344,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         inptVisitDTO.setInNo(orderNo);
 
         // 档案表操作
-        OutptProfileFileExtendDTO extend = getProfileFileDTO(inptVisitDTO);
+        OutptProfileFileDTO extend = getProfileFileDTO(inptVisitDTO);
         // 20210805 liuliyun 珠海住院号生成 start
         Map sysParam=new HashMap();
         sysParam.put("hospCode",inptVisitDTO.getHospCode());
@@ -1385,7 +1385,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         inptVisitDTO.setInProfile(extend.getInProfile());
 
         //设置个人档案ID
-        inptVisitDTO.setProfileId(extend.getProfileId());
+        inptVisitDTO.setProfileId(extend.getId());
 
         //设置 '累计费用'
         inptVisitDTO.setTotalCost(BigDecimalUtils.convert("0"));
@@ -1498,7 +1498,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         return wr.getData();
     }
     // 新增档案
-    private OutptProfileFileExtendDTO getProfileFileDTO(InptVisitDTO inptVisitDTO) {
+    private OutptProfileFileDTO getProfileFileDTO(InptVisitDTO inptVisitDTO) {
         // 档案表
         OutptProfileFileDTO pf = new OutptProfileFileDTO();
         pf.setType("1");
@@ -1525,38 +1525,29 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         pf.setCrteId(inptVisitDTO.getCrteId());
         pf.setCrteName(inptVisitDTO.getCrteName());
         pf.setCrteTime(DateUtils.getNow());
-        WrapperResponse<OutptProfileFileExtendDTO> wr = outptProfileFileService_consumer.save(pf);
-
-        //调用本地建档服务
-        log.debug("入出院登记调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
-        //本地档案表id保持与中心端的一致
-        if(StringUtils.isEmpty(pf.getId())){
-            pf.setId(wr.getData().getProfileId());
-        }
-//        pf.setInProfile(inptVisitDTO.getInNo());
-        pf.setOutProfile(wr.getData().getOutProfile()); //门诊档案号
-        pf.setTotalOut(wr.getData().getTotalOut() == null ? 0 : wr.getData().getTotalOut()); //门诊次数
-        pf.setOutptLastVisitTime(wr.getData().getOutptLastVisitTime()); // 最后门诊就诊时间
-        pf.setInProfile(wr.getData().getInProfile()); //住院病案号
-        pf.setTotalIn(wr.getData().getTotalIn() == null ? 1 : wr.getData().getTotalIn()); // 住院次数
-        pf.setInptLastVisitTime(wr.getData().getInptLastVisitTime() == null ? DateUtils.getNow() : wr.getData().getInptLastVisitTime()); // 最后住院就诊时间
         pf.setContactAddress(inptVisitDTO.getAddress());
         pf.setPatientCode(inptVisitDTO.getPatientCode());
         pf.setPreferentialTypeId(inptVisitDTO.getPreferentialTypeId());
+//        WrapperResponse<OutptProfileFileExtendDTO> wr = outptProfileFileService_consumer.save(pf);
+
+        //调用本地建档服务
+        log.debug("入出院登记调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         Map localMap = new HashMap();
         localMap.put("hospCode", inptVisitDTO.getHospCode());
         localMap.put("outptProfileFileDTO", pf);
-        baseProfileFileService_consumer.save(localMap);
+        WrapperResponse<OutptProfileFileDTO> wr = baseProfileFileService_consumer.save(localMap);
+
+
         log.debug("入出院登记调用本地建档服务结束：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
 
         if (wr.getCode() != 0) {
             throw new AppException(wr.getMessage());
         }
-        OutptProfileFileExtendDTO outptProfileFileExtendDTO = wr.getData();
-        if (outptProfileFileExtendDTO == null) {
+        OutptProfileFileDTO outptProfileFileDTO = wr.getData();
+        if (outptProfileFileDTO == null) {
             throw new AppException("获取档案返回信息失败，请联系管理员");
         }
-        return outptProfileFileExtendDTO;
+        return outptProfileFileDTO;
     }
 
     /**

@@ -486,12 +486,13 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     append("2305").append("^").toString();
             if(ListUtils.isEmpty(settleDTOList)){
                 String redisValue = redisUtils.get(redisKey);
-                if(StringUtils.isNotEmpty(redisValue)){
+                if(redisUtils.hasKey(redisKey) && StringUtils.isNotEmpty(redisValue)){
                     InptVisitDTO visitDTO = new InptVisitDTO();
                     visitDTO.setHospCode(hospCode);//医院编码
                     visitDTO.setId(visitId);//就诊id
                     visitDTO.setPatientCode(redisValue);
                     inptVisitDAO.updateInptVisit(visitDTO);
+                    redisUtils.del(redisKey);
                 }
             }
             return WrapperResponse.success("取消结算成功。",null);

@@ -607,13 +607,48 @@ public interface InsureGetInfoDAO {
     **/
     List<Map<String, Object>> selectIcuInfoForMap(Map<String, Object> map);
 
+    /**
+     * @Method selectOprninfoForMap
+     * @Desrciption  查询手术节点信息  转实体驼峰
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:21
+     * @Return
+    **/
     List<Map<String, Object>> selectOprninfoForMap(Map<String, Object> map);
 
+    /**
+     * @Method selectDiseinfoForMap
+     * @Desrciption  查询住院诊断信息 转实体驼峰
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:20
+     * @Return
+    **/
     List<InptDiagnoseDTO>  selectDiseinfoForMap(Map<String, Object> map);
 
+    /**
+     * @Method selectOpspdiseinfoForMap
+     * @Desrciption  查询门诊慢特病诊断信息  转实体驼峰
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:16
+     * @Return
+    **/
     List<Map<String, Object>> selectOpspdiseinfoForMap(Map<String, Object> map);
 
-
+    /**
+     * @Method selectPayinfoForMap
+     * @Desrciption  查询基金支付信息  转实体驼峰
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:17
+     * @Return
+    **/
     List<Map<String, Object>> selectPayinfoForMap(Map<String, Object> map);
 
     /**
@@ -670,4 +705,70 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     InsureIndividualVisitDTO selectInsureIndividual(Map<String, Object> map);
+
+    /**
+     * @Method deleteBldInfo
+     * @Desrciption  删除输血信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/3 17:18
+     * @Return
+    **/
+    void deleteBldInfo(Map<String, Object> map);
+
+    /**
+     * @Method insertBldInfo
+     * @Desrciption  新增输血信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/3 17:19
+     * @Return
+    **/
+    void insertBldInfo(@Param("bldInfoMapList") List<Map<String, Object>> bldInfoMapList);
+
+    /**
+     * @Method selectBldInfo
+     * @Desrciption  查询输血信息节点信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:05
+     * @Return
+     **/
+    List<Map<String, Object>> selectBldInfo(Map<String, Object> map);
+
+    /**
+     * @Method selectBldInfoForMap
+     * @Desrciption   查询输血信息节点信息  转实体驼峰
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 9:23
+     * @Return
+    **/
+    List<Map<String, Object>> selectBldInfoForMap(Map<String, Object> map);
+
+    /**
+     * @Method selectInsuplcAdmdvs
+     * @Desrciption  查询参保地信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 13:47
+     * @Return
+    **/
+    Map<String, Object> selectInsuplcAdmdvs(Map<String, Object> map);
+
+    /**
+     * @Method selectMriInptDiagNose
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 14:35
+     * @Return
+    **/
+    List<InptDiagnoseDTO> selectMriInptDiagNose(Map<String, Object> map);
 }

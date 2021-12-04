@@ -664,12 +664,13 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     append("2208").append("^").toString();
             if(ListUtils.isEmpty(settleDTOList)){
                 String redisValue = redisUtils.get(redisKey);
-                if(StringUtils.isNotEmpty(redisValue)){
+                if(redisUtils.hasKey(redisKey) && StringUtils.isNotEmpty(redisValue)){
                     OutptVisitDTO dto = new OutptVisitDTO();
                     dto.setHospCode(hospCode);//医院编码
                     dto.setId(visitId);//就诊id
                     dto.setPatientCode(redisValue);
                     outptVisitDAO.updateOutptVisit(dto);
+                    redisUtils.del(redisKey);
                 }
             }
 

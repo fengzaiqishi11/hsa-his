@@ -1644,7 +1644,7 @@
             b.dept_id,
             d.name as dept_name,
             b.reality_price ,
-            if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
+            b.total_num AS num
             FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
@@ -1700,10 +1700,10 @@
             a.dept_id,
             d.name as dept_name,
             b.reality_price,
-            if (b.reality_price &lt; 0,-b.num,b.num) AS num
+            b.num AS num
             FROM
             outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
-            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code and b.status_code = c.status_code
             join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
             where 1=1
@@ -3778,7 +3778,7 @@
         a.spec,
         a.num_unit_code AS unit_name,
         a.price,
-        if(a.reality_price &lt; 0, -1*a.total_num, a.total_num) as total_num,
+        a.total_num as total_num,
         a.total_price,
         a.preferential_price,
         a.reality_price,

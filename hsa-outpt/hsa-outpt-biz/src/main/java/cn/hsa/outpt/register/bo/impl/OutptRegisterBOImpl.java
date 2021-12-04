@@ -14,7 +14,6 @@ import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
 import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
@@ -38,7 +37,6 @@ import cn.hsa.module.outpt.register.bo.OutptRegisterBO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.*;
 import cn.hsa.module.outpt.register.entity.*;
-
 import cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO;
 import cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
@@ -1303,6 +1301,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 outptRegisterDetailDO.setTotalPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getTotalPrice()));
                 outptRegisterDetailDO.setPreferentialPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getPreferentialPrice()));
                 outptRegisterDetailDO.setRealityPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getRealityPrice()));
+                outptRegisterDetailDO.setNum(BigDecimalUtils.negate(outptRegisterDetailDO.getNum()));
+                outptRegisterDetailDO.setCardPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getCardPrice()));
+                outptRegisterDetailDO.setCreditPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getCreditPrice()));
 
                 // 创建信息
                 outptRegisterDetailDO.setCrteId(outptRegisterDO.getCrteId());

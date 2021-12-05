@@ -499,6 +499,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             if (!ListUtils.isEmpty(setldetailList)) {
                 for (Map<String, Object> detailMap : setldetailList) {
                     String fundPayType = MapUtils.get(detailMap, "fund_pay_type");
+                    String setlProcInfo = MapUtils.get(detailMap, "setl_proc_info");
                     String fundPayamt = MapUtils.get(detailMap, "fund_payamt").toString();
                     switch (fundPayType) {
                         case "630100": // 医院减免金额
@@ -530,6 +531,18 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                             break;
                         case "999997": // 其他基金
                             insureIndividualSettleDTO.setOthPay(BigDecimalUtils.convert(fundPayamt));
+                            if ("640101".equals(setlProcInfo)) {
+                                insureIndividualSettleDTO.setGovernmentPay(BigDecimalUtils.convert(fundPayamt));
+                            }
+                            if ("630101".equals(setlProcInfo)) {
+                                insureIndividualSettleDTO.setHospExemAmount(BigDecimalUtils.convert(fundPayamt));
+                            }
+                            if ("620101".equals(setlProcInfo)) {
+                                insureIndividualSettleDTO.setThbPay(BigDecimalUtils.convert(fundPayamt));
+                            }
+                            if ("610101".equals(setlProcInfo)) {
+                                insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(fundPayamt));
+                            }
                             break;
                         case "510100": // 生育基金
                             insureIndividualSettleDTO.setFertilityPay(BigDecimalUtils.convert(fundPayamt));

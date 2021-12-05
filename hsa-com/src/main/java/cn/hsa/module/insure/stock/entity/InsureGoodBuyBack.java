@@ -35,4 +35,7 @@ public class InsureGoodBuyBack  extends PageDO implements Serializable {
     private String hospCode;
     private String keyword;
     private String unitCode; // 单位编码
+    private String insureItemCode;// 医保中心编码
+    private String insureItemName;// 医保中心项目名称
+    private String insureRegCode;// 医保机构编码
 }

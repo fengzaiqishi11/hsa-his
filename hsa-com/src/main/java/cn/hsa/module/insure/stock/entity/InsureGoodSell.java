@@ -16,7 +16,7 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureGoodSell   extends PageDO implements Serializable {
     private String medListCodg	;//医疗目录编码	字符型	50	　	Y　	新医保
-    private String fixmedinsHilistId	;//定点医药机构目录编号	字符型	30	　	Y　	新医保/核3	核3：drugCode
+    private String fixmedinsHilistId	;//定点医药机构目insureRegCode录编号	字符型	30	　	Y　	新医保/核3	核3：drugCode
     private String fixmedinsHilistName	;//定点医药机构目录名称	字符型	200	　	Y　	新医保/核3	核3：drugName
     private String fixmedinsBchno	;//定点医药机构批次流水号	字符型	30	　	Y　	新医保
     private String prscDrCertType	;//开方医师证件类型	字符型	6	Y　	　	新医保
@@ -56,4 +56,8 @@ public class InsureGoodSell   extends PageDO implements Serializable {
     private String sellType;// 销售类型
     private String visitId;// 就诊id
     private String keyword;
+    private String insureItemCode;// 医保中心编码
+    private String insureItemName;// 医保中心项目名称
+    private String insureRegCode;// 医保机构编码
+
 }

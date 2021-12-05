@@ -23,6 +23,7 @@ import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -904,7 +905,12 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     if (!ListUtils.isEmpty(windosList) && windosList.get(0)!=null && windosList.get(0).get("id")!=null) {
       inReceiveDTO.setWindowId((String) windosList.get(0).get("id"));
     }
-    List<PharInWaitReceiveDTO> summaryStock = getSummaryStock(inReceiveList);
+    List<PharInWaitReceiveDTO> newInReceiveList = new ArrayList<>();
+    for(PharInWaitReceiveDTO pharInWaitReceiveDTO:inReceiveList) {
+      PharInWaitReceiveDTO newItem = DeepCopy.deepCopy(pharInWaitReceiveDTO);
+      newInReceiveList.add(newItem);
+    }
+    List<PharInWaitReceiveDTO> summaryStock = getSummaryStock(newInReceiveList);
     Map<String, String> stockMap = new HashMap<>();
     // 检验哪些药品 药房的库存不足
     for(PharInWaitReceiveDTO dto:summaryStock) {

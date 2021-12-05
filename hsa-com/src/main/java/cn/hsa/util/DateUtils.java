@@ -630,4 +630,24 @@ public class DateUtils {
         return getEndOfADayWithDateTimeFormatted(format(endDate, Y_M_D));
     }
 
+    /**
+     * @Method getNumerToStringDate
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/4 17:11
+     * @Return
+    **/
+    public static String getNumerToStringDate(Object object){
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.Y_M_DH_M_S);
+        if(object instanceof Long){
+            date.setTime((Long) object);
+        }
+        if(object instanceof Integer){
+            date.setTime( ((Integer) object).longValue());
+        }
+        return simpleDateFormat.format(date);
+    }
 }

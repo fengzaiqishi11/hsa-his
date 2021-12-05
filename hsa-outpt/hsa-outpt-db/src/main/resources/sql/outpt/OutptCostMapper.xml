@@ -3528,4 +3528,16 @@
         and a.visit_id = #{visitId} and a.settle_code &lt;&gt; '2' group by a.item_id
     </select>
 
+    <!-- 批量修改发票信息ID到费用表 -->
+    <update id="batchUpdateSettleInvoiceId" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update
+            outpt_cost
+            set
+            settle_invoice_id = #{item.settleInvoiceId}
+            where
+            id = #{item.id} and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
 </mapper>

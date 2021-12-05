@@ -1,6 +1,5 @@
 package cn.hsa.interf.nation.drug.controller;
 
-import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;

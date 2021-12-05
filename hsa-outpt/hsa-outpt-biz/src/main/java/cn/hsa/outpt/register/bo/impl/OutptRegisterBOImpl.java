@@ -14,7 +14,6 @@ import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
 import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
@@ -38,7 +37,6 @@ import cn.hsa.module.outpt.register.bo.OutptRegisterBO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.*;
 import cn.hsa.module.outpt.register.entity.*;
-
 import cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO;
 import cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
@@ -336,34 +334,34 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setCrteId(docId);
             outptProfileFileDTO.setCrteName(docName);
             outptProfileFileDTO.setCrteTime(new Date());
-            //调用中心端建档服务
-            WrapperResponse<OutptProfileFileExtendDTO> response = outptProfileFileService.save(outptProfileFileDTO);
-            OutptProfileFileExtendDTO outptProfileFileExtendDTO = response.getData();
-            OutptVisitDTO outptVisitDTOUpdate = new OutptVisitDTO();
-            outptVisitDTOUpdate.setId(jzid);
-            outptVisitDTOUpdate.setHospCode(hospCode);
-            outptVisitDTOUpdate.setProfileId(outptProfileFileExtendDTO.getProfileId());
-            outptVisitDTOUpdate.setOutProfile(outptProfileFileExtendDTO.getOutProfile());
-            outptVisitDAO.updateProfile(outptVisitDTOUpdate);
-
-            //调用本地建档服务
-            log.debug("门诊挂号调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
-            //本地档案表id保持与中心端的一致
-            outptProfileFileDTO.setId(outptProfileFileExtendDTO.getProfileId());
-            outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getOutProfile()); //门诊档案号
-            outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getInProfile()); //住院病案号
-            outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getOutptLastVisitTime()); // 门诊最后就诊时间
-            outptProfileFileDTO.setTotalOut(outptProfileFileExtendDTO.getTotalOut() == null ? 1 : outptProfileFileExtendDTO.getTotalOut()); // 累计门诊次数
-            outptProfileFileDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getInptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getInptLastVisitTime()); // 住院最后就诊时间
-            outptProfileFileDTO.setTotalIn(outptProfileFileExtendDTO.getTotalIn() == null ? 0 : outptProfileFileExtendDTO.getTotalIn()); // 累计住院次数
             outptProfileFileDTO.setPatientCode(outptVisitDTO.getPatientCode());
             outptProfileFileDTO.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
             outptProfileFileDTO.setContactAddress(outptVisitDTO.getContactAddress());
+
+            /**
+             * 档案不走中心端
+             * @Date: 2021.12.02
+             * @Author: luoyong
+             */
+            /*//调用中心端建档服务
+            WrapperResponse<OutptProfileFileExtendDTO> response = outptProfileFileService.save(outptProfileFileDTO);
+            OutptProfileFileExtendDTO outptProfileFileExtendDTO = response.getData();*/
+
+            //调用本地建档服务
+            log.debug("门诊挂号调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
             Map localMap = new HashMap();
             localMap.put("hospCode", hospCode);
             localMap.put("outptProfileFileDTO", outptProfileFileDTO);
-            baseProfileFileService_consumer.save(localMap);
+            outptProfileFileDTO = baseProfileFileService_consumer.save(localMap).getData();
             log.debug("门诊挂号调用本地建档服务结束：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+
+            // 更新就诊表中档案信息
+            OutptVisitDTO outptVisitDTOUpdate = new OutptVisitDTO();
+            outptVisitDTOUpdate.setId(jzid);
+            outptVisitDTOUpdate.setHospCode(hospCode);
+            outptVisitDTOUpdate.setProfileId(outptProfileFileDTO.getId());
+            outptVisitDTOUpdate.setOutProfile(outptProfileFileDTO.getOutProfile());
+            outptVisitDAO.updateProfile(outptVisitDTOUpdate);
         }
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("settleId", settleId);
@@ -1303,6 +1301,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                 outptRegisterDetailDO.setTotalPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getTotalPrice()));
                 outptRegisterDetailDO.setPreferentialPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getPreferentialPrice()));
                 outptRegisterDetailDO.setRealityPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getRealityPrice()));
+                outptRegisterDetailDO.setNum(BigDecimalUtils.negate(outptRegisterDetailDO.getNum()));
+                outptRegisterDetailDO.setCardPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getCardPrice()));
+                outptRegisterDetailDO.setCreditPrice(BigDecimalUtils.negate(outptRegisterDetailDO.getCreditPrice()));
 
                 // 创建信息
                 outptRegisterDetailDO.setCrteId(outptRegisterDO.getCrteId());

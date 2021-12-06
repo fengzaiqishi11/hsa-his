@@ -194,6 +194,9 @@ public class InsureDictController extends BaseController {
         insureDictDTO.setCrteName(sysUserDTO.getName());
         insureDictDTO.setCrteId(sysUserDTO.getId());
         Map map = new HashMap();
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("insureDictDTO",insureDictDTO);
         return insureDictService_consumer.updateDictValue(map);
@@ -218,6 +221,9 @@ public class InsureDictController extends BaseController {
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("insureDictDTO",insureDictDTO);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         return insureDictService_consumer.updateDictCode(map);
     }
     /**

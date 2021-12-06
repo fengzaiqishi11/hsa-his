@@ -3,8 +3,10 @@ package cn.hsa.module.insure.module.dao;
 import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
+import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.insure.module.dao
@@ -186,4 +188,37 @@ public interface InsureDiseaseRecordDAO {
      * @Date: 2021-04-30
      */
     InsureDiseaseRecordDTO getByIdTwoDise(InsureDiseaseRecordDTO insureDiseaseRecordDTO);
+
+    /**
+     * @Method insertSpecialOutptRecord
+     * @Desrciption  保留门诊单病种备案新
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 11:19
+     * @Return
+    **/
+    void insertSpecialOutptRecord(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method insertSpecialOutptRecord
+     * @Desrciption 江西省：门诊单病种备案撤销
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/25 10:33
+     * @Return
+     */
+    void deleteSpecialOutptRecord(Map<String, Object> map);
+
+    /**
+     * @param insureSpecialRecordDTO
+     * @Method queryPage
+     * @Desrciption 江西省：门诊单病种备案分页查询（his）
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/29 10:24
+     * @Return
+     */
+    List<InsureSpecialRecordDTO> queryPageSpecialRecord(InsureSpecialRecordDTO insureSpecialRecordDTO);
 }

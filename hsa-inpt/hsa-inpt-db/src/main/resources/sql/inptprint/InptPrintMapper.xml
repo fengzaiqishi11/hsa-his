@@ -169,6 +169,8 @@
         (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
         (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
         (select c.name from base_finance_classify c where c.id = ic.bfc_id and c.hosp_code = #{hospCode}) as bfcName,
+        ifnull(iic.item_code, ifnull(ic.nation_code, '')) as nationCode,
+        ifnull(iic.item_name, ifnull(ic.nation_name, '')) as nationName,
         iic.guest_ratio as guestRatio
         from inpt_cost ic left join insure_individual_cost iic on ic.id = iic.cost_id
         where ic.hosp_code = #{hospCode} and ic.cost_time is not null
@@ -179,17 +181,13 @@
                 AND ic.status_code = #{statusCode}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-                and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &lt;= #{costStopTime}
+                and ic.cost_time &gt;= #{costStartTime} and ic.cost_time &lt;= #{costStopTime}
             </if>
             <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
-                <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
-                ]]>
+                and ic.cost_time &lt;= #{costStopTime}
             </if>
             <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
-                <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
-                ]]>
+                and ic.cost_time &gt;= #{costStartTime}
             </if>
         <if test='queryBaby =="N"'>
             and (ic.baby_id is null or ic.baby_id = '')
@@ -248,6 +246,8 @@
     (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
     (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
     (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode,
+     ifnull(iic.item_code, ifnull(bd.nation_code, ifnull(bi.nation_code, ifnull(bm.nation_code, ifnull(ic.nation_code, ''))))) as nationCode,
+     ifnull(iic.item_name, ifnull(bd.nation_name, ifnull(bi.nation_name, ifnull(bm.nation_name, ifnull(ic.nation_name, ''))))) as nationName,
     ifnull(max(iic.guest_ratio), '') as guestRatio
       from
      inpt_cost ic
@@ -275,17 +275,13 @@
         AND ic.baby_id = #{babyId}
     </if>
       <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
-          and DATE_FORMAT(ic.cost_time,'%Y-%m-%d %H:%i:%s') &gt;= #{costStartTime} and DATE_FORMAT(ic.cost_time,'%Y-%m-%d') &lt;= #{costStopTime}
+          and ic.cost_time &gt;= #{costStartTime} and ic.cost_time &lt;= #{costStopTime}
       </if>
       <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
-          <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') <= #{costStopTime}
-                ]]>
+         and ic.cost_time &lt;= #{costStopTime}
       </if>
       <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
-          <![CDATA[
-                    and DATE_FORMAT(ic.cost_time, '%Y-%m-%d %H:%i:%s') >= #{costStartTime}
-                ]]>
+         and ic.cost_time >= #{costStartTime}
       </if>
     group by ic.item_id,ic.price
     order by max(ic.crte_time),max(ic.bfc_id)

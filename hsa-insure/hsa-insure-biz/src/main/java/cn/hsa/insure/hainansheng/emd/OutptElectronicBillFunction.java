@@ -9,6 +9,7 @@ import cn.hsa.module.insure.module.dao.InsureItemMatchDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONArray;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -388,10 +390,10 @@ public class OutptElectronicBillFunction {
 
         JSONArray condList = new JSONArray();
         JSONObject condItem = new JSONObject();
-        condItem.put("condCodg","-");//病情编码
-        condItem.put("condName","-");//病情名称
+        condItem.put("condCodg", insureIndividualVisitDTO.getBka006());//病情编码
+        condItem.put("condName", insureIndividualVisitDTO.getBka006Name());//病情名称
 
-        condItem.put("mainCondDscr","-");//主要病情描 todo,CondList中无此属性值
+        condItem.put("mainCondDscr", insureIndividualVisitDTO.getBka006Name());//主要病情描 todo,CondList中无此属性值
 
         condList.add(condItem);
         data.put("condList",condList);//病情编码列表
@@ -466,24 +468,37 @@ public class OutptElectronicBillFunction {
     public Map deletePatientCostPremium(HashMap<String, Object> param) {
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
+        OutptVisitDTO outptVisitDTO = (OutptVisitDTO) param.get("outptVisitDTO");//个人基本信息
+        OutptSettleDTO outptSettleDTO = (OutptSettleDTO) param.get("outptSettleDTO");
+
+        //查询医保就诊信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+        insureIndividualVisitDTO.setHospCode(hospCode);
+        insureIndividualVisitDTO.setVisitId(outptVisitDTO.getId());
+        List<InsureIndividualVisitDTO> insureIndividualVisitDTOList = insureIndividualVisitDAO.findByCondition(insureIndividualVisitDTO);
+        if (insureIndividualVisitDTOList == null || insureIndividualVisitDTOList.isEmpty()){ throw new AppException("未找到医保就诊信息。"); }
+        insureIndividualVisitDTO = insureIndividualVisitDTOList.get(0);
+
         Map<String,Object> httpParam = new HashMap<String,Object>();
         JSONObject data = new JSONObject();
         data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//null);//应用渠道编号
-        data.put("payOrdId",null);//支付订单号
-        data.put("appRefdSn",null);//应用退款流水号
-        data.put("appRefdTime",null);//应用退费时间
-        data.put("totlRefdAmt",null);//总退费金额
-        data.put("psnAcctRefdAmt",null);//医保个人账户支付
-        data.put("fundRefdAmt",null);//基金支付
-        data.put("cashRefdAmt",null);//现金退费金额
-        data.put("ecToken",null);//电子凭证授权 Token
-        data.put("refdType",null);//退费类型
+        data.put("payOrdId", insureIndividualVisitDTO.getPayOrdId());//支付订单号
+        data.put("appRefdSn", "11");//应用退款流水号
+        data.put("appRefdTime", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));//应用退费时间
+        data.put("totlRefdAmt", String.valueOf(outptSettleDTO.getTotalPrice()));//总退费金额
+        data.put("psnAcctRefdAmt", String.valueOf(outptSettleDTO.getAcctPay() != null ? outptSettleDTO.getAcctPay() : "0.00"));//医保个人账户支付
+        data.put("fundRefdAmt", String.valueOf(outptSettleDTO.getMiPrice()));//基金支付
+        data.put("cashRefdAmt", String.valueOf(outptSettleDTO.getSelfPrice()));//现金退费金额
+        data.put("ecToken", insureIndividualVisitDTO.getPayToken());//电子凭证授权 Token
+        data.put("refdType", "ALL");//退费类型
 
         JSONObject extData = new JSONObject();
         extData.put("opter",null);//经办人
         extData.put("systemNo",null);//所属系统标识
         data.put("extData",extData);//医保扩展数据
+
         httpParam.put("data",data);//
+        httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRefundSetl);//操作类型
 
         // 查询电子凭证地址
@@ -496,7 +511,7 @@ public class OutptElectronicBillFunction {
         }
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
 
-        return null;
+        return httpResult;
     }
 
     /**

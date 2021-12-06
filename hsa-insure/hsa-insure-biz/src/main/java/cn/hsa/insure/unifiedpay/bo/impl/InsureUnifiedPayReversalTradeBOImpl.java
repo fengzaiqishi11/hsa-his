@@ -582,7 +582,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }else{
             actPayDedc = MapUtils.get(setlInfoMap,"act_pay_dedc");
         }
-        if(Constants.SF.S.equals(isHospital)){
+        if(!mdtrtareaAdmvs.substring(0,2).equals(insuplcAdmdvs.substring(0,2)) && Constants.SF.S.equals(isHospital)){
+
+            isRemote = true;
+        }
+        if(Constants.SF.S.equals(isHospital) && !isRemote){
             oneSettleMap = checkOneSettle(map, insureIndividualVisitDTO);
             if(!MapUtils.isEmpty(oneSettleMap)){
                 oneSettle = MapUtils.get(oneSettleMap,"flag");
@@ -595,7 +599,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
          * 如果参保地和就医地前四位不相等 且是住院则需要打印异地结算单
          * 1.当是异地结算单是需要获取对应的参保地和区划地名称
          */
-        if(!mdtrtareaAdmvs.substring(0,2).equals(insuplcAdmdvs.substring(0,2)) && Constants.SF.S.equals(isHospital)){
+        if(isRemote){
             List<Map<String,Object>> mapList =  insureReversalTradeDAO.selectMdOrIns(hospCode);
             if(!ListUtils.isEmpty(mapList)){
                 String insuplcAdmdvsName =""; // 对应参保地区划名称
@@ -617,8 +621,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                     }
                 }
             }
-
-            isRemote = true;
         }
         if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
             snRemote = true;
@@ -796,11 +798,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 continue;
             }
             if("部分政策自付费用".equals(polItemName.trim())  || "乙类先自付".equals(polItemName.trim())){
-                s2 = BigDecimalUtils.add(s4,polItemPaySum);
+                s2 = BigDecimalUtils.add(s2,polItemPaySum);
                 continue;
             }
             if("县外就医转外自付费用".equals(polItemName.trim())){
-                s3 =BigDecimalUtils.add(s4,polItemPaySum);
+                s3 =BigDecimalUtils.add(s3,polItemPaySum);
                 continue;
             }
             if("大病起付线".equals(polItemName.trim())){

@@ -9,8 +9,12 @@
     <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
     <!--中心平台 >> 档案管理 -->
     <dubbo:reference id="outptProfileFileService_consumer" interface="cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService" check="false"/>
+    <!--中心平台 >> 国家编码药品信息 -->
+    <dubbo:reference id="nationStandardDrugService_consumer" interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService" check="false"/>
     <!--中心平台 >> 医院信息 -->
     <dubbo:reference id="centerHospitalService_consumer" interface="cn.hsa.module.center.hospital.service.CenterHospitalService" check="false"/>
+    <!--中心平台 >> 国家标准药品 -->
+    <dubbo:reference id="nationDrugService_provider" interface="cn.hsa.module.interf.nation.service.NationDrugService" check="false"/>
     <!-- 基础信息子系统 -> 本地档案服务 -->
     <dubbo:reference id="baseProfileFileService_consumer" interface="cn.hsa.module.base.profileFile.service.BaseProfileFileService" check="false"/>
     <!-- 单据生成规则业务服务层接口 -->

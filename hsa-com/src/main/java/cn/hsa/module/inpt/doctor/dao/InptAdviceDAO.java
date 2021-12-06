@@ -759,7 +759,7 @@ public interface InptAdviceDAO {
      */
     Map<String, Object> getMedicineAdvance(Map<String, Object> map);
 
-    List<BaseAdviceDTO> getIllnessAdviceByVisitId(Map<String, Object> map);
+    List<BaseAdviceDTO> getIllnessAdviceByVisitId(@Param("list") List<InptVisitDTO> inptVisitDTOList);
     /**
      * @Desrciption 取消提前领药记录
      * @param map
@@ -835,4 +835,26 @@ public interface InptAdviceDAO {
      * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptAdviceDTO>
      **/
     List<InptAdviceDTO> queryGroupAdvice(InptAdviceDTO inptAdviceDTO);
+
+    /**
+     * 根据医嘱ID，医嘱组号进行查询（防止漏掉同组核收的数据）
+     * @param inptAdviceDTOList
+     * @return
+     */
+    List<InptAdviceDTO> findGroupAdvice(@Param("listAdvice") List<InptAdviceDTO> inptAdviceDTOList);
+
+    /**
+     * 批量修改医嘱核收跟停嘱核收信息
+     * @param adviceDTOList
+     */
+    void updateStopAndCheckInfo(List<InptAdviceDTO> adviceDTOList);
+
+
+
+    /**
+     * 医嘱最近执行时间更新（最外面的更新执行时间方法（updateLastExeTime）替换成下面这个） - 解决周期费用生成问题
+     * @param medicalAdviceDTO
+     * @param adviceIdCostTime
+     */
+    void newUpdateLastExeTime(@Param("medicalAdviceDTO")MedicalAdviceDTO medicalAdviceDTO, @Param("adviceMap")Map<String, Date> adviceIdCostTime);
 }

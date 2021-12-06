@@ -145,4 +145,6 @@ public interface InsureDictService {
 
 
     WrapperResponse<Map<String,Object>> queryAllInsureDict(Map map);
+
+    WrapperResponse<PageDTO> queryAdmdvsInfoPage(Map map);
 }

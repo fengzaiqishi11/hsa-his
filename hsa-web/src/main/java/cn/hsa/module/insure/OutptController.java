@@ -7,6 +7,7 @@ import cn.hsa.module.insure.outpt.service.DzpzOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -79,7 +80,12 @@ public class OutptController extends BaseController {
         insureIndividualBasicDTO.setAac002(aac002);
         insureIndividualBasicDTO.setAac003(aac003);
         insureIndividualBasicDTO.setAac004(aac004);
+
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
+        Object insuplcAdmdvs = MapUtils.get(param,"insuplcAdmdvs");
+        if (insuplcAdmdvs != null && StringUtils.isNotEmpty(insuplcAdmdvs.toString())) {
+            insureIndividualBasicDTO.setInsuplc_admdvs(insuplcAdmdvs.toString());
+        }
         param.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
         return outptService.getOutptVisitInfo(param);
     }

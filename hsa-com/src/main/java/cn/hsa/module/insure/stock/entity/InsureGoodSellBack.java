@@ -40,4 +40,7 @@ public class InsureGoodSellBack   extends PageDO implements Serializable {
     private String sellType;// 销售类型
     private String visitId;// 就诊id
     private String keyword;
+    private String insureItemCode;// 医保中心编码
+    private String insureItemName;// 医保中心项目名称
+    private String insureRegCode;// 医保机构编码
 }

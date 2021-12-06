@@ -38,7 +38,9 @@ public class InsureInventoryCheck   extends PageDO implements Serializable {
     private String price;//单价	字符型	500	　	　	新医保
     private String cnt	;//盘存数量	字符型	500	　	　	新医保
     private String isUpload	;//是否上传	字符型	500	　	　
-
+    private String insureItemCode;// 医保中心编码
+    private String insureItemName;// 医保中心项目名称
+    private String insureRegCode;// 医保机构编码
 
 
     /*med_list_codg	医疗目录编码

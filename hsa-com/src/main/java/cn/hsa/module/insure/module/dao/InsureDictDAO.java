@@ -159,4 +159,6 @@ public interface InsureDictDAO {
      * @Return
     **/
     List<InsureDictDTO> queryDictByCode(InsureDictDTO insureDictDTO);
+
+    List<Map<String, Object>> queryAdmdvsInfoPage(InsureDictDTO dictDTO);
 }

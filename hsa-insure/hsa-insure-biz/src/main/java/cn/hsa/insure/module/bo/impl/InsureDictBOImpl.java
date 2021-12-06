@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
+public
+class InsureDictBOImpl extends HsafBO implements InsureDictBO {
 
     @Resource
     private InsureDictDAO insureDictDAO;
@@ -279,5 +280,12 @@ public class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         //查询码表信息
         jsonObject.put("insureDict",insureDictDAO.queryInsureDictList2(insureDictDTO));
         return jsonObject;
+    }
+
+    @Override
+    public PageDTO queryAdmdvsInfoPage(InsureDictDTO dictDTO) {
+        PageHelper.startPage(dictDTO.getPageNo(),  dictDTO.getPageSize());
+        List<Map<String,Object>> dictDTOList = insureDictDAO.queryAdmdvsInfoPage(dictDTO);
+        return PageDTO.of(dictDTOList);
     }
 }

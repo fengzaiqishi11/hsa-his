@@ -600,7 +600,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("conerAddr", infoDTO.getConerAddr()); // 联系人地址
         setlinfo.put("conerTel", infoDTO.getConerTel()); // 联系人电话
         setlinfo.put("hiType", infoDTO.getHiType()); // 医保类型  也就是险种   sp_psn_type
-        setlinfo.put("insuplc", infoDTO.getInsuplc()); // 参保地 *******
+        String insuplcAdmdvs = infoDTO.getInsuplc();
+        map.put("insuplcAdmdvs",insuplcAdmdvs);
+        Map<String,Object> admdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
+        if(!MapUtils.isEmpty(admdvsMap)){
+            setlinfo.put("insuplcName", MapUtils.get(admdvsMap,"admdvsName")); // 参保地 *******
+        }
+        setlinfo.put("insuplc", insuplcAdmdvs); // 参保地 *******
         setlinfo.put("spPsnType", infoDTO.getSpPsnType()); // 特殊人员类型
         setlinfo.put("nwbAdmType", infoDTO.getNwbAdmType()); // 新生儿入院类型
 
@@ -623,7 +629,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }else if("22".equals(trtType)){
             setlinfo.put("trtType","2.2"); // 民族医
         }else{
-            setlinfo.put("trtType","30"); // 中西医
+            setlinfo.put("trtType","3"); // 中西医
         }
         setlinfo.put("admTime", infoDTO.getAdmTime()); // 入院时间 *******
         setlinfo.put("admCaty", infoDTO.getAdmCaty()); // 入院科别

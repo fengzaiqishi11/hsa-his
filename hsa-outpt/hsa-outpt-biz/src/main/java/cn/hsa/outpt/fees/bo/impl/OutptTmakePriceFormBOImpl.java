@@ -1747,6 +1747,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
         outptCostUploadAndTrialParam.put("action", "settle");//操作 = 结算操作
 
+        // add 读卡支付新增入参
+        outptCostUploadAndTrialParam.put("isReadCardPay",outptVisitDTO.getIsReadCardPay());
+        outptCostUploadAndTrialParam.put("bka895",outptVisitDTO.getBka895());
+        outptCostUploadAndTrialParam.put("bka896",outptVisitDTO.getBka896());
         /**
          * 医保结算
          *

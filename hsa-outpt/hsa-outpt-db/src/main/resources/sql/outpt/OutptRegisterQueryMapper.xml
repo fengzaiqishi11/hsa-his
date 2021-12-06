@@ -108,6 +108,11 @@
         <if test="endDate != null and endDate != ''">
             and opr.register_time &lt;= #{endDate}
         </if>
+        <if test="crteId != null and crteId != ''">
+            and (ors.crte_id = #{crteId}
+            or opr.crte_id = #{crteId}
+            )
+        </if>
         order by opr.crte_time desc
     </select>
 </mapper>

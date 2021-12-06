@@ -20,6 +20,7 @@
 		<result property="isCrb" column="is_infectious" jdbcType="VARCHAR"/>
 		<result property="crbName" column="infectious_name" jdbcType="VARCHAR"/>
 		<result property="platformCode" column="platform_code" jdbcType="VARCHAR"/>
+		<result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
 		<result property="crbInterval" column="infectious_interval_days" jdbcType="INTEGER"/>
 		<result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
 	</resultMap>
@@ -47,7 +48,7 @@
 
 	<select id="queryPage" resultMap="BaseDiseaseMap">
 		select
-		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id,
+		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, nation_name, is_add, pym, wbm, is_valid, crte_id,
 		crte_name, crte_time,ifnull(seq_no,14836248) as seq_no
 		from base_disease
 		<where>

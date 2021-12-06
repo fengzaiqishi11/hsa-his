@@ -63,7 +63,8 @@
         crte_name,
         crte_time,
         card_price,
-        acct_pay
+        acct_pay,
+        credit_price
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -138,7 +139,8 @@
           crte_id,
           crte_name,
           crte_time,
-         acct_pay
+         acct_pay,
+         credit_price
         ) values (
           #{id,jdbcType=VARCHAR},
           #{hospCode,jdbcType=VARCHAR},
@@ -167,7 +169,8 @@
           #{crteId,jdbcType=VARCHAR},
           #{crteName,jdbcType=VARCHAR},
           #{crteTime,jdbcType=TIMESTAMP},
-          #{acctPay,jdbcType=DECIMAL}
+          #{acctPay,jdbcType=DECIMAL},
+          #{creditPrice,jdbcType=DECIMAL}
         )
     </insert>
 
@@ -591,7 +594,8 @@
         a.card_price as cardPrice,
         c.card_no as cardNo,
         b.profile_id as profileId,
-        b.is_phys as isPhys
+        b.is_phys as isPhys,
+        a.credit_price as creditPrice
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id
@@ -642,7 +646,7 @@
             left join base_finance_classify c on a.bfc_id = c.id
             left join base_dept d on a.phar_id = d.id
             left join base_dept e on a.exec_dept_id = e.id
-            left join outpt_refund_apply ra on ra.cost_id = a.id and ra.hosp_code = a.hosp_code
+            left join outpt_refund_apply ra on ra.cost_id = a.id and ra.hosp_code = a.hosp_code and ra.status = '2'
         WHERE a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
             and a.status_code = #{statusCode} and a.settle_id = #{id}
     </select>

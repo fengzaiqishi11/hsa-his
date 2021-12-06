@@ -23,6 +23,7 @@ import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -341,20 +342,23 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     filterWaitReceive(orderReceiveDTO, waitReceiveListAll, lyList);
     AtomicInteger itemNum = new AtomicInteger();
     HashMap itemMap = new HashMap();
-    lyList.forEach(dto -> {
+    List<PharInWaitReceiveDTO> sumList = new ArrayList<>();
+    //领药申请详情汇总
+    sumList = getSummaryStock(lyList);
+    sumList.forEach(dto -> {
       //校验库存
       if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
         InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
         inptAdviceDTO.setHospCode(dto.getHospCode());
         inptAdviceDTO.setItemId(dto.getItemId());
         inptAdviceDTO.setPharId(dto.getPharId());
-        inptAdviceDTO.setTotalNum(dto.getNum());
+        inptAdviceDTO.setTotalNum(dto.getAllNum());
         inptAdviceDTO.setUnitCode(dto.getUnitCode());
         //判断库存
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
           itemNum.getAndIncrement();
           check.setCheckFlag(true);
-          if(itemNum.get() <= 4 && !itemMap.containsKey(dto.getId())) {
+          if(itemNum.get() <= 8 && !itemMap.containsKey(dto.getId())) {
             itemMap.put(dto.getId(),dto.getItemName());
             message.append("【");
             message.append(dto.getItemName());
@@ -363,8 +367,39 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         }
       }
     });
+
     check.setItemName(String.valueOf(message));
     return check;
+  }
+
+
+  /**
+  * @Menthod getSummaryStock
+  * @Desrciption 领药申请汇总库存校验
+  *
+  * @Param
+  * [inWaitReceiveList]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/11/23 17:20
+  * @Return java.util.List<cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO>
+  **/
+  public List<PharInWaitReceiveDTO> getSummaryStock(List<PharInWaitReceiveDTO> inWaitReceiveList) {
+    if (ListUtils.isEmpty(inWaitReceiveList)) {
+      return inWaitReceiveList;
+    }
+    List<PharInWaitReceiveDTO> summaryList = new ArrayList<>();
+    Map<String, List<PharInWaitReceiveDTO>> itemMap = inWaitReceiveList.stream().collect(Collectors.groupingBy(e -> e.getItemId() + "#" + e.getPharId()));
+    itemMap.forEach((k, v) -> {
+      BigDecimal num = v.stream().map(PharInWaitReceiveDTO::getNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+      BigDecimal totalPrice = v.stream().map(PharInWaitReceiveDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+//            BigDecimal kszbsl = v.stream().map(PharInWaitReceiveDTO::getKszbsl).reduce(BigDecimal.ZERO, BigDecimal::add);
+      v.get(0).setAllNum(num);
+      v.get(0).setAllTotalPrice(totalPrice);
+//            v.get(0).setKszbsl(kszbsl);
+      summaryList.add(v.get(0));
+    });
+    return summaryList;
   }
 
   /**
@@ -863,20 +898,34 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     if (!ListUtils.isEmpty(windosList) && windosList.get(0)!=null && windosList.get(0).get("id")!=null) {
       inReceiveDTO.setWindowId((String) windosList.get(0).get("id"));
     }
-    for(PharInWaitReceiveDTO dto:inReceiveList){
+    List<PharInWaitReceiveDTO> newInReceiveList = new ArrayList<>();
+    for(PharInWaitReceiveDTO pharInWaitReceiveDTO:inReceiveList) {
+      PharInWaitReceiveDTO newItem = DeepCopy.deepCopy(pharInWaitReceiveDTO);
+      newInReceiveList.add(newItem);
+    }
+    List<PharInWaitReceiveDTO> summaryStock = getSummaryStock(newInReceiveList);
+    Map<String, String> stockMap = new HashMap<>();
+    // 检验哪些药品 药房的库存不足
+    for(PharInWaitReceiveDTO dto:summaryStock) {
       //校验库存
       if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
         InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
         inptAdviceDTO.setHospCode(dto.getHospCode());
         inptAdviceDTO.setItemId(dto.getItemId());
         inptAdviceDTO.setPharId(dto.getPharId());
-        inptAdviceDTO.setTotalNum(dto.getNum());
+        inptAdviceDTO.setTotalNum(dto.getAllNum());
         inptAdviceDTO.setUnitCode(dto.getUnitCode());
         //判断库存
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
-          noInventoryList.add(dto);
-          continue;
+          stockMap.put(inptAdviceDTO.getItemId(),inptAdviceDTO.getPharId());
         }
+      }
+    }
+    for(PharInWaitReceiveDTO dto:inReceiveList){
+      // 库存不足的药品 并且是同一个药房的过滤掉
+      if(stockMap.containsKey(dto.getItemId()) && stockMap.get(dto.getItemId()).equals(dto.getPharId())) {
+        noInventoryList.add(dto);
+        continue;
       }
       PharInReceiveDetailDTO pharInReceiveDetailDTO = new PharInReceiveDetailDTO();
       pharInReceiveDetailDTO.setId(SnowflakeUtils.getId());

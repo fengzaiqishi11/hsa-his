@@ -84,6 +84,9 @@ public class OutptRegisterSettleDO extends PageDO implements java.io.Serializabl
     // 一卡通支付金额
     public BigDecimal cardPrice;
 
+    // 挂账金额
+    private BigDecimal creditPrice;
+
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
@@ -411,5 +414,11 @@ public class OutptRegisterSettleDO extends PageDO implements java.io.Serializabl
         this.crteTime = crteTime;
     }
 
+    public BigDecimal getCreditPrice() {
+        return creditPrice;
+    }
 
+    public void setCreditPrice(BigDecimal creditPrice) {
+        this.creditPrice = creditPrice;
+    }
 }

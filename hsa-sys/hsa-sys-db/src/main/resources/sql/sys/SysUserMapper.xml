@@ -110,7 +110,7 @@
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
 		<where>
-			a.hosp_code = #{hospCode}
+			a.hosp_code = #{hospCode} and a.dept_code != 'powersi'
 			<if test="id != null and id != ''">
 				and a.id = #{id}
 			</if>
@@ -302,7 +302,7 @@
     and s.dept_code = #{loginDeptCode} and s.system_code = #{systemCode}
     left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
     <where>
-      a.hosp_code = #{hospCode}
+      a.hosp_code = #{hospCode} and a.dept_code != 'powersi'
       <if test="id != null and id != ''">
         and a.id = #{id}
       </if>
@@ -513,7 +513,7 @@
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
 		<where>
-			a.hosp_code = #{hospCode}
+			a.hosp_code = #{hospCode} and a.dept_code != 'powersi'
 			<if test="id != null and id != ''">
 				and a.id = #{id}
 			</if>
@@ -932,7 +932,7 @@
 		duties_code, prac_certi_no, durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt,
 		last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro,is_guide,is_anaesthesia
 		from sys_user
-		where sys_user.hosp_code = #{hospCode}
+		where sys_user.hosp_code = #{hospCode} and sys_user.dept_code != 'powersi'
 		<if test="workTypeCode != null and workTypeCode.size()>0">
 			and
 			<foreach collection="workTypeCode" separator="or" item="item" open="(" close=")">
@@ -941,7 +941,7 @@
 		</if>
 		and sys_user.code in
 		(select user_code from sys_user_system where sys_user_system.dept_code = #{deptCode} and
-		sys_user_system.hosp_code = #{hospCode} group by user_code
+		sys_user_system.hosp_code = #{hospCode}  group by user_code
 		)
 	</select>
 
@@ -1325,7 +1325,7 @@
 	</select>
 
 	<select id="queryMZAndSFYAllUser" resultMap="SysUserMap" >
-		select * from sys_user where hosp_code = #{hospCode} and work_type_code in ('1','101', '102', '103', '104', '105', '106', '107', '108')
+		select * from sys_user where hosp_code = #{hospCode} and dept_code != 'powersi' and work_type_code in ('1','101', '102', '103', '104', '105', '106', '107', '108')
 	</select>
 
 </mapper>

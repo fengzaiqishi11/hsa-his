@@ -184,4 +184,14 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String insureRegCode;
     private BigDecimal inptSumPrice;
     private BigDecimal insureSumPrice;
+
+    /**
+     * 国家编码
+     */
+    private String nationCode;
+    /**
+     * 国家名称
+     */
+    private String nationName;
+
 }

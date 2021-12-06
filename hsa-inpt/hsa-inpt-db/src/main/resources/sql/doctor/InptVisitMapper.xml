@@ -2229,12 +2229,28 @@
 	</select>
 	<!-- 获取药品信息 -->
 	<select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
-		select a.*, b.trunc_code truncCode, c.id bfcId
-		from base_drug a
-				 left join base_special_calc b on a.code = b.drug_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
-				 left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
-				 left join base_dept d on b.dept_code = d.code and b.hosp_code = d.hosp_code and d.id = #{loginDeptId}
-		where a.id = #{itemId} and a.hosp_code = #{hospCode}
+		SELECT
+			a.*,
+			b.trunc_code truncCode,
+			c.id bfcId
+		FROM
+			base_drug a
+				LEFT JOIN base_special_calc b ON a.CODE = b.drug_code
+				AND a.hosp_code = b.hosp_code
+				AND b.is_valid = '1'
+				AND b.dept_code = (
+					SELECT CODE
+					FROM
+						base_dept
+					WHERE
+						id = #{loginDeptId} and hosp_code = #{hospCode})
+				LEFT JOIN base_finance_classify c ON a.bfc_code = c.CODE
+				AND a.hosp_code = c.hosp_code
+				LEFT JOIN base_dept d ON b.dept_code = d.CODE
+				AND b.hosp_code = d.hosp_code
+				AND d.id = #{loginDeptId}
+		WHERE
+			a.id = #{itemId} and a.hosp_code = #{hospCode}
 	</select>
 
 	<!--查询在院病人状态-->

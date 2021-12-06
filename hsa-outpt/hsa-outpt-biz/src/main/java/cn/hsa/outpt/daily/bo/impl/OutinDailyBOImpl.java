@@ -1180,18 +1180,19 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             // 结算情况
             // 门诊挂号实收
             BigDecimal mzGhSS = odMzGh != null ? odMzGh.getRealityTotalPrice() : new BigDecimal(0);
+            BigDecimal mzGhGz = odMzGh != null ? odMzGh.getCreditTotalPrice() != null ? odMzGh.getCreditTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             // 门诊收费实收
             BigDecimal mzSfSS = odMzSF != null ? odMzSF.getRealityTotalPrice() : new BigDecimal(0);
             // 医保金额
             BigDecimal mzYb = odMzSF != null ? odMzSF.getInsureTotalPrice() : new BigDecimal(0);
-            // 挂账金额
-            BigDecimal mzGz = odMzSF != null ? odMzSF.getCreditTotalPrice() : new BigDecimal(0);
+            // 门诊结算挂账金额  挂账金额小于0时取0
+            BigDecimal mzGz = odMzSF != null ? odMzSF.getCreditTotalPrice() != null ? odMzSF.getCreditTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             // 一卡通实收
             BigDecimal yktczTotalPrice = odMzSF != null ? odMzSF.getYktczTotalPrice() != null ? odMzSF.getYktczTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             BigDecimal ykttkTotalPrice = odMzSF != null ? odMzSF.getYkttkTotalPrice() != null ? odMzSF.getYkttkTotalPrice() : new BigDecimal(0) : new BigDecimal(0);
             BigDecimal mzYKTSS = BigDecimalUtils.subtract(yktczTotalPrice, ykttkTotalPrice);
             // 实缴金额
-            BigDecimal RT_040201 = mzGhSS.add(mzSfSS).add(mzYKTSS).subtract(mzYb).subtract(mzGz);
+            BigDecimal RT_040201 = mzGhSS.add(mzSfSS).add(mzYKTSS).subtract(mzYb).subtract(mzGz).subtract(mzGhGz);
             StringBuffer RT_0401 = new StringBuffer();
             // 门诊、挂号合并
             if ("0".equals(value)) {
@@ -1203,13 +1204,17 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0401.append(" - ");
                 RT_0401.append("医保金额：").append(mzYb).append("元");
                 RT_0401.append(" - ");
-                RT_0401.append("挂账金额：").append(mzGz).append("元");
+                RT_0401.append("门诊结算挂账金额：").append(mzGz).append("元");
+                RT_0401.append(" - ");
+                RT_0401.append("门诊挂号挂账金额：").append(mzGhGz).append("元");
             }
             // 门诊、挂号分开
             else {
                 // 挂号
                 if (Constants.JKLX.MZGH.equals(dto.getTypeCode())) {
                     RT_0401.append("门诊挂号实收：").append(mzGhSS).append("元");
+                    RT_0401.append(" - ");
+                    RT_0401.append("门诊挂号挂账金额：").append(mzGhGz).append("元");
                 }
                 // 门诊
                 else {
@@ -1219,7 +1224,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                     RT_0401.append(" - ");
                     RT_0401.append("医保金额：").append(mzYb).append("元");
                     RT_0401.append(" - ");
-                    RT_0401.append("挂账金额：").append(mzGz).append("元");
+                    RT_0401.append("门诊结算挂账金额：").append(mzGz).append("元");
                 }
             }
             RT_0401.append(" = ");

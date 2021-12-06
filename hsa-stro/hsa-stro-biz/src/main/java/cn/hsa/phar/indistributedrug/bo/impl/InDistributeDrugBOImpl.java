@@ -181,7 +181,13 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
      **/
     @Override
     public Boolean updateInDispense(PharInReceiveDTO pharInReceiveDTO) {
+
+        String redisKey = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYPY").
+                append(pharInReceiveDTO.getId()).append(Constants.INPT_DISPENSE_REDIS_KEY).toString();
         try {
+            if (!redisUtils.setIfAbsent(redisKey,pharInReceiveDTO.getId(),600)){
+                throw new AppException("有人正在进行配药,请稍后再试!");
+            }
             //校验必填信息
             if(StringUtils.isEmpty(pharInReceiveDTO.getId())){
                 throw new AppException("领药申请ID为空,配药失败");
@@ -242,7 +248,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
             if (kcjyMap!=null && kcjyMap.size()>0) {
                 for (String key:kcjyMap.keySet()) {
                     if(!stroStockBO.getStroStock(kcjyMap.get(key))){
-                        throw new RuntimeException(kcjyMap.get(key).get("itemName")+"库存不足");
+                        throw new RuntimeException(kcjyMap.get(key).get("itemName")+"库存不足，可以取消预配药该药品再继续配药");
                     }
                 }
             }
@@ -260,6 +266,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         } catch (AppException e) {
             log.error("配药失败",e.getMessage());
             throw new AppException(e.getMessage());
+        }finally {
+            redisUtils.del(redisKey);
         }
         return true;
     }

@@ -7,12 +7,14 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryUnifiedDept")
     public WrapperResponse<Map<String,Object>> queryUnifiedDept(@RequestBody  Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryUnifiedDept(map);
     }
@@ -61,6 +66,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryDoctorInfo")
     public WrapperResponse<Map<String,Object>> queryDoctorInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryDoctorInfo(map);
     }
@@ -78,6 +86,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryVisitInfo")
     public WrapperResponse<Map<String,Object>> queryVisitInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryVisitInfo(map);
     }
@@ -94,6 +105,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryDiagnoseInfo")
     public WrapperResponse<Map<String,Object>> queryDiagnoseInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryDiagnoseInfo(map);
     }
@@ -110,6 +124,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateFormalData")
     public WrapperResponse<Map<String,Object>> updateFormalData(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateFormalData(map);
     }
@@ -127,6 +144,9 @@ public class InsureUnifiedBaseController extends BaseController {
     public WrapperResponse<Map<String,Object>> updateSettleInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("crteName",sysUserDTO.getName());
         return insureUnifiedBaseService_consumer.updateSettleInfo(map);
     }
@@ -144,6 +164,9 @@ public class InsureUnifiedBaseController extends BaseController {
     public WrapperResponse<Map<String,Object>> queryFeeDetailInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("crteName",sysUserDTO.getName());
         return insureUnifiedBaseService_consumer.queryFeeDetailInfo(map);
     }
@@ -160,6 +183,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/querySpecialUserDrug")
     public WrapperResponse<Map<String,Object>> querySpecialUserDrug(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.querySpecialUserDrug(map);
     }
@@ -176,6 +202,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryPatientSumInfo")
     public WrapperResponse<Map<String,Object>> queryPatientSumInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryPatientSumInfo(map);
     }
@@ -192,6 +221,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryItemConfirm")
     public WrapperResponse<Map<String,Object>> queryItemConfirm(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryItemConfirm(map);
     }
@@ -209,6 +241,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryPatientInfo")
     public WrapperResponse<Map<String,Object>> queryPatientInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryPatientInfo(map);
     }
@@ -228,6 +263,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryTransfInfo")
     public WrapperResponse<Map<String,Object>> queryTransfInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryTransfInfo(map);
     }
@@ -244,6 +282,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryFixRecordInfo")
     public WrapperResponse<Map<String,Object>> queryFixRecordInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryFixRecordInfo(map);
     }
@@ -260,6 +301,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryMzSpecialLimitPrice")
     public WrapperResponse<Map<String,Object>> queryMzSpecialLimitPrice(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryMzSpecialLimitPrice(map);
     }
@@ -277,6 +321,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/querySpecialRecord")
     public WrapperResponse<Map<String,Object>> querySpecialRecord(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.querySpecialRecord(map);
     }
@@ -294,6 +341,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryInform")
     public WrapperResponse<Map<String,Object>> queryInform(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryInform(map);
     }
@@ -327,6 +377,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryPersonFixInfo")
     public WrapperResponse<Map<String,Object>> queryPersonFixInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode",  sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryPersonFixInfo(map);
     }
@@ -341,6 +394,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/queryReportDetails")
     public WrapperResponse<Map<String, Object>> queryReportDetails(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.queryReportDetails(map);
     }
@@ -357,6 +413,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateUnifiedDept")
     public WrapperResponse<Map<String, Object>> updateUnifiedDept(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateUnifiedDept(map);
     }
@@ -373,6 +432,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateUnifiedDeptInfo")
     public WrapperResponse<Map<String, Object>> updateUnifiedDeptInfo(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateUnifiedDeptInfo(map);
     }
@@ -389,6 +451,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/deleteUnifiedDeptInfo")
     public WrapperResponse<Map<String, Object>> deleteUnifiedDeptInfo(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.deleteUnifiedDeptInfo(map);
     }
@@ -406,6 +471,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateInsureInptRegisterStatus")
     public WrapperResponse<Boolean> updateInsureInptRegisterStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateInsureInptRegisterStatus(map);
     }
@@ -422,6 +490,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateInsureInptSettleStatus")
     public WrapperResponse<Boolean> updateInsureInptSettleStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateInsureInptSettleStatus(map);
     }
@@ -438,6 +509,9 @@ public class InsureUnifiedBaseController extends BaseController {
     @PostMapping("/updateInsureInptCancelSettleStatus")
     public WrapperResponse<Boolean> updateInsureInptCancelSettleStatus(@RequestBody Map<String, Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedBaseService_consumer.updateInsureInptCancelSettleStatus(map);
     }

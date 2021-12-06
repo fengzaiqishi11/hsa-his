@@ -85,4 +85,8 @@
     <delete id="deleteBatchPhys" >
         delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode} and settle_code = '0'
     </delete>
+
+    <select id="queryCostPhys" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select visit_id, item_id from outpt_cost where visit_id = #{visitId}
+    </select>
 </mapper>

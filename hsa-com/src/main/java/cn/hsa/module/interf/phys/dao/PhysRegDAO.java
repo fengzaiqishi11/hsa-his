@@ -55,5 +55,12 @@ public interface PhysRegDAO {
     */ 
     int deleteBatchPhys(OutptCostDTO outptCostDTO);
 
+    /**
+     * @Description: 更新结算状态
+     * @Param: [list]
+     * @return: void
+     * @Author: zhangxuan
+     * @Date: 2021-11-30
+     */
     void updateRCodt(@Param("list") List<Map> list);
 }

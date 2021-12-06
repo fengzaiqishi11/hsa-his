@@ -115,14 +115,16 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             outptCostDTO.setCrteTime(DateUtils.getNow());
             // 费用来源方式代码
             outptCostDTO.setSourceCode(Constants.FYLYFS.QTFY);
-
-            outptCostDTOS.add(outptCostDTO);
+            if (x.getIsSettle().equals("1")) {
+                outptCostDTOS.add(outptCostDTO);
+            }
         });
-        // 删除之前的费用信息
+//         删除之前的费用信息
         physRegDAO.deleteBatchPhys(outptCostDTOS.get(0));
         // 新增费用信息
-        int result = physRegDAO.addBatchPhys(outptCostDTOS);
-        return result > 0;
+            int result = physRegDAO.addBatchPhys(outptCostDTOS);
+            return result > 0;
+
     }
 
     /**

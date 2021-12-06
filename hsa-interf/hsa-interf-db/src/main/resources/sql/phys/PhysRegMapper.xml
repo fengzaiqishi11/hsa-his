@@ -83,6 +83,6 @@
     </update>
 
     <delete id="deleteBatchPhys" >
-        delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode}
+        delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode} and settle_code = '0'
     </delete>
 </mapper>

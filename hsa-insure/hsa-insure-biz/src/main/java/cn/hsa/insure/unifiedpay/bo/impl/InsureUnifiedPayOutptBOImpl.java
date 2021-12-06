@@ -773,6 +773,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
         patientDataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType()); //  就诊凭证类型
         patientDataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo()); //  就诊凭证编号
+        if (Constants.SF.S.equals(MapUtils.get(unifiedPayMap,"isReadCardPay"))) {
+            patientDataMap.put("mdtrt_cert_type", MapUtils.get(unifiedPayMap,"bka895")); //  就诊凭证类型
+            patientDataMap.put("mdtrt_cert_no", MapUtils.get(unifiedPayMap,"bka896")); //  就诊凭证编号
+        }
+
         patientDataMap.put("med_type", insureIndividualVisitDTO.getAka130()); //  医疗类别
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMapInfo.get("costStr").toString()));

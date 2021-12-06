@@ -164,6 +164,10 @@ public class InsureIndividualBasicController extends BaseController {
         insureIndividualBasicDTO.setUserCode(sysUserDTO.getCode());
         insureIndividualBasicDTO.setCardIden(cardIden);
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
+        Object insuplcAdmdvs = MapUtils.get(param,"insuplcAdmdvs");
+        if (insuplcAdmdvs != null && StringUtils.isNotEmpty(insuplcAdmdvs.toString())) {
+            insureIndividualBasicDTO.setInsuplc_admdvs(insuplcAdmdvs.toString());
+        }
         insureIndividualBasicDTO.setPsnCertType(psnCertType);
         insureIndividualBasicDTO.setNationECResult(nationECResult);
         map.put("crteName",sysUserDTO.getCrteName());

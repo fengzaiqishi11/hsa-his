@@ -9,22 +9,28 @@ import cn.hsa.module.interf.phys.dto.PhysRegisterDTO;
 import cn.hsa.module.interf.phys.dto.PhysSettleDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
     @Resource
     private PhysRegDAO physRegDAO;
+
+    /**
+     * 系统参数
+     */
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Description: 获取体检者登记信息
@@ -79,6 +85,10 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
     public Boolean addOrUpdateOutptCost(Map map) {
         List<PhysSettleDTO> settleDTOS = MapUtils.get(map, "settleDTOS");
         List<OutptCostDTO> outptCostDTOS = new ArrayList<>();
+        Map mapS = new HashMap();
+        mapS.put("hospCode", settleDTOS.get(0).getHospCode());
+        mapS.put("code", "TJ_YHID");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapS).getData();
         settleDTOS.stream().forEach(x->{
             OutptCostDTO outptCostDTO = new OutptCostDTO();
             // id
@@ -99,8 +109,9 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             outptCostDTO.setTotalNum(BigDecimalUtils.convert("1"));
             // 数量
             outptCostDTO.setNum(BigDecimalUtils.convert("1"));
-            // 计费id ************************ 暂时写死
-            outptCostDTO.setBfcId("1000000000000000012");
+            // 计费id ************************ 通过参数取获取
+            //优惠id
+            outptCostDTO.setBfcId(sysParameterDTO.getValue());
             // 优惠价格
             outptCostDTO.setPreferentialPrice(x.getPreferentialPrice());
             // 优惠后价格
@@ -115,14 +126,25 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
             outptCostDTO.setCrteTime(DateUtils.getNow());
             // 费用来源方式代码
             outptCostDTO.setSourceCode(Constants.FYLYFS.QTFY);
-
             outptCostDTOS.add(outptCostDTO);
         });
-        // 删除之前的费用信息
-        physRegDAO.deleteBatchPhys(outptCostDTOS.get(0));
+        // 先查询出已经登记的项目
+        List<OutptCostDTO> outptCostDTOList = physRegDAO.queryCostPhys(outptCostDTOS.get(0));
+        List<OutptCostDTO> commonList = new ArrayList<>();
+        // 筛选出未插入的费用信息
+        if (!ListUtils.isEmpty(outptCostDTOList)){
+            for (OutptCostDTO outptCostDTO : outptCostDTOList) {
+                // 去掉重复的（已经插入的费用信息）
+                commonList= outptCostDTOS.stream().filter(item -> !item.getVisitId().equals(outptCostDTO.getVisitId()) && !item.getItemId().equals(outptCostDTO.getItemId())).collect(Collectors.toList());
+            }
+        } else {
+            commonList = outptCostDTOS;
+        }
+
         // 新增费用信息
-        int result = physRegDAO.addBatchPhys(outptCostDTOS);
-        return result > 0;
+            int result = physRegDAO.addBatchPhys(commonList);
+            return result > 0;
+
     }
 
     /**

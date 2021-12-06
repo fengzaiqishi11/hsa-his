@@ -212,9 +212,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO
      **/
     private OutptProfileFileDTO insert(OutptProfileFileDTO outptProfileFileDTO) {
-        if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-            outptProfileFileDTO.setId(SnowflakeUtils.getId());
-        }
+        outptProfileFileDTO.setId(SnowflakeUtils.getId());
         outptProfileFileDTO.setIsValid(Constants.SF.S);
         // 住院病案号
         String inProfile ="";

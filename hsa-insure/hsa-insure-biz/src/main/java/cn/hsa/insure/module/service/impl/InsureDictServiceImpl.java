@@ -196,4 +196,19 @@ public class InsureDictServiceImpl extends HsafService implements InsureDictServ
         InsureDictDO dictDTO = MapUtils.get(map,"insureDictDO");
         return WrapperResponse.success(insureDictBO.queryAllInsureDict(dictDTO));
     }
+
+    /**
+     * @param map
+     * @Method queryAdmdvsInfo()
+     * @Desrciption 查询医保地区划
+     * @Param insuplcAdmdvs:医保区划
+     * @Author 廖继广
+     * @Date 2021/12/02 21:03
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryAdmdvsInfoPage(Map map) {
+        InsureDictDTO dictDTO = MapUtils.get(map,"insureDictDTO");
+        return WrapperResponse.success(insureDictBO.queryAdmdvsInfoPage(dictDTO));
+    }
 }

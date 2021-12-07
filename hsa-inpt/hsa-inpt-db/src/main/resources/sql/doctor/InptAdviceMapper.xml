@@ -1306,7 +1306,7 @@
     <!-- 新增诊断信息 -->
     <insert id="insertDiagnose" parameterType="java.util.List" useGeneratedKeys="false">
         insert into inpt_diagnose(
-        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time,custom_disease
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1319,7 +1319,8 @@
             #{item.isMain},
             #{item.crteId},
             #{item.crteName},
-            now()
+            now(),
+            #{item.customDisease}
             )
         </foreach>
     </insert>
@@ -1340,7 +1341,7 @@
 
     <!--  获取诊断信息 -->
     <select id="getInptDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode, a.is_main isMain, b.name diseaseName
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode, a.is_main isMain, b.name diseaseName,a.custom_disease as customDisease
         from inpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}

@@ -1381,7 +1381,7 @@
     <!-- 新增处方诊断信息 -->
     <insert id="insertDiagnose" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_diagnose(
-        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time,custom_disease
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1394,7 +1394,8 @@
             #{item.isMain},
             #{item.crteId},
             #{item.crteName},
-            now()
+            now(),
+            #{item.customDisease}
             )
         </foreach>
     </insert>
@@ -1812,7 +1813,7 @@
 
     <!--  获取诊断信息 -->
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
         a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
@@ -2149,7 +2150,13 @@
 
 
     <select id="findVisitListById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
-        select * from outpt_visit a  where a.profile_id = #{id}
+        select * from outpt_visit a  where a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and a.profile_id = #{id}
+        </if>
+        <if test="id == null or id == ''">
+            and a.id = #{visitId}
+        </if>
         <!-- 开始时间-->
         <if test="startDate != null and startDate != '' ">
             and date(a.visit_time) &gt;=  STR_TO_DATE(#{startDate},'%Y-%m-%d')
@@ -2268,6 +2275,20 @@
                 and item_id = #{item.itemId}
             </if>
         </foreach>
+    </update>
+    <update id="updateOutptRegister">
+        update outpt_register set
+                               name = #{name},
+                               gender_code = #{genderCode},
+                               age = #{age},
+                               birthday = #{birthday},
+                               cert_code = #{certCode},
+                               cert_no = #{certNo},
+                               phone = #{phone},
+                               visit_code = #{visitCode},
+                               source_tj_code = #{sourceTjCode},
+                               source_tj_remark = #{sourceTjRemark}
+        where visit_id = #{id} and hosp_code = #{hospCode}
     </update>
 
 

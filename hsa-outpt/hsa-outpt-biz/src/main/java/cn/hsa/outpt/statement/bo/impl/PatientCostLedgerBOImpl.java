@@ -3088,4 +3088,59 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptFinanceList(inptVisitDTO);
         return PageDTO.of(inptVisitDTOS);
     }
+
+    @Override
+    public PageDTO queryHospitalCardList(OutptVisitDTO outptVisitDTO) {
+        if(StringUtils.isNotEmpty(outptVisitDTO.getStatisticType())&& outptVisitDTO.getStatisticType().equals("0")) {
+            PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+            // 统计已开住院证并住院的病人信息
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.getMzHospitalCardDetailList(outptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        } else {
+            PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+            // 统计合计人次
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.getMzHospitalCardTotalList(outptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        }
+    }
+
+
+    /**
+     * @Menthod queryHospitalCardList
+     * @Desrciption 门诊住院项目使用量统计（按科室过滤）
+     * @Param inptVisitDTO
+     * @Author liuliyun
+     * @Date   2021/12/07 11:54
+     * @Return WrapperResponse<PageDTO>
+     **/
+    @Override
+    public PageDTO queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap) {
+
+        Integer pageNo =Integer.parseInt((String) paraMap.get("pageNo"));
+        Integer pageSize =Integer.parseInt((String) paraMap.get("pageSize"));
+        PageHelper.startPage(pageNo, pageSize);
+
+        String str = (String) paraMap.get("tyepCodeList");
+        if(StringUtils.isEmpty(str)){
+            throw new RuntimeException("请选择业务类型进行查询!");
+        }
+        List<String> tyepCodeList = new ArrayList<>(Arrays.asList(str.split(",")));
+        if(ListUtils.isEmpty(tyepCodeList)){
+            throw new RuntimeException("请选择业务类型进行查询!");
+        }
+        if(tyepCodeList.size()>1){
+            paraMap.put("queryType", "all");
+        }else{
+            paraMap.put("queryType", tyepCodeList.get(0));
+        }
+        paraMap.put("tyepCodeList", tyepCodeList);
+        //门诊住院项目使用量统paraMap计查询
+        List<LinkedHashMap<String, Object>> datalist = new ArrayList<>();
+        LinkedHashMap<String, Object> sumMap = new LinkedHashMap<>();
+        //按业务类型、开方医生、项目、就诊病人分组
+        datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOne(paraMap);
+        PageHelper.clearPage();
+        sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOneSum(paraMap);
+        return PageDTO.of(datalist,sumMap);
+    }
 }

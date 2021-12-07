@@ -524,4 +524,6 @@ public interface InptCostDAO {
     int deleteInDistributeAllDetailOrg(PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO);
 
     int deleteInDistributeDetailOrg(PharInDistributeDetailDTO pharInDistributeDetailDTO);
+
+    int updateCostIdBatch(List<InptCostDTO> normalsNew);
 }

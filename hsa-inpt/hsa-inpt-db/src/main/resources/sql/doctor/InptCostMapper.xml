@@ -2034,6 +2034,14 @@
         set num =#{num},total_price =#{totalPrice},split_num = #{splitNum}
         where hosp_code = #{hospCode} and id =#{id}
     </update>
+    <update id="updateCostIdBatch">
+        <foreach collection="list" item="dto" separator=";">
+            update phar_in_wait_receive
+            set cost_id = #{dto.id}
+            where hosp_code = #{dto.hospCode}
+            and cost_id = #{dto.oldCostId}
+        </foreach>
+    </update>
 
 
     <!--单个新增-->

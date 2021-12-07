@@ -2830,11 +2830,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceExecDTOList.clear();
             }
         }
-        // 修复数据未达到500条时数据不会自动保存的bug
-        if(inptAdviceExecDTOList.size() >= 0) {
-            inptAdviceExecDAO.insertInptAdviceExecBatch(inptAdviceExecDTOList);
-            inptAdviceExecDTOList.clear();
-        }
+
     }
 
     /**

@@ -2149,7 +2149,13 @@
 
 
     <select id="findVisitListById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
-        select * from outpt_visit a  where a.profile_id = #{id}
+        select * from outpt_visit a  where a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and a.profile_id = #{id}
+        </if>
+        <if test="id == null or id == ''">
+            and a.id = #{visitId}
+        </if>
         <!-- 开始时间-->
         <if test="startDate != null and startDate != '' ">
             and date(a.visit_time) &gt;=  STR_TO_DATE(#{startDate},'%Y-%m-%d')

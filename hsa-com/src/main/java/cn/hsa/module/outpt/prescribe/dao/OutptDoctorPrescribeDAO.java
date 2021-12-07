@@ -880,4 +880,6 @@ public interface OutptDoctorPrescribeDAO {
      * @Return
      */
     List<OutptCostDTO> selectCost(OutptPrescribeDTO outptPrescribeDTO);
+
+    int updateOutptRegister(OutptVisitDTO outptVisitDTO);
 }

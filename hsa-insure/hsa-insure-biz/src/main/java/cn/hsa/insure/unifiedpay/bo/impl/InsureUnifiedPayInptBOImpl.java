@@ -937,11 +937,15 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     throw new AppException((String) resultMap.get("msg"));
                 }
                 if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode);
                     Object resultMsg = resultMap.get("err_msg");
                     if (resultMsg == null) {
                         resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";
                     }
-                    throw new AppException(resultMsg.toString());
+                    if(StringUtils.isEmpty(InmsgID)||"".equals(InmsgID)){
+                        throw new AppException(resultMsg.toString()+"his结算单边账没有查询到请联系管理员处理！");
+                    }
+                    throw new AppException(resultMsg.toString()+"his单边账流水号为:"+InmsgID+"请去医保单边账菜单进行结算单边账操作！");
                 }
                 Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
                 Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");

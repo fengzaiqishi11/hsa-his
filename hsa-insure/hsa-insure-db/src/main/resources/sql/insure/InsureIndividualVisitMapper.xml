@@ -1382,4 +1382,16 @@
         select value
         from sys_parameter where hosp_code = #{hospCode} and code = #{code}
     </select>
+    <select id="queryMsgId" resultType="java.lang.String">
+        SELECT top 1
+            msg_id
+        FROM insure_function_log where
+            msg_info = '2304' and
+            code = '0' and hosp_code = #{hospCode}
+            and visit_id =#{visitId} and
+            medis_code = #{medisCode}
+        order by
+            crte_time desc
+    </select>
+
 </mapper>

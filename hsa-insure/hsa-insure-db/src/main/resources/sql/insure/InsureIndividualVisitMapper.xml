@@ -1383,8 +1383,7 @@
         from sys_parameter where hosp_code = #{hospCode} and code = #{code}
     </select>
     <select id="queryMsgId" resultType="java.lang.String">
-        SELECT top 1
-            msg_id
+        SELECT max(msg_id)
         FROM insure_function_log where
             msg_info = '2304' and
             code = '0' and hosp_code = #{hospCode}

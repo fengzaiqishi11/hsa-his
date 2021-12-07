@@ -22,6 +22,7 @@
         <result property="preferentialTotalPrice" column="preferential_total_price" jdbcType="NUMERIC"/>
         <result property="roundTotalPrice" column="round_total_price" jdbcType="NUMERIC"/>
         <result property="realityTotalPrice" column="reality_total_price" jdbcType="NUMERIC"/>
+        <result property="creditTotalPrice" column="credit_total_price" jdbcType="NUMERIC"/>
         <result property="isOk" column="is_ok" jdbcType="VARCHAR"/>
         <result property="okId" column="ok_id" jdbcType="VARCHAR"/>
         <result property="okName" column="ok_name" jdbcType="VARCHAR"/>
@@ -68,7 +69,8 @@
             sum( card_total_price ) AS card_total_price,
             sum( preferential_total_price ) AS preferential_total_price,
             sum( round_total_price ) AS round_total_price,
-            sum( reality_total_price) + sum(yjss_total_price) - sum(yjjs_total_price) - sum(insure_total_price) + ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) AS reality_total_price,
+            sum( reality_total_price) + sum(yjss_total_price) - sum(yjjs_total_price) - sum(insure_total_price) + ifnull(sum(yktcz_total_price), 0) - ifnull(sum(ykttk_total_price), 0) - ifnull(sum(credit_total_price), 0) AS reality_total_price,
+            sum(credit_total_price) as credit_total_price,
             min(is_ok) as is_ok,
             min(ok_name) as ok_name,
             min(ok_time) as ok_time,
@@ -162,7 +164,7 @@
 
     <!-- 根据缴款开始、结束时间查询挂号结算记录 -->
     <select id="queryOutptRegisterSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price
+        select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_register_settle
         where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
     </select>
@@ -202,7 +204,7 @@
 
     <!-- 门诊 - 结算表 -->
     <select id="queryOutptSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price
+        select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_settle
         where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
     </select>
@@ -235,7 +237,7 @@
         (select count(invoice_no) from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as usenum
 
         from outpt_settle_invoice osi
-        where osi.hosp_code = #{hospCode} and osi.status_code = '0' and osi.invoice_no is not null and osi.settle_id in (
+        where osi.hosp_code = #{hospCode} and osi.status_code = '0' and print_num &lt;&gt; 0 and osi.invoice_no is not null and osi.settle_id in (
 	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
 	    )
 	    group by invoice_id
@@ -251,15 +253,14 @@
 
     <!-- 门诊 - 合同单位支付表 -->
     <select id="queryOutptInsurePay" resultType="java.util.Map">
-        select oip.type_code, sum(oip.total_price) total_price from outpt_insure_pay oip where oip.hosp_code = #{hospCode} and oip.settle_id in (
-	        select os.id from outpt_settle os where os.hosp_code = oip.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
-	    )
-	    group by oip.type_code
+        select ifnull(sum(oip.insure_price), 0) as insure_price, ifnull(sum(oip.personal_price), 0) as personal_price, ifnull((sum(oip.insure_price) - sum(oip.personal_price)), 0) as total_price
+        from insure_individual_settle oip where oip.hosp_code = #{hospCode} and oip.settle_id in
+        (select os.id from outpt_settle os where os.hosp_code = oip.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime} )
     </select>
 
     <!-- 住院 - 结算表 -->
     <select id="queryInptSettleAll" resultType="java.util.Map">
-        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price from inpt_settle
+        select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price, sum(credit_price) credit_price from inpt_settle
         where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
     </select>
 
@@ -289,7 +290,7 @@
         (select count(invoice_no) from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as usenum
 
         from inpt_settle_invoice isi
-        where isi.hosp_code = #{hospCode} and isi.status_code = '0' and isi.settle_id in (
+        where isi.hosp_code = #{hospCode} and isi.status_code = '0' and print_num &lt;&gt; 0 and isi.invoice_no is not null and isi.settle_id in (
             select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
         )
         group by isi.invoice_id
@@ -305,18 +306,17 @@
 
     <!-- 住院 - 合同单位支付表 -->
     <select id="queryInptInsurePay" resultType="java.util.Map">
-        select iip.type_code, sum(iip.total_price) total_price from inpt_insure_pay iip where iip.hosp_code = #{hospCode} and iip.settle_id in (
-            select iss.id from inpt_settle iss where iss.hosp_code = iip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
-        )
-        group by iip.type_code
+        select ifnull(sum(iip.insure_price), 0) as insure_price, ifnull(sum(iip.personal_price), 0) as personal_price, ifnull((sum(iip.insure_price) - sum(iip.personal_price)), 0) as total_price
+        from insure_individual_settle iip where iip.hosp_code = #{hospCode} and iip.settle_id in
+        (select iss.id from inpt_settle iss where iss.hosp_code = iip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})
     </select>
 
     <!-- 新增日结缴款主表 -->
     <insert id="insertOutinDailyList">
-        insert into outin_daily(id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, yktcz_total_price, ykttk_total_price, back_total_price, preferential_total_price, round_total_price, card_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time)
+        insert into outin_daily(id, hosp_code, daily_no, start_time, end_time, type_code, total_price, insure_total_price, yjss_total_price, yjtk_total_price, yjjs_total_price, yjcd_total_price, yktcz_total_price, ykttk_total_price, back_total_price, preferential_total_price, round_total_price, card_total_price, reality_total_price, is_ok, ok_id, ok_name, ok_time, crte_id, crte_name, crte_time, credit_total_price)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id}, #{item.hospCode}, #{item.dailyNo}, #{item.startTime}, #{item.endTime}, #{item.typeCode}, #{item.totalPrice}, #{item.insureTotalPrice}, #{item.yjssTotalPrice}, #{item.yjtkTotalPrice}, #{item.yjjsTotalPrice}, #{item.yjcdTotalPrice}, #{item.yktczTotalPrice}, #{item.ykttkTotalPrice}, #{item.backTotalPrice}, #{item.preferentialTotalPrice}, #{item.roundTotalPrice}, #{item.cardTotalPrice}, #{item.realityTotalPrice}, #{item.isOk}, #{item.okId}, #{item.okName}, #{item.okTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+            (#{item.id}, #{item.hospCode}, #{item.dailyNo}, #{item.startTime}, #{item.endTime}, #{item.typeCode}, #{item.totalPrice}, #{item.insureTotalPrice}, #{item.yjssTotalPrice}, #{item.yjtkTotalPrice}, #{item.yjjsTotalPrice}, #{item.yjcdTotalPrice}, #{item.yktczTotalPrice}, #{item.ykttkTotalPrice}, #{item.backTotalPrice}, #{item.preferentialTotalPrice}, #{item.roundTotalPrice}, #{item.cardTotalPrice}, #{item.realityTotalPrice}, #{item.isOk}, #{item.okId}, #{item.okName}, #{item.okTime}, #{item.crteId}, #{item.crteName}, #{item.crteTime}, #{item.creditTotalPrice})
         </foreach>
 
     </insert>
@@ -350,10 +350,10 @@
 
     <!-- 新增日结缴款合同单位支付表 -->
     <insert id="insertOutinDailyInsureList">
-        insert into outin_daily_insure(id, hosp_code, daily_id, daily_no, type_code, insure_code, total_price)
+        insert into outin_daily_insure(id, hosp_code, daily_id, daily_no, type_code, insure_code, total_price, insure_price, personal_price)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.insureCode}, #{item.totalPrice})
+        (#{item.id}, #{item.hospCode}, #{item.dailyId}, #{item.dailyNo}, #{item.typeCode}, #{item.insureCode}, #{item.totalPrice}, #{item.insurePrice}, #{item.personalPrice})
         </foreach>
     </insert>
 
@@ -412,7 +412,7 @@
 
     <!-- 根据日结单号、日结类型查询日结支付方式表 -->
     <select id="queryOutinDailyPay" resultType="java.util.Map">
-         select t.name, ifnull( t1.total_price, 0 ) total_price from sys_code_detail t
+         select t.name, ifnull( t1.total_price, 0 ) total_price, t1.pay_code from sys_code_detail t
             left join (
                 SELECT odp.pay_code, sum( odp.total_price ) total_price FROM outin_daily_pay odp
                 WHERE odp.hosp_code = #{hospCode} AND odp.daily_no = #{dailyNo} and odp.type_code = #{typeCode}
@@ -712,5 +712,9 @@
             ) t1 on t.value = t1.pay_code
          where t.c_code = 'ZFFS' and (t.is_valid = '1' or (t.is_valid = '0' and t1.total_price is not null))
          order by t.seq_no
+    </select>
+
+    <select id="getOutinDailyInsure" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.daily.dto.OutinDailyDTO">
+        select total_price, personal_price from outin_daily_insure where hosp_code = #{hospCode} and daily_no = #{dailyNo} and type_code = #{typeCode}
     </select>
 </mapper>

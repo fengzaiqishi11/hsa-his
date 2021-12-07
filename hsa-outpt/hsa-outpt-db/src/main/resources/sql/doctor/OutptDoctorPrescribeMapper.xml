@@ -339,96 +339,96 @@
     <!-- 查询未就诊、已就诊数据-->
     <select id="queryPatientByOperType" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select * from (
-            select a.id, a.hosp_code hospCode, a.profile_id profileId, a.out_profile outProfile, a.register_id registerId,
-            a.register_no registerNo, a.name ,a.gender_code genderCode, a.age,a.age_unit_code ageUnitCode, a.birthday, a.marry_code marryCode,
-            a.nation_code nationCode, a.cert_code certCode, a.cert_no certNo, a.phone, a.visit_no visitNo, a.visit_code visitCode, a.patient_code patientCode,
-            a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
-            a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
-            a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
-            a.crte_time, a.now_address as nowAddress,
-            otv.triage_start_code as triageStatusCode,
-            otv.is_call as isCanCall,
-            case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
-            from outpt_visit a
-            join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
-            left join outpt_diagnose c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1' and ifnull(c.disease_id,'') != ''
+        select a.id, a.hosp_code hospCode, a.profile_id profileId, a.out_profile outProfile, a.register_id registerId,
+        a.register_no registerNo, a.name ,a.gender_code genderCode, a.age,a.age_unit_code ageUnitCode, a.birthday, a.marry_code marryCode,
+        a.nation_code nationCode, a.cert_code certCode, a.cert_no certNo, a.phone, a.visit_no visitNo, a.visit_code visitCode, a.patient_code patientCode,
+        a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
+        a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
+        a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
+        a.crte_time, a.now_address as nowAddress,
+        otv.triage_start_code as triageStatusCode,
+        otv.is_call as isCanCall,
+        case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
+        from outpt_visit a
+        join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+        left join outpt_diagnose c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1' and ifnull(c.disease_id,'') != ''
         left join base_disease d on c.disease_id = d.id and c.hosp_code = d.hosp_code
-            left join sys_parameter e on e.code = 'MZYS_EKCFNL' and a.hosp_code = e.hosp_code
-                and (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(a.birthday)), '%Y')+0) &lt;= e.value
+        left join sys_parameter e on e.code = 'MZYS_EKCFNL' and a.hosp_code = e.hosp_code
+        and (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(a.birthday)), '%Y')+0) &lt;= e.value
         left join outpt_triage_visit otv on a.hosp_code = otv.hosp_code and a.register_id = otv.register_id
-            <!-- 待接诊 -->
-            <if test="operType == '1'.toString() ">
-                left join sys_parameter f on f.code = 'GH_JS' and a.hosp_code = f.hosp_code
-                left join outpt_register_settle g on b.id = g.register_id and b.hosp_code = g.hosp_code and g.status_code = '0'
-                <!-- 挂号保留的有效天数，默认为当天有效-->
-                left join sys_parameter sys on sys.code = 'GH_VALID_DAY' and a.hosp_code = sys.hosp_code and sys.is_valid = '1'
-            </if>
-            where a.hosp_code = #{hospCode}
-            <!-- 待接诊 -->
-            <if test="operType == '1'.toString() ">
-                and ((f.value = '0' and g.id is not null) or ifnull(f.value,'0') != '0' or f.id is null)
-                and (
-                    b.doctor_id = #{doctorId} or (b.dept_id = #{deptId} and ifnull(b.doctor_id,'') = '')
-                ) and ifnull( a.is_visit, '0' ) = '0' and ifnull(b.is_cancel,'0') = '0'
-                <!--and date(b.register_time) = date(now())-->
-              <![CDATA[
+        <!-- 待接诊 -->
+        <if test="operType == '1'.toString() ">
+            left join sys_parameter f on f.code = 'GH_JS' and a.hosp_code = f.hosp_code
+            left join outpt_register_settle g on b.id = g.register_id and b.hosp_code = g.hosp_code and g.status_code = '0'
+            <!-- 挂号保留的有效天数，默认为当天有效-->
+            left join sys_parameter sys on sys.code = 'GH_VALID_DAY' and a.hosp_code = sys.hosp_code and sys.is_valid = '1'
+        </if>
+        where a.hosp_code = #{hospCode}
+        <!-- 待接诊 -->
+        <if test="operType == '1'.toString() ">
+            and ((f.value = '0' and g.id is not null) or ifnull(f.value,'0') != '0' or f.id is null)
+            and (
+            b.doctor_id = #{doctorId} or (b.dept_id = #{deptId} and ifnull(b.doctor_id,'') = '')
+            ) and ifnull( a.is_visit, '0' ) = '0' and ifnull(b.is_cancel,'0') = '0'
+            <!--and date(b.register_time) = date(now())-->
+            <![CDATA[
                 and IF(sys.value > 0 , date(date_sub(now(), interval sys.value day)), date(now())) <= date(b.register_time)
               ]]>
-                <if test="keyword !=null and keyword !=''">
+            <if test="keyword !=null and keyword !=''">
                 and (a.name like concat('%',#{keyword},'%')
                 or a.visit_no like concat('%',#{keyword},'%')
                 or a.cert_no like concat('%',#{keyword},'%')
                 or a.phone like concat('%',#{keyword},'%'))
-                </if>
             </if>
+        </if>
 
-            <!-- 已接诊 -->
-            <if test="operType == '2'.toString() ">
-                and a.dept_id = #{deptId} and ifnull( a.is_visit, '0' ) = '1' and date(a.visit_time) between #{startDate} and #{endDate}
-                and (a.name like concat('%',#{keyword},'%') or a.visit_no like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%') or a.phone like concat('%',#{keyword},'%'))
-            </if>
+        <!-- 已接诊 -->
+        <if test="operType == '2'.toString() ">
+            and a.dept_id = #{deptId} and ifnull( a.is_visit, '0' ) = '1' and date(a.visit_time) between #{startDate} and #{endDate}
+            and (a.name like concat('%',#{keyword},'%') or a.visit_no like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%') or a.phone like concat('%',#{keyword},'%'))
+        </if>
 
-            <!-- 处方查询 -->
-            <if test="operType == '3'.toString() ">
-                and b.dept_id = #{deptId} and ifnull( a.is_visit, '0' ) = '1' and date(a.visit_time) between #{startDate} and #{endDate}
-                and (a.name like concat('%',#{keyword},'%') or a.visit_no like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%') or a.phone like concat('%',#{keyword},'%'))
-            </if>
+        <!-- 处方查询 -->
+        <if test="operType == '3'.toString() ">
+            and b.dept_id = #{deptId} and ifnull( a.is_visit, '0' ) = '1' and date(a.visit_time) between #{startDate} and #{endDate}
+            and (a.name like concat('%',#{keyword},'%') or a.visit_no like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%') or a.phone like concat('%',#{keyword},'%'))
+        </if>
 
-            <!-- 就诊科室 -->
-            <if test="deptId != null and deptId != '' and operType == '3'.toString()" >
-                and b.dept_id = #{deptId}
-            </if>
-            <!-- 就诊id -->
-            <if test="id != null and id != ''" >
-                and a.id = #{id}
-            </if>
+        <!-- 就诊科室 -->
+        <if test="deptId != null and deptId != '' and operType == '3'.toString()" >
+            and b.dept_id = #{deptId}
+        </if>
+        <!-- 就诊id -->
+        <if test="id != null and id != ''" >
+            and a.id = #{id}
+        </if>
         ) a order by a.type, a.visitTime,a.registerNo desc
     </select>
 
     <!--  获取历史病历记录 -->
     <select id="queryMedicalRecord" resultType="java.util.Map" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, a.visit_id visitId, a.profile_id profileId, a.disease_id diseaseId, c.name diagnoseName,
-        a.start_date startDate, a.chief_complaint chiefComplaint, a.present_illness presentIllness,
-        a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
-        a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion, a.specialty_check specialtyCheck,
-        a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
-        a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke
+               a.start_date startDate, a.chief_complaint chiefComplaint, a.present_illness presentIllness,
+               a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
+               a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion, a.specialty_check specialtyCheck,
+               a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
+               a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke
         from  outpt_medical_record a
-        join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
-        left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
+                  join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+                  left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
         where a.profile_id = #{profileId} and a.hosp_code = #{hospCode}
     </select>
 
     <!--  获取病历记录 -->
     <select id="getMedicalRecord" resultType="java.util.Map" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, a.visit_id visitId, a.profile_id profileId, a.disease_id diseaseId, a.start_date startDate, a.chief_complaint chiefComplaint, a.present_illness presentIllness,
-        a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
-        a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion,
-        a.specialty_check specialtyCheck, a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
-        a.breath, a.height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, c.name diagnoseName,
-        (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke
+               a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
+               a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion,
+               a.specialty_check specialtyCheck, a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
+               a.breath, a.height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, c.name diagnoseName,
+               (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke
         from  outpt_medical_record a
-        left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
+                  left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
 
@@ -440,99 +440,99 @@
             breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time
         )
         values (
-            #{id}, #{hospCode}, #{visitId}, #{profileId}, #{diseaseId}, #{startDate}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory},
-            #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
-            #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now()
-        )
+                   #{id}, #{hospCode}, #{visitId}, #{profileId}, #{diseaseId}, #{startDate}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory},
+                   #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
+                   #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now()
+               )
     </insert>
 
     <!--修改病历记录-->
     <update id="updateMedicalRecord" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO">
         update outpt_medical_record set
-            disease_id = #{diseaseId},
-            start_date = #{startDate},
-            chief_complaint = #{chiefComplaint},
-            present_illness = #{presentIllness},
-            past_history = #{pastHistory},
-            oneself_history = #{oneselfHistory},
-            family_history = #{familyHistory},
-            allergy_history = #{allergyHistory},
-            vaccination_history = #{vaccinationHistory},
-            auxiliary_inspect = #{auxiliaryInspect},
-            disease_analysis = #{diseaseAnalysis},
-            handle_suggestion = #{handleSuggestion},
-            specialty_check = #{specialtyCheck},
-            temperature = #{temperature},
-            min_blood_pressure = #{minBloodPressure},
-            max_blood_pressure = #{maxBloodPressure},
-            breath = #{breath},
-            height = #{height},
-            blood_sugar = #{bloodSugar},
-            pulse = #{pulse},
-            weight = #{weight},
-            bmi = #{bmi},
-            entrust = #{entrust},
-            remarke = #{remarke}
+                                        disease_id = #{diseaseId},
+                                        start_date = #{startDate},
+                                        chief_complaint = #{chiefComplaint},
+                                        present_illness = #{presentIllness},
+                                        past_history = #{pastHistory},
+                                        oneself_history = #{oneselfHistory},
+                                        family_history = #{familyHistory},
+                                        allergy_history = #{allergyHistory},
+                                        vaccination_history = #{vaccinationHistory},
+                                        auxiliary_inspect = #{auxiliaryInspect},
+                                        disease_analysis = #{diseaseAnalysis},
+                                        handle_suggestion = #{handleSuggestion},
+                                        specialty_check = #{specialtyCheck},
+                                        temperature = #{temperature},
+                                        min_blood_pressure = #{minBloodPressure},
+                                        max_blood_pressure = #{maxBloodPressure},
+                                        breath = #{breath},
+                                        height = #{height},
+                                        blood_sugar = #{bloodSugar},
+                                        pulse = #{pulse},
+                                        weight = #{weight},
+                                        bmi = #{bmi},
+                                        entrust = #{entrust},
+                                        remarke = #{remarke}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!--修改就诊信息-->
     <update id="updateVisit" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update outpt_visit set
-            name = #{name},
-            gender_code = #{genderCode},
-            age = #{age},
-            age_unit_code = #{ageUnitCode},
-            birthday = #{birthday},
-            marry_code = #{marryCode},
-            nation_code = #{nationCode},
-            cert_code = #{certCode},
-            cert_no = #{certNo},
-            phone = #{phone},
-            patient_code = #{patientCode},
-            preferential_type_id = #{preferentialTypeId},
-            visit_code = #{visitCode},
-            remark = #{remark},
-            now_address = #{nowAddress},
-            source_tj_code = #{sourceTjCode},
-            source_tj_remark = #{sourceTjRemark}
+                               name = #{name},
+                               gender_code = #{genderCode},
+                               age = #{age},
+                               age_unit_code = #{ageUnitCode},
+                               birthday = #{birthday},
+                               marry_code = #{marryCode},
+                               nation_code = #{nationCode},
+                               cert_code = #{certCode},
+                               cert_no = #{certNo},
+                               phone = #{phone},
+                               patient_code = #{patientCode},
+                               preferential_type_id = #{preferentialTypeId},
+                               visit_code = #{visitCode},
+                               remark = #{remark},
+                               now_address = #{nowAddress},
+                               source_tj_code = #{sourceTjCode},
+                               source_tj_remark = #{sourceTjRemark}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!--修改住院证信息-->
     <update id="updateVisitInHospital" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update outpt_visit set
-      <if test="advancePayment!=null and advancePayment!=''">
-        advance_payment = #{advancePayment},
-      </if>
-      <if test="tranInCode!=null and tranInCode!=''">
-        tran_in_code = #{tranInCode},
-      </if>
-      <if test="inDeptId!=null and inDeptId!=''">
-        in_dept_id = #{inDeptId},
-      </if>
-      <if test="inDiseaseId!=null and inDiseaseId!=''">
-        in_disease_id = #{inDiseaseId},
-      </if>
-      <if test="inRemark!=null and inRemark!=''">
-        in_remark = #{inRemark},
-      </if>
-      <if test="inCertTime!=null">
-        in_cert_time = #{inCertTime}
-      </if>
-      where id = #{id} and hosp_code = #{hospCode}
+        <if test="advancePayment!=null and advancePayment!=''">
+            advance_payment = #{advancePayment},
+        </if>
+        <if test="tranInCode!=null and tranInCode!=''">
+            tran_in_code = #{tranInCode},
+        </if>
+        <if test="inDeptId!=null and inDeptId!=''">
+            in_dept_id = #{inDeptId},
+        </if>
+        <if test="inDiseaseId!=null and inDiseaseId!=''">
+            in_disease_id = #{inDiseaseId},
+        </if>
+        <if test="inRemark!=null and inRemark!=''">
+            in_remark = #{inRemark},
+        </if>
+        <if test="inCertTime!=null">
+            in_cert_time = #{inCertTime}
+        </if>
+        where id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!-- 接诊接口 -->
     <update id="updateIsVisit" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update outpt_visit set
-            is_visit = #{isVisit},
-            is_first_visit = #{isFirstVisit},
-            doctor_id = #{doctorId},
-            doctor_name = #{doctorName},
-            dept_id = #{deptId},
-            dept_name = #{deptName},
-            visit_time = now()
+                               is_visit = #{isVisit},
+                               is_first_visit = #{isFirstVisit},
+                               doctor_id = #{doctorId},
+                               doctor_name = #{doctorName},
+                               dept_id = #{deptId},
+                               dept_name = #{deptName},
+                               visit_time = now()
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -540,57 +540,57 @@
     <update id="updateOutptCostDoctor" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update outpt_cost a
         set doctor_id = #{doctorId},
-        doctor_name = #{doctorName}
+            doctor_name = #{doctorName}
         where a.visit_id = #{id} and a.hosp_code = #{hospCode} and ifnull(a.doctor_id,'') = ''
     </update>
 
     <!--  获取处方主表、明细表记录 -->
     <select id="getPrescribeAllDetail" resultMap="outptPrescribeDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code , a.visit_id ,
-        c.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
-        a.dept_name , a.type_code , a.prescribe_type_code ,
-        a.settle_id , a.remark , a.is_settle , a.is_cancel , a.is_print ,
-        a.is_herb_hospital , a.herb_num , a.herb_use_code ,
-        a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime, a.is_submit, j.cflJf, i.cfje,
-        b.id idDetail,  b.op_id,  b.opt_id,  b.optd_group_no,  b.optd_group_seq_no,  b.optd_id,  b.group_no,
-        b.group_seq_no,  b.item_code,  b.item_id,  b.item_name,  b.price,  b.total_price,  b.spec,  b.prep_code,  b.dosage,  b.dosage_unit_code,  b.usage_code,
-        b.rate_id,  b.speed_code,  b.use_days,  b.num,  b.num_unit_code,  b.total_num,   b.herb_note_code,  b.is_skin,  b.is_positive,  b.content,
-        b.phar_id,  b.bfc_id,  b.use_code,  b.exec_dept_id,  b.exec_date,  b.exec_id,  b.exec_name,  b.exec_num,  b.technology_no,  b.skin_durg_id,  b.skin_phar_id,
-        b.skin_unit_code,case when b.item_code = '2' then '2'  when b.item_code = '1' and f.big_type_code = '2' then  '3' when b.item_code = '1' then '1'
-        when b.item_code = '4' and h.type_code = '3' then '4' when b.item_code = '4' and h.type_code = '12' then '5' when  b.item_code = '4' then '6' end type,
-        case when b.item_code = '1' and f.ph_code = '5' then '1' when b.item_code = '1' and f.ph_code = '1' or b.item_code = '1' and (f.ph_code = '2' or f.ph_code = '3') then '4'
-        when b.item_code = '1' and f.ph_code = '6' then '5' when b.item_code = '1' and f.ph_code = '4' then '6' else '1'
-        end phCode, d.name execDeptName, e.good_name skinGoodName,
-        case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
-        case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
-        case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
-        f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
-        b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail
+               c.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
+               a.dept_name , a.type_code , a.prescribe_type_code ,
+               a.settle_id , a.remark , a.is_settle , a.is_cancel , a.is_print ,
+               a.is_herb_hospital , a.herb_num , a.herb_use_code ,
+               a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime, a.is_submit, j.cflJf, i.cfje,
+               b.id idDetail,  b.op_id,  b.opt_id,  b.optd_group_no,  b.optd_group_seq_no,  b.optd_id,  b.group_no,
+               b.group_seq_no,  b.item_code,  b.item_id,  b.item_name,  b.price,  b.total_price,  b.spec,  b.prep_code,  b.dosage,  b.dosage_unit_code,  b.usage_code,
+               b.rate_id,  b.speed_code,  b.use_days,  b.num,  b.num_unit_code,  b.total_num,   b.herb_note_code,  b.is_skin,  b.is_positive,  b.content,
+               b.phar_id,  b.bfc_id,  b.use_code,  b.exec_dept_id,  b.exec_date,  b.exec_id,  b.exec_name,  b.exec_num,  b.technology_no,  b.skin_durg_id,  b.skin_phar_id,
+               b.skin_unit_code,case when b.item_code = '2' then '2'  when b.item_code = '1' and f.big_type_code = '2' then  '3' when b.item_code = '1' then '1'
+                                     when b.item_code = '4' and h.type_code = '3' then '4' when b.item_code = '4' and h.type_code = '12' then '5' when  b.item_code = '4' then '6' end type,
+               case when b.item_code = '1' and f.ph_code = '5' then '1' when b.item_code = '1' and f.ph_code = '1' or b.item_code = '1' and (f.ph_code = '2' or f.ph_code = '3') then '4'
+                    when b.item_code = '1' and f.ph_code = '6' then '5' when b.item_code = '1' and f.ph_code = '4' then '6' else '1'
+                   end phCode, d.name execDeptName, e.good_name skinGoodName,
+               case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
+               case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
+               case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
+               f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
+               b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail
         from outpt_prescribe a
-        join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
-        join(
+                 join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
+                 join(
             select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a
-            join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+                     join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
             where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
             group by a.id ,a.hosp_code
         )c on a.id = c.id and a.hosp_code = c.hosp_code
-        left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
-        left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
-        left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
-        left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
-        left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
-        left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and h.code = parameter.value and h.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
-        left join (
+                 left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
+                 left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
+                 left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
+                 left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
+                 left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
+                 left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and h.code = parameter.value and h.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
+                 left join (
             select a.hosp_code, a.visit_id, a.op_id, sum(ifnull(a.reality_price, 0)) cfje
             from outpt_cost a
             where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
             group by a.hosp_code, a.visit_id, a.op_id
         )i on a.id = i.op_id and a.hosp_code = i.hosp_code
-        left join (
+                 left join (
             select a.id, a.hosp_code, sum(ifnull(b.total_price, 0)) cflJf
             from outpt_prescribe a
-            join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
+                     join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
             where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
             group by a.id,a.hosp_code
         )j on a.id = j.id and a.hosp_code = j.hosp_code
@@ -655,12 +655,12 @@
         from outpt_prescribe a
         join outpt_settle b on a.hosp_code=b.hosp_code and a.settle_id=b.id
         join(
-            select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
-            from outpt_prescribe a
-            join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
-            join outpt_settle c on a.hosp_code=c.hosp_code and a.settle_id=c.id
-            where a.hosp_code = #{hospCode} and c.settle_no=#{settleNo}
-            group by a.id ,a.hosp_code
+        select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
+        from outpt_prescribe a
+        join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+        join outpt_settle c on a.hosp_code=c.hosp_code and a.settle_id=c.id
+        where a.hosp_code = #{hospCode} and c.settle_no=#{settleNo}
+        group by a.id ,a.hosp_code
         )c on a.id = c.id and a.hosp_code = c.hosp_code
         where a.hosp_code=#{hospCode}
         and b.is_settle='1' and a.is_settle='1'
@@ -681,12 +681,12 @@
     <!--  获取处方主表记录 -->
     <select id="getPrescribe" resultType="java.util.Map" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, a.visit_id visitId,
-        a.diagnose_ids diagnoseIds, a.order_no orderNo, a.doctor_id doctorId, a.doctor_name doctorName, a.dept_id deptId,
-        a.dept_name deptName, a.type_code typeCode, a.prescribe_type_code prescribeTypeCode,
-        a.settle_id settleId, a.remark , a.is_settle isSettle, a.is_cancel isCancel, a.is_print isPrint,
-        a.is_herb_hospital isHerbHospital, a.herb_num herbNum, a.herb_use_code herbUseCode,
-        a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime,
-        a.cancel_name cancelName, a.cancel_date cancelDate
+               a.diagnose_ids diagnoseIds, a.order_no orderNo, a.doctor_id doctorId, a.doctor_name doctorName, a.dept_id deptId,
+               a.dept_name deptName, a.type_code typeCode, a.prescribe_type_code prescribeTypeCode,
+               a.settle_id settleId, a.remark , a.is_settle isSettle, a.is_cancel isCancel, a.is_print isPrint,
+               a.is_herb_hospital isHerbHospital, a.herb_num herbNum, a.herb_use_code herbUseCode,
+               a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime,
+               a.cancel_name cancelName, a.cancel_date cancelDate
         from  outpt_prescribe a
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
@@ -694,78 +694,79 @@
     <!--  获取处方明细记录 -->
     <select id="getPrescribeDetail" resultType="java.util.Map" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, a.op_id opId, a.visit_id visitId,
-        a.optd_group_no optdGroupNo,  a.optd_group_seq_no optdGroupSeqNo, a.optd_id optdId, a.group_no groupNo, a.group_seq_no groupSeqNo,
-        a.item_code itemCode, a.item_id itemId, a.item_name itemName,
-        a.price , a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage dosage,
-        a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,
-        a.speed_code speedCode, a.use_days useDays, a.num num, a.num_unit_code numUnitCode, a.total_num totalNum,
-        a.herb_note_code herbNoteCode, a.is_skin isSkin, a.is_positive isPositive, a.content content, a.phar_id pharId, a.bfc_id bfcId,
-        a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,
-        ( CASE WHEN a.item_code = '1' THEN c.usual_name WHEN a.item_code = '2' THEN g.other_name WHEN a.item_code = '3' THEN it.other_name WHEN a.item_code = '4' THEN ad.other_name END ) bName,
-        case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
-        case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
-        i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark
+               a.optd_group_no optdGroupNo,  a.optd_group_seq_no optdGroupSeqNo, a.optd_id optdId, a.group_no groupNo, a.group_seq_no groupSeqNo,
+               a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+               a.price , a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage dosage,
+               a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,
+               a.speed_code speedCode, a.use_days useDays, a.num num, a.num_unit_code numUnitCode, a.total_num totalNum,
+               a.herb_note_code herbNoteCode, a.is_skin isSkin, a.is_positive isPositive, a.content content, a.phar_id pharId, a.bfc_id bfcId,
+               a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,
+               ( CASE WHEN a.item_code = '1' THEN c.usual_name WHEN a.item_code = '2' THEN g.other_name WHEN a.item_code = '3' THEN it.other_name WHEN a.item_code = '4' THEN ad.other_name END ) bName,
+               case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+               case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
+               i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
         from  outpt_prescribe_detail a
-        left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
-        left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'
-        left join base_item it on a.item_id = it.id  and a.hosp_code = it.hosp_code  and a.item_code = '3'
-	    left join base_advice ad on a.item_id = ad.id  and a.hosp_code = ad.hosp_code  and a.item_code = '4'
-        left join (
+                  left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+                  left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'
+                  left join base_item it on a.item_id = it.id  and a.hosp_code = it.hosp_code  and a.item_code = '3'
+                  left join base_advice ad on a.item_id = ad.id  and a.hosp_code = ad.hosp_code  and a.item_code = '4'
+                  left join base_rate br on a.hosp_code = br.hosp_code and a.rate_id = br.id
+                  left join (
             select a.hosp_code, a.visit_id, a.op_id, sum(ifnull(a.reality_price, 0)) cfje,max(b.crte_id) settleCrteId,max(b.crte_name) settleCrteName
             from outpt_cost a
-            left join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code
+                     left join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code
             where a.op_id = #{opId} and a.hosp_code = #{hospCode} and a.status_code = '0'
             group by a.hosp_code, a.visit_id, a.op_id
         )i on a.op_id = i.op_id and a.hosp_code = i.hosp_code
-        left join (
+                  left join (
             select max(id) id, max(opd_id) opd_id, max(distribute_id) distribute_id, max(hosp_code) hosp_code
             from phar_out_distribute_detail a
             where a.op_id = #{opId} and a.hosp_code = #{hospCode}
             group by opd_id, hosp_code
         ) pharDetail on pharDetail.opd_id = a.id and pharDetail.hosp_code = a.hosp_code
-        left join phar_out_distribute phar on pharDetail.distribute_id = phar.id and phar.hosp_code = pharDetail.hosp_code and phar.status_code = '0'
+                  left join phar_out_distribute phar on pharDetail.distribute_id = phar.id and phar.hosp_code = pharDetail.hosp_code and phar.status_code = '0'
         where a.op_id = #{opId} and a.hosp_code = #{hospCode}
     </select>
 
     <!--  获取处方明细记录（处方查询使用） -->
     <select id="getPrescribeDetailAll" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.visit_id visitId,
-        c.diagnose_ids diagnoseIds, c.disease_names diseaseNames, a.order_no orderNo, a.doctor_id doctorId, a.doctor_name doctorName, a.dept_id deptId,
-        a.dept_name deptName, a.type_code typeCode, a.prescribe_type_code prescribeT_typeCode,
-        a.settle_id settleId, a.is_settle isSettle, a.is_cancel isCancel, a.is_print isPrint,
-        a.is_herb_hospital isHerbHospital, a.herb_num herbNum, a.herb_use_code herbUseCode,
-        a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime,
-        b.id idDetail,  b.op_id opId,  b.opt_id optId,  b.optd_group_no optdGroupNo,  b.optd_group_seq_no optdGroupSeqNo,  b.optd_id optdId,  b.group_no groupNo,
-        b.group_seq_no groupSeqNo,  b.item_code itemCode,  b.item_id itemId,  b.item_name itemName,  b.price,  b.total_price totalPrice,  b.spec,  b.prep_code prepCode,  b.dosage,
-        b.dosage_unit_code dosageUnitCode,  b.usage_code usageCode, b.rate_id rateId,  b.speed_code speedCode,  b.use_days useDays,  b.num, b.num_unit_code numUnitCode,
-        b.total_num totalNum, b.herb_note_code herbNoteCode,  b.is_skin isSkin,  b.is_positive isPositive,  b.content,
-        b.phar_id pharId,  b.bfc_id bfcId,  b.use_code useCode,  b.exec_dept_id execDeptId,  b.exec_date execDate,  b.exec_id execId,  b.exec_name execName,
-        b.exec_num execNum,  b.technology_no technologyNo,  b.skin_durg_id skinDurgId,  b.skin_phar_id skinPharId,
-        b.skin_unit_code skinUnitCode,a.type_code type, a.prescribe_type_code phCode, d.name execDeptName,
-        case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode, b.remark
+               c.diagnose_ids diagnoseIds, c.disease_names diseaseNames, a.order_no orderNo, a.doctor_id doctorId, a.doctor_name doctorName, a.dept_id deptId,
+               a.dept_name deptName, a.type_code typeCode, a.prescribe_type_code prescribeT_typeCode,
+               a.settle_id settleId, a.is_settle isSettle, a.is_cancel isCancel, a.is_print isPrint,
+               a.is_herb_hospital isHerbHospital, a.herb_num herbNum, a.herb_use_code herbUseCode,
+               a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime,
+               b.id idDetail,  b.op_id opId,  b.opt_id optId,  b.optd_group_no optdGroupNo,  b.optd_group_seq_no optdGroupSeqNo,  b.optd_id optdId,  b.group_no groupNo,
+               b.group_seq_no groupSeqNo,  b.item_code itemCode,  b.item_id itemId,  b.item_name itemName,  b.price,  b.total_price totalPrice,  b.spec,  b.prep_code prepCode,  b.dosage,
+               b.dosage_unit_code dosageUnitCode,  b.usage_code usageCode, b.rate_id rateId,  b.speed_code speedCode,  b.use_days useDays,  b.num, b.num_unit_code numUnitCode,
+               b.total_num totalNum, b.herb_note_code herbNoteCode,  b.is_skin isSkin,  b.is_positive isPositive,  b.content,
+               b.phar_id pharId,  b.bfc_id bfcId,  b.use_code useCode,  b.exec_dept_id execDeptId,  b.exec_date execDate,  b.exec_id execId,  b.exec_name execName,
+               b.exec_num execNum,  b.technology_no technologyNo,  b.skin_durg_id skinDurgId,  b.skin_phar_id skinPharId,
+               b.skin_unit_code skinUnitCode,a.type_code type, a.prescribe_type_code phCode, d.name execDeptName,
+               case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode, b.remark
         from  outpt_prescribe a
-        join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
-        join(
+                  join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
+                  join(
             select a.visit_id, a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a
-            join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+                     join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
             where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
             group by a.visit_id ,a.hosp_code
         )c on a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
-        left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
-        left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
-        left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
-        left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
+                  left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
+                  left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
+                  left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
+                  left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
 
     <!--  获取处方明细费用 -->
     <select id="getPrescribeDetailExt" resultType="java.util.Map" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, a.visit_id visitId, a.op_id opId, a.opd_id opdId,
-        a.self_ratio selfRatio, a.item_code itemCode, a.item_id itemId, a.item_name itemName,
-        a.price, a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage,
-        a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId, a.use_days useDays,
-        a.num, a.num_unit_code numUnitCode, a.total_num totalNum, a.use_code useCode
+               a.self_ratio selfRatio, a.item_code itemCode, a.item_id itemId, a.item_name itemName,
+               a.price, a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage,
+               a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId, a.use_days useDays,
+               a.num, a.num_unit_code numUnitCode, a.total_num totalNum, a.use_code useCode
         from outpt_cost a
         where a.opd_id = #{opdId} and a.hosp_code = #{hospCode}
     </select>
@@ -826,164 +827,164 @@
     </select>
 
     <select id="getCfData" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
-      select a.*
-      from (
-      select a.id, a.hosp_code, a.bfc_code, a.code, a.good_name,a.usual_name as bName, a.spec, a.prep_code, a.dosage,
-      a.dosage_unit_code, a.unit_code, a.rate_code,
-      case when #{operType} = '1' and a.out_unit_code = a.unit_code then a.price when #{operType} = '1' and a.out_unit_code = a.split_unit_code then a.split_price
-      when #{operType} = '2' and a.in_unit_code = a.unit_code then a.price when #{operType} = '2' and a.in_unit_code = a.split_unit_code then a.split_price end price,
-      a.split_ratio, a.split_unit_code,
-      a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code,
-      <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
-      case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
-      a.antibacterial_code, a.is_skin,
-      a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
-      case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
-      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
-      ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
-      <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
-      '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
-      a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-      a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code
-      from base_drug a
-      left join(
-      select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
-      max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
-      from base_dept a
-      join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-      join base_dept c on c.hosp_code = b.hosp_code
-      <if test="pharId == null or pharId == ''">
-        and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
-      </if>
-      <if test="pharId != null and pharId != ''">
-        and c.id = #{pharId}
-      </if>
-      where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
-      )b on 1 = 1
-      join stro_stock stock on (
-      case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end
-      ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
-      left join base_rate c on a.rate_code = c.code and a.hosp_code = c.hosp_code
-      left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
-      left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
-      left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-      <if test="operType == '1'.toString() ">
-        left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
-      </if>
-      <if test="operType == '2'.toString() ">
-        left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
-      </if>
-      where a.hosp_code = #{hospCode}
-      <if test="yzmlType != null and yzmlType != ''" >
-        and  '2' = #{yzmlType}
-      </if>
-      and (
-      ((#{operType} = '1' and ifnull(a.is_out,'1') = '1' and (a.out_unit_code = a.unit_code or a.out_unit_code = a.split_unit_code or ifnull(a.out_unit_code,'')='') )
-      or (#{operType} = '2' and ifnull(a.is_in,'1') = '1' and (a.in_unit_code = a.unit_code or a.in_unit_code = a.split_unit_code or ifnull(a.in_unit_code,'')='')))
-      <if test="visitId != null and visitId != ''">
-        and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
-        (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9') or a.gender_code = '' or visit.gender_code = '')
-      </if>
-      )
-      and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
-      union all
-
-      select a.id, a.hosp_code, a.bfc_code, a.code, a.name good_name,a.other_name as bName, a.spec, null prep_code, null dosage,
-      null dosage_unit_code, a.unit_code,null rate_code,a.split_price price, '1' split_ratio, a.split_unit_code
-      split_unit_code,
-      a.split_price split_price, null is_lvp,null usage_code, null ddd, null durg_code, '1' ph_code,null
-      antibacterial_code, null is_skin,
-      null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code, '2' type, '2' itemCode,
-      b.clf pharId, null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
-      a.split_unit_code ouUtnitCode,
-      a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
-      drugRemark, '' drugImgPath,
-      f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-      a.pym usual_pym ,'' as technology_code
-      from base_material a
-      left join(
-      select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
-      '3',c.id,'0')) cyf,
-      max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
-      from base_dept a
-      join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-      join base_dept c on c.hosp_code = b.hosp_code
-      <if test="pharId == null or pharId == ''">
-        and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
-      </if>
-      <if test="pharId != null and pharId != ''">
-        and c.id = #{pharId}
-      </if>
-      where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
-      )b on 1 = 1
-      left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
-      <if test="pharId != null and pharId != ''">
-            and stock.biz_id = #{pharId}
-      </if>
-      <if test="pharId == null or pharId == ''">
-            and b.clf = stock.biz_id
-      </if>
-      left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
-      left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-      where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
-      <if test="yzmlType != null and yzmlType != ''" >
-        and  '3' = #{yzmlType}
-      </if>
-      union all
-
-      select a.id, a.hosp_code, null bfc_code, a.code, a.name good_name,a.other_name as bName, null spec, null prep_code, null dosage,
-      null dosage_unit_code, a.unit_code, null rate_code, a.price,'1' split_ratio, a.unit_code split_unit_code,
-      a.price split_price, null is_lvp, null usage_code, null ddd, null durg_code,'1' ph_code,null
-      antibacterial_code,null is_skin,
-      null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,
-      case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type, '4' itemCode, ''
-      pharId, '' rateId, '' bfcId, b.id execDeptId,
-      a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
-      a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
-      '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-      usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code
-      from base_advice a
-      left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
-      left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
-      left join sys_parameter e on e.code = 'WZYZ_YZCODE' and a.code = e.value and a.hosp_code = e.hosp_code and e.is_valid = '1'
-      <if test="operType == '1'.toString() ">
-        left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
-      </if>
-      <if test="operType == '2'.toString() ">
-        left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
-      </if>
-      left join base_dept f on f.id = #{loginDeptId} and a.hosp_code = f.hosp_code
-      where a.hosp_code = #{hospCode}
-      <if test="yzmlType != null and yzmlType != '' and yzmlType == '1'.toString()" >
-        and  '1' = #{yzmlType}
-      </if>
-      <if test="yzmlType != null and yzmlType != '' and yzmlType == '4'.toString()" >
-        and  e.id is not null
-      </if>
-      <if test="pharId != null and pharId != ''">
-          and 1 = 2
-      </if>
-      <if test="yzmlType != null and yzmlType != '' and yzmlType != '1'.toString() and yzmlType != '4'.toString()" >
-        and  '1' = #{yzmlType}
-      </if>
-      and (FIND_IN_SET(f.code ,a.dept_code) or ifnull(a.dept_code,'') = '') and a.is_valid = '1' and (
-      (#{operType} = a.use_scope_code or ifnull(a.use_scope_code,'0') = '0')
-      <if test="visitId != null and visitId != ''">
-        and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
-        (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9')
-        or ifnull(visit.gender_code,'0') = '' or ifnull(a.gender_code,'0') = '')
-      </if>
-      )
-      )a
-      where 1=1
-      <if test="keyword != null and keyword != ''">
+        select a.*
+        from (
+        select a.id, a.hosp_code, a.bfc_code, a.code, a.good_name,a.usual_name as bName, a.spec, a.prep_code, a.dosage,
+        a.dosage_unit_code, a.unit_code, a.rate_code,
+        case when #{operType} = '1' and a.out_unit_code = a.unit_code then a.price when #{operType} = '1' and a.out_unit_code = a.split_unit_code then a.split_price
+        when #{operType} = '2' and a.in_unit_code = a.unit_code then a.price when #{operType} = '2' and a.in_unit_code = a.split_unit_code then a.split_price end price,
+        a.split_ratio, a.split_unit_code,
+        a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code,
+        <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
+        case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
+        a.antibacterial_code, a.is_skin,
+        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
+        case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
+        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
+        ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
+        <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
+        '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
+        a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code
+        from base_drug a
+        left join(
+        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
+        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+        from base_dept a
+        join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+        join base_dept c on c.hosp_code = b.hosp_code
+        <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+        </if>
+        where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+        )b on 1 = 1
+        join stro_stock stock on (
+        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end
+        ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
+        left join base_rate c on a.rate_code = c.code and a.hosp_code = c.hosp_code
+        left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+        left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
+        left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+        <if test="operType == '1'.toString() ">
+            left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        <if test="operType == '2'.toString() ">
+            left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        where a.hosp_code = #{hospCode}
+        <if test="yzmlType != null and yzmlType != ''" >
+            and  '2' = #{yzmlType}
+        </if>
         and (
-        a.good_pym like concat('%',#{keyword},'%') or a.good_wbm like concat('%',#{keyword},'%') or a.good_name like concat('%',#{keyword},'%') or
-        a.usual_name like concat('%',#{keyword},'%') or a.usual_pym like concat('%',#{keyword},'%') or a.usual_wbm like concat('%',#{keyword},'%')
-        or a.bName like concat('%',#{keyword},'%')
+        ((#{operType} = '1' and ifnull(a.is_out,'1') = '1' and (a.out_unit_code = a.unit_code or a.out_unit_code = a.split_unit_code or ifnull(a.out_unit_code,'')='') )
+        or (#{operType} = '2' and ifnull(a.is_in,'1') = '1' and (a.in_unit_code = a.unit_code or a.in_unit_code = a.split_unit_code or ifnull(a.in_unit_code,'')='')))
+        <if test="visitId != null and visitId != ''">
+            and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+            (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9') or a.gender_code = '' or visit.gender_code = '')
+        </if>
         )
-      </if>
-  </select>
+        and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
+        union all
+
+        select a.id, a.hosp_code, a.bfc_code, a.code, a.name good_name,a.other_name as bName, a.spec, null prep_code, null dosage,
+        null dosage_unit_code, a.unit_code,null rate_code,a.split_price price, '1' split_ratio, a.split_unit_code
+        split_unit_code,
+        a.split_price split_price, null is_lvp,null usage_code, null ddd, null durg_code, '1' ph_code,null
+        antibacterial_code, null is_skin,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code, '2' type, '2' itemCode,
+        b.clf pharId, null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
+        a.split_unit_code ouUtnitCode,
+        a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
+        drugRemark, '' drugImgPath,
+        f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
+        a.pym usual_pym ,'' as technology_code,a.nation_code
+        from base_material a
+        left join(
+        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
+        '3',c.id,'0')) cyf,
+        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+        from base_dept a
+        join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+        join base_dept c on c.hosp_code = b.hosp_code
+        <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+        </if>
+        where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
+        )b on 1 = 1
+        left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
+        <if test="pharId != null and pharId != ''">
+            and stock.biz_id = #{pharId}
+        </if>
+        <if test="pharId == null or pharId == ''">
+            and b.clf = stock.biz_id
+        </if>
+        left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+        left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
+        <if test="yzmlType != null and yzmlType != ''" >
+            and  '3' = #{yzmlType}
+        </if>
+        union all
+
+        select a.id, a.hosp_code, null bfc_code, a.code, a.name good_name,a.other_name as bName, null spec, null prep_code, null dosage,
+        null dosage_unit_code, a.unit_code, null rate_code, a.price,'1' split_ratio, a.unit_code split_unit_code,
+        a.price split_price, null is_lvp, null usage_code, null ddd, null durg_code,'1' ph_code,null
+        antibacterial_code,null is_skin,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,
+        case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type, '4' itemCode, ''
+        pharId, '' rateId, '' bfcId, b.id execDeptId,
+        a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
+        a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
+        '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code
+        from base_advice a
+        left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+        left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+        left join sys_parameter e on e.code = 'WZYZ_YZCODE' and a.code = e.value and a.hosp_code = e.hosp_code and e.is_valid = '1'
+        <if test="operType == '1'.toString() ">
+            left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        <if test="operType == '2'.toString() ">
+            left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        left join base_dept f on f.id = #{loginDeptId} and a.hosp_code = f.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="yzmlType != null and yzmlType != '' and yzmlType == '1'.toString()" >
+            and  '1' = #{yzmlType}
+        </if>
+        <if test="yzmlType != null and yzmlType != '' and yzmlType == '4'.toString()" >
+            and  e.id is not null
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and 1 = 2
+        </if>
+        <if test="yzmlType != null and yzmlType != '' and yzmlType != '1'.toString() and yzmlType != '4'.toString()" >
+            and  '1' = #{yzmlType}
+        </if>
+        and (FIND_IN_SET(f.code ,a.dept_code) or ifnull(a.dept_code,'') = '') and a.is_valid = '1' and (
+        (#{operType} = a.use_scope_code or ifnull(a.use_scope_code,'0') = '0')
+        <if test="visitId != null and visitId != ''">
+            and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+            (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9')
+            or ifnull(visit.gender_code,'0') = '' or ifnull(a.gender_code,'0') = '')
+        </if>
+        )
+        )a
+        where 1=1
+        <if test="keyword != null and keyword != ''">
+            and (
+            a.good_pym like concat('%',#{keyword},'%') or a.good_wbm like concat('%',#{keyword},'%') or a.good_name like concat('%',#{keyword},'%') or
+            a.usual_name like concat('%',#{keyword},'%') or a.usual_pym like concat('%',#{keyword},'%') or a.usual_wbm like concat('%',#{keyword},'%')
+            or a.bName like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
 
     <!--  检查处方是否结算 -->
     <select id="checkIsSettle" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
@@ -998,11 +999,11 @@
     <!-- 作废处方 -->
     <delete id="updatePrescribeIsCancel" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         update outpt_prescribe set
-        is_cancel = #{isCancel} ,
-        cancel_id = #{cancelId} ,
-        cancel_name = #{cancelName} ,
-        cancel_reason = #{cancelReason} ,
-        cancel_date = now()
+                                   is_cancel = #{isCancel} ,
+                                   cancel_id = #{cancelId} ,
+                                   cancel_name = #{cancelName} ,
+                                   cancel_reason = #{cancelReason} ,
+                                   cancel_date = now()
         where id = #{id} and hosp_code = #{hospCode}
     </delete>
 
@@ -1041,7 +1042,7 @@
     <!-- 删除处方费动态计费 -->
     <delete id="deleteOutptCostDt" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode} and source_code = '3' and ope_id is not null
-        and settle_code = '0' and ifnull(settle_id,'') = ''
+                                 and settle_code = '0' and ifnull(settle_id,'') = ''
     </delete>
 
     <!-- 删除手术申请 -->
@@ -1064,9 +1065,9 @@
     <!-- 新增处方信息-->
     <insert id="insertPrescribe" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_prescribe(
-            id, hosp_code, visit_id, diagnose_ids, order_no, doctor_id, doctor_name, dept_id, dept_name,
-            type_code, prescribe_type_code, settle_id, remark, is_herb_hospital, herb_num, herb_use_code,
-            weight, agent_name, agent_cert_no, crte_id, crte_name, crte_time, is_settle, is_cancel, is_print, is_submit
+        id, hosp_code, visit_id, diagnose_ids, order_no, doctor_id, doctor_name, dept_id, dept_name,
+        type_code, prescribe_type_code, settle_id, remark, is_herb_hospital, herb_num, herb_use_code,
+        weight, agent_name, agent_cert_no, crte_id, crte_name, crte_time, is_settle, is_cancel, is_print, is_submit
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1150,11 +1151,11 @@
     <!-- 新增处方明细数据 -->
     <insert id="insertPrescribeDetail" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_prescribe_detail(
-            id, hosp_code, op_id, visit_id, opt_id, optd_group_no, optd_group_seq_no, optd_id, group_no,
-            group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
-            rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content,
-            phar_id, bfc_id, use_code, exec_dept_id, exec_date,exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id,
-            skin_unit_code, prescribe_prefix, prescribe_suffix, remark
+        id, hosp_code, op_id, visit_id, opt_id, optd_group_no, optd_group_seq_no, optd_id, group_no,
+        group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content,
+        phar_id, bfc_id, use_code, exec_dept_id, exec_date,exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id,
+        skin_unit_code, prescribe_prefix, prescribe_suffix, remark
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1339,9 +1340,9 @@
     <!-- 新增处方明细项目明细 -->
     <insert id="insertPrescribeDetailExt" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_prescribe_detail_ext(
-            id, hosp_code, op_id, visit_id, opd_id, group_no, group_seq_no, advice_id, self_ratio,
-            item_code,item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
-            rate_id, use_days, num, num_unit_code, total_num,  content, phar_id, use_code
+        id, hosp_code, op_id, visit_id, opd_id, group_no, group_seq_no, advice_id, self_ratio,
+        item_code,item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, use_days, num, num_unit_code, total_num,  content, phar_id, use_code
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1427,10 +1428,10 @@
     <!--根据值域代码药品大类和医嘱码表数据-->
     <select id="getByCode" parameterType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO" resultType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
         select b.id, b.hosp_code hospCode, b.name, b.value, b.remark, b.up_value upValue, b.is_end isEnd,
-        case when a.code = 'YPDL' then 'YPFL' when a.code = 'YZLB' and b.value = '3' then 'LISXMLX' when a.code = 'YZLB' and b.value = '12' then 'PACSXMLX' else 'YZLB' end code,
-        case when a.code = 'YPDL' then '1' when a.code = 'YZLB' and (b.value = '3' or b.value = '12') then '2' else '0' end type
+               case when a.code = 'YPDL' then 'YPFL' when a.code = 'YZLB' and b.value = '3' then 'LISXMLX' when a.code = 'YZLB' and b.value = '12' then 'PACSXMLX' else 'YZLB' end code,
+               case when a.code = 'YPDL' then '1' when a.code = 'YZLB' and (b.value = '3' or b.value = '12') then '2' else '0' end type
         from sys_code a
-        join sys_code_detail b on a.code = b.c_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
+                 join sys_code_detail b on a.code = b.c_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
         where  a.hosp_code = #{hospCode} and (a.code = 'YZLB' or a.code = 'YPDL') and a.is_valid = '1'
         order by IF(a.code = 'YPDL', 'YPDL', 'YZLB'), b.seq_no asc
     </select>
@@ -1454,12 +1455,12 @@
         where a.is_valid='1' and a.hosp_code = #{hospCode} and a.code=#{code}
         union all
         select a.id, a.label, a.parentId from (
-            select b.value id, b.name label, ifnull(b.up_value, "-2") parentId
-            from sys_code a
-            join sys_code_detail b on a.code = b.c_code
-            where b.is_valid='1' and a.hosp_code = #{hospCode} and a.code=#{code}
-            order by b.seq_no
-        )a
+                                                  select b.value id, b.name label, ifnull(b.up_value, "-2") parentId
+                                                  from sys_code a
+                                                           join sys_code_detail b on a.code = b.c_code
+                                                  where b.is_valid='1' and a.hosp_code = #{hospCode} and a.code=#{code}
+                                                  order by b.seq_no
+                                              )a
     </select>
 
     <!-- 获取药品信息 -->
@@ -1537,8 +1538,8 @@
     <!--查询处方模板信息-->
     <select id="queryOutptPrescribeTempDTO" resultMap="OutptPrescribeTempMap" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
         select
-         a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.remark, a.is_valid, a.pym, a.wbm, a.audit_code, a.audit_id, a.audit_name,
-         a.audit_time, a.crte_id, a.crte_name, a.crte_time
+        a.id, a.hosp_code, a.name, a.type_code, a.dept_id, a.dept_name, a.doctor_id, a.doctor_name, a.remark, a.is_valid, a.pym, a.wbm, a.audit_code, a.audit_id, a.audit_name,
+        a.audit_time, a.crte_id, a.crte_name, a.crte_time
         from outpt_prescribe_temp a
         where a.hosp_code = #{hospCode} and a.audit_code = '1'
         <!-- 个人模板 -->
@@ -1562,48 +1563,48 @@
     <!--根据处方模板id查询出处方模板明细-->
     <select id="queryOutptPrescribeTempDetails" resultMap="OutptPrescribeTempDetailMap" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO">
         select
-          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id,
-          case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name else a.item_name end item_name,
-          case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage,
-          a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.total_num,
-        case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
-        when a.item_code = '1' and a.unit_code = c.unit_code then c.price
-        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price
-        when a.item_code = '2' and a.unit_code = d.unit_code then d.price
-        when a.item_code = '4' then e.price end price,
-        case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price*a.total_num
-        when a.item_code = '1' and a.unit_code = c.unit_code then c.price*a.total_num
-        when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price*a.total_num
-        when a.item_code = '2' and a.unit_code = d.unit_code then d.price*a.total_num
-        when a.item_code = '4' then e.price*a.total_num  end total_price, a.bfc_id,
-        a.use_days, a.exec_dept_id, a.use_code, a.herb_note_code, a.is_skin, a.content,
-        a.type_code type, a.prescribe_type_code phCode, b.name rateName,
-        case when a.item_code = '2' then dd.clf when c.big_type_code = '2' then dd.cyf when c.big_type_code = '1' then dd.zcf when c.big_type_code = '0' then dd.xyf end pharId,
-        case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
-        case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.unit_code end splitUnitCode,
-        case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.unit_code end bigUnitCode,
-        c.drug_remark drugRemark, c.drug_img_path drugImgPath,
-        case when a.item_code = '1' then '1' when a.item_code = '2' then '15' else e.type_code end typeCode,
-        case when parameter.id is null then '0' else '1' end isWz
+            a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id,
+            case when a.item_code = '1' then c.good_name when a.item_code = '2' then d.name else a.item_name end item_name,
+            case when a.item_code = '1'  then c.spec  when a.item_code = '2' then d.spec else a.spec end  spec, a.prep_code, a.dosage,
+            a.dosage_unit_code, a.usage_code, a.rate_id, a.speed_code, a.num, a.unit_code, a.total_num,
+            case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price
+                 when a.item_code = '1' and a.unit_code = c.unit_code then c.price
+                 when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price
+                 when a.item_code = '2' and a.unit_code = d.unit_code then d.price
+                 when a.item_code = '4' then e.price end price,
+            case when a.item_code = '1' and a.unit_code = c.split_unit_code then c.split_price*a.total_num
+                 when a.item_code = '1' and a.unit_code = c.unit_code then c.price*a.total_num
+                 when a.item_code = '2' and a.unit_code = d.split_unit_code then d.split_price*a.total_num
+                 when a.item_code = '2' and a.unit_code = d.unit_code then d.price*a.total_num
+                 when a.item_code = '4' then e.price*a.total_num  end total_price, a.bfc_id,
+            a.use_days, a.exec_dept_id, a.use_code, a.herb_note_code, a.is_skin, a.content,
+            a.type_code type, a.prescribe_type_code phCode, b.name rateName,
+            case when a.item_code = '2' then dd.clf when c.big_type_code = '2' then dd.cyf when c.big_type_code = '1' then dd.zcf when c.big_type_code = '0' then dd.xyf end pharId,
+            case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
+            case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.unit_code end splitUnitCode,
+            case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.unit_code end bigUnitCode,
+            c.drug_remark drugRemark, c.drug_img_path drugImgPath,
+            case when a.item_code = '1' then '1' when a.item_code = '2' then '15' else e.type_code end typeCode,
+            case when parameter.id is null then '0' else '1' end isWz
         from outpt_prescribe_temp_detail a
-        left join base_rate b on a.rate_id = b.id and a.hosp_code = b.hosp_code
-        left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
-        left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
-        left join(
+                 left join base_rate b on a.rate_id = b.id and a.hosp_code = b.hosp_code
+                 left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
+                 left join base_material d on a.item_id = d.id and a.hosp_code = d.hosp_code and a.item_code = '2'
+                 left join(
             select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
-            max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+                   max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
             from base_dept a
-            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+                     join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+                     join base_dept c on c.hosp_code = b.hosp_code and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
             where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
         )dd on 1 = 1
-        left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
-        left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and e.code = parameter.value and e.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
+                 left join base_advice e on a.item_id = e.id and a.hosp_code = e.hosp_code and a.item_code = '4'
+                 left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and e.code = parameter.value and e.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
         where a.hosp_code = #{hospCode}
-        and a.opt_id = #{id} and (
-            (a.item_code = '4' and e.is_valid = '1' and e.id is not null) or (a.item_code ='1' and c.is_valid = '1' and c.id is not null )
-            or (a.item_code ='2' and d.is_valid = '1' and d.id is not null )
-        )
+          and a.opt_id = #{id} and (
+                (a.item_code = '4' and e.is_valid = '1' and e.id is not null) or (a.item_code ='1' and c.is_valid = '1' and c.id is not null )
+                or (a.item_code ='2' and d.is_valid = '1' and d.id is not null )
+            )
         order by a.id asc
     </select>
 
@@ -1616,44 +1617,44 @@
     <select id="getBaseDrug" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select a.*, b.trunc_code truncCode, c.id bfcId
         from base_drug a
-        left join base_special_calc b on a.code = b.drug_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
-        and b.dept_code = (select code from base_dept where id = #{loginDeptId} and hosp_code = #{hospCode})
-        left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
+                 left join base_special_calc b on a.code = b.drug_code and a.hosp_code = b.hosp_code and b.is_valid = '1'
+            and b.dept_code = (select code from base_dept where id = #{loginDeptId} and hosp_code = #{hospCode})
+                 left join base_finance_classify c on a.bfc_code = c.code and a.hosp_code = c.hosp_code
         where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
     <!-- 获取项目信息 -->
     <select id="getBaseItem" resultType="cn.hsa.module.base.bi.dto.BaseItemDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select a.*, b.id bfcId from base_item a
-        join base_finance_classify b on a.bfc_code = b.code and a.hosp_code = b.hosp_code
+                                        join base_finance_classify b on a.bfc_code = b.code and a.hosp_code = b.hosp_code
         where (a.id = #{itemId} or a.code = #{itemId})and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
     <!-- 获取材料信息 -->
     <select id="getBaseMaterial" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select a.*, b.id bfcId from base_material a
-        join base_finance_classify b on a.bfc_code = b.code and a.hosp_code = b.hosp_code
+                                        join base_finance_classify b on a.bfc_code = b.code and a.hosp_code = b.hosp_code
         where (a.id = #{itemId} or a.code = #{itemId}) and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
     <!-- 获取医嘱信息 -->
     <select id="getAdviceDetail" resultMap="BaseItemMap" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select if(b.type_code = '3', c.id, e.id) id, if(b.type_code = '3', c.name, e.name) name, if(b.type_code = '3', c.spec, e.spec) spec,
-        if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
-        a.is_cost isCost, b.type_code, b.unit_code, b.use_code,case when b.type_code = '2' then bb.clf end pharId
+               if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
+               a.is_cost isCost, b.type_code, b.unit_code, b.use_code,case when b.type_code = '2' then bb.clf end pharId
         from base_advice a
-        join base_advice_detail b on a.code = b.advice_code and a.hosp_code = b.hosp_code
-        left join base_item c on b.item_code = c.code and b.hosp_code = c.hosp_code and b.type_code = '3'
-        left join base_finance_classify d on c.bfc_code = d.code and b.hosp_code = d.hosp_code
-        left join base_material e on b.item_code = e.code and b.hosp_code = e.hosp_code and b.type_code = '2'
-        left join base_finance_classify f on e.bfc_code = f.code and e.hosp_code = f.hosp_code
-        left join(
+                 join base_advice_detail b on a.code = b.advice_code and a.hosp_code = b.hosp_code
+                 left join base_item c on b.item_code = c.code and b.hosp_code = c.hosp_code and b.type_code = '3'
+                 left join base_finance_classify d on c.bfc_code = d.code and b.hosp_code = d.hosp_code
+                 left join base_material e on b.item_code = e.code and b.hosp_code = e.hosp_code and b.type_code = '2'
+                 left join base_finance_classify f on e.bfc_code = f.code and e.hosp_code = f.hosp_code
+                 left join(
             select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
-            '3',c.id,'0')) cyf,
-            max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+                                                                                                           '3',c.id,'0')) cyf,
+                   max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
             from base_dept a
-            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+                     join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+                     join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
             where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
         )bb on 1 = 1
         where (a.id = #{itemId} or a.code = #{itemId} ) and a.hosp_code = #{hospCode} and a.is_valid = '1'
@@ -1663,14 +1664,14 @@
     <select id="getDtfy" resultType="cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.opd_id opdId, a.visit_id visitId, a.plan_exec_date planExecDate, a.sign_code signCode, b.id costId, b.source_id sourceId
         from outpt_prescribe_exec a
-        join outpt_cost b on a.id = b.ope_id and a.hosp_code and b.hosp_code and b.status_code = '0'
+                 join outpt_cost b on a.id = b.ope_id and a.hosp_code and b.hosp_code and b.status_code = '0'
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and b.source_code = '3'
     </select>
 
     <!-- 获取所有生成的动态费用首次计费ID -->
     <select id="getDtScfy" resultType="cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.ope_id id,a.id costId, a.source_id sourceId,  a.settle_id settleId from outpt_cost a
-        join base_assist b on a.source_id = b.id and a.hosp_code and b.hosp_code  and b.is_first = '1' and b.way_code = '1'
+                                                                                             join base_assist b on a.source_id = b.id and a.hosp_code and b.hosp_code  and b.is_first = '1' and b.way_code = '1'
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and a.source_code = '3' and a.status_code = '0'
     </select>
 
@@ -1678,19 +1679,19 @@
     <select id="getDtData" resultMap="outptPrescribeDetailsDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.doctor_id doctorId, a.doctor_name doctorName, a.dept_id deptId, b.*, c.id idExec, c.opd_id, c.plan_exec_date, c.hosp_code
         from outpt_prescribe a
-        join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
-        join outpt_prescribe_exec c on b.id = c.opd_id and a.hosp_code = c.hosp_code
-        join base_drug d on b.item_id = d.id and b.hosp_code = d.hosp_code and d.is_lvp = '1'
+                 join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
+                 join outpt_prescribe_exec c on b.id = c.opd_id and a.hosp_code = c.hosp_code
+                 join base_drug d on b.item_id = d.id and b.hosp_code = d.hosp_code and d.is_lvp = '1'
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and a.is_submit = '1'
-            and ifnull(a.is_cancel,'0')='0'
+          and ifnull(a.is_cancel,'0')='0'
     </select>
 
     <!-- 获取首次计费记录 -->
     <select id="getDailyfirstCalc" resultType="cn.hsa.module.base.bdc.dto.BaseDailyfirstCalcDTO" parameterType="java.util.Map">
         select a.id, a.hosp_code hospCode, c.id deptId, b.id rateId, a.usage_code usageCode, a.daily_first_num dailyFirstNum
         from base_dailyfirst_calc a
-        join base_rate b on a.rate_code = b.code and a.hosp_code = b.hosp_code
-        join base_dept c on a.dept_code = c.code and a.hosp_code = c.hosp_code
+                 join base_rate b on a.rate_code = b.code and a.hosp_code = b.hosp_code
+                 join base_dept c on a.dept_code = c.code and a.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
@@ -1713,85 +1714,85 @@
     <!-- 获取辅助计费明细数据 -->
     <select id="getAssistDetail" resultType="cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO" parameterType="cn.hsa.module.base.bac.dto.BaseAssistCalcDTO">
         SELECT
-        bd.id id,
-        bd.hosp_code hospCode,
-        bd.ac_code acCode,
-        bd.type_code itemCode,
-        a.id assistId,
-        bd.use_code useCode,
-        bd.start_time startTime,
-        bd.end_time endTime,
-        bd.num,
-        a.name,
-    CASE
-            WHEN bd.type_code = '3' THEN
-            b.id
-            WHEN bd.type_code = '2' THEN
-            c.id
-        END itemId,
-    CASE
+            bd.id id,
+            bd.hosp_code hospCode,
+            bd.ac_code acCode,
+            bd.type_code itemCode,
+            a.id assistId,
+            bd.use_code useCode,
+            bd.start_time startTime,
+            bd.end_time endTime,
+            bd.num,
+            a.name,
+            CASE
+                WHEN bd.type_code = '3' THEN
+                    b.id
+                WHEN bd.type_code = '2' THEN
+                    c.id
+                END itemId,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.unit_code
-            WHEN bd.type_code = '2' THEN
-            c.split_unit_code
-        END itemUnitCode,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.unit_code
+                WHEN bd.type_code = '2' THEN
+                    c.split_unit_code
+                END itemUnitCode,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.NAME
-            WHEN bd.type_code = '2' THEN
-            c.NAME
-        END itemName,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.NAME
+                WHEN bd.type_code = '2' THEN
+                    c.NAME
+                END itemName,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.price
-            WHEN bd.type_code = '2' THEN
-            c.split_price
-        END price,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.price
+                WHEN bd.type_code = '2' THEN
+                    c.split_price
+                END price,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.price * bd.num
-            WHEN bd.type_code = '2' THEN
-            c.split_price * bd.num
-        END itemPriceAll,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.price * bd.num
+                WHEN bd.type_code = '2' THEN
+                    c.split_price * bd.num
+                END itemPriceAll,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.price
-            WHEN bd.type_code = '2' THEN
-            c.split_price
-        END itemPreferentialPrice,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.price
+                WHEN bd.type_code = '2' THEN
+                    c.split_price
+                END itemPreferentialPrice,
+            CASE
 
-            WHEN bd.type_code = '3' THEN
-            b.price * bd.num
-            WHEN bd.type_code = '2' THEN
-            c.split_price * bd.num
-        END itemPreferentialAllPrice,
-    CASE
+                WHEN bd.type_code = '3' THEN
+                    b.price * bd.num
+                WHEN bd.type_code = '2' THEN
+                    c.split_price * bd.num
+                END itemPreferentialAllPrice,
+            CASE
 
-            WHEN bd.type_code = '2' THEN
-            e.id
-            WHEN bd.type_code = '3' THEN
-            d.id
-        END bfcId
-    FROM
-        base_assist a
-        JOIN base_assist_detail bd ON a.CODE = bd.ac_code
-        AND a.hosp_code = bd.hosp_code
-        LEFT JOIN base_item b ON bd.item_code = b.CODE
-        AND bd.hosp_code = b.hosp_code
-        AND bd.type_code = '3'
-        LEFT JOIN base_material c ON bd.item_code = c.CODE
-        AND bd.hosp_code = c.hosp_code
-        AND bd.type_code = '2'
-        LEFT JOIN base_finance_classify d ON b.bfc_code = d.CODE
-        AND b.hosp_code = d.hosp_code
-        LEFT JOIN base_finance_classify e ON c.bfc_code = e.CODE
-        AND c.hosp_code = e.hosp_code
+                WHEN bd.type_code = '2' THEN
+                    e.id
+                WHEN bd.type_code = '3' THEN
+                    d.id
+                END bfcId
+        FROM
+            base_assist a
+                JOIN base_assist_detail bd ON a.CODE = bd.ac_code
+                AND a.hosp_code = bd.hosp_code
+                LEFT JOIN base_item b ON bd.item_code = b.CODE
+                AND bd.hosp_code = b.hosp_code
+                AND bd.type_code = '3'
+                LEFT JOIN base_material c ON bd.item_code = c.CODE
+                AND bd.hosp_code = c.hosp_code
+                AND bd.type_code = '2'
+                LEFT JOIN base_finance_classify d ON b.bfc_code = d.CODE
+                AND b.hosp_code = d.hosp_code
+                LEFT JOIN base_finance_classify e ON c.bfc_code = e.CODE
+                AND c.hosp_code = e.hosp_code
         where a.hosp_code = #{hospCode} and a.id = #{id} and bd.is_valid = '1' and a.is_valid ='1'
     </select>
 
@@ -1804,7 +1805,7 @@
     <select id="getOutptPrescribeDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select b.id diseaseId, b.name diseaseName
         from outpt_prescribe a
-        join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+                 join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
         where  a.id = #{id} and a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
         group by b.id ,b.name
     </select>
@@ -1812,7 +1813,7 @@
     <!--  获取诊断信息 -->
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
-               a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName
+        a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         join outpt_visit ov on ov.id = a.visit_id and ov.hosp_code = a.hosp_code
@@ -1825,9 +1826,9 @@
     <!--  获取门诊病历诊断信息 -->
     <select id="getOutptMedicalRecordDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select
-        a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, c.name diseaseName
+            a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, c.name diseaseName
         from  outpt_medical_record a
-        left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
+                  left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
 
@@ -1853,25 +1854,25 @@
     <!-- 删除处方诊断 -->
     <delete id="deleteDiagnoseById" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
         delete from outpt_diagnose  where disease_id = #{diseaseId} and hosp_code = #{hospCode}
-        and visit_id = #{visitId}
+                                      and visit_id = #{visitId}
     </delete>
 
     <!--  检查处方是否存在该诊断 -->
     <select id="checkDiagnosePrescribe" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
         select count(id) num from outpt_prescribe a where FIND_IN_SET(#{diseaseId},a.diagnose_ids)
-            and a.hosp_code = #{hospCode} and visit_id = #{visitId}
+                                                      and a.hosp_code = #{hospCode} and visit_id = #{visitId}
     </select>
 
     <!-- 获取药品信息单位 -->
     <select id="getDrugUnitCode" resultType="java.util.Map" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
         select b.name , b.value
         from base_drug a
-        join sys_code_detail b on a.split_unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
+                 join sys_code_detail b on a.split_unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
         where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
         union
         select  b.name , b.value
         from base_drug a
-        join sys_code_detail b on a.unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
+                 join sys_code_detail b on a.unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
         where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
@@ -1879,7 +1880,7 @@
     <select id="getMaterialUnitCode" resultType="java.util.Map" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
         select b.name , b.value
         from base_material a
-        join sys_code_detail b on a.split_unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
+                 join sys_code_detail b on a.split_unit_code = b.value and a.hosp_code = b.hosp_code and b.c_code = 'DW' and b.is_valid = '1'
         where a.id = #{itemId} and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
@@ -1887,34 +1888,34 @@
     <select id="checkStock" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         select * from stro_stock a
         left join (
-            select a.biz_id,a.item_id, a.hosp_code,sum(totalNum) totalNum  from (
-                select a.phar_id biz_id, a.item_id, a.hosp_code, case when a.item_code = '1' and a.num_unit_code = b.split_unit_code then a.total_num
-                when a.item_code = '1' and a.num_unit_code = b.unit_code then a.total_num*b.split_ratio
-                when a.item_code = '2' and a.num_unit_code = c.split_unit_code then a.total_num
-                when a.item_code = '2' and a.num_unit_code = c.unit_code then a.total_num*c.split_ratio else 0 end totalNum
-                from outpt_cost a
-                left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
-                left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
-                where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_add(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
+        select a.biz_id,a.item_id, a.hosp_code,sum(totalNum) totalNum  from (
+        select a.phar_id biz_id, a.item_id, a.hosp_code, case when a.item_code = '1' and a.num_unit_code = b.split_unit_code then a.total_num
+        when a.item_code = '1' and a.num_unit_code = b.unit_code then a.total_num*b.split_ratio
+        when a.item_code = '2' and a.num_unit_code = c.split_unit_code then a.total_num
+        when a.item_code = '2' and a.num_unit_code = c.unit_code then a.total_num*c.split_ratio else 0 end totalNum
+        from outpt_cost a
+        left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+        where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_add(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
 
-                union all
-                select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
-                from stro_stock a
-                where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
-                union all
-                select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
-                when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
-                from base_drug a
-                where a.hosp_code = #{hospCode} and a.id = #{itemId}
-                <if test="costId != null" >
-                    and 1 != 1
-                </if>
-                union all
-                select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
-                when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
-                from base_material a
-                where a.hosp_code = #{hospCode} and a.id = #{itemId}
-            )a where a.hosp_code = #{hospCode} group by a.biz_id,a.item_id, a.hosp_code
+        union all
+        select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
+        from stro_stock a
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
+        union all
+        select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
+        when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+        from base_drug a
+        where a.hosp_code = #{hospCode} and a.id = #{itemId}
+        <if test="costId != null" >
+            and 1 != 1
+        </if>
+        union all
+        select #{pharId}, a.id, a.hosp_code, case when a.split_unit_code = #{numUnitCode} then #{totalNum}
+        when a.unit_code = #{numUnitCode} then #{totalNum}*a.split_ratio else #{totalNum} end totalNum
+        from base_material a
+        where a.hosp_code = #{hospCode} and a.id = #{itemId}
+        )a where a.hosp_code = #{hospCode} group by a.biz_id,a.item_id, a.hosp_code
         )b on a.hosp_code = b.hosp_code and a.item_id = b.item_id and a.biz_id = b.biz_id
         where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId} and (a.split_num - ifnull(b.totalNum,0)) &gt;= 0
     </select>
@@ -1931,9 +1932,9 @@
     <update id="updatePrescribeSubmit" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" >
         update outpt_prescribe
         set is_submit = '1',
-        submit_time = now(),
-        submit_id = #{submitId},
-        submit_name = #{submitName}
+            submit_time = now(),
+            submit_id = #{submitId},
+            submit_name = #{submitName}
         where find_in_set(id, #{ids}) and hosp_code= #{hospCode}
     </update>
 
@@ -1943,9 +1944,9 @@
     <update id="updateIsCanPrescribeSubmit" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" >
         update outpt_prescribe
         set is_submit = '0',
-        submit_time = now(),
-        submit_id = #{submitId},
-        submit_name = #{submitName}
+            submit_time = now(),
+            submit_id = #{submitId},
+            submit_name = #{submitName}
         where find_in_set(id, #{ids}) and hosp_code= #{hospCode}
     </update>
 
@@ -1955,14 +1956,14 @@
     <select id="getOperInfoRecord"
             resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO" parameterType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO" >
         select
-        a.id, a.hosp_code, a.visit_id, a.baby_id, a.in_no, a.advice_id, a.name, a.gender_code, a.age, a.age_unit_code, a.blood_code, a.dept_id, a.oper_dept_id, a.bed_id, a.bed_name,
-        a.oper_disease_id, a.oper_disease_icd9, a.oper_disease_name, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.doctor_id, doctor_name,
-        a.assistant_id1, a.assistant_name1, a.assistant_id2, a.assistant_name2, a.assistant_id3, a.assistant_name3, a.special_request, a.content,
-        a.audit_id, a.audit_name, a.audit_time, a.audit_remark,  a.oper_plan_time,
-        a.oper_room_Id, a.oper_room_name, a.xh_nurse_id, a.xh_nurse_name,
-        a.qx_nurse_id, a.qx_nurse_name, a.ana_code, a.ana_id1, a.ana_name1, a.ana_id2, a.ana_name2, a.ana_id3, a.ana_name3, a.oper_end_time,
-        a.notched_code, a.heal_code, a.oper_time_hour, a.status_code, a.is_cost, a.total_price,  a.cost_time, a.cost_id, a.cost_name,
-        a.remark, a.crte_id, a.crte_name, a.crte_time, a.rank, a.ward_id
+            a.id, a.hosp_code, a.visit_id, a.baby_id, a.in_no, a.advice_id, a.name, a.gender_code, a.age, a.age_unit_code, a.blood_code, a.dept_id, a.oper_dept_id, a.bed_id, a.bed_name,
+            a.oper_disease_id, a.oper_disease_icd9, a.oper_disease_name, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.doctor_id, doctor_name,
+            a.assistant_id1, a.assistant_name1, a.assistant_id2, a.assistant_name2, a.assistant_id3, a.assistant_name3, a.special_request, a.content,
+            a.audit_id, a.audit_name, a.audit_time, a.audit_remark,  a.oper_plan_time,
+            a.oper_room_Id, a.oper_room_name, a.xh_nurse_id, a.xh_nurse_name,
+            a.qx_nurse_id, a.qx_nurse_name, a.ana_code, a.ana_id1, a.ana_name1, a.ana_id2, a.ana_name2, a.ana_id3, a.ana_name3, a.oper_end_time,
+            a.notched_code, a.heal_code, a.oper_time_hour, a.status_code, a.is_cost, a.total_price,  a.cost_time, a.cost_id, a.cost_name,
+            a.remark, a.crte_id, a.crte_name, a.crte_time, a.rank, a.ward_id
         from  oper_info_record a
         where a.advice_id = #{adviceId} and a.hosp_code = #{hospCode}
     </select>
@@ -1970,9 +1971,9 @@
     <!-- 添加处方医技申请 -->
     <insert id="insertMedicalApply" parameterType="java.util.List" useGeneratedKeys="false">
         insert into medic_apply(
-            id, hosp_code, apply_no, type_code, visit_id, cost_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
-            apply_time, imp_dept_id, bar_code, print_time, print_times, rporter, is_allergy, result_id,is_positive, document_sta,
-            opd_id, content, medic_type, is_merge, merge_id, remark, report_time, crte_id, crte_name, crte_time
+        id, hosp_code, apply_no, type_code, visit_id, cost_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
+        apply_time, imp_dept_id, bar_code, print_time, print_times, rporter, is_allergy, result_id,is_positive, document_sta,
+        opd_id, content, medic_type, is_merge, merge_id, remark, report_time, crte_id, crte_name, crte_time
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -2017,7 +2018,7 @@
     <!-- 添加处方医技申请 -->
     <insert id="insertMedicalApplyDetail" parameterType="java.util.List" useGeneratedKeys="false">
         insert medic_apply_detail(
-            id, hosp_code, apply_id, visit_id, opd_id, advice_code, dept_id, order_no, content, remark, blob_id
+        id, hosp_code, apply_id, visit_id, opd_id, advice_code, dept_id, order_no, content, remark, blob_id
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -2056,33 +2057,33 @@
     <!-- 删除处方医技申请计费 -->
     <delete id="deleteMedicApplyCost" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         delete from outpt_cost where visit_id = #{visitId} and hosp_code = #{hospCode} and source_code = '9'
-        and settle_code = '0' and ifnull(settle_id,'') = ''
+                                 and settle_code = '0' and ifnull(settle_id,'') = ''
     </delete>
 
     <!-- 获取医技信息 -->
     <select id="getMedicApply" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.*, b.id opId, e.id materialId, b.exec_dept_id execDeptId, prescribe.dept_id deptId, prescribe.dept_name deptName,
-        prescribe.doctor_id doctorId, prescribe.doctor_name doctorName, c.container_code containerCode, c.specimen_code specimenCode, c.technology_code technologyCode
+               prescribe.doctor_id doctorId, prescribe.doctor_name doctorName, c.container_code containerCode, c.specimen_code specimenCode, c.technology_code technologyCode
         from medic_apply a
-        join outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
-        join outpt_prescribe prescribe on b.op_id = prescribe.id and b.hosp_code = prescribe.hosp_code and prescribe.is_submit = '1'
-        join base_advice c on b.item_id = c.id and b.hosp_code = c.hosp_code and b.item_code = '4'
-        left join sys_code_detail d on d.c_code = 'RQ' and c.hosp_code = d.hosp_code and c.container_code = d.value and d.is_valid = '1'
-        left join base_material e on d.remark = e.code and d.hosp_code = e.hosp_code
+                 join outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_prescribe prescribe on b.op_id = prescribe.id and b.hosp_code = prescribe.hosp_code and prescribe.is_submit = '1'
+                 join base_advice c on b.item_id = c.id and b.hosp_code = c.hosp_code and b.item_code = '4'
+                 left join sys_code_detail d on d.c_code = 'RQ' and c.hosp_code = d.hosp_code and c.container_code = d.value and d.is_valid = '1'
+                 left join base_material e on d.remark = e.code and d.hosp_code = e.hosp_code
         where a.type_code = '4' and a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
 
     <!-- 获取医技需收费数据（过滤合管数据） -->
     <select id="getMedicApplyCost" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.*, prescribe.id opId, e.id materialId, b.exec_dept_id execDeptId, prescribe.dept_id deptId, prescribe.dept_name deptName,
-        prescribe.doctor_id doctorId, prescribe.doctor_name doctorName, c.code, c.container_code containerCode, c.specimen_code specimenCode,
-        c.technology_code technologyCode, prescribe.is_settle isSettle
+               prescribe.doctor_id doctorId, prescribe.doctor_name doctorName, c.code, c.container_code containerCode, c.specimen_code specimenCode,
+               c.technology_code technologyCode, prescribe.is_settle isSettle
         from medic_apply a
-        join outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
-        join outpt_prescribe prescribe on b.op_id = prescribe.id and b.hosp_code = prescribe.hosp_code and prescribe.is_submit = '1'
-        join base_advice c on b.item_id = c.id and b.hosp_code = c.hosp_code and b.item_code = '4'
-        left join sys_code_detail d on d.c_code = 'RQ' and c.hosp_code = d.hosp_code and c.container_code = d.value and d.is_valid = '1'
-        left join base_material e on d.remark = e.code and d.hosp_code = e.hosp_code
+                 join outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_prescribe prescribe on b.op_id = prescribe.id and b.hosp_code = prescribe.hosp_code and prescribe.is_submit = '1'
+                 join base_advice c on b.item_id = c.id and b.hosp_code = c.hosp_code and b.item_code = '4'
+                 left join sys_code_detail d on d.c_code = 'RQ' and c.hosp_code = d.hosp_code and c.container_code = d.value and d.is_valid = '1'
+                 left join base_material e on d.remark = e.code and d.hosp_code = e.hosp_code
         where a.type_code = '4' and a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and a.merge_id = a.id
     </select>
 
@@ -2090,7 +2091,7 @@
     <select id="getMedicApplyFy" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.opd_id id,a.id costId, a.source_id sourceId,  a.settle_id settleId
         from outpt_cost a
-        join medic_apply b on a.source_id = b.id and a.hosp_code = b.hosp_code
+                 join medic_apply b on a.source_id = b.id and a.hosp_code = b.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and a.source_code = '9'
     </select>
 
@@ -2108,47 +2109,53 @@
     <!--  获取JSON数据 -->
     <select id="getPrescribeData" resultMap="outptPrescribeDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code , a.visit_id ,
-        c.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
-        a.dept_name , a.type_code , a.prescribe_type_code ,
-        a.settle_id , a.remark , a.is_settle , a.is_cancel , a.is_print ,
-        a.is_herb_hospital , a.herb_num , a.herb_use_code ,
-        a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime, a.is_submit,
-        b.id idDetail,  b.op_id,  b.opt_id,  b.optd_group_no,  b.optd_group_seq_no,  b.optd_id,  b.group_no,
-        b.group_seq_no,  b.item_code,  b.item_id,  b.item_name,  b.price,  b.total_price,  b.spec,  b.prep_code,  b.dosage,  b.dosage_unit_code,  b.usage_code,
-        b.rate_id,  b.speed_code,  b.use_days,  b.num,  b.num_unit_code,  b.total_num,   b.herb_note_code,  b.is_skin,  b.is_positive,  b.content,
-        b.phar_id,  b.bfc_id,  b.use_code,  b.exec_dept_id,  b.exec_date,  b.exec_id,  b.exec_name,  b.exec_num,  b.technology_no,  b.skin_durg_id,  b.skin_phar_id,
-        b.skin_unit_code,a.type_code type, a.prescribe_type_code phCode, d.name execDeptName, e.good_name skinGoodName,
-        case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
-        case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
-        case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
-        f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
-        b.prescribe_prefix, b.prescribe_suffix
+               c.diagnose_ids , c.disease_names, a.order_no , a.doctor_id , a.doctor_name , a.dept_id ,
+               a.dept_name , a.type_code , a.prescribe_type_code ,
+               a.settle_id , a.remark , a.is_settle , a.is_cancel , a.is_print ,
+               a.is_herb_hospital , a.herb_num , a.herb_use_code ,
+               a.weight, a.agent_name agentName, a.agent_cert_no agentCertNo, a.crte_id crteId, a.crte_name crteName, a.crte_time crteTime, a.is_submit,
+               b.id idDetail,  b.op_id,  b.opt_id,  b.optd_group_no,  b.optd_group_seq_no,  b.optd_id,  b.group_no,
+               b.group_seq_no,  b.item_code,  b.item_id,  b.item_name,  b.price,  b.total_price,  b.spec,  b.prep_code,  b.dosage,  b.dosage_unit_code,  b.usage_code,
+               b.rate_id,  b.speed_code,  b.use_days,  b.num,  b.num_unit_code,  b.total_num,   b.herb_note_code,  b.is_skin,  b.is_positive,  b.content,
+               b.phar_id,  b.bfc_id,  b.use_code,  b.exec_dept_id,  b.exec_date,  b.exec_id,  b.exec_name,  b.exec_num,  b.technology_no,  b.skin_durg_id,  b.skin_phar_id,
+               b.skin_unit_code,a.type_code type, a.prescribe_type_code phCode, d.name execDeptName, e.good_name skinGoodName,
+               case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
+               case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
+               case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
+               f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
+               b.prescribe_prefix, b.prescribe_suffix
         from outpt_prescribe a
-        join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
-        join(
+                 join outpt_prescribe_detail b on a.id = b.op_id and a.hosp_code = b.hosp_code
+                 join(
             select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a
-            join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+                     join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
             where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
             group by a.id ,a.hosp_code
         )c on a.id = c.id and a.hosp_code = c.hosp_code
-        left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
-        left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
-        left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
-        left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
-        left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
+                 left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
+                 left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
+                 left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
+                 left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
+                 left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
         order by a.crte_time desc
     </select>
 
     <!--  更新就诊表是否食源性 -->
     <update id="updateIsFoodBorne" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
-      update outpt_visit set is_food_borne = #{isFoodBorne} where hosp_code = #{hospCode} and id = #{id}
+        update outpt_visit set is_food_borne = #{isFoodBorne} where hosp_code = #{hospCode} and id = #{id}
     </update>
 
 
     <select id="findVisitListById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
-        select * from outpt_visit a  where a.profile_id = #{id}
+        select * from outpt_visit a  where a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and a.profile_id = #{id}
+        </if>
+        <if test="id == null or id == ''">
+            and a.id = #{visitId}
+        </if>
         <!-- 开始时间-->
         <if test="startDate != null and startDate != '' ">
             and date(a.visit_time) &gt;=  STR_TO_DATE(#{startDate},'%Y-%m-%d')
@@ -2171,7 +2178,7 @@
                  join outpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
                  join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
-        and iim.insure_illness_code is not null
+          and iim.insure_illness_code is not null
     </select>
 
     <!--根据visitIds，itemIds查询出对应的费用表数据-->
@@ -2224,7 +2231,7 @@
     <!--根据处方ids和visitId从处方明细表副表查询出处方列表-->
     <select id="queryPrescribeListByIdsAndVisitId" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO">
         select
-               *
+            *
         from outpt_prescribe_detail_ext
         where hosp_code = #{hospCode}
           and visit_id = #{visitId}
@@ -2267,6 +2274,20 @@
                 and item_id = #{item.itemId}
             </if>
         </foreach>
+    </update>
+    <update id="updateOutptRegister">
+        update outpt_register set
+                               name = #{name},
+                               gender_code = #{genderCode},
+                               age = #{age},
+                               birthday = #{birthday},
+                               cert_code = #{certCode},
+                               cert_no = #{certNo},
+                               phone = #{phone},
+                               visit_code = #{visitCode},
+                               source_tj_code = #{sourceTjCode},
+                               source_tj_remark = #{sourceTjRemark}
+        where visit_id = #{id} and hosp_code = #{hospCode}
     </update>
 
 

@@ -45,7 +45,7 @@ public class BaseProfileFileServiceImpl extends HsafService implements BaseProfi
      * @Return: Boolean
      **/
     @Override
-    public WrapperResponse<Boolean> save(Map map) {
+    public WrapperResponse<OutptProfileFileDTO> save(Map map) {
         return WrapperResponse.success(baseProfileFileBO.save(MapUtils.get(map, "outptProfileFileDTO")));
     }
 

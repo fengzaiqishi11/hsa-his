@@ -768,6 +768,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
         patientDataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType()); //  就诊凭证类型
         patientDataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo()); //  就诊凭证编号
+        if (Constants.SF.S.equals(MapUtils.get(unifiedPayMap,"isReadCardPay"))) {
+            patientDataMap.put("mdtrt_cert_type", MapUtils.get(unifiedPayMap,"bka895")); //  就诊凭证类型
+            patientDataMap.put("mdtrt_cert_no", MapUtils.get(unifiedPayMap,"bka896")); //  就诊凭证编号
+        }
+
         patientDataMap.put("med_type", insureIndividualVisitDTO.getAka130()); //  医疗类别
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMapInfo.get("costStr").toString()));
@@ -1567,10 +1572,13 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         insureConfigurationDTO.setRegCode(regCode);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map httpParam = new HashMap();
-        httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_5301);  //交易编号
-        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        String funtionCode = Constant.UnifiedPay.REGISTER.UP_5301;
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        String medisCode = insureConfigurationDTO.getOrgCode();
+        httpParam.put("infno", funtionCode);  //交易编号
+        httpParam.put("msgid", msgId);
         httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
-        httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        httpParam.put("medins_code", medisCode); //定点医药机构编号
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
         Map<String, Object> dataMap = new HashMap<>();
@@ -1580,6 +1588,17 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         logger.info("人员慢特病备案查询入参:" + dataJson);
         String url = insureConfigurationDTO.getUrl();
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(url, dataJson);
+
+        map.put("medisCode",medisCode);
+        map.put("visitId","");
+        map.put("msgId",msgId);
+        map.put("msgInfo",funtionCode);
+        map.put("msgName","人员慢特病备案查询");
+        map.put("isHospital",Constants.SF.F) ;
+        map.put("paramMapJson",dataJson);
+        map.put("resultStr",resultStr);
+        insureUnifiedLogService_consumer.insertInsureFunctionLog(map);
+
         logger.info("人员慢特病备案查询回参:" + resultStr);
         if (StringUtils.isEmpty(resultStr)) {
             throw new AppException("无法访问统一支付平台");

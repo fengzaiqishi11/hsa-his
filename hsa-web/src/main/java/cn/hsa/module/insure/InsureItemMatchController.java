@@ -8,10 +8,7 @@ import cn.hsa.module.insure.module.dto.InsureItemDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.StringUtils;
-import cn.hsa.util.UploadByExcel;
+import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -293,6 +290,9 @@ public class InsureItemMatchController extends BaseController {
         insureItemDTO.setCrteName(sysUserDTO.getName());
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("insureItemDTO", insureItemDTO);
         return this.insureItemMatchService_consumer.uploadItem(map);
     }
@@ -315,6 +315,9 @@ public class InsureItemMatchController extends BaseController {
         insureItemMatchDTO.setCrteName( sysUserDTO.getName());
         insureItemMatchDTO.setIsItemCancel(true);
         Map<String, Object> map = new HashMap<>();
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureItemMatchDTO", insureItemMatchDTO);
         return this.insureItemMatchService_consumer.deleteInsureItemMatch(map);
@@ -337,6 +340,9 @@ public class InsureItemMatchController extends BaseController {
         insureItemMatchDTO.setCrteName(sysUserDTO.getName());
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode",  sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         map.put("insureItemMatchDTO", insureItemMatchDTO);
         return this.insureItemMatchService_consumer.updateUplaodInsureItem(map);
     }

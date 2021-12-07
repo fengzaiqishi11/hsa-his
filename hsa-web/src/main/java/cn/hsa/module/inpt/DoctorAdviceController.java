@@ -118,8 +118,10 @@ public class DoctorAdviceController extends BaseController {
             inptAdviceDTO.setCrteId(sysUserDTO.getId());
             //医生姓名
             inptAdviceDTO.setCrteName(sysUserDTO.getName());
-            //就诊科室
-            inptAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+            //就诊科室，会诊病人开嘱科室前端赋值过来
+            if(StringUtils.isEmpty(inptAdviceDTO.getDeptId())) {
+                inptAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
         }
         //医嘱信息
         paramMap.put("inptAdviceDTOList", inptAdviceTDTO.getInptAdviceDTOList());
@@ -441,5 +443,27 @@ public class DoctorAdviceController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptAdviceDTO", inptAdviceDTO);
         return doctorAdviceService_consumer.queryLisAdvice(map);
+    }
+
+    /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    @GetMapping("/getZyAdviceByVisitId")
+    public WrapperResponse<List<InptAdviceDTO>> getZyAdviceByVisitId(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(inptVisitDTO.getId())) {
+            throw new RuntimeException("未选择就诊人信息");
+        }
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("inptVisitDTO", inptVisitDTO);
+        return doctorAdviceService_consumer.getZyAdviceByVisitId(map);
     }
 }

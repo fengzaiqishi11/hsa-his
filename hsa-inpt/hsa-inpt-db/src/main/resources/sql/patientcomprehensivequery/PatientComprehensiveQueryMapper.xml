@@ -524,7 +524,8 @@
         e.outpt_doctor_name,-- 门诊医生
         e.jz_doctor_name,-- 经治医生
         e.zg_doctor_name,-- 主管医生
-        ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount
+        ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount,
+        ifnull(a.credit_price, 0) as creditPrice
         FROM
         inpt_settle a
         left join inpt_settle_invoice b on a.id = b.settle_id and a.hosp_code = b.hosp_code
@@ -562,9 +563,6 @@
         </if>
         <if test='queryBaby =="N"'>
             and (a.baby_id is null or a.baby_id = '')
-        </if>
-        <if test="ywlx != null and ywlx != ''">
-            and f.aka130 = #{ywlx}
         </if>
         order by a.settle_no desc, a.crte_time desc
     </select>
@@ -880,6 +878,6 @@
         order by cost_time desc
     </select>
     <select id="queryYWLX" resultType="java.util.Map">
-        SELECT DISTINCT aka130,aka130_name FROM insure_individual_visit WHERE hosp_code =#{hospCode}
+        SELECT  `name`,`value` FROM insure_dict WHERE hosp_code =#{hospCode} and code = 'YWLX_ZY'
     </select>
 </mapper>

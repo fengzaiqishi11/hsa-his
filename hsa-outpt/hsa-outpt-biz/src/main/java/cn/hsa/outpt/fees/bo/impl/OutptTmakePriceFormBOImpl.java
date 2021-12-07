@@ -54,6 +54,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -80,6 +82,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private OutptCostDAO outptCostDAO;
@@ -995,6 +999,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         BigDecimal aka151 = BigDecimalUtils.convert(payinfo.get("aka151"));//起付线费用
         BigDecimal akb067 = BigDecimalUtils.convert(payinfo.get("akb067"));//个人现金支付
         BigDecimal akb066 = BigDecimalUtils.convert(payinfo.get("akb066"));//个人账户支付
+
+        /**
+         * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         */
+        if(BigDecimalUtils.equals(akb067,akc264)){
+            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+        }
+
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
         BigDecimal ake039 = BigDecimalUtils.convert(payinfo.get("ake039"));//医疗保险统筹基金支付
         BigDecimal ake035 = BigDecimalUtils.convert(payinfo.get("ake035"));//公务员医疗补助基金支付
@@ -1318,6 +1330,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
             outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+            // 2021年11月25日20:13:53  添加挂账金额，挂账支付方式必须为8
+            for (OutptPayDO dto : outptPayDOList) {
+                if ( "8".equals(dto.getPayCode())) {
+                    outptSettleDO.setCreditPrice(dto.getPrice());
+                }
+            }
             outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
             // 7.1 结算后需要将结算单号返回给前端
             Map<String, Object> settleMap = new HashMap<>();
@@ -1729,6 +1747,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
         outptCostUploadAndTrialParam.put("action", "settle");//操作 = 结算操作
 
+        // add 读卡支付新增入参
+        outptCostUploadAndTrialParam.put("isReadCardPay",outptVisitDTO.getIsReadCardPay());
+        outptCostUploadAndTrialParam.put("bka895",outptVisitDTO.getBka895());
+        outptCostUploadAndTrialParam.put("bka896",outptVisitDTO.getBka896());
         /**
          * 医保结算
          *
@@ -2900,7 +2922,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         tempMap.put("id", tempMap.get("medOrgOrd").toString()); // 结算id
         tempMap.put("hospCode", hospCode);
         InsureIndividualSettleDO insureIndividualSettleDO = outptSettleDAO.getInsureInsureIndividualSettle(tempMap);
-
+        insureIndividualSettleDO.setSettleId(tempMap.get("medOrgOrd").toString());
         insureIndividualSettleDO.setId(SnowflakeUtils.getId());
         insureIndividualSettleDO.setTotalPrice(new BigDecimal(tempMap.get("feeSumamt").toString()));
         insureIndividualSettleDO.setPersonalPrice(new BigDecimal(tempMap.get("ownpayAmt").toString()));
@@ -3206,6 +3228,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 返回值定义
         Map<String, Object> retMap = new HashMap<>();
 
+        //pengbo   20211203 结算更新费用结算发票ID
+        outptCostDAO.batchUpdateSettleInvoiceId(outotCost);
+
         if (!UtilFunc.isEmpty(pjList)) {
             retMap.put("jspjJsonList", pjList);
         }
@@ -3485,7 +3510,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             pjList.add(outptSettleInvoiceDO);
         }
-
+        /**
+         * 设置发票结算ID到费用表
+         */
+        outptCostDTO.setSettleInvoiceId(outptSettleInvoiceDO.getId());
         return outptSettleInvoiceDO;
     }
 
@@ -3675,6 +3703,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             JSONObject data = (JSONObject) wrapperResponse.getData();
             OutinInvoiceDTO outinInvoiceDTO = (OutinInvoiceDTO) data.get("outinInvoiceDTO");
             saveMzfpDy(outinInvoiceDTO, pjList, pjnrList);
+        }
+        // 体检回调
+        if (outptVisitDTO!=null &&"1".equals(outptVisitDTO.getIsPhys())) {
+            phyIsCallBack(outptVisitDTO);
         }
         return wrapperResponse;
     }
@@ -4070,5 +4102,38 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("statusCode",Constants.ZTBZ.ZC);//状态标志 = 正常
         map.put("settleCodes", new String[]{Constants.JSZT.WJS, Constants.JSZT.YUJS});//结算状态代码：未结算,预结算
         return outptCostDAO.queryOutptPrescribeCostList(map);
+    }
+
+    // 支付成功后，调用体检接口
+    public void phyIsCallBack(OutptVisitDTO outptVisitDTO){
+        Map<String, Object> stringObjectMap = new HashMap<>();
+        Map queryMap = new HashMap();
+        queryMap.put("hospCode", outptVisitDTO.getHospCode());
+        queryMap.put("code", "TJ_URL");
+        SysParameterDTO sysParameterDTO= sysParameterService_consumer.getParameterByCode(queryMap).getData();
+        String url ="";
+        if(sysParameterDTO!=null){
+            url = sysParameterDTO.getValue()+"/updateCost";
+        }else {
+            url ="http://172.26.62.219:8899/hsa-phys/web/phys/interface/his/updateCost";
+        }
+        stringObjectMap.put("url",url);
+        List<Map> maps =new ArrayList<>();
+        if(outptVisitDTO.getOutptCostDTOList()!=null && outptVisitDTO.getOutptCostDTOList().size()>0) {
+            for (OutptCostDTO outptCostDTO:outptVisitDTO.getOutptCostDTOList()) {
+                Map<String, Object> item =new HashMap<>();
+                item.put("HospCode", outptVisitDTO.getHospCode());
+                item.put("VisitId", outptCostDTO.getVisitId());
+                item.put("ItemId", outptCostDTO.getItemId());
+                item.put("actualPrice", outptCostDTO.getRealityPrice());
+                item.put("SettleId",outptCostDTO.getSettleId());
+                maps.add(item);
+            }
+        }
+        String json = JSONObject.toJSONString(maps);
+        stringObjectMap.put("param",json);
+        logger.info("体检收费入参:" + json);
+        String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        logger.info("体检收费反参:" + resultStr);
     }
 }

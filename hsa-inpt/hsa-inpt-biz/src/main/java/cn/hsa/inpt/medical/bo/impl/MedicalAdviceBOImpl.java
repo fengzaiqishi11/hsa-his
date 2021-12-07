@@ -2109,10 +2109,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //if("1".equals(adviceDTO.getIsLong()) && "2".equals(adviceDTO.getYylx())){
         if("1".equals(adviceDTO.getIsLong())){
             inptCostDTO.setTotalNum(adviceDTO.getTotalNum());
+            // 动静态计费的总数量=每日数量*医嘱天数 add luoyong 2021.11.29
+            if (Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode())) {
+                inptCostDTO.setTotalNum(BigDecimalUtils.multiply(numBig,BigDecimal.valueOf(adviceDTO.getUseDays())));
+            }
             if(Constants.XMLB.XM.equals(inptAdviceDetailDTO.getItemCode())){
-                inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
-            } else {
-                inptCostDTO.setTotalNumUnitCode(adviceDTO.getTotalNumUnitCode());
+              inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
+              inptCostDTO.setTotalNumUnitCode(inptAdviceDetailDTO.getUnitCode());
             }
             //药品
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
@@ -2827,6 +2830,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceExecDTOList.clear();
             }
         }
+
     }
 
     /**

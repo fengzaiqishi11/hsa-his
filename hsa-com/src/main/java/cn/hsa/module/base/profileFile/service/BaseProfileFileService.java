@@ -34,7 +34,7 @@ public interface BaseProfileFileService {
      * @Return: Boolean
      **/
     @PostMapping("/service/base/baseProfileFile/save")
-    WrapperResponse<Boolean> save(Map map);
+    WrapperResponse<OutptProfileFileDTO> save(Map map);
 
     /**
      * @Menthod: queryPage

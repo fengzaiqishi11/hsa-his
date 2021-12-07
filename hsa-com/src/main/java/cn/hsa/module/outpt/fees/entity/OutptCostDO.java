@@ -149,4 +149,9 @@ public class OutptCostDO extends PageDO implements Serializable {
          * 是否报销
          */
         private String isReimburse;
+
+        /**
+         * 发票信息ID
+         */
+        private String settleInvoiceId;
 }

@@ -3,7 +3,7 @@ package cn.hsa.outpt.fees.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.service.*;
@@ -32,7 +32,10 @@ import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -52,6 +55,8 @@ import java.util.*;
  */
 @Component
 public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
@@ -101,6 +106,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private OutptRegisterDAO outptRegisterDAO;
     @Resource
     private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    @Resource
+    private OutptElectronicBillService outptElectronicBillService;
 
     @Resource
     private RedisUtils  redisUtils;
@@ -239,7 +247,33 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             oldOutptSettleDTO.setPatientCode("0");
         }
         Integer patientCodeValue = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
-        if (patientCodeValue > 0) {
+
+
+        // 判断病人是否为电子凭证用户
+        boolean isDZPZ = false;
+        // 海南电子凭证退费  2021年11月30日19:22:37========================start===========================
+        if (oldOutptSettleDTO.getSourcePayCode() != null && "4".equals(oldOutptSettleDTO.getSourcePayCode())) {
+            isDZPZ = true;
+            // 调用电子凭证退费
+            Map<String,Object> outptElectronicParam = new HashMap<String,Object>();
+            outptElectronicParam.put("hospCode",outptVisitDTO.getHospCode());//医院编码
+            outptElectronicParam.put("outptCostDTOList",outptVisitDTO.getOutptCostDTOList());//费用信息
+            outptElectronicParam.put("outptVisitDTO",outptVisitDTO);//个人信息
+            outptElectronicParam.put("outptSettleDTO", outptSettleDTO);
+            selectMap.put("state",Constants.ZTBZ.ZC);
+            InsureIndividualSettleDO insureIndividualSettleDO = insureIndividualSettleService_consumer.getByParams(selectMap);
+            if (insureIndividualSettleDO == null) {
+                throw new AppException("未获取到医保结算数据");
+            }
+            outptElectronicParam.put("insureRegCode",insureIndividualSettleDO.getInsureOrgCode());//医保编码
+            Map<String,Object> httpResult = (Map<String, Object>) outptElectronicBillService.deletePatientCostPremium(outptElectronicParam).getData();
+            if (!"0".equals(httpResult.get("code"))) {
+                throw new AppException("电子凭证退费失败");
+            }
+        }
+        // 海南电子凭证退费  2021年11月30日19:22:37====================end===============================
+
+        if (patientCodeValue > 0 && !isDZPZ) {
             InsureIndividualBasicDTO insureIndividualBasicDTO = outptVisitDAO.getInsureBasicById(selectMap);
             if (insureIndividualBasicDTO == null) {
                 throw new AppException("未进行医保登记，医保退费失败");
@@ -425,6 +459,20 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 outptService.setOutptCostUploadAndTrial(outFeeMap);
             }
         }
+
+        // 2021年12月2日14:35:38 查询系统参数是否自动重收  如果没有配置会自动重收，配置为0不自动重收
+        Map<String, String> sysMap = new HashMap<>();
+        sysMap.put("code", "SF_AUTO_SETTLE");
+        sysMap.put("hospCode", hospCode);
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if(sysParameterDTO !=null && "0".equals(sysParameterDTO.getValue())) {
+            // 体检回调
+            if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+                phyIsCallBack(allCostDTOList);
+            }
+            return WrapperResponse.success(true);
+        }
+
         /**END*****************医保病人处理********************************************************************/
 
        // TODO 非医保病人自动退费
@@ -616,18 +664,23 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     append("2208").append("^").toString();
             if(ListUtils.isEmpty(settleDTOList)){
                 String redisValue = redisUtils.get(redisKey);
-                if(StringUtils.isNotEmpty(redisValue)){
+                if(redisUtils.hasKey(redisKey) && StringUtils.isNotEmpty(redisValue)){
                     OutptVisitDTO dto = new OutptVisitDTO();
                     dto.setHospCode(hospCode);//医院编码
                     dto.setId(visitId);//就诊id
                     dto.setPatientCode(redisValue);
                     outptVisitDAO.updateOutptVisit(dto);
+                    redisUtils.del(redisKey);
                 }
             }
 
         outptTmakePriceFormService_consumer.saveOutptSettleByTf(chargeParams);
         }
        /***********End*****************非医保病人自动收费************************************/
+        // 体检回调
+        if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+            phyIsCallBack(allCostDTOList);
+        }
         return WrapperResponse.success(true);
     }
 
@@ -1261,6 +1314,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         selectOutptSettleDTO.setTotalPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTotalPrice()));
         selectOutptSettleDTO.setTruncPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getTruncPrice()));
         selectOutptSettleDTO.setAcctPay(BigDecimalUtils.negate(selectOutptSettleDTO.getAcctPay()));
+        selectOutptSettleDTO.setCreditPrice(BigDecimalUtils.negate(selectOutptSettleDTO.getCreditPrice()));
 
         // 创建信息
         selectOutptSettleDTO.setCrteId(outptSettleDTO.getCrteId());
@@ -1527,6 +1581,40 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
     }
 
+    // 退费成功后，调用体检接口
+    public void phyIsCallBack(List<OutptCostDTO> outptCostDTOS){
+        Map<String, Object> stringObjectMap = new HashMap<>();
+        Map queryMap = new HashMap();
+        queryMap.put("hospCode", outptCostDTOS.get(0).getHospCode());
+        queryMap.put("code", "TJ_URL");
+        SysParameterDTO sysParameterDTO= sysParameterService_consumer.getParameterByCode(queryMap).getData();
+        String url ="";
+        if(sysParameterDTO!=null){
+            url = sysParameterDTO.getValue() +"/updateReturnCost";
+        }else {
+            url ="http://172.26.62.219:8899/hsa-phys/web/phys/interface/his/updateReturnCost";
+        }
+        stringObjectMap.put("url",url);
+        List<Map> maps =new ArrayList<>();
+        if(outptCostDTOS!=null && outptCostDTOS.size()>0) {
+            for (OutptCostDTO outptCostDTO:outptCostDTOS) {
+                Map<String, Object> item =new HashMap<>();
+                if (BigDecimalUtils.less(new BigDecimal(0),outptCostDTO.getBackNum())) {
+                    item.put("HospCode", outptCostDTO.getHospCode());
+                    item.put("VisitId", outptCostDTO.getVisitId());
+                    item.put("ItemId", outptCostDTO.getItemId());
+                    item.put("returnPrice", outptCostDTO.getRealityPrice());
+                    item.put("SettleId", outptCostDTO.getSettleId());
+                    maps.add(item);
+                }
+            }
+        }
+        String json = JSONObject.toJSONString(maps);
+        stringObjectMap.put("param",json);
+        logger.info("体检退费入参:" + json);
+        String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        logger.info("体检退费反参:" + resultStr);
+    }
 
 
 }

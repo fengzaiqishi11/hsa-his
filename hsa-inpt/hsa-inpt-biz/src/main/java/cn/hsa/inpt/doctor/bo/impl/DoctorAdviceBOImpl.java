@@ -1488,6 +1488,29 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     }
 
     /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    @Override
+    public List<InptAdviceDTO> getZyAdviceByVisitId(InptVisitDTO inptVisitDTO) {
+        InptVisitDTO visitById = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        if (visitById == null) {
+            throw new RuntimeException("未查询到相关就诊信息");
+        }
+        List<InptAdviceDTO> zyAdviceByVisitId = inptAdviceDAO.getZyAdviceByVisitId(inptVisitDTO);
+        if (!ListUtils.isEmpty(zyAdviceByVisitId)) {
+            BigDecimal reduce = zyAdviceByVisitId.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            zyAdviceByVisitId.forEach(item -> item.setPrintTotalPrice(reduce));
+        }
+        return zyAdviceByVisitId;
+    }
+
+    /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode
      * @return

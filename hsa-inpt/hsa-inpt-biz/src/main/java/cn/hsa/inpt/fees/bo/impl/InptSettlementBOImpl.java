@@ -17,14 +17,11 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.fees.bo.InptSettlementBO;
 import cn.hsa.module.inpt.fees.dao.*;
-import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.fees.entity.*;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
-import cn.hsa.module.insure.module.dao.InsureIndividualSettleDAO;
 import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.insure.module.entity.InsureDirectoryInfoDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.insure.module.service.*;
@@ -43,8 +40,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -444,6 +439,13 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal akb066 = BigDecimalUtils.convert(inptInsureResult.get("akb066"));//个人账户支付
                 BigDecimal akb067 = BigDecimalUtils.convert(inptInsureResult.get("akb067"));//个人现金支付
                 BigDecimal akc264 = BigDecimalUtils.convert(inptInsureResult.get("akc264"));//医疗总费用akc264 = bka831 + bka832+bka842
+
+                /**
+                 * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+                 */
+                if(BigDecimalUtils.equals(akb067,akc264)){
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
                 BigDecimal ake026 = BigDecimalUtils.convert(inptInsureResult.get("ake026"));//企业补充医疗保险基金支付
                 BigDecimal ake029 = BigDecimalUtils.convert(inptInsureResult.get("ake029"));//大额医疗费用补助基金支付
                 BigDecimal ake035 = BigDecimalUtils.convert(inptInsureResult.get("ake035"));//公务员医疗补助基金支付
@@ -858,8 +860,13 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             BigDecimal actualPrice = new BigDecimal(0);//实收金额
             // 第三方支付金额
             BigDecimal thirdPartyPrice = new BigDecimal(0);
+            // 挂账金额
+            BigDecimal creditPrice = new BigDecimal(0);
             List<InptPayDO> inptPayParam = new ArrayList<InptPayDO>();
             for (InptPayDO inptPayDO : inptPayDOList) {
+                if ("8".equals(inptPayDO.getPayCode())) {
+                    creditPrice = inptPayDO.getPrice();
+                }
                 //TODO 后续考虑支付手续费
                 if (StringUtils.isNotEmpty(inptPayDO.getPayCode()) && inptPayDO.getPrice() != null) {
                     // 支付方式中第三方支付费用总和
@@ -958,6 +965,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptSettleDO1.setId(settleId);//结算id
             inptSettleDO1.setIsSettle(Constants.SF.S);//是否结算 = 是
             inptSettleDO1.setSourcePayCode("0"); // 0：his 1：微信 2：支付宝 3：自助机
+            inptSettleDO1.setCreditPrice(creditPrice);
             inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO1);
 
             //判断是否需要发票
@@ -1403,6 +1411,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("personalPrice", list.get(0).get("personalPrice"));
             returnMap.put("beforeSettle", list.get(0).get("beforeSettle"));
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
+            returnMap.put("creditPrice", list.get(0).get("creditPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {

@@ -4,10 +4,13 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.bor.bo.BaseOrderRuleBO;
 import cn.hsa.module.base.profileFile.bo.BaseProfileFileBO;
 import cn.hsa.module.base.profileFile.dao.BaseProfileFileDAO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
+import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,12 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     @Resource
     private BaseProfileFileDAO baseProfileFileDAO;
 
+    @Resource
+    private SysParameterDAO sysParameterDAO;
+
+    @Resource
+    private BaseOrderRuleBO baseOrderRuleBO;
+
     /**
      * @Menthod: save
      * @Desrciption: 保存/新增个人档案
@@ -47,42 +56,40 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return: OutptProfileFileExtendDTO
      **/
     @Override
-    public Boolean save(OutptProfileFileDTO outptProfileFileDTO) {
+    public OutptProfileFileDTO save(OutptProfileFileDTO outptProfileFileDTO) {
         //校验身份证格式是否正确
         this.checkCard(outptProfileFileDTO.getCertNo(), outptProfileFileDTO.getCertCode());
         if (StringUtils.isNotEmpty(outptProfileFileDTO.getType())) {
             String type = outptProfileFileDTO.getType();
-            if (StringUtils.isNotEmpty(type)) {
-                if ("0".equals(type)) {
-                    if (StringUtils.isEmpty(outptProfileFileDTO.getId())) {
-                        //判断身份证是否存在
-                        if (isCertNoExist(outptProfileFileDTO)) {
-                            throw new AppException("身份证号重复，请重新输入");
-                        }
-                        return insert(outptProfileFileDTO) > 0;
-                    } else {
-                        return update(outptProfileFileDTO) > 0;
+            if ("0".equals(type)) {
+                if (StringUtils.isEmpty(outptProfileFileDTO.getId())) {
+                    //判断身份证是否存在
+                    if (isCertNoExist(outptProfileFileDTO)) {
+                        throw new AppException("身份证号重复，请重新输入");
                     }
-                } else if (type.equals("1") || type.equals("2")) {
-                    if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
-                        return insert(outptProfileFileDTO) > 0;
+                    outptProfileFileDTO = insert(outptProfileFileDTO);
+                } else {
+                    outptProfileFileDTO = update(outptProfileFileDTO);
+                }
+            } else if (type.equals("1") || type.equals("2")) {
+                if (Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())) {
+                    outptProfileFileDTO = insert(outptProfileFileDTO);
+                } else {
+                    //判断此身份证是否建档
+                    OutptProfileFileDTO newFile = baseProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
+                    if (newFile != null) {
+                        newFile.setType(type);
+                        newFile.setHospCode(outptProfileFileDTO.getHospCode());
+                        outptProfileFileDTO = update(outptProfileFileDTO);
                     } else {
-                        //判断此身份证是否建档
-                        OutptProfileFileDTO newFile = baseProfileFileDAO.isCertNoExistS(outptProfileFileDTO);
-                        if (newFile != null) {
-                            newFile.setType(type);
-                            newFile.setHospCode(outptProfileFileDTO.getHospCode());
-                            return update(outptProfileFileDTO) > 0;
-                        } else {
-                            return insert(outptProfileFileDTO) > 0;
-                        }
+                        outptProfileFileDTO = insert(outptProfileFileDTO);
                     }
                 }
             }
         } else {
             throw new AppException("请传建档类型(type)");
         }
-        return false;
+        return outptProfileFileDTO;
     }
 
     /**
@@ -153,7 +160,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Date 2020/9/22 16:50
      * @Return cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO
      **/
-    private Integer update(OutptProfileFileDTO outptProfileFileDTO) {
+    private OutptProfileFileDTO update(OutptProfileFileDTO outptProfileFileDTO) {
         OutptProfileFileDTO profileFileDTO = baseProfileFileDAO.queryById(outptProfileFileDTO);
         if (profileFileDTO == null) {
             //新增
@@ -175,7 +182,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 //门诊
                 param.setTotalOut(profileFileDTO.getTotalOut() == null ? 1 : profileFileDTO.getTotalOut() + 1);
                 param.setOutptLastVisitTime(DateUtils.getNow());
-                return baseProfileFileDAO.update(param);
+                baseProfileFileDAO.update(param);
             } else if ("1".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
                 // 档案表已存在病人类型
                 if (StringUtils.isNotEmpty(profileFileDTO.getPatientCode())){
@@ -187,11 +194,12 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 //住院
                 param.setTotalIn(profileFileDTO.getTotalIn() == null ? 1 : profileFileDTO.getTotalIn() + 1);
                 param.setInptLastVisitTime(DateUtils.getNow());
-                return baseProfileFileDAO.update(param);
+                baseProfileFileDAO.update(param);
             } else {
                 // 只有档案管理(type=0)才修改档案的基本信息，门诊/住院不修改
-                return baseProfileFileDAO.update(outptProfileFileDTO);
+                baseProfileFileDAO.update(outptProfileFileDTO);
             }
+            return profileFileDTO;
         }
     }
 
@@ -203,11 +211,22 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Date 2020/9/22 16:50
      * @Return cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO
      **/
-    private Integer insert(OutptProfileFileDTO outptProfileFileDTO) {
-        if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-            outptProfileFileDTO.setId(SnowflakeUtils.getId());
-        }
+    private OutptProfileFileDTO insert(OutptProfileFileDTO outptProfileFileDTO) {
+        outptProfileFileDTO.setId(SnowflakeUtils.getId());
         outptProfileFileDTO.setIsValid(Constants.SF.S);
+        // 住院病案号
+        String inProfile ="";
+        // 是否开启自定义住院号
+        SysParameterDTO sysParameterDTO = sysParameterDAO.getParameterByCode(outptProfileFileDTO.getHospCode(), "BAH_SF");
+        if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+            inProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "361");
+        } else {
+            inProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "36");
+        }
+        outptProfileFileDTO.setInProfile(inProfile);
+        // 门诊档案号
+        String outProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "104");
+        outptProfileFileDTO.setOutProfile(outProfile);
         //新增
         if ("2".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
             //门诊
@@ -217,7 +236,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
             if (outptProfileFileDTO.getOutptLastVisitTime() == null) {
                 outptProfileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
             }
-        } else if ("3".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
+        } else if ("1".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
             //住院
             if (outptProfileFileDTO.getTotalIn() == null) {
                 outptProfileFileDTO.setTotalIn(1);
@@ -228,7 +247,9 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
         }
         outptProfileFileDTO.setPym(PinYinUtils.toFirstPY(outptProfileFileDTO.getName()));
         outptProfileFileDTO.setWbm(WuBiUtils.getWBCode(outptProfileFileDTO.getName()));
-        return baseProfileFileDAO.insert(outptProfileFileDTO);
+        // 档案表入库
+        baseProfileFileDAO.insert(outptProfileFileDTO);
+        return outptProfileFileDTO;
     }
 
     /**
@@ -328,6 +349,15 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     @Override
     public Boolean deleteProfileFile(Map map) {
         String profileId = MapUtils.get(map,"id");
+        //查询是否之前就诊过
+        OutptProfileFileDTO outptProfileFileDTO = baseProfileFileDAO.queryProfileFile(profileId);
+        if((null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalOut()>1)//判断第一次门诊
+                ||(null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalIn()>1)//判断第一次住院
+                ||(null != outptProfileFileDTO.getTotalOut()//判断有过一次门诊情况且来第一次住院，也说明已经在医院就诊过
+                &&null != outptProfileFileDTO.getTotalIn()
+                &&(outptProfileFileDTO.getTotalOut()+outptProfileFileDTO.getTotalIn())>1)){
+            throw new AppException("当前档案病人已经就诊，不允许删除！");
+        }
         if(!"0".equals(baseProfileFileDAO.queryPatient(profileId))){
                 throw new AppException("当前档案病人正在就诊，不允许删除！");
         }

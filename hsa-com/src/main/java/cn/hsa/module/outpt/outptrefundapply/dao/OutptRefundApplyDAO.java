@@ -52,4 +52,26 @@ public interface OutptRefundApplyDAO {
 	 * @Return
 	 */
 	int updateOutptRefundAppyStatus(OutptSettleDTO outptSettleDTO);
+
+	/**
+	 * @Description: 门诊医生取消退费确认
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 14:30
+	 * @Return
+	 */
+	int updateUnconfirmedOutptRefundAppy(OutptSettleDTO outptSettleDTO);
+
+	/**
+	 * @Description: 门诊医生取消退费申请
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/12/01 15:46
+	 * @Return
+	 */
+	int deleteOutptRefundAppy(OutptSettleDTO outptSettleDTO);
+
+	List<OutptCostDTO> queryUncostList(OutptSettleDTO outptSettleDTO);
 }

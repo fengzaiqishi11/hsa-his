@@ -837,6 +837,17 @@ public interface InptAdviceDAO {
     List<InptAdviceDTO> queryGroupAdvice(InptAdviceDTO inptAdviceDTO);
 
     /**
+     * @Menthod: getZyAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药医嘱列表
+     * @Param: inptVisitDTO
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-11-26 11:31
+     * @Return:
+     **/
+    List<InptAdviceDTO> getZyAdviceByVisitId(InptVisitDTO inptVisitDTO);
+
+    /**
      * 医嘱最近执行时间更新（最外面的更新执行时间方法（updateLastExeTime）替换成下面这个） - 解决周期费用生成问题
      * @param medicalAdviceDTO
      * @param adviceIdCostTime

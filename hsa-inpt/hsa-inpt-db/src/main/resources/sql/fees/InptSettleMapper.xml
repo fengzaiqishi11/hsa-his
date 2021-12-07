@@ -151,7 +151,8 @@
         crte_id,
         crte_name,
         crte_time,
-        acct_pay
+        acct_pay,
+        credit_price
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -462,7 +463,10 @@
                     crte_time,
                 </if>
                 <if test="acctPay != null">
-                acct_pay
+                acct_pay,
+                </if>
+                <if test="creditPrice != null">
+                    credit_price
                 </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -569,7 +573,10 @@
                         #{crteTime,jdbcType=TIMESTAMP},
                 </if>
                 <if test="acctPay != null">
-                        #{acctPay,jdbcType=DECIMAL}
+                        #{acctPay,jdbcType=DECIMAL},
+                </if>
+                <if test="creditPrice != null">
+                    #{creditPrice,jdbcType=DECIMAL}
                 </if>
         </trim>
     </insert>
@@ -723,6 +730,9 @@
                 <if test="acctPay != null">
                     acct_pay = #{acctPay,jdbcType=DECIMAL}
                 </if>
+                <if test="creditPrice != null">
+                    credit_price = #{creditPrice,jdbcType=DECIMAL}
+                </if>
         </set>
         where
         id = #{id}
@@ -859,11 +869,11 @@
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') bsxj,
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') bszz,
             (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr, d.personalPrice,
-            d.beforeSettle, d.lastSettle
+            d.beforeSettle, d.lastSettle, d.creditPrice
             from
             (
             select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle,ifnull(iis.before_settle, 0.00) as beforeSettle,
-            (c.reality_price - c.trunc_price - c.mi_price) as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId, ifnull(iis.personal_price, 0) as personalPrice
+            (c.reality_price - c.trunc_price - c.mi_price) as selfPrice, c.reality_price as settleRealityPrice, c.settle_time as settleTime, c.baby_id as babyId, ifnull(iis.personal_price, 0) as personalPrice, ifnull(c.credit_price, 0.00) as creditPrice
             from inpt_cost a join inpt_visit b on a.visit_id=b.id
             join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id
             left join insure_individual_settle iis on iis.hosp_code = c.hosp_code and iis.settle_id = c.id

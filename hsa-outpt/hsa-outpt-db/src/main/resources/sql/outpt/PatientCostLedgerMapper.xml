@@ -764,11 +764,14 @@
         case when a.curr_unit_code = a.unit_code then a.num else a.split_num end num,a.crte_time as crteTime,a.crte_name as crteName,
         a.item_code as itemCode, a.item_id as itemId,"门诊退药" as retrunType,
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
+        (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
+        '门诊病人' as statusCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',ifnull(v.age,''),
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
+        left join outpt_prescribe op on op.id = a.op_id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where
@@ -779,6 +782,9 @@
         </if>
         <if test="endTime != null">
             and a.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and op.dept_id = #{deptToldId}
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
@@ -798,11 +804,13 @@
     <!--药房住院退药报表查询-->
     <select id="queryReturnInDrugLedger" resultType="java.util.Map" parameterType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO">
         select
+        v.status_code as statusCode,
         e.id as id,e.item_name as itemName,e.spec,e.price,e.split_price as splitPrice,
         e.curr_unit_code as currUnitCode,e.unit_code as unitCode,e.split_unit_code as splitUnitCode,e.split_num as splitNum,
         case when e.curr_unit_code = e.unit_code then e.num else e.split_num end num,e.crte_time as crteTime,
         e.crte_name as crteName,e.item_code as itemCode, e.item_id as itemId,"住院退药" as retrunType,
         (select name from base_dept where hosp_code = d.hosp_code and id = d.phar_id) as pharName,
+        (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail where value = v.gender_code and c_code='XB' and hosp_code = e.hosp_code),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'岁')))) patientInfo
         from phar_in_distribute_all_detail e
@@ -810,15 +818,22 @@
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
         left join base_drug b on e.item_id = b.id and e.hosp_code = b.hosp_code and e.item_code = "1"
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
+        left join inpt_advice ia on ia.id = e.advice_id
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
             and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and ia.dept_id = #{deptToldId}
         </if>
         <if test="endTime != null">
             and e.crte_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and v.status_code = #{statusCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -841,6 +856,8 @@
         case when e.curr_unit_code = e.unit_code then e.num else e.split_num end num,e.crte_time as crteTime,
         e.crte_name as crteName,e.item_code as itemCode, e.item_id as itemId,"住院退药" as retrunType,
         (select name from base_dept where hosp_code = d.hosp_code and id = d.phar_id) as pharName,
+        (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
+        v.status_code as statusCode,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail sc where hosp_code = v.hosp_code and sc.value=v.gender_code and sc.c_code='XB'),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         FROM phar_in_distribute_all_detail e
@@ -848,6 +865,7 @@
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
         left join base_drug b on e.item_id = b.id and e.hosp_code = b.hosp_code and e.item_code = "1"
         left join base_material c on e.item_id = c.id and e.hosp_code = c.hosp_code and e.item_code = "2"
+        left join inpt_advice ia on ia.id = e.advice_id
         WHERE e.hosp_code = #{hospCode} and ifnull(e.num,0) &lt; 0
         <if test="startTime != null">
             and e.crte_time >= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
@@ -857,6 +875,12 @@
         </if>
         <if test="pharId != null and pharId !=''">
             and d.phar_id = #{pharId}
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and ia.dept_id = #{deptToldId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and v.status_code = #{statusCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -874,11 +898,14 @@
         case when a.curr_unit_code = a.unit_code then a.num else a.split_num end num,a.crte_time as crteTime,a.crte_name as crteName,
         a.item_code as itemCode, a.item_id as itemId,"门诊退药" as retrunType,
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
+        (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
+        '门诊病人' as statusCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',v.age,
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
+        left join outpt_prescribe op on op.id = a.op_id
         left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where ifnull(a.num,0) &lt; 0 and a.hosp_code = #{hospCode}
@@ -890,6 +917,12 @@
         </if>
         <if test="pharId != null and pharId !=''">
             and b.phar_id = #{pharId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and 1=-1
+        </if>
+        <if test="deptToldId != null and deptToldId != ''">
+            and op.dept_id = #{deptToldId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -1324,6 +1357,9 @@
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
         </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
+        </if>
     </select>
 
     <!--门诊住院项目使用量统计查询,按业务类型、项目、开方医生分组-->
@@ -1608,7 +1644,7 @@
             b.dept_id,
             d.name as dept_name,
             b.reality_price ,
-            if(b.reality_price &lt; 0,-b.total_num,b.total_num)  AS num
+            b.total_num AS num
             FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
@@ -1664,10 +1700,10 @@
             a.dept_id,
             d.name as dept_name,
             b.reality_price,
-            if (b.reality_price &lt; 0,-b.num,b.num) AS num
+            b.num AS num
             FROM
             outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
-            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code
+            left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code and b.status_code = c.status_code
             join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
             where 1=1
@@ -3648,10 +3684,10 @@
         on a.visit_id = d.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}
@@ -3681,10 +3717,10 @@
         on a.visit_id = d.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(b.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(b.crte_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}
@@ -3712,10 +3748,10 @@
         on a.bill_id = c.id
         where a.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != '' ">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%S') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="endTime != null and endTime != '' ">
-            and DATE_FORMAT(a.settle_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            and DATE_FORMAT(a.settle_time,'%Y-%m-%d %H:%i:%S') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%S')
         </if>
         <if test="typeCode != null and typeCode != '' ">
             and c.type_code = #{typeCode}
@@ -3742,7 +3778,7 @@
         a.spec,
         a.num_unit_code AS unit_name,
         a.price,
-        if(a.reality_price &lt; 0, -1*a.total_num, a.total_num) as total_num,
+        a.total_num as total_num,
         a.total_price,
         a.preferential_price,
         a.reality_price,
@@ -5442,7 +5478,9 @@
         from(
         <include refid="getOutRegisterCostBig"></include>
         where settle.hosp_code = #{hospCode} and ((date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' )
-        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s')) or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m') or
+        and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= date_format(ifnull(#{endDate}, now()), '%Y-%m-%d %H:%i:%s'))
+        or date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+         or
         (date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(date_sub(#{startDate}, interval 1 year), '%Y-%m-%d %H:%i:%s' )
         and date_format(settle.settle_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(date_sub(ifnull(#{endDate}, now()), interval 1 year), '%Y-%m-%d %H:%i:%s' )))
         group by b.up_code

@@ -1,4 +1,4 @@
-package cn.hsa.interf.nation.drug.bo.imol;
+package cn.hsa.interf.nation.drug.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;

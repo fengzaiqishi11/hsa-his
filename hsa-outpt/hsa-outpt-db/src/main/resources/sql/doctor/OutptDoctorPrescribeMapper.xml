@@ -2275,6 +2275,20 @@
             </if>
         </foreach>
     </update>
+    <update id="updateOutptRegister">
+        update outpt_register set
+                               name = #{name},
+                               gender_code = #{genderCode},
+                               age = #{age},
+                               birthday = #{birthday},
+                               cert_code = #{certCode},
+                               cert_no = #{certNo},
+                               phone = #{phone},
+                               visit_code = #{visitCode},
+                               source_tj_code = #{sourceTjCode},
+                               source_tj_remark = #{sourceTjRemark}
+        where visit_id = #{id} and hosp_code = #{hospCode}
+    </update>
 
 
     <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">

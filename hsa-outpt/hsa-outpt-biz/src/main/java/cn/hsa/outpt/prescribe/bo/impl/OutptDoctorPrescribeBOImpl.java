@@ -311,6 +311,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      **/
     @Override
     public boolean updateVisit(OutptVisitDTO outptVisitDTO) {
+        outptDoctorPrescribeDAO.updateOutptRegister(outptVisitDTO);
         return outptDoctorPrescribeDAO.updateVisit(outptVisitDTO) > 0;
     }
 

@@ -209,8 +209,8 @@
         where
         hosp_code = #{hospCode}
         <if test="keyword != null and keyword != ''">
-            and admdvs_name like concat('%',#{keyword},'%')
-            or admdvs_code like concat('%',#{keyword},'%')
+            and (admdvs_name like concat('%',#{keyword},'%')
+            or admdvs_code like concat('%',#{keyword},'%'))
         </if>
     </select>
 

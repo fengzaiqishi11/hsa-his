@@ -448,9 +448,10 @@
         FROM
         inpt_cost t
         WHERE
-        t.status_code = '0' and
-        <foreach collection="list" item="dto" open="(" close=")" separator=" or ">
-            (hosp_code = #{dto.hospCode} and iat_id = #{dto.iatId} and DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' ) = DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
+        t.status_code = '0'
+        and (hosp_code,iat_id,DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' )) in
+        <foreach collection="list" item="dto" open="(" close=")" separator=",">
+            (#{dto.hospCode},#{dto.iatId},DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
         </foreach>
         group by hosp_code,iat_id,DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' )
     </select>

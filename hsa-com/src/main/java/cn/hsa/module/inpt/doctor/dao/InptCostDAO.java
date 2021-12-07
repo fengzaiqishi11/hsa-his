@@ -524,13 +524,6 @@ public interface InptCostDAO {
     int deleteInDistributeAllDetailOrg(PharInDistributeAllDetailDTO pharInDistributeAllDetailDTO);
 
     int deleteInDistributeDetailOrg(PharInDistributeDetailDTO pharInDistributeDetailDTO);
-    /**
-     * @Meth: updateCostIdBatch
-     * @Description: 防止不同事务导致的问题
-     * @Param: [inptCostDTOs]
-     * @return: int
-     * @Author: zhangguorui
-     * @Date: 2021/12/6
-     */
-    int updateCostIdBatch(List<InptCostDTO> inptCostDTOs);
+
+    int updateCostIdBatch(List<InptCostDTO> normalsNew);
 }

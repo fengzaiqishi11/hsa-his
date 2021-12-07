@@ -117,4 +117,6 @@ public interface BaseProfileFileDAO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     String queryPatient(String profileId);
+
+    OutptProfileFileDTO queryProfileFile(String profileId);
 }

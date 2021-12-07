@@ -443,5 +443,27 @@ public interface PatientCostLedgerService {
   @GetMapping("/service/outpt/statement/getInptFinanceTitle")
   WrapperResponse<Map> getInptFinanceTitle(Map map);
 
+  /**
+   * @Menthod queryHospitalCardList
+   * @Desrciption 统计入院证
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/06 10:51
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/service/outpt/statement/queryHospitalCardList")
+  WrapperResponse<PageDTO> queryHospitalCardList(Map map);
+
+  /**
+   * @param paraMap
+   * @Method queryOutptorInHosptialItemUseInfo
+   * @Desrciption 门诊业务使用量统计按科室过滤
+   * @Author liuliyun
+   * @Date 2021/12/07 11:48
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < java.util.Map < java.lang.String, java.lang.Object>>>
+   **/
+  @PostMapping("/service/outpt/statement/queryOutptorInHosptialItemUseInfo")
+  WrapperResponse<PageDTO> queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap);
+
 }
 

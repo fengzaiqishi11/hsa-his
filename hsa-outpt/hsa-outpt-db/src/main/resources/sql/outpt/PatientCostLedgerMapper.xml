@@ -6860,6 +6860,65 @@
         order by a.out_time desc
     </select>
 
+   <!--统计已开住院证并住院的病人信息-->
+   <select id="getMzHospitalCardDetailList" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+       select b.in_no as inNo,
+              b.name,b.gender_code as genderCode,
+              b.age,a.doctor_id as doctorId,
+              a.doctor_name as doctorName,
+              a.dept_id as outptDeptId,
+              a.dept_name as outptDeptName,
+              b.in_dept_id as inDeptId,
+              b.in_dept_name as inDeptName,
+              b.in_time as inTime,
+              b.bed_name as bedName,
+              b.in_disease_name as inDiseaseName
+       from outpt_visit a
+       JOIN inpt_visit b
+       on b.outpt_visit_no = a.visit_no
+       and b.hosp_code =#{hospCode}
+       where a.tran_in_code ='2' and a.hosp_code =#{hospCode}
+       <if test="deptId != null and deptId != ''">
+           and a.dept_id = #{deptId}
+       </if>
+       <if test="startTime != null and startTime !=''">
+           and b.in_time &gt;= #{startTime}
+       </if>
+       <if test="endTime != null and endTime !=''">
+           and b.in_time &lt;= #{endTime}
+       </if>
+       <if test="keyword != null and keyword != ''">
+           and b.name like concat('%', #{keyword}, '%')
+       </if>
+       <if test="outptDoctorName != null and outptDoctorName != ''">
+           and a.doctor_name like concat('%', #{outptDoctorName}, '%')
+       </if>
+       order by b.in_time desc
+   </select>
+
+    <!--统计已开住院证并住院的病人信息-->
+   <select id="getMzHospitalCardTotalList" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+       select COUNT(a.id) as totalNum,
+              a.doctor_name as doctorName,
+              a.dept_id,
+              a.dept_name as outptDeptName
+       from outpt_visit a
+       JOIN inpt_visit b on b.outpt_visit_no = a.visit_no and b.hosp_code =#{hospCode}
+       where a.tran_in_code ='2' and a.hosp_code =#{hospCode}
+       <if test="deptId != null and deptId != ''">
+           and a.dept_id = #{deptId}
+       </if>
+       <if test="startTime != null and startTime !=''">
+           and b.in_time &gt;= #{startTime}
+       </if>
+       <if test="endTime != null and endTime !=''">
+           and b.in_time &lt;= #{endTime}
+       </if>
+       <if test="outptDoctorName != null and outptDoctorName != ''">
+           and a.doctor_name like concat('%', #{outptDoctorName}, '%')
+       </if>
+       GROUP BY a.dept_id,a.doctor_id
+   </select>
 
 
 </mapper>

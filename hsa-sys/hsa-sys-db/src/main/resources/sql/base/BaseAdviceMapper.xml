@@ -399,6 +399,9 @@
         <if test="deptId != null and deptId != '' ">
             and ov.dept_id = #{deptId}
         </if>
+        <if test="typeCode != null and typeCode != '' ">
+            and op.type_code = #{typeCode}
+        </if>
         <if test="visitNo != null and visitNo != '' ">
             and ov.visit_no like concat('%',#{visitNo},'%')
         </if>

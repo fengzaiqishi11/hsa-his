@@ -1528,46 +1528,48 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String,Object>> opernInfoList =  MapUtils.get(map,"oprninfo");
         if(!ListUtils.isEmpty(opernInfoList)){
             opernInfoList = opernInfoList.stream().filter(item->StringUtils.isNotEmpty(MapUtils.get(item,"oprnOprtCode"))).collect(Collectors.toList());
-            opernInfoList.get(0).put("oprnOprtType","1");
-            opernInfoList.stream().forEach(item->{
-                Object oprnOprtStartTime  = MapUtils.get(item,"oprnOprtStartTime");
-                if(oprnOprtStartTime !=null){
-                    item.put("oprnOprtStartTime",DateUtils.getNumerToStringDate(oprnOprtStartTime)); // 手术开始时间
-                }
-                Object oprnOprtEndTime  = MapUtils.get(item,"oprnOprtEndTime");
-                if(oprnOprtEndTime !=null){
-                    item.put("oprnOprtEndTime",DateUtils.getNumerToStringDate(oprnOprtEndTime)); // 手术结束时间
-                }
-                Object anstDrStartTime  = MapUtils.get(item,"anstDrStartTime");
-                if(anstDrStartTime !=null){
-                    item.put("anstDrStartTime",DateUtils.getNumerToStringDate(anstDrStartTime)); // 麻醉开始时间
-                }
-                Object anstDrEndTime  = MapUtils.get(item,"anstDrEndTime");
-                if(anstDrEndTime !=null){
-                    item.put("anstDrEndTime",DateUtils.getNumerToStringDate(anstDrEndTime)); // 麻醉结束时间
-                }
-                Object oprnOprtDate =  MapUtils.get(item,"oprnOprtDate");
-                /**
-                 * 如果直接在清单上面填写  手术信息，则需要根据手术开始时间和结束时间来确定手术操作日期
-                 */
-                if(oprnOprtDate == null && oprnOprtStartTime !=null){
-                    item.put("oprnOprtDate",DateUtils.parse(DateUtils.getNumerToStringDate(oprnOprtStartTime),DateUtils.Y_M_D)); // 麻醉结束时间
-                }else{
-                    item.put("oprnOprtDate",DateUtils.getNumerToStringDate(oprnOprtDate)); // 手术操作日期
-                }
-                /**
-                 * 前端默认第一条数据就是主要手术  1:代表主要手术  2：其他手术
-                 */
-                if(!"1".equals(MapUtils.get(item,"oprnOprtType"))){
-                    item.put("oprnOprtType","2"); // 手术操作类别
-                }
+            if(!ListUtils.isEmpty(opernInfoList)){
+                opernInfoList.get(0).put("oprnOprtType","1");
+                opernInfoList.stream().forEach(item->{
+                    Object oprnOprtStartTime  = MapUtils.get(item,"oprnOprtStartTime");
+                    if(oprnOprtStartTime !=null){
+                        item.put("oprnOprtStartTime",DateUtils.getNumerToStringDate(oprnOprtStartTime)); // 手术开始时间
+                    }
+                    Object oprnOprtEndTime  = MapUtils.get(item,"oprnOprtEndTime");
+                    if(oprnOprtEndTime !=null){
+                        item.put("oprnOprtEndTime",DateUtils.getNumerToStringDate(oprnOprtEndTime)); // 手术结束时间
+                    }
+                    Object anstDrStartTime  = MapUtils.get(item,"anstDrStartTime");
+                    if(anstDrStartTime !=null){
+                        item.put("anstDrStartTime",DateUtils.getNumerToStringDate(anstDrStartTime)); // 麻醉开始时间
+                    }
+                    Object anstDrEndTime  = MapUtils.get(item,"anstDrEndTime");
+                    if(anstDrEndTime !=null){
+                        item.put("anstDrEndTime",DateUtils.getNumerToStringDate(anstDrEndTime)); // 麻醉结束时间
+                    }
+                    Object oprnOprtDate =  MapUtils.get(item,"oprnOprtDate");
+                    /**
+                     * 如果直接在清单上面填写  手术信息，则需要根据手术开始时间和结束时间来确定手术操作日期
+                     */
+                    if(oprnOprtDate == null && oprnOprtStartTime !=null){
+                        item.put("oprnOprtDate",DateUtils.parse(DateUtils.getNumerToStringDate(oprnOprtStartTime),DateUtils.Y_M_D)); // 麻醉结束时间
+                    }else{
+                        item.put("oprnOprtDate",DateUtils.getNumerToStringDate(oprnOprtDate)); // 手术操作日期
+                    }
+                    /**
+                     * 前端默认第一条数据就是主要手术  1:代表主要手术  2：其他手术
+                     */
+                    if(!"1".equals(MapUtils.get(item,"oprnOprtType"))){
+                        item.put("oprnOprtType","2"); // 手术操作类别
+                    }
 
-            });
+                });
 
-            List<Map<String, Object>> mapList = insertCommonSettleInfo(map, opernInfoList);
-            if(!ListUtils.isEmpty(mapList)){
-                insureGetInfoDAO.deleteOperInfo(map);
-                insureGetInfoDAO.insertOperInfo(mapList);
+                List<Map<String, Object>> mapList = insertCommonSettleInfo(map, opernInfoList);
+                if(!ListUtils.isEmpty(mapList)){
+                    insureGetInfoDAO.deleteOperInfo(map);
+                    insureGetInfoDAO.insertOperInfo(mapList);
+                }
             }
         }
     }

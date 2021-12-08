@@ -25,6 +25,6 @@ public interface NationDrugService {
      * @Email: nianxin.luo@powersi.com
      * @Date: 2021/6/11 14:07
      **/
-    @GetMapping("/service/interf/nationDrug/queryCenterNationStandardDrugPage")
+    @GetMapping("/service/interf/nationDrug/queryNationStandardDrugPage")
     WrapperResponse<PageDTO> queryNationStandardDrugPage(NationStandardDrugDTO nationStandardMaterialDTO);
 }

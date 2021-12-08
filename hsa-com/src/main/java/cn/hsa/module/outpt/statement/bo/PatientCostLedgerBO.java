@@ -377,4 +377,24 @@ public interface PatientCostLedgerBO {
    * @Return Map
    **/
   Map getInptFinanceTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptFinanceList
+   * @Desrciption 查询住院财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/10/25 11:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO queryHospitalCardList(OutptVisitDTO outptVisitDTO);
+
+  /**
+   * @Menthod queryHospitalCardList
+   * @Desrciption 门诊住院项目使用量统计（按科室过滤）
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/07 11:54
+   * @Return WrapperResponse<PageDTO>
+   **/
+  PageDTO queryOutptorInHosptialItemUseInfo(Map<String,Object> paraMap);
 }

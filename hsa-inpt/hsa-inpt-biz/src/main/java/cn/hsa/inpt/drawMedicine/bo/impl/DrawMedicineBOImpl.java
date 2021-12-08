@@ -391,13 +391,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     List<PharInWaitReceiveDTO> summaryList = new ArrayList<>();
     Map<String, List<PharInWaitReceiveDTO>> itemMap = inWaitReceiveList.stream().collect(Collectors.groupingBy(e -> e.getItemId() + "#" + e.getPharId()));
     itemMap.forEach((k, v) -> {
-      for (PharInWaitReceiveDTO waitReceiveDTO : v) {
-        if (waitReceiveDTO.getSplitUnitCode().equals(waitReceiveDTO.getCurrUnitCode())) {
-          waitReceiveDTO.setNum(waitReceiveDTO.getSplitNum());
-          waitReceiveDTO.setPrice(waitReceiveDTO.getSplitPrice());
-          waitReceiveDTO.setTotalPrice(BigDecimalUtils.multiply(waitReceiveDTO.getNum(), waitReceiveDTO.getPrice()));
-        }
-      }
       BigDecimal num = v.stream().map(PharInWaitReceiveDTO::getNum).reduce(BigDecimal.ZERO, BigDecimal::add);
       BigDecimal totalPrice = v.stream().map(PharInWaitReceiveDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
 //            BigDecimal kszbsl = v.stream().map(PharInWaitReceiveDTO::getKszbsl).reduce(BigDecimal.ZERO, BigDecimal::add);

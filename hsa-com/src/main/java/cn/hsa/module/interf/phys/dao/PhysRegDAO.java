@@ -55,5 +55,21 @@ public interface PhysRegDAO {
     */ 
     int deleteBatchPhys(OutptCostDTO outptCostDTO);
 
+    /**
+     * @Description: 更新结算状态
+     * @Param: [list]
+     * @return: void
+     * @Author: zhangxuan
+     * @Date: 2021-11-30
+     */
     void updateRCodt(@Param("list") List<Map> list);
+
+    /**
+     * @Description: 查询已插入费用表信息
+     * @Param: [outptCostDTO]
+     * @return: java.util.List<cn.hsa.module.outpt.visit.dto.OutptVisitDTO>
+     * @Author: zhangxuan
+     * @Date: 2021-12-06
+     */
+    List<OutptCostDTO> queryCostPhys(OutptCostDTO outptCostDTO);
 }

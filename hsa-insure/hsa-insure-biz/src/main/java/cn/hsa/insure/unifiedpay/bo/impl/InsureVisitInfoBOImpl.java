@@ -148,7 +148,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		inputMap.put("input", dataMap);  // 入参具体数据
 		inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());  // 就医地医保区划
 		inputMap.put("insur_code", insureConfigurationDTO.getRegCode());  // 医保中心编码
-		if("03".equals(mdtrtCertType)){
+		/*if("03".equals(mdtrtCertType)){
 			if(StringUtils.isEmpty(insureIndividualBasicDTO.getInsuplc_admdvs())){
 				inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
 			}else{
@@ -156,7 +156,9 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			}
 		}else{
 			inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
-		}
+		}*/
+		inputMap.put("insuplc_admdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); //参保地医保区划分
+
 		String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
 		inputMap.put("msgid", omsgId);
 		String url = insureConfigurationDTO.getUrl();

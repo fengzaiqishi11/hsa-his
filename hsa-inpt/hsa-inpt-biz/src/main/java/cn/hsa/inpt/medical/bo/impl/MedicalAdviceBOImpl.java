@@ -2830,6 +2830,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceExecDTOList.clear();
             }
         }
+
     }
 
     /**

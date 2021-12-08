@@ -212,9 +212,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO
      **/
     private OutptProfileFileDTO insert(OutptProfileFileDTO outptProfileFileDTO) {
-        if(StringUtils.isEmpty(outptProfileFileDTO.getId())){
-            outptProfileFileDTO.setId(SnowflakeUtils.getId());
-        }
+        outptProfileFileDTO.setId(SnowflakeUtils.getId());
         outptProfileFileDTO.setIsValid(Constants.SF.S);
         // 住院病案号
         String inProfile ="";
@@ -351,6 +349,15 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
     @Override
     public Boolean deleteProfileFile(Map map) {
         String profileId = MapUtils.get(map,"id");
+        //查询是否之前就诊过
+        OutptProfileFileDTO outptProfileFileDTO = baseProfileFileDAO.queryProfileFile(profileId);
+        if((null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalOut()>1)//判断第一次门诊
+                ||(null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalIn()>1)//判断第一次住院
+                ||(null != outptProfileFileDTO.getTotalOut()//判断有过一次门诊情况且来第一次住院，也说明已经在医院就诊过
+                &&null != outptProfileFileDTO.getTotalIn()
+                &&(outptProfileFileDTO.getTotalOut()+outptProfileFileDTO.getTotalIn())>1)){
+            throw new AppException("当前档案病人已经就诊，不允许删除！");
+        }
         if(!"0".equals(baseProfileFileDAO.queryPatient(profileId))){
                 throw new AppException("当前档案病人正在就诊，不允许删除！");
         }

@@ -865,6 +865,24 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    **/
   List<InptCostDTO> getInptFinanceTitle(InptVisitDTO inptVisitDTO);
 
+  /**
+   * @Menthod getMzHospitalCardDetailList
+   * @Desrciption 统计门诊已开住院证并住院的病人(明细)
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/06 11:00
+   * @Return List<Map>
+   **/
+  List<Map> getMzHospitalCardDetailList(OutptVisitDTO outptVisitDTO);
 
+  /**
+   * @Menthod getMzHospitalCardTotalList
+   * @Desrciption  查询门诊财务分类明细
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/05 11:01
+   * @Return List<Map>
+   **/
+  List<Map> getMzHospitalCardTotalList(OutptVisitDTO outptVisitDTO);
 
 }

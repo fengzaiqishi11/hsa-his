@@ -409,5 +409,8 @@ public interface InsureIndividualVisitDAO {
      * @Return
      */
     Map<String, String> selectSysParameter(Map<String, String> map);
+
+
+    String queryMsgId(String hospCode, String visitId, String medisCode);
 }
 

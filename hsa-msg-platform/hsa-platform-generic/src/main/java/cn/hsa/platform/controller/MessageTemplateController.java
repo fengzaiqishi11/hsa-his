@@ -5,6 +5,7 @@ import cn.hsa.platform.domain.MessageTemplate;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author unkown
  */
 @RestController
+@Slf4j
 public class MessageTemplateController {
 
     @Autowired
@@ -65,6 +67,7 @@ public class MessageTemplateController {
     public String query() {
         Iterable<MessageTemplate> all = messageTemplateDao.selectList(null);
         for (MessageTemplate messageTemplate : all) {
+            log.error(messageTemplate.toString());
             return JSON.toJSONString(messageTemplate);
         }
         return null;

@@ -33,7 +33,7 @@ public class SendController {
          */
 
         // 文案参数
-        Map<String, String> variables = new HashMap<>(8);
+        Map<String, String> variables = new HashMap<String,String>(8);
         variables.put("contentValue", "6666");
 
         MessageParam messageParam = new MessageParam().setReceiver(phone).setVariables(variables);

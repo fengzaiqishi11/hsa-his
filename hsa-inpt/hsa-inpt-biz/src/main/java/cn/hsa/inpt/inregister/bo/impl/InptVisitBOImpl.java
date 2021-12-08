@@ -1339,9 +1339,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (StringUtils.isEmpty(inptVisitDTO.getInDeptName())) {
             throw new AppException("入院科室名称不可为空");
         }
-        //设置住院号
-        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
-        inptVisitDTO.setInNo(orderNo);
 
         // 档案表操作
         OutptProfileFileDTO extend = getProfileFileDTO(inptVisitDTO);
@@ -1355,6 +1352,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             sysParameterDTO=new SysParameterDTO();
             sysParameterDTO.setValue("0");
         }
+        //设置住院号
+        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        inptVisitDTO.setInNo(orderNo);
+
         if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
             // 住院次数获取(未获取，默认1次)
             Map countMap=new HashMap();

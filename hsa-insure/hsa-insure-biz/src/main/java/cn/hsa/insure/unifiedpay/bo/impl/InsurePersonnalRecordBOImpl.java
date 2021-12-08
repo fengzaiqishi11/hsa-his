@@ -96,6 +96,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","慢特病备案");
         logMap.put("visitId","");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteName",insureDiseaseRecordDTO.getCrteName());
         logMap.put("crteId",insureDiseaseRecordDTO.getCrteId());
         logMap.put("crteTime",DateUtils.getNow());
@@ -145,6 +146,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","慢特病备案撤销");
         logMap.put("visitId","");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteName",insureDiseaseRecordDTO.getCrteName());
         logMap.put("crteId",insureDiseaseRecordDTO.getCrteId());
         logMap.put("crteTime",DateUtils.getNow());
@@ -223,6 +225,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","人员定点备案");
         logMap.put("visitId","");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteName",fixPersonnalRecordDTO.getCrteName());
         logMap.put("crteId",fixPersonnalRecordDTO.getCrteId());
         logMap.put("crteTime",DateUtils.getNow());
@@ -274,6 +277,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","撤销人员定点备案");
         logMap.put("visitId","");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteName",fixPersonnalRecordDTO.getCrteName());
         logMap.put("crteId",fixPersonnalRecordDTO.getCrteId());
         logMap.put("crteTime",DateUtils.getNow());
@@ -364,6 +368,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         dataMap.put("refmedin", paramMap);
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","新增转院备案信息");
+        logMap.put("hospCode",hospCode);
         logMap.put("visitId",insureIndividualVisitDTO.getVisitId());
         logMap.put("crteName",insureInptRecordDTO.getCrteName());
         logMap.put("crteId",insureInptRecordDTO.getCrteId());
@@ -441,6 +446,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         logMap.put("msgName","撤销转院备案");
         logMap.put("visitId",inptRecordDTO.getVisitId());
         logMap.put("crteName",inptRecordDTO.getCrteName());
+        logMap.put("hospCode",hospCode);
         logMap.put("crteId",inptRecordDTO.getCrteId());
         logMap.put("crteTime",DateUtils.getNow());
         logMap.put("isHospital","");
@@ -476,6 +482,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         dataMap.put("endtime", null);
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","转院备案查询");
+        logMap.put("hospCode",hospCode);
         logMap.put("visitId","");
         logMap.put("isHospital","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(),  Constant.UnifiedPay.REGISTER.UP_5304, dataMap, logMap);
@@ -520,6 +527,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         dataMap.put("data", paramMap);
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","门诊两病备案");
+        logMap.put("hospCode",hospCode);
         logMap.put("visitId",insureDiseaseRecordDTO.getVisitId());
         logMap.put("crteName",insureDiseaseRecordDTO.getCrteName());
         logMap.put("crteId",insureDiseaseRecordDTO.getCrteId());
@@ -560,6 +568,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         dataMap.put("data", paramMap);
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","门诊两病备案撤销");
+        logMap.put("hospCode",hospCode);
         logMap.put("visitId",insureDiseaseRecordDTO.getVisitId());
         logMap.put("crteName",insureDiseaseRecordDTO.getCrteName());
         logMap.put("crteId",insureDiseaseRecordDTO.getCrteId());
@@ -611,6 +620,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         paramMap.put("data",dataMap);
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","门诊两病备案查询");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteId",MapUtils.get(map,"crteId"));
         logMap.put("crteName",MapUtils.get(map,"crteName"));
         logMap.put("crteTime",DateUtils.getNow());
@@ -646,6 +656,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
 
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","门诊单病种备案");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteTime",DateUtils.getNow());
         logMap.put("isHospital","0");
         logMap.put("crteId",MapUtils.get(map,"crteId"));
@@ -682,6 +693,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         logMap.put("msgName","门诊单病种备案撤销");
         logMap.put("crteTime",DateUtils.getNow());
         logMap.put("isHospital","0");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteId",MapUtils.get(map,"crteId"));
         logMap.put("crteName",MapUtils.get(map,"crteName"));
         insureUnifiedCommonUtil.commonInsureUnified(hospCode,insureRegCode, "2586", dataMap,logMap);
@@ -709,6 +721,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         Map<String,Object> logMap = new HashMap<>();
         logMap.put("msgName","门诊单病种备案登记查询");
         logMap.put("isHospital","0");
+        logMap.put("hospCode",hospCode);
         logMap.put("crteId",MapUtils.get(map,"crteId"));
         logMap.put("crteName",MapUtils.get(map,"crteName"));
         logMap.put("crteTime",DateUtils.getNow());

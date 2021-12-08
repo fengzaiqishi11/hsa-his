@@ -495,6 +495,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         String psnIdetType = ""; //人员身份类别
         boolean isRemote = false; // 用来判断省外异地结算单
         boolean snRemote = false; // 用了判断省内异地结算单
+        boolean jxSettle = false; // 江西省结算单格式
         Map<String,Object> oneSettleMap;
         Map<String,Object> fourPartMap ;
         map.put("code","HOSP_MEDICINS_INFO");
@@ -523,6 +524,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 }
                 if("aee140Str".equals(key)){
                     aee140Str = MapUtils.get(stringObjectMap,key);
+                }
+                if("jxSettle".equals(key)){
+                    jxSettle = MapUtils.get(stringObjectMap,key);
                 }
                 if("mdOrInsuplcAdmdvs".equals(key)){
                     mdOrInsuplcAdmdvs = MapUtils.get(stringObjectMap,key); // 医院结算单取参保地区划 还是就医地区划
@@ -594,7 +598,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             }
         }
         InsureIndividualSettleDTO individualSettleDTO = insureReversalTradeDAO.querySettleInfo(map);
-        Map<String,Object> baseInfoMap  = handlerInptSettleParam(insureIndividualVisitDTO,setlInfoMap,oneSettle,psnIdetType,specialOneSettle);
+        Map<String,Object> baseInfoMap  = handlerInptSettleParam(insureIndividualVisitDTO,setlInfoMap,
+                oneSettle,psnIdetType,specialOneSettle ,jxSettle);
         /**
          * 如果参保地和就医地前四位不相等 且是住院则需要打印异地结算单
          * 1.当是异地结算单是需要获取对应的参保地和区划地名称
@@ -625,7 +630,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         if(!mdtrtareaAdmvs.substring(0,4).equals(insuplcAdmdvs.substring(0,4)) && Constants.SF.S.equals(isHospital)){
             snRemote = true;
         }
-        fourPartMap =  handlerInsureSettleFee(setlInfoMap,isRemote,individualSettleDTO,setldetail);
+        fourPartMap =  handlerInsureSettleFee(setlInfoMap,isRemote,individualSettleDTO,setldetail,jxSettle);
 
         /**
          * 计算预交金
@@ -707,12 +712,20 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         if(ListUtils.isEmpty(settleFeeMap)){
             Map<String, Object> feeMap = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
             List<Map<String, Object>> outptMap  = MapUtils.get(feeMap,"outptMap");
-            // 费用分组统计合并
-            feeMapList = handlerInsureIndividualCost(outptMap);
+            if(!jxSettle){
+                // 费用分组统计合并
+                feeMapList = handlerInsureIndividualCost(outptMap);
+            }else{
+                feeMapList = handlerJxCostFee(outptMap);
+            }
         }
         else{
-            // 费用分组统计合并
-            feeMapList = handlerInsureIndividualCost(settleFeeMap);
+            if(!jxSettle){
+                // 费用分组统计合并
+                feeMapList = handlerInsureIndividualCost(settleFeeMap);
+            }else{
+                feeMapList = handlerJxCostFee(settleFeeMap);
+            }
         }
         /**
          * 住院独有
@@ -766,6 +779,61 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         String json = JSONObject.toJSONString(map);
         System.out.println("----======"+json);
         return map;
+    }
+
+    /**
+     * @Method handlerJxCostFee
+     * @Desrciption  江西省结算单格式：费用明细项
+     *             总金额： det_item_fee_sumamt
+     *             符合政策范围：inscp_scp_amt
+     *             先行自付： preselfpay_amt
+     *             超限价： overlmt_amt
+     *             自费：fulamt_ownpay_amt
+     *
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/6 11:37
+     * @Return
+    **/
+    private List<Map<String, Object>> handlerJxCostFee(List<Map<String, Object>> feeDetailMapList) {
+
+        List<Map<String, Object>> groupListMap = new ArrayList<>();
+        if(!ListUtils.isEmpty(feeDetailMapList)){
+            feeDetailMapList = feeDetailMapList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "med_chrgitm_type"))).collect(Collectors.toList());
+            Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
+                    collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
+            Map<String, Object> pMap = null;
+            for (String key : groupMap.keySet()) {
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+                BigDecimal inscpScpAmt = new BigDecimal(0.00); // 符合政策范围
+                BigDecimal preselfpayAmt = new BigDecimal(0.00);  //  先行自付
+                BigDecimal overlmtAmt = new BigDecimal(0.00);  //  超限价
+                BigDecimal fulamtOwnpayAmt = new BigDecimal(0.00);  // 自费
+                System.out.println(key + "=====" + groupMap.get(key));
+                Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+                if (iterator.hasNext()) {
+                    pMap = new HashMap<>();
+                    List<Map<String, Object>> listMap = groupMap.get(key);
+                    for (Map<String, Object> item : listMap) {
+                        DecimalFormat df1 = new DecimalFormat("0.00");
+                        sumDetItemFeeSumamt = BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(item, "det_item_fee_sumamt")));
+                        inscpScpAmt = BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(item, "inscp_scp_amt")));
+                        preselfpayAmt = BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(item, "preselfpay_amt")));
+                        overlmtAmt = BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(item, "overlmt_amt")));
+                        fulamtOwnpayAmt = BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(item, "fulamt_ownpay_amt")));
+                    }
+                    pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
+                    pMap.put("inscpScpAmt", inscpScpAmt);
+                    pMap.put("preselfpayAmt", preselfpayAmt);
+                    pMap.put("overlmtAmt", overlmtAmt);
+                    pMap.put("fulamtOwnpayAmt", fulamtOwnpayAmt);
+                    pMap.put("medChrgitmType", key);
+                    groupListMap.add(pMap);
+                }
+            }
+        }
+        return groupListMap;
     }
 
     /**
@@ -1175,7 +1243,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Date   2021/10/19 20:09
      * @Return
      **/
-    private Map<String, Object> handlerInsureSettleFee(Map<String, Object> setlInfoMap, boolean isRemote, InsureIndividualSettleDTO individualSettleDTO, List<Map<String, Object>> setldetail) {
+    private Map<String, Object> handlerInsureSettleFee(Map<String, Object> setlInfoMap,
+                                                       boolean isRemote,
+         InsureIndividualSettleDTO individualSettleDTO, List<Map<String, Object>> setldetail,boolean jxSettle) {
         Map<String,Object> partFourMap = new HashMap<>();
         BigDecimal hospPrice = new BigDecimal(0.00);
         DecimalFormat df1 = new DecimalFormat("0.00");
@@ -1204,13 +1274,22 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             partFourMap.put("hospPrice",new BigDecimal(0.00)); // 医院支付
         }
         partFourMap.put("balc",s10); // 个人账户余额
-        if(isRemote){
+        if(isRemote || jxSettle){
             if(!ListUtils.isEmpty(setldetail)){
                 BigDecimal fundSumAmt = new BigDecimal(0.00);
+                BigDecimal seriousPrice = new BigDecimal(0.00);
                 String fundPayamt = "" ; // 基金支付金额
+                String fundPayType = ""; // 基金支付类型名称
+                BigDecimal fundPayamtPrice =new BigDecimal(0.00);
              for(Map<String,Object> item : setldetail){
                  fundPayamt = DataTypeUtils.dataToNumString(MapUtils.get(item, "fund_payamt"));
-                 fundSumAmt = BigDecimalUtils.add(fundSumAmt,BigDecimalUtils.convert(fundPayamt));
+                 fundPayamtPrice = BigDecimalUtils.convert(fundPayamt);
+                 fundPayType = MapUtils.get(item, "fund_pay_type");
+                 fundSumAmt = BigDecimalUtils.add(fundSumAmt,fundPayamtPrice);
+                 if("610102".equals(fundPayType)){
+                     seriousPrice = fundPayamtPrice;
+                     partFourMap.put("seriousPrice",seriousPrice); // 重大病疾病补充保险支付
+                    }
                 }
                 partFourMap.put("fundSumAmt",fundSumAmt); // 基金支付
                 partFourMap.put("fundSumAmtCN",numberToCN.number2CNMontrayUnit(fundSumAmt)); // 基金支付
@@ -1504,7 +1583,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Return
      **/
     private Map<String, Object> handlerInptSettleParam(InsureIndividualVisitDTO insureIndividualVisitDTO,
-                                                       Map<String, Object> setlInfoMap, boolean oneSettle, String psnIdetType,boolean specialOneSettle) {
+                                                       Map<String, Object> setlInfoMap, boolean oneSettle,
+                                                       String psnIdetType,boolean specialOneSettle,boolean jsSettle) {
         Map<String,Object> map = new HashMap<>();
         map.put("fixmedinsName",insureIndividualVisitDTO.getFixmedinsName()); // 医疗机构名称
         map.put("hospLv",insureIndividualVisitDTO.getHospLv()); // 医院等级
@@ -1548,7 +1628,12 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("begntime",insureIndividualVisitDTO.getInTime()); // 入院日期
         map.put("endtime",insureIndividualVisitDTO.getOutTime()); // 出院日期
         map.put("endtimeBegntime",insureIndividualVisitDTO.getHospitalDay()); // 住院天数
-        map.put("certno",MapUtils.get(setlInfoMap,"certno")); // 证件号码
+        String certno =  MapUtils.get(setlInfoMap,"certno");
+        if(jsSettle){
+
+        }else{
+            map.put("certno",certno); // 证件号码
+        }
         map.put("mdtrtCertType",MapUtils.get(setlInfoMap,"psn_cert_type")); // 证件类型
         map.put("dscgMaindiagName",insureIndividualVisitDTO.getOutDiseaseName()); // 出院诊断
         map.put("medType",insureIndividualVisitDTO.getAka130()); // 医疗类别
@@ -1605,9 +1690,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Date   2021/10/14 11:44
      * @Return
      **/
-
-
-
     private List<Map<String, Object>>  handlerInsureIndividualCost(List<Map<String, Object>> feeDetailMapList ) {
 
         List<Map<String, Object>> groupListMap = new ArrayList<>();

@@ -649,7 +649,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("inptLastDay",inptLastDay);
         setlinfo.put("inptLastHour",inptLastHour);
         setlinfo.put("inptLastMinute",inptLastMinute);
-        setlinfo.put("pwcryBfadmComaDra", infoDTO.getPwcryBfadmComaDura()); // 颅脑损伤患者入院前昏迷时长 *******
+        setlinfo.put("pwcryBfadmComaDura", infoDTO.getPwcryBfadmComaDura()); // 颅脑损伤患者入院前昏迷时长 *******
         setlinfo.put("pwcryAfadmComaDura", infoDTO.getPwcryAfadmComaDura()); //颅脑损伤患者入院后昏迷时长
         setlinfo.put("bldCat", infoDTO.getBldCat()); //输血品种
         setlinfo.put("bldAmt", infoDTO.getBldAmt()); //输血量
@@ -1252,7 +1252,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Author fuhui
      * @Date   2021/12/4 22:12
      * @Return
-    **/
+     **/
     public static String getDateToString(java.sql.Timestamp time){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.Y_M_D);
         return simpleDateFormat.format(time);

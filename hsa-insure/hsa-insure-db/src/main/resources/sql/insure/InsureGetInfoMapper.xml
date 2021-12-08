@@ -1649,7 +1649,7 @@
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
-            order by  mid.disease_code desc
+        order by  mid.disease_code desc
     </select>
 
     <!-- 根据主键删除表信息 -->

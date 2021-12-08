@@ -1252,7 +1252,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Author fuhui
      * @Date   2021/12/4 22:12
      * @Return
-    **/
+     **/
     public static String getDateToString(java.sql.Timestamp time){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.Y_M_D);
         return simpleDateFormat.format(time);

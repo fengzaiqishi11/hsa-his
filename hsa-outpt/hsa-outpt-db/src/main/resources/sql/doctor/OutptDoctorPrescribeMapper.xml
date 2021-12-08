@@ -2149,7 +2149,13 @@
 
 
     <select id="findVisitListById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
-        select * from outpt_visit a  where a.profile_id = #{id}
+        select * from outpt_visit a  where a.hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and a.profile_id = #{id}
+        </if>
+        <if test="id == null or id == ''">
+            and a.id = #{visitId}
+        </if>
         <!-- 开始时间-->
         <if test="startDate != null and startDate != '' ">
             and date(a.visit_time) &gt;=  STR_TO_DATE(#{startDate},'%Y-%m-%d')
@@ -2268,6 +2274,20 @@
                 and item_id = #{item.itemId}
             </if>
         </foreach>
+    </update>
+    <update id="updateOutptRegister">
+        update outpt_register set
+                               name = #{name},
+                               gender_code = #{genderCode},
+                               age = #{age},
+                               birthday = #{birthday},
+                               cert_code = #{certCode},
+                               cert_no = #{certNo},
+                               phone = #{phone},
+                               visit_code = #{visitCode},
+                               source_tj_code = #{sourceTjCode},
+                               source_tj_remark = #{sourceTjRemark}
+        where visit_id = #{id} and hosp_code = #{hospCode}
     </update>
 
 

@@ -527,7 +527,7 @@
                                      sp_psn_type, nwb_adm_type, nwb_bir_wt, nwb_adm_wt, opsp_diag_caty, opsp_mdtrt_date,
                                      ipt_med_type, adm_way, trt_type, adm_time, adm_caty, refldept_dept, dscg_time,
                                      dscg_caty, act_ipt_days, opt_wm_dise, wm_disw_code, opt_tcm_dise, tcm_dise_code,
-                                     diag_code_cnt, oprn_oprt_code_cnt, vent_used_dura, pwcry_bfadmcoma_dura,
+                                     diag_code_cnt, oprn_oprt_code_cnt, vent_used_durg, pwcry_bfadmcoma_dura,
                                      pwcry_afadmcoma_dura, bld_cat, bld_amt, bld_unt, spga_nurscare_days,
                                      lv1_nurscare_days, scd_nurscare_days, lv3_nursecare_days, dscg_way,
                                      acp_medins_name, acp_optins_code, bill_code, bill_no, biz_sn, days_rinp_flag_31,
@@ -610,7 +610,7 @@
                                      nwb_bir_wt, nwb_adm_wt, opsp_diag_caty, opsp_mdtrt_date, ipt_med_type, adm_way,
                                      trt_type, adm_time, adm_caty, refldept_dept, dscg_time, dscg_caty, act_ipt_days,
                                      opt_wm_dise, wm_disw_code, opt_tcm_dise, tcm_dise_code, diag_code_cnt,
-                                     oprn_oprt_code_cnt, vent_used_dura, pwcry_bfadmcoma_dura, pwcry_afadmcoma_dura,
+                                     oprn_oprt_code_cnt, vent_used_durg, pwcry_bfadmcoma_dura, pwcry_afadmcoma_dura,
                                      bld_cat, bld_amt, bld_unt, spga_nurscare_days, lv1_nurscare_days,
                                      scd_nurscare_days,
                                      lv3_nursecare_days, dscg_way, acp_medins_name, acp_optins_code, bill_code, bill_no,
@@ -629,7 +629,7 @@
                 #{hiType}, #{insuplc}, #{spPsnType}, #{nwbAdmType}, #{nwbBirWt}, #{nwbAdmWt}, #{opspDiagCaty},
                 #{opspMdtrtDate}, #{iptMedType}, #{admWay}, #{trtType}, #{admTime}, #{admCaty}, #{refldeptDept},
                 #{dscgTime}, #{dscgCaty}, #{actIptDays}, #{otpWmDise}, #{wmDiseCode}, #{otpTcmDise}, #{tcmDiseCode},
-                #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDura}, #{pwcryBfadmComaDura}, #{pwcryAfadmComaDura},
+                #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDurg}, #{pwcryBfadmComaDura}, #{pwcryAfadmComaDura},
                 #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscareDays}, #{lv1NurscareDays}, #{scdNurscareDays},
                 #{lv3NursecareDays},
                 #{dscgWay}, #{acpMedinsName}, #{acpOptinsCode}, #{billCode}, #{billNo}, #{bizSn}, #{daysRinpFlag31},
@@ -960,7 +960,7 @@
                tcm_dise_code,
                diag_code_cnt,
                oprn_oprt_code_cnt,
-               vent_used_dura,
+               vent_used_durg,
                pwcry_bfadmcoma_dura,
                pwcry_afadmcoma_dura,
                bld_cat,
@@ -1649,7 +1649,7 @@
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
-            order by  mid.disease_code desc
+        order by  mid.disease_code desc
     </select>
 
     <!-- 根据主键删除表信息 -->

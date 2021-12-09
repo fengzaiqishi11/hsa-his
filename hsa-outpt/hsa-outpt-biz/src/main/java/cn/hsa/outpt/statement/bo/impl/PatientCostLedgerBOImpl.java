@@ -1299,6 +1299,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                 }
                 break;
+            case "12" :
+                Map<String, List<OutptCostAndReigsterCostDTO>> chargeManCollect = outptCostAndReigsterCostDTOS.stream().
+                        collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getChargeId));
+                // 组装固定表头
+                Map<String,Object> headItemMap12 = new HashMap<>();
+                headItemMap12.put("label","收款人");
+                headItemMap12.put("prop","name");
+                tableHeader.put("name",headItemMap12);
+
+                this.setFixedtableHeader(tableHeader);
+
+                for (String chargeId : chargeManCollect.keySet()){
+
+                    Map<String,Object> dataItemMap = new HashMap<>();
+                    List<OutptCostAndReigsterCostDTO> groupByList = chargeManCollect.get(chargeId);
+                    // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                    dataItemMap.put("name",groupByList.get(0).getChargeName());
+
+                    this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+
+                }
+                break;
             case "5" :
             case "6" :
             default:
@@ -1858,6 +1880,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     dataItemMap.put("doctorName",groupByList.get(0).getDoctorName());
                     // 因为已根据科室id和医生id和患者id分组， 所以可以直接拿第一个的医生名
                     dataItemMap.put("visitName",groupByList.get(0).getVisitName());
+
+                    this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+
+                }
+                break;
+            case "12" :
+                Map<String, List<OutptCostAndReigsterCostDTO>> chargeManCollect = outptCostAndReigsterCostDTOS.stream().
+                        collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getChargeId));
+                // 组装固定表头
+                Map<String,Object> headItemMap12 = new HashMap<>();
+                headItemMap12.put("label","收款人");
+                headItemMap12.put("prop","name");
+                tableHeader.put("name",headItemMap12);
+
+                this.setFixedtableHeader(tableHeader);
+
+                for (String chargeId : chargeManCollect.keySet()){
+
+                    Map<String,Object> dataItemMap = new HashMap<>();
+                    List<OutptCostAndReigsterCostDTO> groupByList = chargeManCollect.get(chargeId);
+                    // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                    dataItemMap.put("name",groupByList.get(0).getChargeName());
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 

@@ -993,7 +993,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			// 结束号码转数字
 			int endNumInt = Integer.parseInt(endNum);
 
-			return (startNumInt - endNumInt) > 50;
+			return (endNumInt - startNumInt) > 50;
 		} catch (Exception e) {
 			throw new RuntimeException("号码比较错误，检查是否为数字");
 		}

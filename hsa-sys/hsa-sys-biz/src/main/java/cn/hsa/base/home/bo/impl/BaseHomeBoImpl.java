@@ -147,7 +147,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //今日预警:统计库存数量低于库存下线，高于库存上线的数据
         Map<String,Object> yjMap = baseHomeDao.getKcSxxxYjData(praMap);
         //待办事项：查询出药库当日待办的事项
-        Map<String,Object> dbMap = baseHomeDao.getYkDrDbsx(praMap);
+//        Map<String,Object> dbMap = baseHomeDao.getYkDrDbsx(praMap);
 
         //趋势图数据：查询出药库入、出库趋势图数据
         List<Map<String,Object>> rkcsList = baseHomeDao.getYkrkCstData(praMap);
@@ -162,7 +162,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         resultMap.put("ywMap",ywMap);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
-        resultMap.put("dbMap",dbMap);//待办事项
+//        resultMap.put("dbMap",null);//待办事项
         resultMap.put("csMap",csMap);//趋势图数据
         resultMap.put("btMap",btMap);//饼图数据
     }
@@ -220,7 +220,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //今日预警:统计库存数量低于库存下线，高于库存上线的数据
         Map<String,Object> yjMap = baseHomeDao.getKcSxxxYjData(praMap);
         //待办事项：查询出药房当日待办的事项
-        Map<String,Object> dbMap = baseHomeDao.getYfDrDbsx(praMap);
+//        Map<String,Object> dbMap = baseHomeDao.getYfDrDbsx(praMap);
 
         //趋势图数据：查询出药房门诊发药趋势图数据
         List<Map<String,Object>> mzcsList = baseHomeDao.getYfMzCstData(praMap);
@@ -239,7 +239,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         resultMap.put("ywMap",ywMap);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
-        resultMap.put("dbMap",dbMap);//待办事项
+//        resultMap.put("dbMap",null);//待办事项
         resultMap.put("csMap",csMap);//矩形趋势图数据
         resultMap.put("btMap",btMap);//饼图数据
     }

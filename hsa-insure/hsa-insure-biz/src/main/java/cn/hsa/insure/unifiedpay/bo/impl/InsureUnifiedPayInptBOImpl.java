@@ -943,7 +943,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";
                     }
                     if(StringUtils.isEmpty(InmsgID)||"".equals(InmsgID)){
-                        throw new AppException(resultMsg.toString()+"his结算单边账没有查询到请联系管理员处理！");
+                        throw new AppException(resultMsg.toString()+"请联系管理员处理！");
                     }
                     throw new AppException(resultMsg.toString()+"his单边账流水号为:"+InmsgID+"请去医保单边账菜单进行结算单边账操作！");
                 }

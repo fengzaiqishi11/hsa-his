@@ -359,12 +359,12 @@
         select ${sqlStr} d.out_dept_id
         from inpt_visit d
         join inpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
-        left join inpt_settle c on a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
-        where a.hosp_code = #{hospCode}
         <if test="statusCode != null and statusCode != ''">
-            and d.status_code = #{statusCode}
             <if test="statusCode =='7'.toString()">
-                and c.id is not null
+                left join inpt_settle c on a.visit_id = c.visit_id and a.settle_id =c.id and a.hosp_code = c.hosp_code
+                where a.hosp_code = #{hospCode}
+                and d.status_code = #{statusCode}
+                and c.id is not null and c.is_settle = '1'
                 <if test="startDate != null">
                     and c.settle_time &gt;= #{startDate}
                 </if>
@@ -373,6 +373,9 @@
                 </if>
             </if>
             <if test="statusCode =='5'.toString()">
+                left join inpt_settle c on a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
+                where a.hosp_code = #{hospCode}
+                and d.status_code = #{statusCode}
                 <if test="startDate != null">
                     and d.out_time &gt;= #{startDate}
                 </if>
@@ -381,6 +384,9 @@
                 </if>
             </if>
             <if test="statusCode =='2'.toString()">
+                left join inpt_settle c on a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
+                where a.hosp_code = #{hospCode}
+                and d.status_code = #{statusCode}
                 <if test="startDate != null">
                     and d.in_time &gt;= #{startDate}
                 </if>
@@ -3317,6 +3323,11 @@
                 ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
                 as deptName,
             </if>
+            <!-- 按收款人-->
+            <if test="'12'.toString() == flag">
+                ifnull(A.crte_name,'其他') as chargeName,
+                ifnull(A.crte_id,'0') as chargeId,
+            </if>
             ifnull(B.visit_id,'0') as visitId,
             t.name as visitName
             from
@@ -3355,6 +3366,11 @@
                 ifnull(c.dept_id,'0') as deptId,
                 ifnull((select name from base_dept bfc where bfc.id = c.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
                 as deptName,
+            </if>
+            <!-- 按收款人-->
+            <if test="'12'.toString() == flag">
+                ifnull(A.crte_name,'其他') as chargeName,
+                ifnull(A.crte_id,'0') as chargeId,
             </if>
             ifnull(B.visit_id,'0') as visitId,
             t.name as visitName
@@ -3431,7 +3447,7 @@
                 as deptName,
             </if>
             <!-- 按开方科室 -->
-            <if test="'1'.toString() == flag or '2'.toString() == flag or '3'.toString() == flag or '8'.toString() == flag or '10'.toString() == flag or '11'.toString() == flag">
+            <if test="'1'.toString() == flag or '2'.toString() == flag or '3'.toString() == flag or '8'.toString() == flag or '10'.toString() == flag or '11'.toString() == flag or '12'.toString() == flag">
                 ifnull(B.dept_id,'0') as deptId,
                 ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
                 as deptName,
@@ -3441,6 +3457,11 @@
                 ifnull(B.dept_id,'0') as deptId,
                 ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
                 as deptName,
+            </if>
+            <!-- 按收款人-->
+            <if test="'12'.toString() == flag">
+                ifnull(A.crte_name,'其他') as chargeName,
+                ifnull(A.crte_id,'0') as chargeId,
             </if>
             ifnull(B.visit_id,'0') as visitId,
             t.name as visitName

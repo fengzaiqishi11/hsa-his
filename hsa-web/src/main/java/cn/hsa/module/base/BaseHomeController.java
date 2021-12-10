@@ -2,7 +2,7 @@ package cn.hsa.module.base;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.base.home.service.BaseHomeService;
+import cn.hsa.module.interf.home.service.BaseHomeService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;

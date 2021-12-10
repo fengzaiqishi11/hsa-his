@@ -1602,17 +1602,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     private void buildStaticCost(String hospCode, List<String> adviceIds) {
         //根据医嘱ID获取医嘱记录
         List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(hospCode, adviceIds);
-        //医嘱组号(同一组号辅助计费共用,不重复生成)
-        Integer groupNo = 0;
+        List<String > adviceKey = new ArrayList<String>();
         for (InptAdviceDTO inptAdviceDTO :inptAdviceDTOList) {
-            //长期医嘱未停止或者临时医嘱不交病人
-            //boolean flag = (("0".equals(inptAdviceDTO.getIsLong()) && !"1".equals(inptAdviceDTO.getIsStop())) || !("1".equals(inptAdviceDTO.getIsLong()) && "1".equals(inptAdviceDTO.getIsGive())));
-
             //长期医嘱未停止或者临时医嘱（20211105 修改）
             boolean flag = (("0".equals(inptAdviceDTO.getIsLong()) && !"1".equals(inptAdviceDTO.getIsStop())) || "1".equals(inptAdviceDTO.getIsLong()) );
 
+            //相同病人的医嘱组号(同一组号辅助计费共用,不重复生成)
             if (flag) {
-                if (groupNo!=inptAdviceDTO.getGroupNo() || inptAdviceDTO.getGroupNo()==0) {
+                if (!adviceKey.contains(inptAdviceDTO.getVisitId()+"_"+inptAdviceDTO.getGroupNo()) || inptAdviceDTO.getGroupNo()==0) {
                     //根据用法拿到辅助计费对象
                     String[] result = getBaseAssistCalcDTO(inptAdviceDTO,inptAdviceDTO.getUsageCode(),"0","");
                     if (result!=null && result.length>0 && Integer.valueOf(result[1])>0  && !StringUtils.isEmpty(result[0])) {
@@ -1623,8 +1620,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                             staticBuildCost(inptAdviceDTO, result[0],"AN");
                         }
                     }
+                    //只对组号大于0的进行记录
+                    if(inptAdviceDTO.getGroupNo() != 0){
+                        adviceKey.add(inptAdviceDTO.getVisitId()+"_"+inptAdviceDTO.getGroupNo());
+                    }
                 }
-                groupNo = inptAdviceDTO.getGroupNo()==null?0:inptAdviceDTO.getGroupNo();
             }
         }
     }
@@ -2441,7 +2441,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         Map<String,Date>  adviceIdCostTime = new HashMap<String,Date>();
 
         //住院费用信息
-        List<InptCostDTO> inptCostDTOs = new ArrayList<>();
+        List<InptCostDTO> inptCostDTOs = new ArrayList<InptCostDTO>();
+
+        List<String> inputCostStr = new ArrayList<String>();
         //领药申请集合
         List<PharInWaitReceiveDTO> inWaitReceiveDTOS = new ArrayList<>();
         //消息集合
@@ -2465,9 +2467,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             throw new AppException("获取医嘱信息为空");
         }
         Map<String, InptVisitDTO> visitMap = inptVisitDTOList.stream().collect(Collectors.toMap(InptVisitDTO::getId, visit->visit));
-        if (visitMap==null || visitMap.isEmpty()) {
-            throw new AppException("获取患者信息为空");
-        }
+
         //根据医嘱ID获取医嘱明细记录
         List<InptAdviceDetailDTO> inptAdviceDetailDTOList = inptAdviceDetailDAO.getAdviceDetails(medicalAdviceDTO.getHospCode(),adviceIds);
         if (ListUtils.isEmpty(inptAdviceDetailDTOList)) {
@@ -2580,15 +2580,22 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
                 //判断当前集合是否已经存在对应的待领记录
 //                Date finalDate = date;
-                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
-                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(date))==0
-                        && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {
+//                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
+//                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(date))==0
+//                        && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {
+//                    //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
+//                    adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
+//                    startTime = DateUtils.dateAdd(startTime, day);
+//                    continue;
+//                }
+                //替换上面的判断
+                String key = inptCostDTO.getIatId()+"_"+inptCostDTO.getSourceId()+"_"+DateUtils.format(inptCostDTO.getCostTime(),DateUtils.YMD);
+                if (inputCostStr.contains(key)) {
                     //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
                     adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                     startTime = DateUtils.dateAdd(startTime, day);
                     continue;
                 }
-
                 //判断领药记录是否已生成
                 List<InptCostDTO> waitReceiveDTOList = inptCostDAO.queryWait(inptCostDTO);
                 if (!ListUtils.isEmpty(waitReceiveDTOList)) {
@@ -2614,10 +2621,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 }
 
                 inptCostDTOs.add(inptCostDTO);
+                //添加Key 防止重复生成当天费用
+                inputCostStr.add(key);
+
                 if(inptCostDTOs.size() % 100 == 0){
                     inptCostDAO.insertInptCostBatch(inptCostDTOs);
                     inptCostDTOs.clear();
                 }
+
                 //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
                 adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                 //时间根据频率周期变化 开始时间 = 开始时间+频率周期
@@ -2890,14 +2901,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         Date stopTime = inptAdviceDTO.getStopTime();
         Date longStratTime = inptAdviceDTO.getLongStartTime();
 
-        if (startTime.compareTo(endTime)==0 && stopTime!=null
-                && endTime.compareTo(DateUtils.dateToDate(stopTime))==0
-                && endExecNum>=0) {//开始日期=结束日期=停嘱日期 停嘱当日执行次数>=0 表示是停嘱当天
+        if (startTime.compareTo(endTime)==0 && stopTime!=null && endTime.compareTo(DateUtils.dateToDate(stopTime))==0 && endExecNum>=0) {
+            //开始日期=结束日期=停嘱日期 停嘱当日执行次数>=0 表示是停嘱当天
             dailyTimes = endExecNum>rateTimes?rateTimes:endExecNum;
-        } else if (startTime.compareTo(DateUtils.dateToDate(longStratTime))==0
-                && startExecNum>=0) {//开始日期=医嘱开始日期 开嘱当日执行次数>0 表示开嘱当天
+        } else if (startTime.compareTo(DateUtils.dateToDate(longStratTime))==0 && startExecNum>=0) {
+            //开始日期=医嘱开始日期 开嘱当日执行次数>0 表示开嘱当天
             dailyTimes = startExecNum>rateTimes?rateTimes:startExecNum;
-        } else if ("1".equals(inptAdviceDTO.getIsGive()) && Constants.YYXZ.CYDY.equals(inptAdviceDTO.getUseCode())) {//用药性质:出院带药  交病人 次数为1  增加控制交病人且为出院带药在执行表里面装只插一条记录
+        } else if ("1".equals(inptAdviceDTO.getIsGive()) && Constants.YYXZ.CYDY.equals(inptAdviceDTO.getUseCode())) {
+            //用药性质:出院带药  交病人 次数为1  增加控制交病人且为出院带药在执行表里面装只插一条记录
             dailyTimes = 1;
         } else {
             dailyTimes = rateTimes;

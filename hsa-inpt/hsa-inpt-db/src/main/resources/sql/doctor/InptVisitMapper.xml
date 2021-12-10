@@ -2110,7 +2110,7 @@
 
 	<!--	修改病重类的字段-->
 	<update id="updateIllnessBacth">
-		<foreach collection="list"  separator=";">
+		<foreach collection="list"  separator=";" item="item">
 			update inpt_visit
 			set diet_type = #{item.dietType},
 			nursing_code =#{item.nursingCode} ,

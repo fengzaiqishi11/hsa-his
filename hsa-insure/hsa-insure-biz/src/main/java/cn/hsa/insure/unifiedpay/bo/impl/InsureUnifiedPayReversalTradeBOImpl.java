@@ -785,7 +785,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      * @Return
      **/
     private List<Map<String, Object>> handlerJxCostFee(List<Map<String, Object>> feeDetailMapList) {
-        CountDownLatch countDownLatch = new CountDownLatch(2);
         List<Map<String, Object>> groupListMap = new ArrayList<>();
         if (!ListUtils.isEmpty(feeDetailMapList)) {
             feeDetailMapList = feeDetailMapList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "med_chrgitm_type"))).collect(Collectors.toList());

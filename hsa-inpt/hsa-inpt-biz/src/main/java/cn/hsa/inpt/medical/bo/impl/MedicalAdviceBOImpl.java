@@ -1619,7 +1619,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                             staticBuildCost(inptAdviceDTO, result[0],"AN");
                         }
                     }
-                    //只对组号大于0的进行记录
+
                     if(inptAdviceDTO.getGroupNo() != 0){
                         adviceKey.add(inptAdviceDTO.getVisitId()+"_"+inptAdviceDTO.getGroupNo());
                     }
@@ -2592,10 +2592,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //替换上面的判断
                 String key = inptCostDTO.getIatId()+"_"+inptCostDTO.getSourceId()+"_"+DateUtils.format(inptCostDTO.getCostTime(),DateUtils.YMD);
                 if (inputCostStr.contains(key)) {
-                Date finalDate = date;
-                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
-                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(finalDate))==0
-                        && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {
                     //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
                     adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                     startTime = DateUtils.dateAdd(startTime, day);
@@ -2860,7 +2856,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceExecDTOList.clear();
             }
         }
-
     }
 
     /**
@@ -3486,6 +3481,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 stopTime = dto.getStopTime();
             }
             inptAdviceDTO.setStopTime(stopTime);
+            //获取带教医生信息
+            //SysUserDTO sysUserDTO = getSysUserDTO(adviceDTO);
+            //代教医生 实习医生老师
+            //if (sysUserDTO != null) {
+                //inptAdviceDTO.setTeachDoctorId(sysUserDTO.getId());
+                //inptAdviceDTO.setTeachDoctorName(sysUserDTO.getName());
+            //}
             inptAdviceDTO.setStopDoctorId(adviceDTO.getCrteId());
             inptAdviceDTO.setStopDoctorName(adviceDTO.getCrteName());
             //停嘱审核人

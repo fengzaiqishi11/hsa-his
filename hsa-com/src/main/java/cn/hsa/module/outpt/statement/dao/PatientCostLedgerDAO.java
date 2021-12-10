@@ -5,9 +5,11 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -884,5 +886,50 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return List<Map>
    **/
   List<Map> getMzHospitalCardTotalList(OutptVisitDTO outptVisitDTO);
-
+  /**
+   * @Meth: queryIncomeUpCode
+   * @Description: 获得门诊、住院、挂号大类
+   * @Param: [paraMap]
+   * @return: java.util.List<java.lang.String>
+   * @Author: zhangguorui
+   * @Date: 2021/12/9
+   */
+  List<String> queryIncomeUpCode(Map<String, Object> paraMap);
+    /**
+     * @Meth: queryIncomeOutptPrice
+     * @Description: 门诊费用
+     * 1.本月收入 outCurrentRealityPrice
+     * 2.上年同期 outYearRealityPrice
+     * 3.同比：outSameCompare
+     * 4.上月收入：outMonthRealityPrice
+     * 5.环比：outLinkCompare
+     * @Param: [upCodeList]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2021/12/10
+     */
+    List<IncomeDTO> queryIncomeOutptPrice(@Param("list") List<String> upCodeList);
+    /**
+     * @Meth: queryIncomeIntPrice
+     * @Description: 住院费用
+     * 1.本月收入 inCurrentRealityPrice
+     * 2.上年同期 inYearRealityPrice
+     * 3.同比：inSameCompare
+     * 4.上月收入：inMonthRealityPrice
+     * 5.环比：inLinkCompare
+     * @Param: [upCodeList]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2021/12/10
+     */
+    List<IncomeDTO> queryIncomeIntPrice(@Param("list") List<String> upCodeList);
+    /**
+     * @Meth: queryBaseFinanceClassify
+     * @Description: 查出收入大类
+     * @Param: [upCodeList]
+     * @return: java.util.List<cn.hsa.module.outpt.statement.dto.IncomeDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/12/10
+     */
+    List<IncomeDTO> queryBaseFinanceClassify(@Param("list") List<String> upCodeList);
 }

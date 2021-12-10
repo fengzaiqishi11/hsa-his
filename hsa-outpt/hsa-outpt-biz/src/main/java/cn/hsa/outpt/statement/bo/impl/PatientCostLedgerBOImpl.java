@@ -1299,6 +1299,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                 }
                 break;
+            case "12" :
+                Map<String, List<OutptCostAndReigsterCostDTO>> chargeManCollect = outptCostAndReigsterCostDTOS.stream().
+                        collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getChargeId));
+                // 组装固定表头
+                Map<String,Object> headItemMap12 = new HashMap<>();
+                headItemMap12.put("label","收款人");
+                headItemMap12.put("prop","name");
+                tableHeader.put("name",headItemMap12);
+
+                this.setFixedtableHeader(tableHeader);
+
+                for (String chargeId : chargeManCollect.keySet()){
+
+                    Map<String,Object> dataItemMap = new HashMap<>();
+                    List<OutptCostAndReigsterCostDTO> groupByList = chargeManCollect.get(chargeId);
+                    // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                    dataItemMap.put("name",groupByList.get(0).getChargeName());
+
+                    this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+
+                }
+                break;
             case "5" :
             case "6" :
             default:
@@ -1858,6 +1880,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     dataItemMap.put("doctorName",groupByList.get(0).getDoctorName());
                     // 因为已根据科室id和医生id和患者id分组， 所以可以直接拿第一个的医生名
                     dataItemMap.put("visitName",groupByList.get(0).getVisitName());
+
+                    this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+
+                }
+                break;
+            case "12" :
+                Map<String, List<OutptCostAndReigsterCostDTO>> chargeManCollect = outptCostAndReigsterCostDTOS.stream().
+                        collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getChargeId));
+                // 组装固定表头
+                Map<String,Object> headItemMap12 = new HashMap<>();
+                headItemMap12.put("label","收款人");
+                headItemMap12.put("prop","name");
+                tableHeader.put("name",headItemMap12);
+
+                this.setFixedtableHeader(tableHeader);
+
+                for (String chargeId : chargeManCollect.keySet()){
+
+                    Map<String,Object> dataItemMap = new HashMap<>();
+                    List<OutptCostAndReigsterCostDTO> groupByList = chargeManCollect.get(chargeId);
+                    // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                    dataItemMap.put("name",groupByList.get(0).getChargeName());
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -3087,5 +3131,60 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         // 统计全部费用
         List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptFinanceList(inptVisitDTO);
         return PageDTO.of(inptVisitDTOS);
+    }
+
+    @Override
+    public PageDTO queryHospitalCardList(OutptVisitDTO outptVisitDTO) {
+        if(StringUtils.isNotEmpty(outptVisitDTO.getStatisticType())&& outptVisitDTO.getStatisticType().equals("0")) {
+            PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+            // 统计已开住院证并住院的病人信息
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.getMzHospitalCardDetailList(outptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        } else {
+            PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+            // 统计合计人次
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.getMzHospitalCardTotalList(outptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
+        }
+    }
+
+
+    /**
+     * @Menthod queryHospitalCardList
+     * @Desrciption 门诊住院项目使用量统计（按科室过滤）
+     * @Param inptVisitDTO
+     * @Author liuliyun
+     * @Date   2021/12/07 11:54
+     * @Return WrapperResponse<PageDTO>
+     **/
+    @Override
+    public PageDTO queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap) {
+
+        Integer pageNo =Integer.parseInt((String) paraMap.get("pageNo"));
+        Integer pageSize =Integer.parseInt((String) paraMap.get("pageSize"));
+        PageHelper.startPage(pageNo, pageSize);
+
+        String str = (String) paraMap.get("tyepCodeList");
+        if(StringUtils.isEmpty(str)){
+            throw new RuntimeException("请选择业务类型进行查询!");
+        }
+        List<String> tyepCodeList = new ArrayList<>(Arrays.asList(str.split(",")));
+        if(ListUtils.isEmpty(tyepCodeList)){
+            throw new RuntimeException("请选择业务类型进行查询!");
+        }
+        if(tyepCodeList.size()>1){
+            paraMap.put("queryType", "all");
+        }else{
+            paraMap.put("queryType", tyepCodeList.get(0));
+        }
+        paraMap.put("tyepCodeList", tyepCodeList);
+        //门诊住院项目使用量统paraMap计查询
+        List<LinkedHashMap<String, Object>> datalist = new ArrayList<>();
+        LinkedHashMap<String, Object> sumMap = new LinkedHashMap<>();
+        //按业务类型、开方医生、项目、就诊病人分组
+        datalist = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOne(paraMap);
+        PageHelper.clearPage();
+        sumMap = patientCostLedgerDAO.queryHospitalItemReportInfoGroupOneSum(paraMap);
+        return PageDTO.of(datalist,sumMap);
     }
 }

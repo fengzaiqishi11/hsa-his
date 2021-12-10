@@ -30,7 +30,7 @@ import java.util.Map;
  **/
 @RestController
 @Slf4j
-@RequestMapping("/interf/nationDrug")
+@RequestMapping("interf/nationDrug")
 public class NationDrugController {
 
     @Resource

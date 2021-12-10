@@ -376,9 +376,14 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("lis_type", map.get("insureItemType") == null ? "" : map.get("insureItemType").toString()); // TODO 医疗机构目录编码
                 DecimalFormat df1 = new DecimalFormat("0.00");
                 String realityPrice = df1.format(BigDecimalUtils.convert(map.get("realityPrice").toString()));
-                costInfoMap.put("det_item_fee_sumamt", BigDecimalUtils.convert(realityPrice)); // 明细项目费用总额
+                BigDecimal bigDecimal = BigDecimalUtils.convert(realityPrice);
+                costInfoMap.put("det_item_fee_sumamt", bigDecimal); // 明细项目费用总额
+                BigDecimal totalNum = BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4);
                 costInfoMap.put("cnt", BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4));//  数量
-                costInfoMap.put("pric", MapUtils.get(map, "price"));// 单价
+                /**
+                 * 考虑到优惠信息的存在  单价
+                 */
+                costInfoMap.put("pric", BigDecimalUtils.divide(bigDecimal,totalNum));// 单价
 
 
                 costInfoMap.put("sin_dos_dscr", ""); // 单次计量描述
@@ -768,6 +773,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
         patientDataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType()); //  就诊凭证类型
         patientDataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo()); //  就诊凭证编号
+        if (Constants.SF.S.equals(MapUtils.get(unifiedPayMap,"isReadCardPay"))) {
+            patientDataMap.put("mdtrt_cert_type", MapUtils.get(unifiedPayMap,"bka895")); //  就诊凭证类型
+            patientDataMap.put("mdtrt_cert_no", MapUtils.get(unifiedPayMap,"bka896")); //  就诊凭证编号
+        }
+
         patientDataMap.put("med_type", insureIndividualVisitDTO.getAka130()); //  医疗类别
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMapInfo.get("costStr").toString()));

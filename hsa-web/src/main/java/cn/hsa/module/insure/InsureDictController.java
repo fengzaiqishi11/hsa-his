@@ -295,4 +295,23 @@ public class InsureDictController extends BaseController {
             return insureDictService_consumer.insertDict(map);
         }
     }
+
+    /**
+     * @Method getAdmdvsInfo()
+     * @Desrciption  查询医保地区划
+     * @Param insuplcAdmdvs:医保区划
+     *
+     * @Author 廖继广
+     * @Date   2021/12/02 21:03
+     * @Return
+     **/
+    @GetMapping("/queryAdmdvsInfoPage")
+    public WrapperResponse<PageDTO> queryAdmdvsInfoPage(InsureDictDTO insureDictDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        insureDictDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureDictDTO", insureDictDTO);
+        return insureDictService_consumer.queryAdmdvsInfoPage(map);
+    }
 }

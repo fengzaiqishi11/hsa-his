@@ -128,4 +128,6 @@ public interface InsureDictBO {
     Boolean insertDict(InsureDictDTO dictDTO);
 
     Map<String,Object> queryAllInsureDict(InsureDictDO dictDTO);
+
+    PageDTO queryAdmdvsInfoPage(InsureDictDTO dictDTO);
 }

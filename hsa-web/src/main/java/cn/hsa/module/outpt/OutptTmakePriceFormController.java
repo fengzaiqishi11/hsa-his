@@ -319,6 +319,8 @@ public class OutptTmakePriceFormController extends BaseController {
         param.put("outptVisitDTO",outptVisitDTO);//(个人信息、费用信息)
         param.put("outptSettleDTO",outptSettleDTO);//结算信息
         param.put("outptPayDOList",outptPayDOList);//支付信息
+
+        // add 结算读卡二次核验支付新增入参 by liaojiguang on 2021-12-06
         return outptTmakePriceFormService_consumer.saveOutptSettle(param);
     }
 

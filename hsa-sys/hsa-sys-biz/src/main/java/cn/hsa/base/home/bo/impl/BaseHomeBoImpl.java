@@ -147,7 +147,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //今日预警:统计库存数量低于库存下线，高于库存上线的数据
         Map<String,Object> yjMap = baseHomeDao.getKcSxxxYjData(praMap);
         //待办事项：查询出药库当日待办的事项
-        Map<String,Object> dbMap = baseHomeDao.getYkDrDbsx(praMap);
+//         Map<String,Object> dbMap = baseHomeDao.getYkDrDbsx(praMap);
 
         //趋势图数据：查询出药库入、出库趋势图数据
         List<Map<String,Object>> rkcsList = baseHomeDao.getYkrkCstData(praMap);
@@ -162,7 +162,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         resultMap.put("ywMap",ywMap);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
-        resultMap.put("dbMap",dbMap);//待办事项
+//        resultMap.put("dbMap",null);//待办事项
         resultMap.put("csMap",csMap);//趋势图数据
         resultMap.put("btMap",btMap);//饼图数据
     }
@@ -220,7 +220,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //今日预警:统计库存数量低于库存下线，高于库存上线的数据
         Map<String,Object> yjMap = baseHomeDao.getKcSxxxYjData(praMap);
         //待办事项：查询出药房当日待办的事项
-        Map<String,Object> dbMap = baseHomeDao.getYfDrDbsx(praMap);
+//        Map<String,Object> dbMap = baseHomeDao.getYfDrDbsx(praMap);
 
         //趋势图数据：查询出药房门诊发药趋势图数据
         List<Map<String,Object>> mzcsList = baseHomeDao.getYfMzCstData(praMap);
@@ -239,7 +239,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         resultMap.put("ywMap",ywMap);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
-        resultMap.put("dbMap",dbMap);//待办事项
+//        resultMap.put("dbMap",null);//待办事项
         resultMap.put("csMap",csMap);//矩形趋势图数据
         resultMap.put("btMap",btMap);//饼图数据
     }
@@ -521,15 +521,15 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         if(EnumUtil.XT_RCYZTT.getKey().equals(systemCode)){
             //--入出院子系统
             //今日待办
-            zyJrdb = baseHomeDao.getZyRcyJrdb(praMap);
+//            zyJrdb = baseHomeDao.getZyRcyJrdb(praMap);
         }else if(EnumUtil.XT_ZYHSZZXT.getKey().equals(systemCode)){
             //--住院护士站
             //今日待办
-            zyJrdb = baseHomeDao.getZyhsJrdb(praMap);
+//            zyJrdb = baseHomeDao.getZyhsJrdb(praMap);
         }else if(EnumUtil.XT_ZYYSZZXT.getKey().equals(systemCode)){
             //--住院医生站
             //今日待办
-            zyJrdb = baseHomeDao.getZyysJrdb(praMap);
+//            zyJrdb = baseHomeDao.getZyysJrdb(praMap);
         }
 
 
@@ -721,7 +721,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         Map btMap = new HashMap();
         if (EnumUtil.XT_MZYSZXT.getKey().equals(systemCode)){
             //门诊医生站今日代办事项
-            dbMap = baseHomeDao.getMzyszDbsxByToday(paramMap);
+//            dbMap = baseHomeDao.getMzyszDbsxByToday(paramMap);
 
             //门诊医生站已接诊趋势图数据
             List<Map<String, Object>> yjzData = baseHomeDao.getMzyszQsYjzrsData(paramMap);
@@ -738,7 +738,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         }else if (EnumUtil.XT_MZHSZZXT.getKey().equals(systemCode)){
             //门诊护士站今日待办事项
-            dbMap = baseHomeDao.getMzhszDbsxByToday(paramMap);
+//            dbMap = baseHomeDao.getMzhszDbsxByToday(paramMap);
 
             //门诊护士站已输液趋势图数据
             List<Map<String, Object>> ysyData = baseHomeDao.getMzhszQsYsyrsData(paramMap);
@@ -753,7 +753,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         }else if (EnumUtil.XT_MZSFZXT.getKey().equals(systemCode)){
             //门诊收费站今日待办事项
-            dbMap = baseHomeDao.getMzsfzDbsxByToday(paramMap);
+//            dbMap = baseHomeDao.getMzsfzDbsxByToday(paramMap);
 
             //门诊收费站收费趋势图数据
             List<Map<String, Object>> sffyData = baseHomeDao.getMzsfzQsSffyData(paramMap);

@@ -1447,11 +1447,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //计费时间=计费当天日期+当前时间(时分秒)
                 Date date = DateUtils.parse(startTime + " " + DateUtils.format(DateUtils.getNow(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
                 // update 计费时间=计费当天日期+核收时间(时分秒)  luoyong 2021-10-28
-//                Date date = DateUtils.parse(startTime + " " + DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                // 隔天核收：计费时间<核收时间 如2021-10-26 17:00:00提交，次日2021-10-27 09:00:00核收
-//                if (date.compareTo(medicalAdviceDTO.getCheckTime()) < 0) {
-//                    date = DateUtils.parse(startTime + " " + DateUtils.format(adviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-//                }
+                if(date.before(adviceDTO.getLongStartTime())) {
+                    date = DateUtils.parse(startTime + " " + DateUtils.format(adviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
+                    date = DateUtils.dateAddMinute(date, 10);
+                }
                 if (baseAssistCalcDetailDO.getItemId() == null ){
                     throw new AppException(baseAssistCalcDetailDO.getName() +"配置项目错误!");
                 }
@@ -1556,7 +1555,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //创建人信息
                 inptCostDTO.setCrteId(medicalAdviceDTO.getCheckId());
                 inptCostDTO.setCrteName(medicalAdviceDTO.getCheckName());
-                inptCostDTO.setCrteTime(medicalAdviceDTO.getCheckTime());
+                inptCostDTO.setCrteTime(date);
                 inptCostDTO.setAttributionCode("0");
 
                 //计算优惠金额
@@ -2561,10 +2560,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //计费时间=计费当天日期+核收时间(时分秒)
                 Date date = DateUtils.parse(DateUtils.format(startTime, DateUtils.Y_M_D) + " "
                         + DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                /*// 计算的计费时间<核收时间
-                if (date.compareTo(medicalAdviceDTO.getCheckTime()) < 0) {
+
+                // 隔天核收，计费时间修改
+                if(date.before(inptAdviceDTO.getLongStartTime())) {
                     date = DateUtils.parse(DateUtils.format(startTime, DateUtils.Y_M_D) + " " + DateUtils.format(inptAdviceDTO.getLongStartTime(), DateUtils.H_M_S), DateUtils.Y_M_DH_M_S);
-                }*/
+                    date = DateUtils.dateAddMinute(date, 10);
+                }
 
                 //判断当天费用是否已生成，如果已生产跳过循环
                 List<InptCostDTO> costDTOList = inptCostDAO.queryCostList(inptAdviceDTO.getHospCode(),inptAdviceDTO.getId(),inptAdviceDetailDTO.getId(),startTime);
@@ -2591,6 +2592,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //替换上面的判断
                 String key = inptCostDTO.getIatId()+"_"+inptCostDTO.getSourceId()+"_"+DateUtils.format(inptCostDTO.getCostTime(),DateUtils.YMD);
                 if (inputCostStr.contains(key)) {
+                Date finalDate = date;
+                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())
+                        && DateUtils.dateToDate(cost.getPlanExecTime()).compareTo(DateUtils.dateToDate(finalDate))==0
+                        && cost.getSourceId().equals(inptCostDTO.getSourceId())).collect(Collectors.toList()))) {
                     //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
                     adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                     startTime = DateUtils.dateAdd(startTime, day);
@@ -2855,6 +2860,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptAdviceExecDTOList.clear();
             }
         }
+
     }
 
     /**

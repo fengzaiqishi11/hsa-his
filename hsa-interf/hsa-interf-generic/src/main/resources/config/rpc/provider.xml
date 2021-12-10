@@ -5,5 +5,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
     <dubbo:service interface="cn.hsa.module.interf.nation.service.NationDrugService" ref="nationDrugService_provider"/>
+    <!--病人费用台账-->
+    <dubbo:service interface="cn.hsa.module.interf.statement.service.PatientCostLedgerService" ref="patientCostLedgerService_provider"/>
+
+    <!-- 首页数据查询 -->
+    <dubbo:service interface="cn.hsa.module.interf.home.service.BaseHomeService" ref="baseHomeService_provider"/>
+
+    <!--统计报表(支付方式、医保结算)-->
+    <dubbo:service interface="cn.hsa.module.interf.report.service.StatisticalReportService" ref="statisticalReportService_provider"/>
 
 </beans>

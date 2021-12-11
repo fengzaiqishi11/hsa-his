@@ -2264,7 +2264,7 @@
 		visit.in_dept_name,
 		visit.out_disease_name,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name
-		= visit.name) as zycs,
+		= visit.name and a.hosp_code =#{hospCode}) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
 		visit.crte_name AS czr,
@@ -2375,7 +2375,7 @@
 		visit.in_dept_name,
 		visit.out_disease_name,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name
-		= visit.name) as zycs,
+		= visit.name and a.hosp_code =#{hospCode}) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
 		visit.crte_name AS czr,

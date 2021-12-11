@@ -1392,5 +1392,9 @@
         order by
             crte_time desc
     </select>
+    <select id="selectInsuplcName" resultType="java.lang.String">
+        select admdvs_name
+        from insure_admdvs where hosp_code =#{hospCode} and admdvs_code =#{insuplcAdmdvs}
+    </select>
 
 </mapper>

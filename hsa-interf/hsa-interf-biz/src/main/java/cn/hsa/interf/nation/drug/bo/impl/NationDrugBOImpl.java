@@ -1,6 +1,7 @@
 package cn.hsa.interf.nation.drug.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService;
 import cn.hsa.module.interf.nation.bo.NationDrugBO;
@@ -21,7 +22,7 @@ import javax.annotation.Resource;
  **/
 @Component
 @Slf4j
-public class NationDrugBOImpl implements NationDrugBO {
+public class NationDrugBOImpl extends HsafBO implements NationDrugBO {
 
     @Resource
     private NationStandardDrugService nationStandardDrugService_consumer;

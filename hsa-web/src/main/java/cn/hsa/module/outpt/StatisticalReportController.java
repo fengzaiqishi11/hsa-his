@@ -4,7 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.outpt.report.service.StatisticalReportService;
+import cn.hsa.module.interf.report.service.StatisticalReportService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;

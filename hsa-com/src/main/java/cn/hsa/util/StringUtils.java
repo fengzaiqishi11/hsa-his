@@ -268,5 +268,34 @@ public class StringUtils {
         String randomStr = String.valueOf((int) (Math.random() * (9000) + 1000));
         return stringBuilder.append(orgCode).append(dateStr).append(randomStr).toString();
     }
+
+    /**
+     * @Method
+     * @Desrciption  手机号码前三后四脱敏
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/6 16:35
+     * @Return
+    **/
+    public static String mobileEncrypt(String mobile) {
+        if (StringUtils.isEmpty(mobile) || (mobile.length() != 11)) {
+            return mobile;
+        }
+        return mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
+    //身份证前三后四脱敏
+    public static String idEncrypt(String id) {
+        if (StringUtils.isEmpty(id) || (id.length() < 18)) {
+            return id;
+        }
+        return id.replaceAll("(?<=\\w{3})\\w(?=\\w{4})", "*");
+    }
+
+    public static void main(String[] args) {
+        System.out.println(mobileEncrypt("18574728194"));
+        System.out.println(idEncrypt("430426199705124852"));
+    }
 }
 

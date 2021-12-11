@@ -263,8 +263,8 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 
 		// 新增退领号码段到发票明细表
 		String invoiceDetailStatusCode = Constants.PJMXSYZT.TL;
-		List<OutinInvoiceDetailDO> insertList = this.getInvoiceDetailInfo(outinInvoiceDTO, invoiceDetailStatusCode);
-		outinInvoiceDao.insertOutinInvoiceDetailBatch(insertList);
+		// List<OutinInvoiceDetailDO> insertList = this.getInvoiceDetailInfo(outinInvoiceDTO, invoiceDetailStatusCode);
+		// outinInvoiceDao.insertOutinInvoiceDetailBatch(insertList);
 
 		// 更新发票主表信息
 		Integer num = this.getNum(outinInvoiceDTO.getInvalidEndNo(), outinInvoiceDO.getEndNo());
@@ -311,6 +311,10 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 
 		if (this.compareNum(outinInvoiceDTO.getInvalidStartNo(), outinInvoiceDTO.getInvalidEndNo())) {
 			throw new AppException("起始号码不能大于结束号码");
+		}
+
+		if (this.checkNum(outinInvoiceDTO.getInvalidStartNo(), outinInvoiceDTO.getInvalidEndNo())) {
+			throw new AppException("一次作废不能大于50张发票");
 		}
 
 		// 判断作废发票是否用完
@@ -972,6 +976,29 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			throw new RuntimeException("号码比较错误，检查是否为数字");
 		}
 	}
+
+	/**
+	 * @Description: 检查作废数量
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2021/12/8 21:41
+	 * @Return
+	 */
+	private boolean checkNum(String startNum, String endNum) {
+		try {
+			// 开始号码转数字
+			int startNumInt = Integer.parseInt(startNum);
+
+			// 结束号码转数字
+			int endNumInt = Integer.parseInt(endNum);
+
+			return (endNumInt - startNumInt) > 50;
+		} catch (Exception e) {
+			throw new RuntimeException("号码比较错误，检查是否为数字");
+		}
+	}
+
 
 	/**
 	 * @param outinInvoiceDTO

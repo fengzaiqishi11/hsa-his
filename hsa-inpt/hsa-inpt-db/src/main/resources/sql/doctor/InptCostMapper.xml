@@ -1750,6 +1750,33 @@
 
     </select>
 
+    <select id="queryMedic" resultType="java.lang.String">
+        select distinct ma.id
+        from inpt_cost c,
+        medic_apply ma,
+        inpt_advice b
+        where
+        c.hosp_code = ma.hosp_code
+        and c.hosp_code = b.hosp_code
+        and b.id = c.iat_id
+        and ma.apply_no = b.technology_no
+        and ma.visit_id = c.visit_id
+        and c.hosp_code = #{hospCode}
+
+            and c.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </select>
+
+    <update id="updateMedicApply" >
+        update medic_apply set document_sta = '05' where hosp_code = #{hospCode} and is_inpt = '1' and
+        id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
     <!--批量新增-->
   <insert id="insertPharInReceives" keyProperty="id" useGeneratedKeys="true">
     insert into phar_in_receive(id,hosp_code, phar_id, window_id, order_no, order_receive_id, total_price, assign_user_id,

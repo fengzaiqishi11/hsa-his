@@ -190,7 +190,7 @@
         iic.id, iic.hosp_code, iic.visit_id, iic.settle_id, iic.is_hospital, iic.visit_no, iic.discharge_dn_code,
         iic.insure_org_code,iic.insure_reg_code,iic.hosp_exem_amount,iic.maf_pay,
         iic.medicine_org_code,iic.discharge_dn_name, discharged_date, iic.discharged_case,
-        (case iic.settleway when '01' then '普通结算' when '02' then '包干结算' else '欠款结算' end) as settleway,
+        '普通结算'  as settleway,
         iic.total_price, iic.plan_price,
         iic.serious_price, iic.civil_price, iic.retire_price, iic.personal_price, iic.person_price, iic.hosp_price,
         iic.before_settle, iic.last_settle,
@@ -200,7 +200,7 @@
         iic.costbatch, iic.aka130,iic.injury_borth_sn, iic.is_account, iic.remark, iic.crte_id,iic.insureSettleId,
         iic.crte_name, iic.crte_time,iiv.visit_drpt_name as visitDrptName,
         iiv.aka130_name as aka130Name,iiv.aac001,iiv.bka006,
-        CASE iiv.bka006_name WHEN 'null' THEN '-' WHEN '' THEN '-' ELSE iiv.bka006_name END bka006_name,
+        bka006_name,
         iiv.visit_icd_code as visitIcdCode,iiv.visit_icd_name as visitIcdName,
         iib.aac003,iib.aac002,
         CASE iib.aac004 WHEN '男' THEN 2 WHEN '女' THEN 1 ELSE iib.aac004 END aac004,iib.aae005,
@@ -220,7 +220,7 @@
         left join insure_individual_visit iiv on iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
         join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
         left join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code
-        where iic.hosp_code = #{hospCode} and iic.insureSettleId is not null and iic.is_cancel ='0'
+        where iic.hosp_code = #{hospCode} and iic.is_cancel ='0'
         <if test="keyWord != null and keyWord != ''">
             and ( iiv.visit_no like concat('%',#{keyWord},'%')
             or iib.aac003 like concat('%',#{keyWord},'%')

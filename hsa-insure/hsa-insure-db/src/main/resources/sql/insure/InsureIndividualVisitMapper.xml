@@ -381,7 +381,10 @@
                 psn_idet_type,
             </if>
             <if test="isOneSettle != null">
-                is_one_settle
+                is_one_settle,
+            </if>
+            <if test="payTokenDengJi != null and payTokenDengJi != ''">
+                pay_token_deng_ji
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -525,9 +528,11 @@
                 #{psnIdetType,jdbcType=VARCHAR},
             </if>
             <if test="isOneSettle != null">
-                #{isOneSettle,jdbcType=VARCHAR}
+                #{isOneSettle,jdbcType=VARCHAR},
             </if>
-
+            <if test="payTokenDengJi != null and payTokenDengJi != ''">
+                #{payTokenDengJi,jdbcType=VARCHAR}
+            </if>
         </trim>
     </insert>
     <insert id="insertCommonLog">

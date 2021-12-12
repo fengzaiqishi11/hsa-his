@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCost
 import cn.hsa.module.interf.statement.bo.PatientCostLedgerBO;
 import cn.hsa.module.interf.statement.dao.PatientCostLedgerDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -1121,7 +1122,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     /**
      * @Method queryIncomeClassifyInfo
      * @Desrciption 全院月收入分类统计
-     * @param paraMap
+     * @param
      * @Author liuqi1
      * @Date   2020/11/18 17:10
      * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>

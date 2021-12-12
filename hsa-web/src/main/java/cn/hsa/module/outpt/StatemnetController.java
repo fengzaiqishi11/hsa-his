@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -411,7 +412,7 @@ public class StatemnetController extends BaseController {
   }
 
   /**
-   * @param paraMap
+   * @param
    * @Method queryIncomeClassifyInfo
    * @Desrciption 全院月收入分类统计
    * @Author liuqi1

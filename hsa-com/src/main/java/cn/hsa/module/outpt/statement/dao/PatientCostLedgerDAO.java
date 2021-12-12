@@ -685,7 +685,7 @@ public interface PatientCostLedgerDAO {
    * @Date   2020/12/16 15:00
    * @Return java.util.Map<java.lang.String,java.lang.Object>
    **/
-  List<Map<String,Object>> queryIncomeClassifyInfo(Map<String,Object> map);
+  List<Map<String,Object>> queryIncomeClassifyInfo(IncomeDTO incomeDTO);
 
   /**
    * @Method queryIncomeClassifyInfoBig
@@ -695,7 +695,7 @@ public interface PatientCostLedgerDAO {
    * @Date   2020/12/16 15:00
    * @Return java.util.Map<java.lang.String,java.lang.Object>
    **/
-  List<Map<String,Object>> queryIncomeClassifyInfoBig(Map<String,Object> map);
+  List<Map<String,Object>> queryIncomeClassifyInfoBig(IncomeDTO incomeDTO);
 
 
   /**
@@ -894,7 +894,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Author: zhangguorui
    * @Date: 2021/12/9
    */
-  List<String> queryIncomeUpCode(Map<String, Object> paraMap);
+  List<String> queryIncomeUpCode(IncomeDTO incomeDTO);
     /**
      * @Meth: queryIncomeOutptPrice
      * @Description: 门诊费用
@@ -908,7 +908,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Author: zhangguorui
      * @Date: 2021/12/10
      */
-    List<IncomeDTO> queryIncomeOutptPrice(@Param("list") List<String> upCodeList);
+    List<IncomeDTO> queryIncomeOutptPrice(IncomeDTO incomeDTO);
     /**
      * @Meth: queryIncomeIntPrice
      * @Description: 住院费用
@@ -922,7 +922,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Author: zhangguorui
      * @Date: 2021/12/10
      */
-    List<IncomeDTO> queryIncomeIntPrice(@Param("list") List<String> upCodeList);
+    List<IncomeDTO> queryIncomeIntPrice(IncomeDTO incomeDTO);
     /**
      * @Meth: queryBaseFinanceClassify
      * @Description: 查出收入大类
@@ -931,5 +931,5 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Author: zhangguorui
      * @Date: 2021/12/10
      */
-    List<IncomeDTO> queryBaseFinanceClassify(@Param("list") List<String> upCodeList);
+    List<IncomeDTO> queryBaseFinanceClassify(IncomeDTO incomeDTO);
 }

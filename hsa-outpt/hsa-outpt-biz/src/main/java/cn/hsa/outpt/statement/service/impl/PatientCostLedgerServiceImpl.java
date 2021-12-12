@@ -304,7 +304,7 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
 //  public WrapperResponse<List<Map<String, Object>>> queryIncomeClassifyInfo(Map<String, Object> paraMap) {
   public WrapperResponse<PageDTO> queryIncomeClassifyInfo(Map<String, Object> paraMap) {
 //    List<Map<String, Object>> list = patientCostLedgerBO.queryIncomeClassifyInfo(paraMap);
-    return WrapperResponse.success( patientCostLedgerBO.queryIncomeClassifyInfo(paraMap));
+    return WrapperResponse.success( patientCostLedgerBO.queryIncomeClassifyInfo(MapUtils.get(paraMap,"incomeDTO")));
   }
 
   /**

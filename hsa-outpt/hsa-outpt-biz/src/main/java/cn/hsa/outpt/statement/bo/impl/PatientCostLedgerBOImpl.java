@@ -1133,16 +1133,18 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      **/
     @Override
 //    public List<Map<String, Object>> queryIncomeClassifyInfo(Map<String, Object> paraMap) {
-    public PageDTO queryIncomeClassifyInfo(Map<String, Object> paraMap) {
-        Integer pageNo = Integer.parseInt((String) paraMap.get("pageNo"));
-        Integer pageSize = Integer.parseInt((String) paraMap.get("pageSize"));
+    public PageDTO queryIncomeClassifyInfo(IncomeDTO incomeDTO) {
+        Integer pageNo = incomeDTO.getPageNo();
+        Integer pageSize = incomeDTO.getPageSize();
+
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> showList = new ArrayList<>();
-        if ("1".equals(MapUtils.get(paraMap, "sumCode"))) {
+        if ("1".equals(incomeDTO.getSumCode())) {
             // 先查出大类，挂号大类、门诊大类、住院大类
-            List<String> upCodeList = patientCostLedgerDAO.queryIncomeUpCode(paraMap);
+            List<String> upCodeList = patientCostLedgerDAO.queryIncomeUpCode(incomeDTO);
+            incomeDTO.setList(upCodeList);
             // 查出收入大类
-            List<IncomeDTO> bfcNameList = patientCostLedgerDAO.queryBaseFinanceClassify(upCodeList);
+            List<IncomeDTO> bfcNameList = patientCostLedgerDAO.queryBaseFinanceClassify(incomeDTO);
             /*
              * 门诊费用：
              * 1.本月收入 outCurrentRealityPrice
@@ -1151,7 +1153,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
              * 4.上月收入：outMonthRealityPrice
              * 5.环比：outLinkCompare
              * */
-            List<IncomeDTO> outptPriceMapList = patientCostLedgerDAO.queryIncomeOutptPrice(upCodeList);
+            List<IncomeDTO> outptPriceMapList = patientCostLedgerDAO.queryIncomeOutptPrice(incomeDTO);
             // key 是upCode
             Map<String, IncomeDTO> outptPriceMap = outptPriceMapList.stream()
                     .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
@@ -1163,9 +1165,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
              * 4.上月收入：inMonthRealityPrice
              * 5.环比：inLinkCompare
              * */
-            List<IncomeDTO> inptPriceMapList = patientCostLedgerDAO.queryIncomeIntPrice(upCodeList);
+            List<IncomeDTO> inptPriceMapList = patientCostLedgerDAO.queryIncomeIntPrice(incomeDTO);
             // key 是upCode
-            Map<String, IncomeDTO> inptPriceMap = outptPriceMapList.stream()
+            Map<String, IncomeDTO> inptPriceMap = inptPriceMapList.stream()
                     .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
             /*==== 返回参数封装begin====*/
             for (IncomeDTO item : bfcNameList) {
@@ -1192,24 +1194,37 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 // 全院上月费用
                 BigDecimal yardMonthRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutMonthRealityPrice(), inptPriceDTO.getInMonthRealityPrice());
                 // 同比
-                BigDecimal yardSameCompareBigDecimal = BigDecimalUtils.divide(
-                        BigDecimalUtils.subtract(yardCurrentRealityPrice, yardYearRealityPrice),
-                        BigDecimalUtils.multiply(yardYearRealityPrice, new BigDecimal(0.01))
-                ).setScale(2);
+                BigDecimal multiply = BigDecimalUtils.multiply(yardYearRealityPrice, new BigDecimal(0.01));
+                BigDecimal yardSameCompareBigDecimal;
+                if (!BigDecimalUtils.isZero(multiply)){ // 除数不是0
+                     yardSameCompareBigDecimal = BigDecimalUtils.divide(
+                            BigDecimalUtils.subtract(yardCurrentRealityPrice, yardYearRealityPrice),
+                            multiply
+                    );
+                }else{
+                     yardSameCompareBigDecimal = new BigDecimal(0);
+                }
+
                 if (null == yardSameCompareBigDecimal) {
                     yardSameCompareBigDecimal = new BigDecimal(0);
                 }
-                String yardSameCompareString = yardSameCompareBigDecimal.toString();
+                String yardSameCompareString = yardSameCompareBigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString();
                 String yardSameCompare = yardSameCompareString + "%";
                 // 环比
-                BigDecimal yardLinkCompareBigDecimal = BigDecimalUtils.divide(
-                        BigDecimalUtils.subtract(yardCurrentRealityPrice, yardMonthRealityPrice),
-                        BigDecimalUtils.multiply(yardMonthRealityPrice, new BigDecimal(0.01))
-                ).setScale(2);
+                BigDecimal multiply1 = BigDecimalUtils.multiply(yardMonthRealityPrice, new BigDecimal(0.01));
+                BigDecimal yardLinkCompareBigDecimal;
+                if (!BigDecimalUtils.isZero(multiply1)){ // 除数不是0
+                     yardLinkCompareBigDecimal = BigDecimalUtils.divide(
+                            BigDecimalUtils.subtract(yardCurrentRealityPrice, yardMonthRealityPrice),
+                            multiply1
+                    );
+                }else{
+                    yardLinkCompareBigDecimal = new BigDecimal(0);
+                }
                 if (null == yardSameCompareBigDecimal) {
                     yardLinkCompareBigDecimal = new BigDecimal(0);
                 }
-                String yardLinkCompareString = yardLinkCompareBigDecimal.toString();
+                String yardLinkCompareString = yardLinkCompareBigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString();
                 String yardLinkCompare = yardLinkCompareString + "%";
                 /*====计算全院费用end====*/
                 // 封装全院费用
@@ -1220,10 +1235,10 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 item.setYardYearRealityPrice(yardYearRealityPrice);
             }
             /*====返回参数封装end====*/
-            System.out.println(bfcNameList);
-            showList = patientCostLedgerDAO.queryIncomeClassifyInfoBig(paraMap);
+            //showList = patientCostLedgerDAO.queryIncomeClassifyInfoBig(incomeDTO);
+            return PageDTO.of(bfcNameList);
         } else {
-            showList = patientCostLedgerDAO.queryIncomeClassifyInfo(paraMap);
+            showList = patientCostLedgerDAO.queryIncomeClassifyInfo(incomeDTO);
         }
 //        return showList;
         return PageDTO.of(showList);

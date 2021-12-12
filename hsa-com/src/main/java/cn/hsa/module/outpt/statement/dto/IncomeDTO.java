@@ -2,13 +2,18 @@ package cn.hsa.module.outpt.statement.dto;
 
 import cn.hsa.base.PageDO;
 import cn.hsa.util.BigDecimalUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @Class_name: IncomeDTO
@@ -22,7 +27,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class IncomeDTO  implements Serializable {
+public class IncomeDTO   implements Serializable {
     private static final long serialVersionUID = -816969372277325373L;
     private String upCode;
     private String bfcName;// 收入分类
@@ -42,4 +47,16 @@ public class IncomeDTO  implements Serializable {
     private BigDecimal inMonthRealityPrice;// 住院上月金额
     private String inLinkCompare;// 住院环比
 
+    private int pageNo;
+    private int pageSize;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
+    private String sumCode;
+    private List<String> list = new ArrayList<>();
+    private String hospCode;
 }

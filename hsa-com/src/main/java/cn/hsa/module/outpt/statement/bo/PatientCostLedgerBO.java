@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -227,7 +228,7 @@ public interface PatientCostLedgerBO {
    * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
    **/
 //  List<Map<String,Object>> queryIncomeClassifyInfo(Map<String,Object> paraMap);
-  PageDTO queryIncomeClassifyInfo(Map<String,Object> paraMap);
+  PageDTO queryIncomeClassifyInfo(IncomeDTO incomeDTO);
 
   /**
    * @Method queryInvoiceStatistics

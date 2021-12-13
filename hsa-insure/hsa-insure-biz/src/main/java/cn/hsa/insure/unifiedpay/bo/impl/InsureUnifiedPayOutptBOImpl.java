@@ -376,14 +376,18 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("lis_type", map.get("insureItemType") == null ? "" : map.get("insureItemType").toString()); // TODO 医疗机构目录编码
                 DecimalFormat df1 = new DecimalFormat("0.00");
                 String realityPrice = df1.format(BigDecimalUtils.convert(map.get("realityPrice").toString()));
-                BigDecimal bigDecimal = BigDecimalUtils.convert(realityPrice);
-                costInfoMap.put("det_item_fee_sumamt", bigDecimal); // 明细项目费用总额
-                BigDecimal totalNum = BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4);
+//                BigDecimal bigDecimal = BigDecimalUtils.convert(realityPrice);
+//                costInfoMap.put("det_item_fee_sumamt", bigDecimal); // 明细项目费用总额
+//                BigDecimal totalNum = BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4);
+//                costInfoMap.put("cnt", BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4));//  数量
+////                /**
+////                 * 考虑到优惠信息的存在  单价
+////                 */
+////                costInfoMap.put("pric", BigDecimalUtils.divide(bigDecimal,totalNum));// 单价
+
+                costInfoMap.put("det_item_fee_sumamt", BigDecimalUtils.convert(realityPrice)); // 明细项目费用总额
                 costInfoMap.put("cnt", BigDecimalUtils.scale((BigDecimal) map.get("totalNum"), 4));//  数量
-                /**
-                 * 考虑到优惠信息的存在  单价
-                 */
-                costInfoMap.put("pric", BigDecimalUtils.divide(bigDecimal,totalNum));// 单价
+                costInfoMap.put("pric", MapUtils.get(map, "price"));// 单价
 
 
                 costInfoMap.put("sin_dos_dscr", ""); // 单次计量描述

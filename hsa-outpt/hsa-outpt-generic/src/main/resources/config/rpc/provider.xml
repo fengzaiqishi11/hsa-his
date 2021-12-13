@@ -51,13 +51,9 @@
 
     <!-- ################################################ 报表consumer start ################################################ -->
 
-    <!--病人费用台账-->
-    <dubbo:service interface="cn.hsa.module.outpt.statement.service.PatientCostLedgerService" ref="patientCostLedgerService_provider"/>
     <!--病人手术补记账-->
     <dubbo:service interface="cn.hsa.module.outpt.fees.service.OutptCostKeepAccountsService" ref="outptCostKeepAccounts_provider"/>
 
-    <!--统计报表(支付方式、医保结算)-->
-    <dubbo:service interface="cn.hsa.module.outpt.report.service.StatisticalReportService" ref="statisticalReportService_provider"/>
 
     <dubbo:service interface="cn.hsa.module.outpt.lis.service.LisService" ref="lisService_provider"/>
 

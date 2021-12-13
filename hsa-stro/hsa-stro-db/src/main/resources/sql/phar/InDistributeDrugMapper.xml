@@ -437,11 +437,9 @@
     <select id="queryPatientInfoByVitsitId" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
       select a.*,
      (CONCAT(a.name,'/',
-     (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = a.gender_code and e.hosp_code = a.hosp_code AND
-     e.c_code = 'XB' ), '' )),'/',
+     (ifnull((case a.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
      a.age,
-     (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = a.age_unit_code AND hosp_code =
-     a.hosp_code ), '岁' )))) as patientInfo
+     (ifnull((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as patientInfo
      from inpt_visit a where a.hosp_code = #{hospCode}
      <if test="ids!=null and ids.size()>0">
        and (a.id) in

@@ -894,8 +894,9 @@
             left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
             left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
             left join insure_individual_visit iiv on iiv.hosp_code = a.hosp_code and iiv.visit_id = v.id
-            left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim
-            on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code
+            <!--left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim -->
+            <!--on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code-->
+            left join insure_item_match iim on a.hosp_code = iim.hosp_code and iiv.insure_org_code = iim.insure_reg_code and a.item_id = iim.hosp_item_id
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
     </select>
 
@@ -1601,7 +1602,7 @@
         FROM
         outpt_register_settle b
         LEFT JOIN outpt_register a ON a.id = b.register_id
-        LEFT JOIN outin_invoice_detail c ON ( b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
+        LEFT JOIN outin_invoice_detail c ON ( b.hosp_code = c.hosp_code and b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
         LEFT JOIN outin_invoice e ON b.bill_id = e.id
         LEFT JOIN outpt_visit f ON f.id = a.visit_id
         WHERE

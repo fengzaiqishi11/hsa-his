@@ -9,8 +9,8 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Package_name
@@ -99,4 +99,6 @@ public class MedicalApplyDTO extends MedicalApplyDO implements Serializable {
     private String itemName;
     // 是否结算
     private String isSettle;
+    // 医技申请主键集合
+    private List<String> ids;
 }

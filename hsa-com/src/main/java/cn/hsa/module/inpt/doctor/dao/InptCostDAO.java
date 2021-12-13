@@ -4,6 +4,7 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
+import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
@@ -552,4 +553,6 @@ public interface InptCostDAO {
      * @Date: 2021/12/6
      */
     int updateCostIdBatch(List<InptCostDTO> inptCostDTOs);
+
+    void newUpdateLastExeTime(MedicalAdviceDTO medicalAdviceDTO, Map<String, Date> adviceIdCostTime);
 }

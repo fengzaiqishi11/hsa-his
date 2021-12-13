@@ -1645,7 +1645,7 @@
 
     <select id="queryWait" resultMap="InptCostMap">
         select * from inpt_cost where hosp_code=#{hospCode} and visit_id=#{visitId}
-        and iat_id=#{iatId} and DATE_FORMAT(crte_time, '%Y-%m-%d')=DATE_FORMAT(#{crteTime}, '%Y-%m-%d') and is_wait='1'
+        and iat_id=#{iatId} and DATE_FORMAT(cost_time, '%Y-%m-%d')=DATE_FORMAT(#{costTime}, '%Y-%m-%d') and is_wait='1'
         and source_id=#{sourceId}
     </select>
 

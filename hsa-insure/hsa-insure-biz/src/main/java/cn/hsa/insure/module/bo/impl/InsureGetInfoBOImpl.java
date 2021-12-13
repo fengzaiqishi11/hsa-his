@@ -1175,8 +1175,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         String acctPay = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"acct_pay"));
         String cashPayamt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"cash_payamt"));
+        /**
+         * 2021/12/09 个人自费 =全自费金额（fulamtOwnpayAmt）  不包含超限价自费金额
+         */
         // 个人自费 == 全自费金额（fulamtOwnpayAmt） +超限价自费金额（overlmtSelfpay）
-        BigDecimal psnOwnpay = BigDecimalUtils.add(fulamtOwnpayAmt, overlmtSelfpay);
+        BigDecimal psnOwnpay = BigDecimalUtils.convert(fulamtOwnpayAmt);
         /**
          *     金额合计=医保统筹基金支付+补充医疗保险支付+医疗救助支付+个人负担
          *     补充医疗保险支付：职工大额补助+居民大病保险+公务员医疗补助

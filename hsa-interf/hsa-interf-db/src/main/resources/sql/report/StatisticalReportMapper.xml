@@ -1,0 +1,1840 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.report.dao.StatisticalReportDAO">
+    <!--支付方式统计报表-->
+    <select id="queryPayCodeReport" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT t1.settleTime, t2.totalPrice, t2.selfPrice, t2.miPrice, t2.apOffsetPrice, t1.XJprice, t1.POSprice,
+        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice,t2.cardPrice
+        FROM (
+        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
+        IFNULL(SUM(CASE ss.pay_code WHEN '1' THEN ss.price ELSE 0 END ),0) as XJprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '2' THEN ss.price ELSE 0 END ),0) as POSprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '3' THEN ss.price ELSE 0 END ),0) as ZPprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '4' THEN ss.price ELSE 0 END ),0) as ZZprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '5' THEN ss.price ELSE 0 END ),0) as WXprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '6' THEN ss.price ELSE 0 END ),0) as ZFBprice
+        FROM (
+        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price, a.card_price
+        from outpt_settle a
+        left join outpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'MZ' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price,0 card_price
+        from inpt_settle a
+        left join inpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'ZY' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
+        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price, a.card_price
+        from outpt_register_settle a
+        left join outpt_register_pay b on a.id = b.rs_id and a.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'GH' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        ) t1 join (
+        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
+        sum(reality_price) totalPrice, sum(mi_price) miPrice, sum(self_price) selfPrice, sum(ap_offset_price)
+        apOffsetPrice, sum(trunc_price) truncPrice, sum(card_price) cardPrice
+        FROM (
+        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price, a.card_price
+        from outpt_settle a
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'MZ' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, (a.self_price-a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price, 0 card_price
+        from inpt_settle a
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'ZY' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
+        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price, a.card_price
+        from outpt_register_settle a
+        where a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'GH' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        )t2 on t1.settleTime = t2.settleTime
+
+    </select>
+
+    <!--支付方式统计报表合计-->
+    <select id="queryPayCodeReportSum" parameterType="java.util.Map" resultType="java.util.Map">
+        select SUM(totalPrice) totalPriceSum, SUM(selfPrice) selfPriceSum,SUM(miPrice) miPriceSum,
+        SUM(apOffsetPrice) apOffsetPriceSum,SUM(XJprice) XJpriceSum,SUM(POSprice) POSpriceSum,SUM(ZPprice) ZPpriceSum,
+        SUM(ZZprice) ZZpriceSum,SUM(WXprice) WXpriceSum,SUM(ZFBprice) ZFBpriceSum,SUM(truncPrice) truncPriceSum from(
+        SELECT t1.settleTime, t2.totalPrice, t2.selfPrice, t2.miPrice, t2.apOffsetPrice, t1.XJprice, t1.POSprice,
+        t1.ZPprice, t1.ZZprice, t1.WXprice, t1.ZFBprice, t2.truncPrice
+        FROM (
+        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
+        IFNULL(SUM(CASE ss.pay_code WHEN '1' THEN ss.price ELSE 0 END ),0) as XJprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '2' THEN ss.price ELSE 0 END ),0) as POSprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '3' THEN ss.price ELSE 0 END ),0) as ZPprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '4' THEN ss.price ELSE 0 END ),0) as ZZprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '5' THEN ss.price ELSE 0 END ),0) as WXprice,
+        IFNULL(SUM(CASE ss.pay_code WHEN '6' THEN ss.price ELSE 0 END ),0) as ZFBprice
+        FROM (
+        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, b.pay_code, b.price, a.self_price, 0 ap_offset_price
+        from outpt_settle a
+        left join outpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'MZ' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, b.pay_code, b.price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price
+        from inpt_settle a
+        left join inpt_pay b on a.id = b.settle_id and a.hosp_code = b.hosp_code
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'ZY' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
+        null mi_price, b.pay_code, b.price, a.reality_price self_price, 0 ap_offset_price
+        from outpt_register_settle a
+        join outpt_register_detail c on a.register_id = c.register_id and a.hosp_code = c.hosp_code
+        left join outpt_register_pay b on c.visit_id = b.visit_id and c.hosp_code = b.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'GH' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        ) t1 join (
+        SELECT DATE_FORMAT(ss.settle_time,'%Y-%m-%d') settleTime,
+        sum(reality_price) totalPrice, sum(mi_price) miPrice, sum(self_price) selfPrice, sum(ap_offset_price)
+        apOffsetPrice, sum(trunc_price) truncPrice
+        FROM (
+        select 'MZ' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, a.self_price, 0 ap_offset_price, a.trunc_price
+        from outpt_settle a
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'MZ' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'ZY' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, reality_price,
+        a.mi_price mi_price, (a.self_price+a.settle_back_price)  self_price, a.ap_offset_price, a.trunc_price
+        from inpt_settle a
+        where a.is_settle = '1' and a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'ZY' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        select 'GH' sxtj, DATE_FORMAT(a.settle_time,'%Y-%m-%d') as settle_time, a.reality_price,
+        null mi_price,a.reality_price self_price, 0 ap_offset_price, 0 trunc_price
+        from outpt_register_settle a
+        where a.hosp_code = #{hospCode}
+        <if test="crteId != null and crteId != ''">
+            and a.crte_Id = #{crteId}
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settle_time,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and 'GH' IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        ) ss GROUP BY DATE_FORMAT(ss.settle_time,'%Y-%m-%d')
+        )t2 on t1.settleTime = t2.settleTime
+        )tableSum
+    </select>
+
+    <!--医保结算统计报表(按明细)-->
+    <select id="queryYbSettleReportByMX" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ywlx,
+        visitNo,
+        name,
+        bedName,
+        patientCode,
+        settleTime,
+        inTime,
+        outTime,
+        inDays,
+        totalPrice,
+        planPrice,
+        civilPrice,
+        seriousPrice,
+        retirePrice,
+        hospPrice,
+        personPrice,
+        apTotalPrice,
+        ynyh,
+        remark,
+        mafPay,
+        personalPrice
+        FROM
+        (
+        SELECT
+        'MZ' ywlx,
+        b.visit_no as visitNo,
+        ( SELECT NAME FROM outpt_visit ov WHERE ov.hosp_code = a.hosp_code AND ov.id = a.visit_id ) AS name ,
+        '' AS bedName,
+        a.patient_code AS patientCode,
+        a.settle_time AS settleTime,
+        '' AS inTime,
+        '' AS outTime,
+        '' AS inDays,
+        b.total_price AS totalPrice,
+        b.plan_price AS planPrice,
+        b.civil_price AS civilPrice,
+        b.serious_price AS seriousPrice,
+        b.retire_price AS retirePrice,
+        b.hosp_price AS hospPrice,
+        b.person_price AS personPrice,
+        0.00 AS apTotalPrice,
+        ( a.total_price - a.reality_price ) AS ynyh,
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
+        FROM
+        outpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.id = b.settle_id
+        and a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        'ZY' ywlx,
+        c.in_no AS visitNo,
+        c.NAME,
+        c.bed_name AS bedName,
+        a.patient_code AS patientCode,
+        a.settle_time AS settleTime,
+        c.in_time AS inTime,
+        c.out_time AS outTime,
+        DATEDIFF( c.out_time, c.in_time ) AS inDays,
+        b.total_price AS totalPrice,
+        b.plan_price AS planPrice,
+        b.civil_price AS civilPrice,
+        b.serious_price AS seriousPrice,
+        b.retire_price AS retirePrice,
+        b.hosp_price AS hospPrice,
+        b.person_price AS personPrice,
+        a.ap_total_price AS apTotalPrice,
+        a.hosp_jm_price AS ynyh,
+        b.remark,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
+        FROM insure_individual_settle b
+        LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
+        JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE
+        b.hosp_code = #{hospCode}
+        AND a.is_settle = '1'
+        AND a.status_code = '0'
+        <!--FROM
+            inpt_settle a,
+            insure_individual_settle b,
+            inpt_visit c
+        WHERE
+            a.id = b.settle_id
+            and a.is_settle = '1'
+            AND a.visit_id = b.visit_id
+            AND b.visit_id = c.id
+            AND a.hosp_code = b.hosp_code
+            AND b.hosp_code = c.hosp_code
+            AND a.hosp_code = #{hospCode}-->
+        ) ss
+        WHERE 1=1
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and ywlx IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
+        </if>
+        ORDER BY settleTime DESC
+    </select>
+
+    <!--医保结算统计报表合计(按明细)-->
+    <select id="queryYbSettleReportByMXSum" parameterType="java.util.Map" resultType="java.util.Map">
+        select SUM(totalPrice) as totalPriceSum,
+        SUM(planPrice)as  planPriceSum,
+        SUM(civilPrice)as planPriceSum,
+        SUM(seriousPrice)as seriousPriceSum,
+        SUM(retirePrice)as retirePriceSum,
+        SUM(hospPrice)as hospPriceSum,
+        SUM(personPrice)as personPriceSum,
+        SUM(apTotalPrice)as apTotalPriceSum,
+        SUM(ynyh)as ynyhSum from(
+        SELECT
+        ywlx,
+        visitNo,
+        name,
+        bedName,
+        patientCode,
+        settleTime,
+        inTime,
+        outTime,
+        inDays,
+        totalPrice,
+        planPrice,
+        civilPrice,
+        seriousPrice,
+        retirePrice,
+        hospPrice,
+        personPrice,
+        apTotalPrice,
+        ynyh,
+        remark
+        FROM
+        (
+        SELECT
+        'MZ' ywlx,
+        b.visit_no as visitNo,
+        ( SELECT NAME FROM outpt_visit ov WHERE ov.hosp_code = a.hosp_code AND ov.id = a.visit_id ) AS name ,
+        '' AS bedName,
+        a.patient_code AS patientCode,
+        a.settle_time AS settleTime,
+        '' AS inTime,
+        '' AS outTime,
+        '' AS inDays,
+        b.total_price AS totalPrice,
+        b.plan_price AS planPrice,
+        b.civil_price AS civilPrice,
+        b.serious_price AS seriousPrice,
+        b.retire_price AS retirePrice,
+        b.hosp_price AS hospPrice,
+        b.person_price AS personPrice,
+        0.00 AS apTotalPrice,
+        ( a.total_price - a.reality_price ) AS ynyh,
+        b.remark
+        FROM
+        outpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.id = b.settle_id
+        and a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        'ZY' ywlx,
+        c.in_no AS visitNo,
+        c.NAME,
+        c.bed_name AS bedName,
+        a.patient_code AS patientCode,
+        a.settle_time AS settleTime,
+        c.in_time AS inTime,
+        c.out_time AS outTime,
+        DATEDIFF( c.out_time, c.in_time ) AS inDays,
+        b.total_price AS totalPrice,
+        b.plan_price AS planPrice,
+        b.civil_price AS civilPrice,
+        b.serious_price AS seriousPrice,
+        b.retire_price AS retirePrice,
+        b.hosp_price AS hospPrice,
+        b.person_price AS personPrice,
+        a.ap_total_price AS apTotalPrice,
+        a.hosp_jm_price AS ynyh,
+        b.remark
+        FROM insure_individual_settle b
+        LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
+        JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
+        WHERE
+        b.hosp_code = #{hospCode}
+        AND a.is_settle = '1'
+        AND a.status_code = '0'
+        <!--FROM
+            inpt_settle a,
+            insure_individual_settle b,
+            inpt_visit c
+        WHERE
+            a.id = b.settle_id
+            and a.is_settle = '1'
+            AND a.visit_id = b.visit_id
+            AND b.visit_id = c.id
+            AND a.hosp_code = b.hosp_code
+            AND b.hosp_code = c.hosp_code
+            AND a.hosp_code = #{hospCode}-->) ss
+        WHERE 1=1
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and ywlx IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        ORDER BY settleTime DESC
+        ) tableSum
+    </select>
+
+    <!--医保结算统计报表合计(按病人类型)-->
+    <select id="queryYbSettleReportByBRLXSum" parameterType="java.util.Map" resultType="java.util.Map">
+        select SUM(totalPrice) as totalPriceSum,
+        SUM(planPrice)as  planPriceSum,
+        SUM(civilPrice)as planPriceSum,
+        SUM(seriousPrice)as seriousPriceSum,
+        SUM(retirePrice)as retirePriceSum,
+        SUM(hospPrice)as hospPriceSum,
+        SUM(personPrice)as personPriceSum,
+        SUM(apTotalPrice)as apTotalPriceSum,
+        SUM(ynyh)as ynyhSum from(
+        SELECT
+        ywlx,
+        patientCode,
+        SUM( ss.totalPrice ) AS totalPrice,
+        SUM( ss.planPrice ) AS planPrice,
+        SUM( ss.civilPrice ) AS civilPrice,
+        SUM( ss.seriousPrice ) AS seriousPrice,
+        SUM( ss.retirePrice ) AS retirePrice,
+        SUM( ss.hospPrice ) AS hospPrice,
+        SUM( ss.personPrice ) AS personPrice,
+        SUM( ss.apTotalPrice ) AS apTotalPrice,
+        SUM( ss.ynyh ) AS ynyh
+        FROM
+        (
+        SELECT
+        'MZ' AS ywlx,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d' ) AS settleTime,
+        a.patient_code AS patientCode,
+        IFNULL( b.total_price, 0 ) AS totalPrice,
+        IFNULL( b.plan_price, 0 ) AS planPrice,
+        IFNULL( b.civil_price, 0 ) AS civilPrice,
+        IFNULL( b.serious_price, 0 ) AS seriousPrice,
+        IFNULL( b.retire_price, 0 ) AS retirePrice,
+        IFNULL( b.hosp_price, 0 ) AS hospPrice,
+        IFNULL( b.person_price, 0 ) AS personPrice,
+        0 AS apTotalPrice,
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        FROM
+        outpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.hosp_code = b.hosp_code
+        AND a.id = b.settle_id
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        'ZY' AS ywlx,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d' ) AS settleTime,
+        a.patient_code AS patientCode,
+        IFNULL( b.total_price, 0 ) AS totalPrice,
+        IFNULL( b.plan_price, 0 ) AS planPrice,
+        IFNULL( b.civil_price, 0 ) AS civilPrice,
+        IFNULL( b.serious_price, 0 ) AS seriousPrice,
+        IFNULL( b.retire_price, 0 ) AS retirePrice,
+        IFNULL( b.hosp_price, 0 ) AS hospPrice,
+        IFNULL( b.person_price, 0 ) AS personPrice,
+        IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
+        FROM
+        inpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.id = b.settle_id
+        AND a.hosp_code = b.hosp_code
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        ) ss
+        WHERE 1 = 1
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and ywlx IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        GROUP BY ywlx, patientCode
+        )tableSum
+    </select>
+    <!--医保结算统计报表(按病人类型)-->
+    <select id="queryYbSettleReportByBRLX" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ywlx,
+        patientCode,
+        SUM( ss.totalPrice ) AS totalPrice,
+        SUM( ss.planPrice ) AS planPrice,
+        SUM( ss.civilPrice ) AS civilPrice,
+        SUM( ss.seriousPrice ) AS seriousPrice,
+        SUM( ss.retirePrice ) AS retirePrice,
+        SUM( ss.hospPrice ) AS hospPrice,
+        SUM( ss.personPrice ) AS personPrice,
+        SUM( ss.apTotalPrice ) AS apTotalPrice,
+        SUM( ss.ynyh ) AS ynyh,
+        SUM( ss.mafPay) AS mafPay,
+        SUM( ss.personalPrice) as personalPrice
+        FROM
+        (
+        SELECT
+        'MZ' AS ywlx,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d %H:%i:%s' ) AS settleTime,
+        a.patient_code AS patientCode,
+        IFNULL( b.total_price, 0 ) AS totalPrice,
+        IFNULL( b.plan_price, 0 ) AS planPrice,
+        IFNULL( b.civil_price, 0 ) AS civilPrice,
+        IFNULL( b.serious_price, 0 ) AS seriousPrice,
+        IFNULL( b.retire_price, 0 ) AS retirePrice,
+        IFNULL( b.hosp_price, 0 ) AS hospPrice,
+        IFNULL( b.person_price, 0 ) AS personPrice,
+        0 AS apTotalPrice,
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
+        FROM
+        outpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.hosp_code = b.hosp_code
+        AND a.id = b.settle_id
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        UNION ALL
+        SELECT
+        'ZY' AS ywlx,
+        DATE_FORMAT( a.settle_time, '%Y-%m-%d %H:%i:%s' ) AS settleTime,
+        a.patient_code AS patientCode,
+        IFNULL( b.total_price, 0 ) AS totalPrice,
+        IFNULL( b.plan_price, 0 ) AS planPrice,
+        IFNULL( b.civil_price, 0 ) AS civilPrice,
+        IFNULL( b.serious_price, 0 ) AS seriousPrice,
+        IFNULL( b.retire_price, 0 ) AS retirePrice,
+        IFNULL( b.hosp_price, 0 ) AS hospPrice,
+        IFNULL( b.person_price, 0 ) AS personPrice,
+        IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
+        IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
+        ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.personal_price, 0.00) as personalPrice
+        FROM
+        inpt_settle a,
+        insure_individual_settle b
+        WHERE
+        a.id = b.settle_id
+        AND a.hosp_code = b.hosp_code
+        AND a.is_settle = '1'
+        AND a.hosp_code = #{hospCode}
+        ) ss
+        WHERE 1 = 1
+        <if test="searchTypeList != null and searchTypeList.size > 0">
+            and ywlx IN
+            <foreach collection="searchTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="searchDate != null and searchDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d') = #{searchDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and DATE_FORMAT(settleTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and patientCode =#{patientCode}
+        </if>
+        GROUP BY ywlx, patientCode
+    </select>
+
+    <!--门诊工作日志查询(病人基本信息 、 就诊日期 、 费用合计 、 疾病信息 、 处方信息 、 医生)-->
+    <!-- <select id="queryOutptWorkLog" parameterType="java.util.Map" resultType="java.util.Map">
+         SELECT
+         t1.id,
+         t1.visit_no as visitNo,
+         t1.visit_time as visitTime,
+         t1.name,
+         t1.gender_code as genderCode,
+         t1.age,
+         t1.age_unit_code as ageUnitCode,
+         t1.birthday,
+         t1.cert_no as certNo,
+         t1.phone,
+         t1.visit_dept_name as visitDeptName,
+         t2.order_no as orderNo,
+         t2.opd_id as opdId,
+         t2.op_id as opId,
+         t2.diagnose_ids as diagnoseIds,
+         t2.doctor_name as doctorName,
+         t2.dept_name as deptName,
+         t2.item_code as itemCode,
+         t2.item_name as itemName,
+         t2.spec,
+         t2.price,
+         t2.num,
+         t2.num_unit_code as numUnitCode,
+         t2.total_num as totalNum,
+         t2.dosage,
+         t2.dosage_unit_code as dosageUnitCode,
+         t2.usage_code as usageCode,
+         t3.total_price as totalPrice
+         FROM (
+         SELECT a.id,
+         a.hosp_code,
+         a.name,
+         a.gender_code,
+         a.age,
+         a.cert_no,
+         a.phone,
+         a.age_unit_code,
+         a.birthday,
+         a.pym,
+         a.wbm,
+         a.visit_no,
+         a.visit_time,
+         a.dept_name AS visit_dept_name
+         FROM outpt_visit a
+         ) t1,
+         (
+         SELECT op.order_no,
+         opd.id AS opd_id,
+         op.diagnose_ids,
+         opd.op_id,
+         opd.visit_id,
+         opd.hosp_code,
+         op.doctor_name,
+         op.dept_name,
+         opd.item_code,
+         opd.item_name,
+         opd.spec,
+         opd.price,
+         opd.num,
+         opd.num_unit_code,
+         opd.total_num,
+         opd.dosage,
+         opd.dosage_unit_code,
+         opd.usage_code
+         FROM outpt_prescribe_detail opd
+         LEFT JOIN outpt_prescribe op ON op.id = opd.op_id AND op.hosp_code = opd.hosp_code
+         ) t2,
+         (
+         SELECT visit_id, hosp_code, SUM(reality_price) AS total_price
+         FROM outpt_cost oc
+         WHERE oc.settle_code = '2'
+         AND oc.status_code = '0'
+         GROUP BY visit_id, hosp_code
+         ) t3
+         WHERE t1.id = t2.visit_id AND t1.hosp_code = t2.hosp_code
+         AND t1.id = t3.visit_id AND t1.hosp_code = t3.hosp_code
+         AND t1.hosp_code = #{hospCode}
+         <if test="startDate != null">
+             AND DATE_FORMAT(t1.visit_time, '%Y-%m-%d') >= #{startDate}
+         </if>
+         <if test="endDate != null">
+             AND DATE_FORMAT(t1.visit_time, '%Y-%m-%d') &lt;= #{endDate}
+         </if>
+         <if test="keyword != null and keyword != ''">
+             AND (
+             t1.NAME LIKE CONCAT('%', #{keyword}, '%')
+             OR t1.visit_no LIKE CONCAT('%', #{keyword}, '%')
+             OR t1.pym LIKE CONCAT('%', #{keyword}, '%')
+             OR t1.wbm LIKE CONCAT('%', #{keyword}, '%')
+             OR t1.cert_no LIKE CONCAT('%', #{keyword}, '%')
+             OR t2.doctor_name LIKE CONCAT('%', #{keyword}, '%'))
+         </if>
+         ORDER BY t1.visit_time DESC, t2.order_no ASC
+     </select>-->
+    <!--<select id="queryOutptWorkLog" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        t1.id,
+        t1.visit_no AS visitNo,
+        t1.visit_time AS visitTime,
+        t1.name,
+        t1.gender_code AS genderCode,
+        t1.age,
+        t1.age_unit_code AS ageUnitCode,
+        t1.birthday,
+        t1.cert_no AS certNo,
+        t1.phone,
+        t1.patient_code AS patientCode,
+        t1.visit_dept_name AS visitDeptName,
+        t1.diagnose_ids AS diagnoseIds,
+        t3.total_price AS totalPrice
+        FROM
+        (
+        SELECT
+        a.id,
+        a.hosp_code,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.cert_no,
+        a.phone,
+        a.age_unit_code,
+        a.birthday,
+        a.pym,
+        a.wbm,
+        a.visit_no,
+        a.visit_time,
+        a.dept_name AS visit_dept_name,
+        a.patient_code,
+        b.diagnose_ids
+        FROM
+        outpt_prescribe b
+        LEFT JOIN outpt_visit a ON a.id = b.visit_id AND a.hosp_code = b.hosp_code
+        GROUP BY a.id,b.diagnose_ids
+        ) t1,
+        (
+        SELECT
+        visit_id,
+        hosp_code,
+        SUM( reality_price ) AS total_price
+        FROM
+        outpt_cost oc
+        WHERE oc.settle_code = '2'
+        AND oc.status_code = '0'
+        GROUP BY visit_id, hosp_code
+        ) t3
+        WHERE
+        t1.id = t3.visit_id
+        AND t1.hosp_code = t3.hosp_code
+        AND t1.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            AND DATE_FORMAT(t1.visit_time, '%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE_FORMAT(t1.visit_time, '%Y-%m-%d') &lt;= #{endDate}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+            t1.name LIKE CONCAT('%', #{keyword}, '%')
+            OR t1.visit_no LIKE CONCAT('%', #{keyword}, '%')
+            OR t1.pym LIKE CONCAT('%', #{keyword}, '%')
+            OR t1.wbm LIKE CONCAT('%', #{keyword}, '%')
+            OR t1.cert_no LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and t1.patient_code = #{typeCode}
+        </if>
+        ORDER BY t1.visit_time DESC
+    </select>-->
+    <select id="queryOutptWorkLog" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            a.id,
+            a.hosp_code,
+            a.visit_time as visitTime,
+            (CONCAT(
+                a.name,'/',
+                case a.gender_code when '1' then '男' when '2' then '女' else '' end, '/',
+                a.age,
+                case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end
+            )) AS patientInfo,
+            a.cert_no as certNo,
+            a.phone,
+            ifnull( a.is_first_visit, '0' ) AS isFirstVisit,
+            a.visit_no as visitNo,
+            a.doctor_name as doctorName,
+            a.dept_name AS visitDeptName,
+            a.patient_code as patientCode,
+            (SELECT name from base_disease bd where od.hosp_code = bd.hosp_code and od.disease_id = bd.id) as diagnoseName,
+            od.crte_time as diagnoseTime,
+            omr.start_date as startDate,
+            ifnull( a.is_food_borne, 0 ) AS isFoodBorne,
+            b.reality_price as totalPrice,
+            a.now_address as nowAddress
+        FROM
+            outpt_visit a
+        JOIN (
+            SELECT
+                t.hosp_code,
+                t.visit_id,
+                SUM(t.reality_price) as reality_price
+            FROM
+            (
+                SELECT
+                    ors.hosp_code, org.visit_id, ors.reality_price
+                FROM outpt_register_settle ors
+                JOIN outpt_register org ON ors.hosp_code = org.hosp_code AND ors.register_id = org.id
+                where ors.hosp_code = #{hospCode}
+                  and ors.status_code = '0'
+                UNION ALL
+                SELECT
+                    hosp_code, visit_id, reality_price
+                FROM outpt_settle
+                WHERE hosp_code = #{hospCode}
+                and is_settle = '1'
+                and status_code = '0'
+            ) t
+            GROUP BY t.hosp_code, t.visit_id
+        ) b ON  a.hosp_code = b.hosp_code AND a.id = b.visit_id
+        LEFT JOIN outpt_diagnose od ON a.hosp_code = od.hosp_code AND a.id = od.visit_id AND od.is_main = '1'
+        LEFT JOIN ( SELECT visit_id, hosp_code, max( start_date ) AS start_date FROM outpt_medical_record WHERE hosp_code = #{hospCode} GROUP BY visit_id, hosp_code ) omr ON a.hosp_code = omr.hosp_code and a.id = omr.visit_id
+        WHERE a.hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and a.patient_code = #{typeCode}
+        </if>
+        <if test="startDate != null">
+            AND DATE_FORMAT(a.visit_time, '%Y-%m-%d %H:%i%s') >= date_format(#{startDate}, '%Y-%m-%d %H:%i%s')
+        </if>
+        <if test="endDate != null">
+            AND DATE_FORMAT(a.visit_time, '%Y-%m-%d %H:%i%s') &lt;= date_format(#{endDate}, '%Y-%m-%d %H:%i%s')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND ( a.name LIKE CONCAT('%', #{keyword}, '%') OR a.visit_no LIKE CONCAT('%', #{keyword}, '%') OR a.pym LIKE CONCAT('%', #{keyword}, '%')
+            OR a.wbm LIKE CONCAT('%', #{keyword}, '%') OR a.cert_no LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and a.doctor_id = #{doctorId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        ORDER BY a.visit_time DESC
+    </select>
+
+
+    <select id="lisStatistics" resultType="map" parameterType="map">
+
+        SELECT
+        iv.name,
+        iv.in_dept_id,
+        iv.in_dept_name,
+        iv.in_no,
+        iv.bed_name,
+        iv.in_disease_name,
+        ma.crte_time AS crte_time,
+        ma.content AS item_name,
+        ia.price as price,
+        ia.total_price as totalPrice,
+        ia.crte_name as doctor_name,
+        bd.technology_code ,
+        ma.type_code,
+        ia.baby_id,
+        ia.hosp_code as hosp_code,
+        ia.total_num as num,
+        ma.visit_id,
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        ib.NAME AS babyName,
+        ib.gender_code AS babyGenderCode
+        FROM
+        medic_apply ma
+        LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
+        LEFT JOIN inpt_visit iv ON ma.visit_id = iv.id AND iv.hosp_code = ma.hosp_code
+        LEFT JOIN base_advice bd ON ia.item_id = bd.id
+        LEFT JOIN inpt_baby ib ON ia.baby_id = ib.id
+        WHERE
+        ma.is_inpt = '1'
+        and ma.hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and  ma.crte_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt; #{endTime}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and ma.dept_id = #{deptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
+            and 1=2
+        </if>
+        union all
+        SELECT
+        ov.name,
+        ov.dept_id AS in_dept_id,
+        ov.dept_name AS in_dept_name,
+        ov.visit_no AS in_no,
+        '' AS bed_name,
+        '' AS  in_disease_name,
+        ma.crte_time,
+        ma.content AS item_name,
+        pd.price as price,
+        pd.total_price as totalPrice,
+        ma.doctor_name,
+        bd.technology_code ,
+        ma.type_code ,
+        '' as baby_id,
+        ov.hosp_code as hosp_code,
+        pd.total_num as num,
+        ma.visit_id,
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        '' AS babyName,
+        '' AS babyGenderCode
+        FROM
+        medic_apply ma,
+        outpt_prescribe_detail pd,
+        outpt_visit ov,
+        base_advice bd
+        WHERE
+        ma.visit_id = ov.id
+        and ma.hosp_code = ov.hosp_code
+        and ma.opd_id = pd.id
+        and ma.hosp_code = pd.hosp_code
+        and pd.item_id = bd.id
+        AND bd.hosp_code = pd.hosp_code
+        and ma.is_inpt = '0'
+        and ma.hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and  ma.crte_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt; #{endTime}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and ma.dept_id = #{deptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
+            and 1=2
+        </if>
+
+        order by crte_time desc
+    </select>
+
+    <select id="passStatistics"  resultType="map" parameterType="map">
+
+        SELECT
+        iv.name,
+        iv.in_dept_id,
+        iv.in_dept_name,
+        iv.in_no,
+        iv.bed_name,
+        iv.in_disease_name,
+        ma.crte_time AS crte_time,
+        ma.content AS item_name,
+        ia.price as price,
+        ia.total_price as totalPrice,
+        ia.crte_name as doctor_name,
+        bd.technology_code ,
+        ma.type_code,
+        ia.baby_id,
+        ia.hosp_code as hosp_code,
+        ia.total_num as num,
+        ma.visit_id,
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        ib.NAME AS babyName,
+        ib.gender_code AS babyGenderCode
+        FROM
+        medic_apply ma
+        LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
+        LEFT JOIN inpt_visit iv ON ma.visit_id = iv.id AND iv.hosp_code = ma.hosp_code
+        LEFT JOIN base_advice bd ON ia.item_id = bd.id
+        LEFT JOIN inpt_baby ib ON ia.baby_id = ib.id
+        WHERE
+        ma.is_inpt = '1'
+        and ma.hosp_code = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and  ma.crte_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt; #{endTime}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and ma.dept_id = #{deptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
+            and 1=2
+        </if>
+        union all
+        SELECT
+        ov.name,
+        ov.dept_id AS in_dept_id,
+        ov.dept_name AS in_dept_name,
+        ov.visit_no AS in_no,
+        '' AS bed_name,
+        '' AS  in_disease_name,
+        ma.crte_time,
+        ma.content AS item_name,
+        pd.price as price,
+        pd.total_price as totalPrice,
+        ma.doctor_name,
+        bd.technology_code ,
+        ma.type_code ,
+        '' as baby_id,
+        ov.hosp_code as hosp_code,
+        pd.total_num as num,
+        ma.visit_id,
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        '' AS babyName,
+        '' AS babyGenderCode
+        FROM
+        medic_apply ma,
+        outpt_prescribe_detail pd,
+        outpt_visit ov,
+        base_advice bd
+        WHERE
+        ma.visit_id = ov.id
+        and ma.hosp_code = #{hospCode}
+        and ma.hosp_code = ov.hosp_code
+        and ma.opd_id = pd.id
+        and ma.hosp_code = pd.hosp_code
+        and pd.item_id = bd.id
+        AND bd.hosp_code = pd.hosp_code
+        and ma.is_inpt = '0'
+        AND ma.type_code = #{typeCode}
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and  ma.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt;= #{endTime}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and ma.dept_id = #{deptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
+            and 1=2
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        order by crte_time desc
+    </select>
+
+    <!-- 根据处方、医嘱id查询费用数量信息 -->
+    <select id="queryMedicalFeeAndCountInfo" resultType="map" parameterType="map">
+        select visit_id ,opd_id,total_num, hosp_code,sum(total_price) as total_price, source_code ,op_id from outpt_cost
+        where
+            hosp_code = #{hospCode}
+          and visit_id in
+              <foreach collection="visitIdList" item="item" open="(" separator="," close=")">
+                  #{item}
+              </foreach>
+          and opd_id in
+              <foreach collection="opdIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+              </foreach>
+          AND status_code='0'
+        group by hosp_code, visit_id,opd_id ,total_num
+    </select>
+
+    <!-- 查询门诊疾病信息 -->
+    <select id="queryDiseaeNameByOpIds" resultType="java.util.Map" parameterType="map">
+        SELECT bd.NAME as diseaseName,op.id as opId FROM
+            base_disease bd ,
+        ( SELECT SUBSTRING_INDEX( diagnose_ids, ',', 1 ) as bdId ,id FROM outpt_prescribe
+            WHERE id in
+                  <foreach collection="opIdList" item="item" open="(" separator="," close=")">
+                      #{item}
+                  </foreach>
+        GROUP BY id) op
+        where bd.id = op.bdId  and bd.hosp_code = #{hospCode}
+    </select>
+
+
+    <!--抗菌类门诊发药统计-->
+    <select id="queryOutAntibiosisDrug" resultType="java.util.Map">
+        SELECT
+        type_code,
+        code,
+        good_name,
+        spec,
+        unit_code,
+        num,
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+        prod_code,
+        prod_name,
+        ddd
+        FROM
+        (
+        SELECT
+        max('门诊') type_code,
+        g.code,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        sum(a.num) num,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_out_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time > #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by code,good_name,g.prod_code,spec,unit_code
+        )tab where tab.num !=0
+    </select>
+
+    <!--抗菌类门诊发药汇总统计-->
+    <select id="queryOutSumAntibiosisDrug" resultType="java.util.Map">
+        SELECT
+        crte_time,
+        sum( visit_number ) visit_number,
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name
+        FROM
+        (
+        SELECT
+        DATE_FORMAT( ( b.crte_time ), '%Y-%m' ) crte_time,
+        g.antibacterial_code,
+        ( CASE g.antibacterial_code WHEN 1 THEN '抗菌类' WHEN 2 THEN '抗菌类' WHEN 3 THEN '特殊使用抗菌药' ELSE '' END ) antibacterial_name,
+        IF ( g.proton_pump = '1', '质子泵', '' ) proton_pump_name,
+        b.visit_id,
+        1 visit_number
+        FROM
+        base_drug g
+        JOIN phar_out_distribute_all_detail a ON g.hosp_code = a.hosp_code AND g.id = a.item_id
+        JOIN phar_out_distribute b ON a.distribute_id = b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        and a.num >0
+        and a.num > a.total_back_num
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time > #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
+        <if test='statisWay == "5"'>
+            and g.prep_code in ('241','16','138')
+        </if>
+        GROUP BY
+        DATE_FORMAT( ( b.crte_time ), '%Y-%m' ),
+        g.antibacterial_code,
+        g.proton_pump,
+        b.visit_id
+        ) tab
+        GROUP BY
+        crte_time,
+        antibacterial_name,
+        proton_pump_name
+        ORDER BY
+        crte_time ASC
+    </select>
+
+    <!--抗菌类住院发药统计2-->
+    <select id="queryInAntibiosisDrug" resultType="java.util.Map">
+        SELECT
+        type_code,
+        code,
+        good_name,
+        spec,
+        unit_code,
+        num,
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+        prod_code,
+        prod_name,
+        ddd
+        FROM
+        (
+        SELECT
+        max('住院') type_code,
+        g.code,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        sum(a.num) num,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_in_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time > #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by code,good_name,g.prod_code,spec,unit_code
+        )tab where tab.num != 0
+    </select>
+
+
+    <!--抗菌类住院发药汇总统 计-->
+    <select id="queryInSumAntibiosisDrug" resultType="java.util.Map">
+        SELECT
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+        sum( visit_number ) visit_number
+        FROM
+        (
+        SELECT
+        g.antibacterial_code,
+        ( CASE g.antibacterial_code WHEN 1 THEN '抗菌类' WHEN 2 THEN '抗菌类' WHEN 3 THEN '特殊使用抗菌药' ELSE '' END ) antibacterial_name,
+        IF ( g.proton_pump = '1', '质子泵', '' ) proton_pump_name,
+        a.visit_id,
+        1  visit_number
+        FROM
+        base_drug g
+        JOIN phar_in_distribute_all_detail a ON g.hosp_code = a.hosp_code AND g.id = a.item_id
+        JOIN phar_in_distribute b ON a.distribute_id = b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time > #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
+        <if test='statisWay == "5"'>
+            and g.prep_code in ('241','16','138')
+        </if>
+        GROUP BY
+        g.antibacterial_code,
+        g.proton_pump,
+        a.visit_id
+        having sum(a.num) > 0
+        ) tab
+        GROUP BY
+        antibacterial_name,
+        proton_pump_name
+
+    </select>
+
+    <!--科室人数统计报表-->
+    <select id="queryDeptNum" parameterType="java.util.Map" resultType="java.util.Map">
+        select t2.zyNum, t1.*
+        from (
+        SELECT
+        IFNULL(SUM( CASE a.status_code WHEN '1' THEN 1 ELSE 0 END ), 0 ) AS ryNum,
+        <!--IFNULL(SUM( CASE a.status_code WHEN '2' THEN 1 ELSE 0 END ), 0 ) AS zyNum,-->
+        IFNULL(SUM( CASE a.status_code WHEN '5' THEN 1 ELSE 0 END ), 0 ) AS ycyNum,
+        IFNULL(SUM( CASE a.status_code WHEN '7' THEN 1 ELSE 0 END ), 0 ) AS cyNum,
+        IFNULL(SUM( b.num ), 0 ) as babyNum,
+        a.in_dept_id as inDeptId,
+        a.hosp_code,
+        (SELECT code from base_dept bd where bd.id = a.in_dept_id and bd.hosp_code = a.hosp_code) as deptCode,
+        a.in_dept_name as inDeptName
+        FROM
+        inpt_visit a
+        left join
+        (SELECT ib.visit_id, ib.hosp_code, COUNT(ib.id) as num FROM inpt_baby ib GROUP BY ib.visit_id, ib.hosp_code) b
+        on a.hosp_code = b.hosp_code and a.id = b.visit_id
+        where a.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.in_dept_id = #{deptId}
+        </if>
+        GROUP BY a.in_dept_id, a.in_dept_name, a.hosp_code
+        ) t1
+        join (
+        SELECT
+        a.in_dept_id as inDeptId,
+        a.in_dept_name as inDeptName,
+        a.hosp_code,
+        IFNULL(SUM( CASE a.status_code WHEN '2' THEN 1 ELSE 0 END ), 0 ) AS zyNum
+        FROM
+        inpt_visit a
+        where a.hosp_code = #{hospCode}
+        <if test="endDate != null">
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
+        ) t2
+        on t1.hosp_code = t2.hosp_code and t1.inDeptId = t2.inDeptId
+    </select>
+
+    <select id="queryBedNum" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        t1.dept_id as deptId,
+        (SELECT code from base_dept bd where bd.hosp_code = t1.hosp_code and t1.dept_id = bd.id) as deptCode,
+        t1.dept_name as deptName,
+        t1.hosp_code as hospCode,
+        IFNULL(t3.zyNum, 0) as zyNum,
+        IFNULL(t2.cyNum, 0) as cyNum,
+        IFNULL(t1.szDays, 0) as szDays,
+        IFNULL(t2.czDays, 0) as czDays,
+        IFNULL(CONVERT(t2.czDays/t2.cyNum, DECIMAL(14,2)),0) as pjDays
+        FROM (
+        SELECT
+        hosp_code,
+        in_dept_id as dept_id ,
+        in_dept_name as dept_name,
+        <![CDATA[
+                IFNULL(sum((case
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s') and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  then if( DATEDIFF(out_time, #{startDate}) = 0, 1, DATEDIFF(out_time, #{startDate}))
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s') < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) then 0
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) < DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d %H:%i:%s') ) then DATEDIFF(#{endDate}, #{startDate})
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' ) and out_time is not null and DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  then  if(DATEDIFF( out_time, in_time) = 0, 1,DATEDIFF( out_time, in_time))
+                WHEN DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s' ) BETWEEN DATE_FORMAT( #{startDate}, '%Y-%m-%d %H:%i:%s' ) AND DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s' )  and (out_time is null or  out_time = '' or DATE_FORMAT( out_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT(#{endDate}, '%Y-%m-%d %H:%i:%s')) then if(DATEDIFF(#{endDate}, in_time) = 0, 1, DATEDIFF(#{endDate}, in_time))
+                when DATE_FORMAT( in_time, '%Y-%m-%d %H:%i:%s') >  DATE_FORMAT( #{endDate}, '%Y-%m-%d %H:%i:%s') then 0
+                end)), 0) as szDays
+            ]]>
+        FROM
+        inpt_visit
+        where hosp_code = #{hospCode}
+        and bed_id is not null
+        and status_code in ('2','5','7')
+        <if test="deptId != null and deptId != ''">
+            and in_dept_id = #{deptId}
+        </if>
+        GROUP BY in_dept_id, in_dept_name, hosp_code
+        ) t1
+        LEFT JOIN (
+        SELECT
+        out_dept_id as dept_id,
+        out_dept_name as dept_name,
+        hosp_code,
+        count(1) AS cyNum,
+        IFNULL(SUM( CASE WHEN DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')), DATE_FORMAT(in_time,'%Y-%m-%d %H:%i:%s')) = 0 THEN 1 ELSE DATEDIFF(IFNULL(DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s'), DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')), DATE_FORMAT(in_time,'%Y-%m-%d %H:%i:%s')) END ), 0) as czDays
+        FROM
+        inpt_visit
+        where hosp_code = #{hospCode}
+        and status_code in('2','5','7')
+        <if test="deptId != null and deptId != ''">
+            and out_dept_id = #{deptId}
+        </if>
+        <if test="startDate != null and endDate != null">
+            and DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')
+        </if>
+        GROUP BY out_dept_id, out_dept_name, hosp_code
+        ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_id = t2.dept_id
+        left join (
+        SELECT
+        a.in_dept_id as dept_id,
+        a.in_dept_name as dept_name,
+        a.hosp_code,
+        IFNULL(SUM( CASE a.status_code WHEN '2' THEN 1 ELSE 0 END ), 0 ) AS zyNum
+        FROM
+        inpt_visit a
+        where a.hosp_code = #{hospCode}
+        <if test="endDate != null">
+            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+        </if>
+        GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
+        ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_id = t3.dept_id
+    </select>
+
+    <select id="queryWardNum" parameterType="java.util.Map" resultType="java.util.Map">
+
+    </select>
+
+  <!--抗菌类门诊、住院发药汇总统计-->
+  <select id="queryOnlyOutSumAntibiosisDrug" resultType="java.util.Map">
+    SELECT
+    crte_time,
+    type_code,
+    code,
+    usual_name,
+    good_name,
+    spec,
+    unit_code,
+    split_ratio,
+    num,
+    price,
+    total_price,
+    concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+    prod_code,
+    prod_name
+    FROM
+    (
+    SELECT
+    date_format(b.crte_time,'%Y%m%d') crte_time,
+    max('门诊') type_code,
+    g.code,
+    max(g.usual_name) usual_name,
+    g.good_name,
+    g.spec,
+    g.unit_code,
+    max(g.split_ratio) split_ratio,
+    sum(a.num) num,
+    max(a.price) price,
+    sum(a.total_price) total_price,
+    (case max(g.antibacterial_code)
+    when 1 then
+    '抗菌类'
+    when 2 then
+    '抗菌类'
+    when 3 then
+    '特殊使用抗菌药'
+    else
+    ''
+    end) antibacterial_name,
+    if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+    g.prod_code,
+    (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+    max(g.ddd) ddd
+    FROM
+    base_drug g
+    join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+    join phar_out_distribute b on a.distribute_id=b.id
+    WHERE
+    g.hosp_code = #{hospCode}
+    AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+    <if test="startDate != null and startDate != ''">
+      and b.crte_time >= #{startDate}
+    </if>
+    <if test="endDate != null and endDate != ''">
+      and b.crte_time &lt;= #{endDate}
+    </if>
+    group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
+    )tab where tab.num != 0 order by tab.code asc, tab.crte_time desc
+
+  </select>
+
+  <select id="queryOnlyInSumAntibiosisDrug" resultType="java.util.Map">
+    SELECT
+    crte_time,
+    type_code,
+    code,
+    usual_name,
+    good_name,
+    spec,
+    unit_code,
+    split_ratio,
+    num,
+    price,
+    total_price,
+    concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+    prod_code,
+    prod_name
+    FROM
+    (
+    SELECT
+    date_format(b.crte_time,'%Y%m%d') crte_time,
+    max('住院') type_code,
+    g.code,
+    max(g.usual_name) usual_name,
+    g.good_name,
+    g.spec,
+    g.unit_code,
+    max(g.split_ratio) split_ratio,
+    sum(a.num) num,
+    max(a.price) price,
+    sum(a.total_price) total_price,
+    (case max(g.antibacterial_code)
+    when 1 then
+    '抗菌类'
+    when 2 then
+    '抗菌类'
+    when 3 then
+    '特殊使用抗菌药'
+    else
+    ''
+    end) antibacterial_name,
+    if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+    g.prod_code,
+    (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+    max(g.ddd) ddd
+    FROM
+    base_drug g
+    join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+    join phar_in_distribute b on a.distribute_id=b.id
+    WHERE
+    g.hosp_code = #{hospCode}
+    AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+    <if test="startDate != null and startDate != ''">
+      and b.crte_time >=#{startDate}
+    </if>
+    <if test="endDate != null and endDate != ''">
+      and b.crte_time &lt;= #{endDate}
+    </if>
+    group by date_format(b.crte_time,'%Y%m%d'),code,good_name,g.prod_code,spec,unit_code
+
+    )tab where num > 0 order by tab.code asc, tab.crte_time desc
+  </select>
+    <!-- 抗菌药物报表增加按月份统计门诊住院各药品使用量-->
+    <select id="queryOutSumAntibiosisDrugDetail" resultType="java.util.Map">
+        SELECT
+        crte_time,
+        type_code,
+        code,
+        usual_name,
+        good_name,
+        spec,
+        unit_code,
+        split_ratio,
+        num,
+        price,
+        total_price,
+        concat( antibacterial_name, IF ( antibacterial_name != '' AND proton_pump_name != '', '/', '' ), proton_pump_name ) antibacterial_name,
+        prod_code,
+        prod_name
+        FROM
+        (
+        SELECT
+        date_format(b.crte_time,'%Y%m') crte_time,
+        max('住院') type_code,
+        g.code,
+        max(g.usual_name) usual_name,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        max(g.split_ratio) split_ratio,
+        sum(a.num) num,
+        max(a.price) price,
+        sum(a.total_price) total_price,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_in_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_in_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time >=#{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by date_format(b.crte_time,'%Y%m'),code,good_name,g.prod_code,spec,unit_code
+    union all
+        SELECT
+        date_format(b.crte_time,'%Y%m') crte_time,
+        max('门诊') type_code,
+        g.code,
+        max(g.usual_name) usual_name,
+        g.good_name,
+        g.spec,
+        g.unit_code,
+        max(g.split_ratio) split_ratio,
+        sum(a.num) num,
+        max(a.price) price,
+        sum(a.total_price) total_price,
+        (case max(g.antibacterial_code)
+        when 1 then
+        '抗菌类'
+        when 2 then
+        '抗菌类'
+        when 3 then
+        '特殊使用抗菌药'
+        else
+        ''
+        end) antibacterial_name,
+        if(max(g.proton_pump) = '1','质子泵','') proton_pump_name,
+        g.prod_code,
+        (select name from base_product t where t.hosp_code = g.hosp_code and t.code = g.prod_code limit 1) prod_name,
+        max(g.ddd) ddd
+        FROM
+        base_drug g
+        join phar_out_distribute_all_detail a on g.hosp_code =a.hosp_code and g.id = a.item_id
+        join phar_out_distribute b on a.distribute_id=b.id
+        WHERE
+        g.hosp_code = #{hospCode}
+        AND(( g.antibacterial_code IS NOT NULL AND g.antibacterial_code != '' ) or g.proton_pump = '1')
+        <if test="startDate != null and startDate != ''">
+            and b.crte_time >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and b.crte_time &lt;= #{endDate}
+        </if>
+        group by date_format(b.crte_time,'%Y%m'),code,good_name,g.prod_code,spec,unit_code
+        )tab where tab.num != 0 order by tab.crte_time desc,tab.code asc
+    </select>
+
+</mapper>

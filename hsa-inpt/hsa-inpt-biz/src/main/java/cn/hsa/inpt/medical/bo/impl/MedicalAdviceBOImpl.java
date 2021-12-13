@@ -897,6 +897,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
             medicalApplyDTO.setIsMerge(Constants.SF.S);
         }
+        medicalApplyDTO.setDocumentSta("01");
         medicalApplyDTO.setCrteId(medicalAdviceDTO.getCheckId());
         medicalApplyDTO.setCrteName(medicalAdviceDTO.getCheckName());
         medicalApplyDTO.setCrteTime(medicalAdviceDTO.getCheckTime());

@@ -6,10 +6,9 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.phar.pharinbackdrug.dto.*;
-import cn.hsa.module.phar.pharinbackdrug.entity.PharInDistributeDO;
-import cn.hsa.module.phar.pharinbackdrug.entity.PharInDistributeDetailDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -410,6 +409,26 @@ public interface InptCostDAO {
      * @Return
      */
     List<InptCostDTO> queryYJInptCostPage(InptCostDTO inptCostDTO);
+
+    /**
+     * @Description: 查询退费项目的医技申请
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/12/11 14:27
+     * @Return
+     */
+    List<String> queryMedic(InptCostDTO inptCostDTO);
+
+    /**
+     * @Description: 住院退费时更新医技状态
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/12/11 14:00
+     * @Return
+     */
+    void updateMedicApply(MedicalApplyDTO medicalApplyDTO);
 
     /**
      * @param pharInReceiveDTOs

@@ -86,4 +86,8 @@ public class MrisDiagnoseDO implements Serializable {
      * 诊断类型名称
      */
     private String diseaseName2;
+    /**
+     * 疾病分类
+     */
+    private String typeCode;
 }

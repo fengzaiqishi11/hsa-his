@@ -250,12 +250,15 @@
         a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
         (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
         (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
-        (a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
-        (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
+        <!--(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,-->
+        <!--(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost-->
+        (a.total_advance - sum(ic.reality_price)) as totalMergeBalance,
+        sum(ic.reality_price) as totalMergeCost
         <if test="zgbrQuery == '2'.toString()">
             , t.is_consule, t.apply_deptid
         </if>
         from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
+        left join inpt_cost ic on a.hosp_code = ic.hosp_code and a.id = ic.hosp_code
         <!--会诊病人，关联会诊申请表-->
         <if test="zgbrQuery == '2'.toString()">
             join (

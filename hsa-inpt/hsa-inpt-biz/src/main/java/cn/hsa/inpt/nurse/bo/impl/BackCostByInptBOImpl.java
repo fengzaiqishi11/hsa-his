@@ -372,7 +372,7 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
                 //新增退费费用冲红记录
                 if (!ListUtils.isEmpty(normalsNew)) {
                     inptCostDAO.insertInptCostBatch(normalsNew);
-                    //批量更新待领表的费用明细id:
+                    //批量更新待领表的费用明细id:用于退药查询用
                     inptCostDAO.updateCostIdBatch(normalsNew);
                 }
             }

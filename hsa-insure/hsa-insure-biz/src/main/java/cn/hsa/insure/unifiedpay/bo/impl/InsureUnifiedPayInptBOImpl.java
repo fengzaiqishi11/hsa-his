@@ -1477,11 +1477,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("emp_name", null);//	单位名称
         mdtrtinfoMap.put("dise_cond_sev", inptVisitDTO.getCriticalValueCode());//	病情严重程度
         mdtrtinfoMap.put("clnc_flag", null);//	临床试验标志
-        mdtrtinfoMap.put("er_flag", null);//	急诊标志
-        mdtrtinfoMap.put("advpay", null);//	预付款
-        mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
-        mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
-        mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
+        mdtrtinfoMap.put("er_flag", "0");//	急诊标志
+        mdtrtinfoMap.put("advpay", "0");//	预付款
+        mdtrtinfoMap.put("repeat_ipt_flag", "0");//	重复住院标志
+        mdtrtinfoMap.put("ttp_resp", "0");//	是否第三方责任标志
+        mdtrtinfoMap.put("merg_setl_flag", "0");//	合并结算标志
         mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
         mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
         mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
@@ -1862,7 +1862,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         adminfoMap.put("coner_adr", null);//	联系地址
         adminfoMap.put("adm_time", null);//	入院时间
         adminfoMap.put("opt_time", null);//	经办时间
-        adminfoMap.put("clnc_flag", null);//	临床试验标志
+        adminfoMap.put("clnc_flag", "0");//	临床试验标志
         adminfoMap.put("advpay", null);//	预付款
 
         //代办人信息参数agnterinfo

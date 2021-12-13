@@ -2095,8 +2095,16 @@
 	</select>
 
 	<!--	修改病重类的字段-->
-	<update id="updateIllness">
-		update inpt_visit  set diet_type = #{dietType},nursing_code =#{nursingCode} , illness_code =#{illnessCode} where id =#{id} and hosp_code=#{hospCode}
+	<update id="updateIllnessBacth">
+		<foreach collection="list"  separator=";" item="item">
+			update inpt_visit
+			set diet_type = #{item.dietType},
+			nursing_code =#{item.nursingCode} ,
+			illness_code =#{item.illnessCode}
+			where
+			id =#{item.id}
+			and hosp_code=#{item.hospCode}
+		</foreach>
 	</update>
 
     <!--获取档案信息 liuliyun 20210803-->

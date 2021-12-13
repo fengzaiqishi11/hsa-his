@@ -429,4 +429,11 @@ public interface WxBasicInfoService  {
      **/
     @PostMapping("/service/interf/wxBasicInfo/dailyListDetailsQuery")
     WrapperResponse<String> dailyListDetailsQuery(Map<String, Object> map);
+
+    /**
+     * 查询所有科室下所有七天内有排班的医生
+     * pengbo
+     */
+    @PostMapping("/service/interf/wxBasicInfo/querySevenQueueDoctor")
+    WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map);
 }

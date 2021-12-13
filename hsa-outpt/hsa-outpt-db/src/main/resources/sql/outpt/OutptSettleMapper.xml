@@ -556,6 +556,9 @@
         <if test="doctorId != null and doctorId != ''">
             and c.doctor_id = #{doctorId}
         </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
+        </if>
         group by a.id
         order by a.settle_no desc, a.settle_time desc
     </select>

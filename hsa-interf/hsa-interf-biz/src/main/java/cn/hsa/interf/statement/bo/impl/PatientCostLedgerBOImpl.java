@@ -1133,13 +1133,13 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         Integer pageNo = incomeDTO.getPageNo();
         Integer pageSize = incomeDTO.getPageSize();
         PageHelper.startPage(pageNo, pageSize);
-        List<Map<String, Object>> showList = new ArrayList<>();
+        List<IncomeDTO> upCodeList  = new ArrayList<>();
         if ("1".equals(incomeDTO.getSumCode())) {
-            // 先查出大类，挂号大类、门诊大类、住院大类
-            List<String> upCodeList = patientCostLedgerDAO.queryIncomeUpCode(incomeDTO);
-            incomeDTO.setList(upCodeList);
-            // 查出收入大类
-            List<IncomeDTO> bfcNameList = patientCostLedgerDAO.queryBaseFinanceClassify(incomeDTO);
+            // 先查出大类，挂号大类、门诊大类、住院大类，及其名称
+            upCodeList = patientCostLedgerDAO.queryIncomeUpCode(incomeDTO);
+            // 获得所有的code
+            List<String> codeList = upCodeList.stream().map(IncomeDTO::getUpCode).collect(Collectors.toList());
+            incomeDTO.setList(codeList);
             /*
              * 门诊费用：
              * 1.本月收入 outCurrentRealityPrice
@@ -1149,9 +1149,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
              * 5.环比：outLinkCompare
              * */
             List<IncomeDTO> outptPriceMapList = patientCostLedgerDAO.queryIncomeOutptPrice(incomeDTO);
-            // key 是upCode
-            Map<String, IncomeDTO> outptPriceMap = outptPriceMapList.stream()
-                    .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
             /*
              * 住院费用：
              * 1.本月收入 inCurrentRealityPrice
@@ -1161,81 +1158,120 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
              * 5.环比：inLinkCompare
              * */
             List<IncomeDTO> inptPriceMapList = patientCostLedgerDAO.queryIncomeIntPrice(incomeDTO);
-            // key 是upCode
-            Map<String, IncomeDTO> inptPriceMap = inptPriceMapList.stream()
-                    .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
-            /*==== 返回参数封装begin====*/
-            for (IncomeDTO item : bfcNameList) {
-                // 初始化
-                IncomeDTO outPriceDTO = MapUtils.get(outptPriceMap, item.getUpCode(), new IncomeDTO());
-                IncomeDTO inptPriceDTO = MapUtils.get(inptPriceMap, item.getUpCode(), new IncomeDTO());
-                // 封装门诊费用
-                item.setOutCurrentRealityPrice(outPriceDTO.getOutCurrentRealityPrice());
-                item.setOutLinkCompare(outPriceDTO.getOutLinkCompare());
-                item.setOutMonthRealityPrice(outPriceDTO.getOutMonthRealityPrice());
-                item.setOutSameCompare(outPriceDTO.getOutSameCompare());
-                item.setOutYearRealityPrice(outPriceDTO.getOutYearRealityPrice());
-                // 封装住院费用
-                item.setInCurrentRealityPrice(inptPriceDTO.getInCurrentRealityPrice());
-                item.setInLinkCompare(inptPriceDTO.getInLinkCompare());
-                item.setInMonthRealityPrice(inptPriceDTO.getInMonthRealityPrice());
-                item.setInSameCompare(inptPriceDTO.getInSameCompare());
-                item.setInYearRealityPrice(inptPriceDTO.getInYearRealityPrice());
-                /*====计算全院费用begin====*/
-                // 全院当月费用
-                BigDecimal yardCurrentRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutCurrentRealityPrice(), inptPriceDTO.getInCurrentRealityPrice());
-                // 全院上年同期费用
-                BigDecimal yardYearRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutYearRealityPrice(), inptPriceDTO.getInYearRealityPrice());
-                // 全院上月费用
-                BigDecimal yardMonthRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutMonthRealityPrice(), inptPriceDTO.getInMonthRealityPrice());
-                // 同比
-                BigDecimal multiply = BigDecimalUtils.multiply(yardYearRealityPrice, new BigDecimal(0.01));
-                BigDecimal yardSameCompareBigDecimal;
-                if (!BigDecimalUtils.isZero(multiply)) { // 除数不是0
-                    yardSameCompareBigDecimal = BigDecimalUtils.divide(
-                            BigDecimalUtils.subtract(yardCurrentRealityPrice, yardYearRealityPrice),
-                            multiply
-                    );
-                } else {
-                    yardSameCompareBigDecimal = new BigDecimal(0);
-                }
-
-                if (null == yardSameCompareBigDecimal) {
-                    yardSameCompareBigDecimal = new BigDecimal(0);
-                }
-                String yardSameCompareString = yardSameCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
-                String yardSameCompare = yardSameCompareString + "%";
-                // 环比
-                BigDecimal multiply1 = BigDecimalUtils.multiply(yardMonthRealityPrice, new BigDecimal(0.01));
-                BigDecimal yardLinkCompareBigDecimal;
-                if (!BigDecimalUtils.isZero(multiply1)) { // 除数不是0
-                    yardLinkCompareBigDecimal = BigDecimalUtils.divide(
-                            BigDecimalUtils.subtract(yardCurrentRealityPrice, yardMonthRealityPrice),
-                            multiply1
-                    );
-                } else {
-                    yardLinkCompareBigDecimal = new BigDecimal(0);
-                }
-                if (null == yardSameCompareBigDecimal) {
-                    yardLinkCompareBigDecimal = new BigDecimal(0);
-                }
-                String yardLinkCompareString = yardLinkCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
-                String yardLinkCompare = yardLinkCompareString + "%";
-                /*====计算全院费用end====*/
-                // 封装全院费用
-                item.setYardCurrentRealityPrice(yardCurrentRealityPrice);
-                item.setYardLinkCompare(yardLinkCompare);
-                item.setYardMonthRealityPrice(yardMonthRealityPrice);
-                item.setYardSameCompare(yardSameCompare);
-                item.setYardYearRealityPrice(yardYearRealityPrice);
-            }
-            /*====返回参数封装end====*/
-            return PageDTO.of(bfcNameList);
+            // 调用getPageDTO 封装组装数据
+            PageDTO pageDTO = getPageDTO(upCodeList, outptPriceMapList, inptPriceMapList,"1");
+            return pageDTO;
         } else {
-            showList = patientCostLedgerDAO.queryIncomeClassifyInfo(incomeDTO);
+            // 先查出所有的计费类别
+            upCodeList = patientCostLedgerDAO.queryIncomeBfcId(incomeDTO);
+            // 获得所有bfcId
+            List<String> bfcLists = upCodeList.stream().map(IncomeDTO::getBfcId).collect(Collectors.toList());
+            incomeDTO.setList(bfcLists);
+            // 查询门诊费用
+            List<IncomeDTO> outptPriceList = patientCostLedgerDAO.queryIncomeOutptPriceByBfcId(incomeDTO);
+            // 查询住院费用
+            List<IncomeDTO> inptPriceList = patientCostLedgerDAO.queryIncomeIntPriceByBfcId(incomeDTO);
+            PageDTO pageDTO = getPageDTO(upCodeList, outptPriceList, inptPriceList,"0");
+            return pageDTO;
         }
-//        return showList;
-        return PageDTO.of(showList);
+    }
+    /**
+     * @Meth: getPageDTO
+     * @Description: 返回参数封装
+     * @Param: [upCodeList, outptPriceMap, inptPriceMap]
+     * @return: cn.hsa.base.PageDTO
+     * @Author: zhangguorui
+     * @Date: 2021/12/13
+     */
+    protected PageDTO getPageDTO(List<IncomeDTO> upCodeList, List<IncomeDTO> outptPriceMapList, List<IncomeDTO> inptPriceMapList,String sumCode) {
+        Map<String, IncomeDTO> outptPriceMap = new HashMap<>();
+        Map<String, IncomeDTO> inptPriceMap = new HashMap<>();
+        if ("1".equals(sumCode)) { // key 是upCode 对应收费大类
+             outptPriceMap = outptPriceMapList.stream()
+                    .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
+             inptPriceMap= inptPriceMapList.stream()
+                    .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
+        } else { // key 是bfcId 对应计费类别
+             outptPriceMap = outptPriceMapList.stream()
+                    .collect(Collectors.toMap(IncomeDTO::getBfcId, Function.identity(), (key1, key2) -> key2));
+             inptPriceMap = inptPriceMapList.stream()
+                    .collect(Collectors.toMap(IncomeDTO::getBfcId, Function.identity(), (key1, key2) -> key2));
+        }
+        /*==== 返回参数封装begin====*/
+        for (IncomeDTO item : upCodeList) {
+            // 初始化
+            IncomeDTO outPriceDTO;
+            IncomeDTO inptPriceDTO;
+            if ("1".equals(sumCode)) {
+                outPriceDTO = MapUtils.get(outptPriceMap, item.getUpCode(), new IncomeDTO());
+                inptPriceDTO = MapUtils.get(inptPriceMap, item.getUpCode(), new IncomeDTO());
+            } else {
+                outPriceDTO = MapUtils.get(outptPriceMap, item.getBfcId(), new IncomeDTO());
+                inptPriceDTO = MapUtils.get(inptPriceMap, item.getBfcId(), new IncomeDTO());
+            }
+
+            // 封装门诊费用
+            item.setOutCurrentRealityPrice(outPriceDTO.getOutCurrentRealityPrice());
+            item.setOutLinkCompare(outPriceDTO.getOutLinkCompare());
+            item.setOutMonthRealityPrice(outPriceDTO.getOutMonthRealityPrice());
+            item.setOutSameCompare(outPriceDTO.getOutSameCompare());
+            item.setOutYearRealityPrice(outPriceDTO.getOutYearRealityPrice());
+            // 封装住院费用
+            item.setInCurrentRealityPrice(inptPriceDTO.getInCurrentRealityPrice());
+            item.setInLinkCompare(inptPriceDTO.getInLinkCompare());
+            item.setInMonthRealityPrice(inptPriceDTO.getInMonthRealityPrice());
+            item.setInSameCompare(inptPriceDTO.getInSameCompare());
+            item.setInYearRealityPrice(inptPriceDTO.getInYearRealityPrice());
+            /*====计算全院费用begin====*/
+            // 全院当月费用
+            BigDecimal yardCurrentRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutCurrentRealityPrice(), inptPriceDTO.getInCurrentRealityPrice());
+            // 全院上年同期费用
+            BigDecimal yardYearRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutYearRealityPrice(), inptPriceDTO.getInYearRealityPrice());
+            // 全院上月费用
+            BigDecimal yardMonthRealityPrice = BigDecimalUtils.add(outPriceDTO.getOutMonthRealityPrice(), inptPriceDTO.getInMonthRealityPrice());
+            // 同比
+            BigDecimal multiply = BigDecimalUtils.multiply(yardYearRealityPrice, new BigDecimal(0.01));
+            BigDecimal yardSameCompareBigDecimal;
+            if (!BigDecimalUtils.isZero(multiply)) { // 除数不是0
+                yardSameCompareBigDecimal = BigDecimalUtils.divide(
+                        BigDecimalUtils.subtract(yardCurrentRealityPrice, yardYearRealityPrice),
+                        multiply
+                );
+            } else {
+                yardSameCompareBigDecimal = new BigDecimal(0);
+            }
+
+            if (null == yardSameCompareBigDecimal) {
+                yardSameCompareBigDecimal = new BigDecimal(0);
+            }
+            String yardSameCompareString = yardSameCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
+            String yardSameCompare = yardSameCompareString + "%";
+            // 环比
+            BigDecimal multiply1 = BigDecimalUtils.multiply(yardMonthRealityPrice, new BigDecimal(0.01));
+            BigDecimal yardLinkCompareBigDecimal;
+            if (!BigDecimalUtils.isZero(multiply1)) { // 除数不是0
+                yardLinkCompareBigDecimal = BigDecimalUtils.divide(
+                        BigDecimalUtils.subtract(yardCurrentRealityPrice, yardMonthRealityPrice),
+                        multiply1
+                );
+            } else {
+                yardLinkCompareBigDecimal = new BigDecimal(0);
+            }
+            if (null == yardSameCompareBigDecimal) {
+                yardLinkCompareBigDecimal = new BigDecimal(0);
+            }
+            String yardLinkCompareString = yardLinkCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
+            String yardLinkCompare = yardLinkCompareString + "%";
+            /*====计算全院费用end====*/
+            // 封装全院费用
+            item.setYardCurrentRealityPrice(yardCurrentRealityPrice);
+            item.setYardLinkCompare(yardLinkCompare);
+            item.setYardMonthRealityPrice(yardMonthRealityPrice);
+            item.setYardSameCompare(yardSameCompare);
+            item.setYardYearRealityPrice(yardYearRealityPrice);
+        }
+        /*====返回参数封装end====*/
+        return PageDTO.of(upCodeList);
     }
 
 

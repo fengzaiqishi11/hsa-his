@@ -1121,7 +1121,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
     /**
      * @Method queryIncomeClassifyInfo
-     * @Desrciption 全院月收入分类统计
+     * @Desrciption 全院月收入分类统计重写
      * @param
      * @Author liuqi1
      * @Date   2020/11/18 17:10
@@ -1132,7 +1132,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     public PageDTO queryIncomeClassifyInfo(IncomeDTO incomeDTO) {
         Integer pageNo = incomeDTO.getPageNo();
         Integer pageSize = incomeDTO.getPageSize();
-
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> showList = new ArrayList<>();
         if ("1".equals(incomeDTO.getSumCode())) {
@@ -1192,35 +1191,35 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 // 同比
                 BigDecimal multiply = BigDecimalUtils.multiply(yardYearRealityPrice, new BigDecimal(0.01));
                 BigDecimal yardSameCompareBigDecimal;
-                if (!BigDecimalUtils.isZero(multiply)){ // 除数不是0
-                     yardSameCompareBigDecimal = BigDecimalUtils.divide(
+                if (!BigDecimalUtils.isZero(multiply)) { // 除数不是0
+                    yardSameCompareBigDecimal = BigDecimalUtils.divide(
                             BigDecimalUtils.subtract(yardCurrentRealityPrice, yardYearRealityPrice),
                             multiply
                     );
-                }else{
-                     yardSameCompareBigDecimal = new BigDecimal(0);
+                } else {
+                    yardSameCompareBigDecimal = new BigDecimal(0);
                 }
 
                 if (null == yardSameCompareBigDecimal) {
                     yardSameCompareBigDecimal = new BigDecimal(0);
                 }
-                String yardSameCompareString = yardSameCompareBigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString();
+                String yardSameCompareString = yardSameCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
                 String yardSameCompare = yardSameCompareString + "%";
                 // 环比
                 BigDecimal multiply1 = BigDecimalUtils.multiply(yardMonthRealityPrice, new BigDecimal(0.01));
                 BigDecimal yardLinkCompareBigDecimal;
-                if (!BigDecimalUtils.isZero(multiply1)){ // 除数不是0
-                     yardLinkCompareBigDecimal = BigDecimalUtils.divide(
+                if (!BigDecimalUtils.isZero(multiply1)) { // 除数不是0
+                    yardLinkCompareBigDecimal = BigDecimalUtils.divide(
                             BigDecimalUtils.subtract(yardCurrentRealityPrice, yardMonthRealityPrice),
                             multiply1
                     );
-                }else{
+                } else {
                     yardLinkCompareBigDecimal = new BigDecimal(0);
                 }
                 if (null == yardSameCompareBigDecimal) {
                     yardLinkCompareBigDecimal = new BigDecimal(0);
                 }
-                String yardLinkCompareString = yardLinkCompareBigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString();
+                String yardLinkCompareString = yardLinkCompareBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).toString();
                 String yardLinkCompare = yardLinkCompareString + "%";
                 /*====计算全院费用end====*/
                 // 封装全院费用
@@ -1231,7 +1230,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 item.setYardYearRealityPrice(yardYearRealityPrice);
             }
             /*====返回参数封装end====*/
-            //showList = patientCostLedgerDAO.queryIncomeClassifyInfoBig(incomeDTO);
             return PageDTO.of(bfcNameList);
         } else {
             showList = patientCostLedgerDAO.queryIncomeClassifyInfo(incomeDTO);

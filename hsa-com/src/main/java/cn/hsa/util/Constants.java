@@ -458,6 +458,8 @@ public interface Constants {
         public static final String ZZ = "4"; // 转帐
         public static final String WX = "5"; // 微信
         public static final String ZFB = "6"; // 支付宝
+
+        public static final String GZ = "8"; // 挂账
     }
 
     /**

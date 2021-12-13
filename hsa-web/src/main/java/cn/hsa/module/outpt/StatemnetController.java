@@ -7,7 +7,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
-import cn.hsa.module.outpt.statement.service.PatientCostLedgerService;
+import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -410,7 +412,7 @@ public class StatemnetController extends BaseController {
   }
 
   /**
-   * @param paraMap
+   * @param
    * @Method queryIncomeClassifyInfo
    * @Desrciption 全院月收入分类统计
    * @Author liuqi1
@@ -426,12 +428,16 @@ public class StatemnetController extends BaseController {
   }*/
 
   @GetMapping("/queryIncomeClassifyInfo")
-  public WrapperResponse<PageDTO> queryIncomeClassifyInfo(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
-    if (MapUtils.get(paraMap, "startDate") == null || "".equals(MapUtils.get(paraMap, "startDate"))) {
+  public WrapperResponse<PageDTO> queryIncomeClassifyInfo(IncomeDTO incomeDTO, HttpServletRequest req, HttpServletResponse res) {
+    Date startDate = incomeDTO.getStartDate();
+    if (startDate == null) {
       throw new AppException("开始时间不能为空");
     }
     SysUserDTO userDTO = getSession(req, res) ;
+    Map paraMap = new HashMap();
     paraMap.put("hospCode", userDTO.getHospCode());
+    incomeDTO.setHospCode(userDTO.getHospCode());
+    paraMap.put("incomeDTO",incomeDTO);
     WrapperResponse<PageDTO> listWrapperResponse = patientCostLedgerService_consumer.queryIncomeClassifyInfo(paraMap);
     return listWrapperResponse;
   }
@@ -769,5 +775,40 @@ public class StatemnetController extends BaseController {
     map.put("hospCode", userDTO.getHospCode());
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.getInptFinanceTitle(map);
+  }
+
+  /**
+   * @Menthod queryHospitalCardList
+   * @Desrciption 统计入院证
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/06 10:49
+   * @Return WrapperResponse<PageDTO>
+   **/
+  @GetMapping("/queryHospitalCardList")
+  public WrapperResponse<PageDTO> queryHospitalCardList(OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    map.put("outptVisitDTO", outptVisitDTO);
+    return patientCostLedgerService_consumer.queryHospitalCardList(map);
+  }
+
+  /**
+   * @param paraMap
+   * @Method queryOutptorInHosptialItemUseInfo
+   * @Desrciption 门诊业务使用量统计按科室过滤
+   * @Author liuliyun
+   * @Date 2021/12/07 11:46
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < java.util.Map < java.lang.String, java.lang.Object>>>
+   **/
+  @GetMapping("/queryOutptorInHosptialItemUseInfo")
+  public WrapperResponse<PageDTO> queryOutptorInHosptialItemUseInfo(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    paraMap.put("deptId", userDTO.getLoginBaseDeptDTO().getId());
+    WrapperResponse<PageDTO> listWrapperResponse = patientCostLedgerService_consumer.queryOutptorInHosptialItemUseInfo(paraMap);
+    return listWrapperResponse;
   }
 }

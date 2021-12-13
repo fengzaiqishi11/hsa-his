@@ -56,5 +56,6 @@ public class InptDiagnoseDTO extends InptDiagnoseDO implements Serializable {
     private String medicalRegNo ; // 就医登记号
     private String insureSettleId; // 医保结算id
     private String admCondType; // 入院病情标识
+    private String customDisease; // 自定义诊断
 
 }

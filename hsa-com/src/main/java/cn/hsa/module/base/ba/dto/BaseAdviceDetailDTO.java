@@ -85,6 +85,9 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
      * 拆零数量
      */
     private BigDecimal splitNum;
-
+    /**
+     * 国家编码
+     */
+    private String nationCode;
 
 }

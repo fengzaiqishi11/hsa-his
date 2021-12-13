@@ -20,10 +20,12 @@ import java.io.Serializable;
 public class InsureDictDTO extends InsureDictDO implements Serializable {
 
         // 医保机构编码
+        private String keyword;
         private String regCode;
         private String keyWord; // 关键字查询
         private String label;
-        private String[] codes;//编码
+        private String[] codes; // 编码
         private String type;
         private String medicineOrgCode;
+
 }

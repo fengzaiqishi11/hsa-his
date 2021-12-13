@@ -153,8 +153,8 @@
             past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
             outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
         from  base_profile_file
-        <!--where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}-->
-        where hosp_code = #{hospCode} and is_valid = '1' and id = #{id}
+        where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}
+        <!--where hosp_code = #{hospCode} and is_valid = '1' and id = #{id}-->
     </select>
 
     <update id="update" parameterType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
@@ -446,8 +446,22 @@
         SELECT COUNT(1) FROM(
          SELECT id ,register_no as `profile` FROM outpt_visit where profile_id = #{profileId} and is_visit = '0'
         UNION all
-        SELECT id ,in_no as `profile` from inpt_visit where profile_id =  #{profileId}and status_code not in ('7','8')) a
+        SELECT id ,in_no as `profile` from inpt_visit where profile_id =  #{profileId}and status_code not in ('0','8')) a
     </select>
+    <select id="queryProfileFile" resultType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+        select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from  base_profile_file
+        where id = #{profileId}
+    </select>
+
     <delete id="deleteProfileFile">
         delete from base_profile_file
         where hosp_code = #{hospCode}

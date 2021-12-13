@@ -311,6 +311,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      **/
     @Override
     public boolean updateVisit(OutptVisitDTO outptVisitDTO) {
+        outptDoctorPrescribeDAO.updateOutptRegister(outptVisitDTO);
         return outptDoctorPrescribeDAO.updateVisit(outptVisitDTO) > 0;
     }
 
@@ -498,9 +499,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(outptRegisterDTO);
         //是否需要建档案
         if(StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode())) {
-            OutptProfileFileExtendDTO opf = this.getFprFileId(outptVisitDTO);
+            OutptProfileFileDTO opf = this.getFprFileId(outptVisitDTO);
             //档案ID
-            outptVisitDTO.setProfileId(opf.getProfileId());
+            outptVisitDTO.setProfileId(opf.getId());
             //档案号
             outptVisitDTO.setOutProfile(opf.getOutProfile());
         }
@@ -3155,8 +3156,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      * @Date 2020/9/16 17:26
      * @Return OutptProfileFileExtendDTO 档案信息
      */
-    private OutptProfileFileExtendDTO getFprFileId(OutptVisitDTO outptVisitDTO){
+    private OutptProfileFileDTO getFprFileId(OutptVisitDTO outptVisitDTO){
         OutptProfileFileDTO outptProfileFileDTO = new OutptProfileFileDTO();
+        outptProfileFileDTO.setId(outptVisitDTO.getProfileId());
         outptProfileFileDTO.setName(outptVisitDTO.getName());
         outptProfileFileDTO.setGenderCode(outptVisitDTO.getGenderCode());
         outptProfileFileDTO.setAge(outptVisitDTO.getAge());
@@ -3170,18 +3172,6 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setSourceTjRemark(outptVisitDTO.getSourceTjRemark());
         outptProfileFileDTO.setHospCode(outptVisitDTO.getHospCode());
         outptProfileFileDTO.setType("2");
-        WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
-
-        //调用本地建档服务
-        log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
-        //本地档案表id保持与中心端的一致
-        outptProfileFileDTO.setId(outptProfileFileExtendDTO.getData().getProfileId());
-        outptProfileFileDTO.setOutProfile(outptProfileFileExtendDTO.getData().getOutProfile()); //门诊档案号
-        outptProfileFileDTO.setInProfile(outptProfileFileExtendDTO.getData().getInProfile()); //住院病案号
-        outptProfileFileDTO.setOutptLastVisitTime(outptProfileFileExtendDTO.getData().getOutptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getOutptLastVisitTime()); // 门诊最后就诊时间
-        outptProfileFileDTO.setTotalOut(outptProfileFileExtendDTO.getData().getTotalOut() == null ? 1 : outptProfileFileExtendDTO.getData().getTotalOut()); // 累计门诊次数
-        outptProfileFileDTO.setInptLastVisitTime(outptProfileFileExtendDTO.getData().getInptLastVisitTime() == null ? DateUtils.getNow() : outptProfileFileExtendDTO.getData().getInptLastVisitTime()); // 住院最后就诊时间
-        outptProfileFileDTO.setTotalIn(outptProfileFileExtendDTO.getData().getTotalIn() == null ? 0 : outptProfileFileExtendDTO.getData().getTotalIn()); // 累计住院次数
         outptProfileFileDTO.setPatientCode(outptVisitDTO.getPatientCode());
         outptProfileFileDTO.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
         outptProfileFileDTO.setContactAddress(outptVisitDTO.getContactAddress());
@@ -3190,10 +3180,14 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCrteId(outptVisitDTO.getCrteId());
         outptProfileFileDTO.setCrteName(outptVisitDTO.getCrteName());
         outptProfileFileDTO.setCrteTime(DateUtils.getNow());
+//        WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
+
+        //调用本地建档服务
+        log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         Map localMap = new HashMap();
         localMap.put("hospCode", outptVisitDTO.getHospCode());
         localMap.put("outptProfileFileDTO", outptProfileFileDTO);
-        baseProfileFileService_consumer.save(localMap);
+        WrapperResponse<OutptProfileFileDTO> outptProfileFileExtendDTO = baseProfileFileService_consumer.save(localMap);
         log.debug("直接就诊调用本地建档服务结束：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
 
         return outptProfileFileExtendDTO.getData();

@@ -48,7 +48,7 @@ public class BaseProfileFileController extends BaseController {
      * @Return: Boolean
      **/
     @PostMapping("/save")
-    public WrapperResponse<Boolean> save(@RequestBody OutptProfileFileDTO outptProfileFileDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<OutptProfileFileDTO> save(@RequestBody OutptProfileFileDTO outptProfileFileDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         outptProfileFileDTO.setHospCode(sysUserDTO.getHospCode());
         outptProfileFileDTO.setCrteId(sysUserDTO.getId());

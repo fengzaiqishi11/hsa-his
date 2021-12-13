@@ -31,25 +31,20 @@
         a.insure_item_code as medListCodg,
         a.hosp_item_code as fixmedinsHilistId,
         a.hosp_item_name as fixmedinsHilistName,
+        a.insure_item_code as insureItemCode,
+        a.insure_item_name as insureItemName,
+        a.insure_reg_code as insureRegCode,
         si.order_no AS dyntNo,
+        ( SELECT bs.`name` FROM stro_in s JOIN base_supplier bs ON s.supplier_id = bs.id AND s.hosp_code = bs.hosp_code WHERE s.order_no = si.order_no
+        AND s.hosp_code = si.hosp_code LIMIT 1 ) splerName,
         (
-        SELECT bs.`name`
-        FROM
-        stro_in s
-        JOIN base_supplier bs ON s.supplier_id = bs.id AND s.hosp_code = bs.hosp_code
-        WHERE
-        s.order_no = si.order_no
-        AND s.hosp_code = si.hosp_code
-        LIMIT 1
-        ) splerName,
-        (	SELECT NAME FROM
-        base_product t
-        WHERE
-        t.hosp_code = b.hosp_code
-        AND (t.CODE = b.prod_code or t.CODE = c.prod_code)
-        LIMIT 1
-        ) prodentpName,
-        b.dan AS aprvno,
+        case si.item_code
+        when '1'
+        then (SELECT NAME FROM base_product t WHERE t.hosp_code = b.hosp_code  AND t.CODE = b.prod_code limit 1)
+        when '0'
+        then (SELECT NAME FROM base_product t WHERE t.hosp_code = c.hosp_code  AND t.CODE = b.prod_code limit 1)
+        end
+        ) as prodentpName, b.dan AS aprvno,
         DATE_SUB(si.crte_time,INTERVAL 2 MONTH) as manuDate,
         NULL AS splerPmtno,
         si.batch_no as manuLotnum,
@@ -66,16 +61,20 @@
         NULL AS memo,
         null as medinsProdPurcNo
         FROM
-        (
-        SELECT *   FROM stro_invoicing
-        where outin_code in ('1','2')
-        ) si
-        JOIN insure_item_match A on  si.item_id = A.hosp_item_id and a.hosp_code = si.hosp_code
+        stro_invoicing si
+        JOIN insure_item_match a on si.item_id = a.hosp_item_id and a.hosp_code = si.hosp_code
+        and a.audit_code = '1' /*医保项目已审核*/
+        and a.is_match = '1' /*医保项目已匹配*/
+        and a.is_trans = '1' /*医保项目已传输*/
+        and a.is_valid = '1' /*医保项目有效*/
         left join base_drug b on si.item_id = b.id and b.hosp_code = si.hosp_code
         left join base_material c on si.item_id = c.id and c.hosp_code = si.hosp_code
-        where si.hosp_code = #{hospCode} and si.upload_insure = '0'
+        where si.hosp_code = #{hospCode} and si.upload_insure = '0' and si.outin_code in ('1','2')
         <if test="keyword != null and keyword != ''">
-            and a.hosp_item_name like concat('%',#{keyword},'%')
+          and a.hosp_item_name like concat('%',#{keyword},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+         and a.insure_reg_code = #{insureRegCode}
         </if>
     </select>
 
@@ -86,6 +85,9 @@
         a.insure_item_code as medListCodg,
         a.hosp_item_code as fixmedinsHilistId,
         a.hosp_item_name as fixmedinsHilistName,
+        a.insure_item_code as insureItemCode,
+        a.insure_item_name as insureItemName,
+        a.insure_reg_code as insureRegCode,
         si.order_no AS dyntNo,
         (
         SELECT bs.`name`
@@ -132,6 +134,13 @@
         <if test="keyword != null and keyword != ''">
             and a.hosp_item_name like concat('%',#{keyword},'%')
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and a.insure_reg_code = #{insureRegCode}
+        </if>
+        AND a.audit_code = '1' /*医保项目已审核*/
+        AND a.is_match = '1' /*医保项目已匹配*/
+        AND a.is_trans = '1' /*医保项目已传输*/
+        AND a.is_valid = '1' /*医保项目有效*/
     </select>
 
     <select id="queryInsureUploadDataPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
@@ -179,7 +188,10 @@
             c.insure_item_code AS medListCodg,
             c.insure_item_code AS fixmedinsHilistId,
             c.insure_item_name AS fixmedinsHilistName,
-            si.id AS fixmedinsBchno,
+            c.insure_item_code as insureItemCode,
+            c.insure_item_name as insureItemName,
+            c.insure_reg_code as insureRegCode,
+        si.id AS fixmedinsBchno,
             a.doctor_name AS prscDrName,
             si.crte_name AS pharName,
             IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
@@ -235,12 +247,18 @@
             or b.usual_wbm like concat('%',#{keyword},'%')
             or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
    UNION ALL
         /*住院*/
         SELECT
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
+        c.insure_item_code as insureItemCode,
+        c.insure_item_name as insureItemName,
+        c.insure_reg_code as insureRegCode,
         si.id AS fixmedinsBchno,
         a.doctor_name AS prscDrName,
         si.crte_name AS pharName,
@@ -296,6 +314,9 @@
             or b.usual_wbm like concat('%',#{keyword},'%')
             or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
     </select>
 
     <select id="queryInsureGoodSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
@@ -303,6 +324,9 @@
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
+        c.insure_item_code as insureItemCode,
+        c.insure_item_name as insureItemName,
+        c.insure_reg_code as insureRegCode,
         si.id AS fixmedinsBchno,
         a.doctor_name AS prscDrName,
         si.crte_name AS pharName,
@@ -350,12 +374,18 @@
             or b.usual_wbm like concat('%',#{keyword},'%')
             or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
         UNION ALL
         /*住院*/
         SELECT
         c.insure_item_code AS medListCodg,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
+        c.insure_item_code as insureItemCode,
+        c.insure_item_name as insureItemName,
+        c.insure_reg_code as insureRegCode,
         si.id AS fixmedinsBchno,
         a.doctor_name AS prscDrName,
         si.crte_name AS pharName,
@@ -403,6 +433,9 @@
             or b.usual_wbm like concat('%',#{keyword},'%')
             or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
     </select>
 
     <select id="queryInsureInventoryCheckPage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryCheck">
@@ -410,6 +443,9 @@
         a.insure_item_code as medlistcodg,
         a.hosp_item_code as fixmedinsHilistId,
         a.hosp_item_name as fixmedinsHilistName,
+        a.insure_item_code as insureItemCode,
+        a.insure_item_name as insureItemName,
+        a.insure_reg_code as insureRegCode,
         CASE
         WHEN si.item_code = '1' THEN
         b.is_prescription
@@ -441,6 +477,9 @@
         <if test="isUpload != null and isUpload != ''">
             and si.upload_insure = #{isUpload}
         </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and a.insure_reg_code = #{insureRegCode}
+        </if>
     </select>
     <!--查询库存变更-->
     <select id="queryInsureInventoryStockUpdatePage" resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">
@@ -449,6 +488,9 @@
         #{invChgType} as invChgType,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
+        c.insure_item_code as insureItemCode,
+        c.insure_item_name as insureItemName,
+        c.insure_reg_code as insureRegCode,
         si.id AS fixmedinsBchno,
         si.sell_price AS pric,
         si.num AS cnt,
@@ -482,11 +524,15 @@
           or b.usual_wbm like concat('%',#{keyword},'%')
           or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
       </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
         AND c.audit_code = '1' /*医保项目已审核*/
         AND c.is_match = '1' /*医保项目已匹配*/
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and (si.upload_insure = '0' or si.upload_insure is null)
+
       order by fixmedinsBchno
     </select>
     <!--查询销售或者退货-->

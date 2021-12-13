@@ -47,12 +47,13 @@ public class InsureUnifiedCommonUtil {
      * @Param hospCode:医院编码
      * orgCode:医疗机构编码
      * functionCode：功能号
-     * paramMap:入参
+     * paramMap:调用医保参数入参
+     * logParamMap:日志入参
      * @Author fuhui
      * @Date 2021/4/28 19:51
      * @Return
      **/
-    public Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap) {
+    public Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap,Map<String,Object> logParamMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setRegCode(orgCode);
@@ -61,17 +62,30 @@ public class InsureUnifiedCommonUtil {
         if(insureConfigurationDTO ==null){
             throw new AppException("查询医保机构配置信息为空");
         }
+        StringBuilder stringBuilder = new StringBuilder();
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
-        httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        if(StringUtils.isEmpty(MapUtils.get(paramMap,"insuplcAdmdvs"))){
+            httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        }else{
+            httpParam.put("insuplc_admdvs", MapUtils.get(paramMap,"insuplcAdmdvs")); //参保地医保区划分
+            MapUtils.remove(paramMap,"insuplcAdmdvs");
+        }
         httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
         httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         httpParam.put("input", paramMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("调用功能号【" + functionCode + "】的入参为" + json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        logParamMap.put("medisCode",insureConfigurationDTO.getOrgCode());
+        logParamMap.put("paramMapJson",json);
+        logParamMap.put("msgId",msgId);
+        logParamMap.put("msgInfo",functionCode);
+        logParamMap.put("resultStr",resultJson);
+        insureUnifiedLogService_consumer.insertInsureFunctionLog(logParamMap);
         if (StringUtils.isEmpty(resultJson)) {
             throw new AppException("无法访问统一支付平台");
         }
@@ -108,5 +122,31 @@ public class InsureUnifiedCommonUtil {
             throw new AppException("未查找到医保就诊信息，请做医保登记。");
         }
         return insureIndividualVisitDTO;
+    }
+
+    /**
+     * @Method getInsureInsureConfiguration
+     * @Desrciption  根据医院编码和医保机构编码查找医保机构配置信息
+     * @Param hospCode:医院编码 regCode:医保机构配置编码
+     *
+     * @Author fuhui
+     * @Date   2021/11/25 13:54
+     * @Return
+    **/
+    public InsureConfigurationDTO getInsureInsureConfiguration(String hospCode,String regCode){
+        if(StringUtils.isEmpty(hospCode)){
+            throw new AppException("医院编码参数为空");
+        }
+        if(StringUtils.isEmpty(regCode)){
+            throw new AppException("医保机构编码参数为空");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setCode(regCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(insureConfigurationDTO == null){
+            throw new AppException("根据医保机构编码未查找到医保机构配置信息");
+        }
+        return insureConfigurationDTO;
     }
 }

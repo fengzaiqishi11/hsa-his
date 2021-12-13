@@ -248,4 +248,8 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
      * 统计类型  0 统计全部费用；1 统计挂号费用
      */
     private String  statisticType;
+
+    private String isReadCardPay; // 是否读卡支付
+    private String bka895; // 磁卡类型
+    private String bka896; // 磁卡号码
 }

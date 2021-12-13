@@ -826,6 +826,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());// 人员编号
         dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型
         dataMap.put("mdtrt_cert_no",insureIndividualVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        String isReadCard = MapUtils.get(map,"isReadCard");
+        String bka895 = MapUtils.get(map,"bka895");
+        String bka896 = MapUtils.get(map,"bka896");
+        if (Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)) {
+            dataMap.put("mdtrt_cert_type",bka895);// 就诊凭证类型
+            dataMap.put("mdtrt_cert_no",bka896); // 就诊凭证编号
+        }
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMap.get("costStr").toString()));
         dataMap.put("medfee_sumamt",BigDecimalUtils.convert(realityPrice));// 医疗费总额
@@ -937,11 +944,15 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     throw new AppException((String) resultMap.get("msg"));
                 }
                 if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode);
                     Object resultMsg = resultMap.get("err_msg");
                     if (resultMsg == null) {
                         resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";
                     }
-                    throw new AppException(resultMsg.toString());
+                    if(StringUtils.isEmpty(InmsgID)||"".equals(InmsgID)){
+                        throw new AppException(resultMsg.toString()+"请联系管理员处理！");
+                    }
+                    throw new AppException(resultMsg.toString()+"his单边账流水号为:"+InmsgID+"请去医保单边账菜单进行结算单边账操作！");
                 }
                 Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
                 Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");

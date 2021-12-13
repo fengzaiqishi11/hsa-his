@@ -68,8 +68,14 @@
             <if test="insureRegCode != null and insureRegCode != ''">
                 and insure_reg_code = #{insureRegCode}
             </if>
-            <if test="itemCode != null and itemCode != ''">
-                and item_code = #{itemCode}
+            <if test="itemCode == '101'.toString() and itemCode != ''">
+                and item_code  in ('11','101')
+            </if>
+            <if test="itemCode == '102'.toString() and itemCode != ''">
+                and item_code  in ('12','102')
+            </if>
+            <if test="itemCode == '103'.toString() and itemCode != ''">
+                and item_code  in ('13','103')
             </if>
             <if test="pqccItemId != null and pqccItemId != ''">
                 and pqcc_item_id = #{pqccItemId}

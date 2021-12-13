@@ -439,6 +439,13 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 BigDecimal akb066 = BigDecimalUtils.convert(inptInsureResult.get("akb066"));//个人账户支付
                 BigDecimal akb067 = BigDecimalUtils.convert(inptInsureResult.get("akb067"));//个人现金支付
                 BigDecimal akc264 = BigDecimalUtils.convert(inptInsureResult.get("akc264"));//医疗总费用akc264 = bka831 + bka832+bka842
+
+                /**
+                 * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+                 */
+                if(BigDecimalUtils.equals(akb067,akc264)){
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
                 BigDecimal ake026 = BigDecimalUtils.convert(inptInsureResult.get("ake026"));//企业补充医疗保险基金支付
                 BigDecimal ake029 = BigDecimalUtils.convert(inptInsureResult.get("ake029"));//大额医疗费用补助基金支付
                 BigDecimal ake035 = BigDecimalUtils.convert(inptInsureResult.get("ake035"));//公务员医疗补助基金支付
@@ -961,43 +968,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptSettleDO1.setCreditPrice(creditPrice);
             inptSettleDAO.updateByPrimaryKeySelective(inptSettleDO1);
 
-            //判断是否需要发票
-            if (isInvoice) { //true:打印发票生成发票信息
-                Map<String, Object> map = new HashMap<String, Object>();
-                outinInvoiceDTO.setSettleId(settleId);//结算id
-                outinInvoiceDTO.setDqCurrNo(outinInvoiceDTO.getCurrNo());
-                map.put("hospCode", hospCode);
-                map.put("outinInvoiceDTO", outinInvoiceDTO);
-                OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService_consumer.updateInvoiceStatus(map).getData();
-                //保存inpt_settle_invoice住院结算发票情况表
-                InptSettleInvoiceDO inptSettleInvoiceDO = new InptSettleInvoiceDO();
-                String inptSettleInvoiceId = SnowflakeUtils.getId();
-                inptSettleInvoiceDO.setId(inptSettleInvoiceId);//id
-                inptSettleInvoiceDO.setHospCode(hospCode);//医院编码
-                inptSettleInvoiceDO.setSettleId(settleId);//结算id
-                inptSettleInvoiceDO.setVisitId(id);//就诊id
-                inptSettleInvoiceDO.setInvoiceId(outinInvoiceDTO.getId());//发票id
-                inptSettleInvoiceDO.setInvoiceDetailId(outinInvoiceDetailDO.getId());//发票明细id
-                inptSettleInvoiceDO.setInvoiceNo(String.valueOf(outinInvoiceDetailDO.getInvoiceNo()));//发票号码
-                inptSettleInvoiceDO.setTotalPrice(realityPrice);//发票总金额
-                inptSettleInvoiceDO.setPrintId(null);//发票打印人id
-                inptSettleInvoiceDO.setPrintName(null);//发票打印人姓名
-                inptSettleInvoiceDO.setPrintTime(null);//发票打印时间
-                inptSettleInvoiceDO.setPrintNum(0);//打印次数
-                inptSettleInvoiceDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志代码（ZTBZ）
-                inptSettleInvoiceDO.setRedId(null);//冲红id
-                inptSettleInvoiceDAO.insertSelective(inptSettleInvoiceDO);//保存住院结算发票情况表
-
-                //保存inpt_settle_invoice_content住院结算发票内容表
-                InptSettleInvoiceContentDO inptSettleInvoiceContentDO = new InptSettleInvoiceContentDO();
-                inptSettleInvoiceContentDO.setId(SnowflakeUtils.getId());//id
-                inptSettleInvoiceContentDO.setHospCode(hospCode);//医院编码
-                inptSettleInvoiceContentDO.setSettleInvoiceId(inptSettleInvoiceId);//结算发票ID（inpt_settle_invoice）
-                inptSettleInvoiceContentDO.setInCode(null);//住院发票代码
-                inptSettleInvoiceContentDO.setInName(null);//住院发票名称
-                inptSettleInvoiceContentDO.setRealityPrice(realityPrice);//优惠后总金额
-                inptSettleInvoiceContentDAO.insertSelective(inptSettleInvoiceContentDO);//保存住院结算发票内容表
-            }
             // 官红强修改， 2021年1月19日14:50:34 如果个人自付为0，意味着有预交金额退款，此时不再写一遍支付信息,如果自付与预交刚好相等，需要写一次记录（即自付为0，退款为0）
             if (!inptPayParam.isEmpty() && (!BigDecimalUtils.isZero(selfPrice) || BigDecimalUtils.isZero(inptSettleDO.getSettleBackPrice()))) {
                 //保存inpt_pay 住院结算支付方式表
@@ -1143,6 +1113,43 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 }
 
             }
+            //判断是否需要发票
+            if (isInvoice) { //true:打印发票生成发票信息
+                Map<String, Object> map = new HashMap<String, Object>();
+                outinInvoiceDTO.setSettleId(settleId);//结算id
+                outinInvoiceDTO.setDqCurrNo(outinInvoiceDTO.getCurrNo());
+                map.put("hospCode", hospCode);
+                map.put("outinInvoiceDTO", outinInvoiceDTO);
+                OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService_consumer.updateInvoiceStatus(map).getData();
+                //保存inpt_settle_invoice住院结算发票情况表
+                InptSettleInvoiceDO inptSettleInvoiceDO = new InptSettleInvoiceDO();
+                String inptSettleInvoiceId = SnowflakeUtils.getId();
+                inptSettleInvoiceDO.setId(inptSettleInvoiceId);//id
+                inptSettleInvoiceDO.setHospCode(hospCode);//医院编码
+                inptSettleInvoiceDO.setSettleId(settleId);//结算id
+                inptSettleInvoiceDO.setVisitId(id);//就诊id
+                inptSettleInvoiceDO.setInvoiceId(outinInvoiceDTO.getId());//发票id
+                inptSettleInvoiceDO.setInvoiceDetailId(outinInvoiceDetailDO.getId());//发票明细id
+                inptSettleInvoiceDO.setInvoiceNo(String.valueOf(outinInvoiceDetailDO.getInvoiceNo()));//发票号码
+                inptSettleInvoiceDO.setTotalPrice(realityPrice);//发票总金额
+                inptSettleInvoiceDO.setPrintId(null);//发票打印人id
+                inptSettleInvoiceDO.setPrintName(null);//发票打印人姓名
+                inptSettleInvoiceDO.setPrintTime(null);//发票打印时间
+                inptSettleInvoiceDO.setPrintNum(0);//打印次数
+                inptSettleInvoiceDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志代码（ZTBZ）
+                inptSettleInvoiceDO.setRedId(null);//冲红id
+                inptSettleInvoiceDAO.insertSelective(inptSettleInvoiceDO);//保存住院结算发票情况表
+
+                //保存inpt_settle_invoice_content住院结算发票内容表
+                InptSettleInvoiceContentDO inptSettleInvoiceContentDO = new InptSettleInvoiceContentDO();
+                inptSettleInvoiceContentDO.setId(SnowflakeUtils.getId());//id
+                inptSettleInvoiceContentDO.setHospCode(hospCode);//医院编码
+                inptSettleInvoiceContentDO.setSettleInvoiceId(inptSettleInvoiceId);//结算发票ID（inpt_settle_invoice）
+                inptSettleInvoiceContentDO.setInCode(null);//住院发票代码
+                inptSettleInvoiceContentDO.setInName(null);//住院发票名称
+                inptSettleInvoiceContentDO.setRealityPrice(realityPrice);//优惠后总金额
+                inptSettleInvoiceContentDAO.insertSelective(inptSettleInvoiceContentDO);//保存住院结算发票内容表
+            }
             return WrapperResponse.success("支付成功。", null);
         } catch (RuntimeException e) {
             throw e;
@@ -1196,6 +1203,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureUnifiedPayParam.put("crteId", MapUtils.get(param, "crteId"));
         insureUnifiedPayParam.put("code", code);
         insureUnifiedPayParam.put("userName", userName);
+        insureUnifiedPayParam.put("isReadCard", MapUtils.get(param,"isReadCard"));
+        insureUnifiedPayParam.put("bka895", MapUtils.get(param,"bka895"));
+        insureUnifiedPayParam.put("bka896", MapUtils.get(param,"bka896"));
         /**统一支付平台调用出院办理   结束*/
 
         /**
@@ -1404,6 +1414,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("personalPrice", list.get(0).get("personalPrice"));
             returnMap.put("beforeSettle", list.get(0).get("beforeSettle"));
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
+            returnMap.put("creditPrice", list.get(0).get("creditPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {

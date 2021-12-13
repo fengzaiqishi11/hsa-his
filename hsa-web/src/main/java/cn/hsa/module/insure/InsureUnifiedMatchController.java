@@ -310,6 +310,9 @@ public class InsureUnifiedMatchController extends BaseController {
     public WrapperResponse<Map<String,Object>> selectPersonTreatment(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         return this.insureUnifiedPayRestService_consumer.selectPersonTreatment(map);
     }
 
@@ -354,6 +357,9 @@ public class InsureUnifiedMatchController extends BaseController {
             throw new AppException("请先选择当前页数");
         }
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
         return this.insureUnifiedPayRestService_consumer.queryMedicnInfo(map);
     }
 

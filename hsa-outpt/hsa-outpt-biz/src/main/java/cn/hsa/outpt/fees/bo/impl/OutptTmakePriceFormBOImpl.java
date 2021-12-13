@@ -999,6 +999,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         BigDecimal aka151 = BigDecimalUtils.convert(payinfo.get("aka151"));//起付线费用
         BigDecimal akb067 = BigDecimalUtils.convert(payinfo.get("akb067"));//个人现金支付
         BigDecimal akb066 = BigDecimalUtils.convert(payinfo.get("akb066"));//个人账户支付
+
+        /**
+         * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         */
+        if(BigDecimalUtils.equals(akb067,akc264)){
+            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+        }
+
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
         BigDecimal ake039 = BigDecimalUtils.convert(payinfo.get("ake039"));//医疗保险统筹基金支付
         BigDecimal ake035 = BigDecimalUtils.convert(payinfo.get("ake035"));//公务员医疗补助基金支付
@@ -1739,6 +1747,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
         outptCostUploadAndTrialParam.put("action", "settle");//操作 = 结算操作
 
+        // add 读卡支付新增入参
+        outptCostUploadAndTrialParam.put("isReadCardPay",outptVisitDTO.getIsReadCardPay());
+        outptCostUploadAndTrialParam.put("bka895",outptVisitDTO.getBka895());
+        outptCostUploadAndTrialParam.put("bka896",outptVisitDTO.getBka896());
         /**
          * 医保结算
          *
@@ -1820,7 +1832,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 OutptSettleDO outptSettleDO = new OutptSettleDO();
                 outptSettleDO.setHospCode(hospCode);
                 outptSettleDO.setId(settleId);
-                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
                 if(object == null){
                     outptSettleDO.setAcctPay(new BigDecimal(0.00));
                 }
@@ -1829,6 +1840,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 }else{
                     outptSettleDO.setAcctPay(MapUtils.get(payinfo,"acct_pay"));
                 }
+                outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
                 // 结算前个人账户余额 =  个人账户支出+结算后个人账户余额
                 individualSettleDO.setBeforeSettle(BigDecimalUtils.add(outptSettleDO.getAcctPay(),individualSettleDO.getLastSettle()));
                 individualSettleDO.setInsureSettleId(insureSettleId);
@@ -2910,7 +2922,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         tempMap.put("id", tempMap.get("medOrgOrd").toString()); // 结算id
         tempMap.put("hospCode", hospCode);
         InsureIndividualSettleDO insureIndividualSettleDO = outptSettleDAO.getInsureInsureIndividualSettle(tempMap);
-
+        insureIndividualSettleDO.setSettleId(tempMap.get("medOrgOrd").toString());
         insureIndividualSettleDO.setId(SnowflakeUtils.getId());
         insureIndividualSettleDO.setTotalPrice(new BigDecimal(tempMap.get("feeSumamt").toString()));
         insureIndividualSettleDO.setPersonalPrice(new BigDecimal(tempMap.get("ownpayAmt").toString()));
@@ -3216,6 +3228,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 返回值定义
         Map<String, Object> retMap = new HashMap<>();
 
+        //pengbo   20211203 结算更新费用结算发票ID
+        outptCostDAO.batchUpdateSettleInvoiceId(outotCost);
+
         if (!UtilFunc.isEmpty(pjList)) {
             retMap.put("jspjJsonList", pjList);
         }
@@ -3495,7 +3510,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             pjList.add(outptSettleInvoiceDO);
         }
-
+        /**
+         * 设置发票结算ID到费用表
+         */
+        outptCostDTO.setSettleInvoiceId(outptSettleInvoiceDO.getId());
         return outptSettleInvoiceDO;
     }
 
@@ -4116,6 +4134,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         stringObjectMap.put("param",json);
         logger.info("体检收费入参:" + json);
         String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("体检退费反参信息为空，请联系管理员。");
+        }
         logger.info("体检收费反参:" + resultStr);
+        JSONObject resultObj = JSON.parseObject(resultStr);
+        String code = resultObj.get("code").toString();
+        if (!"0".equals(code)) {
+            throw new AppException((String) resultObj.get("message"));
+        }
     }
 }

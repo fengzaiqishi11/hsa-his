@@ -202,4 +202,16 @@
         </if>
     </select>
 
+    <select id="queryAdmdvsInfoPage" resultType="java.util.HashMap" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select
+        id, hosp_code, admdvs_code admdvsCode, admdvs_name admdvsName
+        from insure_admdvs
+        where
+        hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (admdvs_name like concat('%',#{keyword},'%')
+            or admdvs_code like concat('%',#{keyword},'%'))
+        </if>
+    </select>
+
 </mapper>

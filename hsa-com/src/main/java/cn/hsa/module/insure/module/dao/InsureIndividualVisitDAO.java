@@ -409,5 +409,19 @@ public interface InsureIndividualVisitDAO {
      * @Return
      */
     Map<String, String> selectSysParameter(Map<String, String> map);
+
+
+    String queryMsgId(String hospCode, String visitId, String medisCode);
+
+    /**
+     * @Method selectInsuplcName
+     * @Desrciption  查询参保地区划
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/8 18:49
+     * @Return
+    **/
+    String selectInsuplcName(Map<String, Object> visitMap);
 }
 

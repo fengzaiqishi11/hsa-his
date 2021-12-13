@@ -1121,7 +1121,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
     /**
      * @Method queryIncomeClassifyInfo
-     * @Desrciption 全院月收入分类统计
+     * @Desrciption 全院月收入分类统计重写
      * @param
      * @Author liuqi1
      * @Date   2020/11/18 17:10

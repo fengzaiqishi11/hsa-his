@@ -390,4 +390,9 @@ public interface WxBasicInfoDAO {
 
     // 查询优惠类别，默认普通病人
     List<BasePreferentialTypeDTO> queryPreferentialTypeList(String hospCode);
+    /**
+     * 查询所有科室下所有七天内有排班的医生
+     * pengbo
+     */
+    List<Map<String,Object>> querySevenQueueDoctor(Map<String, Object> map);
 }

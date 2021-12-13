@@ -50,5 +50,7 @@ public class BaseAdviceDTO extends BaseAdviceDO implements Serializable {
 
     private Boolean checkFlag;
 
+    private String visitId ;
+
 
 }

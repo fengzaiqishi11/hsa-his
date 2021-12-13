@@ -888,7 +888,7 @@ public class WxBasicInfoController {
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-01 10:35
-     * @Return: 
+     * @Return:
      **/
     @PostMapping("/inpatientInformationInquiry")
     public WrapperResponse<String> inpatientInformationInquiry(@RequestBody Map<String, Object> paramMap) {
@@ -955,7 +955,7 @@ public class WxBasicInfoController {
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-05 11:15
-     * @Return: 
+     * @Return:
      **/
     @PostMapping("/detailedQueryOfInpatientRecords")
     public WrapperResponse<String> detailedQueryOfInpatientRecords(@RequestBody Map<String, Object> paramMap) {
@@ -1035,7 +1035,7 @@ public class WxBasicInfoController {
      * @Author: luoyong
      * @Email: luoyong@powersi.com.cn
      * @Date: 2021-07-05 17:19
-     * @Return: 
+     * @Return:
      **/
     @PostMapping("/dailyListDetailsQuery")
     public WrapperResponse<String> dailyListDetailsQuery(@RequestBody Map<String, Object> paramMap) {
@@ -1058,6 +1058,32 @@ public class WxBasicInfoController {
             map.put("data", JSON.parse(data));
         }
         return wxBasicInfoService_consumer.dailyListDetailsQuery(map);
+    }
+
+    /**
+     * 查询所有科室下所有七天内有排班的医生
+     */
+    @PostMapping("/querySevenQueueDoctor")
+    public WrapperResponse<String> querySevenQueueDoctor(@RequestBody Map<String, Object> paramMap) {
+        String hospCode = MapUtils.get(paramMap, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("入参错误，请传入医院编码！");
+        }
+
+        String data = null;
+        try {
+            log.debug("微信小程序【查询所有科室下所有七天内有排班的医生】入参解密前：" + MapUtils.get(paramMap, "data"));
+            data = AsymmetricEncryption.pubdecrypt(MapUtils.get(paramMap, "data"));
+            log.debug("微信小程序【查询所有科室下所有七天内有排班的医生】入参解密后：" + JSON.parse(data));
+        } catch (Exception e) {
+            throw new AppException("【住院病人日费用清单明细】入参错误，请联系管理员！" + e.getMessage());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        if (StringUtils.isNotEmpty(data)) {
+            map.put("data", JSON.parse(data));
+        }
+        return wxBasicInfoService_consumer.querySevenQueueDoctor(map);
     }
 
 }

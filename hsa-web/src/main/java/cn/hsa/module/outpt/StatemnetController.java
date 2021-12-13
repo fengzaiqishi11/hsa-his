@@ -7,7 +7,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
-import cn.hsa.module.outpt.statement.service.PatientCostLedgerService;
+import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -410,7 +412,7 @@ public class StatemnetController extends BaseController {
   }
 
   /**
-   * @param paraMap
+   * @param
    * @Method queryIncomeClassifyInfo
    * @Desrciption 全院月收入分类统计
    * @Author liuqi1
@@ -426,12 +428,16 @@ public class StatemnetController extends BaseController {
   }*/
 
   @GetMapping("/queryIncomeClassifyInfo")
-  public WrapperResponse<PageDTO> queryIncomeClassifyInfo(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
-    if (MapUtils.get(paraMap, "startDate") == null || "".equals(MapUtils.get(paraMap, "startDate"))) {
+  public WrapperResponse<PageDTO> queryIncomeClassifyInfo(IncomeDTO incomeDTO, HttpServletRequest req, HttpServletResponse res) {
+    Date startDate = incomeDTO.getStartDate();
+    if (startDate == null) {
       throw new AppException("开始时间不能为空");
     }
     SysUserDTO userDTO = getSession(req, res) ;
+    Map paraMap = new HashMap();
     paraMap.put("hospCode", userDTO.getHospCode());
+    incomeDTO.setHospCode(userDTO.getHospCode());
+    paraMap.put("incomeDTO",incomeDTO);
     WrapperResponse<PageDTO> listWrapperResponse = patientCostLedgerService_consumer.queryIncomeClassifyInfo(paraMap);
     return listWrapperResponse;
   }

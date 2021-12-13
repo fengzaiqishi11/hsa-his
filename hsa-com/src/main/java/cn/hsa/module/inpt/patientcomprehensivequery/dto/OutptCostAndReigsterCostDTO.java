@@ -43,4 +43,8 @@ public class OutptCostAndReigsterCostDTO extends PageDO implements Serializable 
     private String visitId;
     // 就诊名称
     private String visitName;
+    // 收费员id
+    private String chargeId;
+    // 收费员姓名
+    private String chargeName;
 }

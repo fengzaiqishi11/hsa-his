@@ -189,6 +189,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             }
             insureIndividualVisitDO.setIsEcqr(Constants.SF.S);
             insureIndividualVisitDO.setPayToken(app);//电子凭证token
+            insureIndividualVisitDO.setPayTokenDengJi(app);
         }
         insureIndividualVisitDO.setVisitTime(now);//就诊时间
         insureIndividualVisitDO.setVisitDrptId(deptId);//就诊科室ID

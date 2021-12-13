@@ -173,11 +173,9 @@
 		(select name from base_dept where in_ward_id = base_dept.id) as wardName,bb.seq_no,
 		CONCAT(
 		iv.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		iv.gender_code),'-'),'/',
+		IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(iv.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		iv.age_unit_code),'')
+		IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
 		) AS keyword,
 		(iv.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = iv.id)) as totalMergeBalance,
 		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = iv.id) as totalMergeCost
@@ -246,11 +244,9 @@
 		(select name from base_dept where v.in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName, b.seq_no,
 		CONCAT(
 		v.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		v.gender_code),'-'),'/',
+		IFNULL((case v.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '-'),'/',
 		IFNULL(v.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		v.age_unit_code),'')
+		IFNULL((case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
 		) AS keyword
 		from inpt_visit v
 		left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
@@ -314,11 +310,9 @@
 		(select name from base_dept where pt.in_ward_id = base_dept.id) as wardName,pb.id as babyId,2 as px,pb.name as babyName, b.seq_no,
 		CONCAT(
 		pt.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		pt.gender_code),'-'),'/',
+		IFNULL((case pt.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(pt.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		pt.age_unit_code),'')
+		IFNULL((case pt.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
 		) AS keyword
 		from inpt_visit pt
 		join inpt_baby pb on pt.id = pb.visit_id and pb.is_cancel ='0'
@@ -387,11 +381,9 @@
 		(select name from base_dept where a.in_ward_id = base_dept.id) as wardName,
 		CONCAT(
 		a.name,'/',
-		IFNULL((select name from sys_code_detail where a.hosp_code = #{hospCode} and c_code = 'XB' and value =
-		a.gender_code),'-'),'/',
+		IFNULL((case a.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(a.age,'-'),
-		IFNULL((select name from sys_code_detail where a.hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		a.age_unit_code),'')
+		IFNULL((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
 		) AS keyword,
 		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
 		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
@@ -1007,11 +999,9 @@
 		select
 		CONCAT(
 		iv.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		iv.gender_code),'-'),'/',
+		IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(iv.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		iv.age_unit_code),'')
+		IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
 		) AS keyword,
 		iv.id,
 		iv.hosp_code,
@@ -1141,11 +1131,9 @@
     select distinct
     CONCAT(
     iv.name,'/',
-    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-    iv.gender_code),'-'),'/',
+    IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
     IFNULL(iv.age,'-'),
-    IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-    iv.age_unit_code),'')
+    IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
     ) AS keyword,
     iv.id,
     iv.hosp_code,
@@ -2058,11 +2046,9 @@
 		(select name from base_dept where a.in_ward_id = base_dept.id) as wardName,
 		CONCAT(
 		a.name,'/',
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'XB' and value =
-		a.gender_code),'-'),'/',
+		IFNULL((case a.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '-'),'/',
 		IFNULL(a.age,'-'),
-		IFNULL((select name from sys_code_detail where hosp_code = #{hospCode} and c_code = 'NLDW' and value =
-		a.age_unit_code),'')
+		IFNULL((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
 		) AS keyword,
 		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
 		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
@@ -2278,7 +2264,7 @@
 		visit.in_dept_name,
 		visit.out_disease_name,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name
-		= visit.name) as zycs,
+		= visit.name and a.hosp_code =#{hospCode}) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
 		visit.crte_name AS czr,
@@ -2389,7 +2375,7 @@
 		visit.in_dept_name,
 		visit.out_disease_name,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name
-		= visit.name) as zycs,
+		= visit.name and a.hosp_code =#{hospCode}) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
 		visit.crte_name AS czr,

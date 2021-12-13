@@ -73,8 +73,8 @@
 
     <!--新增所有列-->
     <insert id="insertSurgery">
-        insert into oper_info_record(id,hosp_code, visit_id, baby_id, in_no, advice_id, name, gender_code, age, age_unit_code, blood_code, dept_id, oper_dept_id, bed_id, bed_name, oper_disease_id, oper_disease_icd9, oper_disease_name, in_disease_id, in_disease_name, in_disease_icd10, doctor_id, doctor_name, assistant_id1, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, special_request, content, audit_id, audit_name, audit_time, audit_remark, oper_plan_time, oper_room_Id, oper_room_name, xh_nurse_id, xh_nurse_name, qx_nurse_id, qx_nurse_name, ana_code, ana_id1, ana_name1, ana_id2, ana_name2, ana_id3, ana_name3, oper_end_time, notched_code, heal_code, oper_time_hour, status_code, is_cost, total_price, cost_time, cost_id, cost_name, remark, crte_id, crte_name, crte_time,rank,ward_id)
-        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{inNo}, #{adviceId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{bloodCode}, #{deptId}, #{operDeptId}, #{bedId}, #{bedName}, #{operDiseaseId}, #{operDiseaseIcd9}, #{operDiseaseName}, #{inDiseaseId}, #{inDiseaseName}, #{inDiseaseIcd10}, #{doctorId}, #{doctorName}, #{assistantId1}, #{assistantName1}, #{assistantId2}, #{assistantName2}, #{assistantId3}, #{assistantName3}, #{specialRequest}, #{content}, #{auditId}, #{auditName}, #{auditTime}, #{auditRemark}, #{operPlanTime}, #{operRoomId}, #{operRoomName}, #{xhNurseId}, #{xhNurseName}, #{qxNurseId}, #{qxNurseName}, #{anaCode}, #{anaId1}, #{anaName1}, #{anaId2}, #{anaName2}, #{anaId3}, #{anaName3}, #{operEndTime}, #{notchedCode}, #{healCode}, #{operTimeHour}, #{statusCode}, #{isCost}, #{totalPrice}, #{costTime}, #{costId}, #{costName}, #{remark}, #{crteId}, #{crteName}, #{crteTime},#{rank},#{wardId})
+        insert into oper_info_record(id,hosp_code, visit_id, baby_id, in_no, advice_id, name, gender_code, age, age_unit_code, blood_code, dept_id, oper_dept_id, bed_id, bed_name, oper_disease_id, oper_disease_icd9, oper_disease_name, in_disease_id, in_disease_name, in_disease_icd10, doctor_id, doctor_name, assistant_id1, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, special_request, content,oper_Type, audit_id, audit_name, audit_time, audit_remark, oper_plan_time, oper_room_Id, oper_room_name, xh_nurse_id, xh_nurse_name, qx_nurse_id, qx_nurse_name, ana_code, ana_id1, ana_name1, ana_id2, ana_name2, ana_id3, ana_name3, oper_end_time, notched_code, heal_code, oper_time_hour, status_code, is_cost, total_price, cost_time, cost_id, cost_name, remark, crte_id, crte_name, crte_time,rank,ward_id)
+        values (#{id},#{hospCode}, #{visitId}, #{babyId}, #{inNo}, #{adviceId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{bloodCode}, #{deptId}, #{operDeptId}, #{bedId}, #{bedName}, #{operDiseaseId}, #{operDiseaseIcd9}, #{operDiseaseName}, #{inDiseaseId}, #{inDiseaseName}, #{inDiseaseIcd10}, #{doctorId}, #{doctorName}, #{assistantId1}, #{assistantName1}, #{assistantId2}, #{assistantName2}, #{assistantId3}, #{assistantName3}, #{specialRequest}, #{content}, #{operType}, #{auditId}, #{auditName}, #{auditTime}, #{auditRemark}, #{operPlanTime}, #{operRoomId}, #{operRoomName}, #{xhNurseId}, #{xhNurseName}, #{qxNurseId}, #{qxNurseName}, #{anaCode}, #{anaId1}, #{anaName1}, #{anaId2}, #{anaName2}, #{anaId3}, #{anaName3}, #{operEndTime}, #{notchedCode}, #{healCode}, #{operTimeHour}, #{statusCode}, #{isCost}, #{totalPrice}, #{costTime}, #{costId}, #{costName}, #{remark}, #{crteId}, #{crteName}, #{crteTime},#{rank},#{wardId})
     </insert>
 
     <update id="updateSurgeryStatus">
@@ -182,6 +182,9 @@
                 audit_remark = #{auditRemark},
             <if test="operPlanTime != null">
                 oper_plan_time = #{operPlanTime},
+            </if>
+            <if test="operType != null and operType != ''">
+                oper_Type = #{operType},
             </if>
             <if test="operRoomId != null and operRoomId != ''">
                 oper_room_Id = #{operRoomId},
@@ -630,7 +633,7 @@
         oper.oper_disease_icd9,oper.oper_disease_name,oper.in_disease_id,oper.in_disease_name,
         oper.in_disease_icd10,oper.doctor_id,oper.doctor_name,oper.assistant_id1,oper.assistant_name1,
         oper.assistant_id2,oper.assistant_name2,oper.assistant_id3,oper.assistant_name3,
-        oper.special_request,oper.content,oper.audit_id,oper.audit_name,oper.audit_time,
+        oper.special_request,oper.content,oper.oper_Type,oper.audit_id,oper.audit_name,oper.audit_time,
         oper.audit_remark,oper.oper_plan_time,oper.oper_room_Id,oper.oper_room_name,
         oper.xh_nurse_id,oper.xh_nurse_name,oper.qx_nurse_id,oper.qx_nurse_name,oper.ana_code,
         oper.ana_id1,oper.ana_name1,oper.ana_id2,oper.ana_name2,oper.ana_id3,oper.ana_name3,

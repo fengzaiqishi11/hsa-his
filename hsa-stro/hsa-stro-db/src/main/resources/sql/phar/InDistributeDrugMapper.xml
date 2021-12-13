@@ -152,9 +152,9 @@
         ,sum(a.num) num,a.split_unit_code,ifnull(sum(a.split_num), 0) splitNum,a.split_ratio,a.dosage_unit_code,
         c.in_no
         from phar_in_receive_detail a
-        join phar_in_receive b on a.receive_id=b.id
-        join inpt_visit c on a.visit_id=c.id
-        where a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode}
+        join phar_in_receive b on a.receive_id=b.id and a.hosp_code = b.hosp_code
+        join inpt_visit c on a.visit_id=c.id and a.hosp_code = c.hosp_code
+        where a.hosp_code=#{hospCode}
         <if test="receiveId!=null and receiveId!=''">
             and a.receive_id=#{receiveId}
         </if>

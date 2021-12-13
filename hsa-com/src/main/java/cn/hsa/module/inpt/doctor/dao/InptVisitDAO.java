@@ -432,7 +432,7 @@ public interface InptVisitDAO {
      **/
     List<InptVisitDTO> queryBabyInptVisitPage(InptVisitDTO inptVisitDTO);
 
-    void updateIllness(InptVisitDTO inptVisitDTO);
+    void updateIllnessBacth(@Param("list")List<InptVisitDTO>  inptVisitDTOs);
 
     /**
      * @Method: getBaseProfileInfo

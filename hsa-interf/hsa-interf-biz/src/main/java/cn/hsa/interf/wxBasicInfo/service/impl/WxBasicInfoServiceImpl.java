@@ -529,4 +529,14 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
         return  wxBasicInfoBO.queryDailyCostListDetails(map);
     }
 
+    /**
+     * 查询所有科室下所有七天内有排班的医生
+     *
+     * @param map
+     */
+    @Override
+    public WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map) {
+        return  wxBasicInfoBO.querySevenQueueDoctor(map);
+    }
+
 }

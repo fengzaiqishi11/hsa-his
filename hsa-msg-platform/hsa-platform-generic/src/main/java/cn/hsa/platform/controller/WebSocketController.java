@@ -1,49 +1,48 @@
 package cn.hsa.platform.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.yeauty.annotation.OnEvent;
-import org.yeauty.annotation.ServerEndpoint;
-import org.yeauty.pojo.Session;
+import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-@ServerEndpoint("/im/{userId}/{toUserId}")
-@RestController
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 一个提供webSocket长连接给前端使用的接口
+ *
+ * @author  luonianxin
+ * @Date  2021-12-13
+ */
+
+@RequestMapping("index")
+@Controller
 public class WebSocketController {
-    @OnOpen
-    public void onOpen(Session session, HttpHeaders headers, ParameterMap parameterMap) throws IOException {
-        System.out.println("new connection");
 
-        String paramValue = parameterMap.getParameter("paramKey");
-        System.out.println(paramValue);
-    }
-
-    @OnClose
-    public void onClose(Session session) throws IOException {
-        System.out.println("one connection closed");
-    }
-
-    @OnError
-    public void onError(Session session, Throwable throwable) {
-        throwable.printStackTrace();
-    }
-
-    @OnMessage
-    public void onMessage(Session session, String message) {
-        System.out.println(message);
-        session.sendText("Hello Netty!");
-    }
-
-    @OnBinary
-    public void onBinary(Session session, byte[] bytes) {
-        for (byte b : bytes) {
-            System.out.println(b);
-        }
-        session.sendBinary(bytes);
-    }
-
-    @OnEvent
-    public void onEvent(Session session, Object evt) {
-       System.out.println(evt+"事务");
-       Integer.MAX_VALUE
+    /**
+     *
+     * @param id 用户主键
+     * @param idList 要把消息发送给其他用户的主键
+     */
+    @RequestMapping("hello1")
+    public String hello(Long id, List<Long> idList){
+        //获取所有连接的客户端,如果是集群环境使用redis的hash数据类型存储即可
+        Map<String, Channel> channelMap = HsaPlatformWebSocketHandler.getChannelMap();
+        //获取与用户主键绑定的channel,如果是集群环境使用redis的hash数据类型存储即可
+        Map<String, Long> clientMap = HsaPlatformWebSocketHandler.getClientMap();
+        //解决问题六,websocket集群中一个客户端向其他客户端主动发送消息，如何实现？
+        clientMap.forEach((k,v)->{
+            if (idList.contains(v)){
+                Channel channel = channelMap.get(k);
+                channel.eventLoop().execute(() -> channel.writeAndFlush(new TextWebSocketFrame(Thread.currentThread().getName()+"服务器时间" + LocalDateTime.now() + "wdy")));
+            }
+        });
+        return "SUCCESS";
     }
 }
 

@@ -227,7 +227,7 @@ public class OutptElectronicBillFunction {
         certParam.put("id",outptVisitDTO.getDoctorId());
         Map<String,Object> sysUser = insureIndividualVisitDAO.selectSysUserByid(certParam);
         data.put("drDeptCodg",sysUser.get("dept_code"));//医生科室编号，不可空
-        data.put("caty","");//科室类别
+        data.put("caty","门诊");//科室类别
         data.put("drCertNo",sysUser.get("prac_certi_no"));//医生证件号码，不可空
         data.put("rxItemVal",outptCostDTOList.size());//明细上传数量，不可空
         data.put("iptType","");//住院类别，可空

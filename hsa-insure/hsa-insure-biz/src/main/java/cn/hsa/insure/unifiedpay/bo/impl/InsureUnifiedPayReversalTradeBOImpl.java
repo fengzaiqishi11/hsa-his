@@ -1255,6 +1255,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         partFourMap.put("actPayDedc", s8); // 实际支付起付线
         partFourMap.put("psnCashPay", s9); // 现金支付金额
         partFourMap.put("mafPay", s12); // 医疗救助
+        partFourMap.put("othPay",s11); // 其他支付
         partFourMap.put("hifobPayAndHifmiPay", BigDecimalUtils.add(s4, s5)); // 大病保险支付
 
         if (individualSettleDTO != null) {

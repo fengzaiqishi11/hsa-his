@@ -3,7 +3,6 @@ package cn.hsa.interf.report.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.interf.report.bo.StatisticalReportBO;
 import cn.hsa.module.interf.report.dao.StatisticalReportDAO;
 import cn.hsa.util.BigDecimalUtils;
@@ -209,7 +208,8 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
         List<Map<String, Object>> resultData = statisticalReportDAO.lisStatistics(paramMap);
-        return getPageDTO(paramMap, resultData);
+        //return getPageDTO(paramMap, resultData);
+        return PageDTO.of(resultData);
     }
 
     @Override

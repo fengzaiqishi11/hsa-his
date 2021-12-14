@@ -1256,7 +1256,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Date   2021/12/4 22:12
      * @Return
      **/
-    public static String getDateToString(java.sql.Timestamp time){
+    public String getDateToString(java.sql.Timestamp time){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.Y_M_D);
         return simpleDateFormat.format(time);
     }
@@ -2191,7 +2191,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Date   2021/11/17 14:34
      * @Return
      **/
-    public static <T> T getEmptyErr(Map map, Object key, String errMsg) {
+    public <T> T getEmptyErr(Map map, Object key, String errMsg) {
         if (!map.containsKey(key)) {
             throw new RuntimeException(errMsg);
         }

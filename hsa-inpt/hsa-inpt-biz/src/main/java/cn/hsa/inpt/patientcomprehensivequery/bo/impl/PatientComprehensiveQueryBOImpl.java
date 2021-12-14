@@ -12,6 +12,7 @@ import cn.hsa.module.inpt.patientcomprehensivequery.dao.PatientComprehensiveQuer
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO;
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -304,7 +305,16 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
   @Override
   public List<Map<String, Object>> queryYWLX(Map map) {
     String hospCode = MapUtils.get(map, "hospCode");
-    List<Map<String, Object>> ywlx = patientComprehensiveQueryDAO.queryYWLX(hospCode);
+    //分割字符串
+    String[] code = MapUtils.get(map, "codes").toString().split(",");
+    //用来存code值的list
+    List<String> codesList = new ArrayList<>();
+    if (code.length > 0){
+      for (int i = 0; i < code.length; i++) {
+        codesList.add(code[i]);
+      }
+    }
+    List<Map<String, Object>> ywlx = patientComprehensiveQueryDAO.queryYWLX(hospCode, codesList);
     return ywlx;
-  }
+   }
 }

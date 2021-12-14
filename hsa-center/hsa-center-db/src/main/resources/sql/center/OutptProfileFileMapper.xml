@@ -461,8 +461,23 @@
     
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into center_profile_file(id, name, gender_code, age, age_unit_code,birthday, nation_code, nationality_cation, native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code, now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code, contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code, take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease, expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark, allergy_remark, pym, wbm, remark, crte_id, crte_name)
-        values (#{id}, #{name}, #{genderCode}, #{age},#{ageUnitCode}, #{birthday}, #{nationCode}, #{nationalityCation}, #{nativePlace}, #{educationCode}, #{occupationCode}, #{marryCode}, #{certCode}, #{certNo}, #{phone}, #{email}, #{oftenCode}, #{nowProv}, #{nowCity}, #{nowArea}, #{nowAddress}, #{nowPostCode}, #{nativeProv}, #{nativeCity}, #{nativeArea}, #{nativeAddress}, #{nativePostCode}, #{contactName}, #{contactRelaCode}, #{contactPhone}, #{contactPostCode}, #{contactAddress}, #{takeName}, #{takeRelaCode}, #{takeCertNo}, #{takePhone}, #{work}, #{workPhone}, #{workPostCode}, #{workAddress}, #{bloodCode}, #{familyDisease}, #{exposeDisease}, #{heredityDisease}, #{allergyDisease}, #{pastDisease}, #{pastOper}, #{pastTrauma}, #{pastBlood}, #{pastRemark}, #{allergyRemark}, #{pym}, #{wbm}, #{remark}, #{crteId}, #{crteName})
+        insert into center_profile_file(id, name, gender_code, age, age_unit_code,birthday, nation_code,
+            nationality_cation, native_place, education_code, occupation_code,marry_code, cert_code,
+            cert_no, phone, email, often_code, now_prov, now_city, now_area, now_address, now_post_code,
+        native_prov, native_city, native_area, native_address, native_post_code, contact_name,
+    contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+    take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+    expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+                                        past_remark, allergy_remark, pym, wbm, remark, crte_id, crte_name)
+        values (#{id}, #{name}, #{genderCode}, #{age},#{ageUnitCode}, #{birthday}, #{nationCode},
+                #{nationalityCation}, #{nativePlace}, #{educationCode}, #{occupationCode}, #{marryCode},
+                #{certCode}, #{certNo}, #{phone}, #{email}, #{oftenCode}, #{nowProv}, #{nowCity}, #{nowArea},
+                #{nowAddress}, #{nowPostCode}, #{nativeProv}, #{nativeCity}, #{nativeArea}, #{nativeAddress},
+                #{nativePostCode}, #{contactName}, #{contactRelaCode}, #{contactPhone}, #{contactPostCode},
+                #{contactAddress}, #{takeName}, #{takeRelaCode}, #{takeCertNo}, #{takePhone}, #{work},
+                #{workPhone}, #{workPostCode}, #{workAddress}, #{bloodCode}, #{familyDisease}, #{exposeDisease},
+                #{heredityDisease}, #{allergyDisease}, #{pastDisease}, #{pastOper}, #{pastTrauma}, #{pastBlood},
+                #{pastRemark}, #{allergyRemark}, #{pym}, #{wbm}, #{remark}, #{crteId}, #{crteName})  on duplicate key update remark=#{remark};
     </insert>
     
     <!--通过主键修改数据-->
@@ -699,7 +714,7 @@
     <!--新增所有列-->
     <insert id="insertExtend" keyProperty="id" useGeneratedKeys="true">
         insert into center_profile_file_extend(id, hosp_code, profile_id, in_profile, out_profile, total_out, total_in, outpt_last_visit_time, inpt_last_visit_time, source_tj_code, source_tj_remark, crte_id, crte_name, crte_time)
-        values (#{id}, #{hospCode}, #{profileId}, #{inProfile}, #{outProfile}, #{totalOut}, #{totalIn}, #{outptLastVisitTime}, #{inptLastVisitTime}, #{sourceTjCode}, #{sourceTjRemark}, #{crteId}, #{crteName}, #{crteTime})
+        values (#{id}, #{hospCode}, #{profileId}, #{inProfile}, #{outProfile}, #{totalOut}, #{totalIn}, #{outptLastVisitTime}, #{inptLastVisitTime}, #{sourceTjCode}, #{sourceTjRemark}, #{crteId}, #{crteName}, #{crteTime})  on duplicate key update source_tj_remark=#{sourceTjRemark};
     </insert>
     
     <!--通过主键修改数据(有判空条件))-->

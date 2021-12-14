@@ -7,6 +7,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO;
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -220,5 +221,5 @@ public interface PatientComprehensiveQueryDAO {
    * @Return
    *
    * @return*/
-  List<Map<String, Object>> queryYWLX(String hospCode);
+  List<Map<String, Object>> queryYWLX(String hospCode, List<String> codesList);
 }

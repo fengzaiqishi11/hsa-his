@@ -944,7 +944,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     throw new AppException((String) resultMap.get("msg"));
                 }
                 if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode);
+                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode,"2304");
                     Object resultMsg = resultMap.get("err_msg");
                     if (resultMsg == null) {
                         resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";

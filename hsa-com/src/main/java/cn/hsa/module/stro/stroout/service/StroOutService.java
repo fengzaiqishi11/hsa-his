@@ -3,6 +3,7 @@ package cn.hsa.module.stro.stroout.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
+import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -117,5 +118,14 @@ public interface StroOutService {
      **/
     @PostMapping("/service/stro/stroOut/queryWholeOut")
     WrapperResponse<StroOutDTO> queryWholeOut(Map map);
-    
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 根据出库单id 查询 出库单明细
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    @GetMapping("/service/stro/stroOut/queryStroOutDetail")
+    WrapperResponse<List<StroOutDetailDTO>> queryStroOutDetail(Map map);
 }

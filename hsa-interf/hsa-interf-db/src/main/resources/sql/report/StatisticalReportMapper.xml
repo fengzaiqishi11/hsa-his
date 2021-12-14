@@ -1484,7 +1484,7 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
-        <if test='statisWay == "5"'>
+        <if test='statisWay == "6"'>
             and g.prep_code in ('241','16','138')
         </if>
         GROUP BY

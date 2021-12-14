@@ -6544,6 +6544,9 @@
         <if test="settleEndTime != null and settleEndTime !=''">
             and b.settle_time &lt;= #{settleEndTime}
         </if>
+        <if test="patientCode != null and patientCode !=''">
+            and d.patient_code = #{patientCode}
+        </if>
         <if test="deptId !=null and deptId !=''">
             and d.dept_id =#{deptId}
         </if>
@@ -6621,6 +6624,9 @@
         </if>
         <if test="outptDoctorName != null and outptDoctorName !=''">
             and a.doctor_name like concat('%', #{outptDoctorName}, '%')
+        </if>
+        <if test="patientCode !=null and patientCode !=''">
+            and a.patient_code =#{patientCode}
         </if>
         <if test="keyword != null and keyword != ''">
             and (a.name like concat('%', #{keyword}, '%')

@@ -1419,7 +1419,7 @@
     <select id="queryMsgId" resultType="java.lang.String">
         SELECT max(msg_id)
         FROM insure_function_log where
-            msg_info = '2304' and
+            msg_info = #{functionCode} and
             code = '0' and hosp_code = #{hospCode}
             and visit_id =#{visitId} and
             medis_code = #{medisCode}

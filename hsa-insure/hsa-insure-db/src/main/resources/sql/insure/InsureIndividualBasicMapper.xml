@@ -369,7 +369,12 @@
                 or iiv.aac001 like concat('%',#{keyword},'%')
                 )
         </if>
-
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiV.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and iiV.visit_id = #{visitId}
+        </if>
     </select>
     <select id="queryInptAndOutptPatientPage"
             resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
@@ -394,6 +399,7 @@
             </if>
         </if>
     </select>
+
 
     <!-- 新增表信息 -->
     <insert id="insert" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
@@ -1197,4 +1203,14 @@
             #{cardIden}
         )
     </insert>
+    <select id="queryPersonInfo" resultType="java.util.Map">
+        select iiv.aac001,iib.aac003,iib.aac006,
+               (select name from  insure_dict id where id.code = 'XZLX' AND id.value = iib.aae140)  as aae140Name,
+               iib.bka035_name as bka035Name,iiv.insuplc_admdvs,iib.bka008,iib.akc252 as balc,iib.bka008
+        from insure_individual_visit  iiv
+        left join  insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
+        where iiv.hosp_code =#{hospCode}
+          and iiv.visit_id = #{visitId}
+          and iiv.medical_reg_no = #{medicalRegNo}
+    </select>
 </mapper>

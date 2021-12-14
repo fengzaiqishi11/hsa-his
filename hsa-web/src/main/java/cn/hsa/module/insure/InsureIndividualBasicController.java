@@ -273,4 +273,19 @@ public class InsureIndividualBasicController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureIndividualBasicService_consumer.queryInsureInfo(map);
     }
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @GetMapping("/queryPersonInfo")
+    public WrapperResponse<Map<String,Object>> queryPersonInfo(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureIndividualBasicService_consumer.queryPersonInfo(map);
+    }
 }

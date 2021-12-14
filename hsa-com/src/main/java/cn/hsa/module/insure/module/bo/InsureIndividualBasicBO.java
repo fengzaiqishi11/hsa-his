@@ -78,7 +78,7 @@ public interface InsureIndividualBasicBO {
     Boolean deleteInsureBasic(InsureIndividualBasicDTO insureIndividualBasicDTO);
 
     /**
-     * @param map
+     * @param
      * @Method queryInsurePatientPage
      * @Desrciption 分页查询医保病人的登记注册信息
      * @Param
@@ -109,4 +109,14 @@ public interface InsureIndividualBasicBO {
      * @Return
      */
     Map<String,Object> queryInsureInfo(Map<String, Object> map);
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    Map<String,Object> queryPersonInfo(Map<String, Object> map);
 }

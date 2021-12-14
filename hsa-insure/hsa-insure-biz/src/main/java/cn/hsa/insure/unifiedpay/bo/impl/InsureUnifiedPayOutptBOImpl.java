@@ -941,8 +941,13 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
-            throw new AppException((String) resultMap.get("err_msg"));
+        if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+            String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode,"2207");
+            Object resultMsg = resultMap.get("err_msg");
+            if(StringUtils.isEmpty(InmsgID)||"".equals(InmsgID)){
+                throw new AppException(resultMsg.toString()+"请联系管理员处理！");
+            }
+            throw new AppException(resultMsg.toString()+"his单边账流水号为:"+InmsgID+"请去医保单边账菜单进行结算单边账操作！");
         }
         logger.info("医保通统一支付平台门诊预结算/结算回参:" + resultJson);
         Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");

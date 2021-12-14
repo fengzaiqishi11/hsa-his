@@ -69,7 +69,8 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
                 //存储每个channel中的future，保证每个channel中有一个定时任务在执行
                 futureMap.put(key, future);
             } else {
-                //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响 解决问题一
+                //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
+                // 主动通信业务在此处填写
                 ctx.channel().writeAndFlush(new TextWebSocketFrame(Thread.currentThread().getName() + "服务器时间" + LocalDateTime.now() + "hsa-msg-platform"));
             }
 

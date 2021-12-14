@@ -28,6 +28,9 @@ public class HsaPlatformGenericApplication {
     @Resource
     private WebsocketInitialization websocketInitialization;
 
+    /**
+     *  初始化websocket服务器运行端口
+     */
     @PostConstruct
     public void start() {
         try {

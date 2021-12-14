@@ -386,6 +386,9 @@
         a.id = b.settle_id
         and a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' ywlx,
@@ -416,6 +419,9 @@
         b.hosp_code = #{hospCode}
         AND a.is_settle = '1'
         AND a.status_code = '0'
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         <!--FROM
             inpt_settle a,
             insure_individual_settle b,
@@ -700,6 +706,9 @@
         AND a.id = b.settle_id
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' AS ywlx,
@@ -724,6 +733,9 @@
         AND a.hosp_code = b.hosp_code
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         ) ss
         WHERE 1 = 1
         <if test="searchTypeList != null and searchTypeList.size > 0">

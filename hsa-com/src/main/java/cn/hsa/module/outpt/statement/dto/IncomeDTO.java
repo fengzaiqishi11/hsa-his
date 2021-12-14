@@ -29,6 +29,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class IncomeDTO   implements Serializable {
     private static final long serialVersionUID = -816969372277325373L;
+    private String bfcId;
     private String upCode;
     private String bfcName;// 收入分类
     private BigDecimal yardCurrentRealityPrice;// 全院本月收入

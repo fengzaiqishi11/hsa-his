@@ -199,7 +199,7 @@ WHERE
         (#{registerId},#{hospCode},#{id},#{registerNo},#{name},#{genderCode},#{age},
         #{birthday},#{certCode},#{certNo},#{phone},#{sourceBzCode},#{visitCode},
         #{sourceTjCode},#{sourceTjRemark},#{registerTime},#{deptId},#{deptName},
-        #{doctorName},#{doctorId},#{isFirstVisit},#{crteId},#{crteName},#{crteTime})
+        #{doctorName},#{doctorId},#{isFirstVisit},#{crteId},#{crteName},#{crteTime})  on duplicate key update crte_time=#{crteTime};
     </insert>
 
     <select id="queryDiaginose" resultType="java.util.Map" parameterType="java.util.Map">

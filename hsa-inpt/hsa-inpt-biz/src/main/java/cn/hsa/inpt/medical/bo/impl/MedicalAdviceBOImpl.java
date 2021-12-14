@@ -3386,7 +3386,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if(ListUtils.isEmpty(inptAdviceDTOList)) {
             return;
         }
-
+        List<InptAdviceDTO> tzList = null ;
         //循环住院医嘱记录
         for(InptAdviceDTO adviceDTO:inptAdviceDTOList) {
             //根据ID获取医嘱目录信息
@@ -3395,11 +3395,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             List<InptAdviceDTO> list = new ArrayList<>();
             //停同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSame())) {
-                list.addAll(inptAdviceDAO.getTlAdvices(adviceDTO));
+                tzList = inptAdviceDAO.getTlAdvices(adviceDTO);
+                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                list.addAll(tzList);
             }
             //停非同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSameNot())) {
-                list.addAll(inptAdviceDAO.getFtlAdvices(adviceDTO));
+                tzList = inptAdviceDAO.getFtlAdvices(adviceDTO);
+                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                list.addAll(tzList);
             }
             //停自身(长期医嘱) 不更新停嘱当日执行次数
             if("1".equals(boById.getIsStopMyself())) {

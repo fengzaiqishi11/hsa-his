@@ -2872,7 +2872,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             return true;
         }
         if (StringUtils.isEmpty(feeOrg.getPayToken()) || StringUtils.isEmpty(feeOrg.getPayOrdId())) {
-            return true;
+            throw new AppException("撤销费用失败，电子凭证登记时的 payToken 或 payOrdId 为空，请联系管理员");
         }
         Map<String,Object> jsonObject = new HashMap<>();
 //        Map<String,Object> jsonObjectData = new HashMap<>();

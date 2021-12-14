@@ -96,7 +96,7 @@
         <foreach collection="list" item="dto" separator=",">
             (#{dto.id}, #{dto.hospCode}, #{dto.pharId}, #{dto.windowId}, #{dto.orderNo}, #{dto.orderReceiveId}, #{dto.totalPrice},
              #{dto.assignUserId}, #{dto.assignUserName}, #{dto.assignTime}, #{dto.distUserId}, #{dto.distUserName}, #{dto.distTime},
-            #{dto.statusCode}, #{dto.deptId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime})
+            #{dto.statusCode}, #{dto.deptId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime})   on duplicate key update crte_time=#{dto.crteTime};
 
         </foreach>
     </insert>

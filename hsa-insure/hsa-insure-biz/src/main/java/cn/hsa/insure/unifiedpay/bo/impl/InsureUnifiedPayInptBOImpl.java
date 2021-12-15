@@ -881,8 +881,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
         dataMap.put("mdtrt_mode","");// 就诊方式
-        dataMap.put("hcard_basinfo","");// 持卡就诊基本信息
-        dataMap.put("hcard_chkinfo","");// 持卡就诊校验信息
+        dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息
+        dataMap.put("hcard_chkinfo",insureIndividualVisitDTO.getHcardChkinfo());// 持卡就诊校验信息
         /**
          * 说明是结算
          */
@@ -1086,16 +1086,18 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         Map <String,String> resultMap = new HashMap<>();
         List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
         if (!ListUtils.isEmpty(setldetailList)) {
+            BigDecimal othPay = BigDecimal.ZERO;
             for (Map<String,Object> map : setldetailList) {
                 String fundPayType = MapUtils.get(map,"fund_pay_type");
                 String fundPayamt = MapUtils.get(map,"fund_payamt").toString();
+                String setlProcInfo = MapUtils.get(map, "setl_proc_info");
                 switch (fundPayType) {
                     case "630100": // 医院减免金额
                         resultMap.put("hospExemAmount",fundPayamt);
                         break;
-                    /*case "610100": // 医疗救助基金
+                    case "610100": // 医疗救助基金
                         resultMap.put("mafPay",fundPayamt);
-                        break;*/
+                        break;
                     case "330200": // 职工意外伤害基金
                         resultMap.put("acctInjPay",fundPayamt);
                         break;
@@ -1118,7 +1120,32 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         resultMap.put("lowInPay",fundPayamt);
                         break;
                     case "999997": // 其他基金
-                        resultMap.put("othPay",fundPayamt);
+                        othPay = BigDecimalUtils.add(othPay.toString(),fundPayamt);
+                        resultMap.put("othPay",othPay.toString());
+                        if ("640101".equals(setlProcInfo)) {
+                            resultMap.put("governmentPay",fundPayamt);
+                        }
+                        if ("630101".equals(setlProcInfo)) {
+                            resultMap.put("hospExemAmount",fundPayamt);
+                        }
+                        if ("620101".equals(setlProcInfo)) {
+                            resultMap.put("thbPay",fundPayamt);
+                        }
+                        if ("610101".equals(setlProcInfo)) {
+                            resultMap.put("mafPay",fundPayamt);
+                        }
+                        break;
+                    case "610101":
+                        resultMap.put("mafPay",fundPayamt);
+                        break;
+                    case "620101":
+                        resultMap.put("thbPay",fundPayamt);
+                        break;
+                    case "630101" :
+                        resultMap.put("hospExemAmount",fundPayamt);
+                        break;
+                    case "640101":
+                        resultMap.put("governmentPay",fundPayamt);
                         break;
                     case "510100": // 生育基金
                         resultMap.put("fertilityPay",fundPayamt);
@@ -1485,7 +1512,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
         mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
         mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
-
+        mdtrtinfoMap.put("hcard_basinfo", insureInptRegisterDTO.getHcardBasinfo());//	证件号码（广州读卡就医必传）
+        mdtrtinfoMap.put("hcard_chkinfo", insureInptRegisterDTO.getHcardChkinfo());//	证件号码（广州读卡就医必传）
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();

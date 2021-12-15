@@ -77,6 +77,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
         } catch (Exception e) {
 
             log.error("websocket服务器推送消息发生错误：", e);
+            ctx.channel().writeAndFlush(new TextWebSocketFrame("websocket服务器处理连接发生错误："+e.getMessage()+ "服务器时间" + LocalDateTime.now() ));
 
         }
 

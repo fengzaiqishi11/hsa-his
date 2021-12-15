@@ -829,8 +829,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("medins_name", outptVisitDTO.getHospName()); // TODO 医疗机构名称
         patientDataMap.put("mdtrt_mode", ""); // TODO 就诊方式
         patientDataMap.put("order_no", ""); // TODO 医疗机构订单号或医疗机构就医序列号
-        patientDataMap.put("hcard_basinfo", ""); // TODO 持卡就诊基本信息
-        patientDataMap.put("hcard_chkinfo", ""); // TODO 持卡就诊校验信息
+        patientDataMap.put("hcard_basinfo", insureIndividualVisitDTO.getHcardBasinfo()); // TODO 持卡就诊基本信息
+        patientDataMap.put("hcard_chkinfo", insureIndividualVisitDTO.getHcardChkinfo()); // TODO 持卡就诊校验信息
         // 门诊费用明细
         List<Map<String, Object>> list = new ArrayList<>();
         List<Map<String, Object>> costList = new ArrayList<>();
@@ -1046,7 +1046,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         Map<String, Object> combineResultMap = new HashMap<>();
         combineResultMap.putAll(paramMap);
         combineResultMap.putAll(setDetailMap);
-        return paramMap;
+        return combineResultMap;
     }
 
     // 保存试算基金信息
@@ -1054,16 +1054,18 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         Map <String,Object> resultMap = new HashMap<>();
         List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
         if (!ListUtils.isEmpty(setldetailList)) {
+            BigDecimal othPay = BigDecimal.ZERO;
             for (Map<String,Object> map : setldetailList) {
                 String fundPayType = MapUtils.get(map,"fund_pay_type");
                 String fundPayamt = MapUtils.get(map,"fund_payamt");
+                String setlProcInfo = MapUtils.get(map, "setl_proc_info");
                 switch (fundPayType) {
                     case "630100": // 医院减免金额
                         resultMap.put("hospExemAmount",fundPayamt);
                         break;
-                    /*case "610100": // 医疗救助基金
+                    case "610100": // 医疗救助基金
                         resultMap.put("mafPay",fundPayamt);
-                        break;*/
+                        break;
                     case "330200": // 职工意外伤害基金
                         resultMap.put("acctInjPay",fundPayamt);
                         break;
@@ -1084,9 +1086,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                         break;
                     case "999109": // 农村低收入人口医疗补充保险
                         resultMap.put("lowInPay",fundPayamt);
-                        break;
-                    case "999997": // 其他基金
-                        resultMap.put("othPay",fundPayamt);
                         break;
                     case "510100": // 生育基金
                         resultMap.put("fertilityPay",fundPayamt);
@@ -1120,6 +1119,34 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                         break;
                     case "310500": //  代缴基金（破产改制）
                         resultMap.put("behalfPay",fundPayamt);
+                        break;
+                    case "999997": // 其他基金
+                        othPay = BigDecimalUtils.add(othPay.toString(),fundPayamt);
+                        resultMap.put("othPay",othPay.toString());
+                        if ("640101".equals(setlProcInfo)) {
+                            resultMap.put("governmentPay",fundPayamt);
+                        }
+                        if ("630101".equals(setlProcInfo)) {
+                            resultMap.put("hospExemAmount",fundPayamt);
+                        }
+                        if ("620101".equals(setlProcInfo)) {
+                            resultMap.put("thbPay",fundPayamt);
+                        }
+                        if ("610101".equals(setlProcInfo)) {
+                            resultMap.put("mafPay",fundPayamt);
+                        }
+                        break;
+                    case "610101":
+                        resultMap.put("mafPay",fundPayamt);
+                        break;
+                    case "620101":
+                        resultMap.put("thbPay",fundPayamt);
+                        break;
+                    case "630101" :
+                        resultMap.put("hospExemAmount",fundPayamt);
+                        break;
+                    case "640101":
+                        resultMap.put("governmentPay",fundPayamt);
                         break;
                     default:
                         break;
@@ -1222,6 +1249,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden()); // 传值社保卡识别码
         dataMap.put("psn_cert_type", "1");
         dataMap.put("certno", insureIndividualVisitDTO.getAac002()); // 传值证件号码
+        dataMap.put("hcardBasinfo", insureIndividualVisitDTO.getHcardBasinfo()); // 读卡就诊基本信息
+        dataMap.put("hcardChkinfo", insureIndividualVisitDTO.getHcardChkinfo()); // 读卡就诊校验信息
 
         Map deptMap = new HashMap();
         deptMap.put("hospCode", hospCode);

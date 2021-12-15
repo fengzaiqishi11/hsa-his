@@ -1,6 +1,7 @@
 package cn.hsa.module.login;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -18,6 +19,7 @@ import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -32,6 +34,9 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+
+import static cn.hsa.util.Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY;
+import static cn.hsa.util.IPWhiteListUtil.checkLoginIP;
 
 /**
  * @Package_name: cn.hsa.module.login
@@ -114,9 +119,15 @@ public class LoginController extends BaseController {
             if (hospitalDTOto == null) {
                 throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
             }
+
+            if (!DateUtils.betweenDate(hospitalDTOto.getStartDate(), hospitalDTOto.getEndDate())) {
+                String startDate = DateUtils.format(hospitalDTOto.getStartDate(), DateUtils.Y_M_DH_M_S);
+                String endDate = DateUtils.format(hospitalDTOto.getEndDate(), DateUtils.Y_M_DH_M_S);
+                throw new AppException("医院编码【" + hospCode + "】：未在有效服务期内，服务开始时间【" + startDate + "】，服务结束时间【" + endDate + "】");
+            }
             // checkAccessIP(getIP(req,res),hospitalDTOto);
             // 校验服务有效期
-            checkServiceTimeout(hospitalDTOto);
+            //  checkServiceTimeout(hospitalDTOto);
             // 指定医院数据源查询用户信息
             Map paramMap = new HashMap<>();
             paramMap.put("hospCode", hospCode);
@@ -237,20 +248,20 @@ public class LoginController extends BaseController {
      * @param hospitalDTOto 医院信息DTO
      */
     private void checkServiceTimeout(CenterHospitalDTO hospitalDTOto){
-//        String encryptStartDate = Optional.ofNullable(hospitalDTOto.getEncryptStartDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务开始时间"));
-//        String encryptEndDate = Optional.ofNullable(hospitalDTOto.getEncryptEndDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务结束时间"));;
-//        try {
-//            encryptStartDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptStartDate.getBytes()), privateKey);
-//            encryptEndDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptEndDate.getBytes()), privateKey);
-//        } catch (Exception e) {
-//            throw new AppException("解析服务时间出现错误,请联系管理员！" + e.getMessage() + "11-" + hospitalDTOto.getCode());
-//        }
-//        encryptStartDate = encryptStartDate.split("&")[0];
-//        encryptEndDate = encryptEndDate.split("&")[0];
-        Date startDate = DateUtils.parse(hospitalDTOto.getStart_time(),DateUtils.Y_M_DH_M_S);
-        Date endDate =  DateUtils.parse(hospitalDTOto.getEnd_time(),DateUtils.Y_M_DH_M_S);
+        String encryptStartDate = Optional.ofNullable(hospitalDTOto.getEncryptStartDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务开始时间"));
+        String encryptEndDate = Optional.ofNullable(hospitalDTOto.getEncryptEndDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务结束时间"));;
+        try {
+            encryptStartDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptStartDate.getBytes()), privateKey);
+            encryptEndDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptEndDate.getBytes()), privateKey);
+        } catch (Exception e) {
+            throw new AppException("解析服务时间出现错误,请联系管理员！" + e.getMessage() + "11-" + hospitalDTOto.getCode());
+        }
+        encryptStartDate = encryptStartDate.split("&")[0];
+        encryptEndDate = encryptEndDate.split("&")[0];
+        Date startDate = DateUtils.parse(encryptStartDate,DateUtils.Y_M_DH_M_S);
+        Date endDate =  DateUtils.parse(encryptEndDate,DateUtils.Y_M_DH_M_S);
         if (!DateUtils.betweenDate(startDate, endDate)) {
-            throw new AppException("医院编码【" + hospitalDTOto.getCode() + "】：未在有效服务期内，服务开始时间【" + hospitalDTOto.getStart_time() + "】，服务结束时间【" + hospitalDTOto.getEnd_time() + "】");
+            throw new AppException("医院编码【" + hospitalDTOto.getCode() + "】：未在有效服务期内，服务开始时间【" + encryptStartDate + "】，服务结束时间【" + encryptEndDate + "】");
         }
         hospitalDTOto.setEncryptEndDate("");
         hospitalDTOto.setEncryptStartDate("");

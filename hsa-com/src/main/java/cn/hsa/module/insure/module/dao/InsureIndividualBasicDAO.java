@@ -139,6 +139,16 @@ public interface InsureIndividualBasicDAO {
      * @Return
      */
     List<InsureIndividualVisitDTO> queryInptAndOutptPatientPage(Map<String, Object> map);
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    Map<String, Object> queryPersonInfo(Map<String, Object> map);
 
     /**
      * @param map

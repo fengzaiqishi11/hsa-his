@@ -959,4 +959,25 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Date: 2021/12/13
    */
   List<IncomeDTO> queryIncomeOutptPriceByBfcId(IncomeDTO incomeDTO);
+
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  获取手术室费用明细表头
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:03
+   * @Return List<InptCostDTO>
+   **/
+  List<InptCostDTO> getInptOperFinanceTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption  获取手术室费用明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:03
+   * @Return List<Map>
+   **/
+  List<Map> getInptOperFinanceList(InptVisitDTO inptVisitDTO);
 }

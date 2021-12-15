@@ -175,6 +175,19 @@ public class InsureIndividualBasicServiceImpl extends HsafService implements Ins
     public WrapperResponse<Map<String, Object>> queryInsureInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureIndividualBasicBO.queryInsureInfo(map));
     }
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryPersonInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureIndividualBasicBO.queryPersonInfo(map));
+    }
 
     /**
      * @param map

@@ -1012,7 +1012,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             /**
              * 如果只要开始时间，没有结束时间，说明一直符合一站式身份
              */
-            List<Map<String, Object>> collect = listMap.stream().filter(item -> (StringUtils.isNotEmpty(MapUtils.get(item, "begntime")) && StringUtils.isEmpty(MapUtils.get(item, "endtime"))) || DateUtils.betweenDate(DateUtils.parse(MapUtils.get(item, "endtime"), DateUtils.Y_M_DH_M_S),
+            List<Map<String, Object>> collect = listMap.stream().filter(item -> (StringUtils.isNotEmpty(MapUtils.get(item, "begntime")) && StringUtils.isEmpty(MapUtils.get(item, "endtime"))) || DateUtils.betweenDate(DateUtils.parse(MapUtils.get(item, "begntime"), DateUtils.Y_M_DH_M_S),
                     DateUtils.parse(MapUtils.get(item, "endtime"), DateUtils.Y_M_DH_M_S), DateUtils.getNow()))
                     .collect(Collectors.toList());
             if (ListUtils.isEmpty(collect)) {

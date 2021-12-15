@@ -462,5 +462,29 @@ public interface PatientCostLedgerService {
   @PostMapping("/service/outpt/statement/queryOutptorInHosptialItemUseInfo")
   WrapperResponse<PageDTO> queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap);
 
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption 查询住院手术财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  @GetMapping("/service/outpt/statement/getInptOperFinanceList")
+  WrapperResponse<PageDTO> getInptOperFinanceList(Map map);
+
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  查询住院手术财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:14
+   * @Return Map
+   **/
+  @GetMapping("/service/outpt/statement/getInptOperFinanceTitle")
+  WrapperResponse<Map> getInptOperFinanceTitle(Map map);
+
 }
 

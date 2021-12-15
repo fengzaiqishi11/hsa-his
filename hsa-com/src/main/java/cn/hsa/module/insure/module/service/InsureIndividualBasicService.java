@@ -120,4 +120,14 @@ public interface InsureIndividualBasicService {
      * @Return
      **/
     WrapperResponse<Map<String, Object>> queryInsureInfo(Map<String, Object> map);
+
+    /**
+     * @Description: 获取已结算人员信息 - 用于门诊已结算自费病人（大学生医保）医保直报
+     * @Param:
+     * @Author: liaojiguang
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date 2021/12/15 13:59
+     * @Return
+     */
+    WrapperResponse<PageDTO> queryOutptSettleInfo(Map<String, Object> map);
 }

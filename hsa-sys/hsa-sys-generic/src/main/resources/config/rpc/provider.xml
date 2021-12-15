@@ -96,9 +96,6 @@
     <!-- 基础信息子系统 -> 门诊执行科室配置信息生产者 -->
     <dubbo:service interface="cn.hsa.module.base.baseoutptexec.service.BaseOutptExecService" ref="baseOutptExecService_provider"/>
 
-    <!-- 首页数据查询 -->
-    <dubbo:service interface="cn.hsa.module.base.home.service.BaseHomeService" ref="baseHomeService_provider"/>
-
     <!--诊断模板-->
     <dubbo:service interface="cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService" ref="baseDiagnosisTemplateService_provider"/>
   <!--诊室信息-->

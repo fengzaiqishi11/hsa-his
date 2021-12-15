@@ -197,7 +197,7 @@
         e.total_price AS medfee_sumamt,
         case
         when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
-        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
         else e.insure_price - e.personal_price end as fund_pay_sumamt,
         e.person_price,
         e.personal_price AS acct_pay,
@@ -311,7 +311,7 @@
         e.total_price AS medfee_sumamt,
         case
         when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
-        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
         else e.insure_price - e.personal_price end as fund_pay_sumamt,
         e.personal_price AS acct_pay
         FROM

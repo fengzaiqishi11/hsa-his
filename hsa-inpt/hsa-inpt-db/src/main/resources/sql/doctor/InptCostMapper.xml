@@ -448,9 +448,10 @@
         FROM
         inpt_cost t
         WHERE
-        t.status_code = '0' and
-        <foreach collection="list" item="dto" open="(" close=")" separator=" or ">
-            (hosp_code = #{dto.hospCode} and iat_id = #{dto.iatId} and DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' ) = DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
+        t.status_code = '0'
+        and (hosp_code,iat_id,DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' )) in
+        <foreach collection="list" item="dto" open="(" close=")" separator=",">
+            (#{dto.hospCode},#{dto.iatId},DATE_FORMAT( #{dto.planExecTime}, '%Y-%m-%d' ))
         </foreach>
         group by hosp_code,iat_id,DATE_FORMAT( t.plan_exec_time, '%Y-%m-%d' )
     </select>
@@ -1645,7 +1646,7 @@
 
     <select id="queryWait" resultMap="InptCostMap">
         select * from inpt_cost where hosp_code=#{hospCode} and visit_id=#{visitId}
-        and iat_id=#{iatId} and DATE_FORMAT(crte_time, '%Y-%m-%d')=DATE_FORMAT(#{crteTime}, '%Y-%m-%d') and is_wait='1'
+        and iat_id=#{iatId} and DATE_FORMAT(cost_time, '%Y-%m-%d')=DATE_FORMAT(#{costTime}, '%Y-%m-%d') and is_wait='1'
         and source_id=#{sourceId}
     </select>
 
@@ -1749,6 +1750,33 @@
         </if>
 
     </select>
+
+    <select id="queryMedic" resultType="java.lang.String">
+        select distinct ma.id
+        from inpt_cost c,
+        medic_apply ma,
+        inpt_advice b
+        where
+        c.hosp_code = ma.hosp_code
+        and c.hosp_code = b.hosp_code
+        and b.id = c.iat_id
+        and ma.apply_no = b.technology_no
+        and ma.visit_id = c.visit_id
+        and c.hosp_code = #{hospCode}
+
+            and c.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </select>
+
+    <update id="updateMedicApply" >
+        update medic_apply set document_sta = '05' where hosp_code = #{hospCode} and is_inpt = '1' and
+        id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
     <!--批量新增-->
   <insert id="insertPharInReceives" keyProperty="id" useGeneratedKeys="true">

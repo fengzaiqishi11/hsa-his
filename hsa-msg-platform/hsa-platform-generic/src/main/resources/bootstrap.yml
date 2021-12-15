@@ -1,0 +1,52 @@
+server:
+  servlet:
+    context-path: /hsa-platform
+  port: 9105
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: hsa-platform
+  cloud:
+    nacos:
+      config:
+        file-extension: properties
+        group: dev
+        enabled: false
+        encode: UTF-8
+        server-addr: 127.0.0.1:8848
+  # kafka相关的信息配置 TODO
+  kafka:
+    bootstrap-servers:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto:
+        offset:
+          reset: earliest
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+  consumer:
+    timeout: 60000
+  application:
+    name: hsa-inpt
+  protocol:
+    name: dubbo
+    port: 29005
+  provider:
+    threads: 1000
+security:
+  oauth2:
+    client:
+      permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
+#mybatis-plus配置控制台打印完整带参数SQL语句
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

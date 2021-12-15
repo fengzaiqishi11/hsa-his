@@ -17,6 +17,7 @@ import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.nurse.bo.AddAccountByInptBO;
 import cn.hsa.module.inpt.nurse.bo.BackCostByInputBO;
 import cn.hsa.module.inpt.nurse.dao.InptAdviceExecDAO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
@@ -27,7 +28,6 @@ import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -235,6 +235,18 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             }
             //  退费需要校验系统参数，判断医技是否需要确费 =========2021年3月16日16:23:00 官红强  end
 
+            if (!inptCostDTO.getIds().isEmpty() && inptCostDTO.getIds() != null) {
+                List<String> medicDTOSList = inptCostDAO.queryMedic(inptCostDTO);
+                MedicalApplyDTO medicalApplyDTO = new MedicalApplyDTO();
+                medicalApplyDTO.setHospCode(hospCode);
+                medicalApplyDTO.setIds(medicDTOSList);
+                // 住院退费后，需要更新医技状态
+                if (!medicDTOSList.isEmpty() && medicDTOSList != null) {
+                    inptCostDAO.updateMedicApply(medicalApplyDTO);
+                }
+            }
+
+
             //根据费用集合信息获得待领集合信息
             PharInWaitReceiveDTO pharInWaitReceiveDTO = new PharInWaitReceiveDTO();
             pharInWaitReceiveDTO.setHospCode(hospCode);
@@ -250,7 +262,7 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
                     baseDrugDTO = new BaseDrugDTO ();
                     baseDrugDTO.setId(dto.getItemId());
                     baseDrugDTO.setHospCode(dto.getHospCode());
-
+                    baseDrugDTO.setLoginDeptId(deptId);
                     mapParm = new HashMap();
                     mapParm.put("hospCode",dto.getHospCode());
                     mapParm.put("baseDrugDTO",baseDrugDTO);
@@ -360,7 +372,7 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
                 //新增退费费用冲红记录
                 if (!ListUtils.isEmpty(normalsNew)) {
                     inptCostDAO.insertInptCostBatch(normalsNew);
-                    //批量更新待领表的费用明细id:
+                    //批量更新待领表的费用明细id:用于退药查询用
                     inptCostDAO.updateCostIdBatch(normalsNew);
                 }
             }

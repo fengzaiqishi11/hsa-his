@@ -100,6 +100,8 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         String aka130Name = (String) info.get("aka130Name");//业务类型名称
         String bka006 = (String) info.get("bka006");//待遇类型
         String bka006Name = (String) info.get("bka006Name");//待遇类型名称
+        String hcardBasinfo = (String) info.get("hcardBasinfo");//读卡就诊信息
+        String hcardChkinfo = (String) info.get("hcardChkinfo");//读卡校验信息
         String aac001 = personinfo.get("aac001");//个人电脑号
         JSONArray jsonArray = (JSONArray) info.get("diagnose");//诊断信息
         if (jsonArray.size() == 0) {
@@ -158,6 +160,8 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         insureIndividualVisitDO.setBka006(bka006);//待遇类型
         insureIndividualVisitDO.setBka006Name(bka006Name);//待遇类型名称
         insureIndividualVisitDO.setInjuryBorthSn(null);//业务申请号
+        insureIndividualVisitDO.setHcardBasinfo(hcardBasinfo); // 读卡就诊基本信息
+        insureIndividualVisitDO.setHcardChkinfo(hcardChkinfo); // 读卡就诊校验信息
         /**
          * 长沙市门特病人  必填主副诊断
          */
@@ -189,6 +193,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             }
             insureIndividualVisitDO.setIsEcqr(Constants.SF.S);
             insureIndividualVisitDO.setPayToken(app);//电子凭证token
+            insureIndividualVisitDO.setPayTokenDengJi(app);
         }
         insureIndividualVisitDO.setVisitTime(now);//就诊时间
         insureIndividualVisitDO.setVisitDrptId(deptId);//就诊科室ID

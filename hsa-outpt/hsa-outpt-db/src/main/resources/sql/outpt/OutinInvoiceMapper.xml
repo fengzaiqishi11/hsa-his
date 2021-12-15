@@ -724,14 +724,21 @@
     <!-- 根据条件查询挂号发票明细表列表信息 -->
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo, b.totalPrice as invoiceTotalPrice,
-        v.visit_code as visitCode,b.pay_code as sourcePayCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
+        v.visit_code as visitCode,b.pay_code as sourcePayCode,b.payCode as payCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
         (select code from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfc_code,
         (select name from base_finance_classify where hosp_code=a.hosp_code and a.bfc_id=id) bfcName,
         a.visit_id,
         b.pay_code,
-        b.credit_price as creditPrice
+        b.credit_price as creditPrice,
+        ifnull((select GROUP_CONCAT(b.name) as payCode
+          from outpt_register_pay a
+          join sys_code_detail b
+            on b.value = a.pay_code
+           and b.hosp_code =#{hospCode}
+           and b.c_code ='ZFFS'
+          where rs_id =#{registerId} and a.hosp_code = #{hospCode} GROUP BY rs_id),'现金') as payCode
         FROM outpt_register_detail a
         join outpt_register_settle b on a.register_id = b.register_id
         WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
@@ -747,6 +754,14 @@
           ifnull(os.credit_price, 0.00) as creditPrice,
           ifnull(iis.last_settle, 0.00) as lastSettle,
           os.source_pay_code as sourcePayCode,
+          ifnull((select GROUP_CONCAT(b.name) as payCode
+          from outpt_pay a
+          join sys_code_detail b
+          on b.value = a.pay_code
+          and b.hosp_code =#{hospCode}
+          and b.c_code ='ZFFS'
+          where a.settle_id =#{settleId}
+          and a.hosp_code = #{hospCode} GROUP BY a.settle_id),'现金') as payCode,
           ifnull(os.mi_price, 0.00)as miPrice,
           v.visit_code as visitCode,
           v.visit_no as visitNo,
@@ -769,7 +784,14 @@
     <!-- 根据条件查询门诊发票明细表列表信息 -->
     <select id="queryOutptsettleInvoiceConent" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select b.reality_price as totalPrice, b.out_code as bfc_code, b.out_name as bfcName, os.crte_name as crteName, os.crte_time as crteTime,
-        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle, ifnull(os.credit_price, 0.00) as creditPrice
+        ifnull(iis.personal_price, 0.00) as personalPrice, ifnull(os.mi_price, 0.00) as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle, ifnull(os.credit_price, 0.00) as creditPrice,
+         ifnull((select GROUP_CONCAT(b.name) as payCode
+          from outpt_pay a
+          join sys_code_detail b
+            on b.value = a.pay_code
+           and b.hosp_code =#{hospCode}
+           and b.c_code ='ZFFS'
+          where a.settle_id =os.id and a.hosp_code = #{hospCode} GROUP BY settle_id),'现金') as payCode
         from outpt_settle_invoice s left join outpt_settle_invoice_content b on b.settle_invoice_id = s.id and b.hosp_code = s.hosp_code
         left join outpt_settle os on os.id = s.settle_id and os.hosp_code = s.hosp_code
         left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
@@ -894,8 +916,9 @@
             left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
             left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
             left join insure_individual_visit iiv on iiv.hosp_code = a.hosp_code and iiv.visit_id = v.id
-            left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim
-            on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code
+            <!--left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim -->
+            <!--on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code-->
+            left join insure_item_match iim on a.hosp_code = iim.hosp_code and iiv.insure_org_code = iim.insure_reg_code and a.item_id = iim.hosp_item_id
         WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
     </select>
 
@@ -1601,7 +1624,7 @@
         FROM
         outpt_register_settle b
         LEFT JOIN outpt_register a ON a.id = b.register_id
-        LEFT JOIN outin_invoice_detail c ON ( b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
+        LEFT JOIN outin_invoice_detail c ON ( b.hosp_code = c.hosp_code and b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
         LEFT JOIN outin_invoice e ON b.bill_id = e.id
         LEFT JOIN outpt_visit f ON f.id = a.visit_id
         WHERE

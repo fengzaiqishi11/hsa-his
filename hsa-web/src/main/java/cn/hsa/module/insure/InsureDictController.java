@@ -310,6 +310,7 @@ public class InsureDictController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
+        insureDictDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("insureDictDTO", insureDictDTO);
         return insureDictService_consumer.queryAdmdvsInfoPage(map);
     }

@@ -153,6 +153,10 @@ public class OperInfoRecordDO extends PageDO implements Serializable {
     */
     private String content;
     /**
+     * 手术执行类别
+     */
+    private String operType;
+    /**
     * 审核医生ID
     */
     private String auditId;

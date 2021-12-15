@@ -22,7 +22,7 @@ import javax.annotation.Resource;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 @Slf4j
-@Service("/nationDrugService_provider")
+@Service("nationDrugService_provider")
 @HsafRestPath("/service/interf/nationDrug")
 public class NationDrugServiceImpl extends HsafService implements NationDrugService {
 

@@ -227,7 +227,7 @@ public class OutptElectronicBillFunction {
         certParam.put("id",outptVisitDTO.getDoctorId());
         Map<String,Object> sysUser = insureIndividualVisitDAO.selectSysUserByid(certParam);
         data.put("drDeptCodg",sysUser.get("dept_code"));//医生科室编号，不可空
-        data.put("caty","");//科室类别
+        data.put("caty","门诊");//科室类别
         data.put("drCertNo",sysUser.get("prac_certi_no"));//医生证件号码，不可空
         data.put("rxItemVal",outptCostDTOList.size());//明细上传数量，不可空
         data.put("iptType","");//住院类别，可空
@@ -377,7 +377,7 @@ public class OutptElectronicBillFunction {
             rxItem.put("acordDeptName",execDept.get("name"));//受单科室名称
             rxItem.put("ordersDrCode","");//受单医生编码
             rxItem.put("ordersDrName","");//受单医生姓名
-            rxItem.put("hospApprFlag","1");//医院审批标志 todo,RxList中无此属性值
+            rxItem.put("hospApprFlag","0");//医院审批标志 todo,RxList中无此属性值
             rxItem.put("tcmdrugUsedWay","");//中药使用方式
             rxItem.put("etipFlag","");//外检标志
             rxItem.put("etipHospCode","");//外检医院编码
@@ -427,16 +427,16 @@ public class OutptElectronicBillFunction {
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
         InsureIndividualVisitDTO insureIndividualVisitDTO = (InsureIndividualVisitDTO) param.get("insureIndividualVisitDTO");//个人基本信息
-        //JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
+        JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayTokenDengJi());
         Map<String,Object> httpParam = new HashMap<String,Object>();
         JSONObject data = new JSONObject();
         data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
         data.put("payOrdId",insureIndividualVisitDTO.getPayOrdId());//支付订单号
         data.put("orgCodg",insureIndividualVisitDTO.getMedicineOrgCode());//机构编号
         data.put("payToken",insureIndividualVisitDTO.getPayToken());//支付 token，可空
-        // data.put("idNo",app.get("idNo"));//证件号码
-        // data.put("userName",app.get("userName"));//用户姓名
-        // data.put("idType",app.get("idType"));//证件类别
+        data.put("idNo",app.get("idNo"));//证件号码
+        data.put("userName",app.get("userName"));//用户姓名
+        data.put("idType",app.get("idType"));//证件类别
         JSONObject extData = new JSONObject();
         extData.put("systemNo",hospCode);//所属系统标识
         data.put("extData",extData);//医保扩展数据

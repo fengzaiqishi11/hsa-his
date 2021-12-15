@@ -121,8 +121,16 @@ public class NumberToCN {
         String s = numberOfMoney.toString();
         if (s.contains(".")) {
             String[] split = s.split("\\.");
-            if (Integer.parseInt(split[1].substring(0,2)) <=0) {
-                sb.append(CN_FULL);
+            int length = split[1].length();
+            if(length == 1){
+                if (Integer.parseInt(split[1].substring(0,1)) <=0) {
+                    sb.append(CN_FULL);
+                }
+            }
+            if(length == 2){
+                if (Integer.parseInt(split[1].substring(0,2)) <=0) {
+                    sb.append(CN_FULL);
+                }
             }
         } else {
             sb.append(CN_FULL);

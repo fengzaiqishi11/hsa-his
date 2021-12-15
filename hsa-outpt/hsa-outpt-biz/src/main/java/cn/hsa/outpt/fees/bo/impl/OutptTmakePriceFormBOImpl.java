@@ -2872,7 +2872,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             return true;
         }
         if (StringUtils.isEmpty(feeOrg.getPayToken()) || StringUtils.isEmpty(feeOrg.getPayOrdId())) {
-            return true;
+            throw new AppException("撤销费用失败，电子凭证登记时的 payToken 或 payOrdId 为空，请联系管理员");
         }
         Map<String,Object> jsonObject = new HashMap<>();
 //        Map<String,Object> jsonObjectData = new HashMap<>();
@@ -4134,6 +4134,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         stringObjectMap.put("param",json);
         logger.info("体检收费入参:" + json);
         String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("体检退费反参信息为空，请联系管理员。");
+        }
         logger.info("体检收费反参:" + resultStr);
+        JSONObject resultObj = JSON.parseObject(resultStr);
+        String code = resultObj.get("code").toString();
+        if (!"0".equals(code)) {
+            throw new AppException((String) resultObj.get("message"));
+        }
     }
 }

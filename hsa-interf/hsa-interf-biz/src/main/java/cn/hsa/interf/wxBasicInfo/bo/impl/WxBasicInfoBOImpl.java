@@ -293,31 +293,31 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             }
         }
 
-        OutptProfileFileExtendDTO outptProfileFileExtendDTO = null;
+        OutptProfileFileDTO outptProfileFileDTO = null;
         if (StringUtils.isEmpty(profileId)) {
             // 根据身份证号查询是否已经存在档案
             OutptProfileFileDTO profileFileDTO = wxBasicInfoDAO.queryProfileByCertNo(map);
             if (profileFileDTO == null) {
                 // 新增
-                outptProfileFileExtendDTO = this.saveProfileFileDTOInfo(data);
+                outptProfileFileDTO = this.saveProfileFileDTOInfo(data);
 
             } else {
                 // 修改，讲数据库查询出的profileId设置到查询接口中
                 data.put("profileId", profileFileDTO.getId());
                 data.put("hospCode", hospCode);
-                outptProfileFileExtendDTO =  this.updateProfileFile(data);
+                outptProfileFileDTO =  this.updateProfileFile(data);
             }
 
         } else {
             // 修改，根据接收的档案信息
-            outptProfileFileExtendDTO = this.updateProfileFile(data);
+            outptProfileFileDTO = this.updateProfileFile(data);
         }
 
         // 返参加密
-        log.debug("微信小程序【档案登记或修改】返参加密前：" + JSON.toJSONString(outptProfileFileExtendDTO));
+        log.debug("微信小程序【档案登记或修改】返参加密前：" + JSON.toJSONString(outptProfileFileDTO));
         String res = null;
         try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(outptProfileFileExtendDTO));
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(outptProfileFileDTO));
             log.debug("微信小程序【档案登记或修改】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【档案登记或修改】返参加密错误，请联系管理员！" + e.getMessage());
@@ -353,7 +353,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      * @Param: Map<String, Object> data
      * @Return:
      **/
-    private OutptProfileFileExtendDTO updateProfileFile(Map<String, Object> data) {
+    private OutptProfileFileDTO updateProfileFile(Map<String, Object> data) {
         OutptProfileFileDTO profileFileDTO = new OutptProfileFileDTO();
         profileFileDTO.setId(MapUtils.get(data, "profileId"));
         profileFileDTO.setHospCode(MapUtils.get(data, "hospCode"));
@@ -368,12 +368,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         profileFileDTO.setNativeAddress(MapUtils.get(data, "nativeAddress"));
         profileFileDTO.setPatientCode(MapUtils.get(data, "patientCode"));
         profileFileDTO.setPreferentialTypeId(MapUtils.get(data, "preferentialTypeId"));
-        OutptProfileFileExtendDTO outptProfileFileExtendDTO = outptProfileFileService_consumer.save(profileFileDTO).getData();
+//        OutptProfileFileExtendDTO outptProfileFileExtendDTO = outptProfileFileService_consumer.save(profileFileDTO).getData();
         Map map = new HashMap();
         map.put("hospCode", MapUtils.get(data, "hospCode"));
         map.put("outptProfileFileDTO", profileFileDTO);
-        baseProfileFileService_consumer.save(map);
-        return outptProfileFileExtendDTO;
+        return baseProfileFileService_consumer.save(map).getData();
     }
 
     /**
@@ -383,7 +382,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      * @Return:
      **/
     @SneakyThrows
-    private OutptProfileFileExtendDTO saveProfileFileDTOInfo(Map<String, Object> data) {
+    private OutptProfileFileDTO saveProfileFileDTOInfo(Map<String, Object> data) {
         OutptProfileFileDTO profileFileDTO = new OutptProfileFileDTO();
         // 医院编码
         profileFileDTO.setHospCode(MapUtils.get(data, "hospCode"));
@@ -423,38 +422,17 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         profileFileDTO.setCrteName(MapUtils.get(data, "crteName"));
         // 创建时间
 //        profileFileDTO.setCrteTime(MapUtils.get(data, "crteTime") == null ? DateUtils.getNow() : DateUtils.parse(DateUtils.getDateStr(MapUtils.get(data, "crteTime")), DateUtils.Y_M_D));
-        profileFileDTO.setCrteTime(MapUtils.get(data, "crteTime") == null ? DateUtils.getNow() : DateUtils.parse(MapUtils.get(data, "crteTime"), DateUtils.Y_M_D));
+        profileFileDTO.setCrteTime(MapUtils.get(data, "crteTime") == null ? DateUtils.getNow() : DateUtils.parse(MapUtils.get(data, "crteTime"), DateUtils.Y_M_DH_M_S));
 
-        /**
-         * 中心端建档服务
-         */
-        OutptProfileFileExtendDTO outptProfileFileExtendDTO = outptProfileFileService_consumer.save(profileFileDTO).getData();
-        /**
-         * 本地端建档服务
-         */
-        if (outptProfileFileExtendDTO != null && StringUtils.isNotEmpty(outptProfileFileExtendDTO.getProfileId())) {
-            // 本地档案表id保持与中心端的一致
-            profileFileDTO.setId(outptProfileFileExtendDTO.getProfileId());
-        }
-        profileFileDTO.setInProfile(outptProfileFileExtendDTO.getInProfile());
-        profileFileDTO.setOutProfile(outptProfileFileExtendDTO.getOutProfile());
-        if ("1".equals(MapUtils.get(data, "type"))) {
-            // 住院
-            profileFileDTO.setTotalIn(1);
-            profileFileDTO.setInptLastVisitTime(DateUtils.getNow());
-        } else if ("2".equals(MapUtils.get(data, "type"))) {
-            // 门诊
-            profileFileDTO.setTotalOut(1);
-            profileFileDTO.setOutptLastVisitTime(DateUtils.getNow());
-        }
         log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
         Map map = new HashMap();
         map.put("hospCode", MapUtils.get(data, "hospCode"));
         map.put("outptProfileFileDTO", profileFileDTO);
-        baseProfileFileService_consumer.save(map);
+        OutptProfileFileDTO outptProfileFileDTO = baseProfileFileService_consumer.save(map).getData();
+
         log.debug("直接就诊调用本地建档服务结束：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
 
-        return outptProfileFileExtendDTO;
+        return outptProfileFileDTO;
     }
 
     /**
@@ -1516,11 +1494,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     public WrapperResponse<String> removeLock(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         if (StringUtils.isEmpty(hospCode)) {
-            return WrapperResponse.error(500, "未检测到医院信息，请核对医院信息！", null);
+            return WrapperResponse.error(500, "未检测到医院信息，请核对医院信息!", null);
         }
         Map<String, Object> data = MapUtils.get(map, "data");
         if (data == null) {
-            return WrapperResponse.error(500, "服务器异常，请联系管理员！", null);
+            return WrapperResponse.error(500, "传入参数不能为空!", null);
         }
 
         // 校验参数
@@ -1529,6 +1507,9 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         //查询单个号源id记录，判断是否未当前人员的锁的号
         OutptDoctorRegisterDto outptDoctorRegisterDto = wxBasicInfoDAO.getDoctorRegisterById((String) data.get("sourceId"), hospCode);
+        if(outptDoctorRegisterDto== null){
+            return WrapperResponse.error(500, "未获取到对应号源信息", null);
+        }
         if (!MapUtils.get(data, "profileId").equals(outptDoctorRegisterDto.getProfileId())) {
             return WrapperResponse.error(500, "该号源非该用户预约，不能进行解锁！", null);
         }
@@ -2553,6 +2534,30 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【住院病人日费用清单明细】返参加密错误，请联系管理员！" + e.getMessage());
         }
+        return WrapperResponse.success(res);
+    }
+
+    /**
+     * 查询所有科室下所有七天内有排班的医生
+     * pengbo
+     *
+     * @param map
+     */
+    @Override
+    public WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map) {
+
+        List<Map<String,Object>> list = wxBasicInfoDAO.querySevenQueueDoctor(map);
+
+        // 返参加密
+        log.debug("微信小程序【询所有科室下所有七天内有排班的医生】返参加密前：" + JSON.toJSONString(list));
+        String res = null;
+        try {
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(list));
+            log.debug("微信小程序【询所有科室下所有七天内有排班的医生】返参加密后：" + res);
+        } catch (UnsupportedEncodingException e) {
+            throw new AppException("【询所有科室下所有七天内有排班的医生】返参加密错误，请联系管理员！" + e.getMessage());
+        }
+
         return WrapperResponse.success(res);
     }
 

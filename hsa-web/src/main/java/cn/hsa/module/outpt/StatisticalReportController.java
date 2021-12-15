@@ -4,21 +4,16 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.outpt.report.service.StatisticalReportService;
+import cn.hsa.module.interf.report.service.StatisticalReportService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -137,7 +132,8 @@ public class StatisticalReportController extends BaseController {
     public WrapperResponse<PageDTO> lisStatistics(@RequestParam Map<String, Object> paramMap,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
         paramMap.put("hospCode", userDTO.getHospCode());
-        return statisticalReportService_consumer.lisStatistics(paramMap);
+		paramMap.put("impDeptId", userDTO.getLoginBaseDeptDTO().getId());
+		return statisticalReportService_consumer.lisStatistics(paramMap);
     }
 
 
@@ -155,6 +151,7 @@ public class StatisticalReportController extends BaseController {
     public WrapperResponse<PageDTO> passStatistics(@RequestParam Map<String, Object> paramMap,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res) ;
         paramMap.put("hospCode", userDTO.getHospCode());
+		paramMap.put("impDeptId", userDTO.getLoginBaseDeptDTO().getId());
         return statisticalReportService_consumer.passStatistics(paramMap);
     }
 

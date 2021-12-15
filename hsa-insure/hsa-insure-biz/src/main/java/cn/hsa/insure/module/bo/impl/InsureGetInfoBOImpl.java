@@ -649,7 +649,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("inptLastDay",inptLastDay);
         setlinfo.put("inptLastHour",inptLastHour);
         setlinfo.put("inptLastMinute",inptLastMinute);
-        setlinfo.put("pwcryBfadmComaDra", infoDTO.getPwcryBfadmComaDura()); // 颅脑损伤患者入院前昏迷时长 *******
+        setlinfo.put("pwcryBfadmComaDura", infoDTO.getPwcryBfadmComaDura()); // 颅脑损伤患者入院前昏迷时长 *******
         setlinfo.put("pwcryAfadmComaDura", infoDTO.getPwcryAfadmComaDura()); //颅脑损伤患者入院后昏迷时长
         setlinfo.put("bldCat", infoDTO.getBldCat()); //输血品种
         setlinfo.put("bldAmt", infoDTO.getBldAmt()); //输血量
@@ -1175,8 +1175,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         String acctPay = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"acct_pay"));
         String cashPayamt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"cash_payamt"));
+        /**
+         * 2021/12/09 个人自费 =全自费金额（fulamtOwnpayAmt）  不包含超限价自费金额
+         */
         // 个人自费 == 全自费金额（fulamtOwnpayAmt） +超限价自费金额（overlmtSelfpay）
-        BigDecimal psnOwnpay = BigDecimalUtils.add(fulamtOwnpayAmt, overlmtSelfpay);
+        BigDecimal psnOwnpay = BigDecimalUtils.convert(fulamtOwnpayAmt);
         /**
          *     金额合计=医保统筹基金支付+补充医疗保险支付+医疗救助支付+个人负担
          *     补充医疗保险支付：职工大额补助+居民大病保险+公务员医疗补助
@@ -1253,7 +1256,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Date   2021/12/4 22:12
      * @Return
      **/
-    public static String getDateToString(java.sql.Timestamp time){
+    public String getDateToString(java.sql.Timestamp time){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.Y_M_D);
         return simpleDateFormat.format(time);
     }
@@ -2188,7 +2191,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Date   2021/11/17 14:34
      * @Return
      **/
-    public static <T> T getEmptyErr(Map map, Object key, String errMsg) {
+    public <T> T getEmptyErr(Map map, Object key, String errMsg) {
         if (!map.containsKey(key)) {
             throw new RuntimeException(errMsg);
         }

@@ -499,7 +499,7 @@
         e.id,
         e.crte_time,
         e.crte_name,
-        (select t.name from inpt_visit t where t.hosp_code = e.hosp_code and t.id = e.visit_id) visitName,
+        v.name  visitName,
         e.item_name,
         e.spec,
         e.price,
@@ -518,8 +518,8 @@
         case when e.item_code='1' then bd.code when e.item_code='2' then bm.code end drugCode
         FROM phar_in_wait_receive e
         join inpt_cost c on e.cost_id = c.id and e.hosp_code=c.hosp_code
-        left join base_drug bd on bd.id = e.item_id and bd.hosp_code = #{hospCode}
-        left join base_material bm on bm.id = e.item_id and bm.hosp_code = #{hospCode}
+        left join base_drug bd on bd.id = e.item_id and bd.hosp_code = e.hosp_code
+        left join base_material bm on bm.id = e.item_id and bm.hosp_code = e.hosp_code
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
         WHERE e.hosp_code = #{hospCode}
         AND e.is_back = '1'

@@ -70,7 +70,7 @@
     <!-- 基础信息子系统 -> 一卡通管理 -->
     <dubbo:reference id="baseCardService_consumer" interface="cn.hsa.module.base.card.service.BaseCardService" check="false"/>
     <!-- 首页数据查询 -->
-    <dubbo:reference id="baseHomeService_consumer" interface="cn.hsa.module.base.home.service.BaseHomeService" check="false"/>
+    <dubbo:reference id="baseHomeService_consumer" interface="cn.hsa.module.interf.home.service.BaseHomeService" check="false"/>
 
     <!-- ########################################### 药库服务consumer start ########################################### -->
     <!-- 采购计划 -->
@@ -416,10 +416,10 @@
     <!-- ################################################ 报表consumer start ################################################ -->
 
     <!--病人费用台账-->
-    <dubbo:reference id="patientCostLedgerService_consumer" interface="cn.hsa.module.outpt.statement.service.PatientCostLedgerService" check="false"/>
+    <dubbo:reference id="patientCostLedgerService_consumer" interface="cn.hsa.module.interf.statement.service.PatientCostLedgerService" check="false"/>
 
     <!--统计报表(支付方式、医保结算)-->
-    <dubbo:reference id="statisticalReportService_consumer" interface="cn.hsa.module.outpt.report.service.StatisticalReportService" check="false"/>
+    <dubbo:reference id="statisticalReportService_consumer" interface="cn.hsa.module.interf.report.service.StatisticalReportService" check="false"/>
 
     <!-- ################################################ 报表consumer end ################################################ -->
 

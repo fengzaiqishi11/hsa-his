@@ -890,19 +890,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             inptAdviceDAO.insertDiagnose(inptDiagnoseDTODTOList);
         }
 
-        // 非必填(系统中暂无来源数据)
-        insureInptRegisterDTO.setAaa129(""); // 区/县
-        insureInptRegisterDTO.setAab001(""); // 单位电脑号
-        insureInptRegisterDTO.setAab019(""); // 单位类型
-        insureInptRegisterDTO.setAab999(""); // 单位管理码
-        insureInptRegisterDTO.setCardIden(insureIndividualBasicDTO.getCardIden());// 卡识别码
-        insureInptRegisterDTO.setAac002(insureIndividualBasicDTO.getAac002()); // 证件号码
-        insureInptRegisterDTO.setAac148(""); // 补助类型
-        insureInptRegisterDTO.setAae140(""); // 险种编码
-        insureInptRegisterDTO.setBaa027(""); // 人员所属中心
-        insureInptRegisterDTO.setBac001(""); // 公务员级别
+        insureInptRegisterDTO.setHcardBasinfo(insureIndividualBasicDTO.getHcardBasinfo());
+        insureInptRegisterDTO.setHcardChkinfo(insureIndividualBasicDTO.getHcardChkinfo());
         insureInptRegisterDTO.setBka035(insureIndividualBasicDTO.getBka035()); // 人员类别
-        insureInptRegisterDTO.setBka061(""); // 病情严重程度 （病种严重程度(A：病种单纯 B：严重 C：严重并发 D：危重)）
+
 
         // 非必填(系统中有数据来源)
         insureInptRegisterDTO.setAac003(inptVisitDto.getName()); // 姓名
@@ -1080,6 +1071,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 			insureIndividualVisitDTO.setInsuplcAdmdvs(insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
             insureIndividualVisitDTO.setMdtrtCertType(insureIndividualBasicDTO.getBka895()); // 就诊凭证类型
             insureIndividualVisitDTO.setMdtrtCertNo(insureIndividualBasicDTO.getBka896());  // 就诊凭证号码
+            insureIndividualVisitDTO.setHcardBasinfo(insureIndividualBasicDTO.getHcardBasinfo()); //广州读卡就诊基本填信息
+            insureIndividualVisitDTO.setHcardChkinfo(insureIndividualBasicDTO.getHcardChkinfo()); //广州读卡就诊校验信息
 			// 统一支付平台需要的值 end
 
             Map<String,Object> insertMap = new HashMap<>();
@@ -1339,9 +1332,6 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (StringUtils.isEmpty(inptVisitDTO.getInDeptName())) {
             throw new AppException("入院科室名称不可为空");
         }
-        //设置住院号
-        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
-        inptVisitDTO.setInNo(orderNo);
 
         // 档案表操作
         OutptProfileFileDTO extend = getProfileFileDTO(inptVisitDTO);
@@ -1355,6 +1345,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             sysParameterDTO=new SysParameterDTO();
             sysParameterDTO.setValue("0");
         }
+        //设置住院号
+        String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
+        inptVisitDTO.setInNo(orderNo);
+
         if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
             // 住院次数获取(未获取，默认1次)
             Map countMap=new HashMap();
@@ -1362,15 +1356,14 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             countMap.put("certCode",inptVisitDTO.getCertCode());
             countMap.put("certNo",inptVisitDTO.getCertNo());
             List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
-            int inCnt = 1;
+            int inCnt= inptVisitDAO.getInCnt(countMap);
+            if (inCnt ==0){
+                inCnt=1;
+            }
             if (info == null|| info.size() ==0) {
-                inCnt = 1;
                 orderNo = extend.getInProfile()+"-00"+inCnt;
             }else {
-                if (info.get(0).get("total_in")!=null) {
-                    inCnt = (int) info.get(0).get("total_in");
-                    inCnt = inCnt + 1;
-                }
+                inCnt = inCnt + 1;
                 orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
             }
             inptVisitDTO.setInNo(orderNo);

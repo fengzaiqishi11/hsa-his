@@ -1,7 +1,6 @@
 package cn.hsa.module.login;
 
 import cn.hsa.base.BaseController;
-import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -19,7 +18,6 @@ import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -34,9 +32,6 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-
-import static cn.hsa.util.Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY;
-import static cn.hsa.util.IPWhiteListUtil.checkLoginIP;
 
 /**
  * @Package_name: cn.hsa.module.login
@@ -119,9 +114,9 @@ public class LoginController extends BaseController {
             if (hospitalDTOto == null) {
                 throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
             }
-           // checkAccessIP(getIP(req,res),hospitalDTOto);
+            // checkAccessIP(getIP(req,res),hospitalDTOto);
             // 校验服务有效期
-           //  checkServiceTimeout(hospitalDTOto);
+            checkServiceTimeout(hospitalDTOto);
             // 指定医院数据源查询用户信息
             Map paramMap = new HashMap<>();
             paramMap.put("hospCode", hospCode);
@@ -230,7 +225,7 @@ public class LoginController extends BaseController {
     private String getGlobalAccessIpConfig() {
         Map<String,String> result = null;
         if(redisUtils.hasKey(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY)){
-           return redisUtils.hget(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY,"global_access_ip_config");
+            return redisUtils.hget(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY,"global_access_ip_config");
         }
         CenterGlobalConfigDTO  configDTO = new CenterGlobalConfigDTO();
         Map<String,Object> configInfo = globalConfigService.refreshGlobalConfig(configDTO);
@@ -242,20 +237,20 @@ public class LoginController extends BaseController {
      * @param hospitalDTOto 医院信息DTO
      */
     private void checkServiceTimeout(CenterHospitalDTO hospitalDTOto){
-        String encryptStartDate = Optional.ofNullable(hospitalDTOto.getEncryptStartDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务开始时间"));
-        String encryptEndDate = Optional.ofNullable(hospitalDTOto.getEncryptEndDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务结束时间"));;
-        try {
-            encryptStartDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptStartDate.getBytes()), privateKey);
-            encryptEndDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptEndDate.getBytes()), privateKey);
-        } catch (Exception e) {
-            throw new AppException("解析服务时间出现错误,请联系管理员！" + e.getMessage() + "11-" + hospitalDTOto.getCode());
-        }
-        encryptStartDate = encryptStartDate.split("&")[0];
-        encryptEndDate = encryptEndDate.split("&")[0];
-        Date startDate = DateUtils.parse(encryptStartDate,DateUtils.Y_M_DH_M_S);
-        Date endDate =  DateUtils.parse(encryptEndDate,DateUtils.Y_M_DH_M_S);
+//        String encryptStartDate = Optional.ofNullable(hospitalDTOto.getEncryptStartDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务开始时间"));
+//        String encryptEndDate = Optional.ofNullable(hospitalDTOto.getEncryptEndDate()).orElseThrow(()-> new AppException("未获取到医院编码为【" + hospitalDTOto.getCode() + "】的服务结束时间"));;
+//        try {
+//            encryptStartDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptStartDate.getBytes()), privateKey);
+//            encryptEndDate = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(encryptEndDate.getBytes()), privateKey);
+//        } catch (Exception e) {
+//            throw new AppException("解析服务时间出现错误,请联系管理员！" + e.getMessage() + "11-" + hospitalDTOto.getCode());
+//        }
+//        encryptStartDate = encryptStartDate.split("&")[0];
+//        encryptEndDate = encryptEndDate.split("&")[0];
+        Date startDate = DateUtils.parse(hospitalDTOto.getStart_time(),DateUtils.Y_M_DH_M_S);
+        Date endDate =  DateUtils.parse(hospitalDTOto.getEnd_time(),DateUtils.Y_M_DH_M_S);
         if (!DateUtils.betweenDate(startDate, endDate)) {
-            throw new AppException("医院编码【" + hospitalDTOto.getCode() + "】：未在有效服务期内，服务开始时间【" + encryptStartDate + "】，服务结束时间【" + encryptEndDate + "】");
+            throw new AppException("医院编码【" + hospitalDTOto.getCode() + "】：未在有效服务期内，服务开始时间【" + hospitalDTOto.getStart_time() + "】，服务结束时间【" + hospitalDTOto.getEnd_time() + "】");
         }
         hospitalDTOto.setEncryptEndDate("");
         hospitalDTOto.setEncryptStartDate("");
@@ -415,56 +410,56 @@ public class LoginController extends BaseController {
      **/
     @GetMapping("/authCode")
     public void authCode(HttpServletRequest req, HttpServletResponse res) {
-         try {
-             int width = 79;
-             int height = 32;
+        try {
+            int width = 79;
+            int height = 32;
 
-             Random random = new Random();
-             //设置response头信息
-             //禁止缓存
-             res.setContentType("image/jpeg");
-             res.setHeader("Pragma", "No-cache");
-             res.setHeader("Cache-Control", "no-cache");
-             res.setDateHeader("Expires", 0);
+            Random random = new Random();
+            //设置response头信息
+            //禁止缓存
+            res.setContentType("image/jpeg");
+            res.setHeader("Pragma", "No-cache");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setDateHeader("Expires", 0);
 
-             //生成缓冲区image类
-             BufferedImage image = new BufferedImage(width, height, 1);
-             //产生image类的Graphics用于绘制操作
-             Graphics g = image.getGraphics();
-             //Graphics类的样式
-             g.setColor(this.getRandColor(200, 250));
-             g.setFont(new Font("Times New Roman",0,28));
-             g.fillRect(0, 0, width, height);
-             //绘制干扰线
-             for(int i = 0;i < 40; i++){
-                 g.setColor(this.getRandColor(130, 200));
-                 int x = random.nextInt(width);
-                 int y = random.nextInt(height);
-                 int x1 = random.nextInt(12);
-                 int y1 = random.nextInt(12);
-                 g.drawLine(x, y, x + x1, y + y1);
-             }
+            //生成缓冲区image类
+            BufferedImage image = new BufferedImage(width, height, 1);
+            //产生image类的Graphics用于绘制操作
+            Graphics g = image.getGraphics();
+            //Graphics类的样式
+            g.setColor(this.getRandColor(200, 250));
+            g.setFont(new Font("Times New Roman",0,28));
+            g.fillRect(0, 0, width, height);
+            //绘制干扰线
+            for(int i = 0;i < 40; i++){
+                g.setColor(this.getRandColor(130, 200));
+                int x = random.nextInt(width);
+                int y = random.nextInt(height);
+                int x1 = random.nextInt(12);
+                int y1 = random.nextInt(12);
+                g.drawLine(x, y, x + x1, y + y1);
+            }
 
-             //绘制字符
-             String authCode = "";
-             for(int i = 0; i < 4; i++){
-                 String rand = String.valueOf(random.nextInt(10));
-                 authCode = authCode + rand;
-                 g.setColor(new Color(20 + random.nextInt(110),20 + random.nextInt(110),20 + random.nextInt(110)));
-                 g.drawString(rand, 13 * i + 6, 28);
-             }
+            //绘制字符
+            String authCode = "";
+            for(int i = 0; i < 4; i++){
+                String rand = String.valueOf(random.nextInt(10));
+                authCode = authCode + rand;
+                g.setColor(new Color(20 + random.nextInt(110),20 + random.nextInt(110),20 + random.nextInt(110)));
+                g.drawString(rand, 13 * i + 6, 28);
+            }
 
-             // 将字验证码保存到session中用于前端的验证
-             setSession(SESSION_AUTH_CODE, authCode, 5 * 60, req, res);
-             g.dispose();
+            // 将字验证码保存到session中用于前端的验证
+            setSession(SESSION_AUTH_CODE, authCode, 5 * 60, req, res);
+            g.dispose();
 
-             OutputStream out = res.getOutputStream();
-             ImageIO.write(image, "JPEG", out);
-             out.flush();
-             out.close();
-         } catch (Exception e) {
+            OutputStream out = res.getOutputStream();
+            ImageIO.write(image, "JPEG", out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
-         }
+        }
     }
 
     /**

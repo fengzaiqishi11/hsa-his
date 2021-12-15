@@ -487,7 +487,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 // 医保支付总金额
                 outinDailyInsureDTO.setInsurePrice(MapUtils.get(map, "insure_price"));
                 // 个人账户按支付总金额
-                outinDailyInsureDTO.setPersonalPrice(MapUtils.get(map, "persinal_price"));
+                outinDailyInsureDTO.setPersonalPrice(MapUtils.get(map, "personal_price"));
                 odinList.add(outinDailyInsureDTO);
             }
         }

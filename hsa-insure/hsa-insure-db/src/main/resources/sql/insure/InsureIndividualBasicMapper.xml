@@ -401,6 +401,60 @@
     </select>
 
 
+    <select id="queryOutptSettleInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            a.hosp_code,
+            a.NAME,
+            a.age,
+            a.gender_code genderCode,
+            a.age_unit_code ageUnitCode,
+            a.cert_code certCode,
+            a.cert_no certNo,
+            a.visit_time visitTime,
+            a.visit_no visitNo,
+            a.id visitId,
+            a.visit_code visitCode,
+            a.preferential_type_id preferentialTypeId,
+            b.id settleId,
+            b.settle_time settleTime,
+            b.total_price totalPrice,
+            b.reality_price realityPrice,
+            b.patient_code,
+            c.insureSettleId,
+            c.insure_reg_code insureRegCode,
+            IF
+                ( ifnull( c.insureSettleId, '0' ) = '0', '0', '1' ) isInsureSettle
+        FROM
+            outpt_visit a
+                LEFT JOIN outpt_settle b ON a.hosp_code = b.hosp_code
+                AND a.id = b.visit_id
+                LEFT JOIN insure_individual_settle c ON b.hosp_code = c.hosp_code
+                AND b.id = c.settle_id
+        WHERE
+            1 = 1
+          AND a.hosp_code = #{hospCode}
+          AND b.is_settle = '1'
+          AND b.status_code = '0'
+          AND ifnull(c.insureSettleId,'0') = '0'
+          <if test="keyWord != null and keyWord != ''">
+            and (a.name like concat('%',#{keyWord},'%')
+            or a.cert_no like concat('%',#{keyWord},'%')
+            or a.visit_no like concat('%',#{keyWord},'%')
+            )
+          </if>
+          <if test="patientCode != null and patientCode != ''">
+                and b.patient_code = #{patientCode}
+          </if>
+          <if test="startDate != null">
+                and date(b.settle_time) &gt;= date(#{startDate})
+          </if>
+          <if test="endDate != null">
+                and date(b.settle_time) &lt;= date(#{endDate})
+          </if>
+    </select>
+
+
+
     <!-- 新增表信息 -->
     <insert id="insert" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
         insert into

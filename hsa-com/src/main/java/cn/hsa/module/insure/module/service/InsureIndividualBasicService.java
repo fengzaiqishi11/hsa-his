@@ -120,4 +120,15 @@ public interface InsureIndividualBasicService {
      * @Return
      **/
     WrapperResponse<Map<String, Object>> queryInsureInfo(Map<String, Object> map);
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @GetMapping("/service/insure/insureIndividualBasic/queryPersonInfo")
+    WrapperResponse<Map<String, Object>> queryPersonInfo(Map<String, Object> map);
 }

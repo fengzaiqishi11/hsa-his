@@ -87,7 +87,7 @@ public class RequestInsure {
         httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
         String activityCode = SnowflakeUtils.getId();//交易号
         httpParam.put("activityCode",activityCode);
-        Map<String,Object> resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+        Map<String,Object> resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
         Integer code = (Integer) resultObj.get("code");
         if (code < 0) {
             throw new AppException((String) resultObj.get("msg"));
@@ -152,7 +152,7 @@ public class RequestInsure {
             httpParam.put("attrCode",insureConfigurationDO.getAttrCode());
             String activityCode = SnowflakeUtils.getId();//交易号
             httpParam.put("activityCode",activityCode);
-            Map<String,Object> resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+            Map<String,Object> resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
             Integer code = (Integer) resultObj.get("code");
             if (code < 0) {
                 throw new AppException((String) resultObj.get("msg"));
@@ -188,7 +188,7 @@ public class RequestInsure {
             httpParam.put("activityCode",activityCode);
             logger.info("入参:[" + param + "]");
             httpParam.put("data", param);
-            Map<String,Object> resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+            Map<String,Object> resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
             logger.info("出参:[" + resultObj.toString() + "]");
             Integer code = (Integer) resultObj.get("code");
             if (code < 0) {
@@ -252,7 +252,7 @@ public class RequestInsure {
             String activityCode = SnowflakeUtils.getId();//交易号
             httpParam.put("activityCode",activityCode);
             httpParam.put("data", paramObj);
-            resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+            resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
             Integer code = (Integer) resultObj.get("code");
             if (code < 0) {
                 throw new AppException((String) resultObj.get("msg"));
@@ -316,7 +316,7 @@ public class RequestInsure {
                 String activityCode = SnowflakeUtils.getId();//交易号
                 httpParam.put("activityCode",activityCode);
                 httpParam.put("data", paramObj);
-                resultObj = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+                resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
                 Integer code = (Integer) resultObj.get("code");
                 if (code < 0) {
                     throw new AppException((String) resultObj.get("msg"));
@@ -361,7 +361,7 @@ public class RequestInsure {
             httpParam.put("url",url);
             httpParam.put("param",paramObj);
             System.out.println(JSON.toJSONString(paramObj));
-            Map<String,Object> httpResult = RequestInsure.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+            Map<String,Object> httpResult = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
             Integer code = (Integer) httpResult.get("code");
             if (code < 0){
                 throw new AppException((String) httpResult.get("msg"));
@@ -390,7 +390,7 @@ public class RequestInsure {
             httpParam.put("activityCode",activityCode);
             httpParam.put("url",url);
             httpParam.put("param",paramObj);
-            Map<String,Object> httpResult = RequestInsure.sendMessage(kafkaIp,hospCode,httpParam,activityCode);
+            Map<String,Object> httpResult = this.sendMessage(kafkaIp,hospCode,httpParam,activityCode);
             Integer code = (Integer) httpResult.get("code");
             if (code < 0){
                 throw new AppException((String) httpResult.get("msg"));
@@ -412,7 +412,7 @@ public class RequestInsure {
      * @Date 2021/2/20 14:41
      * @return: String
      */
-    public static Map<String,Object> sendMessage(String servers, String hospCode, Map<String, Object> param, String activityCode) throws Exception {
+    public Map<String,Object> sendMessage(String servers, String hospCode, Map<String, Object> param, String activityCode) throws Exception {
         KafkaConsumer<String, String> consumer = null;
         try {
             String producerTopic = hospCode + producerTopicKey;//生产者消息推送Topic

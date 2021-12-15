@@ -251,10 +251,6 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return map;
     }
 
-    public static void main(String[] args) {
-
-    }
-
     /**
      * @Method queryFeeDetailInfo
      * @Desrciption 政策项查询
@@ -341,7 +337,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Return
      */
 
-    public static int daysBetween(Date date1, Date date2) {
+    public int daysBetween(Date date1, Date date2) {
         return DateUtils.differentDays(date1, date2);
     }
 
@@ -497,17 +493,19 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualSettleDTO.setMafPay(MapUtils.get(setlinfo,"maf_pay"));
             List <Map<String,Object>> setldetailList = MapUtils.get(outptMap,"setldetail");
             if (!ListUtils.isEmpty(setldetailList)) {
+                BigDecimal othPay = BigDecimal.ZERO;
                 for (Map<String, Object> detailMap : setldetailList) {
                     String fundPayType = MapUtils.get(detailMap, "fund_pay_type");
                     String setlProcInfo = MapUtils.get(detailMap, "setl_proc_info");
-                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt").toString();
+                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt");
+                    // 因为医保返回的就是这么奇怪：610100、610101、999997里面都可以是医疗救助基金，码表什么的都是浮云
                     switch (fundPayType) {
                         case "630100": // 医院减免金额
                             insureIndividualSettleDTO.setHospExemAmount(BigDecimalUtils.convert(fundPayamt));
                             break;
-                    /*case "610100": // 医疗救助基金
-                        resultMap.put("mafPay",fundPayamt);
-                        break;*/
+                        case "610100": // 医疗救助基金
+                            insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
                         case "330200": // 职工意外伤害基金
                             insureIndividualSettleDTO.setAcctInjPay(BigDecimalUtils.convert(fundPayamt));
                             break;
@@ -530,7 +528,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                             insureIndividualSettleDTO.setLowInPay(BigDecimalUtils.convert(fundPayamt));
                             break;
                         case "999997": // 其他基金
-                            insureIndividualSettleDTO.setOthPay(BigDecimalUtils.convert(fundPayamt));
+                            othPay = BigDecimalUtils.add(othPay.toString(),fundPayamt);
+                            insureIndividualSettleDTO.setOthPay(othPay);
                             if ("640101".equals(setlProcInfo)) {
                                 insureIndividualSettleDTO.setGovernmentPay(BigDecimalUtils.convert(fundPayamt));
                             }
@@ -543,6 +542,18 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                             if ("610101".equals(setlProcInfo)) {
                                 insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(fundPayamt));
                             }
+                            break;
+                        case "610101":
+                            insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "620101":
+                            insureIndividualSettleDTO.setThbPay(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "630101" :
+                            insureIndividualSettleDTO.setHospExemAmount(BigDecimalUtils.convert(fundPayamt));
+                            break;
+                        case "640101":
+                            insureIndividualSettleDTO.setGovernmentPay(BigDecimalUtils.convert(fundPayamt));
                             break;
                         case "510100": // 生育基金
                             insureIndividualSettleDTO.setFertilityPay(BigDecimalUtils.convert(fundPayamt));

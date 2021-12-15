@@ -811,4 +811,42 @@ public class StatemnetController extends BaseController {
     WrapperResponse<PageDTO> listWrapperResponse = patientCostLedgerService_consumer.queryOutptorInHosptialItemUseInfo(paraMap);
     return listWrapperResponse;
   }
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption 查询住院手术财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  @GetMapping("/getInptOperFinanceList")
+  public WrapperResponse<PageDTO> getInptOperFinanceList(InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    inptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.getInptOperFinanceList(map);
+  }
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  查询住院手术财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:14
+   * @Return Map
+   **/
+  @PostMapping("/getInptOperFinanceTitle")
+  public WrapperResponse<Map> getInptOperFinanceTitle(@RequestBody InptVisitDTO inptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    inptVisitDTO.setHospCode(userDTO.getHospCode());
+    inptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("inptVisitDTO", inptVisitDTO);
+    return patientCostLedgerService_consumer.getInptOperFinanceTitle(map);
+  }
 }

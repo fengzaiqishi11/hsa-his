@@ -579,4 +579,32 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     return WrapperResponse.success(patientCostLedgerBO.queryOutptorInHosptialItemUseInfo(paraMap));
   }
 
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption 查询住院手术财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  @Override
+  public WrapperResponse<PageDTO> getInptOperFinanceList(Map map) {
+    InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.getInptOperFinanceList(inptVisitDTO));
+  }
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  查询住院手术财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:14
+   * @Return Map
+   **/
+  @Override
+  public WrapperResponse<Map> getInptOperFinanceTitle(Map map) {
+    InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
+    return WrapperResponse.success(patientCostLedgerBO.getInptOperFinanceTitle(inptVisitDTO));
+  }
 }

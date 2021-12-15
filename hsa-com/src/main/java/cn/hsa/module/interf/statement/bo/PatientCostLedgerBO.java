@@ -395,4 +395,24 @@ public interface PatientCostLedgerBO {
    * @Return WrapperResponse<PageDTO>
    **/
   PageDTO queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption 查询住院手术财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO getInptOperFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  查询住院手术财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 12:14
+   * @Return Map
+   **/
+  Map getInptOperFinanceTitle(InptVisitDTO inptVisitDTO);
 }

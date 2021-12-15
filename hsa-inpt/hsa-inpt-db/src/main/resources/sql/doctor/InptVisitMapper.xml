@@ -2476,5 +2476,9 @@
 			and id = #{id}
 		</if>
 	</select>
-
+	<!--获取住院次数 liuliyun 20211213-->
+	<select id="getInCnt" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from inpt_visit
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo}
+    </select>
 </mapper>

@@ -256,5 +256,18 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         }
         return resultMap;
     }
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryPersonInfo(Map<String, Object> map) {
+        return insureIndividualBasicDAO.queryPersonInfo(map);
+    }
 
 }

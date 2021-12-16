@@ -51,4 +51,6 @@ public class InsureInptRegisterDTO extends InsureInptRegisterDO implements Seria
     private String userName;//员工姓名
     private String injuryBorthSn;// 业务申请序列号
     private String cardIden;// 卡识别码
+    private String hcardBasinfo;// 广州读卡就医基本信息
+    private String hcardChkinfo;// 广州读卡就医校验信息
 }

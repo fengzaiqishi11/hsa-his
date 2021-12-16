@@ -231,4 +231,13 @@ public interface StroOutDAO {
     * @Return java.lang.Boolean
     **/
     Boolean insertStroOutAll(List<StroOutDTO> stroOutDTOS);
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 通过出库id查询出库明细单
+     * @Param: [stroOutDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    List<StroOutDetailDTO> queryStroOutDetail(StroOutDetailDTO stroOutDetailDTO);
 }

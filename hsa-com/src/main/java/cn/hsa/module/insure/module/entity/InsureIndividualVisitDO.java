@@ -139,4 +139,11 @@ public class InsureIndividualVisitDO extends PageDO implements Serializable {
 
         // 结算时间
         private Date idetEndDate;
+
+        // 登记时获取的人员信息
+        private String payTokenDengJi;
+
+        private String hcardBasinfo; // 广州读卡就医基本信息
+
+        private String hcardChkinfo; // 广州读卡就医校验信息
 }

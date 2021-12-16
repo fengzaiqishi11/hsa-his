@@ -2,6 +2,7 @@ package cn.hsa.module.interf.statement.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -224,7 +225,7 @@ public interface PatientCostLedgerBO {
    * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
    **/
 //  List<Map<String,Object>> queryIncomeClassifyInfo(Map<String,Object> paraMap);
-  PageDTO queryIncomeClassifyInfo(Map<String, Object> paraMap);
+  PageDTO queryIncomeClassifyInfo(IncomeDTO incomeDTO);
 
   /**
    * @Method queryInvoiceStatistics
@@ -394,4 +395,24 @@ public interface PatientCostLedgerBO {
    * @Return WrapperResponse<PageDTO>
    **/
   PageDTO queryOutptorInHosptialItemUseInfo(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption 查询住院手术财务分类明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:10
+   * @Return cn.hsa.base.PageDTO
+   **/
+  PageDTO getInptOperFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  查询住院手术财务分类标题
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 12:14
+   * @Return Map
+   **/
+  Map getInptOperFinanceTitle(InptVisitDTO inptVisitDTO);
 }

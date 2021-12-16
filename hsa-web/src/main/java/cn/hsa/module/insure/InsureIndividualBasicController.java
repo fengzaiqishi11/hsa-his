@@ -273,4 +273,34 @@ public class InsureIndividualBasicController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureIndividualBasicService_consumer.queryInsureInfo(map);
     }
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @GetMapping("/queryPersonInfo")
+    public WrapperResponse<Map<String,Object>> queryPersonInfo(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureIndividualBasicService_consumer.queryPersonInfo(map);
+    }
+
+    /**
+     * @Description: 获取已结算人员信息 - 用于门诊已结算自费病人（大学生医保）医保直报
+     * @Param:
+     * @Author: liaojiguang
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date 2021/12/15 13:59
+     * @Return
+     */
+    @GetMapping("/queryOutptSettleInfo")
+    public WrapperResponse<PageDTO> queryOutptSettleInfo(@RequestParam Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureIndividualBasicService_consumer.queryOutptSettleInfo(map);
+    }
 }

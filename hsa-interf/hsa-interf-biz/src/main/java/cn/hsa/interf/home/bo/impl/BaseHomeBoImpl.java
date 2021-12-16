@@ -1,4 +1,4 @@
-package cn.hsa.interf.home.impl;
+package cn.hsa.interf.home.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.interf.home.bo.BaseHomeBo;

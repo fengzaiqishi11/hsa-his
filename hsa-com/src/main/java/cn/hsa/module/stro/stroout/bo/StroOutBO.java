@@ -2,6 +2,7 @@ package cn.hsa.module.stro.stroout.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
+import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
 
 import java.util.List;
 
@@ -102,4 +103,13 @@ public interface StroOutBO {
      * @Return cn.hsa.module.stro.stroout.dto.StroOutDTO
      **/
     StroOutDTO queryWholeOut(StroOutDTO stroOutDTO);
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 根据出库单查询出库明细
+     * @Param: [stroOutDetailDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    List<StroOutDetailDTO> queryStroOutDetail(StroOutDetailDTO stroOutDetailDTO);
 }

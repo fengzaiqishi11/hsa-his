@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--多IP配置-->
+    <!--<import resource="classpath:config/cache/cache-cluster.xml"/>-->
+    <!--分布式关系数据库-->
+    <import resource="classpath:config/db/db.xml"/>
+
+       <!--分布式消息队列-->
+    <!--<import resource="classpath:config/mq/producer.xml"/>-->
+
+
+</beans>

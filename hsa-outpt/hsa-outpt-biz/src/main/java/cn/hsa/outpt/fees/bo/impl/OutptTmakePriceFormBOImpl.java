@@ -486,7 +486,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 patientIsCF = this.checkPatientIsMZ(outptVisitDTO);
             }
             // 3、1 直接划价收费病人重新计算优惠
-            if (!patientIsCF) {
+//            if (!patientIsCF) {
+//                outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
+//            }
+            if (StringUtils.isEmpty(outptVisitDTO.getId())) {
                 outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
             }
 
@@ -4134,6 +4137,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         stringObjectMap.put("param",json);
         logger.info("体检收费入参:" + json);
         String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("体检退费反参信息为空，请联系管理员。");
+        }
         logger.info("体检收费反参:" + resultStr);
+        JSONObject resultObj = JSON.parseObject(resultStr);
+        String code = resultObj.get("code").toString();
+        if (!"0".equals(code)) {
+            throw new AppException((String) resultObj.get("message"));
+        }
     }
 }

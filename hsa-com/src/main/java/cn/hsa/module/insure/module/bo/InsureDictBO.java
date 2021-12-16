@@ -130,4 +130,15 @@ public interface InsureDictBO {
     Map<String,Object> queryAllInsureDict(InsureDictDO dictDTO);
 
     PageDTO queryAdmdvsInfoPage(InsureDictDTO dictDTO);
+
+    /**
+     * @Method queryAdmdvsInfo()
+     * @Desrciption  查询医保地区划
+     * @Param insuplcAdmdvs:医保区划
+     *
+     * @Author yuelong.chen
+     * @Date   2021/12/15 21:03
+     * @Return
+     **/
+    List<Map<String,Object>> queryAdmdvsInfo(Map map);
 }

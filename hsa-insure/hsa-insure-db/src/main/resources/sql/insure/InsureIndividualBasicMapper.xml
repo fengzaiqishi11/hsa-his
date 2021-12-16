@@ -369,7 +369,12 @@
                 or iiv.aac001 like concat('%',#{keyword},'%')
                 )
         </if>
-
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiV.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and iiV.visit_id = #{visitId}
+        </if>
     </select>
     <select id="queryInptAndOutptPatientPage"
             resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
@@ -394,6 +399,75 @@
             </if>
         </if>
     </select>
+
+
+    <select id="queryOutptSettleInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            a.hosp_code,
+            a.name,
+            a.age,
+            a.gender_code genderCode,
+            a.age_unit_code ageUnitCode,
+            a.cert_code certCode,
+            a.cert_no certNo,
+            DATE_FORMAT(a.visit_time,'%Y-%m-%d %h:%i:%s') visitTime,
+            a.visit_no visitNo,
+            a.id visitId,
+            a.visit_code visitCode,
+            a.preferential_type_id preferentialTypeId,
+            (select name from base_preferential_type where hosp_code = #{hospCode} and id = a.preferential_type_id) preferentialTypeName,
+            b.id settleId,
+            DATE_FORMAT(b.settle_time,'%Y-%m-%d %h:%i:%s') settleTime,
+            b.total_price totalPrice,
+            b.reality_price realityPrice,
+            b.actual_price actualPrice,
+            b.patient_code patientCode,
+            b.crte_name crteName,
+            c.insureSettleId,
+            c.crte_name inusreCrteName,
+            c.total_price insureTotalPrice,
+            c.plan_price planPrice,
+            c.personal_price presonalPrice,
+            c.person_price personPrice,
+            d.insure_reg_code insureRegCode,
+            d.medical_reg_no medicalRegNo,
+            IF
+                ( ifnull( c.insureSettleId, '0' ) = '0', '0', '1' ) isInsureSettle
+        FROM
+            outpt_visit a
+                LEFT JOIN outpt_settle b ON a.hosp_code = b.hosp_code
+                AND a.id = b.visit_id
+                LEFT JOIN insure_individual_settle c ON b.hosp_code = c.hosp_code
+                AND b.id = c.settle_id
+                LEFT JOIN insure_individual_visit d ON  a.hosp_code = b.hosp_code
+                AND a.id = d.visit_id
+        WHERE
+            1 = 1
+          AND a.hosp_code = #{hospCode}
+          AND b.is_settle = '1'
+          AND b.status_code = '0'
+          AND ifnull(c.insureSettleId,'0') = '0'
+          <if test="keyWord != null and keyWord != ''">
+            and (a.name like concat('%',#{keyword},'%')
+            or a.cert_no like concat('%',#{keyword},'%')
+            or a.visit_no like concat('%',#{keyword},'%')
+            )
+          </if>
+          <if test="patientCode != null and patientCode != ''">
+                and b.patient_code = #{patientCode}
+          </if>
+          <if test="isUpload == '1'.toString">
+                and ifnull(c.insureSettleId,'-1') != '-1'
+          </if>
+          <if test="startDate != null">
+                and date(b.settle_time) &gt;= date(#{startDate})
+          </if>
+          <if test="endDate != null">
+                and date(b.settle_time) &lt;= date(#{endDate})
+          </if>
+    </select>
+
+
 
     <!-- 新增表信息 -->
     <insert id="insert" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO" >
@@ -1197,4 +1271,14 @@
             #{cardIden}
         )
     </insert>
+    <select id="queryPersonInfo" resultType="java.util.Map">
+        select iiv.aac001,iib.aac003,iib.aac006,
+               (select name from  insure_dict id where id.code = 'XZLX' AND id.value = iib.aae140)  as aae140Name,
+               iib.bka035_name as bka035Name,iiv.insuplc_admdvs,iib.bka008,iib.akc252 as balc,iib.bka008
+        from insure_individual_visit  iiv
+        left join  insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
+        where iiv.hosp_code =#{hospCode}
+          and iiv.visit_id = #{visitId}
+          and iiv.medical_reg_no = #{medicalRegNo}
+    </select>
 </mapper>

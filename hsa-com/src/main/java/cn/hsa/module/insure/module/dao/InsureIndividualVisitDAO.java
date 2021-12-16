@@ -412,7 +412,7 @@ public interface InsureIndividualVisitDAO {
     Map<String, String> selectSysParameter(Map<String, String> map);
 
 
-    String queryMsgId(String hospCode, String visitId, String medisCode);
+    String queryMsgId(String hospCode, String visitId, String medisCode,String functionCode);
 
     /**
      * @Method selectInsuplcName

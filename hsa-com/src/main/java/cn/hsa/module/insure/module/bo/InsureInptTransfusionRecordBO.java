@@ -1,7 +1,6 @@
 package cn.hsa.module.insure.module.bo;
 
 import cn.hsa.module.insure.module.dto.InsureInptTransfusionRecordDTO;
-import scala.annotation.meta.param;
 
 import java.util.List;
 import java.util.Map;

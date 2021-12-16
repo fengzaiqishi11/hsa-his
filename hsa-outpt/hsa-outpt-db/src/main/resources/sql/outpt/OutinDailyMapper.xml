@@ -230,16 +230,17 @@
     <select id="queryOutptSettleInvoice" resultType="java.util.Map">
         select count( osi.invoice_no) num, sum(osi.total_price) total_price,
 
-        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and hosp_code = osi.hosp_code and settle_id = osi.settle_id) as zfnum,
-	    (select count(invoice_no) from outpt_settle_invoice where status_code = '2' and hosp_code = osi.hosp_code and settle_id = osi.settle_id) as tfnum,
-        CONCAT(min(CAST(oid.invoice_no as SIGNED)), '') as start_no,
-        CONCAT(max(CAST(oid.invoice_no as SIGNED)), '') as end_no,
-        count(oid.invoice_no) as usenum
-        from outpt_settle_invoice osi join outin_invoice_detail oid on osi.hosp_code = oid.hosp_code and osi.settle_id = oid.settle_id
+        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as zfnum,
+	    (select count(invoice_no) from outpt_settle_invoice where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as tfnum,
+        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as start_no,
+        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as end_no,
+        (select count(invoice_no) from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as usenum
+
+        from outpt_settle_invoice osi
         where osi.hosp_code = #{hospCode} and osi.status_code = '0' and print_num &lt;&gt; 0 and osi.invoice_no is not null and osi.settle_id in (
 	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
 	    )
-	    group by osi.invoice_id
+	    group by invoice_id
     </select>
 
     <!-- 门诊 - 支付方式表 -->
@@ -573,6 +574,12 @@
     <!-- 日结缴款 - 预交金列表 -->
     <select id="queryAdvancePay" resultType="java.util.Map">
         SELECT
+        CONCAT(
+        iv.name,'/',
+        IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(iv.age,'-'),
+        IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS keyword,
             iv.name,
             iv.in_no,
             iv.gender_code,
@@ -607,6 +614,12 @@
     <!-- 日结缴款 - 预交金冲抵列表 -->
     <select id="queryAdvancePayCd" resultType="java.util.Map">
         SELECT
+            CONCAT(
+                    iv.name,'/',
+                    IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+                    IFNULL(iv.age,'-'),
+                    IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+                ) AS keyword,
             iv.name,
             iv.in_no,
             iv.gender_code,

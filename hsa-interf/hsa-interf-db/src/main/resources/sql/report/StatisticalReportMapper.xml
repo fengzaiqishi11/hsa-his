@@ -386,6 +386,9 @@
         a.id = b.settle_id
         and a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' ywlx,
@@ -416,6 +419,9 @@
         b.hosp_code = #{hospCode}
         AND a.is_settle = '1'
         AND a.status_code = '0'
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         <!--FROM
             inpt_settle a,
             insure_individual_settle b,
@@ -700,6 +706,9 @@
         AND a.id = b.settle_id
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' AS ywlx,
@@ -724,6 +733,9 @@
         AND a.hosp_code = b.hosp_code
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         ) ss
         WHERE 1 = 1
         <if test="searchTypeList != null and searchTypeList.size > 0">
@@ -994,10 +1006,12 @@
 
 
     <select id="lisStatistics" resultType="map" parameterType="map">
-        select (a.price/a.num) as singlePrice,a.* ,ib.name as babyName,
-               ib.gender_code as babyGenderCode,a.technology_code as fee_type  from (
+
         SELECT
-        iv.name,
+        (CONCAT(iv.name,'/',
+        (ifnull((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        iv.age,
+        (ifnull((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
@@ -1005,7 +1019,8 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ia.total_price as price,
+        ia.price as price,
+        ia.total_price as totalPrice,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1013,29 +1028,31 @@
         ia.hosp_code as hosp_code,
         ia.total_num as num,
         ma.visit_id,
-        ma.opd_id
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        ib.NAME AS babyName,
+        ib.gender_code AS babyGenderCode
         FROM
-        medic_apply ma,
-        inpt_advice ia,
-        inpt_visit iv,
-        base_advice bd
+        medic_apply ma
+        LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
+        LEFT JOIN inpt_visit iv ON ma.visit_id = iv.id AND iv.hosp_code = ma.hosp_code
+        LEFT JOIN base_advice bd ON ia.item_id = bd.id
+        LEFT JOIN inpt_baby ib ON ia.baby_id = ib.id
         WHERE
-        ma.order_no = ia.order_no
-        and ma.visit_id = ia.visit_id
-        AND ma.hosp_code = ia.hosp_code
-        AND ma.visit_id = iv.id
-        AND iv.hosp_code = ma.hosp_code
-        and ia.item_id = bd.id
-        and ma.type_code =  #{typeCode}
+        ma.is_inpt = '1'
         and ma.hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
         <if test="startTime != null and startTime != ''">
             and  ma.crte_time &gt; #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1047,12 +1064,18 @@
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
             and 1=2
         </if>
         union all
         SELECT
-        ov.name,
+        (CONCAT(ov.name,'/',
+        (ifnull((case ov.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        ov.age,
+        (ifnull((case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         ov.dept_id AS in_dept_id,
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
@@ -1060,15 +1083,20 @@
         '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        '-1' as price,
+        pd.price as price,
+        pd.total_price as totalPrice,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
         '' as baby_id,
         ov.hosp_code as hosp_code,
-        '-1' as num,
+        pd.total_num as num,
         ma.visit_id,
-        ma.opd_id
+        ma.opd_id,
+        ma.document_sta,
+        ma.medic_type,
+        '' AS babyName,
+        '' AS babyGenderCode
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
@@ -1083,16 +1111,17 @@
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
-        and ma.type_code =  #{typeCode}
-        AND ma.document_sta in ('02', '03','07','08')
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
         <if test="startTime != null and startTime != ''">
             and  ma.crte_time &gt; #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1104,19 +1133,23 @@
         <if test="technologyCode != null and technologyCode != ''">
             and ma.medic_type = #{technologyCode}
         </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
             and 1=2
         </if>
-        ) a
-        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
-        order by a.crte_time desc
+
+        order by crte_time desc
     </select>
 
     <select id="passStatistics"  resultType="map" parameterType="map">
-        select a.* ,ib.name as babyName, ib.gender_code as babyGenderCode,
-               a.technology_code as fee_type from (
+
         SELECT
-        iv.name,
+        (CONCAT(iv.name,'/',
+        (ifnull((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        iv.age,
+        (ifnull((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
@@ -1124,7 +1157,8 @@
         iv.in_disease_name,
         ma.crte_time AS crte_time,
         ma.content AS item_name,
-        ia.total_price as price,
+        ia.price as price,
+        ia.total_price as totalPrice,
         ia.crte_name as doctor_name,
         bd.technology_code ,
         ma.type_code,
@@ -1133,19 +1167,18 @@
         ia.total_num as num,
         ma.visit_id,
         ma.opd_id,
-        ma.document_sta
+        ma.document_sta,
+        ma.medic_type,
+        ib.NAME AS babyName,
+        ib.gender_code AS babyGenderCode
         FROM
-        medic_apply ma,
-        inpt_advice ia,
-        inpt_visit iv,
-        base_advice bd
+        medic_apply ma
+        LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
+        LEFT JOIN inpt_visit iv ON ma.visit_id = iv.id AND iv.hosp_code = ma.hosp_code
+        LEFT JOIN base_advice bd ON ia.item_id = bd.id
+        LEFT JOIN inpt_baby ib ON ia.baby_id = ib.id
         WHERE
-        ma.order_no = ia.order_no
-        and ma.visit_id = ia.visit_id
-        AND ma.visit_id = iv.id
-        AND iv.hosp_code = ma.hosp_code
-        and ia.item_id = bd.id
-        and ma.type_code =  #{typeCode}
+        ma.is_inpt = '1'
         and ma.hosp_code = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and  ma.crte_time &gt; #{startTime}
@@ -1156,8 +1189,8 @@
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1167,14 +1200,20 @@
             and ma.content like concat('%',#{itemName},'%')
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and bd.technology_code = #{technologyCode}
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
         </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
             and 1=2
         </if>
         union all
         SELECT
-        ov.name,
+        (CONCAT(ov.name,'/',
+        (ifnull((case ov.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        ov.age,
+        (ifnull((case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         ov.dept_id AS in_dept_id,
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
@@ -1182,7 +1221,8 @@
         '' AS  in_disease_name,
         ma.crte_time,
         ma.content AS item_name,
-        pd.total_price as price,
+        pd.price as price,
+        pd.total_price as totalPrice,
         ma.doctor_name,
         bd.technology_code ,
         ma.type_code ,
@@ -1191,7 +1231,10 @@
         pd.total_num as num,
         ma.visit_id,
         ma.opd_id,
-        ma.document_sta
+        ma.document_sta,
+        ma.medic_type,
+        '' AS babyName,
+        '' AS babyGenderCode
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
@@ -1199,6 +1242,7 @@
         base_advice bd
         WHERE
         ma.visit_id = ov.id
+        and ma.hosp_code = #{hospCode}
         and ma.hosp_code = ov.hosp_code
         and ma.opd_id = pd.id
         and ma.hosp_code = pd.hosp_code
@@ -1206,7 +1250,6 @@
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
         AND ma.type_code = #{typeCode}
-        AND ma.document_sta in ('02', '03','07','08')
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
@@ -1216,8 +1259,8 @@
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt;= #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1226,14 +1269,16 @@
         <if test="itemName != null and itemName != ''">
             and ma.content like concat('%',#{itemName},'%')
         </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
         <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
             and 1=2
         </if>
         <if test="technologyCode != null and technologyCode != ''">
-            and bd.technology_code = #{technologyCode}
+            and ma.medic_type = #{technologyCode}
         </if>
-        )a
-        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        order by crte_time desc
     </select>
 
     <!-- 根据处方、医嘱id查询费用数量信息 -->
@@ -1451,7 +1496,7 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
-        <if test='statisWay == "5"'>
+        <if test='statisWay == "6"'>
             and g.prep_code in ('241','16','138')
         </if>
         GROUP BY

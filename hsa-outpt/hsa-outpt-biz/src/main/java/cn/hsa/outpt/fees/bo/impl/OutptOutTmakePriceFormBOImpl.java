@@ -32,6 +32,7 @@ import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
@@ -1052,7 +1053,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
             insureIndividualBasicService_consumer.deleteInsureBasic(map).getData();
             OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
-            outptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
+            outptVisitDTO.setPatientCode(insureIndividualVisitDTO.getPatientCode()); // 取消之后修改为登记之前的病人类型，不一定是自费病人
             outptVisitDTO.setHospCode(hospCode);
             outptVisitDTO.setId(id);
             outptVisitDAO.updateOutptVisit(outptVisitDTO);
@@ -1613,7 +1614,15 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         stringObjectMap.put("param",json);
         logger.info("体检退费入参:" + json);
         String resultStr = HttpConnectUtil.doPost(stringObjectMap);
+        if (StringUtils.isEmpty(resultStr)) {
+            throw new AppException("体检退费反参信息为空，请联系管理员。");
+        }
         logger.info("体检退费反参:" + resultStr);
+        JSONObject resultObj = JSON.parseObject(resultStr);
+        String code = resultObj.get("code").toString();
+        if (!"0".equals(code)) {
+            throw new AppException((String) resultObj.get("message"));
+        }
     }
 
 

@@ -89,5 +89,5 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
      * 国家编码
      */
     private String nationCode;
-
+    private String otherName;
 }

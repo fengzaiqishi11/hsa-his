@@ -65,13 +65,14 @@
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
         and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
-        <if test="isValid != null and isValid != ''">
-            and b.is_valid = #{isValid}
-        </if>
+
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and b.is_valid = #{isValid}
             </if>
             <if test="locationNo != null and locationNo != ''">
                 and a.location_no = #{locationNo}
@@ -169,13 +170,13 @@
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
         and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
-        <if test="isValid != null and isValid != ''">
-            and b.is_valid = #{isValid}
-        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and b.is_valid = #{isValid}
             </if>
             <if test="locationNo != null and locationNo != ''">
                 and a.location_no = #{locationNo}
@@ -264,13 +265,13 @@
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
         and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
-        <if test="isValid != null and isValid != ''">
-            and b.is_valid = #{isValid}
-        </if>
         <where>
             and a.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and b.is_valid = #{isValid}
             </if>
             <if test="locationNo != null and locationNo != ''">
                 and a.location_no = #{locationNo}
@@ -365,13 +366,13 @@
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
         and ssd.id = (select stock_detail_id from stro_in_record where item_id = a.item_id order by crte_time desc limit 1)
-        <if test="isValid != null and isValid != ''">
-            and b.is_valid = #{isValid}
-        </if>
         <where>
             and a.hosp_code = #{hospCode} and b.hosp_code = #{hospCode}
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="isValid != null and isValid != ''">
+                and b.is_valid = #{isValid}
             </if>
             <if test="locationNo != null and locationNo != ''">
                 and a.location_no = #{locationNo}

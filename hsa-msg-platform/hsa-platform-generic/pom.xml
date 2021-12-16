@@ -6,6 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hsa-platform-generic</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
     <name>hsa-platform-generic</name>
 
     <parent>
@@ -84,6 +85,18 @@
 
     <build>
         <finalName>hsa-platform</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -120,56 +133,8 @@
                     </excludes>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.spotify</groupId>-->
-<!--                <artifactId>docker-maven-plugin</artifactId>-->
-<!--                <version>1.2.2</version>-->
-<!--                &lt;!&ndash;将插件绑定在某个phase执行&ndash;&gt;-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>build-image</id>-->
-<!--                        &lt;!&ndash;用户只需执行mvn package ，就会自动执行mvn docker:build&ndash;&gt;-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>build</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-
-<!--                <configuration>-->
-<!--                    &lt;!&ndash;指定生成的镜像名,这里是我们的作者名+项目名&ndash;&gt;-->
-<!--                    <imageName>yuanzibo/${project.build.finalName}</imageName>-->
-
-<!--                    &lt;!&ndash;指定标签 这里指定的是镜像的版本，我们默认版本是latest&ndash;&gt;-->
-<!--                    <imageTags>-->
-<!--                        <imageTag>latest</imageTag>-->
-<!--                    </imageTags>-->
-
-<!--                    &lt;!&ndash;指定基础镜像jdk1.8&ndash;&gt;-->
-<!--                    <baseImage>java:8</baseImage>-->
-
-<!--                    &lt;!&ndash;切换到ROOT目录&ndash;&gt;-->
-<!--                    <workdir>/</workdir>-->
-<!--                    <entryPoint>["java","-Xms256m","-Xmx1024m","-jar","/${project.build.finalName}.jar"]</entryPoint>-->
-
-<!--                    <exposes>19005</exposes>-->
-
-<!--                    &lt;!&ndash;指定远程 docker api地址&ndash;&gt;-->
-<!--                    <dockerHost>${dockerUrl}</dockerHost>-->
-<!--                    <dockerCertPath>${dockerUrlZs}</dockerCertPath>-->
-<!--                    &lt;!&ndash; 这里是复制 jar 包到 docker 容器指定目录配置 &ndash;&gt;-->
-<!--                    <resources>-->
-<!--                        <resource>-->
-<!--                            <targetPath>/</targetPath>-->
-<!--                            &lt;!&ndash;jar 包所在的路径  此处配置的 即对应 target 目录&ndash;&gt;-->
-<!--                            <directory>${project.build.directory}</directory>-->
-<!--                            &lt;!&ndash;用于指定需要复制的文件 需要包含的 jar包 ，这里对应的是 Dockerfile中添加的文件名　&ndash;&gt;-->
-<!--                            <include>${project.build.finalName}.jar</include>-->
-<!--                        </resource>-->
-<!--                    </resources>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
         </plugins>
+
     </build>
 
 </project>

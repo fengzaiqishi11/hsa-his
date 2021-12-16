@@ -57,4 +57,8 @@ public class WebsocketInitialization {
             workerGroup.shutdownGracefully();
         }
     }
+
+    public Integer getPort(){
+        return port;
+    }
 }

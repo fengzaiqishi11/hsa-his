@@ -386,6 +386,9 @@
         a.id = b.settle_id
         and a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' ywlx,
@@ -416,6 +419,9 @@
         b.hosp_code = #{hospCode}
         AND a.is_settle = '1'
         AND a.status_code = '0'
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         <!--FROM
             inpt_settle a,
             insure_individual_settle b,
@@ -700,6 +706,9 @@
         AND a.id = b.settle_id
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         UNION ALL
         SELECT
         'ZY' AS ywlx,
@@ -724,6 +733,9 @@
         AND a.hosp_code = b.hosp_code
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
+        <if test="medType != null and medType != ''">
+            AND b.aka130 = #{medType}
+        </if>
         ) ss
         WHERE 1 = 1
         <if test="searchTypeList != null and searchTypeList.size > 0">
@@ -996,7 +1008,10 @@
     <select id="lisStatistics" resultType="map" parameterType="map">
 
         SELECT
-        iv.name,
+        (CONCAT(iv.name,'/',
+        (ifnull((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        iv.age,
+        (ifnull((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
@@ -1036,8 +1051,8 @@
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1057,7 +1072,10 @@
         </if>
         union all
         SELECT
-        ov.name,
+        (CONCAT(ov.name,'/',
+        (ifnull((case ov.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        ov.age,
+        (ifnull((case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         ov.dept_id AS in_dept_id,
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
@@ -1102,8 +1120,8 @@
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt; #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1128,7 +1146,10 @@
     <select id="passStatistics"  resultType="map" parameterType="map">
 
         SELECT
-        iv.name,
+        (CONCAT(iv.name,'/',
+        (ifnull((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        iv.age,
+        (ifnull((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         iv.in_dept_id,
         iv.in_dept_name,
         iv.in_no,
@@ -1168,8 +1189,8 @@
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1189,7 +1210,10 @@
         </if>
         union all
         SELECT
-        ov.name,
+        (CONCAT(ov.name,'/',
+        (ifnull((case ov.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        ov.age,
+        (ifnull((case ov.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as name,
         ov.dept_id AS in_dept_id,
         ov.dept_name AS in_dept_name,
         ov.visit_no AS in_no,
@@ -1235,8 +1259,8 @@
         <if test="endTime != null and endTime != ''">
             and ma.crte_time &lt;= #{endTime}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and ma.dept_id = #{deptId}
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
         </if>
         <if test="keyword != null and keyword != ''">
             and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
@@ -1472,7 +1496,7 @@
             and b.crte_time &lt;= #{endDate}
         </if>
         <!--注射类 241：粉针剂 16：注射液 138：注射剂-->
-        <if test='statisWay == "5"'>
+        <if test='statisWay == "6"'>
             and g.prep_code in ('241','16','138')
         </if>
         GROUP BY

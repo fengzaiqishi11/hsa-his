@@ -78,7 +78,7 @@ public interface InsureIndividualBasicBO {
     Boolean deleteInsureBasic(InsureIndividualBasicDTO insureIndividualBasicDTO);
 
     /**
-     * @param map
+     * @param
      * @Method queryInsurePatientPage
      * @Desrciption 分页查询医保病人的登记注册信息
      * @Param
@@ -109,4 +109,25 @@ public interface InsureIndividualBasicBO {
      * @Return
      */
     Map<String,Object> queryInsureInfo(Map<String, Object> map);
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    Map<String,Object> queryPersonInfo(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Description: 获取已结算人员信息 - 用于门诊已结算自费病人（大学生医保）医保直报
+     * @Param:
+     * @Author: liaojiguang
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date 2021/12/15 13:59
+     * @Return
+     */
+    PageDTO queryOutptSettleInfo(Map<String, Object> map);
 }

@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.phar.pharapply.dao.PharApplyDAO;
 import cn.hsa.module.phar.pharapply.dto.PharApplyDTO;
+import cn.hsa.module.phar.pharapply.entity.StroOutDetail;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
@@ -106,13 +107,27 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
      **/
     @Override
     public PageDTO queryPage(StroOutDTO stroOutDTO) {
+        // 康德需求之出库单添加名字过滤
+        String itemNameKey = stroOutDTO.getItemNameKey();
+        if (StringUtils.isNotEmpty(itemNameKey)){
+            List<StroOutDetailDTO> stroOutDetails = stroOutDAO.queryAllDetails(stroOutDTO);
+            if (!ListUtils.isEmpty(stroOutDetails)){
+                List<String> inIds = stroOutDetails.stream().map(StroOutDetailDTO::getOutId).distinct().collect(Collectors.toList());
+                stroOutDTO.setIds(inIds);
+                stroOutDTO.setId("");
+            }
+        }
+
         PageHelper.startPage(stroOutDTO.getPageNo(), stroOutDTO.getPageSize());
         //查出页面大小数量的数据
         List<StroOutDTO> stroOutinDTOS = this.stroOutDAO.queryPage(stroOutDTO);
         if (!ListUtils.isEmpty(stroOutinDTOS)) {
-            stroOutinDTOS.forEach(item -> {
+            for (StroOutDTO item : stroOutinDTOS){
+                if (StringUtils.isNotEmpty(itemNameKey)){
+                    item.setItemNameKey(itemNameKey);
+                }
                 item.setStroOutDetailDTOS(stroOutDAO.queryAllDetails(item));
-            });
+            }
         }
         return PageDTO.of(stroOutinDTOS);
     }
@@ -487,6 +502,18 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
         }
         stroOutDTO.setStroOutDetailDTOS(stroOutDetailDTOS);
         return stroOutDTO;
+    }
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 根据出库单查询出库明细
+     * @Param: [stroOutDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    @Override
+    public List<StroOutDetailDTO> queryStroOutDetail(StroOutDetailDTO stroOutDetailDTO) {
+        return stroOutDAO.queryStroOutDetail(stroOutDetailDTO);
     }
 
     public void judgeStock(StroOutDTO stroOutDTO){

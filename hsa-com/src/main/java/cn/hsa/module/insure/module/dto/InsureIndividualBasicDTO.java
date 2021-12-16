@@ -100,4 +100,6 @@ public class InsureIndividualBasicDTO extends InsureIndividualBasicDO implements
         private String specialType; // 用来区分慢特病用药记录的
         private String visitBerth; // 床位号
         private String psnCertType; // 类型
+        private String hcardBasinfo; // 广州读卡就医基本信息
+        private String hcardChkinfo; // 广州读卡就医校验信息
 }

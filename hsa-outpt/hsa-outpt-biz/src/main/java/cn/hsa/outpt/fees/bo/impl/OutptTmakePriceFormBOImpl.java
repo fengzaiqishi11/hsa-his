@@ -486,7 +486,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 patientIsCF = this.checkPatientIsMZ(outptVisitDTO);
             }
             // 3、1 直接划价收费病人重新计算优惠
-            if (!patientIsCF) {
+//            if (!patientIsCF) {
+//                outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
+//            }
+            if (StringUtils.isEmpty(outptVisitDTO.getId())) {
                 outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
             }
 

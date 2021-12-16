@@ -147,4 +147,15 @@ public interface InsureDictService {
     WrapperResponse<Map<String,Object>> queryAllInsureDict(Map map);
 
     WrapperResponse<PageDTO> queryAdmdvsInfoPage(Map map);
+
+    /**
+     * @Method queryAdmdvsInfo()
+     * @Desrciption  查询医保地区划
+     * @Param insuplcAdmdvs:医保区划
+     *
+     * @Author yuelong.chen
+     * @Date   2021/12/15 21:03
+     * @Return
+     **/
+    WrapperResponse<List<Map<String,Object>>> queryAdmdvsInfo(Map map);
 }

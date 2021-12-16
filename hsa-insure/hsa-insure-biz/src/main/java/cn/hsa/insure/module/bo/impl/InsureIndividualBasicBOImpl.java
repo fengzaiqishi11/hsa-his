@@ -214,6 +214,22 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         return resultMap;
     }
 
+    /**
+     * @param map
+     * @Description: 获取已结算人员信息 - 用于门诊已结算自费病人（大学生医保）医保直报
+     * @Param:
+     * @Author: liaojiguang
+     * @Email: jiguang.liao@powersi.com.cn
+     * @Date 2021/12/15 13:59
+     * @Return
+     */
+    @Override
+    public PageDTO queryOutptSettleInfo(Map<String, Object> map) {
+        PageHelper.startPage(Integer.parseInt(MapUtils.get(map,"pageNo")),Integer.parseInt(MapUtils.get(map,"pageSize")));
+        List<Map<String,Object>> list =  insureIndividualBasicDAO.queryOutptSettleInfo(map);
+        return PageDTO.of(list);
+    }
+
 
     /**
      * @Method commonInsureUnified
@@ -255,6 +271,19 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
             throw new AppException((String) resultMap.get("err_msg"));
         }
         return resultMap;
+    }
+    /**
+     * @Method getPersonInfo
+     * @Desrciption
+     * @Param
+     *
+     * @Author YUELONG.CHEN
+     * @Date   2021/12/14 15:05
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryPersonInfo(Map<String, Object> map) {
+        return insureIndividualBasicDAO.queryPersonInfo(map);
     }
 
 }

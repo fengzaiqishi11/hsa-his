@@ -44,7 +44,8 @@
         <result column="idet_end_date" property="idetEndDate" jdbcType="TIMESTAMP"/>
         <result column="psn_idet_type" property="psnIdetType" jdbcType="VARCHAR"/>
         <result column="is_one_settle" property="isOneSettle" jdbcType="VARCHAR"/>
-
+        <result column="hcard_basinfo" property="hcardBasinfo" jdbcType="VARCHAR"/>
+        <result column="hcard_chkinfo" property="hcardChkinfo" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -89,7 +90,9 @@
         psn_idet_type,
         iiv.pay_token,
         iiv.pay_ord_id,
-        is_one_settle
+        is_one_settle,
+        hcard_basinfo,
+        hcard_chkinfo
     </sql>
 
     <!-- 表所有字段（别名） -->
@@ -134,7 +137,9 @@
         iiv.idet_start_date,
         iiv.idet_end_date,
         iiv.psn_idet_type,
-        iiv.is_one_settle
+        iiv.is_one_settle,
+        iiv.hcard_basinfo,
+        iiv.hcard_chkinfo
     </sql>
 
 
@@ -191,7 +196,9 @@
          idet_start_date,
          idet_end_date,
          psn_idet_type,
-         is_one_settle)
+         is_one_settle,
+         hcard_basinfo,
+         hcard_chkinfo)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -232,7 +239,9 @@
                 #{idetStartDate,jdbcType=VARCHAR},
                 #{idetEndDate,jdbcType=VARCHAR},
                 #{psnIdetType,jdbcType=VARCHAR},
-                #{isOneSettle,jdbcType=VARCHAR}
+                #{isOneSettle,jdbcType=VARCHAR},
+                #{hcardBasinfo,jdbcType=VARCHAR},
+                #{hcardChkinfo,jdbcType=VARCHAR}
                 )
     </insert>
 
@@ -384,7 +393,13 @@
                 is_one_settle,
             </if>
             <if test="payTokenDengJi != null and payTokenDengJi != ''">
-                pay_token_deng_ji
+                pay_token_deng_ji,
+            </if>
+            <if test="hcardBasinfo != null and hcardBasinfo != ''">
+                hcard_basinfo,
+            </if>
+            <if test="hcardChkinfo != null and hcardChkinfo != ''">
+                hcard_chkinfo
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -531,7 +546,13 @@
                 #{isOneSettle,jdbcType=VARCHAR},
             </if>
             <if test="payTokenDengJi != null and payTokenDengJi != ''">
-                #{payTokenDengJi,jdbcType=VARCHAR}
+                #{payTokenDengJi,jdbcType=VARCHAR},
+            </if>
+            <if test="hcardBasinfo != null and hcardBasinfo != ''">
+                #{hcardBasinfo,jdbcType=VARCHAR},
+            </if>
+            <if test="hcardChkinfo != null and hcardChkinfo != ''">
+                #{hcardChkinfo,jdbcType=VARCHAR}
             </if>
         </trim>
     </insert>
@@ -610,7 +631,9 @@
             idet_start_date     = #{idetStartDate,jdbcType=VARCHAR},
             idet_end_date       = #{idetEndDate,jdbcType=VARCHAR},
             psn_idet_type       = #{psnIdetType,jdbcType=VARCHAR},
-            is_one_settle       = #{isOneSettle,jdbcType=VARCHAR}
+            is_one_settle       = #{isOneSettle,jdbcType=VARCHAR},
+            hcard_basinfo       = #{hcardBasinfo,jdbcType=VARCHAR},
+            hcard_chkinfo       = #{hcardChkinfo,jdbcType=VARCHAR}
         where id = #{id}
     </update>
 
@@ -725,7 +748,13 @@
                 psn_idet_type = #{psnIdetType,jdbcType=VARCHAR},
             </if>
             <if test="isOneSettle != null and isOneSettle != ''">
-                is_one_settle  = #{isOneSettle,jdbcType=VARCHAR}
+                is_one_settle  = #{isOneSettle,jdbcType=VARCHAR},
+            </if>
+            <if test="hcardBasinfo != null and hcardBasinfo != ''">
+                hcard_basinfo  = #{hcardBasinfo,jdbcType=VARCHAR},
+            </if>
+            <if test="hcardChkinfo != null and hcardChkinfo != ''">
+                hcard_chkinfo  = #{hcardChkinfo,jdbcType=VARCHAR}
             </if>
 
         </set>
@@ -1390,7 +1419,7 @@
     <select id="queryMsgId" resultType="java.lang.String">
         SELECT max(msg_id)
         FROM insure_function_log where
-            msg_info = '2304' and
+            msg_info = #{functionCode} and
             code = '0' and hosp_code = #{hospCode}
             and visit_id =#{visitId} and
             medis_code = #{medisCode}

@@ -1920,7 +1920,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         sysParameterMap.put("hospCode",MapUtils.get(paraMap,"hospCode"));
         sysParameterMap.put("code", "IS_VALID_ONE_SETTLE");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
-        if (Constants.SF.F.equals(sysParameterDTO.getValue())) {
+        if (sysParameterDTO != null && Constants.SF.F.equals(sysParameterDTO.getValue())) {
             paraMap.put("isValidOneSettle",Constants.SF.F); // 查询不区分一站式
         }
 

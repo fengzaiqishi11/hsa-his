@@ -99,7 +99,7 @@ FROM
 	AND a.hosp_code = b.hosp_code
 	LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
 	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '1' and a.report_time is null and a.document_sta is null
+	where a.is_inpt = '1' and a.report_time is null and a.document_sta = '01'
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">

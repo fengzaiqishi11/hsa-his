@@ -10,18 +10,6 @@
     http://www.springframework.org/schema/aop
      http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
 
-    <bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
-        <property name="properties">
-            <props>
-                <prop key="SQL Server">sqlserver</prop>
-                <prop key="DB2">db2</prop>
-                <prop key="Oracle">oracle</prop>
-                <prop key="MySQL">mysql</prop>
-                <prop key="H2">h2</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
     </bean>

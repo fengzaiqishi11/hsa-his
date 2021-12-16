@@ -1396,5 +1396,17 @@
         select admdvs_name
         from insure_admdvs where hosp_code =#{hospCode} and admdvs_code =#{insuplcAdmdvs}
     </select>
+    <select id="queryOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
+        select a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
+               a.is_main isMain, b.name diseaseName,b.code diseaseCode,a.crte_time
+                ,c.dept_name inDeptName,c.dept_id inDeptId,a.crte_id zzDoctorId,a.crte_name zzDoctorName,
+               iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName,
+        from outpt_diagnose a
+                 join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+                 join outpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
+                 join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+          and iim.is_match ='1' and iim.audit_code ='1' limit 1
+    </select>
 
 </mapper>

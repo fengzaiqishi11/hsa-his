@@ -4,6 +4,8 @@ import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
@@ -150,4 +152,37 @@ public interface OutptVisitDAO {
 	void deleteDiagnoseByVisitId(OutptVisitDTO outptVisitDTO);
 
     void updateInsuresumPatient(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
+
+    /**
+     * @param outptSettleDO
+     * @Method updateOutptAcctPay
+     * @Desrciption 修改
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/15 11:16
+     * @Return
+     */
+    boolean updateOutptAcctPay(OutptSettleDO outptSettleDO);
+
+    /**
+     * @param map
+     * @Method selectOutptSettleById
+     * @Desrciption 根据就诊id查询门诊结算信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:34
+     * @Return
+     */
+    OutptSettleDTO selectOutptSettleById(Map<String, Object> map);
 }

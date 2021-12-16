@@ -1,6 +1,8 @@
 package cn.hsa.module.outpt.visit.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.Map;
@@ -57,4 +59,38 @@ public interface OutptVisitBO {
      * @Return
      **/
     Boolean updateOutptVisit(OutptVisitDTO outptVisitDTO);
+
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
+
+    /**
+     * @param outptSettleDO
+     * @Method updateOutptAcctPay
+     * @Desrciption 修改
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/15 11:16
+     * @Return
+     */
+    boolean updateOutptAcctPay(OutptSettleDO outptSettleDO);
+
+    /**
+     * @param map
+     * @Method selectOutptSettleById
+     * @Desrciption 根据就诊id查询门诊结算信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:34
+     * @Return
+     */
+    OutptSettleDTO selectOutptSettleById(Map<String, Object> map);
 }

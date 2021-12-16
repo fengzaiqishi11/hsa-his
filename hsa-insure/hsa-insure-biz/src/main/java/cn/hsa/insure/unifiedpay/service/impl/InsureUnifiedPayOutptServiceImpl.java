@@ -2,21 +2,13 @@ package cn.hsa.insure.unifiedpay.service.impl;
 
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayOutptBO;
-import cn.hsa.module.insure.outpt.entity.InsureOutptVisitDO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
-import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
-import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
-import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -199,5 +191,33 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	@Override
 	public WrapperResponse<Map<String, Object>> UP4302(Map<String, Object> map) {
 		return WrapperResponse.success(insureUnifiedPayOutptBO.UP4302(map));
+	}
+
+	/**
+	 * @Method handlerInsurePatientSum
+	 * @Desrciption  结算之前,保存个人累计信息
+	 * @Param
+	 *
+	 * @Author fuhui
+	 * @Date   2021/12/14 16:13
+	 * @Return
+	 **/
+	@Override
+	public WrapperResponse<Boolean> insertPatientSumInfo(Map<String, Object> map) {
+		return WrapperResponse.success(insureUnifiedPayOutptBO.insertPatientSumInfo(map));
+	}
+
+	/**
+	 * @Method updateInsureCost
+	 * @Desrciption  费用传输以后：更新医保的反参数据
+	 * @Param
+	 *
+	 * @Author fuhui
+	 * @Date   2021/5/21 8:35
+	 * @Return
+	 **/
+	@Override
+	public WrapperResponse<Boolean> insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> map,List<Map<String, Object>> list) {
+		return WrapperResponse.success(insureUnifiedPayOutptBO.insertInsureCost(resultDataMap,map,list));
 	}
 }

@@ -86,6 +86,7 @@ public class InsureUnifiedCommonUtil {
         logParamMap.put("msgInfo",functionCode);
         logParamMap.put("resultStr",resultJson);
         insureUnifiedLogService_consumer.insertInsureFunctionLog(logParamMap);
+        MapUtils.remove(logParamMap,"msgName");
         if (StringUtils.isEmpty(resultJson)) {
             throw new AppException("无法访问统一支付平台");
         }

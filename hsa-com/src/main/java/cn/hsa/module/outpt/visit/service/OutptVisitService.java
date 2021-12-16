@@ -2,7 +2,10 @@ package cn.hsa.module.outpt.visit.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,4 +68,37 @@ public interface OutptVisitService {
      * @Return
      **/
     WrapperResponse<Boolean> updateOutptVisit(Map<String, Object> outptVisitMap);
+
+    /**
+     * @Method selectOutptVisitById
+     * @Desrciption  根据就诊id查询门诊患者
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/13 16:27
+     * @Return
+    **/
+    WrapperResponse<OutptVisitDTO> selectOutptVisitById(Map<String, Object> map);
+    
+    /**
+     * @Method selectOutptSettleById
+     * @Desrciption   根据就诊id查询门诊结算信息
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/12/13 16:34 
+     * @Return 
+    **/
+    WrapperResponse<OutptSettleDTO> selectOutptSettleById(Map<String, Object> map);
+    
+    /**
+     * @Method updateOutptAcctPay
+     * @Desrciption  修改
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2021/12/15 11:16 
+     * @Return 
+    **/
+    WrapperResponse<Boolean> updateOutptAcctPay(OutptSettleDO outptSettleDO);
 }

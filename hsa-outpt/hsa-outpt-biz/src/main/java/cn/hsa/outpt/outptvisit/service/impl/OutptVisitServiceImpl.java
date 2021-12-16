@@ -4,6 +4,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
@@ -88,6 +90,48 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     @Override
     public WrapperResponse<Boolean> updateOutptVisit(Map<String, Object> outptVisitMap) {
         return WrapperResponse.success(outptVisitBO.updateOutptVisit(MapUtils.get(outptVisitMap,"outptVisitDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    @Override
+    public WrapperResponse<OutptVisitDTO> selectOutptVisitById(Map<String, Object> map) {
+        return WrapperResponse.success(outptVisitBO.selectOutptVisitById(map));
+    }
+
+    /**
+     * @param map
+     * @Method selectOutptSettleById
+     * @Desrciption 根据就诊id查询门诊结算信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:34
+     * @Return
+     */
+    @Override
+    public WrapperResponse<OutptSettleDTO> selectOutptSettleById(Map<String, Object> map) {
+        return WrapperResponse.success(outptVisitBO.selectOutptSettleById(map));
+    }
+
+    /**
+     * @param outptSettleDO
+     * @Method updateOutptAcctPay
+     * @Desrciption 修改
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/15 11:16
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateOutptAcctPay(OutptSettleDO outptSettleDO) {
+        return WrapperResponse.success(outptVisitBO.updateOutptAcctPay(outptSettleDO));
     }
 
 }

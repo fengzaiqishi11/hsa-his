@@ -6,8 +6,6 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
-import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
@@ -265,10 +263,14 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     @Override
     public Boolean insertOutptUnifiedFee(Map<String, Object> unifiedPayMap) {
         String hospCode = unifiedPayMap.get("hospCode").toString();
+        InsureIndividualVisitDTO insureIndividualVisitDTO = null;
         /**
          * 获取医保就诊信息
          */
-        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(unifiedPayMap);
+        insureIndividualVisitDTO = MapUtils.get(unifiedPayMap, "insureIndividualVisitDTO");
+        if(insureIndividualVisitDTO ==null){
+            insureIndividualVisitDTO = commonGetVisitInfo(unifiedPayMap);
+        }
         unifiedPayMap.put("visitId", insureIndividualVisitDTO.getVisitId());
         /**
          * 获取访问的url地址
@@ -501,7 +503,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      * @Date   2021/5/21 8:35
      * @Return
      **/
-    private void insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap, List<Map<String, Object>> list) {
+    public boolean insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap, List<Map<String, Object>> list) {
         String batchNo = MapUtils.get(unifiedPayMap,"batchNo").toString();
         String hospCode  = MapUtils.get(unifiedPayMap,"hospCode");
         String visitId = MapUtils.get(unifiedPayMap,"visitId");
@@ -583,6 +585,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         if(!ListUtils.isEmpty(individualCostDTOList)){
             insureIndividualCostDAO.batchInsertCost(individualCostDTOList);
         }
+        return true;
     }
 
     /**
@@ -593,8 +596,9 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      * @Author fuhui
      * @Date   2021/10/23 14:27
      * @Return
-     **/
-    private void insertPatientSumInfo(Map<String, Object> map) {
+     *
+     * @return*/
+    public boolean insertPatientSumInfo(Map<String, Object> map) {
         String crteName = MapUtils.get(map,"crteName"); //  创建人姓名
         String crteId = MapUtils.get(map,"crteId"); // 创建人id
         String visitId = MapUtils.get(map,"visitId"); // 就诊id
@@ -621,6 +625,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             insureIndividualVisitDAO.deletePatientSumInfo(map);
             insureIndividualVisitDAO.insertPatientSumInfo(resultDataMap);
         }
+        return true;
     }
 
     /**

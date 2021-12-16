@@ -649,7 +649,9 @@
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         AND e.insure_price > 0
-        and ifnull(t.is_one_settle,'0') != '1'
+        <if test="isValidOneSettle == '1'.toString()">
+            and ifnull(t.is_one_settle,'0') != '1'
+        </if>
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -771,7 +773,9 @@
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         AND e.insure_price > 0
+        <if test="isValidOneSettle == '1'.toString()">
         and ifnull(t.is_one_settle,'0') != '1'
+        </if>
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>

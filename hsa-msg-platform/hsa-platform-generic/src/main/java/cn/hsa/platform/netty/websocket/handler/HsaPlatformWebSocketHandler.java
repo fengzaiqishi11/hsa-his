@@ -1,5 +1,7 @@
 package cn.hsa.platform.netty.websocket.handler;
 
+import cn.hsa.platform.dao.MessageInfoDao;
+import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.runner.WebsocketRunnable;
 import com.alibaba.fastjson.JSON;
@@ -9,9 +11,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +45,9 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
      *  解决问题四，如果是集群中需要换成redis的hash数据类型存储即可
      */
     private static Map<String, Long> clientMap = new ConcurrentHashMap<>();
+
+    @Resource
+    private MessageInfoDao messageInfoDao;
 
     /**
      * 客户端发送给服务端的消息
@@ -71,7 +79,11 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             } else {
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
                 // 主动通信业务在此处填写
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(Thread.currentThread().getName() + "服务器时间" + LocalDateTime.now() + "hsa-msg-platform"));
+                MessageInfoModel param =new MessageInfoModel();
+                param.setDeptId("1");
+                param.setHospCode("1000001");
+                List<MessageInfoModel> messageInfoModel =messageInfoDao.queryMessageInfoByType(param);
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModel)));
             }
 
         } catch (Exception e) {

@@ -1415,6 +1415,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("beforeSettle", list.get(0).get("beforeSettle"));
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
             returnMap.put("creditPrice", list.get(0).get("creditPrice"));
+            returnMap.put("bedName", list.get(0).get("bedName"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {

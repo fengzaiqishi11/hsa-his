@@ -245,6 +245,12 @@
 				a.in_stock_id in
 				(select c.id from base_dept c where (c.name like '%${keyword}%' or c.pym like '%${keyword}%' or c.wbm like '%${keyword}%')))
 			</if>
+			<if test="ids != null and ids.size() > 0">
+				and a.id in
+				<foreach collection="ids" item="id" separator="," open="(" close=")">
+					#{id}
+				</foreach>
+			</if>
 		</where>
 		order by a.crte_time desc
 	</select>
@@ -344,6 +350,17 @@
 				<foreach collection="ids" index="index" item="id" separator="," open="(" close=")">
 					#{id}
 				</foreach>
+			</if>
+			<if test="itemNameKey != null and itemNameKey != ''">
+				and (
+				a.item_name like concat('%',#{itemNameKey},'%')
+				or bd.usual_pym like concat('%',#{itemNameKey},'%')
+				or bd.good_pym like concat('%',#{itemNameKey},'%')
+				or bd.good_name like concat('%',#{itemNameKey},'%')
+				or bd.usual_name like concat('%',#{itemNameKey},'%')
+				or bm.name like concat('%',#{itemNameKey},'%')
+				or bm.pym like concat('%',#{itemNameKey},'%')
+				)
 			</if>
 		</where>
 		group by a.batch_no,a.id, a.hosp_code, a.out_id, a.item_code, a.item_id, a.item_name, a.spec, a.num,
@@ -558,7 +575,103 @@
 		</foreach>
 		GROUP BY a.hosp_code,a.item_id,a.batch_no
 	</select>
-  <!-- 批量插入出库单-->
+	<!--根据出库id 查询出库明细-->
+	<select id="queryStroOutDetail" resultType="cn.hsa.module.stro.stroout.dto.StroOutDetailDTO">
+		SELECT
+		a.id,
+		a.hosp_code,
+		a.out_id,
+		a.item_code,
+		a.item_id,
+		a.item_name,
+		a.spec,
+		a.num,
+		a.unit_code,
+		a.dosage,
+		a.dosage_unit_code,
+		a.buy_price,
+		a.sell_price,
+		a.buy_price_all,
+		a.sell_price_all,
+		a.split_ratio,
+		a.split_num,
+		a.split_price,
+		a.split_unit_code,
+		a.expiry_date,
+		a.batch_no,
+		c.name as deptName,
+		CASE WHEN
+		a.item_code = '1' THEN
+		( SELECT NAME FROM base_product WHERE CODE = bd.prod_code AND hosp_code = a.hosp_code )
+		WHEN a.item_code = '2' THEN
+		( SELECT NAME FROM base_product WHERE CODE = bm.prod_code AND hosp_code = a.hosp_code )
+		END prodName,
+		CASE
+		WHEN a.item_code = '1' THEN
+		bd.CODE
+		WHEN a.item_code = '2' THEN
+		bm.CODE
+		END CODE,
+		CASE
+		WHEN a.item_code = '2' THEN
+		bm.model
+		END model
+		FROM
+		stro_out_detail AS a
+		LEFT JOIN base_drug bd ON bd.id = a.item_id
+		AND bd.hosp_code = #{hospCode}
+		LEFT JOIN base_material bm ON bm.id = a.item_id
+		AND bm.hosp_code = #{hospCode}
+		left join stro_out as b on a.out_id = b.id and a.hosp_code = b.hosp_code
+		left join base_dept as c on c.id = b.in_stock_id and a.hosp_code = c.hosp_code
+		<where>
+		a.hosp_code = #{hospCode}
+			<if test="outId != null and outId != ''">
+				AND a.out_id = #{outId}
+			</if>
+			<if test="outIds != null and outIds.size()>0">
+				AND a.out_id IN
+				<foreach collection="outIds" index="index" item="id" separator="," open="(" close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="itemName != null and itemName != ''">
+				AND (
+				a.item_name LIKE concat('%',#{itemName},'%')
+				OR bd.usual_pym LIKE concat('%',#{itemName},'%')
+				OR bd.good_pym LIKE concat('%',#{itemName},'%')
+				OR bd.good_name LIKE concat('%',#{itemName},'%')
+				OR bd.usual_name LIKE concat('%',#{itemName},'%')
+				OR bm.NAME LIKE concat('%',#{itemName},'%')
+				OR bm.pym LIKE concat('%', #{itemName},'%')
+				)
+			</if>
+		</where>
+		GROUP BY
+		a.batch_no,
+		a.id,
+		a.hosp_code,
+		a.out_id,
+		a.item_code,
+		a.item_id,
+		a.item_name,
+		a.spec,
+		a.num,
+		a.unit_code,
+		a.dosage,
+		a.dosage_unit_code,
+		a.buy_price,
+		a.sell_price,
+		a.buy_price_all,
+		a.sell_price_all,
+		a.split_ratio,
+		a.split_num,
+		a.split_price,
+		a.split_unit_code,
+		a.expiry_date
+		ORDER BY a.id
+	</select>
+	<!-- 批量插入出库单-->
   <insert id="insertStroOutAll">
     insert into stro_out(id, hosp_code, out_code, order_no, out_stock_id, in_stock_id, buy_price_all, sell_price_all,
      remark, audit_code, audit_id, audit_name, audit_time, ok_audit_code, ok_audit_id, ok_audit_name, ok_audit_time,

@@ -214,4 +214,12 @@
         </if>
     </select>
 
+    <select id="queryAdmdvsInfo" resultType="java.util.HashMap" >
+        select
+        admdvs_code admdvsCode, admdvs_name admdvsName
+        from insure_admdvs
+        where
+        hosp_code = #{hospCode}
+    </select>
+
 </mapper>

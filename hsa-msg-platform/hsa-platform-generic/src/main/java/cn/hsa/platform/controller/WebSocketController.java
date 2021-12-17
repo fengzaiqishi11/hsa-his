@@ -1,13 +1,18 @@
 package cn.hsa.platform.controller;
 
+import cn.hsa.platform.dao.MessageInfoDao;
+import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +29,8 @@ import java.util.Map;
 @Controller
 public class WebSocketController {
 
+    @Autowired
+    private MessageInfoDao messageInfoDao;
     /**
      *
      * @param id 用户主键
@@ -43,6 +50,14 @@ public class WebSocketController {
             }
         });
         return "SUCCESS";
+    }
+
+    @ResponseBody
+    @GetMapping("/msg/list")
+    public List getMessageInfoList(){
+        MessageInfoModel info = new MessageInfoModel();
+        info.setHospCode("1000001");
+        return messageInfoDao.queryMessageInfoByType(info);
     }
 }
 

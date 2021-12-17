@@ -231,7 +231,7 @@
         a.crte_name,
         a.crte_time,
         c.settle_time,
-        c.reality_price totalCost,
+        ifnull(c.reality_price, a.total_cost) as totalCost,
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         (c.mi_price-c.acct_pay) as miPrice,

@@ -198,4 +198,6 @@ public class BaseDrugDTO extends BaseDrugDO implements Serializable {
     private String downLoadFlag ;
     /** 医技分类代码 **/
     private String technologyCode;
+    /** 是否只能开检查项目 **/
+    private String onlyOpenItem;
 }

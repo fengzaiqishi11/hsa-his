@@ -560,6 +560,8 @@ public class OutptDoctorPrescribeController extends BaseController {
     baseDrugDTO.setHospCode(sysUserDTO.getHospCode());
     //登录科室
     baseDrugDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+    // 是否只能开检查项目
+    baseDrugDTO.setOnlyOpenItem(sysUserDTO.getOnlyOpenItem());
     //查询数据
     paramMap.put("baseDrugDTO", baseDrugDTO);
     return outptDoctorPrescribeService_consumer.getCfData(paramMap);

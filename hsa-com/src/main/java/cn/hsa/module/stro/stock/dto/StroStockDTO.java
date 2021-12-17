@@ -95,4 +95,16 @@ public class StroStockDTO extends StroStockDO implements Serializable {
      * 库存上下限查询条件
      */
     private String stockLimitsFlag;
+    /**
+     * 库存时间节点
+     */
+    private String stockTime;
+    /**
+     * 查询时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date queryTime;
+
+    private String longStockflag;
 }

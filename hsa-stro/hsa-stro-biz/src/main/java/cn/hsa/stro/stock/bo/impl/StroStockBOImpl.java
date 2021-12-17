@@ -1457,7 +1457,54 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         return stroStockDao.updateOccupy(stockDetailDTOList);
     }
 
-    /**库存效期查询
+    /**
+    * @Menthod inserStockByTime
+    * @Desrciption
+    *
+    * @Param
+    * [hospCode]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 16:23
+    * @Return boolean
+    **/
+    @Override
+    public boolean insertStockByTime(StroStockDTO stroStockDTO) {
+      if(stroStockDTO.getCrteTime() == null) {
+        throw new AppException("时间参数为空");
+      }
+      // 如果手动生成 生成上个月得库存
+      if("1".equals(stroStockDTO.getLongStockflag())) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(stroStockDTO.getCrteTime());
+        c.add(Calendar.MONTH, -1);
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMaximum(Calendar.DAY_OF_MONTH));//设置为最后一天
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.set(Calendar.MINUTE, 59);
+        c.set(Calendar.SECOND, 59);
+        c.set(Calendar.MILLISECOND, 999);
+        stroStockDTO.setCrteTime(c.getTime());
+      }
+      // 转化为年月
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+      String stockTime = sdf.format(stroStockDTO.getCrteTime());
+      stroStockDTO.setStockTime(stockTime);
+      // 查找当月数据有没有生成如果生成不再生成
+      List<StroStockDTO> stockTimeItems = stroStockDao.queryStockTimeAll(stroStockDTO);
+      if(!ListUtils.isEmpty(stockTimeItems)) {
+        throw new AppException("该月底库存已经生成");
+      }
+      // 查找当月月底库存
+      List<StroStockDTO> stroStockDTOS = stroStockDao.queryStockAll(stroStockDTO);
+      for(StroStockDTO item : stroStockDTOS) {
+        item.setCrteTime(DateUtils.getNow());
+        item.setStockTime(stockTime);
+      }
+      stroStockDao.insertStockTime(stroStockDTOS);
+      return true;
+    }
+
+     /**库存效期查询
      * @Method queryValidityWarningPage
      * @Desrciption
      * @param stroStockDTO

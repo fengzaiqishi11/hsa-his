@@ -406,9 +406,16 @@
         <if test="endDate != null">
             and date(a.audit_time) &lt;= date(#{startDate})
       </if>
+      order by crte_time desc
     </select>
 
     <select id="getDeptById" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
         select * from base_dept where hosp_code = #{hospCode} and id = #{id}
+    </select>
+
+    <select id="queryStockApply" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+      select * from stro_stock
+      where item_id = #{itemId} and hosp_code = #{hospCode} and biz_id = #{bizId}
+      and split_num - (stock_occupy + #{splitNum}) &gt;= 0
     </select>
 </mapper>

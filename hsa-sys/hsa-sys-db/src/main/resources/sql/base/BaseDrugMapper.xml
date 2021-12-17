@@ -81,7 +81,6 @@
 	<!--查询单个-->
 	<select id="getById" resultMap="BaseDrugMap">
 		select
-		c.id,
 		a.id, a.hosp_code, a.bfc_code, a.type_code, a.big_type_code, a.code, a.usual_name, a.good_name, a.spec,
 		a.prep_code, a.dosage,
 		a.dosage_unit_code,

@@ -16,6 +16,7 @@ import cn.hsa.module.phar.pharinbackdrug.dao.PharInReceiveDAO;
 import cn.hsa.module.phar.pharinbackdrug.dao.PharInReceiveDetailDAO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
+import cn.hsa.module.stro.purchase.dto.StroPurchaseDetailDTO;
 import cn.hsa.module.stro.stock.dao.StroStockDao;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -241,7 +243,7 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
         List<PharApplyDTO> applyDTOList = pharApplyDAO.queryFlag(pharApplyDTO);
         if(!ListUtils.isEmpty(applyDTOList)){
             for (int i = 0; i < applyDTOList.size(); i++) {
-                if (Constants.SHZT.SHWC.equals(applyDTOList.get(i).getAuditStatus())) {
+                if (Constants.SHZT.SHWC.equals(applyDTOList.get(i).getAuditStatus()) && StringUtils.isEmpty(pharApplyDTO.getLimitFlag())) {
                     throw new AppException("批量作废失败:" + applyDTOList.get(i).getOrderNo() + ":单据号已经审核");
                 }
                 if (Constants.SHZT.ZF.equals(applyDTOList.get(i).getAuditStatus())) {
@@ -570,7 +572,7 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
         return true;
     }
 
-    /**
+  /**
     * @Menthod assembleStroDetail
     * @Desrciption 组装出库明细
     *
@@ -700,5 +702,107 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
         }
         return stockDetailOutList;
   }
+
+    /**
+    * @Menthod applyOrderByminOrUp
+    * @Desrciption 根据库存上下限生成领药申请单
+    *
+    * @Param
+    * [pharApplyDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/15 15:07
+    * @Return java.lang.Boolean
+    **/
+    @Override
+    public Boolean insertapplyOrderByminOrUp(PharApplyDTO pharApplyDTO) {
+      List<PharApplyDetailDTO> pharApplyDetailDTOS = new ArrayList<>();
+      // limitFlag  1: 按下限生成  2：按上限生成
+      if("1".equals(pharApplyDTO.getLimitFlag())){
+        pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementMin(pharApplyDTO);
+      } else {
+        pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementUp(pharApplyDTO);
+      }
+      pharApplyDTO.setId(SnowflakeUtils.getId());
+      Map map =new HashMap();
+      map.put("hospCode", pharApplyDTO.getHospCode());
+      map.put("typeCode", Constants.ORDERRULE.LY);
+      WrapperResponse<String> response = baseOrderRuleService.getOrderNo(map);
+      // 设置领药申请主表参数
+      pharApplyDTO.setOrderNo(response.getData());
+      pharApplyDTO.setAuditStatus("0");
+      BigDecimal sellPriceAll = BigDecimal.valueOf(0);
+      BigDecimal buyPriceAll = BigDecimal.valueOf(0);
+      PharApplyDetailDTO item = new PharApplyDetailDTO();
+      // 设置领药申请明细表参数
+      for (int i = 0; i < pharApplyDetailDTOS.size(); i++) {
+        item = pharApplyDetailDTOS.get(i);
+        item.setApplyId(pharApplyDTO.getId());
+        item.setId(SnowflakeUtils.getId());
+        // 拆零数量向上取整
+        BigDecimal splitNum = BigDecimalUtils.multiply(item.getNum(),item.getSplitRatio());
+        BigDecimal bigDecimal = splitNum.setScale(0, BigDecimal.ROUND_UP);
+        item.setSplitNum(bigDecimal);
+        // 重新计算数量
+        item.setNum(BigDecimalUtils.divide(bigDecimal,item.getSplitRatio()));
+        sellPriceAll = BigDecimalUtils.add(sellPriceAll,item.getSellPriceAll());
+        buyPriceAll = BigDecimalUtils.add(buyPriceAll,item.getBuyPriceAll());
+      }
+      pharApplyDTO.setBuyPriceAll(buyPriceAll);
+      pharApplyDTO.setSellPriceAll(sellPriceAll);
+      pharApplyDTO.setIsOut("0");
+      pharApplyDetailDAO.insert(pharApplyDetailDTOS);
+      pharApplyDAO.insert(pharApplyDTO);
+      return true;
+    }
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [pharApplyDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:19
+    * @Return java.lang.Boolean
+    **/
+    @Override
+    public Map queryStockApply(PharApplyDTO pharApplyDTO) {
+      if(ListUtils.isEmpty(pharApplyDTO.getIds())) {
+        throw new AppException("待审核数据为空");
+      }
+      Map check = new HashMap();
+      StringBuilder message = new StringBuilder();
+      AtomicInteger itemNum = new AtomicInteger();
+      for (String id : pharApplyDTO.getIds()) {
+        pharApplyDTO.setId(id);
+        PharApplyDetailDTO pharApplyDetailDTO = new PharApplyDetailDTO();
+        // 根据id查询领药申请主表
+        PharApplyDTO byId = pharApplyDAO.getById(pharApplyDTO);
+        // 查询明细数据
+        pharApplyDetailDTO.setApplyId(id);
+        pharApplyDetailDTO.setHospCode(byId.getHospCode());
+        List<PharApplyDetailDTO> pharApplyDetailDTOS = pharApplyDetailDAO.pharApplyDetail(pharApplyDetailDTO);
+        if(ListUtils.isEmpty(pharApplyDetailDTOS)) {
+          throw new AppException("领药数据为空");
+        }
+        for(PharApplyDetailDTO item : pharApplyDetailDTOS) {
+          item.setBizId(byId.getOutStroId());
+          // 校验库存
+          if(ListUtils.isEmpty(pharApplyDetailDAO.queryStockApply(item))) {
+            itemNum.getAndIncrement();
+            check.put("flag",true);
+            if(itemNum.get() <= 6) {
+              message.append("【");
+              message.append(item.getItemName());
+              message.append("】,");
+            }
+          }
+        }
+        check.put("message",message);
+      }
+      return check;
+    }
 
 }

@@ -157,6 +157,20 @@ public interface StroStockService {
     @PostMapping("/service/web/stro/stroStock/updateOccupy")
     WrapperResponse<Boolean> updateOccupy(Map map);
 
+    /**
+    * @Menthod inserStockByTime
+    * @Desrciption 月底库存存储记录
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 16:12
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @PostMapping("/service/web/stro/stroStock/inserStockByTime")
+    WrapperResponse<Boolean> insertStockByTime(Map map);
+
     /**库存效期查询
     * @Method queryValidityWarningPage
     * @Desrciption

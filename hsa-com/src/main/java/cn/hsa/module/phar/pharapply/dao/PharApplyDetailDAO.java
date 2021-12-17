@@ -177,4 +177,17 @@ public interface PharApplyDetailDAO {
     * @Return cn.hsa.module.base.dept.dto.BaseDeptDTO
     **/
     BaseDeptDTO getDeptById(BaseDeptDTO baseDeptDTO);
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [pharApplyDetailDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:38
+    * @Return java.lang.Boolean
+    **/
+    List<StroStockDTO> queryStockApply(PharApplyDetailDTO pharApplyDetailDTO);
 }

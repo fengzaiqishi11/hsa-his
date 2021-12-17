@@ -3,6 +3,7 @@ package cn.hsa.interf.statement.bo.impl;
 import cn.hsa.base.DynamicTable;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO;
@@ -12,6 +13,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -85,6 +87,30 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     }
 
     /**
+    * @Menthod queryStockTime
+    * @Desrciption 查询月底库存
+    *
+    * @Param
+    * [stroStockDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/14 15:54
+    * @Return cn.hsa.base.PageDTO
+    **/
+    @Override
+    public PageDTO queryStockTime(StroStockDTO stroStockDTO) {
+      if(StringUtils.isEmpty(stroStockDTO.getBizId())) {
+        throw new AppException("请选择药房/药库");
+      }
+      if(StringUtils.isEmpty(stroStockDTO.getStockTime())) {
+        throw new AppException("请选择统计时间");
+      }
+      PageHelper.startPage(stroStockDTO.getPageNo(), stroStockDTO.getPageSize());
+      List<StroStockDTO> stroStockDTOS = patientCostLedgerDAO.queryStockTime(stroStockDTO);
+      return PageDTO.of(stroStockDTOS);
+    }
+
+  /**
      * @Menthod queryPatirntCostLedgerList
      * @Desrciption 查询病人费用台账List
      * @Param

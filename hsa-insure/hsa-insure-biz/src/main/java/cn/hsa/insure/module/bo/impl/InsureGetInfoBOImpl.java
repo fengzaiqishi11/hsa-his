@@ -1162,11 +1162,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }else{
             setlinfo.put("setlBegnDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap,"setlBegnDate")),DateUtils.Y_M_D)); //结算开始日期 *******
         }
-        Object setlEndDate = MapUtils.get(baseInfoMap, "setlEndDate");
+        Object setlEndDate = MapUtils.get(setlinfoMap, "setl_time");
         if(setlEndDate ==null){
             throw new AppException("结算结束时间为空");
         }else{
-            setlinfo.put("setlEndDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap,"setlEndDate")),DateUtils.Y_M_D)); // 结算结束日期 *******
+
+            setlinfo.put("setlEndDate", DateUtils.parse((String) setlEndDate,DateUtils.Y_M_D)); // 结算结束日期 *******
         }
         // 全自费金额
         String   fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"fulamt_ownpay_amt"));

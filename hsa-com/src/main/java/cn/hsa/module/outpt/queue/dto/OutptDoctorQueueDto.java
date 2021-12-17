@@ -47,6 +47,8 @@ public class OutptDoctorQueueDto extends OutptDoctorQueueDO {
     private String cyName;
     // 科室名称
     private String deptName;
+    // 科室编码
+    private String deptCode;
     // 就诊类别
     private String visitCode;
     // 挂号类别代码

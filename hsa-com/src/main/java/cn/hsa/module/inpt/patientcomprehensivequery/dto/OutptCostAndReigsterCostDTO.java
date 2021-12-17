@@ -54,4 +54,5 @@ public class OutptCostAndReigsterCostDTO extends PageDO implements Serializable 
     private String phone;
     private String age;
     private String certNo;
+    private String patientCode;
 }

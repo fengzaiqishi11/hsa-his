@@ -834,7 +834,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Date   2021/10/22 16:17
      * @Return List<Map>
      **/
-  List<Map> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
+    List<OutptCostAndReigsterCostDTO> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
 
   /**
    * @Menthod getMzMedicalRegisterList

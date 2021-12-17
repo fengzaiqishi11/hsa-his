@@ -297,7 +297,8 @@ public class InsureIndividualBasicController extends BaseController {
      * @Date 2021/12/15 13:59
      * @Return
      */
-    public WrapperResponse<PageDTO> queryOutptSettleInfo(Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
+    @GetMapping("/queryOutptSettleInfo")
+    public WrapperResponse<PageDTO> queryOutptSettleInfo(@RequestParam Map<String,Object> map,HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureIndividualBasicService_consumer.queryOutptSettleInfo(map);

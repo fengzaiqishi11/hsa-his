@@ -57,6 +57,7 @@
 		<result property="isGuide" column="is_guide" jdbcType="VARCHAR"/>
 		<result property="isAnaesthesia" column="is_anaesthesia" jdbcType="VARCHAR"/>
 		<result property="isPasswordChange" column="is_password_change" jdbcType="INTEGER"/>
+		<result property="onlyOpenItem" column="only_open_item" jdbcType="INTEGER"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.sys.user.dto.SysUserSystemDTO" id="SysUserSystemMap">
@@ -86,7 +87,7 @@
           prac_certi_name, durg_code, antibacterial_code, ph_code,
           opeartion_code, pswd_err_cnt, last_login_time, last_login_ip,
           status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path,
-          doctor_intro, is_guide,is_anaesthesia,is_password_change
+          doctor_intro, is_guide,is_anaesthesia,is_password_change,only_open_item
         from sys_user
         where hosp_code = #{hospCode} and id = #{id}
     </select>
@@ -509,6 +510,7 @@
 		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
 		a.crte_id,a.crte_name,
 		a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,a.is_anaesthesia,
+		a.only_open_item,
 		b.name as deptName
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
@@ -668,8 +670,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="" useGeneratedKeys="true">
-        insert into sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro, is_guide,is_anaesthesia)
-        values (#{id}, #{hospCode}, #{deptCode}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{isPm}, #{inPmDate}, #{certCode}, #{certNo}, #{photoImage}, #{signImage}, #{introduce}, #{speciality}, #{address}, #{email}, #{phone}, #{educationCode}, #{majorCode}, #{school}, #{schoolDate}, #{schoolImage}, #{workDate}, #{workTypeCode}, #{dutiesCode}, #{pracCertiNo}, #{pracCertiName}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{opeartionCode}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime}, #{signaturePath}, #{doctorIntro}, '0',#{isAnaesthesia})
+        insert into sys_user(id, hosp_code, dept_code, code, password, is_in_job, name, age, birthday, gender_code, nation_code, native_place, marry_code, is_pm, in_pm_date, cert_code, cert_no, photo_image, sign_image, introduce, speciality, address, email, phone, education_code, major_code, school, school_date, school_image, work_date, work_type_code, duties_code, prac_certi_no, prac_certi_name,  durg_code, antibacterial_code, ph_code, opeartion_code, pswd_err_cnt, last_login_time, last_login_ip, status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path, doctor_intro, is_guide,is_anaesthesia,only_open_item)
+        values (#{id}, #{hospCode}, #{deptCode}, #{code}, #{password}, #{isInJob}, #{name}, #{age}, #{birthday}, #{genderCode}, #{nationCode}, #{nativePlace}, #{marryCode}, #{isPm}, #{inPmDate}, #{certCode}, #{certNo}, #{photoImage}, #{signImage}, #{introduce}, #{speciality}, #{address}, #{email}, #{phone}, #{educationCode}, #{majorCode}, #{school}, #{schoolDate}, #{schoolImage}, #{workDate}, #{workTypeCode}, #{dutiesCode}, #{pracCertiNo}, #{pracCertiName}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{opeartionCode}, #{pswdErrCnt}, #{lastLoginTime}, #{lastLoginIp}, #{statusCode}, #{pym}, #{wbm}, #{crteId}, #{crteName}, #{crteTime}, #{signaturePath}, #{doctorIntro}, '0',#{isAnaesthesia},#{onlyOpenItem})
     </insert>
 
 	<!--通过主键修改数据-->
@@ -818,6 +820,9 @@
 			<if test="isAnaesthesia != null and isAnaesthesia != ''">
 				is_anaesthesia = #{isAnaesthesia},
 			</if>
+			<if test="onlyOpenItem != null and onlyOpenItem!= ''">
+				only_open_item = #{onlyOpenItem}
+			</if>
 		</set>
 		where id= #{id} and hosp_code = #{hospCode}
 	</update>
@@ -919,7 +924,7 @@
         a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image, a.introduce, a.speciality,
         a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image, a.work_date, a.work_type_code,
         a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code, a.ph_code, a.opeartion_code,
-        a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm, a.crte_id,a.crte_name, a.crte_time,a.signature_path, a.doctor_intro, a.is_guide,a.is_password_change
+        a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm, a.crte_id,a.crte_name, a.crte_time,a.signature_path, a.doctor_intro, a.is_guide,a.is_password_change,a.only_open_item
         from sys_user a where a.hosp_code = #{hospCode} and a.code = #{userCode}
     </select>
 

@@ -262,7 +262,7 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
                     baseDrugDTO = new BaseDrugDTO ();
                     baseDrugDTO.setId(dto.getItemId());
                     baseDrugDTO.setHospCode(dto.getHospCode());
-
+                    baseDrugDTO.setLoginDeptId(deptId);
                     mapParm = new HashMap();
                     mapParm.put("hospCode",dto.getHospCode());
                     mapParm.put("baseDrugDTO",baseDrugDTO);

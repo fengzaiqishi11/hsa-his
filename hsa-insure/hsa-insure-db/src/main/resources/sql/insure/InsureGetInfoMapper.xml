@@ -1063,6 +1063,7 @@
           and moi.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode}
           and idm.audit_code = '1'
+           order by moi.columns_num asc
     </select>
 
     <select id="selectOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">

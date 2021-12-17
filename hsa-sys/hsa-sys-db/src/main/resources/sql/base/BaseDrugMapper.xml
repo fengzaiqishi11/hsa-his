@@ -81,6 +81,7 @@
 	<!--查询单个-->
 	<select id="getById" resultMap="BaseDrugMap">
 		select
+		c.id,
 		a.id, a.hosp_code, a.bfc_code, a.type_code, a.big_type_code, a.code, a.usual_name, a.good_name, a.spec,
 		a.prep_code, a.dosage,
 		a.dosage_unit_code,
@@ -95,14 +96,16 @@
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select d.name from base_product d where d.code = a.prod_code) as prod_name,
 		(select count(0) from stro_stock e where e.item_code = '1' and e.item_id = a.id ) as stockFlag,
-		b.name as outDeptName,
-		c.name as inDeptName,
-		d.trunc_code truncCode, e.id bfcId
-		from base_drug a
-		LEFT JOIN base_dept b on a.out_unit_code = b.code and a.hosp_code = b.hosp_code
-		LEFT JOIN base_dept c on a.in_unit_code = c.code and a.hosp_code = c.hosp_code
-		left join base_special_calc d on a.code = d.drug_code and a.hosp_code = d.hosp_code and d.is_valid = '1'
-		left join base_finance_classify e on a.bfc_code = e.code and a.hosp_code = e.hosp_code
+		b.trunc_code truncCode, d.id bfcId
+		from  base_drug a
+		left join (
+		select * from (select aa.* from base_special_calc aa, base_dept bb where aa.hosp_code = bb.hosp_code and aa.dept_code = bb.code and aa.is_valid ='1'
+		<if test="loginDeptId != null and loginDeptId != ''">
+			and bb.id = #{loginDeptId}
+		</if>
+		) cc) b on  a.code = b.drug_code and a.hosp_code = b.hosp_code
+		left join base_dept c on b.dept_code = c.code and b.hosp_code = c.hosp_code
+		left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
 		<where>
 			a.hosp_code = #{hospCode}
 			<if test="id != null and id != ''">

@@ -188,4 +188,32 @@ public interface PharApplyService {
     **/
     @GetMapping("/web/stro/pharApply/updatePharApply")
     WrapperResponse<Boolean> updatePharApply(Map map);
+
+    /**
+    * @Menthod applyOrderByminOrUp
+    * @Desrciption 根据库存上下限生成领药申请单
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/15 15:03
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @GetMapping("/web/stro/pharApply/applyOrderByminOrUp")
+    WrapperResponse<Boolean> insertapplyOrderByminOrUp(Map map);
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:17
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @GetMapping("/web/stro/pharApply/queryStockApply")
+    WrapperResponse<Map> queryStockApply(Map map);
 }

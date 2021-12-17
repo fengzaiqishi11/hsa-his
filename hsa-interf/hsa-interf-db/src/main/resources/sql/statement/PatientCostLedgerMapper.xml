@@ -498,6 +498,38 @@
         where a.hosp_code = #{hospCode} and a.status_code = #{statusCode}
         group by a.out_dept_id
     </select>
+    <!--查询库房月底库存-->
+    <select id = "queryStockTime" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+      select a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code, a.num,
+       a.unit_code, a.buy_price_all, a.sell_price_all, a.split_num, a.split_price, a.split_unit_code, a.stock_max,
+       a.stock_min, a.stock_occupy, a.stock_time,a.crte_time,a.split_ratio,
+       case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+       (case a.item_code
+       when '1'
+       then (SELECT NAME FROM base_product t WHERE t.hosp_code = bd.hosp_code AND t.CODE = bd.prod_code limit 1)
+       when '0'
+       then (SELECT NAME FROM base_product t WHERE t.hosp_code = bm.hosp_code AND t.CODE = bm.prod_code limit 1)
+       end
+       ) as prodName
+       from stro_stock_time a
+       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+       left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+       where a.hosp_code = #{hospCode} and a.stock_time = #{stockTime} and a.biz_id = #{bizId}
+      <if test="itemName != null and itemName != ''">
+        and (
+        a.item_name like concat('%',#{itemName},'%')
+        or bd.usual_pym like concat('%',#{itemName},'%')
+        or bd.good_pym like concat('%',#{itemName},'%')
+        or bd.good_name like concat('%',#{itemName},'%')
+        or bd.usual_name like concat('%',#{itemName},'%')
+        or bm.name like concat('%',#{itemName},'%')
+        or bm.pym like concat('%',#{itemName},'%')
+        )
+      </if>
+      <if test="!isMun">
+        and ifnull(a.split_num,0)>0
+      </if>
+    </select>
     <!--药库实时进销存报表/按零售价-->
     <select id="queryStroInvoicingLedger" resultType="java.util.Map" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO">
         SELECT

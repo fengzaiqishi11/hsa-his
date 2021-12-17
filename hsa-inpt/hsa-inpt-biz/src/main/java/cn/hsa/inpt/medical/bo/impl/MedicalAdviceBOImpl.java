@@ -1133,7 +1133,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             List<InptAdviceDTO> adviceDTOList = new ArrayList<>();
 
             //获取到当前患者每个时间的首次费用最大次数
-            Map<String, BigDecimal> dtfyScMap = getScNum(type, baseDailyfirstCalcDTOList, visitDTO, adviceDTOList);
+            Map<String, BigDecimal> dtfyScMap = getScNum(type, baseDailyfirstCalcDTOList, visitDTO, adviceDTOList,medicalAdviceDTO);
 
             for(String key : dtfyScMap.keySet()){
                 //日期
@@ -1317,7 +1317,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
      * @Return: java.util.Map<java.lang.String,java.math.BigDecimal>
      **/
     private Map<String, BigDecimal> getScNum(String type, List<BaseDailyfirstCalcDTO> baseDailyfirstCalcDTOList,
-                                             InptVisitDTO visitDTO, List<InptAdviceDTO> adviceDTOList) {
+                                             InptVisitDTO visitDTO, List<InptAdviceDTO> adviceDTOList,MedicalAdviceDTO medicalAdviceDTO) {
         //首次计费数量
         Map<String, BigDecimal> dtfyScMap = new HashMap();
         //分组组号
@@ -1338,7 +1338,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     continue;
                 }
                 //获取药品信息
-                BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(), inptAdviceDTO.getItemId());
+                BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(), inptAdviceDTO.getItemId(),medicalAdviceDTO.getDeptId());
                 //判断是否是大输液
                 if (StringUtils.isNotEmpty(baseDrugDTO.getIsLvp()) && Constants.SF.S.equals(baseDrugDTO.getIsLvp())) {
                     //计算开始日期、结束日期、判断是否预停
@@ -2236,13 +2236,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
      * @Date: 2020/10/9 15:55
      * @Return: cn.hsa.module.base.drug.dto.BaseDrugDTO
      **/
-    private BaseDrugDTO getBaseDrugDTOById(String hospCode,String itemId) {
+    private BaseDrugDTO getBaseDrugDTOById(String hospCode,String itemId,String loginDept) {
         //组装获取药品信息参数
         Map map = new HashMap();
         map.put("hospCode", hospCode);
         BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
         baseDrugDTO.setHospCode(hospCode);
         baseDrugDTO.setId(itemId);
+        baseDrugDTO.setLoginDeptId(loginDept);
         map.put("baseDrugDTO", baseDrugDTO);
         //获取药品信息
         WrapperResponse<BaseDrugDTO> response = baseDrugService_consumer.getById(map);
@@ -2530,7 +2531,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //获取药品/项目信息,如果拆分比为空,默认给1
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (drugMap==null || drugMap.isEmpty()|| drugMap.get(inptAdviceDetailDTO.getItemId())==null) {
-                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId());
+                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),medicalAdviceDTO.getDeptId());
                     if (drugDTO.getSplitRatio() == null) {
                         drugDTO.setSplitRatio(BigDecimal.valueOf(1));
                     }
@@ -3233,7 +3234,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                         throw new AppException("根据费用来源ID获取医嘱明细失败");
                     }
 
-                    BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(),inptAdviceDTO.getItemId());
+                    BaseDrugDTO baseDrugDTO = getBaseDrugDTOById(inptAdviceDTO.getHospCode(),inptAdviceDTO.getItemId(),medicalAdviceDTO.getDeptId());
                     // 没有配置默认 1：单次向上取整
                     if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
                         adviceDetailDTO.setNum(BigDecimal.valueOf(Math.ceil(adviceDetailDTO.getNum().doubleValue())));
@@ -3385,7 +3386,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if(ListUtils.isEmpty(inptAdviceDTOList)) {
             return;
         }
-
+        List<InptAdviceDTO> tzList = null ;
         //循环住院医嘱记录
         for(InptAdviceDTO adviceDTO:inptAdviceDTOList) {
             //根据ID获取医嘱目录信息
@@ -3394,11 +3395,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             List<InptAdviceDTO> list = new ArrayList<>();
             //停同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSame())) {
-                list.addAll(inptAdviceDAO.getTlAdvices(adviceDTO));
+                tzList = inptAdviceDAO.getTlAdvices(adviceDTO);
+                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                list.addAll(tzList);
             }
             //停非同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSameNot())) {
-                list.addAll(inptAdviceDAO.getFtlAdvices(adviceDTO));
+                tzList = inptAdviceDAO.getFtlAdvices(adviceDTO);
+                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                list.addAll(tzList);
             }
             //停自身(长期医嘱) 不更新停嘱当日执行次数
             if("1".equals(boById.getIsStopMyself())) {

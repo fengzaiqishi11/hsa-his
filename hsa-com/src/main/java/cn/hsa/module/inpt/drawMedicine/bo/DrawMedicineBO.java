@@ -20,7 +20,7 @@ public interface DrawMedicineBO {
 
     /**
      * @Method beforehandDrawMedicine
-     * @Desrciption 预配药
+     * @Desrciption item
        @params [billList]
      * @Author chenjun
      * @Date   2020/9/11 16:47

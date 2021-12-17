@@ -869,7 +869,7 @@
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code='1') bsxj,
             (select ifnull(sum(price),0) from inpt_pay where settle_id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode and pay_code!='1') bszz,
             (select distinct crte_name from inpt_settle where id=#{settleId} and visit_id=d.visitId and hosp_code=d.hospCode) skr,'' kpr, d.personalPrice,
-            d.beforeSettle, d.lastSettle, d.creditPrice
+            d.beforeSettle, d.lastSettle, ifnull(d.creditPrice, 0.00) as creditPrice, e.bed_name as bedName
             from
             (
             select a.bfc_id bfcId,a.visit_id visitId,sum(a.reality_price) realityPrice,a.hosp_code hospCode, c.mi_price as miPrice, ifnull(iis.last_settle, 0.00) as lastSettle,ifnull(iis.before_settle, 0.00) as beforeSettle,

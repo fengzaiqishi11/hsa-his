@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.platform.dao.MessageInfoDao">
+    <resultMap type="cn.hsa.platform.domain.MessageInfoModel" id="MessageInfoMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="level" column="level" jdbcType="VARCHAR"/>
+        <result property="receiverId" column="receiver_id" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="intervalTime" column="interval_time" jdbcType="INTEGER"/>
+        <result property="sendCount" column="send_count" jdbcType="INTEGER"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="lastTime" column="last_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+      <!--单个新增-->
+      <insert id="insertMessageInfo">
+         insert into sys_msg (id, hosp_code, source_id, visit_id, dept_id, type, content, level, receiver_id, start_time,
+          end_time, interval_time, send_count, status_code, url, last_time, crte_time, crte_name, crte_id)
+         values (#{id}, #{hospCode}, #{sourceId}, #{visitId}, #{deptId}, #{type}, #{content}, #{level}, #{receiverId},
+         #{startTime}, #{endTime}, #{intervalTime}, #{sendCount}, #{statusCode}, #{url},#{lastTime}, #{crteTime}, #{crteName}, #{crteId})
+      </insert>
+       <!--批量新增-->
+       <insert id="insertMessageInfoBatch">
+        insert into sys_msg (id, hosp_code, source_id, visit_id, dept_id, type, content, level, receiver_id, start_time,
+        end_time, interval_time, send_count, status_code, url, last_time, crte_time, crte_name, crte_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+         (#{item.id}, #{item.hospCode}, #{item.sourceId}, #{item.visitId}, #{item.deptId}, #{item.type}, #{item.content}, #{item.level},
+         #{item.receiverId},
+         #{item.startTime}, #{item.endTime}, #{item.intervalTime}, #{item.sendCount},
+         #{item.statusCode}, #{item.url},#{item.lastTime}, #{item.crteTime}, #{item.crteName}, #{item.crteId})
+        </foreach>
+       </insert>
+    <update id="updateMssageInfo">
+     UPDATE sys_msg
+     <set>
+         <if test="id !=null and id !=''">
+             id=#{id},
+         </if>
+         <if test="hospCode !=null and hospCode !=''">
+             hosp_code=#{hospCode},
+         </if>
+         <if test="sourceId !=null and sourceId !=''">
+             source_id=#{sourceId},
+         </if>
+         <if test="visitId !=null and visitId !=''">
+             visit_id=#{visitId},
+         </if>
+         <if test="deptId !=null and deptId !=''">
+             dept_id=#{deptId},
+         </if>
+         <if test="type !=null and type !=''">
+             type=#{type},
+         </if>
+         <if test="content !=null and content !=''">
+             content=#{content},
+         </if>
+         <if test="level !=null and level !=''">
+             level=#{level},
+         </if>
+         <if test="receiverId !=null and receiverId !=''">
+             receiver_id=#{receiverId},
+         </if>
+         <if test="startTime !=null and startTime !=''">
+             start_time=#{startTime},
+         </if>
+         <if test="endTime !=null and endTime !=''">
+             end_time=#{endTime},
+         </if>
+         <if test="intervalTime !=null and intervalTime !=''">
+             interval_time=#{intervalTime},
+         </if>
+         <if test="sendCount !=null and sendCount !=''">
+             send_count=#{sendCount},
+         </if>
+         <if test="statusCode !=null and statusCode !=''">
+             status_code=#{statusCode},
+         </if>
+         <if test="url !=null and url !=''">
+             url=#{url},
+         </if>
+         <if test="lastTime !=null and lastTime !=''">
+             last_time=#{lastTime},
+         </if>
+         <if test="crteTime !=null and crteTime !=''">
+             crte_time=#{crteTime},
+         </if>
+         <if test="crteName !=null and crteName !=''">
+             crte_name=#{crteName},
+         </if>
+         <if test="crteId !=null and crteId !=''">
+             crte_id=#{crteId},
+         </if>
+     </set>
+     where hosp_code =#{hospCode}
+        <if test="visitId !=null and visitId !=''">
+           and visit_id =#{visitId}
+        </if>
+        <if test="type !=null and type !=''">
+           and type =#{type}
+        </if>
+    </update>
+
+    <select id="queryMessageInfoByType" resultMap="MessageInfoMap">
+     select id, hosp_code, source_id, visit_id, dept_id, type, content, level, receiver_id, start_time,
+          end_time, interval_time, send_count, status_code, url, last_time, crte_time, crte_name, crte_id
+          from sys_msg
+          where hosp_code = #{hospCode}
+          <if test="type != null and type != ''">
+              and type =#{type}
+          </if>
+        <if test="deptId != null and deptId != ''">
+            and dept_id =#{deptId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and status_code =#{statusCode}
+        </if>
+        <if test="level != null and level != ''">
+            and level =#{level}
+        </if>
+        <if test="receiverId != null and receiverId != ''">
+            and receiver_id =#{receiverId}
+        </if>
+    </select>
+
+    <!--单个删除-->
+    <delete id="deleteMessageInfo">
+        delete from sys_msg
+        where  hosp_code =#{hospCode} and  id =#{id}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteMessageInfoBatch">
+        delete from sys_msg
+        where  hosp_code =#{hospCode} and  id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+     <!--根据就诊id更新消息状态-->
+    <update id="updateMssageInfoBatch">
+        UPDATE sys_msg
+        set status_code =#{statusCode}
+        where hosp_code =#{hospCode}
+        and visit_id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and type =#{type}
+    </update>
+
+    <!--根据消息id更新消息状态-->
+    <update id="updateMssageInfoBatchById">
+        UPDATE sys_msg
+        set status_code =#{statusCode}
+        where hosp_code =#{hospCode}
+        and id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and type =#{type}
+    </update>
+</mapper>

@@ -1100,8 +1100,11 @@ public interface Constants {
         public static final String CZJM_ZY = "1"; // 城镇职工住院
         public static final String CXJM_ZY = "2"; // 城乡居民住院
         public static final String LX_ZY = "3"; // 离休住院
-        public static final String MZ = "4"; // 门诊
+        public static final String MZ = "4"; // 全部门诊
         public static final String YZS = "5"; // 一站式
+        public static final String ZG_MZ = "6"; // 职工门诊
+        public static final String CX_MZ = "7"; // 城乡门诊
+        public static final String LX_MZ = "8"; // 离休门诊
     }
 
     /**

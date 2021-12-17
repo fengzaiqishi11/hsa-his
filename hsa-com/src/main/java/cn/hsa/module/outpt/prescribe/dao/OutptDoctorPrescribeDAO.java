@@ -882,4 +882,13 @@ public interface OutptDoctorPrescribeDAO {
     List<OutptCostDTO> selectCost(OutptPrescribeDTO outptPrescribeDTO);
 
     int updateOutptRegister(OutptVisitDTO outptVisitDTO);
+    /**
+     * @Meth: getCfDataOnlyOpenItem
+     * @Description: 只能开检查项目 和材料
+     * @Param: [baseDrugDTO]
+     * @return: java.util.List<cn.hsa.module.base.drug.dto.BaseDrugDTO>
+     * @Author: zhangguorui
+     * @Date: 2021/12/16
+     */
+    List<BaseDrugDTO> getCfDataOnlyOpenItem(BaseDrugDTO baseDrugDTO);
 }

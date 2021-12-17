@@ -231,7 +231,7 @@
         a.crte_name,
         a.crte_time,
         c.settle_time,
-        c.reality_price totalCost,
+        ifnull(c.reality_price, a.total_cost) as totalCost,
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
         (c.mi_price-c.acct_pay) as miPrice,
@@ -497,6 +497,38 @@
         from inpt_visit a left join inpt_settle b on a.id = b.visit_id and a.hosp_code = b.hosp_code
         where a.hosp_code = #{hospCode} and a.status_code = #{statusCode}
         group by a.out_dept_id
+    </select>
+    <!--查询库房月底库存-->
+    <select id = "queryStockTime" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+      select a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code, a.num,
+       a.unit_code, a.buy_price_all, a.sell_price_all, a.split_num, a.split_price, a.split_unit_code, a.stock_max,
+       a.stock_min, a.stock_occupy, a.stock_time,a.crte_time,a.split_ratio,
+       case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+       (case a.item_code
+       when '1'
+       then (SELECT NAME FROM base_product t WHERE t.hosp_code = bd.hosp_code AND t.CODE = bd.prod_code limit 1)
+       when '0'
+       then (SELECT NAME FROM base_product t WHERE t.hosp_code = bm.hosp_code AND t.CODE = bm.prod_code limit 1)
+       end
+       ) as prodName
+       from stro_stock_time a
+       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+       left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+       where a.hosp_code = #{hospCode} and a.stock_time = #{stockTime} and a.biz_id = #{bizId}
+      <if test="itemName != null and itemName != ''">
+        and (
+        a.item_name like concat('%',#{itemName},'%')
+        or bd.usual_pym like concat('%',#{itemName},'%')
+        or bd.good_pym like concat('%',#{itemName},'%')
+        or bd.good_name like concat('%',#{itemName},'%')
+        or bd.usual_name like concat('%',#{itemName},'%')
+        or bm.name like concat('%',#{itemName},'%')
+        or bm.pym like concat('%',#{itemName},'%')
+        )
+      </if>
+      <if test="!isMun">
+        and ifnull(a.split_num,0)>0
+      </if>
     </select>
     <!--药库实时进销存报表/按零售价-->
     <select id="queryStroInvoicingLedger" resultType="java.util.Map" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO">
@@ -1012,7 +1044,7 @@
         select * from
         (
         select a.crte_name as crteName,'住院结账补交款' as inCometype,a.visit_id as visitId,p.price as money,a.settle_time as time,
-        a.red_id as redId,a.status_code as statusCode, p.pay_code as payCode,a.settle_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode, c.name as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
@@ -1096,11 +1128,12 @@
         </if>
         union all
         select a.crte_name as crteName,'住院预交款' as inCometype,a.visit_id as visitId,a.price as money,a.crte_time as time,
-        a.red_id as redId,a.status_code as statusCode,a.pay_code as payCode,a.ap_order_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode,c.name as payCode,a.ap_order_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from inpt_advance_pay a
+        left join sys_code_detail c on c.c_code = 'ZFFS' and a.pay_code = c.value and a.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -1115,13 +1148,14 @@
         </if>
         union all
         select a.crte_name as crteName,'挂号' as inCometype,rs.visit_id as visitId,p.price as money,a.settle_time as time,
-        '' as redId,a.status_code as statusCode,p.pay_code as payCode,a.register_id as settleNo,
+        '' as redId,a.status_code as statusCode,c.name as payCode,a.register_id as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         rs.name as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from outpt_register_settle a
         left join outpt_register_pay p on p.rs_id = a.id and p.hosp_code = a.hosp_code
         left join outpt_register rs on rs.id = a.register_id and rs.hosp_code = a.hosp_code
+        left join sys_code_detail c on c.c_code = 'ZFFS' and p.pay_code = c.value and p.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -1136,12 +1170,13 @@
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,p.price as money,a.settle_time as time,
-        a.red_id as redId,a.status_code as statusCode,p.pay_code as payCode,a.settle_no as settleNo,
+        a.red_id as redId,a.status_code as statusCode,c.name as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
         (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
         from outpt_settle a
         join outpt_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
+        left join sys_code_detail c on c.c_code = 'ZFFS' and p.pay_code = c.value and p.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode} and a.is_settle = '1'
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
@@ -5038,7 +5073,7 @@
         select '-1' id, '开方科室' label, '-2' prop, '总额' labelBfc, 'true' showSummary,'2' toFixed
         union
         <!-- 挂号 -->
-        <if test="type == null or type == '' or type == '3'.toString() ">
+        <if test="type == null or type == '' or type == '3'.toString() or type == '1'.toString() ">
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_1') prop, '总金额' labelBfc, 'true' showSummary,'2' toFixed
             from outpt_register_settle settle
             join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
@@ -5079,7 +5114,7 @@
             group by a.bfc_id, b.name
         </if>
 
-        <if test="type == null or type == ''">
+        <if test="type == null or type == '' or type == '1'.toString() ">
             union
         </if>
 
@@ -5177,7 +5212,7 @@
     <!--查询财务动态列-->
     <select id="queryBfcGroup" resultType="java.util.Map">
         <!-- 挂号 -->
-        <if test="type == null or type == '' or type == '3'.toString() ">
+        <if test="type == null or type == '' or type == '3'.toString() or type == '1'.toString() ">
             select a.bfc_id id, b.name label, concat(a.bfc_id,'_1') prop, '总金额' labelBfc, 'true' showSummary,'2' toFixed
             from outpt_register_settle settle
             join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
@@ -5192,7 +5227,7 @@
             group by a.bfc_id, b.name
         </if>
 
-        <if test="type == null or type == ''">
+        <if test="type == null or type == '' or type == '1'.toString() ">
             union
         </if>
 
@@ -5238,7 +5273,7 @@
     <select id="queryFinancialCome" resultType="java.util.LinkedHashMap">
         select a.dept_id id, b.name '-1', sum(a.reality_price) '-2', ${sqlStrInpt} from (
         <!-- 挂号 -->
-        <if test="type == null or type == '' or type == '3'.toString() ">
+        <if test="type == null or type == '' or type == '3'.toString() or type == '1'.toString() ">
             select register.dept_id,a.hosp_code, a.bfc_id, a.total_price, a.reality_price, a.preferential_price
             from outpt_register_settle settle
             join outpt_register register on settle.register_id = register.id and settle.hosp_code = register.hosp_code
@@ -5253,7 +5288,7 @@
             </if>
         </if>
 
-        <if test="type == null or type == ''">
+        <if test="type == null or type == '' or type == '1'.toString() ">
             union all
         </if>
 
@@ -6562,81 +6597,61 @@
     </select>
 
     <!--门诊财务分类明细-->
-    <select id="getMzMedicalFinanceList" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+    <select id="getMzMedicalFinanceList" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select
-        a.id,
-        a.register_no registerNo,
-        a.hosp_code,
-        a.profile_id,
-        a.out_profile,
-        a.name,
-        a.gender_code genderCode,
-        a.age,
-        a.age_unit_code,
-        a.birthday,
-        a.nation_code,
-        a.cert_code,
-        a.cert_no certNo,
-        a.marry_code,
-        a.phone,
-        a.patient_code patientCode,
-        c.reality_price totalCost,
-        og.register_time registerTime,
-        a.dept_name deptName,
-        a.doctor_name as doctorName,
-        c.settle_time settleTime,
-        ogs.reality_price as registerPrice,
-        b.*
-        from outpt_visit a
-        LEFT JOIN outpt_register og on og.hosp_code = a.hosp_code and  a.id = og.visit_id
-        LEFT JOIN outpt_register_settle ogs on ogs.hosp_code = a.hosp_code and og.id = ogs.register_id and ogs.status_code = '0'
-        left join outpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
-        left join (
-        select ${sql} d.id visistID,a.doctor_name doctorName
-        from outpt_visit d
-        join outpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
-        left join outpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
-        where a.hosp_code = #{hospCode} and c.is_settle = '1'
-        <if test="settleStartTime != null and settleStartTime !=''">
-            and c.settle_time &gt;= #{settleStartTime}
+        ifnull(B.reality_price,0) as realityPrice,
+        ifnull(B.total_price,0) as totalPrice,
+        ifnull(B.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        ifnull(B.doctor_id,'0') as doctorId,
+        ifnull(B.doctor_name,t.doctor_name) as doctorName,
+        ifnull((select id from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =
+        (select dept_code from sys_user su where su.hosp_code = #{hospCode} and su.id = B.doctor_id )),'0')
+        as deptId,
+        ifnull((select name from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =
+        (select dept_code from sys_user su where su.hosp_code = #{hospCode} and su.id = B.doctor_id )),'其他')
+        as deptName,
+        ifnull(B.visit_id,'0') as visitId,
+        t.name as visitName,
+        ifnull(B.id,'0') as settleId,
+        t.register_no registerNo,
+        t.gender_code genderCode,
+        t.age,
+        t.age_unit_code,
+        t.cert_no certNo,
+        t.phone,
+        t.patient_code patientCode,
+        t.dept_name deptName,
+        t.doctor_name as doctorName,
+        A.settle_time settleTime
+        from
+        outpt_settle A
+        inner join outpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+        inner join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.is_settle = '1' and b.settle_code = '2'
+        <if test="settleStartTime != null and settleStartTime !='' ">
+            and date(A.settle_time) &gt;=date(#{settleStartTime})
         </if>
-        <if test="settleEndTime != null and settleEndTime !=''">
-            and c.settle_time &lt;= #{settleEndTime}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            and (d.name like concat('%', #{keyword}, '%')
-            or d.phone like concat('%', #{keyword}, '%')
-            or d.cert_no like concat('%', #{keyword}, '%'))
-        </if>
-        <if test="outptDoctorName != null and outptDoctorName !=''">
-            and d.doctor_name like concat('%', #{outptDoctorName}, '%')
-        </if>
-        <if test="deptId !=null and deptId !=''">
-            and d.dept_id =#{deptId}
-        </if>
-        ) b on c.visit_id = b.visistID
-        where a.hosp_code = #{hospCode} and c.is_settle = '1'
-        <if test="settleStartTime != null and settleStartTime !=''">
-            and c.settle_time &gt;= #{settleStartTime}
-        </if>
-        <if test="settleEndTime != null and settleEndTime !=''">
-            and c.settle_time &lt;= #{settleEndTime}
-        </if>
-        <if test="outptDoctorName != null and outptDoctorName !=''">
-            and a.doctor_name like concat('%', #{outptDoctorName}, '%')
+        /*结束日期*/
+        <if test="settleEndTime != null and settleEndTime != '' ">
+            and date(A.settle_time) &lt;= date(#{settleEndTime})
         </if>
         <if test="patientCode !=null and patientCode !=''">
-            and a.patient_code =#{patientCode}
+            and t.patient_code =#{patientCode}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (a.name like concat('%', #{keyword}, '%')
-            or a.phone like concat('%', #{keyword}, '%')
-            or a.cert_no like concat('%', #{keyword}, '%'))
+            and (t.name like concat('%', #{keyword}, '%')
+            or t.phone like concat('%', #{keyword}, '%')
+            or t.cert_no like concat('%', #{keyword}, '%'))
         </if>
         <if test="deptId !=null and deptId !=''">
-            and a.dept_id =#{deptId}
+            and t.dept_id =#{deptId}
         </if>
-        order by c.settle_time desc
+        order by A.settle_time desc
     </select>
 
     <!--门诊挂号费用统计-->
@@ -7520,5 +7535,217 @@
         </foreach>
     </select>
 
+    <!--住院病人手术财务分类报表标题 20211213-->
+    <select id="getInptOperFinanceTitle" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select
+        a.bfc_id,c.name as bfcName
+        from inpt_cost a
+        left join inpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code and b.status_code = '0'
+        join base_finance_classify c on a.bfc_id = c.id and a.hosp_code = c.hosp_code
+        join inpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and d.patient_code = #{patientCode}
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and d.in_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and d.in_time &lt;= #{endTime}
+        </if>
+        <!--过滤条件增加医生名称-->
+        <if test="doctorName != null and doctorName != ''">
+            and (
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
+            )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (d.name like concat('%', #{keyword}, '%')
+            or d.phone like concat('%', #{keyword}, '%')
+            or d.cert_no like concat('%', #{keyword}, '%')
+            )
+        </if>
+        group by a.bfc_id,c.name
+    </select>
+
+    <!--住院病人财务分类报表明细-->
+    <select id="getInptOperFinanceList" resultType="java.util.Map" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT DISTINCT
+        a.in_no AS inNo,
+        a. NAME AS name,
+        a.gender_code AS genderCode,
+        a.age AS age,
+        a.patient_code AS patientCode,
+        ifnull((select name from base_dept where id = o.oper_dept_id and hosp_code =#{hospCode}),'') AS operDeptName,
+        o.bed_name as bedName,
+        o.ana_code as anaCode,
+        o.oper_disease_name AS operDiseaseName,
+        o.in_disease_name AS inDiseaseName,
+        o.doctor_name AS doctorName,
+        o.assistant_name1 AS assistantName1,
+        o.assistant_name2 AS assistantName2,
+        o.assistant_name3 AS assistantName3,
+        o.oper_plan_time AS operPlanTime,
+        o.oper_room_name AS operRoomName,
+        o.xh_nurse_name AS xhNurseName,
+        o.qx_nurse_name AS qxNurseName,
+        o.ana_name1 AS anaName1,
+        o.ana_name2 AS anaName2,
+        o.ana_name3 AS anaName3,
+        o.oper_end_time AS operEndTime,
+        o.status_code as operStatusCode,
+        a.id,
+        a.hosp_code,
+        a.profile_id,
+        a.in_profile,
+        a.age_unit_code as ageUnitCode,
+        a.birthday,
+        a.nation_code,
+        a.cert_code,
+        a.cert_no AS certNo,
+        a.marry_code,
+        a.phone,
+        a.address,
+        a.preferential_type_id,
+        a.receive_hosp_name,
+        a.bed_id,
+        a.bed_name,
+        a.nursing_code,
+        a.diet_type,
+        a.Illness_code,
+        a.status_code,
+        a.in_ward_id,
+        a.in_dept_id,
+        a.in_dept_name AS inDeptName,
+        a.zz_doctor_id,
+        a.zz_doctor_name,
+        a.jz_doctor_id,
+        a.jz_doctor_name,
+        a.zg_doctor_id,
+        a.zg_doctor_name AS zgDoctorName,
+        a.in_remark,
+        a.in_mode_code,
+        a.in_disease_id,
+        a.in_disease_icd10,
+        a.in_situation_code,
+        a.outpt_visit_no,
+        a.outpt_doctor_id,
+        a.outpt_doctor_name,
+        a.outpt_disease_id,
+        a.outpt_disease_name,
+        a.outpt_disease_icd10,
+        a.out_ward_id,
+        a.out_dept_id,
+        a.out_dept_name AS outDeptName,
+        a.out_time AS outTime,
+        a.out_disease_id,
+        a.out_disease_name,
+        a.out_disease_icd10,
+        a.out_oper_id,
+        a.out_oper_name,
+        a.out_oper_time,
+        a.out_situation_code,
+        a.out_remark,
+        a.out_mode_code,
+        a.is_archive,
+        a.archive_time,
+        a.archive_id,
+        a.archive_name,
+        a.insure_code,
+        a.insure_org_code,
+        a.insure_no,
+        a.insure_biz_code,
+        a.insure_treat_code,
+        a.insure_patient_id,
+        a.insure_remark,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        a.total_cost AS totalCost,
+        o.total_price AS operTotalPrice,
+        o.cost_time AS costTime,
+        o.cost_name AS costName,
+        b.*
+        FROM
+        inpt_visit a
+        left join (
+        select ${sqlStr} d.id visistID
+        from inpt_visit d
+        join inpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        left join inpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
+        join oper_info_record o ON d.hosp_code = o.hosp_code and o.visit_id = d.id
+        where a.hosp_code = #{hospCode} and o.is_cost ='1'
+        <if test="settleStartTime != null and settleStartTime !=''">
+            and c.settle_time &gt;= #{settleStartTime}
+        </if>
+        <if test="settleEndTime != null and settleEndTime !=''">
+            and c.settle_time &lt;= #{settleEndTime}
+        </if>
+        <!--过滤条件增加医生名称-->
+        <if test="doctorName != null and doctorName != ''">
+            and (
+            d.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or d.zg_doctor_name like concat('%', #{doctorName}, '%')
+            )
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and d.patient_code = #{patientCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (d.name like concat('%', #{keyword}, '%')
+            or d.phone like concat('%', #{keyword}, '%')
+            or d.cert_no like concat('%', #{keyword}, '%')
+            )
+        </if>
+        group by  o.id
+        ) b on a.id = b.visistID
+        left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
+        join oper_info_record o ON a.hosp_code = o.hosp_code and o.visit_id = a.id
+        where a.hosp_code = #{hospCode} and o.is_cost ='1'
+        <if test="settleStartTime != null and settleStartTime !=''">
+            and c.settle_time &gt;= #{settleStartTime}
+        </if>
+        <if test="settleEndTime != null and settleEndTime !=''">
+            and c.settle_time &lt;= #{settleEndTime}
+        </if>
+        <!--过滤条件增加医生名称-->
+        <if test="doctorName != null and doctorName != ''">
+            and (
+            a.outpt_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.jz_doctor_name like concat('%', #{doctorName}, '%')
+            or a.zg_doctor_name like concat('%', #{doctorName}, '%')
+            )
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and o.cost_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and o.cost_time &lt;= #{endTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%', #{keyword}, '%')
+            or a.phone like concat('%', #{keyword}, '%')
+            or a.cert_no like concat('%', #{keyword}, '%')
+            )
+        </if>
+        order by a.out_time desc
+    </select>
 
 </mapper>

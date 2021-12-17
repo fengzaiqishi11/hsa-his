@@ -1012,7 +1012,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             /**
              * 如果只要开始时间，没有结束时间，说明一直符合一站式身份
              */
-            List<Map<String, Object>> collect = listMap.stream().filter(item -> (StringUtils.isNotEmpty(MapUtils.get(item, "begntime")) && StringUtils.isEmpty(MapUtils.get(item, "endtime"))) || DateUtils.betweenDate(DateUtils.parse(MapUtils.get(item, "endtime"), DateUtils.Y_M_DH_M_S),
+            List<Map<String, Object>> collect = listMap.stream().filter(item -> (StringUtils.isNotEmpty(MapUtils.get(item, "begntime")) && StringUtils.isEmpty(MapUtils.get(item, "endtime"))) || DateUtils.betweenDate(DateUtils.parse(MapUtils.get(item, "begntime"), DateUtils.Y_M_DH_M_S),
                     DateUtils.parse(MapUtils.get(item, "endtime"), DateUtils.Y_M_DH_M_S), DateUtils.getNow()))
                     .collect(Collectors.toList());
             if (ListUtils.isEmpty(collect)) {
@@ -1847,6 +1847,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         // 设置分页信息
         PageHelper.startPage(pageNo, pageSize);
+        paraMap.put("isValidOneSettle",Constants.SF.S); // 默认区分一站式
+
+        // 获取系统参数 IS_VALID_ONE_SETTLE,是否区分一站式 1： 区分  ，0：不分区
+        Map<String,Object> sysParameterMap = new HashMap<>();
+        sysParameterMap.put("hospCode",MapUtils.get(paraMap,"hospCode"));
+        sysParameterMap.put("code", "IS_VALID_ONE_SETTLE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
+        if (sysParameterDTO != null && Constants.SF.F.equals(sysParameterDTO.getValue())) {
+            paraMap.put("isValidOneSettle",Constants.SF.F); // 查询不区分一站式
+        }
+
         String declaraType = MapUtils.get(paraMap, "declaraType");
         switch (declaraType) {
             case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
@@ -1866,6 +1877,18 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 return PageDTO.of(insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap));
             case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
                 return PageDTO.of(insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap));
+            case Constants.SBLX.ZG_MZ: // 职工门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.CX_MZ: // 城乡居民门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.LX_MZ: // 离休门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
             default:
                 break;
 
@@ -1888,6 +1911,19 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         // 设置分页信息
         PageHelper.startPage(pageNo, pageSize);
+
+
+
+        // 获取系统参数 IS_VALID_ONE_SETTLE,是否区分一站式 1： 区分  ，0：不分区
+        paraMap.put("isValidOneSettle",Constants.SF.S); // 默认区分一站式
+        Map<String,Object> sysParameterMap = new HashMap<>();
+        sysParameterMap.put("hospCode",MapUtils.get(paraMap,"hospCode"));
+        sysParameterMap.put("code", "IS_VALID_ONE_SETTLE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
+        if (Constants.SF.F.equals(sysParameterDTO.getValue())) {
+            paraMap.put("isValidOneSettle",Constants.SF.F); // 查询不区分一站式
+        }
+
         String declaraType = MapUtils.get(paraMap, "declaraType");
         switch (declaraType) {
             case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
@@ -1907,6 +1943,18 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
             case Constants.SBLX.YZS: // 一站式
                 return PageDTO.of(insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.ZG_MZ: // 职工门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.CX_MZ: // 城乡居民门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+            case Constants.SBLX.LX_MZ: // 离休门诊
+                paraMap.put("isHospital", Constants.SF.F);
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
             default:
                 break;
 

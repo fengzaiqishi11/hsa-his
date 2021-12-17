@@ -5,6 +5,7 @@ import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
+import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
 import cn.hsa.module.stro.stroout.service.StroOutService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
@@ -208,5 +209,24 @@ public class StroOutController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("stroOutDTO",stroOutDTO);
         return stroOutService_consumer.queryWholeOut(map);
+    }
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 根据出库单id 查询出库单明细
+     * @Param: [stroOutDetailDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    @RequestMapping("/queryStroOutDetail")
+    public WrapperResponse<List<StroOutDetailDTO>> queryStroOutDetail(@RequestBody StroOutDetailDTO stroOutDetailDTO,
+                                                                      HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req,res);
+        String hospCode = sysUserDTO.getHospCode();
+        stroOutDetailDTO.setHospCode(hospCode);
+        Map map = new HashMap();
+        map.put("hospCode",hospCode);
+        map.put("stroOutDetailDTO",stroOutDetailDTO);
+        return stroOutService_consumer.queryStroOutDetail(map);
     }
 }

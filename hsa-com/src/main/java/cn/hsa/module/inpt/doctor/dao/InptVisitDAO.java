@@ -528,4 +528,16 @@ public interface InptVisitDAO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
      **/
     Boolean updateFeeDate(@Param("ids")List<String> ids,@Param("hospCode")String hospCode,@Param("feeDate")String feeDate);
+
+
+    /**
+     * @Method: getInCnt
+     * @Description: 获取入院次数
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/12/13 09:52
+     * @Return: int
+     **/
+    int getInCnt(Map map);
 }

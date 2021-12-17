@@ -202,4 +202,54 @@
       #{item}
     </foreach>
   </select>
+
+  <!-- 查询药库中库存不足需要按下限补充得项目 -->
+  <select id="queryNeedSupplementMin" parameterType="java.util.Map" resultType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+      SELECT
+        a.item_id as itemId,
+        (a.stock_min - a.num) as num,
+        a.item_name as itemName,
+        a.item_code as itemCode,
+        a.hosp_code as hospCode,
+        a.spec,
+        a.split_ratio,
+        a.split_unit_code,
+        a.unit_code as unitCode,
+        case a.item_code when '1' then b.split_price when '2' then c.split_price end splitPrice,
+        case a.item_code when '1' then b.price when '2' then c.price end sellPrice,
+        case a.item_code when '1' then b.last_buy_price when '2' then c.last_buy_price end buyPrice,
+        case a.item_code when '1' then  b.price *(a.stock_min - a.num) when '2' then c.price *(a.stock_min - a.num) end sellPriceAll,
+        case a.item_code when '1' then  b.last_buy_price *(a.stock_min - a.num) when '2' then c.last_buy_price *(a.stock_min - a.num) end buyPriceAll,
+        (select p.id from base_product p where p.hosp_code = b.hosp_code and p.code = b.prod_code) as productId
+        FROM
+        stro_stock a
+        LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code and b.is_valid = '1'
+        LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
+        where a.hosp_code = #{hospCode} and stock_min is not null and a.biz_id = #{inStroId} and a.num &lt; a.stock_min
+    </select>
+
+  <!-- 查询药库中库存不足需要按上限补充项目 -->
+  <select id="queryNeedSupplementUp" parameterType="java.util.Map" resultType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
+        SELECT
+          a.item_id as itemId,
+          (a.stock_max - a.num) as num,
+          a.item_name as itemName,
+          a.item_code as itemCode,
+          a.hosp_code as hospCode,
+          a.spec,
+          a.split_ratio,
+          a.split_unit_code,
+          a.unit_code as unitCode,
+          case a.item_code when '1' then b.split_price when '2' then c.split_price end splitPrice,
+          case a.item_code when '1' then b.price when '2' then c.price end sellPrice,
+          case a.item_code when '1' then b.last_buy_price when '2' then c.last_buy_price end buyPrice,
+          case a.item_code when '1' then  b.price *(a.stock_max - a.num) when '2' then c.price *(a.stock_max - a.num) end sellPriceAll,
+          case a.item_code when '1' then  b.last_buy_price *(a.stock_max - a.num) when '2' then c.last_buy_price *(a.stock_max - a.num) end buyPriceAll,
+          (select p.id from base_product p where p.hosp_code = #{hospCode} and p.code = b.prod_code) as productId
+          FROM
+          stro_stock a
+          LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code and b.is_valid = '1'
+          LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
+          where a.hosp_code = #{hospCode} and stock_max is not null and a.biz_id = #{inStroId} and a.num &lt; a.stock_max
+      </select>
 </mapper>

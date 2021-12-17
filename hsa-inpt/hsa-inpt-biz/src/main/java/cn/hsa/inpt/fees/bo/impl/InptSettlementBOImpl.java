@@ -1415,6 +1415,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("beforeSettle", list.get(0).get("beforeSettle"));
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
             returnMap.put("creditPrice", list.get(0).get("creditPrice"));
+            returnMap.put("bedName", list.get(0).get("bedName"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {
@@ -1425,24 +1426,29 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             // 发票上的计费类别需要根据维护的发票分类关联计费类别统计费用
             Map<String, Object> fpjflbMap = new HashMap<>();
             Map<String, String> bfcName = new HashMap<>();
+            // 发票上的计费类别需要根据维护的发票分类关联计费类别统计费用  直接返回名字+金额   材料费：200
+            Map<String, Object> fpjflbNameMap = new HashMap<>();
             for (Map<String, Object> map : list) {
                 bfcName.put("A" + map.get("inCode"), (String) map.get("fpglName"));
                 // 同一个发票分类金额计算在一起
                 if (!fpjflbMap.containsKey("A" + map.get("inCode"))) {
                     fpjflbMap.put("A" + map.get("inCode"), map.get("realityPrice"));
+                    fpjflbNameMap.put((String) map.get("fpglName"), map.get("realityPrice"));
                 } else {
                     fpjflbMap.put("A" + map.get("inCode"), BigDecimalUtils.add((BigDecimal) fpjflbMap.get("A" + map.get("inCode")), (BigDecimal) map.get("realityPrice")));
+                    fpjflbNameMap.put((String) map.get("fpglName"), fpjflbMap.get("A" + map.get("inCode")));
                 }
             }
             int mark = 1;
             for (Map.Entry<String, String> entry : bfcName.entrySet()) {
-                if ("A3".equals(entry.getKey()) || "A4".equals(entry.getKey()) || "A10".equals(entry.getKey()) || "A9".equals(entry.getKey())) {
+                if ("A3".equals(entry.getKey()) || "A4".equals(entry.getKey()) || "A10".equals(entry.getKey()) || "A9".equals(entry.getKey()) || "A15".equals(entry.getKey()) || "A16".equals(entry.getKey())) {
                     returnMap.put("DN" + mark, entry.getValue());
                     returnMap.put("DA" + mark, fpjflbMap.get(entry.getKey()));
                     mark++;
                 }
             }
             returnMap.put("fplb", fpjflbMap);
+            returnMap.put("fplbName", fpjflbNameMap);
         }
         return returnMap;
     }

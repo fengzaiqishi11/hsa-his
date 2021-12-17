@@ -257,4 +257,43 @@ public interface StroStockDao {
      * @Return java.lang.String
      */
     String getTypeIdentityByBizId(@Param("bizId") String bizId,@Param("hospCode") String hospCode);
+
+    /**
+    * @Menthod queryStockAllTime
+    * @Desrciption 查询所有库存
+    *
+    * @Param
+    * [stroStockDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 16:21
+    * @Return
+    **/
+    List<StroStockDTO> queryStockAll(StroStockDTO stroStockDTO);
+
+    /**
+    * @Menthod queryStockTimeAll
+    * @Desrciption 查询库存时间节点库存
+    *
+    * @Param
+    * [stroStockDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 17:09
+    * @Return java.util.List<cn.hsa.module.stro.stock.dto.StroStockDTO>
+    **/
+    List<StroStockDTO> queryStockTimeAll(StroStockDTO stroStockDTO);
+
+    /**
+    * @Menthod insertStockTime
+    * @Desrciption
+    *
+    * @Param
+    * [stroStockDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/14 10:48
+    * @Return int
+    **/
+    int insertStockTime(@Param("list") List<StroStockDTO> stroStockDTOS);
 }

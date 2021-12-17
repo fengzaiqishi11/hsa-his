@@ -182,4 +182,31 @@ public interface PharApplyBO {
     **/
     Boolean updatePharApply(PharApplyDTO pharApplyDTO);
 
+    /**
+    * @Menthod applyOrderByminOrUp
+    * @Desrciption 根据库存上下限生成领药申请单
+    *
+    * @Param
+    * [pharApplyDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/15 15:05
+    * @Return java.lang.Boolean
+    **/
+    Boolean insertapplyOrderByminOrUp(PharApplyDTO pharApplyDTO);
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [pharApplyDTO]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:19
+    * @Return java.lang.Boolean
+    **/
+    Map queryStockApply(PharApplyDTO pharApplyDTO);
+
+
 }

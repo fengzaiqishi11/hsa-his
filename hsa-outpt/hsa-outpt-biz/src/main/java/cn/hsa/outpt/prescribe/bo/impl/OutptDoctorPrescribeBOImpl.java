@@ -752,7 +752,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
 //          List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getNewCfData(baseDrugDTO);
 //          return PageDTO.of(BaseDrugDTOList);
 //        }
-        List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
+        List<BaseDrugDTO> BaseDrugDTOList;
+        if ("1".equals(baseDrugDTO.getOnlyOpenItem())) {
+            BaseDrugDTOList =  outptDoctorPrescribeDAO.getCfDataOnlyOpenItem(baseDrugDTO);
+        } else {
+            BaseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
+        }
         return PageDTO.of(BaseDrugDTOList);
     }
 

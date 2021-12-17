@@ -19,7 +19,6 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureIndividualBasicDTO extends InsureIndividualBasicDO implements Serializable {
-
         // 就诊ID
         private String visitId;
 

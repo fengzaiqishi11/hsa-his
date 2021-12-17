@@ -175,6 +175,19 @@ public interface StroStockBO {
      */
     boolean updateOccupy(String hospCode);
 
+    /**
+    * @Menthod inserStockByTime
+    * @Desrciption 月底库存存储记录
+    *
+    * @Param
+    * [hospCode]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 16:15
+    * @Return boolean
+    **/
+    boolean insertStockByTime(StroStockDTO stroStockDTO);
+
     /**库存效期查询
     * @Method queryValidityWarningPage
     * @Desrciption

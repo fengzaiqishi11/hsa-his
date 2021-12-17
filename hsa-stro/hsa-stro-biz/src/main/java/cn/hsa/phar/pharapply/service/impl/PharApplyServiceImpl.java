@@ -299,4 +299,38 @@ public class PharApplyServiceImpl extends HsafService implements PharApplyServic
       PharApplyDTO pharApplyDTO = MapUtils.get(map, "pharApplyDTO");
       return WrapperResponse.success(pharApplyBO.updatePharApply(pharApplyDTO));
     }
+
+    /**
+    * @Menthod applyOrderByminOrUp
+    * @Desrciption 根据库存上下限生成领药申请单
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/15 15:04
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @Override
+    public WrapperResponse<Boolean> insertapplyOrderByminOrUp(Map map) {
+      PharApplyDTO pharApplyDTO = MapUtils.get(map, "pharApplyDTO");
+      return WrapperResponse.success(pharApplyBO.insertapplyOrderByminOrUp(pharApplyDTO));
+    }
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:18
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @Override
+    public WrapperResponse<Map> queryStockApply(Map map) {
+      PharApplyDTO pharApplyDTO = MapUtils.get(map, "pharApplyDTO");
+      return WrapperResponse.success(pharApplyBO.queryStockApply(pharApplyDTO));
+    }
 }

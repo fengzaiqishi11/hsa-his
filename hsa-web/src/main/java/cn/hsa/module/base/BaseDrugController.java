@@ -68,6 +68,7 @@ public class BaseDrugController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req,res);
         //baseDrugDTO.setHospCode(hospCode);
         baseDrugDTO.setHospCode(sysUserDTO.getHospCode());
+        baseDrugDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         //封装参数
         Map map = new HashMap();
         //map.put("hospCode",hospCode);

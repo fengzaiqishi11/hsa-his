@@ -32,28 +32,33 @@
 
     <!--医生信息查询-->
     <select id="getDoctorListByIdOrDeptCode" parameterType="java.util.Map" resultType="java.util.Map">
-        select
-            dept_code as deptCode,
-            (select name from base_dept bd where bd.hosp_code = hosp_code and bd.code = dept_code) as deptName,
-            id as doctorId,
-            name as doctorName,
-            speciality,
-            introduce,
-            (select name from sys_code_detail scd where scd.value = work_type_code and c_code = 'RYZW') as dutiesName,
-            duties_code as dutiesCode,
-            photo_image as photoImage
-        from  sys_user
-        where hosp_code = #{hospCode}
-            and work_type_code like concat('1', '%')
-            and is_in_job = '1'
-            and status_code = '0'
+        SELECT
+        a.dept_code AS deptCode,
+        b.id AS deptId,
+        b.NAME AS deptName,
+        a.id AS doctorId,
+        a.NAME AS doctorName,
+        a.speciality,
+        a.introduce,
+        ( SELECT NAME FROM sys_code_detail scd WHERE scd.VALUE = work_type_code AND c_code = 'RYZW' ) AS dutiesName,
+        a.duties_code AS dutiesCode,
+        a.photo_image AS photoImage
+        FROM
+        sys_user a,
+        base_dept b
+        WHERE
+        a.hosp_code = b.hosp_code
+        AND a.dept_code = b.CODE
+        AND a.work_type_code LIKE concat( '1', '%' )
+        AND a.is_in_job = '1'
+        AND a.status_code = '0'
         <if test="data.doctorId != null and data.doctorId != ''">
-            and id = #{data.doctorId}
+            and a.id = #{data.doctorId}
         </if>
         <if test="data.deptCode != null and data.deptCode != ''">
-            and dept_code = #{data.deptCode}
+            and a.dept_code = #{data.deptCode}
         </if>
-        order by dept_code
+        order by a.dept_code
     </select>
 
     <!--基础业务代码查询-->
@@ -183,6 +188,7 @@
             b.queue_date as queue_date_str,
             ocs.name as classes_name,
             b.dept_id,
+            bd.code as deptCode,
             bd.name as dept_name,
             ocy.name as classify_name,
             ocy.visit_code,

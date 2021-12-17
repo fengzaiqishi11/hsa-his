@@ -889,6 +889,8 @@
             a.zz_doctor_name as zzDoctorName,
             a.jz_doctor_id as zgDoctorId,
             a.jz_doctor_name as zgDoctorName,
+            a.resp_nurse_id as zrNurseName,
+            a.resp_nurse_name as zrNurseId,
             a.in_situation_code as inSituationCode,
             code_6.name as inSituationName,
             a.out_situation_code as outSituationCode,

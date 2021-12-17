@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /hsa-interf
-  port: 9013
+  port: 9012
 spring:
   main:
     allow-bean-definition-overriding: true

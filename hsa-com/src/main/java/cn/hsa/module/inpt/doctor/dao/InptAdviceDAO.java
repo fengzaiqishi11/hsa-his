@@ -759,7 +759,7 @@ public interface InptAdviceDAO {
      */
     Map<String, Object> getMedicineAdvance(Map<String, Object> map);
 
-    List<BaseAdviceDTO> getIllnessAdviceByVisitId(Map<String, Object> map);
+    List<BaseAdviceDTO> getIllnessAdviceByVisitId(@Param("list") List<InptVisitDTO> inptVisitDTOList);
     /**
      * @Desrciption 取消提前领药记录
      * @param map
@@ -854,4 +854,17 @@ public interface InptAdviceDAO {
      */
     void newUpdateLastExeTime(@Param("medicalAdviceDTO")MedicalAdviceDTO medicalAdviceDTO, @Param("adviceMap")Map<String, Date> adviceIdCostTime);
 
+
+    /**
+     * 根据医嘱ID，医嘱组号进行查询（防止漏掉同组核收的数据）
+     * @param inptAdviceDTOList
+     * @return
+     */
+    List<InptAdviceDTO> findGroupAdvice(@Param("listAdvice") List<InptAdviceDTO> inptAdviceDTOList);
+
+    /**
+     * 批量修改医嘱核收跟停嘱核收信息
+     * @param adviceDTOList
+     */
+    void updateStopAndCheckInfo(List<InptAdviceDTO> adviceDTOList);
 }

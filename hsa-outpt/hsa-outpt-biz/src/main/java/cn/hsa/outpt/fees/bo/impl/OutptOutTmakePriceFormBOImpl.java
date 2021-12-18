@@ -1053,7 +1053,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             map.put("insureIndividualBasicDTO",insureIndividualBasicDTO);
             insureIndividualBasicService_consumer.deleteInsureBasic(map).getData();
             OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
-            outptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
+            outptVisitDTO.setPatientCode(insureIndividualVisitDTO.getPatientCode()); // 取消之后修改为登记之前的病人类型，不一定是自费病人
             outptVisitDTO.setHospCode(hospCode);
             outptVisitDTO.setId(id);
             outptVisitDAO.updateOutptVisit(outptVisitDTO);

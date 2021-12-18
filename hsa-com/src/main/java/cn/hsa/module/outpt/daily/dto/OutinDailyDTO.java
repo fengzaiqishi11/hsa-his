@@ -36,4 +36,6 @@ public class OutinDailyDTO extends OutinDailyDO implements Serializable {
 
     // 支付方式
     private String payCode;
+    //姓名/年龄/性别
+    private String keyword;
 }

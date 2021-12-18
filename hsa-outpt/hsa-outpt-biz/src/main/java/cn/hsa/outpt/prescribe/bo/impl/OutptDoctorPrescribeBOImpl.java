@@ -16,7 +16,6 @@ import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
@@ -26,7 +25,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
-import cn.hsa.module.outpt.fees.dao.*;
+import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.prescribe.bo.OutptDoctorPrescribeBO;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
@@ -753,8 +752,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
 //          List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getNewCfData(baseDrugDTO);
 //          return PageDTO.of(BaseDrugDTOList);
 //        }
-        List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
-        return PageDTO.of(BaseDrugDTOList);
+
+        List<BaseDrugDTO> baseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
+        return PageDTO.of(baseDrugDTOList);
     }
 
     /**
@@ -1895,7 +1895,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                     medicalApplyDTO.setDoctorId(outptPrescribeDTO.getDoctorId());
                     medicalApplyDTO.setDoctorName(outptPrescribeDTO.getDoctorName());
                     medicalApplyDTO.setApplyTime(DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_D));
-                    medicalApplyDTO.setImpDeptId(outptPrescribeDetailsDTO.getDeptId());
+                    medicalApplyDTO.setImpDeptId(outptPrescribeDetailsDTO.getExecDeptId());
                     medicalApplyDTO.setOpdId(outptPrescribeDetailsDTO.getId());
                     medicalApplyDTO.setContent(outptPrescribeDetailsDTO.getContent());
                     medicalApplyDTO.setMedicType(outptPrescribeDTO.getTypeCode());

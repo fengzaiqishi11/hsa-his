@@ -886,6 +886,9 @@
             (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9') or a.gender_code = '' or visit.gender_code = '')
         </if>
         )
+        <if test="onlyOpenItem != null and onlyOpenItem == '1'.toString()">
+            and 1 = 2
+        </if>
         and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
         union all
 
@@ -2295,5 +2298,6 @@
     <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select * from outpt_cost where hosp_code = #{hospCode} and op_id = #{id} and status_code = '0'
     </select>
+
 
 </mapper>

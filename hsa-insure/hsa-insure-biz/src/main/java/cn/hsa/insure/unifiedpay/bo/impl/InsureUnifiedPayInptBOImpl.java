@@ -881,8 +881,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
         dataMap.put("mdtrt_mode","");// 就诊方式
-        dataMap.put("hcard_basinfo","");// 持卡就诊基本信息
-        dataMap.put("hcard_chkinfo","");// 持卡就诊校验信息
+        dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息
+        dataMap.put("hcard_chkinfo",insureIndividualVisitDTO.getHcardChkinfo());// 持卡就诊校验信息
         /**
          * 说明是结算
          */
@@ -944,7 +944,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     throw new AppException((String) resultMap.get("msg"));
                 }
                 if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode);
+                    String InmsgID = insureIndividualVisitDAO.queryMsgId(hospCode,visitId,medisCode,"2304");
                     Object resultMsg = resultMap.get("err_msg");
                     if (resultMsg == null) {
                         resultMsg = "统一支付平台回参为空：infcode(" + MapUtils.get(resultMap,"infcode") + ")";
@@ -1086,16 +1086,18 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         Map <String,String> resultMap = new HashMap<>();
         List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
         if (!ListUtils.isEmpty(setldetailList)) {
+            BigDecimal othPay = BigDecimal.ZERO;
             for (Map<String,Object> map : setldetailList) {
                 String fundPayType = MapUtils.get(map,"fund_pay_type");
                 String fundPayamt = MapUtils.get(map,"fund_payamt").toString();
+                String setlProcInfo = MapUtils.get(map, "setl_proc_info");
                 switch (fundPayType) {
                     case "630100": // 医院减免金额
                         resultMap.put("hospExemAmount",fundPayamt);
                         break;
-                    /*case "610100": // 医疗救助基金
+                    case "610100": // 医疗救助基金
                         resultMap.put("mafPay",fundPayamt);
-                        break;*/
+                        break;
                     case "330200": // 职工意外伤害基金
                         resultMap.put("acctInjPay",fundPayamt);
                         break;
@@ -1118,7 +1120,32 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         resultMap.put("lowInPay",fundPayamt);
                         break;
                     case "999997": // 其他基金
-                        resultMap.put("othPay",fundPayamt);
+                        othPay = BigDecimalUtils.add(othPay.toString(),fundPayamt);
+                        resultMap.put("othPay",othPay.toString());
+                        if ("640101".equals(setlProcInfo)) {
+                            resultMap.put("governmentPay",fundPayamt);
+                        }
+                        if ("630101".equals(setlProcInfo)) {
+                            resultMap.put("hospExemAmount",fundPayamt);
+                        }
+                        if ("620101".equals(setlProcInfo)) {
+                            resultMap.put("thbPay",fundPayamt);
+                        }
+                        if ("610101".equals(setlProcInfo)) {
+                            resultMap.put("mafPay",fundPayamt);
+                        }
+                        break;
+                    case "610101":
+                        resultMap.put("mafPay",fundPayamt);
+                        break;
+                    case "620101":
+                        resultMap.put("thbPay",fundPayamt);
+                        break;
+                    case "630101" :
+                        resultMap.put("hospExemAmount",fundPayamt);
+                        break;
+                    case "640101":
+                        resultMap.put("governmentPay",fundPayamt);
                         break;
                     case "510100": // 生育基金
                         resultMap.put("fertilityPay",fundPayamt);
@@ -1400,6 +1427,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         else{
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
         }
+
+        if ("01".equals(mdtrtCertType)) {
+            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
+            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());
+        }
         mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	医疗类别
         mdtrtinfoMap.put("ipt_no", inptVisitDTO.getInNo());//	住院号
         mdtrtinfoMap.put("medrcdno", null);//	病历号
@@ -1477,15 +1509,16 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("emp_name", null);//	单位名称
         mdtrtinfoMap.put("dise_cond_sev", inptVisitDTO.getCriticalValueCode());//	病情严重程度
         mdtrtinfoMap.put("clnc_flag", null);//	临床试验标志
-        mdtrtinfoMap.put("er_flag", null);//	急诊标志
-        mdtrtinfoMap.put("advpay", null);//	预付款
-        mdtrtinfoMap.put("repeat_ipt_flag", null);//	重复住院标志
-        mdtrtinfoMap.put("ttp_resp", null);//	是否第三方责任标志
-        mdtrtinfoMap.put("merg_setl_flag", null);//	合并结算标志
+        mdtrtinfoMap.put("er_flag", "0");//	急诊标志
+        mdtrtinfoMap.put("advpay", "0");//	预付款
+        mdtrtinfoMap.put("repeat_ipt_flag", "0");//	重复住院标志
+        mdtrtinfoMap.put("ttp_resp", "0");//	是否第三方责任标志
+        mdtrtinfoMap.put("merg_setl_flag", "0");//	合并结算标志
         mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
         mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
         mdtrtinfoMap.put("certno", insureInptRegisterDTO.getAac002());//	证件号码（跨省异地必传）
-
+        mdtrtinfoMap.put("hcard_basinfo", insureInptRegisterDTO.getHcardBasinfo());//	证件号码（广州读卡就医必传）
+        mdtrtinfoMap.put("hcard_chkinfo", insureInptRegisterDTO.getHcardChkinfo());//	证件号码（广州读卡就医必传）
 
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();
@@ -1862,7 +1895,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         adminfoMap.put("coner_adr", null);//	联系地址
         adminfoMap.put("adm_time", null);//	入院时间
         adminfoMap.put("opt_time", null);//	经办时间
-        adminfoMap.put("clnc_flag", null);//	临床试验标志
+        adminfoMap.put("clnc_flag", "0");//	临床试验标志
         adminfoMap.put("advpay", null);//	预付款
 
         //代办人信息参数agnterinfo

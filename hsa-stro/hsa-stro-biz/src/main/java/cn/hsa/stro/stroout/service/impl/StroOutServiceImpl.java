@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.stro.stroout.bo.StroOutBO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
+import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
 import cn.hsa.module.stro.stroout.service.StroOutService;
 import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
@@ -145,6 +146,18 @@ public class StroOutServiceImpl extends HsafService implements StroOutService {
     @Override
     public WrapperResponse<StroOutDTO> queryWholeOut(Map map) {
         return WrapperResponse.success(stroOutBO.queryWholeOut(MapUtils.get(map,"stroOutDTO")));
+    }
+    /**
+     * @Meth: queryStroOutDetail
+     * @Description: 通过出库单id查询出库明细
+     * @Param: [map]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.stro.stroout.dto.StroOutDetailDTO>>
+     * @Author: zhangguorui
+     * @Date: 2021/12/14
+     */
+    @Override
+    public WrapperResponse<List<StroOutDetailDTO>> queryStroOutDetail(Map map) {
+        return WrapperResponse.success(stroOutBO.queryStroOutDetail(MapUtils.get(map,"stroOutDetailDTO")));
     }
 
 

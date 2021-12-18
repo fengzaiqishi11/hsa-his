@@ -43,4 +43,6 @@ public class PharApplyDTO extends PharApplyDO implements Serializable {
     private String outCode ;
 
     private String applyDeptName;  //领药科室名称
+
+    private String limitFlag;
 }

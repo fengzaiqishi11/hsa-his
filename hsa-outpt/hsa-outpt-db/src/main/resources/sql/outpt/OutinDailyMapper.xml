@@ -574,6 +574,12 @@
     <!-- 日结缴款 - 预交金列表 -->
     <select id="queryAdvancePay" resultType="java.util.Map">
         SELECT
+        CONCAT(
+        iv.name,'/',
+        IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(iv.age,'-'),
+        IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS keyword,
             iv.name,
             iv.in_no,
             iv.gender_code,
@@ -608,6 +614,12 @@
     <!-- 日结缴款 - 预交金冲抵列表 -->
     <select id="queryAdvancePayCd" resultType="java.util.Map">
         SELECT
+            CONCAT(
+                    iv.name,'/',
+                    IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+                    IFNULL(iv.age,'-'),
+                    IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+                ) AS keyword,
             iv.name,
             iv.in_no,
             iv.gender_code,

@@ -1,5 +1,6 @@
 package cn.hsa.insure.util;
 
+import cn.hsa.util.KafkaUtil;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import org.apache.http.HttpEntity;
@@ -14,6 +15,8 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -162,6 +165,18 @@ public class HttpConnect {
             conn.disconnect();
         }
         return result.toString();
+    }
+
+    // kafka测试程序 - LiaoJiGuang
+    public static void main(String args[]) {
+        // 1. 创建一个kafka生产者
+        String server = "8.136.110.29:9092";
+        String topic = "LiaoJiGuang_test_topic";
+        KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+        KafkaUtil.sendMessage(kafkaProducer,topic,"测试kafka有没有发送成功！");
+
+        KafkaConsumer<String, String> kafkaConsumer = KafkaUtil.createConsumer(server,topic);
+        KafkaUtil.readMessage(kafkaConsumer,1000);
     }
 
 

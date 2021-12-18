@@ -8,6 +8,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -38,6 +39,19 @@ public interface PatientCostLedgerDAO {
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
    **/
   List<InptCostDTO> getVisitTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [stroStockDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:55
+  * @Return java.util.List<cn.hsa.module.stro.stock.dto.StroStockDTO>
+  **/
+  List<StroStockDTO> queryStockTime(StroStockDTO stroStockDTO);
 
   /**
    * @Menthod queryPatirntCostLedger
@@ -834,7 +848,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Date   2021/10/22 16:17
      * @Return List<Map>
      **/
-  List<Map> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
+    List<OutptCostAndReigsterCostDTO> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
 
   /**
    * @Menthod getMzMedicalRegisterList
@@ -894,7 +908,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Author: zhangguorui
    * @Date: 2021/12/9
    */
-  List<String> queryIncomeUpCode(IncomeDTO incomeDTO);
+  List<IncomeDTO> queryIncomeUpCode(IncomeDTO incomeDTO);
     /**
      * @Meth: queryIncomeOutptPrice
      * @Description: 门诊费用
@@ -932,4 +946,52 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Date: 2021/12/10
      */
     List<IncomeDTO> queryBaseFinanceClassify(IncomeDTO incomeDTO);
+  /**
+   * @Meth: queryIncomeBfcId
+   * @Description: 查询所有的计费类别
+   * @Param: [incomeDTO]
+   * @return: java.util.List<cn.hsa.module.outpt.statement.dto.IncomeDTO>
+   * @Author: zhangguorui
+   * @Date: 2021/12/13
+   */
+  List<IncomeDTO>  queryIncomeBfcId(IncomeDTO incomeDTO);
+  /**
+   * @Meth: queryIncomeIntPriceByBfcId
+   * @Description:查询住院费用
+   * @Param: [incomeDTO]
+   * @return: java.util.List<cn.hsa.module.outpt.statement.dto.IncomeDTO>
+   * @Author: zhangguorui
+   * @Date: 2021/12/13
+   */
+  List<IncomeDTO>  queryIncomeIntPriceByBfcId(IncomeDTO incomeDTO);
+  /**
+   * @Meth: queryIncomeOutptPriceByBfcId
+   * @Description: 查询门诊费用
+   * @Param: [incomeDTO]
+   * @return: java.util.List<java.lang.String>
+   * @Author: zhangguorui
+   * @Date: 2021/12/13
+   */
+  List<IncomeDTO> queryIncomeOutptPriceByBfcId(IncomeDTO incomeDTO);
+
+
+  /**
+   * @Menthod getInptOperFinanceTitle
+   * @Desrciption  获取手术室费用明细表头
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:03
+   * @Return List<InptCostDTO>
+   **/
+  List<InptCostDTO> getInptOperFinanceTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Menthod getInptOperFinanceList
+   * @Desrciption  获取手术室费用明细
+   * @Param inptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/14 10:03
+   * @Return List<Map>
+   **/
+  List<Map> getInptOperFinanceList(InptVisitDTO inptVisitDTO);
 }

@@ -12,10 +12,12 @@ import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQuer
 import cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService;
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -383,12 +385,13 @@ public class PatientComprehensiveQueryController extends BaseController {
      *
      * @return*/
     @GetMapping("/queryYWLX")
-    public WrapperResponse<List<Map<String, Object>>> queryYWLX(HttpServletRequest req, HttpServletResponse res)
+    public WrapperResponse<List<Map<String, Object>>> queryYWLX(@RequestParam Map codes, HttpServletRequest req, HttpServletResponse res)
     {
         SysUserDTO sysUserDTOSession = getSession(req, res);
         //封装参数
         Map map = new HashMap();
         map.put("hospCode",sysUserDTOSession.getHospCode());
+        map.put("codes", MapUtils.get(codes, "code"));
         return comprehensiveQueryService_consumer.queryYWLX(map);
     }
 }

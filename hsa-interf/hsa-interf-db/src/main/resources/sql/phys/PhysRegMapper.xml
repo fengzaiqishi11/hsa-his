@@ -77,7 +77,7 @@
         </foreach>
     </insert>
     <update id="updateRCodt">
-        <foreach collection="list" item="item" index="index" separator=",">
+        <foreach collection="list" item="item" index="index" separator=";">
         update outpt_cost set back_num = 1 where visit_id = #{item.registerId} and item_id = #{item.groupId} and hosp_code = #{item.hospCode}
         </foreach>
     </update>

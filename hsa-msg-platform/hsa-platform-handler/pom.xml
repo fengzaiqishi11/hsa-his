@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>hsa-platform-handler</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-platform-handler</name>
+
+    <parent>
+        <groupId>cn.hsa.platform</groupId>
+        <artifactId>hsa-platform</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+        <dependencies>
+            <dependency>
+                <groupId>cn.hsa.platform</groupId>
+                <artifactId>hsa-platform-support</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+        </dependencies>
+
+</project>

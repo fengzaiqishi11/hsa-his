@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>hsa-platform-generic</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>hsa-platform-generic</name>
+
+    <parent>
+        <artifactId>hsa-platform</artifactId>
+        <groupId>cn.hsa.platform</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <properties>
+        <start-class>cn.hsa.platform.HsaGenericApplication</start-class>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-handler</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-service-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-service-api-impl</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-support</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- 启用Netty https://mvnrepository.com/artifact/org.yeauty/netty-websocket-spring-boot-starter -->
+        <dependency>
+            <groupId>org.yeauty</groupId>
+            <artifactId>netty-websocket-spring-boot-starter</artifactId>
+            <version>0.7.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.session</groupId>-->
+<!--            <artifactId>spring-session-data-redis</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot</artifactId>
+            <version>2.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>hsa-platform</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.3.5.RELEASE</version>
+                <configuration>
+                    <mainClass>${start-class}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                        <exclude>config/**/*.properties</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>

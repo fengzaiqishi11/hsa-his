@@ -250,7 +250,7 @@
         #{preferentialTypeId}, #{sourceTjCode}, #{sourceTjRemark}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
         #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
         #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
-        )
+        )  on duplicate key update pym=#{pym};
 
     </insert>
 

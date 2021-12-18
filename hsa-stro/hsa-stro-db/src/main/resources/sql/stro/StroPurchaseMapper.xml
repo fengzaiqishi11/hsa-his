@@ -572,8 +572,8 @@
         (select d.in_id from stro_in_detail d where d.hosp_code = #{hospCode} and d.item_id = a.item_id) order by crte_time DESC limit 1) as supplierId
         FROM
         stro_stock a
-        LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code
-        LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code
+        LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code and b.is_valid = '1'
+        LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
         where a.hosp_code = #{hospCode} and a.num &lt; a.stock_min and a.biz_id = #{bizId}
     </select>
 
@@ -598,8 +598,8 @@
           (select d.in_id from stro_in_detail d where d.hosp_code = #{hospCode} and d.item_id = a.item_id) order by crte_time DESC limit 1) as supplierId
           FROM
           stro_stock a
-          LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code
-          LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code
+          LEFT JOIN base_drug b ON a.item_id = b.id and a.hosp_code = b.hosp_code and b.is_valid = '1'
+          LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
           where a.hosp_code = #{hospCode} and a.num &lt; a.stock_max and a.biz_id = #{bizId}
       </select>
 
@@ -622,8 +622,8 @@
           (select d.in_id from stro_in_detail d where d.hosp_code = #{hospCode} and d.item_id = a.item_id) order by crte_time DESC limit 1) as supplierId,
           (select num from stro_stock st where st.hosp_code = #{hospCode} and st.item_id = a.item_id and st.biz_id = a.biz_id) as stockNum
           from stro_invoicing a
-          left join base_drug d on a.hosp_code = d.hosp_code and a.item_id = d.id
-          left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code
+          left join base_drug d on a.hosp_code = d.hosp_code and a.item_id = d.id and d.is_valid = '1'
+          left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
           where a.hosp_code = #{hospCode} and a.outin_code in ('4','5','21') and a.biz_id = #{bizId}
            <if test="startDate != null and startDate!=''" >
              AND a.crte_time >= #{startDate}

@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,6 +108,9 @@ public class SysParameterController extends BaseController {
     public WrapperResponse<Boolean> delete(@RequestBody SysParameterDTO sysParameterDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         sysParameterDTO.setHospCode(sysUserDTO.getHospCode());
+        sysParameterDTO.setCrteId(sysUserDTO.getId());
+        sysParameterDTO.setCrteName(sysUserDTO.getName());
+        sysParameterDTO.setCrteTime(DateUtils.getNow());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("sysParameterDTO",sysParameterDTO);
@@ -126,6 +130,9 @@ public class SysParameterController extends BaseController {
     public WrapperResponse<Boolean> update(@RequestBody SysParameterDTO sysParameterDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         sysParameterDTO.setHospCode(sysUserDTO.getHospCode());
+        sysParameterDTO.setCrteId(sysUserDTO.getId());
+        sysParameterDTO.setCrteName(sysUserDTO.getName());
+        sysParameterDTO.setCrteTime(DateUtils.getNow());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("sysParameterDTO",sysParameterDTO);
@@ -149,6 +156,28 @@ public class SysParameterController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("code",sysParameterDTO.getCode());
         return sysParameterService_consumer.getParameterByCode(map);
+    }
+
+    /**
+    * @Menthod getIsReallyPwd
+    * @Desrciption 校验密码是否正确
+    *
+    * @Param
+    * [sysParameterDTO, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/20 14:05
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+    **/
+    @GetMapping("/getIsReallyPwd")
+    public WrapperResponse<Map> getIsReallyPwd(SysParameterDTO sysParameterDTO, HttpServletRequest req, HttpServletResponse res) {
+      SysUserDTO sysUserDTO = getSession(req, res);
+      sysParameterDTO.setHospCode(sysUserDTO.getHospCode());
+      Map map = new HashMap();
+      map.put("hospCode",sysUserDTO.getHospCode());
+      map.put("sysParameterDTO",sysParameterDTO);
+      map.put("sysUserDTO",sysUserDTO);
+      return sysParameterService_consumer.getIsReallyPwd(map);
     }
 
 

@@ -81,6 +81,7 @@
                 remark = #{remark},
                 status_code = #{statusCode},
                 room_no = #{roomNo},
+                seq_no = #{seqNo},
             visit_id = #{visitId}
         </set>
         where id = #{id} and hosp_code= #{hospCode}

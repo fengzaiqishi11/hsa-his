@@ -497,7 +497,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                 for (Map<String, Object> detailMap : setldetailList) {
                     String fundPayType = MapUtils.get(detailMap, "fund_pay_type");
                     String setlProcInfo = MapUtils.get(detailMap, "setl_proc_info");
-                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt");
+                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt").toString();
                     // 因为医保返回的就是这么奇怪：610100、610101、999997里面都可以是医疗救助基金，码表什么的都是浮云
                     switch (fundPayType) {
                         case "630100": // 医院减免金额
@@ -795,7 +795,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("cum_ym", MapUtils.get(map, "cumYm"));
+        Object cumYm = MapUtils.get(map, "cumYm");
+        if (cumYm == null || StringUtils.isEmpty(cumYm.toString())) {
+            cumYm = DateUtils.format(DateUtils.getNow(),DateUtils.YM);
+        }
+        dataMap.put("cum_ym", cumYm);
         paramMap.put("data", dataMap);
         map.put("msgName","人员累计信息查询");
         map.put("isHospital","");

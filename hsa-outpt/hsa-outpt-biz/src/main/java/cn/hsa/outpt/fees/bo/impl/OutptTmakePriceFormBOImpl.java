@@ -486,7 +486,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 patientIsCF = this.checkPatientIsMZ(outptVisitDTO);
             }
             // 3、1 直接划价收费病人重新计算优惠
-            if (!patientIsCF) {
+//            if (!patientIsCF) {
+//                outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
+//            }
+            if (StringUtils.isEmpty(outptVisitDTO.getId())) {
                 outptCostDTOList = this.verifyCouponPrice(outptVisitDTO, 0);
             }
 
@@ -2872,7 +2875,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             return true;
         }
         if (StringUtils.isEmpty(feeOrg.getPayToken()) || StringUtils.isEmpty(feeOrg.getPayOrdId())) {
-            throw new AppException("撤销费用失败，电子凭证登记时的 payToken 或 payOrdId 为空，请联系管理员");
+            return true;
         }
         Map<String,Object> jsonObject = new HashMap<>();
 //        Map<String,Object> jsonObjectData = new HashMap<>();

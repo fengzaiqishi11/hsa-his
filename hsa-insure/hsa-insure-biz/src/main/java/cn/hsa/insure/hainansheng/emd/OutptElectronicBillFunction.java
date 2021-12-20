@@ -184,6 +184,7 @@ public class OutptElectronicBillFunction {
         JSONObject data = new JSONObject();
         data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
         data.put("orgCodg",insureIndividualVisitDTO.getMedicineOrgCode());//机构编码，不可空
+        data.put("medListCodg", insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗目录编码，不可为空
         data.put("orgId",app.get("insuOrg"));//电子凭证机构号，可空
         data.put("ecToken",app.get("ecToken"));//电子凭证授权 ecToken，可空
         data.put("insuCode",app.get("insuOrg"));//参保人所在统筹区编码

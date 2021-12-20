@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -136,7 +137,24 @@ public class StroStockServiceImpl extends HsafBO implements StroStockService {
         return WrapperResponse.success(stroStockBO.updateOccupy(hospCode));
     }
 
-    /**库存效期查询
+    /**
+    * @Menthod inserStockByTime
+    * @Desrciption 月底库存存储记录
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/13 16:16
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @Override
+    public WrapperResponse<Boolean> insertStockByTime(Map map) {
+      StroStockDTO stroStockDTO = MapUtils.get(map, "stroStockDTO");
+      return WrapperResponse.success(stroStockBO.insertStockByTime(stroStockDTO));
+    }
+
+  /**库存效期查询
      * @Method queryValidityWarningPage
      * @Desrciption
      * @param map

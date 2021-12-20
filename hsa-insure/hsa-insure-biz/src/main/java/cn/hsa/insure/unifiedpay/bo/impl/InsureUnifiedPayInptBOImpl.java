@@ -1427,6 +1427,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         else{
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
         }
+        if("01".equals(mdtrtCertType)) {
+            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
+            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());
+        }
         mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	医疗类别
         mdtrtinfoMap.put("ipt_no", inptVisitDTO.getInNo());//	住院号
         mdtrtinfoMap.put("medrcdno", null);//	病历号

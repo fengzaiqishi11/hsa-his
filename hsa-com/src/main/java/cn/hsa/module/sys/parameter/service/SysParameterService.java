@@ -94,4 +94,18 @@ public interface SysParameterService {
 
     @GetMapping("/service/sys/parameter/getParameterByCodeList")
     WrapperResponse<Map<String, SysParameterDTO>> getParameterByCodeList(Map map);
+
+    /**
+    * @Menthod getIsReallyPwd
+    * @Desrciption 校验密码是否正确
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/20 14:05
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+    **/
+    @GetMapping("/service/sys/parameter/getIsReallyPwd")
+    WrapperResponse<Map> getIsReallyPwd(Map map);
 }

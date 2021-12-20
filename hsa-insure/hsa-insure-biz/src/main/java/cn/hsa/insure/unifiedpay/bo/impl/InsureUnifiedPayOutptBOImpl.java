@@ -1061,7 +1061,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             BigDecimal othPay = BigDecimal.ZERO;
             for (Map<String,Object> map : setldetailList) {
                 String fundPayType = MapUtils.get(map,"fund_pay_type");
-                String fundPayamt = MapUtils.get(map,"fund_payamt");
+                String fundPayamt = MapUtils.get(map,"fund_payamt").toString();
                 String setlProcInfo = MapUtils.get(map, "setl_proc_info");
                 switch (fundPayType) {
                     case "630100": // 医院减免金额

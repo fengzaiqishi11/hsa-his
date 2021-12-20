@@ -88,5 +88,9 @@ public class SysParameterDO extends PageDO implements Serializable {
     // 时间戳转换为标准时间格式
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
+    /**
+     * 是否需要重新校验密码
+     */
+    private String isNeedPwd;
 
 }

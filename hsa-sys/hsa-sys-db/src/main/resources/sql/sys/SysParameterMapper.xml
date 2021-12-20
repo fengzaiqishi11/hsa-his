@@ -17,7 +17,15 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="value" column="value" jdbcType="VARCHAR"/>
         <result property="keyword" column="keyword" jdbcType="VARCHAR"/>
+        <result property="isNeedPwd" column="is_need_pwd" jdbcType="VARCHAR"/>
     </resultMap>
+
+    <select id="getById" resultMap="SysParameterMap">
+        select
+        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value,is_need_pwd
+        from sys_parameter
+        where hosp_code = #{hospCode} and id = #{id}
+    </select>
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="SysParameterMap" parameterType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
         select
@@ -41,7 +49,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryPage" resultMap="SysParameterMap" parameterType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
         select
-        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value,is_need_pwd
         from sys_parameter
         <where>
             <if test="keyword != null and keyword != ''">
@@ -115,6 +123,7 @@
         from sys_parameter
         where is_valid='1' and hosp_code=#{hospCode} and code=#{code}
     </select>
+
     <select id="getParameterByCodeList" resultMap="SysParameterMap">
         select
         id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
@@ -122,6 +131,26 @@
         where is_valid='1' and hosp_code=#{hospCode} and code in
         <foreach collection="codeList"  item="code" separator="," open="(" close=")">
             #{code}
+        </foreach>
+    </select>
+
+    <insert id="insertParameterUpdate" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO">
+        insert into sys_parameter_update(id,hosp_code, sys_paramter_id,name, before_code, after_code,before_value,after_value,remark,
+        pym, wbm, is_valid, is_show, crte_id, crte_time,crte_name,is_need_pwd)
+        values
+      <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id}, #{item.hospCode}, #{item.sysParamterId},#{item.name}, #{item.beforeCode}, #{item.afterCode}, #{item.beforeValue}, #{item.afterValue},
+        #{item.remark}, #{item.pym},#{item.wbm}, #{item.isValid},#{item.isShow},#{item.crteId},#{item.crteTime},#{item.crteName},#{item.isNeedPwd})
+      </foreach>
+    </insert>
+
+    <select id="querySysParameterByIds" resultType="cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO">
+      select
+        id as sysParamterId, hosp_code, name, code as beforeCode, remark, pym, wbm, "0" as is_valid, is_show, value as beforeValue
+        from sys_parameter
+        where hosp_code=#{hospCode} and id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+          #{id}
         </foreach>
     </select>
 </mapper>

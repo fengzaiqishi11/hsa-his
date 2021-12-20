@@ -288,4 +288,20 @@ class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         List<Map<String,Object>> dictDTOList = insureDictDAO.queryAdmdvsInfoPage(dictDTO);
         return PageDTO.of(dictDTOList);
     }
+
+    /**
+     * @Method queryAdmdvsInfo()
+     * @Desrciption  查询医保地区划
+     * @Param insuplcAdmdvs:医保区划
+     *
+     * @Author yuelong.chen
+     * @Date   2021/12/15 21:03
+     * @Return
+     **/
+    @Override
+    public List<Map<String,Object>> queryAdmdvsInfo(Map map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        List<Map<String, Object>> list = insureDictDAO.queryAdmdvsInfo(hospCode);
+        return list;
+    }
 }

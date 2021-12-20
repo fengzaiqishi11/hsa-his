@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 
 import java.util.List;
@@ -33,6 +34,19 @@ public interface PatientCostLedgerBO {
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
    **/
   Map queryPatirntCostLedger(InptVisitDTO inptVisitDTO);
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [stroStockDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:53
+  * @Return cn.hsa.base.PageDTO
+  **/
+  PageDTO queryStockTime(StroStockDTO stroStockDTO);
 
   /**
    * @Menthod queryPatirntCostLedger

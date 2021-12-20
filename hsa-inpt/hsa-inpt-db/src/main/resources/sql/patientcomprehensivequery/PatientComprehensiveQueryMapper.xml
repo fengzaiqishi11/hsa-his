@@ -504,7 +504,7 @@
         a.is_settle,
         a.status_code,
         a.is_print,
-        a.mi_price,
+        (a.mi_price-a.acct_pay) as miPrice,
         a.crte_id,
         a.crte_name,
         a.crte_time,
@@ -524,6 +524,7 @@
         e.outpt_doctor_name,-- 门诊医生
         e.jz_doctor_name,-- 经治医生
         e.zg_doctor_name,-- 主管医生
+        e.out_time as outTime,
         ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount,
         ifnull(a.credit_price, 0) as creditPrice
         FROM

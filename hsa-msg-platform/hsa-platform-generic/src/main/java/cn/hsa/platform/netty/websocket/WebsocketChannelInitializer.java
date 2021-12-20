@@ -48,4 +48,8 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
         //自定义的handler ，处理业务逻辑
         pipeline.addLast(webSocketHandler);
     }
+
+    public String getWebSocketContextUrl(){
+        return websocketUrl;
+    }
 }

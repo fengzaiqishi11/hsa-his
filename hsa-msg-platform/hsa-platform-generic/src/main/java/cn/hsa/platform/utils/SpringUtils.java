@@ -1,4 +1,4 @@
-package cn.hsa.platform.util;
+package cn.hsa.platform.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

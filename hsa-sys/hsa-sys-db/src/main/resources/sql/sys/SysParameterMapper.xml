@@ -135,11 +135,11 @@
     </select>
 
     <insert id="insertParameterUpdate" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO">
-        insert into sys_parameter_update(id,hosp_code, name, before_code, after_code,before_value,after_value,remark,
+        insert into sys_parameter_update(id,hosp_code, sys_paramter_id,name, before_code, after_code,before_value,after_value,remark,
         pym, wbm, is_valid, is_show, crte_id, crte_time,crte_name,is_need_pwd)
         values
       <foreach collection="list" item="item" index="index" separator=",">
-        (#{item.id}, #{item.hospCode}, #{item.name}, #{item.beforeCode}, #{item.afterCode}, #{item.beforeValue}, #{item.afterValue},
+        (#{item.id}, #{item.hospCode}, #{item.sysParamterId},#{item.name}, #{item.beforeCode}, #{item.afterCode}, #{item.beforeValue}, #{item.afterValue},
         #{item.remark}, #{item.pym},#{item.wbm}, #{item.isValid},#{item.isShow},#{item.crteId},#{item.crteTime},#{item.crteName},#{item.isNeedPwd})
       </foreach>
     </insert>

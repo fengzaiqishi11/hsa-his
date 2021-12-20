@@ -880,7 +880,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("medins_secd_asist_diag","");// 医疗机构第二副诊断
         dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
-        dataMap.put("mdtrt_mode","");// 就诊方式
+        dataMap.put("mdtrt_mode","0");// 就诊方式
         dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息
         dataMap.put("hcard_chkinfo",insureIndividualVisitDTO.getHcardChkinfo());// 持卡就诊校验信息
         /**
@@ -1427,8 +1427,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         else{
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
         }
-
-        if ("01".equals(mdtrtCertType)) {
+        if("01".equals(mdtrtCertType)) {
             mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());
         }

@@ -3153,8 +3153,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             Map<String,Object> headItemMap12 = new HashMap<>();
             Map<String,Object> headItemMap13 = new HashMap<>();
             Map<String,Object> headItemMap14 = new HashMap<>();
+            Map<String,Object> headItemMap15= new HashMap<>();
+            Map<String,Object> headItemMap16 = new HashMap<>();
+            Map<String,Object> headItemMap17 = new HashMap<>();
             headItemMap7.put("label","挂号单号");
             headItemMap7.put("prop","registerNo");
+            headItemMap7.put("minWidth","150");
             headItemMap8.put("label","姓名");
             headItemMap8.put("prop","name");
             headItemMap9.put("label","性别");
@@ -3164,19 +3168,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             headItemMap10.put("prop","age");
             headItemMap11.put("label","身份证号");
             headItemMap11.put("prop","certNo");
+            headItemMap11.put("minWidth","150");
             headItemMap12.put("label","电话");
             headItemMap12.put("prop","phone");
-            headItemMap13.put("label","优惠前总费用");
-            headItemMap13.put("prop","totalPrice");
-            headItemMap13.put("minWidth","100");
-            headItemMap13.put("type","money");
-            headItemMap13.put("showSummary",true);
-            headItemMap13.put("toFixed",2);
-            headItemMap14.put("label","总费用");
-            headItemMap14.put("prop","price");
-            headItemMap14.put("type","money");
-            headItemMap14.put("showSummary",true);
-            headItemMap14.put("toFixed",2);
+            headItemMap12.put("minWidth","100");
+            headItemMap13.put("label","病人类型");
+            headItemMap13.put("code","BRLX");
+            headItemMap13.put("prop","patientCode");
+            headItemMap14.put("label","开方医生");
+            headItemMap14.put("prop","doctorName");
+            headItemMap15.put("label","开方科室");
+            headItemMap15.put("prop","deptName");
+            headItemMap16.put("label","优惠前总费用");
+            headItemMap16.put("prop","totalPrice");
+            headItemMap16.put("minWidth","100");
+            headItemMap16.put("type","money");
+            headItemMap16.put("showSummary",true);
+            headItemMap16.put("toFixed",2);
+            headItemMap17.put("label","总费用");
+            headItemMap17.put("prop","price");
+            headItemMap17.put("type","money");
+            headItemMap17.put("showSummary",true);
+            headItemMap17.put("toFixed",2);
 
             tableHeader.put("registerNo",headItemMap7);
             tableHeader.put("name",headItemMap8);
@@ -3184,8 +3197,11 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             tableHeader.put("age",headItemMap10);
             tableHeader.put("certNo",headItemMap11);
             tableHeader.put("phone",headItemMap12);
-            tableHeader.put("totalPrice",headItemMap13);
-            tableHeader.put("price",headItemMap14);
+            tableHeader.put("patientCode",headItemMap13);
+            tableHeader.put("doctorName",headItemMap14);
+            tableHeader.put("deptName",headItemMap15);
+            tableHeader.put("totalPrice",headItemMap16);
+            tableHeader.put("price",headItemMap17);
             this.setFixedtableHeader(tableHeader);
 
             for (String chargeId : deptDoctorVisitIdCollect.keySet()) {
@@ -3199,6 +3215,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 dataItemMap.put("age",groupByList.get(0).getAge());
                 dataItemMap.put("certNo",groupByList.get(0).getCertNo());
                 dataItemMap.put("phone",groupByList.get(0).getPhone());
+                dataItemMap.put("patientCode",groupByList.get(0).getPatientCode());
+                dataItemMap.put("doctorName",groupByList.get(0).getDoctorName());
+                dataItemMap.put("deptName",groupByList.get(0).getDeptName());
                 BigDecimal totalPrice = groupByList.stream().
                         map(OutptCostAndReigsterCostDTO::getTotalPrice).reduce(BigDecimal::add).get();
                 dataItemMap.put("totalPrice",totalPrice);
@@ -3241,17 +3260,21 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                 Map<String, List<OutptCostAndReigsterCostDTO>> deptDoctorVisitIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(a->a.getVisitId()));
-                // 组装固定表头
-                Map<String,Object> headItemMap7 = new HashMap<>();
-                Map<String,Object> headItemMap8 = new HashMap<>();
-                Map<String,Object> headItemMap9 = new HashMap<>();
-                Map<String,Object> headItemMap10 = new HashMap<>();
+            // 组装固定表头
+            Map<String,Object> headItemMap7 = new HashMap<>();
+            Map<String,Object> headItemMap8 = new HashMap<>();
+            Map<String,Object> headItemMap9 = new HashMap<>();
+            Map<String,Object> headItemMap10 = new HashMap<>();
             Map<String,Object> headItemMap11 = new HashMap<>();
             Map<String,Object> headItemMap12 = new HashMap<>();
             Map<String,Object> headItemMap13 = new HashMap<>();
             Map<String,Object> headItemMap14 = new HashMap<>();
-                headItemMap7.put("label","挂号单号");
-                headItemMap7.put("prop","registerNo");
+            Map<String,Object> headItemMap15= new HashMap<>();
+            Map<String,Object> headItemMap16 = new HashMap<>();
+            Map<String,Object> headItemMap17 = new HashMap<>();
+            headItemMap7.put("label","挂号单号");
+            headItemMap7.put("prop","registerNo");
+            headItemMap7.put("minWidth","150");
             headItemMap8.put("label","姓名");
             headItemMap8.put("prop","name");
             headItemMap9.put("label","性别");
@@ -3261,19 +3284,28 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             headItemMap10.put("prop","age");
             headItemMap11.put("label","身份证号");
             headItemMap11.put("prop","certNo");
+            headItemMap11.put("minWidth","150");
             headItemMap12.put("label","电话");
             headItemMap12.put("prop","phone");
-            headItemMap13.put("label","优惠前总费用");
-            headItemMap13.put("prop","totalPrice");
-            headItemMap13.put("minWidth","100");
-            headItemMap13.put("type","money");
-            headItemMap13.put("showSummary",true);
-            headItemMap13.put("toFixed",2);
-                headItemMap14.put("label","总费用");
-                headItemMap14.put("prop","price");
-                headItemMap14.put("type","money");
-                headItemMap14.put("showSummary",true);
-                headItemMap14.put("toFixed",2);
+            headItemMap12.put("minWidth","100");
+            headItemMap13.put("label","病人类型");
+            headItemMap13.put("code","BRLX");
+            headItemMap13.put("prop","patientCode");
+            headItemMap14.put("label","开方医生");
+            headItemMap14.put("prop","doctorName");
+            headItemMap15.put("label","开方科室");
+            headItemMap15.put("prop","deptName");
+            headItemMap16.put("label","优惠前总费用");
+            headItemMap16.put("prop","totalPrice");
+            headItemMap16.put("minWidth","100");
+            headItemMap16.put("type","money");
+            headItemMap16.put("showSummary",true);
+            headItemMap16.put("toFixed",2);
+            headItemMap17.put("label","总费用");
+            headItemMap17.put("prop","price");
+            headItemMap17.put("type","money");
+            headItemMap17.put("showSummary",true);
+            headItemMap17.put("toFixed",2);
 
                 tableHeader.put("registerNo",headItemMap7);
                 tableHeader.put("name",headItemMap8);
@@ -3281,8 +3313,11 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 tableHeader.put("age",headItemMap10);
                 tableHeader.put("certNo",headItemMap11);
                 tableHeader.put("phone",headItemMap12);
-                tableHeader.put("totalPrice",headItemMap13);
-                tableHeader.put("price",headItemMap14);
+                tableHeader.put("patientCode",headItemMap13);
+                tableHeader.put("doctorName",headItemMap14);
+                tableHeader.put("deptName",headItemMap15);
+                tableHeader.put("totalPrice",headItemMap16);
+                tableHeader.put("price",headItemMap17);
                 this.setFixedtableHeader(tableHeader);
 
                 for (String chargeId : deptDoctorVisitIdCollect.keySet()){
@@ -3296,6 +3331,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                     dataItemMap.put("age",groupByList.get(0).getAge());
                     dataItemMap.put("certNo",groupByList.get(0).getCertNo());
                     dataItemMap.put("phone",groupByList.get(0).getPhone());
+                    dataItemMap.put("patientCode",groupByList.get(0).getPatientCode());
+                    dataItemMap.put("doctorName",groupByList.get(0).getDoctorName());
+                    dataItemMap.put("deptName",groupByList.get(0).getDeptName());
                     // 计算总费用
                     BigDecimal totalPrice = groupByList.stream().
                             map(OutptCostAndReigsterCostDTO::getTotalPrice).reduce(BigDecimal::add).get();

@@ -6607,12 +6607,6 @@
         as bfcName,
         ifnull(B.doctor_id,'0') as doctorId,
         ifnull(B.doctor_name,t.doctor_name) as doctorName,
-        ifnull((select id from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =
-        (select dept_code from sys_user su where su.hosp_code = #{hospCode} and su.id = B.doctor_id )),'0')
-        as deptId,
-        ifnull((select name from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =
-        (select dept_code from sys_user su where su.hosp_code = #{hospCode} and su.id = B.doctor_id )),'其他')
-        as deptName,
         ifnull(B.visit_id,'0') as visitId,
         t.name as visitName,
         ifnull(B.id,'0') as settleId,
@@ -6651,39 +6645,48 @@
         <if test="deptId !=null and deptId !=''">
             and t.dept_id =#{deptId}
         </if>
+        <if test="outptDoctorName != null and outptDoctorName !=''">
+            and (B.doctor_name like concat('%', #{outptDoctorName}, '%')
+            or t.doctor_name like concat('%', #{outptDoctorName}, '%'))
+        </if>
         order by A.settle_time desc
     </select>
 
     <!--门诊挂号费用统计-->
     <select id="getMzMedicalRegisterList" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         SELECT
-        a.register_no AS registerNo,
-        a.NAME AS name,
-        a.gender_code AS genderCode,
-        a.age AS age,
-        a.cert_no AS certNo,
-        a.phone AS phone,
-        a.register_time AS registerTime,
-        a.dept_name AS deptName,
-        b.reality_price AS registerPrice,
-        b.settle_time AS settleTime
+        b.register_no AS registerNo,
+        b. NAME AS name,
+        b.gender_code AS genderCode,
+        b.age AS age,
+        b.cert_no AS certNo,
+        b.phone AS phone,
+        b.register_time AS registerTime,
+        b.dept_name AS deptName,
+        a.reality_price AS registerPrice,
+        settle.settle_time AS settleTime
         FROM
-        outpt_register a
-        LEFT JOIN outpt_register_settle b ON a.id = b.register_id and a.hosp_code = b.hosp_code
-        WHERE a.hosp_code =#{hospCode} AND b.status_code = '0'
+        outpt_register_settle settle
+        JOIN outpt_register b ON settle.register_id = b.id
+        AND settle.hosp_code = b.hosp_code
+        JOIN outpt_register_detail a ON settle.register_id = a.register_id
+        AND settle.hosp_code = a.hosp_code
+        AND settle.status_code = a.status_code
+        WHERE  a.hosp_code = #{hospCode}
+        AND b.is_cancel = '0'
         <if test="settleStartTime != null and settleStartTime !=''">
-            and b.settle_time &gt;= #{settleStartTime}
+            and settle.crte_time &gt;= #{settleStartTime}
         </if>
         <if test="settleEndTime != null and settleEndTime !=''">
-            and b.settle_time &lt;= #{settleEndTime}
+            and settle.crte_time &lt;= #{settleEndTime}
         </if>
         <if test="deptId !=null and deptId !=''">
-            and a.dept_id =#{deptId}
+            and b.dept_id =#{deptId}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (a.name like concat('%', #{keyword}, '%')
-            or a.phone like concat('%', #{keyword}, '%')
-            or a.cert_no like concat('%', #{keyword}, '%'))
+            and (b.name like concat('%', #{keyword}, '%')
+            or b.phone like concat('%', #{keyword}, '%')
+            or b.cert_no like concat('%', #{keyword}, '%'))
         </if>
     </select>
 
@@ -7543,17 +7546,18 @@
         left join inpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code and b.status_code = '0'
         join base_finance_classify c on a.bfc_id = c.id and a.hosp_code = c.hosp_code
         join inpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
+        where a.hosp_code =#{hospCode} and b.id is not null and b.is_settle = '1' and a.settle_code ='2'
         <if test="deptId != null and deptId != ''">
             and a.dept_id = #{deptId}
         </if>
         <if test="patientCode != null and patientCode != ''">
             and d.patient_code = #{patientCode}
         </if>
-        <if test="startTime != null and startTime !=''">
-            and d.in_time &gt;= #{startTime}
+        <if test="settleStartTime != null and settleStartTime !=''">
+            and b.settle_time &gt;= #{settleStartTime}
         </if>
-        <if test="endTime != null and endTime !=''">
-            and d.in_time &lt;= #{endTime}
+        <if test="settleEndTime != null and settleEndTime !=''">
+            and b.settle_time &lt;= #{settleEndTime}
         </if>
         <!--过滤条件增加医生名称-->
         <if test="doctorName != null and doctorName != ''">
@@ -7677,9 +7681,9 @@
         select ${sqlStr} d.id visistID
         from inpt_visit d
         join inpt_cost a on a.visit_id = d.id and a.hosp_code = d.hosp_code
-        left join inpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
+        join inpt_settle c on a.hosp_code = c.hosp_code and  a.visit_id = c.visit_id and c.id = a.settle_id
         join oper_info_record o ON d.hosp_code = o.hosp_code and o.visit_id = d.id
-        where a.hosp_code = #{hospCode} and o.is_cost ='1'
+        where a.hosp_code = #{hospCode} and c.id is not null and c.is_settle = '1' and a.settle_code ='2' and o.is_cost ='1'
         <if test="settleStartTime != null and settleStartTime !=''">
             and c.settle_time &gt;= #{settleStartTime}
         </if>
@@ -7709,9 +7713,9 @@
         </if>
         group by  o.id
         ) b on a.id = b.visistID
-        left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
+        join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0'
         join oper_info_record o ON a.hosp_code = o.hosp_code and o.visit_id = a.id
-        where a.hosp_code = #{hospCode} and o.is_cost ='1'
+        where a.hosp_code = #{hospCode} and c.id is not null and c.is_settle = '1' and o.is_cost ='1'
         <if test="settleStartTime != null and settleStartTime !=''">
             and c.settle_time &gt;= #{settleStartTime}
         </if>

@@ -1203,7 +1203,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureUnifiedPayParam.put("crteId", MapUtils.get(param, "crteId"));
         insureUnifiedPayParam.put("code", code);
         insureUnifiedPayParam.put("userName", userName);
-        insureUnifiedPayParam.put("isReadCard", MapUtils.get(param,"isReadCard"));
+        insureUnifiedPayParam.put("isReadCard", MapUtils.get(param,"isReadCardPay"));
         insureUnifiedPayParam.put("bka895", MapUtils.get(param,"bka895"));
         insureUnifiedPayParam.put("bka896", MapUtils.get(param,"bka896"));
         /**统一支付平台调用出院办理   结束*/

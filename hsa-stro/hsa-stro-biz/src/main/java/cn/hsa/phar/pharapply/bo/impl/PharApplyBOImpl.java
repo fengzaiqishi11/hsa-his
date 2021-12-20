@@ -723,6 +723,9 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
       } else {
         pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementUp(pharApplyDTO);
       }
+      if(ListUtils.isEmpty(pharApplyDetailDTOS)) {
+        throw new AppException("没有需要生成的库存");
+      }
       pharApplyDTO.setId(SnowflakeUtils.getId());
       Map map =new HashMap();
       map.put("hospCode", pharApplyDTO.getHospCode());

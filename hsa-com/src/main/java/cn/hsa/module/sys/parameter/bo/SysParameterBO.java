@@ -84,4 +84,18 @@ public interface SysParameterBO {
   SysParameterDTO getParameterByCode(String hospCode, String code);
 
   Map<String, SysParameterDTO> getParameterByCodeList(String hospCode, String[] codeList);
+
+  /**
+  * @Menthod getIsReallyPwd
+  * @Desrciption 校验密码是否正确
+  *
+  * @Param
+  * [sysParameterDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/20 14:07
+  * @Return java.util.Map
+  **/
+  Map getIsReallyPwd(Map map);
+
 }

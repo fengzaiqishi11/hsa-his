@@ -827,7 +827,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("opter_name", insureIndividualVisitDTO.getCrteName()); // 登记人姓名
         patientDataMap.put("medins_code", outptVisitDTO.getHospCode()); // 医疗机构编码
         patientDataMap.put("medins_name", outptVisitDTO.getHospName()); // TODO 医疗机构名称
-        patientDataMap.put("mdtrt_mode", ""); // TODO 就诊方式
+        patientDataMap.put("mdtrt_mode", "0"); // TODO 就诊方式
         patientDataMap.put("order_no", ""); // TODO 医疗机构订单号或医疗机构就医序列号
         patientDataMap.put("hcard_basinfo", insureIndividualVisitDTO.getHcardBasinfo()); // TODO 持卡就诊基本信息
         patientDataMap.put("hcard_chkinfo", insureIndividualVisitDTO.getHcardChkinfo()); // TODO 持卡就诊校验信息

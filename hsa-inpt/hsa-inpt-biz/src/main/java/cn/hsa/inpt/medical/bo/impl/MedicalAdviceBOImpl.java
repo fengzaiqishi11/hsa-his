@@ -3396,13 +3396,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //停同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSame())) {
                 tzList = inptAdviceDAO.getTlAdvices(adviceDTO);
-                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                tzList.forEach(e->e.setStopTime(adviceDTO.getLongStartTime()));
                 list.addAll(tzList);
             }
             //停非同类(更新停嘱当日执行次数,执行次数->医嘱目录，非文字医嘱->停嘱当日执行次数)
             if("1".equals(boById.getIsStopSameNot())) {
                 tzList = inptAdviceDAO.getFtlAdvices(adviceDTO);
-                tzList.forEach(e->e.setStopTime(medicalAdviceDTO.getCheckTime()));
+                tzList.forEach(e->e.setStopTime(adviceDTO.getLongStartTime()));
                 list.addAll(tzList);
             }
             //停自身(长期医嘱) 不更新停嘱当日执行次数

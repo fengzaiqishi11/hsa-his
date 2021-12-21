@@ -3,18 +3,11 @@ package cn.hsa.search.controller;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
-import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.search.service.NationStandardDrugService;
 import com.github.pagehelper.PageHelper;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -30,20 +23,8 @@ public class NationStandardController {
 
     @GetMapping("/initData")
     public String init() {
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        PageHelper.startPage(1,10);
-        List<NationStandardDrugDTO>list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
-        PageDTO pageDTO = PageDTO.of(list);
-        long total = pageDTO.getTotal();
-        int totalPages = (int) Math.ceil(total/200);
 
-        for(int i=1;i<totalPages;i++){
-            NationStandardDrugDTO p = new NationStandardDrugDTO();
-            PageHelper.startPage(i+1,200);
-            list = nationStandardDrugDAO.queryNationStandardDrugPage(p);
-            searchableDrugService.saveAll(list);
-        }
-        return "total rows: "+ total;
+        return "total rows: "+ searchableDrugService.refreshDataOfElasticSearch();
     }
 
     @GetMapping("/queryByCond")
@@ -54,17 +35,24 @@ public class NationStandardController {
             return searchableDrugService.searchByConditions(param);
     }
 
-    @GetMapping("/all")
-    public Iterator<NationStandardDrugDO> findAll2(){
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        param.setKeyword("sfadsf");
-        return searchableDrugService.findAll().iterator();
-    }
 
     @GetMapping("/one")
     public Object findOne(){
         NationStandardDrugDTO param = new NationStandardDrugDTO();
         param.setKeyword("sfadsf");
-        return searchableDrugService.findById("1391000864816771072");
+        return searchableDrugService.findById("aFbD230BFn6KF7vMZk4n");
+    }
+
+    @PostMapping("/update")
+    public Object updateDocument(NationStandardDrugDTO updatedDocument){
+        NationStandardDrugDTO param = new NationStandardDrugDTO();
+        param.setKeyword("sfadsf");
+        return searchableDrugService.save(updatedDocument);
+    }
+
+
+    @GetMapping("/getCount")
+    public Object getCount(){
+        return searchableDrugService.count();
     }
 }

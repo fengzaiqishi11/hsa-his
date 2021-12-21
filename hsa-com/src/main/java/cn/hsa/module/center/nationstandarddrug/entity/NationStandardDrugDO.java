@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+
 
 import java.io.Serializable;
 
@@ -23,11 +26,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Document(indexName = "nation_standard_drug")
 public class NationStandardDrugDO extends PageDO implements Serializable {
   private static final long serialVersionUID = -22652313057460226L;
   /**
    * 主键
    */
+  @Id
   private String id;
   /**
    * 数据来源

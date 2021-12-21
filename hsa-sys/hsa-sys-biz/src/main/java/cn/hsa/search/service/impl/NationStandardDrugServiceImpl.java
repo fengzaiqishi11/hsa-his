@@ -36,12 +36,6 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
     @Resource
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
-    /**
-     *  中心端药品数据访问层
-     */
-    @Resource
-    private NationStandardDrugDAO nationStandardDrugDAO;
-
     private final String [] searchFieldNames = new String[]{"prod","goodName","registerName","wbm","pym","code","dan"};
 
     /**
@@ -92,34 +86,5 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         Page<NationStandardDrugDO>  page = search(booleanQueryBuilder,pageable);
         return PageDTO.of(page);
     }
-
-    /**
-     * 刷新elasticsearch中的数据
-     *
-     * @return java.lang.Long 总更新的数据行数
-     */
-    @Override
-    public Long refreshDataOfElasticSearch() {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        param.setIsValid(Constants.SF.S); // 只查询有效状态数据
-        PageHelper.startPage(1,1);
-        List<NationStandardDrugDTO> list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
-        PageDTO pageDTO = PageDTO.of(list);
-        long total = pageDTO.getTotal();
-        // 计算总页数,每次只查询500行数据
-        int totalPages = (int) Math.ceil(total/500);
-        for(int i=1;i<totalPages;i++){
-            NationStandardDrugDTO p = new NationStandardDrugDTO();
-            PageHelper.startPage(i+1,500);
-            list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
-            saveAll(list);
-        }
-        stopWatch.stop();
-        log.debug("本次一共索引数据："+total +" 条，耗时："+stopWatch.prettyPrint());
-        return total;
-    }
-
 
 }

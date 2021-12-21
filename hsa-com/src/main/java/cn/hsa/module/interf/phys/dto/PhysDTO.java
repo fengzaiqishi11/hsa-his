@@ -1,6 +1,5 @@
 package cn.hsa.module.interf.phys.dto;
 
-import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

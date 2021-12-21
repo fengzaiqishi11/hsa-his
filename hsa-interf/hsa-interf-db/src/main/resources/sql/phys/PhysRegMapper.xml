@@ -88,5 +88,8 @@
 
     <select id="queryCostPhys" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select visit_id, item_id from outpt_cost where visit_id = #{visitId}
+        <if test="hospCode != null and hospCode!= ''">
+            and hosp_code = #{hospCode}
+        </if>
     </select>
 </mapper>

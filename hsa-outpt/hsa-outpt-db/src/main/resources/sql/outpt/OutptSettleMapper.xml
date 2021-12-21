@@ -539,8 +539,8 @@
         FROM
         outpt_settle a JOIN outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         <!--存在就诊表里的就诊医生与费用表医生不一致，导致过滤的数据不正确，医生过滤修改成费用表医生 add luoyong 2021.10.4-->
-        left join outpt_cost c on a.id = c.settle_id and a.hosp_code = c.hosp_code
-        WHERE a.hosp_code = #{hospCode} and a.is_settle='1' and c.settle_code = '2'
+        left join outpt_cost c on a.id = c.settle_id and a.hosp_code = c.hosp_code and c.settle_code = '2'
+        WHERE a.hosp_code = #{hospCode} and a.is_settle='1'
         <if test="keyword != null and keyword != ''">
             and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
         </if>

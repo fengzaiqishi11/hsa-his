@@ -1668,7 +1668,7 @@
     <select id="getDtfy" resultType="cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.opd_id opdId, a.visit_id visitId, a.plan_exec_date planExecDate, a.sign_code signCode, b.id costId, b.source_id sourceId
         from outpt_prescribe_exec a
-                 join outpt_cost b on a.id = b.ope_id and a.hosp_code and b.hosp_code and b.status_code = '0'
+                 join outpt_cost b on a.id = b.ope_id and a.hosp_code and b.hosp_code and b.status_code = '0' and a.visit_id = b.visit_id
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and b.source_code = '3'
     </select>
 

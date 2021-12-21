@@ -617,6 +617,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 item.put("medisCode",medisCode);
                 item.put("batchNo",batchNo);
                 item.put("crteTime",DateUtils.getNow());
+                Object cum = item.get("cum");
+                if (cum == null || StringUtils.isEmpty(cum.toString())) {
+                    item.put("cum",0);
+                }
             });
             insureIndividualVisitDAO.deletePatientSumInfo(map);
             insureIndividualVisitDAO.insertPatientSumInfo(resultDataMap);

@@ -3611,7 +3611,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 结束号码
         Integer endNoInt = Integer.valueOf(endNo);
 
-        if (pjSize + currNoInt > endNoInt) {
+        if (pjSize + currNoInt > endNoInt + 1) {
             throw new AppException("门诊结算-发票打印:发票打印失败,当前需要打印[" + pjSize + "],目前发票票据数量不足,请进行重打补打操作!");
         }
 

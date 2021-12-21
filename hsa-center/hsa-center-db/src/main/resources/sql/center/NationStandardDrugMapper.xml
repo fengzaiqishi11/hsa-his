@@ -61,7 +61,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryNationStandardDrugPage" resultMap="NationStandardDrugMap">
         select
-        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name
+        id, data_sources, code, register_name, good_name, register_prep, actual_prep, register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod, dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name, insurance_prep, remark, is_valid, crte_id, crte_name,province_code
         from nation_standard_drug
         <where>
             <if test="id != null and id != ''">

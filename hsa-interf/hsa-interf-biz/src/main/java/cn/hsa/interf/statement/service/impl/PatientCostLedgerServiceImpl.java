@@ -626,4 +626,17 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
     return WrapperResponse.success(patientCostLedgerBO.getInptOperFinanceTitle(inptVisitDTO));
   }
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:57
+   * @Return
+   */
+  @Override
+  public WrapperResponse<PageDTO> queryMzMonthlyReport(Map<String, Object> paraMap) {
+    return WrapperResponse.success(patientCostLedgerBO.queryMzMonthlyReport(paraMap));
+  }
 }

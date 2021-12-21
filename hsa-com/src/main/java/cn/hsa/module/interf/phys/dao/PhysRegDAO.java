@@ -1,6 +1,5 @@
 package cn.hsa.module.interf.phys.dao;
 
-import cn.hsa.module.interf.phys.dto.PhysRegisterDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.apache.ibatis.annotations.Param;

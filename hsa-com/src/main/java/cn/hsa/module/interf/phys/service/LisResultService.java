@@ -1,6 +1,5 @@
 package cn.hsa.module.interf.phys.service;
 
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;

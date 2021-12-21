@@ -1,9 +1,9 @@
 package cn.hsa.interf.lis.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.interf.phys.bo.LisResultBO;
 import cn.hsa.module.interf.phys.dao.LisResultDAO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;

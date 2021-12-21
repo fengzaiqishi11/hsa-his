@@ -1,6 +1,7 @@
 package cn.hsa.module.sys.parameter.dao;
 
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,6 +18,8 @@ import java.util.Map;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 public interface SysParameterDAO {
+
+        SysParameterDTO getById(SysParameterDTO sysParameterDTO);
 
         /**
          * @Menthod queryPage
@@ -108,5 +111,31 @@ public interface SysParameterDAO {
 
         @MapKey("code")
         Map<String, SysParameterDTO> getParameterByCodeList(@Param("hospCode") String hospCode, @Param("codeList") String[] codeList);
+
+        /**
+        * @Menthod insertParameterUpdate
+        * @Desrciption 新增保存记录
+        *
+        * @Param
+        * []
+        *
+        * @Author jiahong.yang
+        * @Date   2021/12/20 15:14
+        * @Return int
+        **/
+        int insertParameterUpdate(@Param("list") List<SysParameterUpdateDTO> sysParameterUpdateDTOS);
+
+        /**
+        * @Menthod querySysParameterByIds
+        * @Desrciption 删除系统参数前查询数据
+        *
+        * @Param
+        * [sysParameterDTO]
+        *
+        * @Author jiahong.yang
+        * @Date   2021/12/20 15:51
+        * @Return java.util.List<cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO>
+        **/
+        List<SysParameterUpdateDTO> querySysParameterByIds(SysParameterDTO sysParameterDTO);
 }
 

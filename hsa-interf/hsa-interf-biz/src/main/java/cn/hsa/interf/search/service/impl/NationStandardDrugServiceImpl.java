@@ -1,13 +1,13 @@
-package cn.hsa.search.service.impl;
+package cn.hsa.interf.search.service.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
+import cn.hsa.interf.search.service.NationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.search.service.NationStandardDrugService;
-import cn.hsa.util.Constants;
-import com.github.pagehelper.PageHelper;
+import cn.hsa.util.PinYinUtils;
+import cn.hsa.util.StringUtils;
+import cn.hsa.util.WuBiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
 import org.springframework.data.elasticsearch.repository.support.SimpleElasticsearchRepository;
 import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -64,6 +63,7 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
      * <p> 注意：使用设置 MultiMatchQueryBuilder多关键字匹配操作符为OR,只要有一个满足便匹配,默认操作符为AND
      * <p> minimumShouldMatch 设置匹配度百分比 85%
      * <p> 详情请参考：https://www.elastic.co/guide/en/elasticsearch/reference/7.9/query-dsl-minimum-should-match.html
+     * <p> 中文ik分词器安装参考：https://github.com/medcl/elasticsearch-analysis-ik
      * @param queryCondition 查询条件
      * @return cn.hsa.base.PageDTO
      */
@@ -74,7 +74,7 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         Pageable pageable = QPageRequest.of(pageNo,queryCondition.getPageSize());
         QueryBuilder queryBuilder = null;
         if(null != queryCondition.getKeyword() && !"".equals(queryCondition.getKeyword())){
-            queryBuilder = QueryBuilders.multiMatchQuery(queryCondition.getKeyword(),searchFieldNames);
+            queryBuilder = QueryBuilders.multiMatchQuery(getFuzzyQueryString(queryCondition.getKeyword()),searchFieldNames);
             ((MultiMatchQueryBuilder)queryBuilder).operator(Operator.OR);
             ((MultiMatchQueryBuilder)queryBuilder).minimumShouldMatch("85%");
         }else{
@@ -87,4 +87,16 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         return PageDTO.of(page);
     }
 
+
+    /**
+     *  获取分词后的五笔码拼音码 字符串
+     * @param sourceQueryString 需要分词的的字符串
+     * @return 分词后的字符串(包含中文的不添加空格)
+     */
+    private String getFuzzyQueryString(String sourceQueryString){
+        if(!StringUtils.isContainChinese(sourceQueryString)){
+            return StringUtils.getFuzzyQueryString(sourceQueryString);
+        }
+        return sourceQueryString;
+    }
 }

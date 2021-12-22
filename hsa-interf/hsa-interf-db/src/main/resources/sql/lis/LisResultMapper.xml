@@ -160,7 +160,7 @@ FROM
 
     <update id="updateApplyStatus">
         update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
-        where advice_id in
+        where opd_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
             #{entity}
         </foreach>

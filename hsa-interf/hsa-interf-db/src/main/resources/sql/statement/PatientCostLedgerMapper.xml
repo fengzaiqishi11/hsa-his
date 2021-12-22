@@ -7752,4 +7752,30 @@
         order by a.out_time desc
     </select>
 
+
+    <select id="queryMzMonthlyReport" resultType="java.util.Map">
+        select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
+        sum(case when s.patient_code &gt;= '-1' then c.reality_price else c.reality_price * 0.3 end) zfbr,
+        ifnull(sum(case when s.patient_code = '-2' then c.reality_price * 0.7 end),0) lxbr,
+        ifnull(sum(case when s.patient_code = '-3' then c.reality_price * 0.7 end),0) gsbr,
+        ifnull(sum(case when s.patient_code = '-4' then c.reality_price * 0.7 end), 0) ysbr,
+        0 as tcbr
+        from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and c.settle_id = s.id
+        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &lt;= '0'
+        GROUP BY settleTime
+
+        union all
+
+        select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
+        sum(ifnull(iic.preselfpay_amt, 0)) as zfbr,
+        0 as lxbr,
+        0 as gsbr,
+        0 as ysbr,
+        sum(ifnull(iic.inscp_scp_amt, 0)) as tcbr
+        from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and c.settle_id = s.id
+        left join insure_individual_cost iic on c.hosp_code = iic.hosp_code and c.id = iic.cost_id
+        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &gt; '0'
+        GROUP BY settleTime
+    </select>
+
 </mapper>

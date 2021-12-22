@@ -194,4 +194,9 @@ public class InptCostDTO extends InptCostDO implements Serializable {
      */
     private String nationName;
 
+    /*
+    个人自付金额
+     */
+    private BigDecimal preselfpayAmt;
+
 }

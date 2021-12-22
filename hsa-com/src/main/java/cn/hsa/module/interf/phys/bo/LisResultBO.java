@@ -1,7 +1,5 @@
 package cn.hsa.module.interf.phys.bo;
 
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-
 import java.util.List;
 import java.util.Map;
 

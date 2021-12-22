@@ -3,16 +3,12 @@ package cn.hsa.base;
 import cn.hsa.hsaf.core.framework.HsafController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.MapUtils;
 import cn.hsa.util.RedisUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.rpc.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.session.Session;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +17,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 /**
  * @公司 创智和宇信息技术股份有限公司 Copyright (c) 2006-2020,All Rights Reserved.
@@ -42,9 +37,6 @@ public class BaseController extends HsafController {
     public static final String SESSION_USER_INFO = "SESSION_USER_INFO";
     @Resource
     private RedisUtils redisUtils;
-    /** Session缓存操作 **/
-    @Resource
-    private RedisOperationsSessionRepository redisSessionRepository;
 
    /* *//**
      * 当前登录用户所属医院编码
@@ -113,8 +105,8 @@ public class BaseController extends HsafController {
     protected HttpSession session;*/
 
     public <T> T getSession(HttpServletRequest req, HttpServletResponse res) {
-        Session session = redisSessionRepository.findById(req.getRequestedSessionId());
-        SysUserDTO value = session.getAttribute("SESSION_USER_INFO");
+        HttpSession session = req.getSession();
+        Object value = session.getAttribute("SESSION_USER_INFO");
         return (T)(value == null ? null : value);
     }
 

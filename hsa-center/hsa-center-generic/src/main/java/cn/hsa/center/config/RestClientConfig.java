@@ -1,4 +1,4 @@
-package cn.hsa.sys.config;
+package cn.hsa.center.config;
 
 
 import org.elasticsearch.client.RestHighLevelClient;

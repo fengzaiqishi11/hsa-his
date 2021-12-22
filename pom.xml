@@ -16,18 +16,18 @@
         <!-- 统一认证模块 -->
         <module>hsa-web</module>
         <!-- 药房药库子系统 -->
-<!--        <module>hsa-stro</module>-->
-<!--&lt;!&ndash;         &lt;!&ndash; 系统管理子系统 &ndash;&gt;&ndash;&gt;-->
-<!--        <module>hsa-sys</module>-->
-<!--         &lt;!&ndash; 中心平台子系统 &ndash;&gt;-->
-<!--        <module>hsa-center</module>-->
-<!--        &lt;!&ndash; 门诊医护子系统 &ndash;&gt;-->
+        <module>hsa-stro</module>
+         <!-- 系统管理子系统 -->
+        <module>hsa-sys</module>
+         <!-- 中心平台子系统 -->
+        <module>hsa-center</module>
+        <!-- 门诊医护子系统 -->
         <module>hsa-outpt</module>
-<!--        &lt;!&ndash; 住院医护子系统 &ndash;&gt;-->
-<!--        <module>hsa-inpt</module>-->
-        <!--医保管理子系统-->
-<!--        <module>hsa-insure</module>-->
-<!--                        <module>hsa-interf</module>-->
+        <!-- 住院医护子系统 -->
+        <module>hsa-inpt</module>
+        <!--  医保管理子系统 -->
+        <module>hsa-insure</module>
+                        <module>hsa-interf</module>
 <!--         定时任务子系统-->
 <!--                        <module>hsa-cron</module>-->
 <!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->

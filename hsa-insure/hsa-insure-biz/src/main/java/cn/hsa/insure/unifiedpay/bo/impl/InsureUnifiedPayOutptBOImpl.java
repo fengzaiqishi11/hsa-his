@@ -440,8 +440,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     costInfoMap.put("hosp_appr_flag", "1");
                     costInfoMap.put("tcmdrug_used_way","1");
                 }
-
-                costInfoMap.put("tcmdrug_used_way", null); // TODO 中药使用方式
                 costInfoMap.put("etip_flag", null); // TODO 外检标志
                 costInfoMap.put("etip_hosp_code", null); // TODO 外检医院编码
                 costInfoMap.put("dscg_tkdrug_flag", null); // TODO 出院带药标志

@@ -112,7 +112,7 @@ public interface InsureReversalTradeDAO {
      * @Date 2021/10/21 09:01
      * @Return
      **/
-    List querySumDeclareInfosPage(Map<String, Object> paraMap);
+    List<Map<String,Object>> querySumDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
      * @param paraMap
@@ -122,7 +122,7 @@ public interface InsureReversalTradeDAO {
      * @Date 2021/10/21 09:01
      * @Return
      **/
-    List queryOutptDeclareInfosPage(Map<String, Object> paraMap);
+    List<Map<String,Object>> queryOutptDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
      * @param paraMap
@@ -132,7 +132,7 @@ public interface InsureReversalTradeDAO {
      * @Date 2021/10/21 09:01
      * @Return
      **/
-    List queryOutptSumDeclareInfosPage(Map<String, Object> paraMap);
+    List<Map<String,Object>> queryOutptSumDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
      * @param paraMap
@@ -142,7 +142,7 @@ public interface InsureReversalTradeDAO {
      * @Date 2021/10/21 09:01
      * @Return
      **/
-    List queryYZSDeclareInfosPage(Map<String, Object> paraMap);
+    List<Map<String,Object>> queryYZSDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
      * @param paraMap
@@ -152,7 +152,7 @@ public interface InsureReversalTradeDAO {
      * @Date 2021/10/21 09:01
      * @Return
      **/
-    List queryYZSSumDeclareInfosPage(Map<String, Object> paraMap);
+    List<Map<String,Object>> queryYZSSumDeclareInfosPage(Map<String, Object> paraMap);
 
     /**
      * @Method selectMdOrIns

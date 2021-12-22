@@ -78,7 +78,7 @@
     </insert>
     <update id="updateRCodt">
         <foreach collection="list" item="item" index="index" separator=";">
-        update outpt_cost set back_num = 1 where visit_id = #{item.registerId} and item_id = #{item.groupId} and hosp_code = #{item.hospCode}
+            update outpt_cost set back_num = 1 where visit_id = #{item.registerId} and item_id = #{item.groupId} and hosp_code = #{item.hospCode}
         </foreach>
     </update>
 
@@ -87,9 +87,6 @@
     </delete>
 
     <select id="queryCostPhys" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
-        select visit_id, item_id from outpt_cost where visit_id = #{visitId}
-        <if test="hospCode != null and hospCode!= ''">
-            and hosp_code = #{hospCode}
-        </if>
+        select visit_id, item_id from outpt_cost where visit_id = #{visitId} and back_num is null
     </select>
 </mapper>

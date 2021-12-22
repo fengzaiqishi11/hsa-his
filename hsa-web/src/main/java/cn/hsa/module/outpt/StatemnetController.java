@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -893,5 +892,20 @@ public class StatemnetController extends BaseController {
     map.put("hospCode", userDTO.getHospCode());
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.getInptOperFinanceTitle(map);
+  }
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:22
+   * @Return
+   */
+  @RequestMapping("/queryMzMonthlyReport")
+  public WrapperResponse<PageDTO> queryMzMonthlyReport(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    return patientCostLedgerService_consumer.queryMzMonthlyReport(paraMap);
   }
 }

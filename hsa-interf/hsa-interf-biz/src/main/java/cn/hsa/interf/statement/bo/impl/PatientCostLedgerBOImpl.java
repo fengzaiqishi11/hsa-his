@@ -3562,7 +3562,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         return resultMap;
     }
 
-
     /**
      * @Menthod getInptOperFinanceList
      * @Desrciption  查询住院手术费用明细
@@ -3591,5 +3590,20 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         // 统计全部费用
         List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptOperFinanceList(inptVisitDTO);
         return PageDTO.of(inptVisitDTOS);
+    }
+
+    /**
+     * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+     * @Param: 
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/12/20 14:59
+     * @Return 
+     */
+    @Override
+    public PageDTO queryMzMonthlyReport(Map<String, Object> paraMap) {
+        PageHelper.startPage(Integer.parseInt(MapUtils.get(paraMap,"pageNo")), Integer.parseInt(MapUtils.get(paraMap,"pageSize")));
+        List<Map> resultMap = patientCostLedgerDAO.queryMzMonthlyReport(paraMap);
+        return PageDTO.of(resultMap);
     }
 }

@@ -994,4 +994,14 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return List<Map>
    **/
   List<Map> getInptOperFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 15:19
+   * @Return
+   */
+  List<Map> queryMzMonthlyReport(Map<String, Object> paraMap);
 }

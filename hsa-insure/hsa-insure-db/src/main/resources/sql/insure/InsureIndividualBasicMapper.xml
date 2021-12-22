@@ -436,7 +436,7 @@
         FROM
             outpt_visit a
                 LEFT JOIN outpt_settle b ON a.hosp_code = b.hosp_code
-                AND a.id = b.visit_id
+                AND a.id = b.visit_id  AND b.is_settle = '1' AND b.status_code = '0'
                 LEFT JOIN insure_individual_settle c ON b.hosp_code = c.hosp_code
                 AND b.id = c.settle_id
                 LEFT JOIN insure_individual_visit d ON  a.hosp_code = b.hosp_code
@@ -444,8 +444,6 @@
         WHERE
             1 = 1
           AND a.hosp_code = #{hospCode}
-          AND b.is_settle = '1'
-          AND b.status_code = '0'
           AND ifnull(c.insureSettleId,'0') = '0'
           <if test="keyWord != null and keyWord != ''">
             and (a.name like concat('%',#{keyword},'%')

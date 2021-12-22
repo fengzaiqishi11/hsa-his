@@ -1,16 +1,13 @@
-package cn.hsa.search.service.impl;
+package cn.hsa.interf.search.service.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
+import cn.hsa.interf.search.service.NationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.search.service.NationStandardDrugService;
-import cn.hsa.util.Constants;
 import cn.hsa.util.PinYinUtils;
 import cn.hsa.util.StringUtils;
 import cn.hsa.util.WuBiUtils;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
 import org.springframework.data.domain.Page;
@@ -20,7 +17,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
 import org.springframework.data.elasticsearch.repository.support.SimpleElasticsearchRepository;
 import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -103,16 +99,4 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         }
         return sourceQueryString;
     }
-
-    /**
-     *  如果拼音码或五笔码为空则填充数据
-     * @param list 需要填充五笔码的数据
-     */
-    private void fillWubiCodeAndNamepyIfNull(List<NationStandardDrugDTO> list) {
-        list.stream().forEach(drugDO ->{
-            drugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(drugDO.getRegisterName()));
-            drugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(drugDO.getRegisterName()));
-        });
-    }
-
 }

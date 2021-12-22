@@ -2,7 +2,6 @@ package cn.hsa.interf.lis.service.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.phys.bo.LisResultBO;
 import cn.hsa.module.interf.phys.service.LisResultService;
 import lombok.extern.slf4j.Slf4j;

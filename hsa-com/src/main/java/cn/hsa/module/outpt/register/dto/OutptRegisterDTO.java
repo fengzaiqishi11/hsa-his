@@ -169,4 +169,6 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
      * 预约挂号时间段：2021-12-08 ( 10:30-11:00 )
      */
     private String bookingTime;
+    // 初/复诊标志
+    private String isFirstVisit;
 }

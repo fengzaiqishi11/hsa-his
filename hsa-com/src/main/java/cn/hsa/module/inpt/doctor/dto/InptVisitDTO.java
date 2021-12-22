@@ -457,4 +457,9 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 会诊申请科室id
      */
     private String applyDeptid;
+
+    /**
+     * 是否已写病案 1：已写；0：未写
+     */
+    private String isLoadMris;
 }

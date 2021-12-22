@@ -128,7 +128,7 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
                 outptCostDTO.setSourceCode(Constants.FYLYFS.QTFY);
                 outptCostDTOS.add(outptCostDTO);
             });
-            // 先查询出已经登记的项目
+            // 先查询出已经登记的项目未退费
             List<OutptCostDTO> outptCostDTOList = physRegDAO.queryCostPhys(outptCostDTOS.get(0));
             List<OutptCostDTO> commonList = new ArrayList<>();
             // 筛选出未插入的费用信息

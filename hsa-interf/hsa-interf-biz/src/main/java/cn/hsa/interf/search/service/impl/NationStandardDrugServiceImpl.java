@@ -2,12 +2,10 @@ package cn.hsa.interf.search.service.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.interf.search.service.NationStandardDrugService;
+import cn.hsa.interf.search.service.SearchableNationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.util.PinYinUtils;
 import cn.hsa.util.StringUtils;
-import cn.hsa.util.WuBiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
 import org.springframework.data.domain.Page;
@@ -19,7 +17,6 @@ import org.springframework.data.elasticsearch.repository.support.SimpleElasticse
 import org.springframework.data.querydsl.QPageRequest;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,7 +24,7 @@ import java.util.Optional;
  *
  */
 @Slf4j
-public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository<NationStandardDrugDO,String> implements NationStandardDrugService {
+public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository<NationStandardDrugDO,String> implements SearchableNationStandardDrugService {
 
     /**
      *  es 操作模板,repository中未支持的方法可使用该模板来实现

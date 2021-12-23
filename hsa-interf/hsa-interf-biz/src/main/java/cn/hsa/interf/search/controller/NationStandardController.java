@@ -1,7 +1,7 @@
 package cn.hsa.interf.search.controller;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.interf.search.service.NationStandardDrugService;
+import cn.hsa.interf.search.service.SearchableNationStandardDrugService;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 public class NationStandardController {
 
     @Resource
-    private NationStandardDrugService searchableDrugService;
+    private SearchableNationStandardDrugService searchableDrugService;
 
 
     @PostMapping("/queryByCond")

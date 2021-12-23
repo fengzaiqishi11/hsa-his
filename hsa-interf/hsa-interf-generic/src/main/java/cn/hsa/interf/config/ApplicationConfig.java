@@ -1,6 +1,6 @@
 package cn.hsa.interf.config;
 
-import cn.hsa.interf.search.service.NationStandardDrugService;
+import cn.hsa.interf.search.service.SearchableNationStandardDrugService;
 import cn.hsa.interf.search.service.impl.NationStandardDrugServiceImpl;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class ApplicationConfig {
     }
 
     @Bean("searchableNationStandardDrugService")
-    public NationStandardDrugService getNationStandardDrugService(@Autowired ElasticsearchRepositoryFactory repositoryFactory, @Autowired  ElasticsearchOperations elasticsearchOperations){
+    public SearchableNationStandardDrugService getNationStandardDrugService(@Autowired ElasticsearchRepositoryFactory repositoryFactory, @Autowired  ElasticsearchOperations elasticsearchOperations){
         ElasticsearchEntityInformation<NationStandardDrugDO,String> metadata = repositoryFactory.getEntityInformation(NationStandardDrugDO.class) ;
         return new NationStandardDrugServiceImpl(metadata,elasticsearchOperations);
     }

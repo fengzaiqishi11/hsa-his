@@ -354,4 +354,51 @@ public class PharApplyController extends BaseController {
       map.put("pharApplyDTO", pharApplyDTO);
       return pharApplyService_consumer.updatePharApply(map);
     }
+
+    /**
+    * @Menthod applyOrderByminOrUp
+    * @Desrciption 根据库存上下限生成领药申请单
+    *
+    * @Param
+    * [pharApplyDTO, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/15 14:58
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @PostMapping("/insertapplyOrderByminOrUp")
+    public WrapperResponse<Boolean> insertapplyOrderByminOrUp(@RequestBody PharApplyDTO pharApplyDTO, HttpServletRequest req, HttpServletResponse res) {
+      SysUserDTO sysUserDTO = getSession(req, res);
+      pharApplyDTO.setHospCode(sysUserDTO.getHospCode());
+      pharApplyDTO.setInStroId(sysUserDTO.getLoginBaseDeptDTO().getId());
+      pharApplyDTO.setCrteTime(DateUtils.getNow());
+      pharApplyDTO.setCrteName(sysUserDTO.getName());
+      pharApplyDTO.setCrteId(sysUserDTO.getId());
+      Map map = new HashMap();
+      map.put("hospCode", sysUserDTO.getHospCode());
+      map.put("pharApplyDTO", pharApplyDTO);
+      return pharApplyService_consumer.insertapplyOrderByminOrUp(map);
+    }
+
+    /**
+    * @Menthod queryStockApply
+    * @Desrciption 查询领药申请明细库存是否足够
+    *
+    * @Param
+    * [pharApplyDTO, req, res]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/16 11:17
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+    **/
+    @PostMapping("/queryStockApply")
+    public WrapperResponse<Map> queryStockApply(@RequestBody PharApplyDTO pharApplyDTO, HttpServletRequest req, HttpServletResponse res) {
+      SysUserDTO sysUserDTO = getSession(req, res);
+      pharApplyDTO.setHospCode(sysUserDTO.getHospCode());
+      Map map = new HashMap();
+      map.put("hospCode", sysUserDTO.getHospCode());
+      map.put("pharApplyDTO", pharApplyDTO);
+      return pharApplyService_consumer.queryStockApply(map);
+    }
+
 }

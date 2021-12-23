@@ -65,6 +65,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureIndividualBasicService insureIndividualBasicService_consumer;
 
     @Resource
+    private InsureIndividualBasicDAO insureIndividualBasicDAO;
+
+    @Resource
     private SysParameterService sysParameterService_consumer;
 
     @Resource
@@ -81,6 +84,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
+    @Resource
+    private InsureDictDAO insureDictDAO;
 
     @Resource
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
@@ -497,7 +502,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                 for (Map<String, Object> detailMap : setldetailList) {
                     String fundPayType = MapUtils.get(detailMap, "fund_pay_type");
                     String setlProcInfo = MapUtils.get(detailMap, "setl_proc_info");
-                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt");
+                    String fundPayamt = MapUtils.get(detailMap, "fund_payamt").toString();
                     // 因为医保返回的就是这么奇怪：610100、610101、999997里面都可以是医疗救助基金，码表什么的都是浮云
                     switch (fundPayType) {
                         case "630100": // 医院减免金额
@@ -599,12 +604,21 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             String setlTime = MapUtils.get(setlinfo,"setl_time");
             Map<String,Object> resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
             Map<String, Object> outputMap = MapUtils.get(resultBaseMap, "output");
-            List<Map<String, Object>> listMap =   MapUtils.get(outputMap,"idetinfo");
 
+            // 参保信息列表（节点标识insuinfo）
+            List<Map<String, Object>> insuinfoList = MapUtils.get(outputMap,"insuinfo");
+            InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
+            if (!ListUtils.isEmpty(insuinfoList)) {
+                insureIndividualBasicDTO.setBka035(MapUtils.get(insuinfoList.get(0),"psn_type"));
+                insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());
+                insureIndividualBasicDTO.setHospCode(hospCode);
+            }
+
+            List<Map<String, Object>> idetinfoList = MapUtils.get(outputMap,"idetinfo"); // 身份信息列表（节点标识：idetinfo）
             // 人员身份类别判断是否一站式
             String isOneSettle = Constants.SF.F;
-            if (!ListUtils.isEmpty(listMap)) {
-                for (Map<String,Object> identMap : listMap) {
+            if (!ListUtils.isEmpty(idetinfoList)) {
+                for (Map<String,Object> identMap : idetinfoList) {
                     String psnIdetType = MapUtils.get(identMap,"psn_idet_type"); // 人员身份类别
                     String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
                     String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
@@ -632,6 +646,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             }
             insureIndividualVisitDTO.setIsOneSettle(isOneSettle);
             insureIndividualVisitDAO.updateByPrimaryKeySelective(insureIndividualVisitDTO);
+            insureIndividualBasicDAO.updateByPrimaryKeySelective(insureIndividualBasicDTO);
             map.put("outptMap", outptMap);
         }
         List<Map<String, Object>> feeDetailMapList = new ArrayList<>();
@@ -700,6 +715,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("opter_name", crteName);
         dataMap.put("opter_type", "1");
         paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         map.put("msgName","费用明细查询");
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
@@ -783,7 +799,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     public Map<String, Object> queryPatientSumInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+
+        InsureIndividualVisitDTO insureIndividualVisitDTO =null;
+        insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        if(insureIndividualVisitDTO ==null){
+            insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        }
         /**
          * 获取访问的url地址
          */
@@ -795,7 +816,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("cum_ym", MapUtils.get(map, "cumYm"));
+        Object cumYm = MapUtils.get(map, "cumYm");
+        if (cumYm == null || StringUtils.isEmpty(cumYm.toString())) {
+            cumYm = DateUtils.format(DateUtils.getNow(),DateUtils.YM);
+        }
+        dataMap.put("cum_ym", cumYm);
         paramMap.put("data", dataMap);
         map.put("msgName","人员累计信息查询");
         map.put("isHospital","");
@@ -1622,6 +1647,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualVisitDAO.updateOutptPatientCode(map);  // 修改门诊病人类型为普通患者
             insureIndividualVisitDAO.updateOutptSettlePatientCode(map); //  修改医保结算表的病人状态类型
         }
+        map.put("insureSettleId",null);
         insureIndividualVisitDAO.updateInsureSettleId(map); //   置空结算id
         map.put("insureSettleId",insureSettleId);
         insureIndividualSettleDAO.updateInsureSettleValue(map); // 把已经医保结算的数据 变成脏数据

@@ -151,18 +151,9 @@ public interface OutptVisitDAO {
 	// 根据就诊id删除所有诊断
 	void deleteDiagnoseByVisitId(OutptVisitDTO outptVisitDTO);
 
-    void updateInsuresumPatient(Map<String, Object> map);
+    boolean updateInsuresumPatient(Map<String, Object> map);
 
-    /**
-     * @param map
-     * @Method selectOutptVisitById
-     * @Desrciption 根据就诊id查询门诊患者
-     * @Param
-     * @Author fuhui
-     * @Date 2021/12/13 16:27
-     * @Return
-     */
-    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
+
 
     /**
      * @param outptSettleDO
@@ -185,4 +176,16 @@ public interface OutptVisitDAO {
      * @Return
      */
     OutptSettleDTO selectOutptSettleById(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
+
 }

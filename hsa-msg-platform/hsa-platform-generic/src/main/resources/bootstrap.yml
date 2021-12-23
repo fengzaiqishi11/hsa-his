@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /hsa-platform
-  port: 9105
+  port: 9992
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

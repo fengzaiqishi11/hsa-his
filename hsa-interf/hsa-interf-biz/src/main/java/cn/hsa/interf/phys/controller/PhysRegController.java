@@ -10,7 +10,10 @@ import cn.hsa.module.interf.phys.service.PhysRegService;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -96,7 +99,7 @@ public class PhysRegController extends BaseController {
     @PostMapping("/insertPhysGroup")
     public WrapperResponse<Boolean> insertPhysGroup(@RequestBody Map map){
         List<Map> list = MapUtils.get(map, "result");
-        map.put("hospCode",MapUtils.get(list.get(0),"hosp_code"));
+        map.put("hospCode", MapUtils.get(list.get(0),"hosp_code"));
         return physRegService.insertPhysGroup(map);
     }
 
@@ -110,7 +113,7 @@ public class PhysRegController extends BaseController {
     @PostMapping("/insertReturn")
     public WrapperResponse<Boolean> insertReturn(@RequestBody Map map){
         List<Map> list = MapUtils.get(map, "result");
-        map.put("hospCode",MapUtils.get(list.get(0),"hospCode"));
+        map.put("hospCode", MapUtils.get(list.get(0),"hospCode"));
         return physRegService.insertReturn(map);
     }
 }

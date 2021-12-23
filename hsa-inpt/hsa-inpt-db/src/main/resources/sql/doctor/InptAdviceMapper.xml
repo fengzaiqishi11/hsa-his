@@ -1023,18 +1023,18 @@
     <select id="getFtlAdvices" resultMap="InptAdviceMap">
         select
          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
-         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
-        and (is_stop_check='0' or is_stop_check is null) and stop_time is not null
-        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code!=#{typeCode} and id!=#{id}
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0' and is_check ='1'
+        and (is_stop_check='0' or is_stop_check is null)
+        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code!=#{typeCode}  and id &lt; #{id}
     </select>
 
     <!--根据参数查询同类医嘱-->
     <select id="getTlAdvices" resultMap="InptAdviceMap">
         select
          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
-         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
-        and (is_stop_check='0' or is_stop_check is null) and stop_time is not null
-        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code=#{typeCode} and id!=#{id}
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0' and is_check ='1'
+        and (is_stop_check='0' or is_stop_check is null)
+        and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code=#{typeCode}  and id &lt; #{id}
     </select>
 
     <!--根据医嘱ID获取医嘱-->
@@ -1515,11 +1515,7 @@
         <foreach collection="list" item="item" separator=";">
             update inpt_advice
             set
-            is_stop = #{item.isStop},
-            stop_doctor_id = #{item.stopDoctorId},
-            stop_doctor_name = #{item.stopDoctorName},
-            end_exec_num = #{item.endExecNum},
-            stop_time = #{item.stopTime}
+            end_exec_num = #{item.endExecNum}
             where hosp_code = #{item.hospCode}
             and id = #{item.id} and ifnull(is_stop,'0') = '0'
         </foreach>
@@ -1963,7 +1959,7 @@
         --         医嘱开始时间小于等于当前时间
         and date(a.long_start_time) &lt;= date(#{endDate})
         and date(ifnull(a.last_exec_time,a.long_start_time)) &lt; date(#{endDate})
-        and a.exec_dept_id = #{deptId}
+        and a.in_dept_id = #{deptId}
         and ifnull(a.advance_days,'0') = '0'
         and A.use_code in ('1','4')
 

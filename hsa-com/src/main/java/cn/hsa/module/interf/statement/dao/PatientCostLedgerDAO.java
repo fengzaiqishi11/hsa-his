@@ -8,6 +8,7 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -38,6 +39,19 @@ public interface PatientCostLedgerDAO {
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptCostDTO>
    **/
   List<InptCostDTO> getVisitTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [stroStockDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:55
+  * @Return java.util.List<cn.hsa.module.stro.stock.dto.StroStockDTO>
+  **/
+  List<StroStockDTO> queryStockTime(StroStockDTO stroStockDTO);
 
   /**
    * @Menthod queryPatirntCostLedger
@@ -834,7 +848,7 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
      * @Date   2021/10/22 16:17
      * @Return List<Map>
      **/
-  List<Map> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
+    List<OutptCostAndReigsterCostDTO> getMzMedicalFinanceList(OutptVisitDTO outptVisitDTO);
 
   /**
    * @Menthod getMzMedicalRegisterList
@@ -980,4 +994,14 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return List<Map>
    **/
   List<Map> getInptOperFinanceList(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 15:19
+   * @Return
+   */
+  List<Map> queryMzMonthlyReport(Map<String, Object> paraMap);
 }

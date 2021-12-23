@@ -26,5 +26,6 @@ public class SysParameterDTO extends SysParameterDO implements Serializable{
     private List<String> ids;
     private List<String> codes;
     private String keyword;
+    private String mdPwd;
 
 }

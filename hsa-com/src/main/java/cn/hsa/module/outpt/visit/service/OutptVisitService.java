@@ -79,26 +79,27 @@ public interface OutptVisitService {
      * @Return
     **/
     WrapperResponse<OutptVisitDTO> selectOutptVisitById(Map<String, Object> map);
-    
+
     /**
      * @Method selectOutptSettleById
      * @Desrciption   根据就诊id查询门诊结算信息
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/12/13 16:34 
-     * @Return 
+     * @Date   2021/12/13 16:34
+     * @Return
     **/
     WrapperResponse<OutptSettleDTO> selectOutptSettleById(Map<String, Object> map);
-    
+
     /**
      * @Method updateOutptAcctPay
      * @Desrciption  修改
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/12/15 11:16 
-     * @Return 
+     * @Date   2021/12/15 11:16
+     * @Return
     **/
-    WrapperResponse<Boolean> updateOutptAcctPay(OutptSettleDO outptSettleDO);
+    WrapperResponse<Boolean> updateOutptAcctPay(Map<String,Object> map);
+
 }

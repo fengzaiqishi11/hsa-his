@@ -2,8 +2,10 @@ package cn.hsa.module.phar.pharapply.dao;
 
 import cn.hsa.module.phar.pharapply.dto.PharApplyDTO;
 import cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO;
+import cn.hsa.module.stro.purchase.dto.StroPurchaseDetailDTO;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -149,4 +151,9 @@ public interface PharApplyDAO {
     * @Return java.util.List<cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO>
     **/
     List<PharApplyDetailDTO> queryPharApplyDetailAll(PharApplyDTO pharApplyDTO);
+
+    List<PharApplyDetailDTO> queryNeedSupplementMin(PharApplyDTO pharApplyDTO);
+
+    List<PharApplyDetailDTO> queryNeedSupplementUp(PharApplyDTO pharApplyDTO);
+
 }

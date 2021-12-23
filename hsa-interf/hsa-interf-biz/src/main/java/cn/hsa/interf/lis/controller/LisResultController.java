@@ -1,8 +1,8 @@
 package cn.hsa.interf.lis.controller;
 
 import cn.hsa.base.BaseController;
-import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.interf.phys.service.LisResultService;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.util.MapUtils;
 import groovy.util.logging.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,7 +55,7 @@ public class LisResultController extends BaseController {
     @PostMapping("queryNoResult")
     public Map updateNoResult(@RequestBody Map map){
         List<Map> resultList = MapUtils.get(map, "lisResult");
-        map.put("hospCode",MapUtils.get(resultList.get(0),"hospCode"));
+        map.put("hospCode", MapUtils.get(resultList.get(0),"hospCode"));
         return lisResultService.updateNoResultLis(map);
     }
 
@@ -69,7 +69,7 @@ public class LisResultController extends BaseController {
     @PostMapping("insertLisResult")
     public Map insertLisResult(@RequestBody Map map){
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
-        map.put("hospCode",MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
+        map.put("hospCode", MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
         return lisResultService.insertLisResult(map);
 
     }
@@ -83,7 +83,7 @@ public class LisResultController extends BaseController {
     @PostMapping("insertDXLisResult")
     public Map insertDXLisResult(@RequestBody Map map){
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
-        map.put("hospCode",MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
+        map.put("hospCode", MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
         return lisResultService.insertDXLisResult(map);
 
     }
@@ -96,7 +96,7 @@ public class LisResultController extends BaseController {
     */
     @PostMapping("queryDXNoResult")
     public Map queryDXNoResult(@RequestBody Map map){
-        map.put("hospCode",MapUtils.get(map,"hospCode"));
+        map.put("hospCode", MapUtils.get(map,"hospCode"));
         List<String> list = lisResultService.queryDXNoResult(map);
         Map result = new HashMap();
         List<String> backList = lisResultService.queryDXBackResult(map);

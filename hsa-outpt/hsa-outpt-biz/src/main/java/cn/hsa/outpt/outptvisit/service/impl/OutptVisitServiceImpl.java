@@ -121,7 +121,7 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     }
 
     /**
-     * @param outptSettleDO
+     * @param map
      * @Method updateOutptAcctPay
      * @Desrciption 修改
      * @Param
@@ -130,7 +130,8 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> updateOutptAcctPay(OutptSettleDO outptSettleDO) {
+    public WrapperResponse<Boolean> updateOutptAcctPay(Map<String,Object> map) {
+        OutptSettleDO outptSettleDO = MapUtils.get(map,"outptSettleDO");
         return WrapperResponse.success(outptVisitBO.updateOutptAcctPay(outptSettleDO));
     }
 

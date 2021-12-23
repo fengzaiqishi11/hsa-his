@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 
 import java.util.List;
@@ -33,6 +34,19 @@ public interface PatientCostLedgerBO {
    * @Return java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
    **/
   Map queryPatirntCostLedger(InptVisitDTO inptVisitDTO);
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [stroStockDTO]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:53
+  * @Return cn.hsa.base.PageDTO
+  **/
+  PageDTO queryStockTime(StroStockDTO stroStockDTO);
 
   /**
    * @Menthod queryPatirntCostLedger
@@ -415,4 +429,14 @@ public interface PatientCostLedgerBO {
    * @Return Map
    **/
   Map getInptOperFinanceTitle(InptVisitDTO inptVisitDTO);
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:58
+   * @Return
+   */
+  PageDTO queryMzMonthlyReport(Map<String, Object> paraMap);
 }

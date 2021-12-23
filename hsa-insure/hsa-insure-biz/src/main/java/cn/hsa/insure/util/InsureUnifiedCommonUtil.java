@@ -62,7 +62,6 @@ public class InsureUnifiedCommonUtil {
         if(insureConfigurationDTO ==null){
             throw new AppException("查询医保机构配置信息为空");
         }
-        StringBuilder stringBuilder = new StringBuilder();
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
         if(StringUtils.isEmpty(MapUtils.get(paramMap,"insuplcAdmdvs"))){

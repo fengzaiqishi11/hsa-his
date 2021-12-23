@@ -1203,7 +1203,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureUnifiedPayParam.put("crteId", MapUtils.get(param, "crteId"));
         insureUnifiedPayParam.put("code", code);
         insureUnifiedPayParam.put("userName", userName);
-        insureUnifiedPayParam.put("isReadCard", MapUtils.get(param,"isReadCard"));
+        insureUnifiedPayParam.put("isReadCard", MapUtils.get(param,"isReadCardPay"));
         insureUnifiedPayParam.put("bka895", MapUtils.get(param,"bka895"));
         insureUnifiedPayParam.put("bka896", MapUtils.get(param,"bka896"));
         /**统一支付平台调用出院办理   结束*/
@@ -1416,6 +1416,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
             returnMap.put("creditPrice", list.get(0).get("creditPrice"));
             returnMap.put("bedName", list.get(0).get("bedName"));
+            returnMap.put("seriousPrice",list.get(0).get("seriousPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {
@@ -1569,7 +1570,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 item.put("crteName",crteName);
                 item.put("psnNo",psnNo);
                 item.put("medisCode",medisCode);
+                item.put("insureSettleId",null);
                 item.put("crteTime",DateUtils.getNow());
+                Object cum = item.get("cum");
+                if (cum == null || StringUtils.isEmpty(cum.toString())) {
+                    item.put("cum",0);
+                }
             });
             inptVisitDAO.deletePatientSumInfo(map);
             inptVisitDAO.insertPatientSumInfo(resultDataMap);

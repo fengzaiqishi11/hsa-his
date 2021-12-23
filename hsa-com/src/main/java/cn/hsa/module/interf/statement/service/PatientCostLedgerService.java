@@ -47,8 +47,23 @@ public interface PatientCostLedgerService {
    **/
   @GetMapping("/service/outpt/statement/queryPatirntCostLedger")
   WrapperResponse<PageDTO> queryPatirntCostLedgerList(Map map);
-    @GetMapping("/service/outpt/statement/queryPatirntCostLedgerSum")
-    WrapperResponse<Map> queryPatirntCostLedgerSum(Map map);
+  @GetMapping("/service/outpt/statement/queryPatirntCostLedgerSum")
+  WrapperResponse<Map> queryPatirntCostLedgerSum(Map map);
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:51
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+  **/
+  @GetMapping("/service/outpt/statement/queryStockTime")
+  WrapperResponse<PageDTO> queryStockTime(Map map);
+
   /**
    * @Menthod queryStroInvoicingLedger
    * @Desrciption 药房药库实时进销存报表
@@ -486,5 +501,15 @@ public interface PatientCostLedgerService {
   @GetMapping("/service/outpt/statement/getInptOperFinanceTitle")
   WrapperResponse<Map> getInptOperFinanceTitle(Map map);
 
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:56
+   * @Return
+   */
+  @GetMapping("/service/outpt/statement/queryMzMonthlyReport")
+  WrapperResponse<PageDTO> queryMzMonthlyReport(Map<String, Object> paraMap);
 }
 

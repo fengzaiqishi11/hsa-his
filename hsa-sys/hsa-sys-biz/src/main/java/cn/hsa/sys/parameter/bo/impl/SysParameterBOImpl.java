@@ -7,12 +7,17 @@ import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.sys.parameter.bo.SysParameterBO;
 import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO;
+import cn.hsa.module.sys.user.dao.SysUserDAO;
+import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +45,9 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
      */
     @Resource
     private BaseOrderRuleService baseOrderRuleService;
+
+    @Resource
+    private SysUserDAO sysUserDAO;
 
     @Resource
     RedisUtils redisUtils;
@@ -104,9 +112,27 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
      **/
     @Override
     public boolean delete(SysParameterDTO sysParameterDTO) {
-        int delete = sysParameterDao.delete(sysParameterDTO);
-//        cacheOperate(sysParameterDTO,false);
-        return delete> 0;
+      List<SysParameterUpdateDTO> sysParameterUpdateDTOS = sysParameterDao.querySysParameterByIds(sysParameterDTO);
+      int delete = sysParameterDao.delete(sysParameterDTO);
+      if(ListUtils.isEmpty(sysParameterUpdateDTOS)) {
+        throw new AppException("删除失败，未查找到数据");
+      }
+      for(SysParameterUpdateDTO sysParameterUpdateDTO: sysParameterUpdateDTOS) {
+        // 主键id
+        sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
+        sysParameterUpdateDTO.setAfterValue(null);
+        sysParameterUpdateDTO.setAfterCode(null);
+        // 删除置为无效
+        sysParameterUpdateDTO.setIsValid("0");
+        // 删除时间
+        sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
+        // 删除人
+        sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
+        // 删除人姓名
+        sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
+      }
+      sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
+      return delete> 0;
     }
 
     /**
@@ -144,17 +170,44 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
             sysParameterDTO.setId(SnowflakeUtils.getId());
             //不重复执行插入
             int insert = sysParameterDao.insert(sysParameterDTO);
-            //缓存
-//            cacheOperate(sysParameterDTO,true);
             return insert> 0;
         } else {
-            int update = sysParameterDao.update(sysParameterDTO);
-            //缓存
-            // 缓存操作 -- 只有有效的时候才进行操作
-            if(Constants.SF.S.equals(sysParameterDTO.getIsValid())){
-//                cacheOperate(sysParameterDTO,true);
-            }
-            return update > 0;
+          // 修改前数据
+          SysParameterDTO beforeItem = sysParameterDao.getById(sysParameterDTO);
+          int update = sysParameterDao.update(sysParameterDTO);
+          // 修改后数据
+          SysParameterDTO afterItem = sysParameterDao.getById(sysParameterDTO);
+          if(afterItem == null || beforeItem == null) {
+            throw new AppException("修改失败，未查到该数据");
+          }
+          SysParameterUpdateDTO sysParameterUpdateDTO = new SysParameterUpdateDTO();
+          // 主键
+          sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
+          // 系统参数主键
+          sysParameterUpdateDTO.setSysParamterId(afterItem.getId());
+          // 修改前编码
+          sysParameterUpdateDTO.setAfterCode(afterItem.getCode());
+          // 修改后编码
+          sysParameterUpdateDTO.setBeforeCode(beforeItem.getCode());
+          // 修改前参数值
+          sysParameterUpdateDTO.setBeforeValue(beforeItem.getValue());
+          // 修改后参数值
+          sysParameterUpdateDTO.setAfterValue(afterItem.getValue());
+          sysParameterUpdateDTO.setName(afterItem.getName());
+          sysParameterUpdateDTO.setHospCode(afterItem.getHospCode());
+          sysParameterUpdateDTO.setRemark(afterItem.getRemark());
+          sysParameterUpdateDTO.setPym(afterItem.getPym());
+          sysParameterUpdateDTO.setWbm(afterItem.getWbm());
+          sysParameterUpdateDTO.setIsValid(afterItem.getIsValid());
+          sysParameterUpdateDTO.setIsShow(afterItem.getIsShow());
+          sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
+          sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
+          sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
+          sysParameterUpdateDTO.setIsNeedPwd(sysParameterDTO.getIsNeedPwd());
+          List<SysParameterUpdateDTO> sysParameterUpdateDTOS = new ArrayList<>();
+          sysParameterUpdateDTOS.add(sysParameterUpdateDTO);
+          sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
+          return update > 0;
         }
     }
 
@@ -183,6 +236,7 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
         return sysParameterDao.getParameterByCodeList(hospCode, codeList);
     }
 
+
     public void cacheOperate(SysParameterDTO sysParameterDTO, Boolean operation){
         if(!ListUtils.isEmpty(sysParameterDTO.getCodes())){
             for(String code : sysParameterDTO.getCodes()){
@@ -204,4 +258,35 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
             }
         }
     }
+
+
+  /**
+  * @Menthod getIsReallyPwd
+  * @Desrciption
+  *
+  * @Param
+  * [map]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/20 14:18
+  * @Return java.util.Map
+  **/
+  @Override
+  public Map getIsReallyPwd(Map map) {
+    Boolean flag = true;
+    Map message = new HashMap();
+    SysUserDTO sysUserDTO = MapUtils.get(map,"sysUserDTO");
+    SysParameterDTO sysParameterDTO = MapUtils.get(map,"sysParameterDTO");
+    SysUserDTO sysUser = new SysUserDTO();
+    sysUser.setHospCode(sysUserDTO.getHospCode());
+    sysUser.setId(sysUserDTO.getId());
+    SysUserDTO byId = sysUserDAO.getById(sysUser);
+    // 密码错误
+    if (!MD5Utils.verifySha(sysParameterDTO.getMdPwd(), byId.getPassword())) {
+      flag = false;
+      throw new AppException("密码错误！");
+    }
+    message.put("flag",flag);
+    return message;
+  }
 }

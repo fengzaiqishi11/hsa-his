@@ -60,18 +60,6 @@ public interface OutptVisitBO {
      **/
     Boolean updateOutptVisit(OutptVisitDTO outptVisitDTO);
 
-
-    /**
-     * @param map
-     * @Method selectOutptVisitById
-     * @Desrciption 根据就诊id查询门诊患者
-     * @Param
-     * @Author fuhui
-     * @Date 2021/12/13 16:27
-     * @Return
-     */
-    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
-
     /**
      * @param outptSettleDO
      * @Method updateOutptAcctPay
@@ -93,4 +81,20 @@ public interface OutptVisitBO {
      * @Return
      */
     OutptSettleDTO selectOutptSettleById(Map<String, Object> map);
+
+
+
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
+
+
 }

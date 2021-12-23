@@ -1,12 +1,16 @@
 server:
   servlet:
     context-path: /hsa-interf
-  port: 9013
+  port: 9012
 spring:
   main:
     allow-bean-definition-overriding: true
   application:
     name: hsa-interf
+  #springboot 接口第一次访问都很慢，因为dispatcherServlet不是一开始就加载的
+  mvc:
+    servlet:
+      load-on-startup: 1
   cloud:
     nacos:
       config:
@@ -24,7 +28,7 @@ dubbo:
     name: hsa-interf
   protocol:
     name: dubbo
-    port: 29012
+    payload: 214748364
   provider:
     threads: 1000
 

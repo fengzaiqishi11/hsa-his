@@ -34,6 +34,10 @@ import org.springframework.stereotype.Component;
 import scala.App;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -286,11 +290,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         mapList.stream().forEach(item->{
             String typeCode = MapUtils.get(item,"diag_type");
             String isMain = MapUtils.getVS(item,"maindiag_flag");
+            String diagType = MapUtils.get(item,"diag_type");
             if(diagnoseList.contains(typeCode)){
                 item.put("adm_cond_type","4");
             }
             if("201".equals(typeCode) && "1".equals(isMain)){
                 item.put("maindiag_flag","0");
+            }
+            if("204".equals(diagType)){
+                item.put("diag_type","1");
             }
         });
         return mapList;
@@ -1162,11 +1170,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }else{
             setlinfo.put("setlBegnDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap,"setlBegnDate")),DateUtils.Y_M_D)); //结算开始日期 *******
         }
-        Object setlEndDate = MapUtils.get(baseInfoMap, "setlEndDate");
+        Object setlEndDate = MapUtils.get(setlinfoMap, "setl_time");
         if(setlEndDate ==null){
             throw new AppException("结算结束时间为空");
         }else{
-            setlinfo.put("setlEndDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap,"setlEndDate")),DateUtils.Y_M_D)); // 结算结束日期 *******
+
+            setlinfo.put("setlEndDate", DateUtils.parse((String) setlEndDate,DateUtils.Y_M_D)); // 结算结束日期 *******
         }
         // 全自费金额
         String   fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"fulamt_ownpay_amt"));
@@ -1628,8 +1637,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     if("03".equals(MapUtils.get(item, "chrgitm_lv"))){
                         CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
                     }
-                    otherClassFee = BigDecimalUtils.add(otherClassFee,BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee));
                 }
+                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee);
                 pMap.put("amt", sumDetItemFeeSumamt);
                 pMap.put("claaSumfee", AClassFee);
                 pMap.put("clabAmt", BClassFee);
@@ -2206,4 +2215,76 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return (T) map.get(key);
     }
+
+//
+//    public static void main(String[] args) {
+//        // 梁桂芳 (2)
+//        File file = new File("C:\\Users\\powersi\\Desktop\\zhuhai\\fee\\李直.txt");
+//        BufferedReader reader = null;
+//        StringBuffer sbf = new StringBuffer();
+//        try {
+//            reader = new BufferedReader(new FileReader(file));
+//            String tempStr;
+//            while ((tempStr = reader.readLine()) != null) {
+//                sbf.append(tempStr);
+//            }
+//            reader.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (reader != null) {
+//                try {
+//                    reader.close();
+//                } catch (IOException e1) {
+//                    e1.printStackTrace();
+//                }
+//            }
+//        }
+//        String str = sbf.toString();
+//        Map<String, Object> resultMap = JSONObject.parseObject(str, Map.class);
+//        List<Map<String, Object>> groupListMap = new ArrayList<>();
+//        List<Map<String, Object>> feeDetailMapList = MapUtils.get(resultMap, "output");
+//        Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
+//                collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
+//        Map<String, Object> pMap = null;
+//        for (String key : groupMap.keySet()) {
+//            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+//            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+//            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+//            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+//            BigDecimal otherClassFee = new BigDecimal(0.00) ; // 其他费用
+//            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+//            if (iterator.hasNext()) {
+//                pMap = new HashMap<>();
+//                List<Map<String, Object>> listMap = groupMap.get(key);
+//                for (Map<String, Object> item : listMap) {
+//                    DecimalFormat df1 = new DecimalFormat("0.00");
+//                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
+//                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+//                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
+//                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    if("01".equals(MapUtils.get(item, "chrgitm_lv"))){
+//                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if("02".equals(MapUtils.get(item, "chrgitm_lv"))){
+//                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if("03".equals(MapUtils.get(item, "chrgitm_lv"))){
+//                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+//                    }
+//                }
+//                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee);
+//                pMap.put("amt", sumDetItemFeeSumamt);
+//                pMap.put("claa_sumfee", AClassFee);
+//                pMap.put("clab_amt", BClassFee);
+//                pMap.put("fulamt_ownpay_amt", CClassFee);
+//                pMap.put("oth_amt", otherClassFee);
+//                pMap.put("med_chrgitm", key);
+//                groupListMap.add(pMap);
+//            }
+//        }
+//        Object toJSON = JSONObject.toJSON(groupListMap);
+//        System.out.println(toJSON);
+//    }
 }

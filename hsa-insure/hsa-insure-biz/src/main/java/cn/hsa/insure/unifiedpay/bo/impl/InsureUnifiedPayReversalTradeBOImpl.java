@@ -1847,9 +1847,12 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         // 设置分页信息
         PageHelper.startPage(pageNo, pageSize);
-        paraMap.put("isValidOneSettle",Constants.SF.S); // 默认区分一站式
+
+        // 返回List
+        List<Map<String,Object>> resultList = new ArrayList<>();
 
         // 获取系统参数 IS_VALID_ONE_SETTLE,是否区分一站式 1： 区分  ，0：不分区
+        paraMap.put("isValidOneSettle",Constants.SF.S); // 默认区分一站式
         Map<String,Object> sysParameterMap = new HashMap<>();
         sysParameterMap.put("hospCode",MapUtils.get(paraMap,"hospCode"));
         sysParameterMap.put("code", "IS_VALID_ONE_SETTLE");
@@ -1874,26 +1877,38 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 break;
             case Constants.SBLX.MZ: // 门诊
                 paraMap.put("isHospital", Constants.SF.F);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
-                return PageDTO.of(insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.ZG_MZ: // 职工门诊
                 paraMap.put("isHospital", Constants.SF.F);
-                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                resultList = insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.CX_MZ: // 城乡居民门诊
                 paraMap.put("isHospital", Constants.SF.F);
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.LX_MZ: // 离休门诊
                 paraMap.put("isHospital", Constants.SF.F);
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             default:
                 break;
 
         }
-        return PageDTO.of(insureReversalTradeDAO.queryDeclareInfosPage(paraMap));
+        resultList = insureReversalTradeDAO.queryDeclareInfosPage(paraMap);
+        resultList.removeAll(Collections.singleton(null));
+        return PageDTO.of(resultList);
     }
 
     /**
@@ -1912,6 +1927,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         // 设置分页信息
         PageHelper.startPage(pageNo, pageSize);
 
+        // 返回List
+        List<Map<String,Object>> resultList = new ArrayList<>();
 
 
         // 获取系统参数 IS_VALID_ONE_SETTLE,是否区分一站式 1： 区分  ，0：不分区
@@ -1920,7 +1937,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         sysParameterMap.put("hospCode",MapUtils.get(paraMap,"hospCode"));
         sysParameterMap.put("code", "IS_VALID_ONE_SETTLE");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
-        if (Constants.SF.F.equals(sysParameterDTO.getValue())) {
+        if (sysParameterDTO != null && Constants.SF.F.equals(sysParameterDTO.getValue())) {
             paraMap.put("isValidOneSettle",Constants.SF.F); // 查询不区分一站式
         }
 
@@ -1940,26 +1957,38 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 break;
             case Constants.SBLX.MZ: // 门诊
                 paraMap.put("isHospital", Constants.SF.F);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.YZS: // 一站式
-                return PageDTO.of(insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.ZG_MZ: // 职工门诊
                 paraMap.put("isHospital", Constants.SF.F);
-                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.CX_MZ: // 城乡居民门诊
                 paraMap.put("isHospital", Constants.SF.F);
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             case Constants.SBLX.LX_MZ: // 离休门诊
                 paraMap.put("isHospital", Constants.SF.F);
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
-                return PageDTO.of(insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap));
+                resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
+                resultList.removeAll(Collections.singleton(null));
+                return PageDTO.of(resultList);
             default:
                 break;
 
         }
-        return PageDTO.of(insureReversalTradeDAO.querySumDeclareInfosPage(paraMap));
+        resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
+        resultList.removeAll(Collections.singleton(null));
+        return PageDTO.of(resultList);
     }
 
     // 对账单（生育）

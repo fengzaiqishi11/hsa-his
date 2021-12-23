@@ -568,7 +568,7 @@
     <insert id="insertPatientSumInfo">
         insert into	insure_patient_sum (id, hosp_code, medis_code, psn_no, visit_id,
         medical_reg_no, insutype, year,
-        cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time)
+        cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time,insure_settle_id)
         values
         <foreach collection="resultDataMap" item="item" index="index" separator=",">
             (
@@ -585,7 +585,8 @@
             #{item.crteId},
             #{item.cum},
             #{item.crteName},
-            #{item.crteTime}
+            #{item.crteTime},
+            #{item.insureSettleId}
             )
         </foreach>
     </insert>
@@ -756,7 +757,6 @@
             <if test="hcardChkinfo != null and hcardChkinfo != ''">
                 hcard_chkinfo  = #{hcardChkinfo,jdbcType=VARCHAR}
             </if>
-
         </set>
         where
         visit_id = #{visitId} and hosp_code =#{hospCode}
@@ -810,7 +810,7 @@
     </update>
     <update id="updateInsureSettleId">
         update insure_individual_visit
-        set insure_settle_id =null
+        set insure_settle_id =#{insureSettleId}
         where hosp_code = #{hospCode}
           and visit_id = #{visitId}
           and medical_reg_no = #{medicalRegNo}
@@ -1396,7 +1396,7 @@
                insutype, year, cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time
         from insure_patient_sum where hosp_code = #{hospCode} and psn_no =#{aac001} and visit_id =#{visitId}
         and medical_reg_no = #{medicalRegNo}
-        <if test="insureSettleId !=null and insureSettleId !='' ">
+        <if test="insureSettleId !=null and insureSettleId !='' and isHospital == '0'.toString() ">
             and insure_settle_id =#{insureSettleId}
         </if>
     </select>
@@ -1434,12 +1434,12 @@
         select a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
                a.is_main isMain, b.name diseaseName,b.code diseaseCode,a.crte_time
                 ,c.dept_name inDeptName,c.dept_id inDeptId,a.crte_id zzDoctorId,a.crte_name zzDoctorName,
-               iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName,
+               iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName
         from outpt_diagnose a
                  join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
                  join outpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
                  join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
-        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{regCode}
           and iim.is_match ='1' and iim.audit_code ='1' limit 1
     </select>
 

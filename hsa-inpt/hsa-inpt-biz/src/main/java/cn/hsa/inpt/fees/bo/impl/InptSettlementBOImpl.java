@@ -1564,6 +1564,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 item.put("crteName",crteName);
                 item.put("psnNo",psnNo);
                 item.put("medisCode",medisCode);
+                item.put("insureSettleId",null);
                 item.put("crteTime",DateUtils.getNow());
             });
             inptVisitDAO.deletePatientSumInfo(map);

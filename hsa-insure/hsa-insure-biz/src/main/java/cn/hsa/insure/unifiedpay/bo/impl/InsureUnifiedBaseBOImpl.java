@@ -700,6 +700,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("opter_name", crteName);
         dataMap.put("opter_type", "1");
         paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         map.put("msgName","费用明细查询");
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
@@ -783,7 +784,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     public Map<String, Object> queryPatientSumInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+
+        InsureIndividualVisitDTO insureIndividualVisitDTO =null;
+        insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        if(insureIndividualVisitDTO ==null){
+            insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        }
         /**
          * 获取访问的url地址
          */
@@ -1622,6 +1628,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualVisitDAO.updateOutptPatientCode(map);  // 修改门诊病人类型为普通患者
             insureIndividualVisitDAO.updateOutptSettlePatientCode(map); //  修改医保结算表的病人状态类型
         }
+        map.put("insureSettleId",null);
         insureIndividualVisitDAO.updateInsureSettleId(map); //   置空结算id
         map.put("insureSettleId",insureSettleId);
         insureIndividualSettleDAO.updateInsureSettleValue(map); // 把已经医保结算的数据 变成脏数据

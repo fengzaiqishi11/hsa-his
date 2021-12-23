@@ -690,6 +690,9 @@
         update insure_patient_sum set insure_settle_id =#{insureSettleId} where hosp_code =#{hospCode}
         and visit_id =#{visitId} and medical_reg_no = #{medicalRegNo} and insure_settle_id is null;
     </update>
+    <update id="updateOutptAcctPay">
+            update outpt_settle set acct_pay =#{acctPay} where hosp_code =#{hospCode} and id =#{settleId} and visit_id =#{visitId}
+    </update>
 
     <!--根据就诊id查询病历信息-->
     <select id="queryMedicalRecordByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO">
@@ -807,6 +810,27 @@
 
     <select id="getOutptRegister" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select * from outpt_register where visit_id = #{id} and hosp_code = #{hospCode}
+    </select>
+    <select id="selectOutptVisitById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code,
+               age, age_unit_code, birthday, marry_code, nation_code, cert_code, cert_no, phone,
+               now_address, visit_no, visit_code, patient_code,
+               source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+               insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time,
+               is_visit, is_first_visit, tran_in_code, in_cert_time, in_dept_id,
+               in_disease_id, in_remark, advance_payment,
+               crte_id, crte_name, crte_time,
+               (select su.prac_certi_no from sys_user su where su.hosp_code = outpt_visit.hosp_code and su.id =outpt_visit.doctor_id ) pracCertiNo,
+               (select bd.nation_code from base_dept  bd where bd.hosp_code = outpt_visit.hosp_code and outpt_visit.dept_id = bd.id ) as caty
+        from outpt_visit where hosp_code =#{hospCode} and id =#{visitId}
+    </select>
+    <select id="selectOutptSettleById" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select id, hosp_code, visit_id, settle_no, patient_code, settle_time, total_price, reality_price,
+               trunc_price, card_price, actual_price, self_price, mi_price, is_settle, daily_settle_id,
+               status_code, red_id, is_print, old_settle_id, is_print_list, print_list_time, source_pay_code,
+               order_no,
+               one_settle_id, crte_id, crte_name, crte_time, acct_pay, credit_price
+        from outpt_settle where hosp_code =#{hospCode} and id =#{settleId} and visit_id =#{visitId}
     </select>
 
     <delete id="deleteDiagnoseByVisitId" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">

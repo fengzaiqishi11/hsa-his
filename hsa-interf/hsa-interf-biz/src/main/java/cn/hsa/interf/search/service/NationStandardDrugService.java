@@ -1,4 +1,4 @@
-package cn.hsa.search.service;
+package cn.hsa.interf.search.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;

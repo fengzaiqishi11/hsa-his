@@ -442,8 +442,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     costInfoMap.put("hosp_appr_flag", "1");
                     costInfoMap.put("tcmdrug_used_way","1");
                 }
-
-                costInfoMap.put("tcmdrug_used_way", null); // TODO 中药使用方式
                 costInfoMap.put("etip_flag", null); // TODO 外检标志
                 costInfoMap.put("etip_hosp_code", null); // TODO 外检医院编码
                 costInfoMap.put("dscg_tkdrug_flag", null); // TODO 出院带药标志
@@ -622,6 +620,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 item.put("batchNo",batchNo);
                 item.put("insureSettleId",null);
                 item.put("crteTime",DateUtils.getNow());
+                Object cum = item.get("cum");
+                if (cum == null || StringUtils.isEmpty(cum.toString())) {
+                    item.put("cum",0);
+                }
             });
             insureIndividualVisitDAO.deletePatientSumInfo(map);
             insureIndividualVisitDAO.insertPatientSumInfo(resultDataMap);
@@ -833,7 +835,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         patientDataMap.put("opter_name", insureIndividualVisitDTO.getCrteName()); // 登记人姓名
         patientDataMap.put("medins_code", outptVisitDTO.getHospCode()); // 医疗机构编码
         patientDataMap.put("medins_name", outptVisitDTO.getHospName()); // TODO 医疗机构名称
-        patientDataMap.put("mdtrt_mode", ""); // TODO 就诊方式
+        patientDataMap.put("mdtrt_mode", "0"); // TODO 就诊方式
         patientDataMap.put("order_no", ""); // TODO 医疗机构订单号或医疗机构就医序列号
         patientDataMap.put("hcard_basinfo", insureIndividualVisitDTO.getHcardBasinfo()); // TODO 持卡就诊基本信息
         patientDataMap.put("hcard_chkinfo", insureIndividualVisitDTO.getHcardChkinfo()); // TODO 持卡就诊校验信息
@@ -1063,7 +1065,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             BigDecimal othPay = BigDecimal.ZERO;
             for (Map<String,Object> map : setldetailList) {
                 String fundPayType = MapUtils.get(map,"fund_pay_type");
-                String fundPayamt = MapUtils.get(map,"fund_payamt");
+                String fundPayamt = MapUtils.get(map,"fund_payamt").toString();
                 String setlProcInfo = MapUtils.get(map, "setl_proc_info");
                 switch (fundPayType) {
                     case "630100": // 医院减免金额

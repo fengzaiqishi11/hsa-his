@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
 import java.util.List;
@@ -65,6 +66,18 @@ public class PageDTO implements Serializable {
         dto.setTotal(pageInfo.getTotal());
         dto.setResult(list);
         dto.setSumData(sumData);
+        return dto;
+    }
+
+    /**
+     *  将elasticSearch搜索的返回结果转换成平台的PageDTO对象
+     * @param elasticsearchResultPage  es查询的分页结果
+     * @return cn.hsa.base.PageDTO
+     */
+    public static PageDTO of(Page elasticsearchResultPage) {
+        PageDTO dto = new PageDTO();
+        dto.setResult(elasticsearchResultPage.getContent());
+        dto.setTotal(elasticsearchResultPage.getTotalElements());
         return dto;
     }
 }

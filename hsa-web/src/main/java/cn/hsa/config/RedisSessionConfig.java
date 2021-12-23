@@ -3,6 +3,7 @@ package cn.hsa.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -16,6 +17,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author luonianxin
  */
 @Configuration
+@Primary()
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds = 7200,redisNamespace = "spring:session",redisFlushMode = RedisFlushMode.ON_SAVE)
 public class RedisSessionConfig extends RedisHttpSessionConfiguration {
 

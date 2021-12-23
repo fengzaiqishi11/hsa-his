@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /hsa-platform
-  port: 9105
+  port: 9992
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -46,7 +46,3 @@ security:
   oauth2:
     client:
       permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
-#mybatis-plus配置控制台打印完整带参数SQL语句
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

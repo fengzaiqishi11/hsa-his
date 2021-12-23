@@ -788,4 +788,37 @@
     </select>
 
 
+   <select id="queryStockAll" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+       select a.id, a.hosp_code, a.biz_id, a.location_no, a.item_code, a.item_id, a.item_name, a.spec,
+       a.prep_code,a.unit_code, a.buy_price_all, a.sell_price_all, a.split_price,a.split_unit_code, a.stock_max,
+       a.stock_min, a.stock_occupy,round(ifnull((b.surplus_num*b.split_ratio),a.split_num),0) as split_num,
+       ifnull(b.surplus_num,a.num) as num,a.split_ratio
+       from stro_stock a left join
+       (select surplus_num,biz_id,hosp_code,item_id,split_ratio from stro_invoicing where id in (
+        select max(id) from stro_invoicing where crte_time &lt;= #{crteTime} group by item_id,hosp_code,biz_id,item_code)) b
+       on a.item_id = b.item_id and a.hosp_code = b.hosp_code and a.biz_id = b.biz_id
+       where a.hosp_code = #{hospCode}
+   </select>
+
+   <select id="queryStockTimeAll" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
+       select id, hosp_code, biz_id, location_no, item_code, item_id, item_name, spec, prep_code, num,
+       unit_code, buy_price_all, sell_price_all, split_num, split_price, split_unit_code, stock_max, stock_min, stock_occupy,
+       stock_time,crte_time
+       from stro_stock_time
+       where hosp_code = #{hospCode} and stock_time = #{stockTime}
+  </select>
+
+   <insert id="insertStockTime" parameterType="java.util.List">
+     insert into stro_stock_time(id, hosp_code, biz_id, location_no, item_code, item_id, item_name, spec, prep_code,
+      num, unit_code, buy_price_all, sell_price_all,split_ratio,split_num, split_price, split_unit_code,
+      stock_max, stock_min, stock_occupy,stock_time,crte_time)
+     values
+     <foreach collection="list" item="item" index="index" separator=",">
+       (#{item.id},#{item.hospCode},#{item.bizId}, #{item.locationNo},#{item.itemCode}, #{item.itemId},#{item.itemName},
+       #{item.spec},#{item.prepCode},#{item.num},#{item.unitCode},#{item.buyPriceAll},#{item.sellPriceAll},#{item.splitRatio},
+       #{item.splitNum},#{item.splitPrice},#{item.splitUnitCode},#{item.stockMax},#{item.stockMin},#{item.stockOccupy},
+       #{item.stockTime},#{item.crteTime})
+     </foreach>
+   </insert>
+
 </mapper>

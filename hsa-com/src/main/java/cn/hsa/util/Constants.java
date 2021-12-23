@@ -302,6 +302,13 @@ public interface Constants {
     String INPT_DISPENSE_REDIS_KEY = "inpt_dispense";
 
     /**
+     * @Desrciption 住院发药退费组合key
+     * @Author zhangguorui
+     * @Date 2021/11/22 15:41
+     */
+    String INPT_DISPENSE_TF_REDIS_KEY = "inpt_dispense_tf";
+
+    /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
      * @Author Ou·Mr
      * @Date 2020/8/31 15:47
@@ -1100,8 +1107,11 @@ public interface Constants {
         public static final String CZJM_ZY = "1"; // 城镇职工住院
         public static final String CXJM_ZY = "2"; // 城乡居民住院
         public static final String LX_ZY = "3"; // 离休住院
-        public static final String MZ = "4"; // 门诊
+        public static final String MZ = "4"; // 全部门诊
         public static final String YZS = "5"; // 一站式
+        public static final String ZG_MZ = "6"; // 职工门诊
+        public static final String CX_MZ = "7"; // 城乡门诊
+        public static final String LX_MZ = "8"; // 离休门诊
     }
 
     /**

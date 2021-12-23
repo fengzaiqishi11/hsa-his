@@ -30,7 +30,7 @@
     <!-- 病人综合查询——医嘱明细查询 杨家洪-->
     <select id="queryAdviceSummaryDetail" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
         select a.*,b.preferential_price,b.reality_price,(b.price * b.num) as valuationPrice from inpt_advice_detail a
-        left join inpt_cost b on b.source_id = a.id and b.hosp_code = a.hosp_code
+        left join inpt_cost b on b.source_id = a.id and b.hosp_code = a.hosp_code and b.visit_id = #{visitId}
         where a.hosp_code = #{hospCode} and a.ia_id = #{iaId} and a.visit_id = #{visitId}
         <if test="babyId != null and babyId != '' ">
             and b.baby_id =#{babyId}
@@ -504,7 +504,7 @@
         a.is_settle,
         a.status_code,
         a.is_print,
-        a.mi_price,
+        (a.mi_price-a.acct_pay) as miPrice,
         a.crte_id,
         a.crte_name,
         a.crte_time,
@@ -524,6 +524,7 @@
         e.outpt_doctor_name,-- 门诊医生
         e.jz_doctor_name,-- 经治医生
         e.zg_doctor_name,-- 主管医生
+        e.out_time as outTime,
         ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount,
         ifnull(a.credit_price, 0) as creditPrice
         FROM

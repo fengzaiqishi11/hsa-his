@@ -513,6 +513,9 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
      */
     @Override
     public List<StroOutDetailDTO> queryStroOutDetail(StroOutDetailDTO stroOutDetailDTO) {
+        if (StringUtils.isEmpty(stroOutDetailDTO.getOutId()) && ListUtils.isEmpty(stroOutDetailDTO.getOutIds())){
+            throw new AppException("请选择需要导出的单据");
+        }
         return stroOutDAO.queryStroOutDetail(stroOutDetailDTO);
     }
 

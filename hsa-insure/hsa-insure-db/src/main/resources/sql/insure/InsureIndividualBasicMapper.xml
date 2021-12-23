@@ -952,7 +952,6 @@
         update
         insure_individual_basic
         set
-                hosp_code = #{hospCode,jdbcType=VARCHAR},
                 aac001 = #{aac001,jdbcType=VARCHAR},
                 injury_borth_sn = #{injuryBorthSn,jdbcType=VARCHAR},
                 aaa027 = #{aaa027,jdbcType=VARCHAR},
@@ -1009,7 +1008,7 @@
                 crte_time = #{crteTime,jdbcType=TIMESTAMP},
                 card_iden = #{cardIden,jdbcType=VARCHAR}
         where
-        id = #{id}
+        id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!-- 修改表信息（实体对象值为null 为'',不进行该字段的修改） -->
@@ -1017,9 +1016,6 @@
         update
         insure_individual_basic
         <set >
-            <if test="hospCode != null and hospCode != ''">
-                hosp_code = #{hospCode,jdbcType=VARCHAR},
-            </if>
             <if test="aac001 != null and aac001 != ''">
                 aac001 = #{aac001,jdbcType=VARCHAR},
             </if>
@@ -1187,7 +1183,7 @@
             </if>
         </set>
         where
-        id = #{id}
+        id = #{id} and hosp_code = #{hospCode}
     </update>
 
     <!-- 根据主键删除表信息 -->
@@ -1275,7 +1271,7 @@
     </insert>
     <select id="queryPersonInfo" resultType="java.util.Map">
         select iiv.aac001,iib.aac003,iib.aac006,
-               (select name from  insure_dict id where id.code = 'XZLX' AND id.value = iib.aae140)  as aae140Name,
+               (select name from  insure_dict id where id.code = 'XZLX' AND id.value = iib.aae140 and insure_reg_code = iiv.insure_reg_code)  as aae140Name,
                iib.bka035_name as bka035Name,iiv.insuplc_admdvs,iib.bka008,iib.akc252 as balc,iib.bka008
         from insure_individual_visit  iiv
         left join  insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code

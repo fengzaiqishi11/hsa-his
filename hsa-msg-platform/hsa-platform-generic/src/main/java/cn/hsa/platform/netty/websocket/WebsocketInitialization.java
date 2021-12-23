@@ -57,4 +57,12 @@ public class WebsocketInitialization {
             workerGroup.shutdownGracefully();
         }
     }
+
+    /**
+     *  返回 websocktServer的服务端口与contextPath
+     * @return java.lang.String
+     */
+    public String getWebSocketPortAndContextPath(){
+        return  port+websocketChannelInitializer.getWebSocketContextUrl();
+    }
 }

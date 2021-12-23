@@ -11,18 +11,16 @@ import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
+import cn.hsa.module.stro.stock.service.StroStockService;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DownloadFileUtil;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import groovy.util.logging.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,6 +43,9 @@ public class StatemnetController extends BaseController {
 
   @Resource
   private PatientCostLedgerService patientCostLedgerService_consumer;
+
+  @Resource
+  private StroStockService stroStockService;
 
 
   /**
@@ -82,6 +83,49 @@ public class StatemnetController extends BaseController {
     map.put("hospCode", userDTO.getHospCode());
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.queryPatirntCostLedgerList(map);
+  }
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 查询月底库存
+  *
+  * @Param
+  * [stroStockDTO, req, res]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/14 15:50
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+  **/
+  @GetMapping("/queryStockTime")
+  public WrapperResponse<PageDTO> queryStockTime(StroStockDTO stroStockDTO, HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    stroStockDTO.setHospCode(userDTO.getHospCode());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("stroStockDTO", stroStockDTO);
+    return patientCostLedgerService_consumer.queryStockTime(map);
+  }
+
+  /**
+  * @Menthod queryStockTime
+  * @Desrciption 自动生成上月月底库存
+  *
+  * @Param
+  * [stroStockDTO, req, res]
+  *
+  * @Author jiahong.yang
+  * @Date   2021/12/16 16:23
+  * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+  **/
+  @PostMapping("/insertStockByTime")
+  public WrapperResponse<Boolean> insertStockByTime(@RequestBody StroStockDTO stroStockDTO, HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res) ;
+    stroStockDTO.setHospCode(userDTO.getHospCode());
+    stroStockDTO.setCrteTime(DateUtils.getNow());
+    map.put("hospCode", userDTO.getHospCode());
+    map.put("stroStockDTO", stroStockDTO);
+    return stroStockService.insertStockByTime(map);
   }
 
   /**
@@ -848,5 +892,20 @@ public class StatemnetController extends BaseController {
     map.put("hospCode", userDTO.getHospCode());
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.getInptOperFinanceTitle(map);
+  }
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:22
+   * @Return
+   */
+  @RequestMapping("/queryMzMonthlyReport")
+  public WrapperResponse<PageDTO> queryMzMonthlyReport(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    return patientCostLedgerService_consumer.queryMzMonthlyReport(paraMap);
   }
 }

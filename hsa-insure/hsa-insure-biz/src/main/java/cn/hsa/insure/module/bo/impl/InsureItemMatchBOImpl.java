@@ -150,7 +150,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         selectMap.put("isValid", Constants.SF.S);
         List<BaseDrugDTO> oldDrugs = insureItemMatchDAO.queryAllDrugsInfo(selectMap);
         List<BaseItemDTO> oldItems = insureItemMatchDAO.queryAllItemsInfo(selectMap);
-        List<BaseMaterialDTO> oldMaterials = insureItemMatchDAO.queryAllMaterialsInfo(selectMap);
+        List<BaseMaterialDTO> oldMaterials = insureItemMatchDAO.queryAllInsureMaterialsInfo(selectMap);
 
         // 基础表中的ID
         List<String> oldDrugIds = oldDrugs.stream().map(BaseDrugDTO::getId).collect(Collectors.toList());

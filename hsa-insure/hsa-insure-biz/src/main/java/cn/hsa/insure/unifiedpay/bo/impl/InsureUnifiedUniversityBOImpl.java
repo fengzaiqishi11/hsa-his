@@ -1221,6 +1221,8 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         data.setIdetStartDate(null);
         data.setIdetEndDate(null);
         data.setPsnIdetType(null);
+        data.setHcardBasinfo(null);
+        data.setHcardChkinfo(null);
         insureIndividualVisitDAO.insert(data);
         return data;
 

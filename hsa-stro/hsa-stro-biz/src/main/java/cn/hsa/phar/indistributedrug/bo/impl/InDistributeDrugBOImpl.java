@@ -364,6 +364,10 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         if(StringUtils.isEmpty(pharInReceiveDTO.getId())){
             throw new AppException("领药申请ID为空,配药失败");
         }
+        String comkey = new StringBuilder(pharInReceiveDTO.getHospCode()).append(pharInReceiveDTO.getDeptId()).append(Constants.INPT_DISPENSE_TF_REDIS_KEY).toString();
+        if (redisUtils.hasKey(comkey)) {
+          throw new AppException("该领药科室正在退费，请稍候再发药!");
+        }
         // 查看当前领药申请id是否正在进行发药
         String key = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYFY").
                 append(pharInReceiveDTO.getId()).append(Constants.INPT_DISTRIBUTE_REDIS_KEY).toString();
@@ -371,6 +375,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
             throw new AppException("该单据正在进行发药，请不要重复发药");
         }
         try {
+            // 锁住退费，发药防止两个并发操作
+            redisUtils.set(comkey, pharInReceiveDTO.getDeptId(), 600);
             redisUtils.set(key,pharInReceiveDTO.getId(),600);
 
             //根据id获取住院领药申请对象
@@ -520,6 +526,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
             log.error("发药失败",e.getMessage());
             throw new AppException("发药失败");
         }finally {
+            redisUtils.del(comkey);
             redisUtils.del(key);
         }
         return true;

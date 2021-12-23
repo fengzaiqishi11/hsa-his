@@ -50,7 +50,28 @@ public class WuBiUtils {
      * @date: 2019年9月26日 上午9:45:53
      */
     public static String getWBCode(String param) {
+        return getWBCode(param,false);
+    }
+
+    /**
+     *  获取添加了空格的五笔码(每两个字符加一个空格)
+     * @param param 需要转换五笔码的参数
+     * @return java.lang.String 添加了空格后的字符串
+     */
+    public static String getWBCodeSplitWithWhiteSpace(String param) {
+
+        return getWBCode(param,true);
+    }
+
+    /**
+     *  获取获取最终的五笔码
+     * @param param 需要转换五笔码的参数
+     * @param needFuzzy 是否需要添加空格用于es分词
+     * @return java.lang.String
+     */
+    private static String getWBCode(String param,boolean needFuzzy){
         StringBuffer result = new StringBuffer();
+        final char whiteSpace = ' ';
         //用char循环取得每一个String的 字符
         for (int i = 0; i < param.length(); i++) {
             char temp1 = param.charAt(i);
@@ -77,10 +98,15 @@ public class WuBiUtils {
                     }
                 }
             }
+            if(needFuzzy){
+                int idx = i+1;
+                if(idx % 2 == 0 && idx != param.length()){
+                    result.append(whiteSpace);
+                }
+            }
         }
         return result.toString();
     }
-
     /**
      *
      * @Title: main
@@ -92,5 +118,10 @@ public class WuBiUtils {
      */
     public static void main(String[] args) {
         System.out.println(getWBCode("创智和宇"));
+        System.out.println(getWBCode("创智和宇士大夫",true));
+        System.out.println(getWBCode("创智和宇士夫",true));
+        System.out.println(getWBCode("创智和宇",true));
+        System.out.println(getWBCode("创智和",true));
+        System.out.println(getWBCode("创智",true));
     }
 }

@@ -7,6 +7,8 @@ import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.search.service.NationStandardDrugService;
 import cn.hsa.util.Constants;
+import cn.hsa.util.PinYinUtils;
+import cn.hsa.util.WuBiUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
@@ -111,9 +113,9 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         // 计算总页数,每次只查询500行数据
         int totalPages = (int) Math.ceil(total/500);
         for(int i=1;i<totalPages;i++){
-            NationStandardDrugDTO p = new NationStandardDrugDTO();
             PageHelper.startPage(i+1,500);
             list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            fillWubiCodeAndNamepyIfNull(list);
             saveAll(list);
         }
         stopWatch.stop();
@@ -121,5 +123,14 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
         return total;
     }
 
-
+    /**
+     *  如果拼音码或五笔码为空则填充数据
+     * @param list 需要填充五笔码的数据
+     */
+    private void fillWubiCodeAndNamepyIfNull(List<NationStandardDrugDTO> list) {
+        list.stream().forEach(drugDO ->{
+            drugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(drugDO.getRegisterName()));
+            drugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(drugDO.getRegisterName()));
+        });
+    }
 }

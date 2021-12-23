@@ -65,6 +65,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureIndividualBasicService insureIndividualBasicService_consumer;
 
     @Resource
+    private InsureIndividualBasicDAO insureIndividualBasicDAO;
+
+    @Resource
     private SysParameterService sysParameterService_consumer;
 
     @Resource
@@ -81,6 +84,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
+    @Resource
+    private InsureDictDAO insureDictDAO;
 
     @Resource
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
@@ -599,12 +604,21 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             String setlTime = MapUtils.get(setlinfo,"setl_time");
             Map<String,Object> resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
             Map<String, Object> outputMap = MapUtils.get(resultBaseMap, "output");
-            List<Map<String, Object>> listMap =   MapUtils.get(outputMap,"idetinfo");
 
+            // 参保信息列表（节点标识insuinfo）
+            List<Map<String, Object>> insuinfoList = MapUtils.get(outputMap,"insuinfo");
+            InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
+            if (!ListUtils.isEmpty(insuinfoList)) {
+                insureIndividualBasicDTO.setBka035(MapUtils.get(insuinfoList.get(0),"psn_type"));
+                insureIndividualBasicDTO.setId(insureIndividualVisitDTO.getMibId());
+                insureIndividualBasicDTO.setHospCode(hospCode);
+            }
+
+            List<Map<String, Object>> idetinfoList = MapUtils.get(outputMap,"idetinfo"); // 身份信息列表（节点标识：idetinfo）
             // 人员身份类别判断是否一站式
             String isOneSettle = Constants.SF.F;
-            if (!ListUtils.isEmpty(listMap)) {
-                for (Map<String,Object> identMap : listMap) {
+            if (!ListUtils.isEmpty(idetinfoList)) {
+                for (Map<String,Object> identMap : idetinfoList) {
                     String psnIdetType = MapUtils.get(identMap,"psn_idet_type"); // 人员身份类别
                     String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
                     String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
@@ -632,6 +646,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             }
             insureIndividualVisitDTO.setIsOneSettle(isOneSettle);
             insureIndividualVisitDAO.updateByPrimaryKeySelective(insureIndividualVisitDTO);
+            insureIndividualBasicDAO.updateByPrimaryKeySelective(insureIndividualBasicDTO);
             map.put("outptMap", outptMap);
         }
         List<Map<String, Object>> feeDetailMapList = new ArrayList<>();

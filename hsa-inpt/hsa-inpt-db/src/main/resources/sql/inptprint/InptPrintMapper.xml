@@ -207,10 +207,10 @@
         is_ok,ok_id,ok_name,ok_time,settle_code,settle_id,is_check,check_id,check_name,check_time,zz_doctor_id,zz_doctor_name,jz_doctor_id,
         jz_doctor_name,zg_doctor_id,zg_doctor_name,exec_id,exec_name,exec_time,exec_dept_id,plan_exec_time,status_code,is_cost,
         cost_time,DATE_FORMAT(cost_time,'%Y-%m-%d') as cost_date,crte_id,crte_name,crte_time,
-        (select min(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as startCostDate,
-        (select max(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = hosp_code and ic.visit_id = visit_id) as endCostDate,
+        (select min(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.visit_id) as startCostDate,
+        (select max(DATE_FORMAT(ic.cost_time,'%Y-%m-%d')) from inpt_cost ic where ic.hosp_code = a.hosp_code and ic.visit_id = a.visit_id) as endCostDate,
         (select c.name from base_finance_classify c where c.id = bfc_id and c.hosp_code = hosp_code) as bfcName
-        from inpt_cost
+        from inpt_cost a
         where hosp_code = #{hospCode} and cost_time is not null
         <if test="visitIds != null and visitIds.size() > 0">
           AND visit_id in

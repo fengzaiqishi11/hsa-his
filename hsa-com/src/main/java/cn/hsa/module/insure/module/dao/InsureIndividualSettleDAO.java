@@ -210,5 +210,16 @@ public interface InsureIndividualSettleDAO {
     void updateInsureSettleValue(Map<String, Object> map);
 
     int updateByInsureSettleId(InsureIndividualSettleDTO insureIndividualSettleDTO);
+
+    /**
+     * @param map
+     * @Method selectInsureIndividualSettleById
+     * @Desrciption 通过his结算id、就诊id查询医保结算表记录
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/20 10:30
+     * @Return
+     */
+    InsureIndividualSettleDTO selectInsureIndividualSettleById(Map<String, Object> map);
 }
 

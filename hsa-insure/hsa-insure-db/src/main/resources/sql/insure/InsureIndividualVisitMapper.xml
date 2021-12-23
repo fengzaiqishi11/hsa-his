@@ -196,7 +196,9 @@
          idet_start_date,
          idet_end_date,
          psn_idet_type,
-         is_one_settle)
+         is_one_settle,
+         hcard_basinfo,
+         hcard_chkinfo)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -237,7 +239,9 @@
                 #{idetStartDate,jdbcType=VARCHAR},
                 #{idetEndDate,jdbcType=VARCHAR},
                 #{psnIdetType,jdbcType=VARCHAR},
-                #{isOneSettle,jdbcType=VARCHAR}
+                #{isOneSettle,jdbcType=VARCHAR},
+                #{hcardBasinfo,jdbcType=VARCHAR},
+                #{hcardChkinfo,jdbcType=VARCHAR}
                 )
     </insert>
 

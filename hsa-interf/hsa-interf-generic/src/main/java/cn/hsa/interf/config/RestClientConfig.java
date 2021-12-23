@@ -8,6 +8,9 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 
+/**
+ *  elasticsearch 客户端连接配置
+ */
 @Configuration
 public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
@@ -18,7 +21,5 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
     public RestHighLevelClient elasticsearchClient() {
         return RestClients.create(ClientConfiguration.create(elasticsearchHostAndPort)).rest();
     }
-
-    // no special bean creation needed
 }
 

@@ -1,8 +1,8 @@
 package cn.hsa.interf.config;
 
-import cn.hsa.interf.search.service.SearchableNationStandardDrugService;
-import cn.hsa.interf.search.service.impl.NationStandardDrugServiceImpl;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
+import cn.hsa.search.SearchableNationStandardDrugService;
+import cn.hsa.search.impl.SearchableNationStandardDrugServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +18,13 @@ public class ApplicationConfig {
        return new ElasticsearchRepositoryFactory(elasticsearchOperations);
     }
 
-    @Bean("searchableNationStandardDrugService")
-    public SearchableNationStandardDrugService getNationStandardDrugService(@Autowired ElasticsearchRepositoryFactory repositoryFactory, @Autowired  ElasticsearchOperations elasticsearchOperations){
-        ElasticsearchEntityInformation<NationStandardDrugDO,String> metadata = repositoryFactory.getEntityInformation(NationStandardDrugDO.class) ;
-        return new NationStandardDrugServiceImpl(metadata,elasticsearchOperations);
+    /**
+     *  生成elasticsearch实体信息用于 repository的构建以及查询结果的自动映射
+     * @param repositoryFactory 查询实体工厂
+     * @return  org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation
+     */
+    @Bean
+    public ElasticsearchEntityInformation<NationStandardDrugDO,String> getNationStandardDrugElasticsearchEntityInformation(@Autowired ElasticsearchRepositoryFactory repositoryFactory){
+       return repositoryFactory.getEntityInformation(NationStandardDrugDO.class) ;
     }
 }

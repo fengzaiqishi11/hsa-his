@@ -1,9 +1,8 @@
-package cn.hsa.interf.search.service;
+package cn.hsa.search;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 
@@ -12,7 +11,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  * @author  luonianxin
  * @since  2021-12-20
  */
-@FeignClient(value = "hsa-search")
+
 public interface SearchableNationStandardDrugService extends ElasticsearchRepository<NationStandardDrugDO,String> {
 
     /**
@@ -28,4 +27,9 @@ public interface SearchableNationStandardDrugService extends ElasticsearchReposi
      */
     PageDTO searchByConditions(NationStandardDrugDTO queryCondition);
 
+    /**
+     *  刷新elasticsearch中的数据
+     * @return java.lang.Long 总更新的数据行数
+     */
+    Long refreshDataOfElasticSearch();
 }

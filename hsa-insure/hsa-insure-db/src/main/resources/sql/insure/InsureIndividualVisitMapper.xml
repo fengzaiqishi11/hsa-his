@@ -1431,4 +1431,10 @@
         from insure_admdvs where hosp_code =#{hospCode} and admdvs_code =#{insuplcAdmdvs}
     </select>
 
+    <select id="getInViBaInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        select b.aae140,a.insuplc_admdvs insuplcAdmdvs
+        from insure_individual_visit a left join  insure_individual_basic b
+        on a.mib_id = b.id where a.visit_id = #{visitId} and a.hosp_code =#{hospCode}
+    </select>
+
 </mapper>

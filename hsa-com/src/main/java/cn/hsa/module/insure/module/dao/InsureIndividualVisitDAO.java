@@ -423,5 +423,7 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     String selectInsuplcName(Map<String, Object> visitMap);
+
+    Map<String, Object> getInViBaInfo(Map<String, Object> selectMap);
 }
 

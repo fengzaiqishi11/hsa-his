@@ -1,8 +1,10 @@
-package cn.hsa.search;
+package cn.hsa.module.interf.search.service;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 
@@ -11,21 +13,15 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  * @author  luonianxin
  * @since  2021-12-20
  */
-
-public interface SearchableNationStandardDrugService extends ElasticsearchRepository<NationStandardDrugDO,String> {
-
-    /**
-     *  删除建立的索引
-     * @param indexName 索引名
-     */
-    void deleteIndex(String indexName);
+@FeignClient("hsa-search")
+public interface SearchableNationStandardDrugService {
 
     /**
      *  返回搜索分页结果
      * @param queryCondition 查询条件
      * @return java.util.List
      */
-    PageDTO searchByConditions(NationStandardDrugDTO queryCondition);
+    WrapperResponse<PageDTO> searchByConditions(NationStandardDrugDTO queryCondition);
 
     /**
      *  刷新elasticsearch中的数据

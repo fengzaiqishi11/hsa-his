@@ -1111,6 +1111,7 @@
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
+        and ma.document_sta &lt;&gt; '01'
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
@@ -1249,7 +1250,7 @@
         and pd.item_id = bd.id
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
-        AND ma.type_code = #{typeCode}
+        and ma.document_sta &lt;&gt; '01'
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>

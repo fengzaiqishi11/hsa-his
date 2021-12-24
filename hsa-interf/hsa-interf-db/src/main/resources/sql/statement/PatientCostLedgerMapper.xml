@@ -5832,7 +5832,7 @@
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             id as item_id,
-            IFNULL( usual_name, good_name ) AS item_name
+            IFNULL( usual_name, good_name ) AS item_name, code as itemCode
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5843,7 +5843,7 @@
         UNION ALL
         SELECT
             id as item_id,
-            name as item_name
+            name as item_name, code as itemCode
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5853,7 +5853,7 @@
         UNION ALL
         SELECT
             id as item_id,
-            IFNULL( name, other_name ) AS item_name
+            IFNULL( name, other_name ) AS item_name, code as itemCode
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -7754,10 +7754,11 @@
 
 
     <select id="queryMzMonthlyReport" resultType="java.util.Map">
-        select settleTime, sum(zfbr) as zfbr, sum(lxbr) as lxbr, sum(gsbr) as gsbr, sum(ysbr) as ysbr, sum(tcbr) as tcbr
+        select settleTime, sum(zfbr) as zfbr, sum(lxbr) as lxbr, sum(gsbr) as gsbr, sum(ysbr) as ysbr, sum(tcbr) as tcbr,
+        sum(zfbr) + sum(lxbr) + sum(gsbr) + sum(ysbr) + sum(tcbr) as hjje
         from (
         select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
-        sum(case when s.patient_code &gt;= '-1' then c.reality_price end) zfbr,
+        sum(case when s.patient_code in ('-1', '0') then c.reality_price end) zfbr,
         ifnull(sum(case when s.patient_code = '-2' then c.reality_price end),0) lxbr,
         ifnull(sum(case when s.patient_code = '-3' then c.reality_price end),0) gsbr,
         ifnull(sum(case when s.patient_code = '-4' then c.reality_price end), 0) ysbr,
@@ -7804,7 +7805,7 @@
                     #{id}
                 </foreach>
             </if>
-        ) b
+        )
         GROUP BY settleTime
         ) a GROUP BY settleTime
     </select>

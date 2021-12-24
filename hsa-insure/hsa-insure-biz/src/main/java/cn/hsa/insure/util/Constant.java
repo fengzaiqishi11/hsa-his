@@ -631,6 +631,17 @@ public interface Constant {
             public static final String GD = "2"; // 广东
         }
 
+        public static class HuNan{
+            public static final String UP_5261 = "5261"; // 人员慢特病限额查询
+            public static final String icdLimitCalc_1 = "基金支付限额";
+            public static final String icdLimitCalc_2 = "符合范围限额";
+            public static final String icdLimitCalc_3 = "医疗费总额限额";
+            public static final String icdLimitCalc_4 = "基金支付定额";
+            // 1 基金支付限额 ,2 符合范围限额;3 医疗费总额限额4 基金支付定额
+        }
+
+
+
         /**
          * 新医保基金支付总额计算方式 - 各个省份计算方式不同
          */

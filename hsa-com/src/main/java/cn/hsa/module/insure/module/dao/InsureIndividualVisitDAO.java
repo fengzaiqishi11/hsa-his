@@ -435,5 +435,7 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     OutptDiagnoseDTO queryOutptDiagnose(Map<String, Object> map);
+
+    Map<String, Object> getInViBaInfo(Map<String, Object> selectMap);
 }
 

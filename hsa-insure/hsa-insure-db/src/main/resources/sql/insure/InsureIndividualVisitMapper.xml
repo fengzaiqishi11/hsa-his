@@ -757,9 +757,6 @@
             <if test="hcardChkinfo != null and hcardChkinfo != ''">
                 hcard_chkinfo  = #{hcardChkinfo,jdbcType=VARCHAR}
             </if>
-            <if test="hcardChkinfo != null and hcardChkinfo != ''">
-                insure_settle_id  = #{hcardChkinfo,jdbcType=VARCHAR}
-            </if>
         </set>
         where
         visit_id = #{visitId} and hosp_code =#{hospCode}
@@ -1169,6 +1166,12 @@
         <!--业务类型选择-->
         <if test="isHospital != null and isHospital != ''">
             and iiv.is_hospital =#{isHospital}
+        </if>
+        <if test="startDate != null">
+            <![CDATA[ and date(iiv.crte_time) >= #{startDate} ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[ and date(iiv.crte_time) <= #{endDate} ]]>
         </if>
         ORDER BY iis.crte_time desc
     </select>

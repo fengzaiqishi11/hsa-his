@@ -1,4 +1,4 @@
-package cn.hsa.search.service;
+package cn.hsa.search;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  * @since  2021-12-20
  */
 
-public interface NationStandardDrugService extends ElasticsearchRepository<NationStandardDrugDO,String> {
+public interface SearchableNationStandardDrugService extends ElasticsearchRepository<NationStandardDrugDO,String> {
 
     /**
      *  删除建立的索引
@@ -27,4 +27,9 @@ public interface NationStandardDrugService extends ElasticsearchRepository<Natio
      */
     PageDTO searchByConditions(NationStandardDrugDTO queryCondition);
 
+    /**
+     *  刷新elasticsearch中的数据
+     * @return java.lang.Long 总更新的数据行数
+     */
+    Long refreshDataOfElasticSearch();
 }

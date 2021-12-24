@@ -302,6 +302,13 @@ public interface Constants {
     String INPT_DISPENSE_REDIS_KEY = "inpt_dispense";
 
     /**
+     * @Desrciption 住院发药退费组合key
+     * @Author zhangguorui
+     * @Date 2021/11/22 15:41
+     */
+    String INPT_DISPENSE_TF_REDIS_KEY = "inpt_dispense_tf";
+
+    /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
      * @Author Ou·Mr
      * @Date 2020/8/31 15:47

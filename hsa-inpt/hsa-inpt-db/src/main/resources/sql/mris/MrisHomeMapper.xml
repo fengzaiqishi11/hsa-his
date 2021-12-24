@@ -31,6 +31,7 @@
             and (
             a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
             or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            or a.in_profile LIKE CONCAT('%',#{keyword},'%')
             )
         </if>
         <if test="zgbrQuery != '2'.toString()">

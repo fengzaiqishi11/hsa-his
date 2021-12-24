@@ -2,6 +2,8 @@ package cn.hsa.outpt.outptvisit.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -87,6 +89,48 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
     @Override
     public Boolean updateOutptVisit(OutptVisitDTO outptVisitDTO) {
         return outptVisitDAO.updateOutptVisit(outptVisitDTO);
+    }
+
+    /**
+     * @param map
+     * @Method selectOutptVisitById
+     * @Desrciption 根据就诊id查询门诊患者
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:27
+     * @Return
+     */
+    @Override
+    public OutptVisitDTO selectOutptVisitById(Map<String, Object> map) {
+        return outptVisitDAO.selectOutptVisitById(map);
+    }
+
+    /**
+     * @param outptSettleDO
+     * @Method updateOutptAcctPay
+     * @Desrciption 修改
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/15 11:16
+     * @Return
+     */
+    @Override
+    public boolean updateOutptAcctPay(OutptSettleDO outptSettleDO) {
+        return outptVisitDAO.updateOutptAcctPay(outptSettleDO);
+    }
+
+    /**
+     * @param map
+     * @Method selectOutptSettleById
+     * @Desrciption 根据就诊id查询门诊结算信息
+     * @Param
+     * @Author fuhui
+     * @Date 2021/12/13 16:34
+     * @Return
+     */
+    @Override
+    public OutptSettleDTO selectOutptSettleById(Map<String, Object> map) {
+        return outptVisitDAO.selectOutptSettleById(map);
     }
 
 

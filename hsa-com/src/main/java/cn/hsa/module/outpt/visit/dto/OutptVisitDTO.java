@@ -252,4 +252,8 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String isReadCardPay; // 是否读卡支付
     private String bka895; // 磁卡类型
     private String bka896; // 磁卡号码
+    // 医师国家编码
+    private String pracCertiNo;
+    // 科别
+    private String caty;
 }

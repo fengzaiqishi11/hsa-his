@@ -72,10 +72,10 @@
     <select id="queryDictValuePage" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
         select id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03
         from insure_dict where hosp_code=#{hospCode}
-        <if test="keyWord != null and keyWord != ''">
-            and ( code like concat('%',#{keyWord},'%')
-            or name like concat('%',#{keyWord},'%')
-            or insure_reg_code like concat('%',#{keyWord},'%')
+        <if test="keyword != null and keyword != ''">
+            and ( code like concat('%',#{keyword},'%')
+            or name like concat('%',#{keyword},'%')
+            or insure_reg_code like concat('%',#{keyword},'%')
             )
         </if>
         order by crte_time desc

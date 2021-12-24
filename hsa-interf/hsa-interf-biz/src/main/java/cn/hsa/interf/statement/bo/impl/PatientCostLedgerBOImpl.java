@@ -3603,6 +3603,24 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     @Override
     public PageDTO queryMzMonthlyReport(Map<String, Object> paraMap) {
         PageHelper.startPage(Integer.parseInt(MapUtils.get(paraMap,"pageNo")), Integer.parseInt(MapUtils.get(paraMap,"pageSize")));
+        List<String> selectDeptIds = new ArrayList<>();
+        List<String> selectPharIds = new ArrayList<>();
+        String dept = MapUtils.get(paraMap, "deptIds");
+        String phar = MapUtils.get(paraMap, "pharIds");
+        if (dept != null && !"".equals(dept)) {
+            String[] str = dept.split(",");
+            for (int i= 0 ; i < str.length; i++) {
+                selectDeptIds.add(str[i]);
+            }
+            paraMap.put("selectDeptIds", selectDeptIds);
+        }
+        if (phar != null && !"".equals(phar)) {
+            String[] str = phar.split(",");
+            for (int i= 0 ; i < str.length; i++) {
+                selectPharIds.add(str[i]);
+            }
+            paraMap.put("selectPharIds", selectPharIds);
+        }
         List<Map> resultMap = patientCostLedgerDAO.queryMzMonthlyReport(paraMap);
         return PageDTO.of(resultMap);
     }

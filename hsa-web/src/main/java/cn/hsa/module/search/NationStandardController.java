@@ -8,10 +8,15 @@ import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.interf.search.service.SearchableNationStandardDrugService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -40,11 +45,10 @@ public class NationStandardController extends BaseController {
      */
     @GetMapping("/queryNationDrugByCond")
     public WrapperResponse<PageDTO> queryByCond(NationStandardDrugDTO queryCondition){
-
-        if (StringUtils.isEmpty(queryCondition.getHospCode())) {
-            throw new AppException("未传入医院编码，请退出后重进");
-        }
-        queryCondition.setProvinceCode(getProvinceCodeParameterObtainedFromTheCache(queryCondition.getHospCode()));
+        HttpSession session = getCurrentRequest().getSession();
+        SysUserDTO sysUserDTO = (SysUserDTO) session.getAttribute("SESSION_USER_INFO");;
+        queryCondition.setHospCode(sysUserDTO.getHospCode());
+        queryCondition.setProvinceCode(getProvinceCodeParameterObtainedFromTheCache(sysUserDTO.getHospCode()));
         return searchableDrugService.searchByConditions(queryCondition);
     }
 
@@ -79,5 +83,13 @@ public class NationStandardController extends BaseController {
     public WrapperResponse<Boolean> invalidateProvinceCodeCache(){
         hospCodeProvinceCodeMapping.clear();
         return WrapperResponse.success(Boolean.TRUE);
+    }
+
+    public HttpServletRequest getCurrentRequest() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) {
+            throw new IllegalStateException("当前线程中不存在 Request 上下文");
+        }
+        return attrs.getRequest();
     }
 }

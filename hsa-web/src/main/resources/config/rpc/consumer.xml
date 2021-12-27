@@ -507,5 +507,7 @@
     <dubbo:reference id="inptConsultationService_consumer" interface="cn.hsa.module.inpt.consultation.service.InptConsultationApplyServcie" check="false"/>
     <!-- 中心端配置信息 -->
     <dubbo:reference id="centerGlobalConfigService_consumer" interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" check="false"/>
+    <!-- 国标基础药品搜索服务 -->
+    <dubbo:reference id="searchableNationStandardDrugService_consumer" interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" check="false"/>
 </beans>
 

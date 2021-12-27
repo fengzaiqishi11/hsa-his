@@ -15,44 +15,24 @@ import java.util.List;
 public class NationStandardController {
 
     @Resource
-    private NationStandardDrugDAO nationStandardDrugDAO;
-    @Resource
     private NationStandardDrugService searchableDrugService;
 
 
 
-    @GetMapping("/initData")
-    public String init() {
+    @GetMapping("/initWesternDrugData")
+    public String initWesternDrugData() {
 
-        return "total rows: "+ searchableDrugService.refreshDataOfElasticSearch();
+        return "total rows: "+ searchableDrugService.refreshWesternDrugDataOfElasticSearch();
     }
+    @GetMapping("/initTCMData")
+    public String initTCMData() {
 
-    @GetMapping("/queryByCond")
-    public PageDTO findAll(@RequestParam("keyword")String keyword,@RequestParam(value = "provinceCode",required = false) String provinceCode){
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        param.setKeyword(keyword);
-        param.setProvinceCode(provinceCode);
-            return searchableDrugService.searchByConditions(param);
-    }
-
-
-    @GetMapping("/one")
-    public Object findOne(){
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        param.setKeyword("sfadsf");
-        return searchableDrugService.findById("aFbD230BFn6KF7vMZk4n");
-    }
-
-    @PostMapping("/update")
-    public Object updateDocument(NationStandardDrugDTO updatedDocument){
-        NationStandardDrugDTO param = new NationStandardDrugDTO();
-        param.setKeyword("sfadsf");
-        return searchableDrugService.save(updatedDocument);
+        return "total rows: "+ searchableDrugService.refreshTCMDrugDataOfElasticSearch();
     }
 
 
     @GetMapping("/getCount")
-    public Object getCount(){
-        return searchableDrugService.count();
+    public Object getCount(@RequestParam(name="flag") int flag){
+        return searchableDrugService.dataCountOfElasticSearch(flag);
     }
 }

@@ -90,6 +90,14 @@
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
         </dependency>
+        <!--
+            jpa运行时依赖,如果不加会报错
+            java.lang.ClassNotFoundException: com.querydsl.core.types.OrderSpecifier
+         -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>

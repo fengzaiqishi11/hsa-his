@@ -26,10 +26,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'MZ' IN
@@ -50,10 +50,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'ZY' IN
@@ -74,10 +74,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'GH' IN

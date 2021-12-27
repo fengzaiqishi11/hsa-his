@@ -403,68 +403,72 @@
 
     <select id="queryOutptSettleInfo" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
-            a.hosp_code,
-            a.name,
-            a.age,
-            a.gender_code genderCode,
-            a.age_unit_code ageUnitCode,
-            a.cert_code certCode,
-            a.cert_no certNo,
-            DATE_FORMAT(a.visit_time,'%Y-%m-%d %h:%i:%s') visitTime,
-            a.visit_no visitNo,
-            a.id visitId,
-            a.visit_code visitCode,
-            a.preferential_type_id preferentialTypeId,
-            (select name from base_preferential_type where hosp_code = #{hospCode} and id = a.preferential_type_id) preferentialTypeName,
-            b.id settleId,
-            DATE_FORMAT(b.settle_time,'%Y-%m-%d %h:%i:%s') settleTime,
-            b.total_price totalPrice,
-            b.reality_price realityPrice,
-            b.actual_price actualPrice,
-            b.patient_code patientCode,
-            b.crte_name crteName,
-            c.insureSettleId,
-            c.crte_name inusreCrteName,
-            c.total_price insureTotalPrice,
-            c.plan_price planPrice,
-            c.personal_price presonalPrice,
-            c.person_price personPrice,
-            d.insure_reg_code insureRegCode,
-            d.medical_reg_no medicalRegNo,
-            IF
-                ( ifnull( c.insureSettleId, '0' ) = '0', '0', '1' ) isInsureSettle
+        a.hosp_code,
+        a.name,
+        a.age,
+        a.gender_code genderCode,
+        a.age_unit_code ageUnitCode,
+        a.cert_code certCode,
+        a.cert_no certNo,
+        DATE_FORMAT(a.visit_time,'%Y-%m-%d %h:%i:%s') visitTime,
+        a.visit_no visitNo,
+        a.id visitId,
+        a.visit_code visitCode,
+        a.preferential_type_id preferentialTypeId,
+        (select name from base_preferential_type where hosp_code = #{hospCode} and id = a.preferential_type_id) preferentialTypeName,
+        b.id settleId,
+        DATE_FORMAT(b.settle_time,'%Y-%m-%d %h:%i:%s') settleTime,
+        b.total_price totalPrice,
+        (b.total_price - b.reality_price ) dzPrice,
+        b.reality_price realityPrice,
+        b.actual_price actualPrice,
+        b.patient_code patientCode,
+        b.crte_name crteName,
+        c.insureSettleId,
+        c.crte_name inusreCrteName,
+        c.total_price insureTotalPrice,
+        c.plan_price planPrice,
+        c.personal_price personalPrice,
+        c.person_price personPrice,
+        d.insure_reg_code insureRegCode,
+        d.medical_reg_no medicalRegNo,
+        c.crte_name as insureCrteName,
+        IF
+        ( ifnull( c.insureSettleId, '0' ) = '0', '0', '1' ) isInsureSettle
         FROM
-            outpt_visit a
-                LEFT JOIN outpt_settle b ON a.hosp_code = b.hosp_code
-                AND a.id = b.visit_id  AND b.is_settle = '1' AND b.status_code = '0'
-                LEFT JOIN insure_individual_settle c ON b.hosp_code = c.hosp_code
-                AND b.id = c.settle_id
-                LEFT JOIN insure_individual_visit d ON  a.hosp_code = b.hosp_code
-                AND a.id = d.visit_id
+        outpt_visit a
+        LEFT JOIN outpt_settle b ON a.hosp_code = b.hosp_code
+        AND a.id = b.visit_id
+        LEFT JOIN insure_individual_settle c ON b.hosp_code = c.hosp_code
+        AND b.id = c.settle_id
+        LEFT JOIN insure_individual_visit d ON  a.hosp_code = b.hosp_code
+        AND a.id = d.visit_id
         WHERE
-            1 = 1
-          AND a.hosp_code = #{hospCode}
-          AND ifnull(c.insureSettleId,'0') = '0'
-          <if test="keyWord != null and keyWord != ''">
+        1 = 1
+        AND a.hosp_code = #{hospCode}
+        AND b.is_settle = '1'
+        AND b.status_code = '0'
+        and b.patient_code ='-1'
+        <if test="keyWord != null and keyWord != ''">
             and (a.name like concat('%',#{keyword},'%')
             or a.cert_no like concat('%',#{keyword},'%')
             or a.visit_no like concat('%',#{keyword},'%')
             )
-          </if>
-          <if test="patientCode != null and patientCode != ''">
-                and b.patient_code = #{patientCode}
-          </if>
-          <if test="isUpload == '1'.toString">
-                and ifnull(c.insureSettleId,'-1') != '-1'
-          </if>
-          <if test="startDate != null">
-                and date(b.settle_time) &gt;= date(#{startDate})
-          </if>
-          <if test="endDate != null">
-                and date(b.settle_time) &lt;= date(#{endDate})
-          </if>
+        </if>
+        <if test="isUpload == '1'.toString">
+            and ifnull(c.insureSettleId,'-1') != '-1'
+        </if>
+        <if test="isUpload == '0'.toString">
+            and ifnull(c.insureSettleId,'-1') = '-1'
+        </if>
+        <if test="startDate != null and startDate != '' ">
+            and date(b.settle_time) &gt;= date(#{startDate})
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date(b.settle_time) &lt;= date(#{endDate})
+        </if>
+        order by a.crte_time
     </select>
-
 
 
     <!-- 新增表信息 -->

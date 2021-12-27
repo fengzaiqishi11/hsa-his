@@ -1398,7 +1398,7 @@
             and b.id=#{visitId}
         </if>
         <if test="deptId != null and deptId != ''">
-            and a.exec_dept_id = #{deptId}
+            and a.in_dept_id = #{deptId}
         </if>
 
         <!-- 提前领药修改,为了不影响长期医嘱加了判断, -->

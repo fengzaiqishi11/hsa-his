@@ -1,13 +1,12 @@
-package cn.hsa.interf.search.service.impl;
+package cn.hsa.search.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.interf.search.service.NationStandardDrugService;
+import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.util.PinYinUtils;
+import cn.hsa.search.SearchableNationStandardDrugService;
 import cn.hsa.util.StringUtils;
-import cn.hsa.util.WuBiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
 import org.springframework.data.domain.Page;
@@ -17,23 +16,25 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
 import org.springframework.data.elasticsearch.repository.support.SimpleElasticsearchRepository;
 import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
  *  国家基础药品搜索服务实现
- *
+ *  加上component注解让spring容器初始化,注意的是 实体映射信息需要我们自己手动构建
  */
 @Slf4j
-public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository<NationStandardDrugDO,String> implements NationStandardDrugService {
+@Component
+public class SearchableNationStandardDrugServiceImpl extends SimpleElasticsearchRepository<NationStandardDrugDO,String> implements SearchableNationStandardDrugService {
 
     /**
      *  es 操作模板,repository中未支持的方法可使用该模板来实现
      */
     @Resource
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
 
     private final String [] searchFieldNames = new String[]{"prod","goodName","registerName","wbm","pym","code","dan"};
 
@@ -42,18 +43,17 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
      * @param metadata 文档实体类元数据信息
      * @param elasticsearchOperations elatisSearchTemplate实现类
      */
-    public NationStandardDrugServiceImpl(ElasticsearchEntityInformation<NationStandardDrugDO,String> metadata, ElasticsearchOperations elasticsearchOperations) {
+    public SearchableNationStandardDrugServiceImpl(ElasticsearchEntityInformation<NationStandardDrugDO,String> metadata, ElasticsearchOperations elasticsearchOperations) {
         super(metadata, elasticsearchOperations);
     }
 
 
     /**
-     *  删除建立的索引
+     *  interf模块默认不实现该接口
      * @param indexName 索引名
      */
     @Override
     public void deleteIndex(String indexName) {
-        elasticsearchRestTemplate.indexOps(NationStandardDrugDO.class).delete();
     }
 
     /**
@@ -98,5 +98,15 @@ public class NationStandardDrugServiceImpl extends SimpleElasticsearchRepository
             return StringUtils.getFuzzyQueryString(sourceQueryString);
         }
         return sourceQueryString;
+    }
+
+    /**
+     *  interf模块默认不实现该接口返回-1
+     * @return java.lang.Long 总更新的数据行数
+     */
+    @Override
+    public Long refreshDataOfElasticSearch() {
+
+        return Long.parseLong("-1");
     }
 }

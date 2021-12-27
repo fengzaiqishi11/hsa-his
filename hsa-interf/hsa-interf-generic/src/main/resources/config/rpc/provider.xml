@@ -13,5 +13,7 @@
 
     <!--统计报表(支付方式、医保结算)-->
     <dubbo:service interface="cn.hsa.module.interf.report.service.StatisticalReportService" ref="statisticalReportService_provider"/>
+    <!-- 中心端国家基础药品搜索服务 -->
+    <dubbo:service interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" ref="searchableNationStandardDrugService_provider"/>
 
 </beans>

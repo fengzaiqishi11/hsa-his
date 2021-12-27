@@ -1,59 +1,52 @@
-package cn.hsa.search.impl;
+package cn.hsa.search.bo.impl;
+
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
-import cn.hsa.search.SearchableNationStandardDrugService;
+import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
+import cn.hsa.module.interf.search.bo.SearchableNationStandardDrugBO;
+import cn.hsa.module.interf.search.repository.SearchableNationStandardDrugRepository;
+import cn.hsa.module.interf.search.repository.SearchableNationStandardTCMDrugRepository;
 import cn.hsa.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
-import org.springframework.data.elasticsearch.repository.support.SimpleElasticsearchRepository;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
- *  国家基础药品搜索服务实现
- *  加上component注解让spring容器初始化,注意的是 实体映射信息需要我们自己手动构建
+ *  国标药品搜索业务层具体实现
+ *   加上component注解让spring容器初始化
  */
-@Slf4j
 @Component
-public class SearchableNationStandardDrugServiceImpl extends SimpleElasticsearchRepository<NationStandardDrugDO,String> implements SearchableNationStandardDrugService {
+public class SearchableNationStandardDrugBOImpl implements SearchableNationStandardDrugBO {
 
     /**
-     *  es 操作模板,repository中未支持的方法可使用该模板来实现
+     *  es 普通药品数据访问层
      */
-    @Resource
-    private ElasticsearchRestTemplate elasticsearchRestTemplate;
-
+    private SearchableNationStandardDrugRepository standardDrugRepository;
+    /**
+     *  es 中药数据访问
+     */
+    private SearchableNationStandardTCMDrugRepository standardTCMDrugRepository;
+    /**
+     *  es 模板访问方法,后续可以拓展
+     */
+    private ElasticsearchOperations elasticsearchTemplate;
 
     private final String [] searchFieldNames = new String[]{"prod","goodName","registerName","wbm","pym","code","dan"};
 
-    /**
-     *  构建服务实现实体类
-     * @param metadata 文档实体类元数据信息
-     * @param elasticsearchOperations elatisSearchTemplate实现类
-     */
-    public SearchableNationStandardDrugServiceImpl(ElasticsearchEntityInformation<NationStandardDrugDO,String> metadata, ElasticsearchOperations elasticsearchOperations) {
-        super(metadata, elasticsearchOperations);
-    }
-
-
-    /**
-     *  interf模块默认不实现该接口
-     * @param indexName 索引名
-     */
-    @Override
-    public void deleteIndex(String indexName) {
+    public SearchableNationStandardDrugBOImpl(SearchableNationStandardDrugRepository standardDrugRepository,ElasticsearchOperations elasticsearchTemplate,SearchableNationStandardTCMDrugRepository standardTCMDrugRepository) {
+        this.standardDrugRepository = standardDrugRepository;
+        this.elasticsearchTemplate = elasticsearchTemplate;
+        this.standardTCMDrugRepository = standardTCMDrugRepository;
     }
 
     /**
@@ -83,8 +76,29 @@ public class SearchableNationStandardDrugServiceImpl extends SimpleElasticsearch
         BoolQueryBuilder booleanQueryBuilder = QueryBuilders.boolQuery();
         booleanQueryBuilder.must(queryBuilder);
         booleanQueryBuilder.filter(QueryBuilders.termQuery("provinceCode",provinceCode));
-        Page<NationStandardDrugDO>  page = search(booleanQueryBuilder,pageable);
-        return PageDTO.of(page);
+
+
+        if(StringUtils.isEmpty(queryCondition.getFlag())) {
+            return PageDTO.of(Collections.EMPTY_LIST);
+        }
+       if("1".equals(queryCondition.getFlag()) || "0".equals(queryCondition.getFlag())) {
+            Page<NationStandardDrugDO> page = standardDrugRepository.search(booleanQueryBuilder,pageable);
+            return PageDTO.of(page);
+        } else {
+            Page<NationStandardDrugZYDO> pageOfTCM = standardTCMDrugRepository.search(queryBuilder,pageable);
+            return PageDTO.of(pageOfTCM);
+        }
+
+    }
+
+    /**
+     * 刷新elasticsearch中的数据
+     * interf 模块默认不实现
+     * @return java.lang.Long 总更新的数据行数
+     */
+    @Override
+    public Long refreshDataOfElasticSearch() {
+        return Long.parseLong("-1");
     }
 
 
@@ -94,19 +108,13 @@ public class SearchableNationStandardDrugServiceImpl extends SimpleElasticsearch
      * @return 分词后的字符串(包含中文的不添加空格)
      */
     private String getFuzzyQueryString(String sourceQueryString){
+        // 2021-12-24 fix 编码code字段被分词后无法查询出数据
+        if(sourceQueryString.matches(".*[a-zA-Z].*") && sourceQueryString.matches(".*[0-9].*")){
+            return sourceQueryString;
+        }
         if(!StringUtils.isContainChinese(sourceQueryString)){
             return StringUtils.getFuzzyQueryString(sourceQueryString);
         }
         return sourceQueryString;
-    }
-
-    /**
-     *  interf模块默认不实现该接口返回-1
-     * @return java.lang.Long 总更新的数据行数
-     */
-    @Override
-    public Long refreshDataOfElasticSearch() {
-
-        return Long.parseLong("-1");
     }
 }

@@ -1126,13 +1126,94 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         paramMap.put("psn_no", psnNo);
         map.put("msgName","人员慢特病备案信息查询");
         map.put("isHospital","0");
+        map.put("id",MapUtils.get(map,"visitId"));
         map.put("visitId","");
+        map.put("psnNo",psnNo);
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_5301, paramMap,map);
         Map<String, Object> outptMap = new HashMap<>(1);
         outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = (List<Map<String, Object>>) MapUtils.get(outptMap, "feedetail");
         map.put("mapList", mapList);
+
+        // 如果有病种去查询病种限额（湖南专属）
+        if (!ListUtils.isEmpty(mapList)) {
+            try {
+                 map = this.queryMzSpecialLimitPriceHuNan(map);
+            } catch (Exception e) {
+                System.out.println(e.getMessage().toString());
+            } finally {
+                return map;
+            }
+        }
         return map;
+    }
+
+    /**
+     * @param data
+     * @Method queryMzSpecialLimitPriceHuNan
+     * @Desrciption 门诊特病限额使用情况查询（湖南）
+     * @Param
+     * @Author 廖继广
+     * @Date 2021/6/8 14:09
+     * @Return
+     */
+    public Map<String, Object> queryMzSpecialLimitPriceHuNan(Map<String, Object> data) {
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> mapList = MapUtils.get(data,"mapList");
+
+        String hospCode = MapUtils.get(data,"hospCode");
+        String orgCode = MapUtils.get(data,"regCode");
+
+        Map<String,Object> selectMap = new HashMap<>();
+        selectMap.put("hospCode",hospCode);
+        selectMap.put("visitId",MapUtils.get(data,"id"));
+        Map<String,Object> inViBaMap = insureIndividualVisitDAO.getInViBaInfo(selectMap);
+        if (inViBaMap == null) {
+            return data;
+        }
+
+        for (Map<String,Object> map : mapList) {
+            String opspDiseCode=  map.get("opsp_dise_code").toString();
+            if (!StringUtils.isEmpty(opspDiseCode)) {
+                Map<String, Object> inptMap = new HashMap<>();
+                inptMap.put("psnNo",MapUtils.get(data,"psnNo"));
+                inptMap.put("insutype",inViBaMap.get("aae140"));
+                inptMap.put("fixmedinsCode",MapUtils.get(data,"medisCode"));
+                inptMap.put("diseNo",opspDiseCode);
+                inptMap.put("insuplcAdmdvs",inViBaMap.get("insuplcAdmdvs"));
+                inptMap.put("queryDate","");
+                inptMap.put("payLoc","");
+                resultMap.put("MtLimitQueryDTO",inptMap);
+                Map<String, Object> specialLimiMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.HuNan.UP_5261, resultMap,data);
+                Map<String,Object> outptMap = MapUtils.get(specialLimiMap, "output");
+                Map<String, Object> dataMap = JSONObject.parseObject(MapUtils.get(outptMap, "data").toString(), Map.class);
+
+                String icdLimitCalcFlag = MapUtils.get(dataMap,"icdLimitCalcFlag");
+                String icdLimitCalcName = icdLimitCalcFlag;
+                switch (icdLimitCalcFlag) {
+                    case "1":
+                        icdLimitCalcName = Constant.UnifiedPay.HuNan.icdLimitCalc_1;
+                        break;
+                    case "2":
+                        icdLimitCalcName = Constant.UnifiedPay.HuNan.icdLimitCalc_2;
+                        break;
+                    case "3":
+                        icdLimitCalcName = Constant.UnifiedPay.HuNan.icdLimitCalc_3;
+                        break;
+                    case "4":
+                        icdLimitCalcName = Constant.UnifiedPay.HuNan.icdLimitCalc_4;
+                        break;
+                    default:
+                        break;
+                }
+                dataMap.put("icdLimitCalcName",icdLimitCalcName);
+                List<Map<String,Object>> resultList = new ArrayList<>();
+                resultList.add(dataMap);
+                map.put("mtLimitQuery",resultList);
+            }
+        }
+        data.put("mapList",mapList);
+        return data;
     }
 
     /**

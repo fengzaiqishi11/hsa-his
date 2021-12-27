@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedUniversityDAO">
+    <insert id="insertOutptInsurePay">
+        insert into
+        outpt_insure_pay
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code,
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id,
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id,
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                type_code,
+            </if>
+            <if test="orgNo != null and orgNo != ''">
+                org_no,
+            </if>
+            <if test="orgName != null and orgName != ''">
+                org_name,
+            </if>
+            <if test="totalPrice != null">
+                total_price
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                #{settleId,jdbcType=VARCHAR},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                #{visitId,jdbcType=VARCHAR},
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                #{typeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orgNo != null and orgNo != ''">
+                #{orgNo,jdbcType=VARCHAR},
+            </if>
+            <if test="orgName != null and orgName != ''">
+                #{orgName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL}
+            </if>
+        </trim>
+    </insert>
+    <delete id="deleteInsureCostFee">
+        delete  from  insure_individual_cost  where hosp_code =#{hospCode} and visit_id =#{visitId} and insure_settle_id is null
+    </delete>
+
+
+    <select id="selectOutptUniversityFee" resultType="java.util.Map">
+        SELECT distinct ic.id                                                                                                    id,
+               ic.hosp_code                                                                                             hospCode,
+               ic.visit_id                                                                                              visitId,
+               ic.op_id                                                                                                 opId,
+               (select op.order_no
+                from outpt_prescribe op
+                where op.hosp_code = ic.hosp_code
+                  and op.id = ic.op_id
+                  and ic.visit_id = op.visit_id)                                                                        rxNo,
+               (select su.work_type_code
+                from sys_user su
+                where su.hosp_code = ic.hosp_code
+                  and ic.doctor_id = su.id)                                                                             workTypeCode,
+               ic.source_code                                                                                           sourceCode,
+               ic.source_id                                                                                             sourceId,
+               ic.old_cost_id                                                                                           oldCostId,
+               ic.source_dept_id                                                                                        sourceDeptId,
+               ic.bfc_id                                                                                                bfcId,
+               ic.item_code                                                                                             itemCode,
+               ic.item_id                                                                                               itemId,
+               ic.item_name                                                                                             itemName,
+               ic.price                                                                                                 price,
+               ic.num                                                                                                   num,
+               ic.spec                                                                                                  spec,
+               ic.prep_code                                                                                             prepCode,
+               ic.dosage                                                                                                dosage,
+               ic.dosage_unit_code                                                                                      dosageUnitCode,
+               ic.usage_code                                                                                            usageCode,
+               ic.rate_id                                                                                               rateId,
+               ic.use_days                                                                                              useDays,
+               ic.num_unit_code                                                                                         numUnitCode,
+               ic.total_num                                                                                             totalNum,
+               ic.herb_note_code                                                                                        herbNoteCode,
+               ic.use_code                                                                                              useCode,
+               ic.herb_num                                                                                              herbNum,
+               ic.total_price                                                                                           totalPrice,
+               ic.preferential_price                                                                                    preferentialPrice,
+               ic.reality_price                                                                                         realityPrice,
+               ic.back_num                                                                                              backNum,
+               ic.doctor_id                                                                                             doctorId,
+               ic.doctor_name                                                                                           doctorName,
+               ic.dept_id                                                                                               deptId,
+               (select bd.name
+                from base_dept bd
+                where bd.hosp_code = ic.hosp_code
+                  and bd.id = ic.dept_id)                                                                            as deptName,
+               ic.phar_id                                                                                               pharId,
+               ic.is_dist                                                                                               isDist,
+               ic.crte_time                                                                                             crteTime,
+               ic.status_code                                                                                           statusCode,
+               iim.item_code                                                                                            insureMatchItemCode,
+               iim.insure_reg_code                                                                                      insureRegCode,
+               iim.molss_item_id                                                                                        molssItemId,
+               iim.pqcc_item_id                                                                                         pqccItemId,
+               iim.hosp_item_id                                                                                         hospItemId,
+               iim.hosp_item_name                                                                                       hospItemName,
+               iim.hosp_item_code                                                                                       hospItemCode,
+               iim.hosp_item_type                                                                                       hospItemType,
+               iim.hosp_item_spec                                                                                       hospItemSpec,
+               iim.hosp_item_unit_code                                                                                  hospItemUnitCode,
+               iim.hosp_item_prep_code                                                                                  hospItemPrepCode,
+               iim.hosp_item_price                                                                                      hospItemPrice,
+               iim.insure_item_name                                                                                     insureItemName,
+               iim.insure_item_code                                                                                     insureItemCode,
+               iim.insure_item_type                                                                                     insureItemType,
+               iim.insure_item_spec                                                                                     insureItemSpec,
+               iim.insure_item_unit_code                                                                                insureItemUnitCode,
+               iim.insure_item_prep_code                                                                                insureItemPrepCode,
+               iim.insure_item_price                                                                                    insureItemPrice,
+               iim.deductible                                                                                           deductible,
+               iim.standard_code                                                                                        standardCode,
+               iim.check_price                                                                                          checkCode,
+               iim.lmt_user_flag                                                                                        lmtUserFlag,
+               ic.is_reimburse                                                                                          isReimburse,
+               iim.manufacturer                                                                                         manufacturer,
+               iim.tcmdrug_used_way                                                                                     tcmdrugUsedWay,
+               (select su.prac_certi_no
+                from sys_user su
+                where su.hosp_code = ic.hosp_code
+                  and su.id = ic.doctor_id)                                                                          as pracCertiNo
+        FROM outpt_cost ic
+                 JOIN insure_item_match iim
+                      ON ic.`item_id` = iim.`hosp_item_id`
+                          AND ic.`item_id` = iim.`hosp_item_id`
+                          AND iim.`is_match` = '1'
+                          AND ic.`hosp_code` = iim.`hosp_code`
+                 LEFT JOIN insure_individual_cost iic
+                           ON ic.`id` = iic.`cost_id`
+                               AND ic.`hosp_code` = iic.`hosp_code`
+
+        WHERE ic.`hosp_code` = #{hospCode}
+          AND ic.`settle_code` = '2'
+          AND ic.`visit_id` = #{visitId}
+          AND ic.`settle_id` = #{settleId}
+          AND IFNULL(iim.`is_match`, '0') = #{isMatch}
+          AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+          AND iim.insure_reg_code = #{insureRegCode}
+    </select>
+    <select id="selectUnMatchFee" resultType="java.lang.String">
+        SELECT
+              distinct ic.item_name itemName
+        FROM outpt_cost ic
+               left join  insure_item_match iim on
+             ic.`hosp_code` = iim.`hosp_code`
+                      and ic.`item_id` = iim.`hosp_item_id`
+        WHERE ic.`hosp_code` = #{hospCode}
+          AND ic.`settle_code` = '2'
+          AND ic.`visit_id` = #{visitId}
+          AND ic.`settle_id` = #{settleId}
+          AND (IFNULL(iim.`is_match`, '0') = #{isMatch} or iim.`is_match` = '0')
+          AND iim.insure_reg_code = #{insureRegCode}
+    </select>
+    <select id="selectSumPrice" resultType="java.math.BigDecimal">
+        select sum(total_price) from outpt_cost where  hosp_code = #{hospCode} and visit_id =#{visitId}
+        and settle_id =#{settleId} and settle_code ='2'
+    </select>
+</mapper>

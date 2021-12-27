@@ -5832,7 +5832,7 @@
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             id as item_id,
-            IFNULL( usual_name, good_name ) AS item_name
+            IFNULL( usual_name, good_name ) AS item_name, code as itemCode
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5843,7 +5843,7 @@
         UNION ALL
         SELECT
             id as item_id,
-            name as item_name
+            name as item_name, code as itemCode
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5853,7 +5853,7 @@
         UNION ALL
         SELECT
             id as item_id,
-            IFNULL( name, other_name ) AS item_name
+            IFNULL( name, other_name ) AS item_name, code as itemCode
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -6422,6 +6422,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         union all
         (SELECT
@@ -6560,6 +6563,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         ORDER BY in_time desc ,px asc
     </select>
@@ -7754,28 +7760,60 @@
 
 
     <select id="queryMzMonthlyReport" resultType="java.util.Map">
+        select settleTime, sum(zfbr) as zfbr, sum(lxbr) as lxbr, sum(gsbr) as gsbr, sum(ysbr) as ysbr, sum(tcbr) as tcbr,
+        sum(zfbr) + sum(lxbr) + sum(gsbr) + sum(ysbr) + sum(tcbr) as hjje
+        from (
         select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
-        sum(case when s.patient_code &gt;= '-1' then c.reality_price else c.reality_price * 0.3 end) zfbr,
-        ifnull(sum(case when s.patient_code = '-2' then c.reality_price * 0.7 end),0) lxbr,
-        ifnull(sum(case when s.patient_code = '-3' then c.reality_price * 0.7 end),0) gsbr,
-        ifnull(sum(case when s.patient_code = '-4' then c.reality_price * 0.7 end), 0) ysbr,
-        0 as tcbr
+        sum(case when s.patient_code in ('-1', '0') then c.reality_price end) zfbr,
+        ifnull(sum(case when s.patient_code = '-2' then c.reality_price end),0) lxbr,
+        ifnull(sum(case when s.patient_code = '-3' then c.reality_price end),0) gsbr,
+        ifnull(sum(case when s.patient_code = '-4' then c.reality_price end), 0) ysbr,
+        ifnull(sum(case when s.patient_code = '-1' then c.preferential_price end),0) as tcbr
         from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and c.settle_id = s.id
-        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &lt;= '0'
+        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &lt;= '0' and s.is_settle = '1'
+        <if test="selectDeptIds != null and selectDeptIds.size()>0">
+            and c.dept_id in
+            <foreach collection="selectDeptIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="selectPharIds != null and selectPharIds.size()>0">
+            and c.phar_id in
+            <foreach collection="selectPharIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
         GROUP BY settleTime
 
         union all
 
-        select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
-        sum(ifnull(iic.preselfpay_amt, 0)) as zfbr,
+        select DATE_FORMAT(ss.settle_time, '%Y-%m-%d') settleTime,
+        ifnull(sum(ss.self_price),0) as zfbr,
         0 as lxbr,
         0 as gsbr,
         0 as ysbr,
-        sum(ifnull(iic.inscp_scp_amt, 0)) as tcbr
-        from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and c.settle_id = s.id
-        left join insure_individual_cost iic on c.hosp_code = iic.hosp_code and c.id = iic.cost_id
-        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &gt; '0'
+        ifnull(sum(ss.mi_price),0) as tcbr
+        from outpt_settle ss where id in (
+            select distinct s.id
+            from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and
+            c.settle_id = s.id
+            where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and
+            #{endDate} and s.patient_code &gt; '0' and s.is_settle = '1'
+            <if test="selectDeptIds != null and selectDeptIds.size()>0">
+                and c.dept_id in
+                <foreach collection="selectDeptIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="selectPharIds != null and selectPharIds.size()>0">
+                and c.phar_id in
+                <foreach collection="selectPharIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        )
         GROUP BY settleTime
+        ) a GROUP BY settleTime
     </select>
 
 </mapper>

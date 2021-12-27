@@ -93,7 +93,7 @@
         select DATE_FORMAT(a.crte_time, '%Y-%m-%d') createDate,(select name from base_dept where id=a.dept_id and hosp_code=#{hospCode}) deptName,
         a.order_no orderNo,(select name from base_window where id=a.window_id and hosp_code=#{hospCode}) windowName,a.window_id windowId,
         a.total_price totalPrice,a.status_code statusCode,a.assign_user_name assignUserName,
-        DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,
+        DATE_FORMAT(a.assign_time, '%Y-%m-%d %H:%i:%s') assignDate,a.id,a.dept_id,
         (select name from base_order_receive where hosp_code=a.hosp_code and id=a.order_receive_id) orderReceiveName
         from phar_in_receive a
         where 1=1 and a.hosp_code=#{hospCode} and a.status_code != '1'

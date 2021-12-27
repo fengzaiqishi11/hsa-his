@@ -431,7 +431,7 @@
     <dubbo:reference id="insureAdviceEntryService_consumer" interface="cn.hsa.module.insure.drg.service.InsureAdviceEntryService" check="false"/>
     <dubbo:reference id="inptService_consumer" interface="cn.hsa.module.insure.inpt.service.InptService" check="false"/>
     <dubbo:reference id="insureReadCardService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureReadCardService" check="false"/>
-
+    <dubbo:reference id="insureUnifiedUniversityService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedUniversityService" check="false"/>
     <!-- ################################################ 医保 consumer end ################################################ -->
 
 

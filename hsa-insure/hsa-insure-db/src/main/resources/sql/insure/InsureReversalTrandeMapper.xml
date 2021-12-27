@@ -169,12 +169,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -283,12 +283,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -389,12 +389,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -491,12 +491,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -575,6 +575,7 @@
         c.bka035_name AS psnType,
         c.aka130_name AS medTypeName,
         c.bka008 insureUnit,
+        tt.out_dept_name outDeptName,
         DATE_FORMAT(tt.in_time,'%Y-%m-%d') AS inTime,
         DATE_FORMAT(tt.out_time,'%Y-%m-%d') AS outTime,
         tt.in_no AS inNo,
@@ -585,7 +586,8 @@
         1,
         DATEDIFF( tt.out_time, tt.in_time )
         ) AS inDay,
-        tt.out_dept_name outDeptName,
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
+        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
         e.starting_price AS startingPrice,
@@ -611,25 +613,24 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
         ) type,
         e.insure_reg_code AS insureRegCode,
-        DATE_FORMAT(e.crte_time,'%Y-%m-%d %H:%i:%S') AS crteTime,
-        DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
         e.all_portion_price as allPortionPrice,
         e.over_self_price as overSelfPrice,
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
-        t.insuplc_admdvs as insuplcAdmdvs
+        t.insuplc_admdvs as insuplcAdmdvs,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'PSN_TYPE' and c.bka035 = value) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -664,11 +665,14 @@
         <if test="deptId != null and deptId != '' ">
             and tt.out_dept_id = #{deptId}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -714,12 +718,12 @@
         e.medicine_org_code medicineOrgCode,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -785,11 +789,14 @@
         <if test="outDeptId != null and outDeptId != '' ">
             and tt.out_dept_id = #{outDeptId}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -838,12 +845,12 @@
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -856,7 +863,8 @@
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
-        t.insuplc_admdvs as insuplcAdmdvs
+        t.insuplc_admdvs as insuplcAdmdvs,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'PSN_TYPE' and c.bka035 = value) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -888,11 +896,14 @@
         <if test="deptId != null and deptId != '' ">
             and tt.dept_id = #{deptId}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -937,12 +948,12 @@
         count( 1 ) AS psnNum,
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 ),
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 ),
         '本市参保',
         IF
         (
-        LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
-        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( e.clr_optins, 2 ),
+        LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 ),
         '省内异地',
         '跨省异地'
         )
@@ -999,11 +1010,14 @@
         <if test="outDeptId != null and outDeptId != '' ">
             and tt.out_dept_id = #{outDeptId}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -1046,6 +1060,17 @@
         c.bka035_name AS psnType,
         c.aka130_name AS medTypeName,
         c.bka008 insureUnit,
+        tt.out_dept_name outDeptName,
+        DATE_FORMAT(tt.in_time,'%Y-%m-%d') AS inTime,
+        DATE_FORMAT(tt.out_time,'%Y-%m-%d') AS outTime,
+        tt.in_no AS inNo,
+        tt.out_disease_name outDiseaseName,
+        IF
+        (
+        LEFT ( tt.in_time, 10 ) = LEFT ( tt.out_time, 10 ),
+        1,
+        DATEDIFF( tt.out_time, tt.in_time )
+        ) AS inDay,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
         e.starting_price AS startingPrice,
@@ -1081,11 +1106,13 @@
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
-        t.insuplc_admdvs as insuplcAdmdvs
+        t.insuplc_admdvs as insuplcAdmdvs,
+        (select name from insure_dict where value = t.psn_idet_type and insure_reg_code = t.insure_reg_code and hosp_code = t.hosp_code) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
-        insure_individual_basic c
+        insure_individual_basic c,
+        inpt_visit tt
         WHERE
         e.hosp_code = t.hosp_code
         AND e.visit_id = t.visit_id
@@ -1099,6 +1126,7 @@
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         AND t.is_one_settle = '1'
+        AND e.visit_id = tt.id
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -1108,11 +1136,14 @@
         <if test="isHospital != null and isHospital != '' ">
             and t.is_hospital = #{isHospital}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
@@ -1194,7 +1225,8 @@
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
-        insure_individual_basic c
+        insure_individual_basic c,
+        inpt_visit tt
         WHERE
         e.hosp_code = t.hosp_code
         AND e.visit_id = t.visit_id
@@ -1208,17 +1240,21 @@
         AND e.insure_price > 0
         AND e.hosp_code = #{hospCode}
         AND t.is_one_settle = '1'
+        AND e.visit_id = tt.id
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
         <if test="medType != null and medType != '' ">
             and c.aka130 = #{medType}
         </if>
-        <if test="isRemote == '0'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
+            and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
-        <if test="isRemote == '1'.toString()">
-            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( e.clr_optins, 4 )
+        <if test="isRemote == '1'.toString()"> <!-- 省内异地 -->
+            and LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 ) and LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )
+        </if>
+        <if test="isRemote == '2'.toString()"> <!-- 省外异地 -->
+            and LEFT ( e.insure_reg_code, 2 ) != LEFT ( t.insuplc_admdvs, 2 )
         </if>
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">

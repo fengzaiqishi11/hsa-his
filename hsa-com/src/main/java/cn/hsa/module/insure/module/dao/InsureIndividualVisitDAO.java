@@ -4,6 +4,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
@@ -423,5 +424,18 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     String selectInsuplcName(Map<String, Object> visitMap);
+
+    /**
+     * @Method
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/14 10:06
+     * @Return
+    **/
+    OutptDiagnoseDTO queryOutptDiagnose(Map<String, Object> map);
+
+    Map<String, Object> getInViBaInfo(Map<String, Object> selectMap);
 }
 

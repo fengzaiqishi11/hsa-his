@@ -6422,6 +6422,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         union all
         (SELECT
@@ -6560,6 +6563,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         ORDER BY in_time desc ,px asc
     </select>

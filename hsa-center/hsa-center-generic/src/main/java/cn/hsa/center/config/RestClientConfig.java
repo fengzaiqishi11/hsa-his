@@ -13,10 +13,18 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
     @Value("${elasticsearch.host}")
     private String elasticsearchHostAndPort;
+    @Value("${elasticsearch.username}")
+    private String elasticsearchUserName;
+    @Value("${elasticsearch.password}")
+    private String elasticsearchPassword;
 
     @Override
     public RestHighLevelClient elasticsearchClient() {
-        return RestClients.create(ClientConfiguration.create(elasticsearchHostAndPort)).rest();
+        ClientConfiguration config  = ClientConfiguration.builder()
+                .connectedTo(elasticsearchHostAndPort)
+                .withBasicAuth(elasticsearchUserName,elasticsearchPassword)
+                .build();
+        return RestClients.create(config).rest();
     }
 
     // no special bean creation needed

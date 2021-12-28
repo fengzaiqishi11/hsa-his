@@ -5,11 +5,12 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
+import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService;
 import cn.hsa.module.interf.search.service.SearchableNationStandardDrugService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.StringUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -29,6 +30,12 @@ public class NationStandardController extends BaseController {
 
     @Resource
     private SearchableNationStandardDrugService searchableDrugService;
+    /**
+     * <p>原中心端查询接口,
+     * <p>根据系统参数 WHETHER_TO_USE_ES 进行判断是走原中心端搜索接口还是es搜索接口
+     */
+    @Resource
+    private NationStandardDrugService centerNationStandardDrugService_consumer;
 
     /** 系统公共参数查询服务 **/
     @Resource
@@ -49,6 +56,15 @@ public class NationStandardController extends BaseController {
         SysUserDTO sysUserDTO = (SysUserDTO) session.getAttribute("SESSION_USER_INFO");;
         queryCondition.setHospCode(sysUserDTO.getHospCode());
         queryCondition.setProvinceCode(getProvinceCodeParameterObtainedFromTheCache(sysUserDTO.getHospCode()));
+        Map mapPatamater = new HashMap();
+        mapPatamater.put("hospCode", sysUserDTO.getHospCode());
+        // 查询 医院所在省份代码
+        mapPatamater.put("code", "WHETHER_TO_USE_ES");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapPatamater).getData();
+        if(null == sysParameterDTO){
+            return centerNationStandardDrugService_consumer.queryNationStandardDrugPage(queryCondition);
+        }
+
         return searchableDrugService.searchByConditions(queryCondition);
     }
 

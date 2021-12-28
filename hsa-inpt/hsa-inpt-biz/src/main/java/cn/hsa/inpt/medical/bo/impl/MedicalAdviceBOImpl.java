@@ -310,6 +310,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //更新住院病人表(inpt_visit)  护理级别(nursing_code)、膳食类型(diet_type)、病情标识(Illness_code)
             updateInpVIsitInfo(inptVisitDTOList);
 
+            // 医嘱停嘱核收-->膳食/护理/危重修改 add luoyong 2021-12-28
+            if (!ListUtils.isEmpty(stopAdviceList)) {
+                this.updateStopInptVisitBizType(stopAdviceList);
+            }
+
             //判断是否存在停同类、停非同类以及停自身的医嘱(新开医嘱)
             stopAdvice(medicalAdviceDTO, adviceIds,stopAdviceList);
 
@@ -3558,6 +3563,48 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //组装住院病人表参数（不管是否为null都需要修改，如果为null 说明没有病重医嘱，需要将病重字段置空）
         if(!ListUtils.isEmpty(listVisit)){
             inptVisitDAO.updateIllnessBacth(listVisit);
+        }
+    }
+
+    /**
+     *  医嘱停嘱或取消停嘱-->膳食/护理/危重修改
+     * @param inptAdviceDTOList
+     */
+    private void updateStopInptVisitBizType(List<InptAdviceDTO> inptAdviceDTOList) {
+        // 根据停嘱的医嘱列表查询的膳食/护理/危重类医嘱
+        List<BaseAdviceDTO> baseAdviceDTOList = inptAdviceDAO.getLongIllnessAdviceByAdviceId(inptAdviceDTOList);
+        if (ListUtils.isEmpty(baseAdviceDTOList)) {
+            return;
+        }
+
+        Map<String, List<BaseAdviceDTO>> map = baseAdviceDTOList.stream().collect(Collectors.groupingBy(BaseAdviceDTO::getVisitId, Collectors.toList()));
+
+        List<InptVisitDTO> inptVisitDTOList = new ArrayList<>();
+        InptVisitDTO inptVisitDTO = null;
+        for(String visitId:map.keySet()) {
+            inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setId(visitId);
+            baseAdviceDTOList = map.get(visitId);
+            //循环当前所有的医嘱目录,判断是否存在膳食类型、护理级别、病情标识
+            for(BaseAdviceDTO baseAdviceDTO:baseAdviceDTOList) {
+                inptVisitDTO.setHospCode(baseAdviceDTO.getHospCode());
+                if("1".equals(baseAdviceDTO.getBizType())) {
+                    //膳食类型
+                    inptVisitDTO.setDietType(null);
+                } else if("2".equals(baseAdviceDTO.getBizType())) {
+                    //护理级别
+                    inptVisitDTO.setNursingCode(null);
+                } else if("3".equals(baseAdviceDTO.getBizType())) {
+                    //病情标识
+                    inptVisitDTO.setIllnessCode(null);
+                }
+            }
+            inptVisitDTOList.add(inptVisitDTO);
+        }
+
+        //组装住院病人表参数（不管是否为null都需要修改，如果为null 说明没有病重医嘱，需要将病重字段置空）
+        if(!ListUtils.isEmpty(inptVisitDTOList)){
+            inptVisitDAO.updateIllnessBacth(inptVisitDTOList);
         }
     }
 

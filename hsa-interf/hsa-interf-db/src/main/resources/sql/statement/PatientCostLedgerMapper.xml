@@ -7816,4 +7816,91 @@
         ) a GROUP BY settleTime
     </select>
 
+    <select id="queryoutptMonthDailybyGh" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+            bfc.CODE AS bfcCode,
+            bfc.id AS bfcId,
+            bfc.NAME as bfcName,
+            ifnull(sum( ord.total_price ),0) AS totalPrice,
+            ifnull(sum( ord.preferential_price ),0) AS preferentialPrice,
+            ifnull(sum( ord.reality_price  ),0) AS realityPrice
+        FROM
+            outpt_register_detail ord
+                LEFT JOIN outpt_register_settle ors ON ors.register_id = ord.register_id and ors.hosp_code = ord.hosp_code
+                left join base_finance_classify bfc on bfc.id = ord.bfc_id and bfc.hosp_code = ord.hosp_code
+        where ord.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            and ors.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and ors.settle_time &lt;= #{endDate}
+        </if>
+        GROUP BY ord.bfc_id
+
+    </select>
+    <select id="queryoutptMonthDailybyMz" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+            SELECT
+                bfc.code AS bfcCode,
+                bfc.id AS bfcId,
+                bfc.NAME as bfcName,
+                ifnull(sum( oc.total_price ),0) AS totalPrice,
+                ifnull(sum( oc.preferential_price ),0) AS preferentialPrice,
+                ifnull(sum( oc.reality_price  ),0) AS realityPrice
+            FROM
+                outpt_cost oc
+                    LEFT JOIN base_finance_classify bfc ON oc.bfc_id = bfc.id and oc.hosp_code = bfc.hosp_code
+                    left join outpt_settle os on os.id = oc.settle_id and oc.hosp_code = os.hosp_code
+            where os.is_settle= '1' and oc.settle_code = '2'
+        <if test="startDate != null">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+            and oc.hosp_code = #{hospCode}
+            GROUP BY
+                oc.bfc_id
+    </select>
+    <select id="queryoutptMonthDailybyZFY" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+        'ZFY' AS bfcCode,
+        '999' AS bfcId,
+        '总费用' as bfcName,
+        ''as preferentialPrice,
+        ifnull(sum( A.totalPrice ),0) AS totalPrice,
+        ifnull(sum( A.realityPrice),0) AS realityPrice
+        FROM
+        (
+        SELECT
+        os.total_price AS totalPrice,
+        os.reality_price AS realityPrice
+        FROM
+        outpt_settle os
+        WHERE
+        os.is_settle = '1'
+        and
+        os.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+        union all
+        SELECT
+        ors.total_price AS totalPrice,
+        ors.reality_price AS realityPrice
+        FROM
+        outpt_register_settle ors
+        WHERE
+            ors.hosp_code = #{hospCode}
+        <if test="startDate != null">
+        and ors.settle_time &gt;= #{startDate}
+         </if>
+        <if test="endDate != null ">
+        and ors.settle_time &lt;= #{endDate}
+        </if>
+        ) A
+    </select>
+
 </mapper>

@@ -425,6 +425,12 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             //更新患者的合计费用 20210520 liuliyun婴儿费用退费不用更新大人总费用
             //if (StringUtils.isNotEmpty(queryBaby)&&queryBaby.equals("N")) {
             inptVisitDAO.updateTotalCost(inptVisitDTO);
+            // 更新手术费用
+            if(StringUtils.isNotEmpty(inptCostDTOs.get(0).getIsSs()) && Constants.SF.S.equals(inptCostDTOs.get(0).getIsSs())){
+                InptCostDTO updateCost = inptCostDTOs.get(0);
+                updateCost.setSourceDeptId(deptId);
+                inptCostDAO.updateOperInfoRecord(updateCost);
+            }
             //}
 
             /***

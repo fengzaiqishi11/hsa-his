@@ -867,4 +867,8 @@ public interface InptAdviceDAO {
      * @param adviceDTOList
      */
     void updateStopAndCheckInfo(List<InptAdviceDTO> adviceDTOList);
+
+    List<BaseAdviceDTO> getLongIllnessAdviceByAdviceId(@Param("longAdviceDTOList") List<InptAdviceDTO> inptAdviceDTOList);
+
+    List<BaseAdviceDTO> getShortIllnessAdviceByAdviceId(@Param("shortAdviceDTOList") List<InptAdviceDTO> inptAdviceDTOList);
 }

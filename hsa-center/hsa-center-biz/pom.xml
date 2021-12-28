@@ -54,14 +54,23 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!--Property热更新-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter</artifactId>-->
+<!--            <version>2.2.7.RELEASE</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-openfeign</artifactId>-->
+<!--            <version>2.2.7.RELEASE</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-context</artifactId>
-            <scope>provided</scope>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>Hoxton.SR10</version>
+            <type>pom</type>
+            <scope>import</scope>
         </dependency>
-
         <!--数据库访问 开始-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -169,7 +178,10 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+        </dependency>
         <!--测试相关-->
         <dependency>
             <groupId>org.springframework</groupId>

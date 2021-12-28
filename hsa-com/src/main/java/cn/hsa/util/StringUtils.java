@@ -1,10 +1,11 @@
 package cn.hsa.util;
 
-import cn.hsa.hsaf.core.framework.web.exception.AppException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Package_ame: cn.hsa.util
@@ -17,6 +18,11 @@ import java.util.Random;
  **/
 public class StringUtils {
     private static final String CHARSET_NAME = "UTF-8";
+
+    /**
+     *  判断字符串是否包含汉字的正则表达式
+     */
+    private static final Pattern chinesePattern = Pattern.compile("[\u4e00-\u9fa5]");
 
     /**
      * @Method 判断字符串是否为空
@@ -208,13 +214,13 @@ public class StringUtils {
     public static Map<String,Object>  getCommonParam(String functionCode, String hospCode, String operateCode) {
         Map resultMap = new HashMap<>();
         if (StringUtils.isEmpty(hospCode)) {
-            throw new AppException("公共入参,传入医院编码参数为空");
+            throw new RuntimeException("公共入参,传入医院编码参数为空");
         }
         if (StringUtils.isEmpty(operateCode)) {
-            throw new AppException("公共入参,传入操作员编码参数为空");
+            throw new RuntimeException("公共入参,传入操作员编码参数为空");
         }
         if (StringUtils.isEmpty(functionCode)) {
-            throw new AppException("公共入参,传入业务编号参数为空");
+            throw new RuntimeException("公共入参,传入业务编号参数为空");
         }
         StringBuffer stringBuffer = new StringBuffer();
         // 生成公共入参
@@ -231,7 +237,7 @@ public class StringUtils {
         commonRequestStr = stringBuffer.append(functionCode).append("^").append(hospCode).append("^").
                 append(operateCode).append("^").append(businessCode).append("^").append(hospTransactionNo).append("^").append("0000").append("^").toString();
         if (StringUtils.isEmpty(commonRequestStr)) {
-            throw new AppException("调用业务号【" + functionCode + "】生成公共参数为空");
+            throw new RuntimeException("调用业务号【" + functionCode + "】生成公共参数为空");
         }
 
         resultMap.put("commonParams",commonRequestStr);
@@ -296,6 +302,37 @@ public class StringUtils {
     public static void main(String[] args) {
         System.out.println(mobileEncrypt("18574728194"));
         System.out.println(idEncrypt("430426199705124852"));
+        System.out.println(getFuzzyQueryString("FFHGMKL"));
+        System.out.println(getFuzzyQueryString("FFMKL"));
     }
+
+    /**
+     *  判断一个字符串是否包含中文(不包括中文标点符)
+     * @param sourceStr
+     * @return 如果包含则返回true,否则返回false
+     */
+
+    public static boolean isContainChinese(String sourceStr) {
+        Matcher m = chinesePattern.matcher(sourceStr);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String getFuzzyQueryString(String sourceStr) {
+        final char whiteSpace = ' ';
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < sourceStr.length(); i++) {
+            char temp1 = sourceStr.charAt(i);
+            result.append(temp1);
+            int idx = i+1;
+            if(idx % 2 == 0 && idx != sourceStr.length()){
+                result.append(whiteSpace);
+            }
+        }
+        return result.toString();
+    }
+
 }
 

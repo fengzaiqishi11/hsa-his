@@ -431,7 +431,7 @@
     <dubbo:reference id="insureAdviceEntryService_consumer" interface="cn.hsa.module.insure.drg.service.InsureAdviceEntryService" check="false"/>
     <dubbo:reference id="inptService_consumer" interface="cn.hsa.module.insure.inpt.service.InptService" check="false"/>
     <dubbo:reference id="insureReadCardService_consumer" interface="cn.hsa.module.insure.inpt.service.InsureReadCardService" check="false"/>
-
+    <dubbo:reference id="insureUnifiedUniversityService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedUniversityService" check="false"/>
     <!-- ################################################ 医保 consumer end ################################################ -->
 
 
@@ -507,5 +507,7 @@
     <dubbo:reference id="inptConsultationService_consumer" interface="cn.hsa.module.inpt.consultation.service.InptConsultationApplyServcie" check="false"/>
     <!-- 中心端配置信息 -->
     <dubbo:reference id="centerGlobalConfigService_consumer" interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" check="false"/>
+    <!-- 国标基础药品搜索服务 -->
+    <dubbo:reference id="searchableNationStandardDrugService_consumer" interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" check="false"/>
 </beans>
 

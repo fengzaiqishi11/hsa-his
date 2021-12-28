@@ -667,6 +667,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setVisitTime(DateUtils.getNow());
         //是否就诊
         outptVisitDTO.setIsVisit(Constants.SF.S);
+        //是否复诊
+        outptVisitDTO.setIsFirstVisit(outptRegisterDTO.getIsFirstVisit());
         //创建人
         outptVisitDTO.setCrteId(outptRegisterDTO.getCrteId());
         //创建人姓名

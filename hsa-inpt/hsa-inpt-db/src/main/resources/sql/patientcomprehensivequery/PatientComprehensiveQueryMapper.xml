@@ -30,7 +30,7 @@
     <!-- 病人综合查询——医嘱明细查询 杨家洪-->
     <select id="queryAdviceSummaryDetail" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO">
         select a.*,b.preferential_price,b.reality_price,(b.price * b.num) as valuationPrice from inpt_advice_detail a
-        left join inpt_cost b on b.source_id = a.id and b.hosp_code = a.hosp_code
+        left join inpt_cost b on b.source_id = a.id and b.hosp_code = a.hosp_code and b.visit_id = #{visitId}
         where a.hosp_code = #{hospCode} and a.ia_id = #{iaId} and a.visit_id = #{visitId}
         <if test="babyId != null and babyId != '' ">
             and b.baby_id =#{babyId}

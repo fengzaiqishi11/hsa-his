@@ -176,4 +176,12 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
 
     // 医保个人账户结算后余额
     private BigDecimal lastSettle;
+
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
+    //就诊结束日期
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 }

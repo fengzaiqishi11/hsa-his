@@ -21,6 +21,7 @@ import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CursorableLinkedList;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -799,19 +800,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             flag = "1";
         }
         switch (statement){
-            case "2": //药房退库汇总  6药房退库 出库药房汇总
+            case "2": //药房退库汇总  6药房退库
                 String sql2 = "        left join stro_out si on sid.order_no = si.order_no and sid.hosp_code = si.hosp_code\n" +
                         "        left join base_dept bs on si.in_stock_id = bs.id and sid.hosp_code =  bs.hosp_code\n" +
                         "        where sid.hosp_code = #{hospCode}  and sid.outin_code = '6'";
                 paraMap.put("sql",sql2);
                 maps = switchFlag(flag,maps,paraMap);
                 break;
-            case "3": // 药房出库科室汇总查询 23.药房发药 25.药房退药
+            case "3": // 药房出库科室汇总查询 23.药房发药 25.药房退药 4.出库到科室， 10.同级调拨
                 String sql3 =
                         "        left join phar_in_distribute si on sid.order_no = si.order_no and si.status_code in ('0','1')  and sid.hosp_code = si.hosp_code\n" +
                                 "        left join phar_out_distribute sii on sid.order_no = sii.order_no and sii.status_code in ('0','1') and sid.hosp_code = sii.hosp_code\n" +
-                                "        left join base_dept bs on bs.id = si.dept_id or bs.id = sii.dept_id  and sid.hosp_code =  bs.hosp_code\n" +
-                                "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('23','25','27','28')";
+                                "        left join base_dept bs on bs.id = si.dept_id or bs.id = sii.dept_id or bs.id = sid.invoicing_target_id and sid.hosp_code =  bs.hosp_code\n" +
+                                "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('23','25','27','28','4',10)";
                 paraMap.put("sql",sql3);
                 // 是否根据药品大类分组（YPDL）
                 paraMap.put("type","Y");
@@ -3562,7 +3563,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         return resultMap;
     }
 
-
     /**
      * @Menthod getInptOperFinanceList
      * @Desrciption  查询住院手术费用明细
@@ -3591,5 +3591,78 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         // 统计全部费用
         List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptOperFinanceList(inptVisitDTO);
         return PageDTO.of(inptVisitDTOS);
+    }
+
+    /**
+     * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2021/12/20 14:59
+     * @Return
+     */
+    @Override
+    public PageDTO queryMzMonthlyReport(Map<String, Object> paraMap) {
+        PageHelper.startPage(Integer.parseInt(MapUtils.get(paraMap,"pageNo")), Integer.parseInt(MapUtils.get(paraMap,"pageSize")));
+        List<String> selectDeptIds = new ArrayList<>();
+        List<String> selectPharIds = new ArrayList<>();
+        String dept = MapUtils.get(paraMap, "deptIds");
+        String phar = MapUtils.get(paraMap, "pharIds");
+        if (dept != null && !"".equals(dept)) {
+            String[] str = dept.split(",");
+            for (int i= 0 ; i < str.length; i++) {
+                selectDeptIds.add(str[i]);
+            }
+            paraMap.put("selectDeptIds", selectDeptIds);
+        }
+        if (phar != null && !"".equals(phar)) {
+            String[] str = phar.split(",");
+            for (int i= 0 ; i < str.length; i++) {
+                selectPharIds.add(str[i]);
+            }
+            paraMap.put("selectPharIds", selectPharIds);
+        }
+        List<Map> resultMap = patientCostLedgerDAO.queryMzMonthlyReport(paraMap);
+        return PageDTO.of(resultMap);
+    }
+    /**
+     * @Menthod getoutptMonthDaily
+     * @Desrciption  查询门诊月结报表
+     * @Param OutptCostDTO
+     * @Author yuelong.chen
+     * @Date   2021/12/24 12:14
+     * @Return List<OutptCostDTO>
+     *
+     * @return*/
+    @Override
+    public Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO) {
+         Map<String, List<OutptCostDTO>> resultmap = new HashMap<>();
+        //门诊收入
+        List<OutptCostDTO> mapMz = patientCostLedgerDAO.queryoutptMonthDailybyMz(outptCostDTO);
+        //门诊挂号
+        List<OutptCostDTO> mapGh = patientCostLedgerDAO.queryoutptMonthDailybyGh(outptCostDTO);
+        //总费用
+        List<OutptCostDTO> mapZFY = patientCostLedgerDAO.queryoutptMonthDailybyZFY(outptCostDTO);
+        if(ListUtils.isEmpty(mapGh)){
+            //收费明细
+            resultmap.put("mapMz",mapMz);
+            //收费总额
+            resultmap.put("mapZFY",mapZFY);
+            return resultmap;
+        }
+        for (int i = 0; i < mapMz.size(); i++) {
+            for (int j = 0; j < mapGh.size(); j++) {
+                if(mapMz.get(i).getBfcId().equals(mapGh.get(j).getBfcId())){
+                    mapMz.get(i).setTotalPrice(BigDecimalUtils.add(mapMz.get(i).getTotalPrice(),mapGh.get(j).getTotalPrice()));
+                    mapMz.get(i).setPreferentialPrice(BigDecimalUtils.add(mapMz.get(i).getPreferentialPrice(),mapGh.get(j).getPreferentialPrice()));
+                    mapMz.get(i).setRealityPrice(BigDecimalUtils.add(mapMz.get(i).getRealityPrice(),mapGh.get(j).getRealityPrice()));
+                }
+            }
+        }
+        //收费明细
+        resultmap.put("mapMz",mapMz);
+        //收费总额
+        resultmap.put("mapZFY",mapZFY);
+        return resultmap;
     }
 }

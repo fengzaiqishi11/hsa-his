@@ -1159,9 +1159,53 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 operInfoRecordDAO.updateOperStatusBatch(applyUnScheduledList);
             }
         }
+
+        // 临时医嘱取消-->膳食/护理/危重修改 add luoyong 2021-12-28
+        this.updateStopInptVisitBizType(inptAdviceDTOList);
         return inptAdviceDAO.updateBatchInptAdviceCancel(inptAdviceDTO) > 0;
     }
 
+    /**
+     *  临时医嘱取消-->膳食/护理/危重修改
+     * @param inptAdviceDTOList
+     */
+    private void updateStopInptVisitBizType(List<InptAdviceDTO> inptAdviceDTOList) {
+        // 根据停嘱的医嘱列表查询的膳食/护理/危重类医嘱
+        List<BaseAdviceDTO> baseAdviceDTOList = inptAdviceDAO.getShortIllnessAdviceByAdviceId(inptAdviceDTOList);
+        if (ListUtils.isEmpty(baseAdviceDTOList)) {
+            return;
+        }
+
+        Map<String, List<BaseAdviceDTO>> map = baseAdviceDTOList.stream().collect(Collectors.groupingBy(BaseAdviceDTO::getVisitId, Collectors.toList()));
+
+        List<InptVisitDTO> inptVisitDTOList = new ArrayList<>();
+        InptVisitDTO inptVisitDTO = null;
+        for(String visitId:map.keySet()) {
+            inptVisitDTO = new InptVisitDTO();
+            inptVisitDTO.setId(visitId);
+            baseAdviceDTOList = map.get(visitId);
+            //循环当前所有的医嘱目录,判断是否存在膳食类型、护理级别、病情标识
+            for(BaseAdviceDTO baseAdviceDTO:baseAdviceDTOList) {
+                inptVisitDTO.setHospCode(baseAdviceDTO.getHospCode());
+                if("1".equals(baseAdviceDTO.getBizType())) {
+                    //膳食类型
+                    inptVisitDTO.setDietType(null);
+                } else if("2".equals(baseAdviceDTO.getBizType())) {
+                    //护理级别
+                    inptVisitDTO.setNursingCode(null);
+                } else if("3".equals(baseAdviceDTO.getBizType())) {
+                    //病情标识
+                    inptVisitDTO.setIllnessCode(null);
+                }
+            }
+            inptVisitDTOList.add(inptVisitDTO);
+        }
+
+        //组装住院病人表参数（不管是否为null都需要修改，如果为null 说明没有病重医嘱，需要将病重字段置空）
+        if(!ListUtils.isEmpty(inptVisitDTOList)){
+            inptVisitDAO.updateIllnessBacth(inptVisitDTOList);
+        }
+    }
 
     /**
      * @Method saveInptAdvice

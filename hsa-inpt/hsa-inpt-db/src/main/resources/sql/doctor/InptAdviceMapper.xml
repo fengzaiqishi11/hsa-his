@@ -1872,6 +1872,65 @@
         order by a.check_time  desc limit 10000) aa group by aa.bizType,aa.visitId,hospCode
 	</select>
 
+    <select id="getLongIllnessAdviceByAdviceId" parameterType="java.util.List" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        SELECT
+            b.name,
+            b.biz_type as bizType,
+            b.biz_code as bizCode,
+            a.visit_id as visitId,
+            a.hosp_code as hospCode
+        FROM
+            inpt_advice a,base_advice b
+        WHERE
+            1=1
+          and a.item_id = b.id
+          AND ifnull(b.biz_type,'') !=''
+          AND ifnull(b.biz_code,'') !=''
+          and a.cancel_id is null
+          and a.is_stop ='1'
+          and a.is_submit ='1'
+          and a.is_reject = '0'
+          and a.is_check='1'
+          and a.id in
+          <foreach collection="longAdviceDTOList" open="(" close=")" item="item" separator=",">
+              #{item.id}
+          </foreach>
+          and a.visit_id in
+          <foreach collection="longAdviceDTOList" open="(" close=")" item="item" separator=",">
+              #{item.visitId}
+          </foreach>
+          order by a.check_time desc
+    </select>
+
+    <select id="getShortIllnessAdviceByAdviceId" parameterType="java.util.List" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        SELECT
+        b.name,
+        b.biz_type as bizType,
+        b.biz_code as bizCode,
+        a.visit_id as visitId,
+        a.hosp_code as hospCode
+        FROM
+        inpt_advice a,base_advice b
+        WHERE
+        1=1
+        and a.item_id = b.id
+        AND ifnull(b.biz_type,'') !=''
+        AND ifnull(b.biz_code,'') !=''
+        and a.cancel_id is null
+        and a.is_submit ='1'
+        and a.is_reject = '0'
+        and a.is_check='1'
+        and a.id in
+        <foreach collection="shortAdviceDTOList" open="(" close=")" item="item" separator=",">
+            #{item.id}
+        </foreach>
+        and a.visit_id in
+        <foreach collection="shortAdviceDTOList" open="(" close=")" item="item" separator=",">
+            #{item.visitId}
+        </foreach>
+        order by a.check_time desc
+    </select>
+
     <insert id="insertMedicineAdvanceAdvice" parameterType="list">
         insert into inpt_medicine_advance_advice (id,advance_id,advice_id,hosp_code)
         values

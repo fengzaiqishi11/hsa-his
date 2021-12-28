@@ -21,6 +21,7 @@ import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CursorableLinkedList;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -3623,5 +3624,45 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         }
         List<Map> resultMap = patientCostLedgerDAO.queryMzMonthlyReport(paraMap);
         return PageDTO.of(resultMap);
+    }
+    /**
+     * @Menthod getoutptMonthDaily
+     * @Desrciption  查询门诊月结报表
+     * @Param OutptCostDTO
+     * @Author yuelong.chen
+     * @Date   2021/12/24 12:14
+     * @Return List<OutptCostDTO>
+     *
+     * @return*/
+    @Override
+    public Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO) {
+         Map<String, List<OutptCostDTO>> resultmap = new HashMap<>();
+        //门诊收入
+        List<OutptCostDTO> mapMz = patientCostLedgerDAO.queryoutptMonthDailybyMz(outptCostDTO);
+        //门诊挂号
+        List<OutptCostDTO> mapGh = patientCostLedgerDAO.queryoutptMonthDailybyGh(outptCostDTO);
+        //总费用
+        List<OutptCostDTO> mapZFY = patientCostLedgerDAO.queryoutptMonthDailybyZFY(outptCostDTO);
+        if(ListUtils.isEmpty(mapGh)){
+            //收费明细
+            resultmap.put("mapMz",mapMz);
+            //收费总额
+            resultmap.put("mapZFY",mapZFY);
+            return resultmap;
+        }
+        for (int i = 0; i < mapMz.size(); i++) {
+            for (int j = 0; j < mapGh.size(); j++) {
+                if(mapMz.get(i).getBfcId().equals(mapGh.get(j).getBfcId())){
+                    mapMz.get(i).setTotalPrice(BigDecimalUtils.add(mapMz.get(i).getTotalPrice(),mapGh.get(j).getTotalPrice()));
+                    mapMz.get(i).setPreferentialPrice(BigDecimalUtils.add(mapMz.get(i).getPreferentialPrice(),mapGh.get(j).getPreferentialPrice()));
+                    mapMz.get(i).setRealityPrice(BigDecimalUtils.add(mapMz.get(i).getRealityPrice(),mapGh.get(j).getRealityPrice()));
+                }
+            }
+        }
+        //收费明细
+        resultmap.put("mapMz",mapMz);
+        //收费总额
+        resultmap.put("mapZFY",mapZFY);
+        return resultmap;
     }
 }

@@ -5832,7 +5832,8 @@
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             id as item_id,
-            IFNULL( usual_name, good_name ) AS item_name, code as itemCode
+            IFNULL( usual_name, good_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5843,7 +5844,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            name as item_name, code as itemCode
+            name as item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5853,7 +5855,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            IFNULL( name, other_name ) AS item_name, code as itemCode
+            IFNULL( name, other_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, '' as splitRatio, '' as splitUnitCode
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'

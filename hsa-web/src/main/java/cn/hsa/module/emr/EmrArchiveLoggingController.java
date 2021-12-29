@@ -84,6 +84,9 @@ public class EmrArchiveLoggingController extends BaseController {
 	public WrapperResponse<PageDTO> getZYEmrFilePatients(EmrArchiveLoggingDTO emrArchiveLoggingDTO, HttpServletRequest req, HttpServletResponse res) {
 		SysUserDTO sysUserDTO = getSession(req, res);
 		emrArchiveLoggingDTO.setHospCode(sysUserDTO.getHospCode());
+		if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+			emrArchiveLoggingDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+		}
 		Map map = new HashMap();
 		map.put("hospCode",sysUserDTO.getHospCode());
 		map.put("emrArchiveLoggingDTO", emrArchiveLoggingDTO);
@@ -105,5 +108,22 @@ public class EmrArchiveLoggingController extends BaseController {
 		return emrArchiveLoggingService_consumer.outHospInsertEmrArchiveLogging(map);
 	}
 
+	/**
+	 * @Description: 查询病人出院7天未归档信息
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/11/25 9:12
+	 * @Return
+	 */
+	@PostMapping("/insertOutHospEmrArchiveLogging")
+	public WrapperResponse<Boolean> insertOutHospEmrArchiveLogging(HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		Map map=new HashMap();
+		map.put("hospCode",sysUserDTO.getHospCode());
+		map.put("crteName",sysUserDTO.getName());
+		map.put("crteId",sysUserDTO.getId());
+		return emrArchiveLoggingService_consumer.insertOutHospEmrArchiveLogging(map);
+	}
 
 }

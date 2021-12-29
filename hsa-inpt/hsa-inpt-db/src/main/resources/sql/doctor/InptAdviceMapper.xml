@@ -2208,4 +2208,60 @@
         </foreach>
     </update>
 
+    <!--查询未提交医嘱信息-->
+    <select id="queryUnsubmitAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where is_submit ='0'
+        and is_reject ='0'
+        and a.hosp_code =#{hospCode}
+        group by v.id
+    </select>
+
+    <!--查询已拒收医嘱信息-->
+    <select id="queryRejectAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where a.hosp_code =#{hospCode} and
+        a.id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        /*拒收*/
+        <if test="type !=null and type =='3'">
+            and a.is_reject ='1'
+        </if>
+        /*提交*/
+        <if test="type !=null and type =='2'">
+            and a.is_reject ='0' and  a.is_submit ='1'
+        </if>
+        group by v.zg_doctor_id,v.in_dept_id
+    </select>
+
+    <!--查询已提交医嘱信息-->
+    <select id="querySubmitAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where a.hosp_code =#{hospCode} and  find_in_set(a.id,#{ids})
+        and a.is_reject ='0' and  a.is_submit ='1'
+        group by v.zg_doctor_id,v.in_dept_id
+    </select>
 </mapper>

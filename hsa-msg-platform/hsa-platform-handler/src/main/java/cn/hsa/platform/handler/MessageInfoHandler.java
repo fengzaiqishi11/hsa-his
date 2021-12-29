@@ -29,4 +29,16 @@ public class MessageInfoHandler implements Handler {
         return false;
     }
 
+    @Override
+    public boolean doHandlerUpdate(TaskInfo taskInfo) {
+        MessageInfoModel messageInfoModels =(MessageInfoModel)taskInfo.getContentModel();
+        cn.hsa.platform.domain.MessageInfoModel messageInfoModel =new cn.hsa.platform.domain.MessageInfoModel();
+        BeanUtils.copyProperties(messageInfoModels,messageInfoModel);
+        if (messageInfoModels!=null){
+            messageInfoDao.updateMssageInfo(messageInfoModel);
+            return true;
+        }
+        return false;
+    }
+
 }

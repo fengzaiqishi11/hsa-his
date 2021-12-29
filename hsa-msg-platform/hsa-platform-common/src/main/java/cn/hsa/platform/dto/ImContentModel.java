@@ -25,4 +25,9 @@ public class ImContentModel extends ContentModel {
      *  部门ID
      */
     private String deptId;
+
+    private String msgId;
+
+    // 1 登录获取；2消息已读
+    private String type;
 }

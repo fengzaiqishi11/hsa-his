@@ -1,5 +1,9 @@
 package cn.hsa.util;
 
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import com.alibaba.fastjson.JSON;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -332,6 +336,28 @@ public class StringUtils {
             }
         }
         return result.toString();
+    }
+
+    public static ConfigInfoDO getConfigInfoDOFromSys(String value,String type){
+        if (StringUtils.isNotEmpty(value)) {
+            ConfigInfoDO configInfoDO =new ConfigInfoDO();
+            Map map = (Map) JSON.parse(value);
+            if (map != null) {
+                Map configInfo = (Map) map.get(type);
+                if (configInfo != null) {
+                    configInfoDO.setReceiverId(MapUtils.get(configInfo, "receiver_id"));
+                    configInfoDO.setLevel(MapUtils.get(configInfo, "level"));
+                    configInfoDO.setStartTime(MapUtils.get(configInfo, "start_time"));
+                    configInfoDO.setEndTime(MapUtils.get(configInfo, "end_time"));
+                    configInfoDO.setSendCount(MapUtils.get(configInfo, "send_count"));
+                    configInfoDO.setIntervalTime(MapUtils.get(configInfo, "interval_time"));
+                    configInfoDO.setDeptId(MapUtils.get(configInfo, "dept_id"));
+                    configInfoDO.setUrl(MapUtils.get(configInfo, "url"));
+                }
+            }
+            return configInfoDO;
+        }
+        return new ConfigInfoDO();
     }
 
 }

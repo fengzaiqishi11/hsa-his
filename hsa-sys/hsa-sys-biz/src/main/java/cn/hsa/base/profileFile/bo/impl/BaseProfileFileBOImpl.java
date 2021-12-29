@@ -351,8 +351,11 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
         String profileId = MapUtils.get(map,"id");
         //查询是否之前就诊过
         OutptProfileFileDTO outptProfileFileDTO = baseProfileFileDAO.queryProfileFile(profileId);
+        if(StringUtils.isEmpty(outptProfileFileDTO.getId())||outptProfileFileDTO == null){
+            throw new AppException("未找到病人信息，请刷新页面！");
+        }
         if((null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalOut()>1)//判断第一次门诊
-                ||(null != outptProfileFileDTO.getTotalOut()&&outptProfileFileDTO.getTotalIn()>1)//判断第一次住院
+                ||(null != outptProfileFileDTO.getTotalIn()&&outptProfileFileDTO.getTotalIn()>1)//判断第一次住院
                 ||(null != outptProfileFileDTO.getTotalOut()//判断有过一次门诊情况且来第一次住院，也说明已经在医院就诊过
                 &&null != outptProfileFileDTO.getTotalIn()
                 &&(outptProfileFileDTO.getTotalOut()+outptProfileFileDTO.getTotalIn())>1)){

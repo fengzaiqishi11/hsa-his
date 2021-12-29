@@ -214,7 +214,7 @@ public class CenterUserServiceImpl extends HsafService implements CenterUserServ
     @HsafRestPath(value = "/changePassWordParam", method = RequestMethod.POST)
     public WrapperResponse<Boolean> changePassWord(Map changePassWordParam) {
         try {
-            return WrapperResponse.success(centerUserBO.changePassWord(changePassWordParam));
+            return WrapperResponse.success(centerUserBO.updatePassWord(changePassWordParam));
         } catch (Exception e) {
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);

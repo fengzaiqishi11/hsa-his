@@ -258,7 +258,7 @@ public class CenterUserBOImpl extends HsafBO implements CenterUserBO {
     }
 
     @Override
-    public boolean changePassWord(Map map) {
+    public boolean updatePassWord(Map map) {
         String id= map.get("id")==null?"":map.get("id").toString();
         String newPasswordByMd5= map.get("newPasswordByMd5")==null?"":map.get("newPasswordByMd5").toString();
         if(StringUtils.isEmpty(id) || StringUtils.isEmpty(newPasswordByMd5) ){

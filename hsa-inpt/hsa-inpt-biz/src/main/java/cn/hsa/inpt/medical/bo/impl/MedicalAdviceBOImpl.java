@@ -26,6 +26,9 @@ import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.drug.service.BaseDrugService;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.base.rate.service.BaseRateService;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
+import cn.hsa.module.emr.message.dao.MessageInfoDAO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDetailDAO;
@@ -58,12 +61,15 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import kafka.utils.Json;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -166,6 +172,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     @Resource
     private OutptDoctorPrescribeService outptDoctorPrescribeService_consumer;
 
+    @Resource
+    private MessageInfoDAO messageInfoDAO;
+
 
     /**
      * @Method: getMedicalAdvices
@@ -206,7 +215,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             throw new AppException("拒收备注为空,拒收失败");
         }
 
-        return inptAdviceDAO.modifyMedicalAdvices(medicalAdviceDTO)>0;
+        int count =inptAdviceDAO.modifyMedicalAdvices(medicalAdviceDTO);
+
+        // 医嘱拒收写入消息
+        insertAdviceMessage(medicalAdviceDTO);
+        return count>0;
     }
 
     /**
@@ -343,7 +356,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             if (!ListUtils.isEmpty(inptVisitDTOList)) {
                 inptVisitDAO.updateInptVisitAmount(inptVisitDTOList);
             }
-
+            // 核收消息消费 liuliyun 2021/12/03
+            consumeCheckAdviceMessage(inptAdviceDTOList,medicalAdviceDTO.getHospCode());
             //医嘱更新最近执行之间
             //if (!ListUtils.isEmpty(adviceIds)) {
             //inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
@@ -3628,5 +3642,107 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
         //批量修改医嘱核收跟停嘱核收信息
         inptAdviceDAO.updateStopAndCheckInfo(adviceDTOList);
+    }
+
+    // 医嘱拒收写入消息 lly 2021-12-02
+    public int insertAdviceMessage(MedicalAdviceDTO medicalAdviceDTO){
+        String hospCode =medicalAdviceDTO.getHospCode();
+        String name = medicalAdviceDTO.getCrteName();
+        String crteId = medicalAdviceDTO.getCrteId();
+        Map openParam = new HashMap();
+        openParam.put("hospCode", hospCode);
+        openParam.put("code", "MSG_OPEN");
+        SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+            Map queryParam =new HashMap();
+            queryParam.put("hospCode",hospCode);
+            queryParam.put("iatIdList",medicalAdviceDTO.getIds());
+            queryParam.put("type",Constants.YZ_TYPE.YZ_TYPE_JS);
+            List<InptVisitDTO> inptVisitDTOS = inptAdviceDAO.queryRejectAdviceList(queryParam);
+            Map paramMap = new HashMap();
+            paramMap.put("hospCode", hospCode);
+            paramMap.put("code", "XXTS_SETTING");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+            ConfigInfoDO configInfoDO = null;
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(),"adviceMsg");
+            }
+            List<MessageInfoDTO> messageInfoDTOList = new ArrayList<>();
+            if (inptVisitDTOS != null && inptVisitDTOS.size() > 0) {
+                for (InptVisitDTO inptVisitDTO : inptVisitDTOS) {
+                    MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                    messageInfoDTO.setId(SnowflakeUtils.getId());
+                    messageInfoDTO.setHospCode(hospCode);
+                    messageInfoDTO.setSourceId("");
+                    messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+                    messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
+                    messageInfoDTO.setContent(inptVisitDTO.getName() + "的医嘱已被拒收");
+                    Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+                    Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+                    messageInfoDTO.setStartTime(startTime);
+                    messageInfoDTO.setEndTime(endTime);
+                    messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);
+                    messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+                    messageInfoDTO.setUrl(configInfoDO.getUrl());
+                    messageInfoDTO.setCrteName(name);
+                    messageInfoDTO.setCrteTime(DateUtils.getNow());
+                    messageInfoDTO.setCrteId(crteId);
+                    messageInfoDTOList.add(messageInfoDTO);
+                }
+                // 获取医院kafka 的IP与端口
+                sendMessage(messageInfoDTOList,Constants.MSG_TOPIC.producerTopicKey,hospCode);
+            }
+        }
+        return 0;
+    }
+
+    // 核收消息消费 lly 2021-12-03
+    public void consumeCheckAdviceMessage(List<InptAdviceDTO> inptAdviceDTOList,String hospCode){
+        Map openParam = new HashMap();
+        openParam.put("hospCode", hospCode);
+        openParam.put("code", "MSG_OPEN");
+        // 有开启消息提醒时才需要消费
+        SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+            Set visitIds = new HashSet();
+            if (inptAdviceDTOList != null && inptAdviceDTOList.size() > 0) {
+                for (InptAdviceDTO adviceDTO : inptAdviceDTOList) {
+                    visitIds.add(adviceDTO.getVisitId());
+                }
+            }
+            // 消息置为已读
+            if (visitIds != null && visitIds.size() > 0) {
+                MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_YD);
+                messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
+                messageInfoDTO.setHospCode(hospCode);
+                messageInfoDTO.setIds(new ArrayList<>(visitIds));
+                List<MessageInfoDTO> messageInfoDTOList =new ArrayList<>();
+                messageInfoDTOList.add(messageInfoDTO);
+                //messageInfoDAO.updateMssageInfoBatch(messageInfoDTO);
+                sendMessage(messageInfoDTOList,Constants.MSG_TOPIC.consumerTopicKey,hospCode);
+            }
+        }
+    }
+
+    public void sendMessage(List<MessageInfoDTO> messageInfoDTOS,String type,String hospCode){
+        // 获取医院kafka 的IP与端口
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", hospCode);
+        sysMap.put("code", "KAFKA_MSG_IP");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sys == null || sys.getValue() == null) {
+            return;
+        }
+        String server = sys.getValue();
+        // 1. 创建一个kafka生产者
+        String producerTopic = type;//生产者消息推送Topic
+        KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+        String message = JSONObject.toJSONString(messageInfoDTOS);
+        KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
     }
 }

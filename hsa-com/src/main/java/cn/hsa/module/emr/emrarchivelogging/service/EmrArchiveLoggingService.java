@@ -76,4 +76,16 @@ public interface EmrArchiveLoggingService {
 	@PostMapping("/service/emr/emrArchiveLogging/outHospInsertEmrArchiveLogging")
 	WrapperResponse<Boolean> outHospInsertEmrArchiveLogging(Map map);
 
+	/**
+	 * @Description: 病人出院7天未归档写入消息
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/11/25 16:54
+	 * @Return
+	 */
+	@PostMapping("/service/emr/emrArchiveLogging/insertOutHospEmrArchiveLogging")
+	WrapperResponse<Boolean> insertOutHospEmrArchiveLogging(Map map);
+
+
 }

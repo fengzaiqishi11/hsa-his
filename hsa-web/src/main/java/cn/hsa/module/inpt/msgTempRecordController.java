@@ -48,6 +48,9 @@ public class msgTempRecordController extends BaseController {
       Map map = new HashMap();
       map.put("hospCode", sysUserDTO.getHospCode());
       msgTempRecordDTO.setHospCode(sysUserDTO.getHospCode());
+      if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+          msgTempRecordDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+       }
       map.put("msgTempRecordDTO",msgTempRecordDTO);
       return msgTempRecordService_consumer.queryMsgTempRecord(map);
     }

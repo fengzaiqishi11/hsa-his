@@ -7930,6 +7930,9 @@
         <if test="settleEndTime != null and settleEndTime !=''">
             and a.settle_time &lt;= #{settleEndTime}
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and t.in_dept_id = #{inDeptId}
+        </if>
     </select>
 
 </mapper>

@@ -85,4 +85,6 @@ public class EmrArchiveLoggingDTO extends EmrArchiveLoggingDO implements Seriali
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private String outEndDate;
+	// 科室id
+	private String inDeptId;
 }

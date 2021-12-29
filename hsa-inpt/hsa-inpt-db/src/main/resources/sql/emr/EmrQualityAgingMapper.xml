@@ -90,4 +90,96 @@
         LEFT JOIN emr_classify b on a.emr_code = b.`code` and a.hosp_code = b.hosp_code and (b.dept_id is null or b.dept_id = '')
         where a.hosp_code =#{hospCode} and b.code = #{emrCode}
     </select>
+
+    <!--查询以出入院时间计算超时时间的超时病历-->
+    <select id="queryRyOrCyUnwriteEmr" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+    select patientName,emrCode,in_time,out_time,emrName,zg_doctor_id,hosp_code,in_dept_id,visitId
+    from (
+        select v.name as patientName,GROUP_CONCAT(et.classify_code) as emrCode,
+        v.hosp_code,
+        CONCAT((select name from emr_classify where CODE =#{emrCode} and hosp_code =#{hospCode} limit 1),'已超过',#{timeOut},'小时未书写，请及时书写') as emrName,
+        v.in_time,
+        v.out_time,
+        v.zg_doctor_id,
+        v.in_dept_id,
+        v.id as visitId
+        from inpt_visit v
+        join emr_patient em on v.id = em.visit_id and em.hosp_code =#{hospCode}
+        JOIN emr_classify_template et on em.classify_template_id = et.id and et.hosp_code =#{hospCode}
+        where TIMESTAMPDIFF(HOUR,${queryColunm},NOW()) > #{timeOut}
+        GROUP BY v.id
+        ) f
+    where emrCode not like concat('%', #{emrCode,jdbcType=VARCHAR}, '%') and hosp_code = #{hospCode}
+    </select>
+    <!--查询以手术时间计算超时时间的超时病历-->
+    <select id="queryOperUnwritEmr" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+     select patientName,emrCode,in_time,out_time,emrName,zg_doctor_id,hosp_code,in_dept_id,visitId
+     from (
+         select v.name as patientName,
+                GROUP_CONCAT(et.classify_code) as emrCode,
+                CONCAT((select name from emr_classify where CODE =#{emrCode} and hosp_code =#{hospCode} limit 1),'已超过',#{timeOut},'小时未书写，请及时书写') as emrName,
+                v.in_time,
+                v.out_time,
+                oi.oper_end_time,
+                v.zg_doctor_id,
+                v.in_dept_id,
+                v.hosp_code,
+                v.id as visitId
+                from inpt_visit v
+                join emr_patient em on v.id = em.visit_id and em.hosp_code =#{hospCode}
+                JOIN emr_classify_template et on em.classify_template_id = et.id and et.hosp_code =#{hospCode}
+                JOIN oper_info_record oi on v.id = oi.visit_id and oi.oper_end_time is not null and oi.hosp_code =#{hospCode}
+                where TIMESTAMPDIFF(HOUR,oi.oper_end_time,NOW()) > #{timeOut}
+                GROUP BY v.id) f
+      where emrCode not like concat('%', #{emrCode,jdbcType=VARCHAR}, '%') and hosp_code = #{hospCode}
+    </select>
+
+    <!--查询以开医嘱时间计算超时时间的超时病历-->
+    <select id="queryAdviceUnwritEmr" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+     select patientName,emrCode,in_time,out_time,zg_doctor_id,hosp_code,emrName,visitId
+     from (
+               select v.name as patientName,
+                      GROUP_CONCAT(et.classify_code) as emrCode,
+                      v.zg_doctor_id,
+                      v.hosp_code,
+                      v.in_time,
+                      v.out_time,
+                      v.id as visitId,
+                      CONCAT((select name from emr_classify where CODE =#{emrCode} and hosp_code =#{hospCode} limit 1),'已超过',#{timeOut},'未书写,请及时书写') as emrName
+                      from inpt_visit v
+                      join emr_patient em on v.id = em.visit_id and em.hosp_code =#{hospCode}
+                      JOIN emr_classify_template et on em.classify_template_id = et.id and et.hosp_code =#{hospCode}
+                      JOIN inpt_advice ia on v.id = ia.visit_id
+                      and ia.item_id in
+                      <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+                         #{id}
+                      </foreach>
+                      and ia.crte_time is not null and ia.hosp_code =#{hospCode}
+                      where TIMESTAMPDIFF(HOUR,ia.crte_time,NOW()) > #{timeOut}
+                      GROUP BY v.id) f
+        where emrCode not like concat('%', #{emrCode,jdbcType=VARCHAR}, '%') and hosp_code = #{hospCode}
+    </select>
+
+    <!--查询以转科时间计算超时时间的超时病历-->
+    <select id="queryTurnDeptUnwriteEmr" resultType="cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO">
+        select patientName,emrCode,in_time,out_time,zg_doctor_id,hosp_code,emrName,visitId
+        from (
+           select v.name as patientName,
+           GROUP_CONCAT(et.classify_code) as emrCode,
+           v.zg_doctor_id,
+           v.hosp_code,
+           v.in_time,
+           v.out_time,
+           v.id as visitId,
+           CONCAT((select name from emr_classify where CODE =#{emrCode} and hosp_code =#{hospCode} limit 1),'已超过',#{timeOut},'小时未书写,请及时书写') as emrName
+           from inpt_visit v
+           join emr_patient em on v.id = em.visit_id and em.hosp_code =#{hospCode}
+           JOIN emr_classify_template et on em.classify_template_id = et.id and et.hosp_code =#{hospCode}
+           join inpt_bed_change bc on bc.visit_id =v.id and bc.change_code ='3' and bc.hosp_code =#{hospCode}
+           where TIMESTAMPDIFF(HOUR,bc.crte_time,NOW()) > #{timeOut}
+           GROUP BY v.id
+           ) f
+         where emrCode not like concat('%', #{emrCode,jdbcType=VARCHAR}, '%') and hosp_code = #{hospCode}
+    </select>
+
 </mapper>

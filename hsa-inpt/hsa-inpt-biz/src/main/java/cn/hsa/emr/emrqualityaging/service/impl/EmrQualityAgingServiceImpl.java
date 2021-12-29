@@ -101,4 +101,17 @@ public class EmrQualityAgingServiceImpl extends HsafService implements EmrQualit
   public WrapperResponse<List<EmrQualityAgingDTO>> queryEmrQualityListById(Map map) {
     return WrapperResponse.success(emrQualityAgingBO.queryEmrQualityListById(map));
   }
+
+  /**
+   * @Description: 病人病历未书写提醒
+   * @param map
+   * @Author: liuliyun
+   * @Email: liyun.liu@powersi.com
+   * @Date 2021/11/29 9:24
+   * @Return WrapperResponse<Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> queryUnwriteEmrList(Map map) {
+    return WrapperResponse.success(emrQualityAgingBO.insertUnwriteEmrList(map));
+  }
 }

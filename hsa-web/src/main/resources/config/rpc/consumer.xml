@@ -509,5 +509,8 @@
     <dubbo:reference id="centerGlobalConfigService_consumer" interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" check="false"/>
     <!-- 国标基础药品搜索服务 -->
     <dubbo:reference id="searchableNationStandardDrugService_consumer" interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" check="false"/>
+    <!--消息推送-->
+    <dubbo:reference id="messageInfoService_consumer" interface="cn.hsa.module.emr.message.service.MessageInfoService" check="false"/>
+
 </beans>
 

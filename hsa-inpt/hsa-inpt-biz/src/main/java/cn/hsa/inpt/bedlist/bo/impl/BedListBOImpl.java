@@ -7,6 +7,9 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
+import cn.hsa.module.emr.message.dao.MessageInfoDAO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.bedlist.bo.BedListBO;
 import cn.hsa.module.inpt.bedlist.dao.BedListDAO;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
@@ -20,7 +23,9 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -57,6 +62,12 @@ public class BedListBOImpl implements BedListBO {
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private MessageInfoDAO messageInfoDAO;
 
     /**
      * @Method queryPage
@@ -1275,6 +1286,8 @@ public class BedListBOImpl implements BedListBO {
             inptVisitDTO.setTotalInDays(totalInDays);
             bedListDAO.updateInptVisitTotalDays(inptVisitDTO);
         }
+        // lly 2021-12-06 预出院收费提醒
+        chargeFeeMsg(inptVisitDTO);
     }
     // 20210723 无出院诊断办理出院时，选择的出院诊断更新至诊断管理表 liuliyun
     public void insertDiagnose(InptVisitDTO inptVisitDTO){
@@ -1386,4 +1399,68 @@ public class BedListBOImpl implements BedListBO {
         }
     }
     /***************************************zhongming added by 20201222 end*****************************************/
+
+    // 预出院将收费消息写入消息表 lly 2021-12-06
+    public void chargeFeeMsg(InptVisitDTO inptVisitDTO){
+        String hospCode =inptVisitDTO.getHospCode();
+        String name = inptVisitDTO.getCrteName();
+        String crteId = inptVisitDTO.getCrteId();
+        Map openParam = new HashMap();
+        openParam.put("hospCode", hospCode);
+        openParam.put("code", "MSG_OPEN");
+        SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+            Map paramMap = new HashMap();
+            paramMap.put("hospCode", hospCode);
+            paramMap.put("code", "XXTS_SETTING");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+            ConfigInfoDO configInfoDO = null;
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(),"chargeMsg");
+            }
+            if (configInfoDO ==null){
+                return;
+            }
+            if (inptVisitDTO != null) {
+                    MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                    messageInfoDTO.setId(SnowflakeUtils.getId());
+                    messageInfoDTO.setHospCode(hospCode);
+                    messageInfoDTO.setSourceId("");
+                    messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+                    messageInfoDTO.setType(Constants.MSG_TYPE.MSG_SF);
+                    messageInfoDTO.setContent(inptVisitDTO.getName() + "已预出院，请及时结算");
+                    Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+                    Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+                    messageInfoDTO.setStartTime(startTime);
+                    messageInfoDTO.setEndTime(endTime);
+                    messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);
+                    messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+                    messageInfoDTO.setUrl(configInfoDO.getUrl());
+                    messageInfoDTO.setCrteName(name);
+                    messageInfoDTO.setCrteTime(DateUtils.getNow());
+                    messageInfoDTO.setCrteId(crteId);
+                    List<MessageInfoDTO> messageInfoDTOList =new ArrayList<>();
+                    messageInfoDTOList.add(messageInfoDTO);
+                //messageInfoDAO.insertMessageInfo(messageInfoDTO);
+                // 获取医院kafka 的IP与端口
+                Map<String, Object> sysMap = new HashMap<>();
+                sysMap.put("hospCode", hospCode);
+                sysMap.put("code", "KAFKA_MSG_IP");
+                SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+                if (sys == null || sys.getValue() == null) {
+                    return;
+                }
+                String server = sys.getValue();
+                // 1. 创建一个kafka生产者
+                String producerTopic = Constants.MSG_TOPIC.producerTopicKey;//生产者消息推送Topic
+                KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+                String message = JSONObject.toJSONString(messageInfoDTOList);
+                KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+            }
+        }
+    }
 }

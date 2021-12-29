@@ -195,4 +195,16 @@ public class PhysRegisterDTO implements Serializable {
 
     // 分组id
     private String groupId;
+
+    // 医生id
+    private String doctorId;
+
+    // 医生姓名
+    private String doctorName;
+
+    // 科室id
+    private String deptId;
+
+    // 科室名称
+    private String deptName;
 }

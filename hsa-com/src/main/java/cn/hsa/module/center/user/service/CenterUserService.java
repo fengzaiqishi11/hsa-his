@@ -168,5 +168,5 @@ public interface CenterUserService {
     */
 
     @GetMapping("/service/center/centerUser/changePassWord")
-    WrapperResponse<Boolean> changePassWord(Map changePassWordParam);
+    WrapperResponse<Boolean> updatePassWord(Map changePassWordParam);
 }

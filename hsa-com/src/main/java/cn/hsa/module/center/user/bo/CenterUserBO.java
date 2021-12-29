@@ -151,7 +151,7 @@ public interface CenterUserBO {
     * @return boolean  
     * @throws   
     */
-    boolean changePassWord(Map changePassWordParam);
+    boolean updatePassWord(Map changePassWordParam);
 
 
 }

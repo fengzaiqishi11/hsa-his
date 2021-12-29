@@ -135,6 +135,8 @@ public class MedicalAdviceController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
         medicalAdviceDTO.setCheckTime(DateUtils.getNow());
+        medicalAdviceDTO.setCrteId(sysUserDTO.getId());
+        medicalAdviceDTO.setCrteName(sysUserDTO.getName());
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("medicalAdviceDTO", medicalAdviceDTO);

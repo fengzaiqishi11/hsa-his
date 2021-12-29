@@ -91,4 +91,48 @@ public interface EmrQualityAgingDAO {
      * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
      **/
     EmrQualityAgingDTO queryEmrQualityListByEmrCode(EmrQualityAgingDTO emrQualityAgingDTO);
+
+    /**
+     * @Menthod queryRyOrCyUnwriteEmr
+     * @param  emrQualityAgingDTO
+     * @Describe: 查询以入、出时间为基准时间的超时病历
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/29 14：16
+     * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+     **/
+    List<EmrQualityAgingDTO> queryRyOrCyUnwriteEmr(EmrQualityAgingDTO emrQualityAgingDTO);
+
+    /**
+     * @Menthod queryTurnDeptUnwriteEmr
+     * @param  emrQualityAgingDTO
+     * @Describe: 查询转科为基准时间的超时病历
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/29 14：37
+     * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+     **/
+    List<EmrQualityAgingDTO> queryTurnDeptUnwriteEmr(EmrQualityAgingDTO emrQualityAgingDTO);
+
+    /**
+     * @Menthod queryOperUnwritEmr
+     * @param  emrQualityAgingDTO
+     * @Describe: 查询以手术时间为基准时间的超时病历
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/29 14：15
+     * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+     **/
+    List<EmrQualityAgingDTO> queryOperUnwritEmr(EmrQualityAgingDTO emrQualityAgingDTO);
+
+    /**
+     * @Menthod queryAdviceUnwritEmr
+     * @param  emrQualityAgingDTO
+     * @Describe: 查询以医嘱时间为基准时间的超时病历
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/11/29 14：14
+     * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+     **/
+    List<EmrQualityAgingDTO> queryAdviceUnwritEmr(EmrQualityAgingDTO emrQualityAgingDTO);
 }

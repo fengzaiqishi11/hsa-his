@@ -755,6 +755,7 @@
           ifnull(iis.before_settle, 0.00) as beforeSettle,
           ifnull(iis.last_settle, 0.00) as lastSettle,
           os.source_pay_code as sourcePayCode,
+          b.preferentialPrice as preferentialPrice,
           ifnull((select GROUP_CONCAT(b.name) as payCode
           from outpt_pay a
           join sys_code_detail b

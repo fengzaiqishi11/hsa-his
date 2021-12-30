@@ -85,6 +85,9 @@
             <if test="crteTime != null">
                 and a.crte_time = #{crteTime}
             </if>
+            <if test="inDeptId != null">
+                  and b.in_dept_id = #{inDeptId}
+            </if>
             <if test="keyword != null and keyword != ''">
               and (b.name like concat('%',#{keyword},'%')
               or b.in_no like concat('%',#{keyword},'%'))

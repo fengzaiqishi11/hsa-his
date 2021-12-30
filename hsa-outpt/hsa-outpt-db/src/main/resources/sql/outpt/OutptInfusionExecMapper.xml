@@ -99,7 +99,12 @@
             b.num_unit_code,
             b.dosage,
             b.dosage_unit_code,
-            b.usage_code
+            b.usage_code,
+            concat(
+                c.name, '/',
+                (case c.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '/',
+                c.age, (case c.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end)
+            ) as patientInfo
         FROM
             outpt_prescribe_exec a
                 left JOIN outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.opd_id = b.id

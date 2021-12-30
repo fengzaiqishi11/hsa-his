@@ -29,4 +29,9 @@ public class EmrQualityAgingDTO extends EmrQualityAgingDO implements Serializabl
     private String keyword; // 搜索关键字
     private String label; // 病历模板名称label
     private String emrName; // 病历模板名称
+    private String zgDoctorId;
+    private String zgDoctorName;
+    private String patientName;
+    private String queryColunm;
+    private String visitId;
 }

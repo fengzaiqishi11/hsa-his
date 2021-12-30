@@ -46,6 +46,11 @@ public class SmsHandler implements Handler {
         return false;
     }
 
+    @Override
+    public boolean doHandlerUpdate(TaskInfo taskInfo) {
+        return false;
+    }
+
 
     /**
      * 如果有输入链接，则把链接拼在文案后

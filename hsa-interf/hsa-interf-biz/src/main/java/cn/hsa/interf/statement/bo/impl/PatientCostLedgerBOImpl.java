@@ -3539,28 +3539,73 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      **/
     @Override
     public Map getInptOperFinanceTitle(InptVisitDTO inptVisitDTO) {
-        Map resultMap = new HashMap();
-        List<Map> listTableConfig = new ArrayList<>();
-        List<InptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getInptOperFinanceTitle(inptVisitDTO);
-        Map<String, List<InptCostDTO>> collect2 = inptCostDTOSAll.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
-        Map map = new HashMap();
-        map.put("label","费用构成");
-        List<Map> childList = new ArrayList<>();
-        int num = 0;
-        for (String key : collect2.keySet()) {
-            Map childMap = new HashMap();
-            childMap.put("label",key);
-            childMap.put("prop",collect2.get(key).get(0).getBfcId());
-            childMap.put("type","money");
-            childMap.put("toFixed", 2);
-            childMap.put("showSummary", true);
-            childMap.put("minWidth","100");
-            childList.add(childMap);
+        // 按科室
+        if(StringUtils.isNotEmpty(inptVisitDTO.getStatisticType())&& inptVisitDTO.getStatisticType().equals("1")) {
+
+            Map<String,Object> returnMap = new HashMap<>();
+            // 返回的表头
+            Map<String,Map> tableHeader = new LinkedHashMap<>();
+
+            List<Map<String,Object>> dataList = new ArrayList<>();
+
+            List<OutptCostAndReigsterCostDTO> outptCostAndReigsterCostDTOS = patientCostLedgerDAO.queryOperCostListGroupByDept(inptVisitDTO);
+
+            if (ListUtils.isEmpty(outptCostAndReigsterCostDTOS)){
+                return returnMap;
+            }
+
+            Map<String, List<OutptCostAndReigsterCostDTO>> deptDoctorVisitIdCollect = outptCostAndReigsterCostDTOS.stream().
+                    collect(Collectors.groupingBy(a->a.getDeptId()));
+            // 组装固定表头
+            Map<String,Object> headItemMap7 = new HashMap<>();
+            Map<String,Object> headItemMap8 = new HashMap<>();
+
+            headItemMap7.put("label","开方科室");
+            headItemMap7.put("prop","name");
+            headItemMap8.put("label","手术总费用");
+            headItemMap8.put("prop","price");
+            headItemMap8.put("type","money");
+            headItemMap8.put("showSummary",true);
+            headItemMap8.put("toFixed",2);
+
+            tableHeader.put("deptName",headItemMap7);
+            tableHeader.put("price",headItemMap8);
+            this.setFixedtableHeader(tableHeader);
+
+            for (String chargeId : deptDoctorVisitIdCollect.keySet()){
+
+                Map<String,Object> dataItemMap = new HashMap<>();
+                List<OutptCostAndReigsterCostDTO> groupByList = deptDoctorVisitIdCollect.get(chargeId);
+                // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                dataItemMap.put("name",groupByList.get(0).getDeptName());
+                this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+            }
+            returnMap.put("tableHeader", new ArrayList<>(tableHeader.values()));
+            return returnMap;
+        } else {
+            Map resultMap = new HashMap();
+            List<Map> listTableConfig = new ArrayList<>();
+            List<InptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getInptOperFinanceTitle(inptVisitDTO);
+            Map<String, List<InptCostDTO>> collect2 = inptCostDTOSAll.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
+            Map map = new HashMap();
+            map.put("label", "费用构成");
+            List<Map> childList = new ArrayList<>();
+            int num = 0;
+            for (String key : collect2.keySet()) {
+                Map childMap = new HashMap();
+                childMap.put("label", key);
+                childMap.put("prop", collect2.get(key).get(0).getBfcId());
+                childMap.put("type", "money");
+                childMap.put("toFixed", 2);
+                childMap.put("showSummary", true);
+                childMap.put("minWidth", "100");
+                childList.add(childMap);
+            }
+            map.put("children", childList);
+            resultMap.put("listTableConfig", listTableConfig);
+            listTableConfig.add(map);
+            return resultMap;
         }
-        map.put("children",childList);
-        resultMap.put("listTableConfig",listTableConfig);
-        listTableConfig.add(map);
-        return resultMap;
     }
 
     /**
@@ -3573,24 +3618,93 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      **/
     @Override
     public PageDTO getInptOperFinanceList(InptVisitDTO inptVisitDTO) {
-        List<InptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getInptOperFinanceTitle(inptVisitDTO);
-        PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
-        //动态拼接sql
-        StringBuffer sqlStr = new StringBuffer();
-        if (ListUtils.isEmpty(inptCostDTOSAll)) {
-            return PageDTO.of(new ArrayList());
+        // 按科室
+        if(StringUtils.isNotEmpty(inptVisitDTO.getStatisticType())&& inptVisitDTO.getStatisticType().equals("1")) {
+
+            Map<String,Object> returnMap = new HashMap<>();
+            // 返回的表头
+            Map<String,Map> tableHeader = new LinkedHashMap<>();
+
+            List<Map<String,Object>> dataList = new ArrayList<>();
+
+            List<OutptCostAndReigsterCostDTO> outptCostAndReigsterCostDTOS = patientCostLedgerDAO.queryOperCostListGroupByDept(inptVisitDTO);
+
+            if (ListUtils.isEmpty(outptCostAndReigsterCostDTOS)){
+                return PageDTO.of(dataList);
+            }
+
+            Map<String, List<OutptCostAndReigsterCostDTO>> deptDoctorVisitIdCollect = outptCostAndReigsterCostDTOS.stream().
+                    collect(Collectors.groupingBy(a->a.getDeptId()));
+            // 组装固定表头
+            Map<String,Object> headItemMap7 = new HashMap<>();
+            Map<String,Object> headItemMap8 = new HashMap<>();
+
+            headItemMap7.put("label","开方科室");
+            headItemMap7.put("prop","name");
+            headItemMap8.put("label","手术总费用");
+            headItemMap8.put("prop","price");
+            headItemMap8.put("type","money");
+            headItemMap8.put("showSummary",true);
+            headItemMap8.put("toFixed",2);
+
+            tableHeader.put("deptName",headItemMap7);
+            tableHeader.put("price",headItemMap8);
+            this.setFixedtableHeader(tableHeader);
+
+            for (String chargeId : deptDoctorVisitIdCollect.keySet()){
+
+                Map<String,Object> dataItemMap = new HashMap<>();
+                List<OutptCostAndReigsterCostDTO> groupByList = deptDoctorVisitIdCollect.get(chargeId);
+                // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+                dataItemMap.put("name",groupByList.get(0).getDeptName());
+                this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+
+            }
+            //returnMap.put("tableHeader", new ArrayList<>(tableHeader.values()));
+            dataList = dataList.stream().sorted(Comparator.comparing(this::comparingByDeptName).reversed()).collect(Collectors.toList());
+            returnMap.put("result",dataList);
+            //return returnMap;
+            PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
+            Map<String,Object> sumData = new HashMap<>();
+            if (!ListUtils.isEmpty(dataList)){
+                for (Map<String,Object> a :dataList){
+                    for (String key :a.keySet()){
+                        if(!sumData.containsKey(key+"Sum")){
+                            if(a.get(key) instanceof  Integer){
+                                sumData.put(key+"Sum",0);
+                            }else if(a.get(key) instanceof  BigDecimal){
+                                sumData.put(key+"Sum",new BigDecimal(0));
+                            }
+                        }
+                        if(a.get(key) instanceof  Integer){
+                            sumData.put(key+"Sum",((Integer)(a.get(key)))+(Integer)(sumData.get(key+"Sum")));
+                        }else if(a.get(key) instanceof  BigDecimal){
+                            sumData.put(key+"Sum",((BigDecimal)(a.get(key))).add((BigDecimal)sumData.get(key+"Sum")));
+                        }
+                    }
+                }
+            }
+            return PageDTO.of(dataList,sumData);
+        } else {
+            List<InptCostDTO> inptCostDTOSAll = patientCostLedgerDAO.getInptOperFinanceTitle(inptVisitDTO);
+            PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
+            //动态拼接sql
+            StringBuffer sqlStr = new StringBuffer();
+            if (ListUtils.isEmpty(inptCostDTOSAll)) {
+                return PageDTO.of(new ArrayList());
+            }
+            for (InptCostDTO inptCostDTO : inptCostDTOSAll) {
+                sqlStr.append("sum((case when a.bfc_id = '");
+                sqlStr.append(inptCostDTO.getBfcId());
+                sqlStr.append("' then a.total_price else 0 end)) '");
+                sqlStr.append(inptCostDTO.getBfcId());
+                sqlStr.append("', ");
+            }
+            inptVisitDTO.setSqlStr(sqlStr.toString());
+            // 统计全部费用
+            List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptOperFinanceList(inptVisitDTO);
+            return PageDTO.of(inptVisitDTOS);
         }
-        for (InptCostDTO inptCostDTO : inptCostDTOSAll) {
-            sqlStr.append("sum((case when a.bfc_id = '");
-            sqlStr.append(inptCostDTO.getBfcId());
-            sqlStr.append("' then a.total_price else 0 end)) '");
-            sqlStr.append(inptCostDTO.getBfcId());
-            sqlStr.append("', ");
-        }
-        inptVisitDTO.setSqlStr(sqlStr.toString());
-        // 统计全部费用
-        List<Map> inptVisitDTOS = patientCostLedgerDAO.getInptOperFinanceList(inptVisitDTO);
-        return PageDTO.of(inptVisitDTOS);
     }
 
     /**
@@ -3650,14 +3764,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             resultmap.put("mapZFY",mapZFY);
             return resultmap;
         }
+        boolean flag = true;
         for (int i = 0; i < mapMz.size(); i++) {
             for (int j = 0; j < mapGh.size(); j++) {
                 if(mapMz.get(i).getBfcId().equals(mapGh.get(j).getBfcId())){
+                    flag = false;
                     mapMz.get(i).setTotalPrice(BigDecimalUtils.add(mapMz.get(i).getTotalPrice(),mapGh.get(j).getTotalPrice()));
                     mapMz.get(i).setPreferentialPrice(BigDecimalUtils.add(mapMz.get(i).getPreferentialPrice(),mapGh.get(j).getPreferentialPrice()));
                     mapMz.get(i).setRealityPrice(BigDecimalUtils.add(mapMz.get(i).getRealityPrice(),mapGh.get(j).getRealityPrice()));
                 }
             }
+        }
+        if(flag){
+            mapMz.addAll(mapGh);
         }
         //收费明细
         resultmap.put("mapMz",mapMz);

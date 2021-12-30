@@ -10,6 +10,10 @@ import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
+import cn.hsa.module.emr.message.dao.MessageInfoDAO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.consultation.dao.InptConsultationApplyDAO;
 import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
@@ -18,6 +22,7 @@ import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.inptprint.dao.InptPrintDAO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
+import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
@@ -32,8 +37,10 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -106,6 +113,11 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     @Resource
     private InptConsultationApplyDAO inptConsultationApplyDAO;
 
+    /**
+     * 消息dao
+     */
+    @Resource
+    private MessageInfoDAO messageInfoDAO;
     /**
     * @Method updateInptAdviceBatch
     * @Desrciption 批量更新医嘱
@@ -430,6 +442,15 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             insetAdvicePrint.get(i).setSeqNo(i);
           }
         }
+        Map queryParam =new HashMap();
+        queryParam.put("hospCode",inptAdviceTDTO.getHospCode());
+        queryParam.put("crteName",inptAdviceTDTO.getSubmitName());
+        queryParam.put("crteId",inptAdviceTDTO.getSubmitId());
+        queryParam.put("type",Constants.YZ_TYPE.YZ_TYPE_YTJ);
+        queryParam.put("ids", inptAdviceTDTO.getIds());
+        // 医嘱提交消息写入
+        insertUnsubmitAdviceList(queryParam,Constants.YZ_TYPE.YZ_TYPE_YTJ);
+
         return inptPrintDAO.insertAdvicePrint(insetAdvicePrint) > 0;
     }
 
@@ -1565,5 +1586,105 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         sysParamMap.put("code", "INSURE_DEFAULT_REG_CODE"); // 医保限制用药默认医保机构编码
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParamMap).getData();
         return sysParameterDTO;
+    }
+
+
+    @Override
+    public List<MessageInfoDTO> insertUnsubmitAdviceList(Map param,String type) {
+        String hospCode = (String) param.get("hospCode");
+        Map openParam = new HashMap();
+        openParam.put("hospCode", hospCode);
+        openParam.put("code", "MSG_OPEN");
+        // 是否开启消息推送 lly 2021-12-02
+        SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+            List<InptVisitDTO> inptVisitDTOS = null;
+            if (Constants.YZ_TYPE.YZ_TYPE_WTJ.equals(type)) {
+                inptVisitDTOS = inptAdviceDAO.queryUnsubmitAdviceList(param);
+            } else if (Constants.YZ_TYPE.YZ_TYPE_YTJ.equals(type)) {
+                inptVisitDTOS = inptAdviceDAO.querySubmitAdviceList(param);
+            }
+            String name = (String) param.get("crteName");
+            String crteId = (String) param.get("crteId");
+            Map paramMap = new HashMap();
+            paramMap.put("hospCode", param.get("hospCode"));
+            paramMap.put("code", "XXTS_SETTING");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+            ConfigInfoDO configInfoDO = null;
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(), "adviceMsg");
+            }
+            if (configInfoDO ==null){
+                return new ArrayList<>();
+            }
+            List<MessageInfoDTO> messageInfoDTOList = new ArrayList<>();
+            if (inptVisitDTOS != null && inptVisitDTOS.size() > 0) {
+                for (InptVisitDTO inptVisitDTO : inptVisitDTOS) {
+                    MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                    messageInfoDTO.setId(SnowflakeUtils.getId());
+                    messageInfoDTO.setHospCode(hospCode);
+                    messageInfoDTO.setSourceId("");
+                    messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+                    messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
+                    messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);
+                    if (Constants.YZ_TYPE.YZ_TYPE_WTJ.equals(type)) {
+                        messageInfoDTO.setContent(inptVisitDTO.getName() + "的医嘱未提交，请及时提交");
+                    } else if (Constants.YZ_TYPE.YZ_TYPE_YTJ.equals(type)) {
+                        messageInfoDTO.setContent(inptVisitDTO.getName() + "的医嘱已提交，请及时核收");
+                    }
+                    Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+                    Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+                    messageInfoDTO.setStartTime(startTime);
+                    messageInfoDTO.setEndTime(endTime);
+                    messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+                    messageInfoDTO.setUrl(configInfoDO.getUrl());
+                    messageInfoDTO.setCrteName(name);
+                    messageInfoDTO.setCrteTime(DateUtils.getNow());
+                    messageInfoDTO.setCrteId(crteId);
+                    messageInfoDTOList.add(messageInfoDTO);
+                    // 消息消费
+                    if (Constants.YZ_TYPE.YZ_TYPE_YTJ.equals(type)) {
+                        consumeSubmitAdviceMessage(inptVisitDTO.getId(), hospCode);
+                    }
+                }
+                sendMessage(messageInfoDTOList, Constants.MSG_TOPIC.producerTopicKey, hospCode);
+                //messageInfoDAO.insertMessageInfoBatch(messageInfoDTOList);
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // 提交消息消费  lly 2021-12-03
+    public void consumeSubmitAdviceMessage(String visitId,String hospCode){
+        // 消息置为已读
+        MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+        messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_YD);
+        messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
+        messageInfoDTO.setHospCode(hospCode);
+        messageInfoDTO.setVisitId(visitId);
+        List<MessageInfoDTO> messageInfoDTOList =new ArrayList<>();
+        messageInfoDTOList.add(messageInfoDTO);
+        sendMessage(messageInfoDTOList,Constants.MSG_TOPIC.consumerTopicKey,hospCode);
+    }
+
+    public void sendMessage(List<MessageInfoDTO> messageInfoDTOS,String type,String hospCode){
+        // 获取医院kafka 的IP与端口
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", hospCode);
+        sysMap.put("code", "KAFKA_MSG_IP");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sys == null || sys.getValue() == null) {
+            return;
+        }
+        String server = sys.getValue();
+        // 1. 创建一个kafka生产者
+        String producerTopic = type;//生产者消息推送Topic
+        KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+        String message = JSONObject.toJSONString(messageInfoDTOS);
+        KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
     }
 }

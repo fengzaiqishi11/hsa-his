@@ -462,4 +462,8 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 是否已写病案 1：已写；0：未写
      */
     private String isLoadMris;
+    /**
+     * 手术报表统计方式： 0：按明细；1：按科室
+     */
+    private String statisticType;
 }

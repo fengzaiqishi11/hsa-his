@@ -1,6 +1,7 @@
 package cn.hsa.module.inpt.doctor.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 
@@ -218,4 +219,15 @@ public interface DoctorAdviceBO {
      * @Return:
      **/
     List<InptAdviceDTO> getZyAdviceByVisitId(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询未提交医嘱信息
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-01 10:01
+     * @Return:
+     **/
+    List<MessageInfoDTO> insertUnsubmitAdviceList(Map map,String type);
 }

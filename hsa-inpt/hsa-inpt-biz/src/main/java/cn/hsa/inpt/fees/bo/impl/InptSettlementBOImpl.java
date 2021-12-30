@@ -1493,6 +1493,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureIndividualVisitDTO.setIsHalfSettle(inHalfSettle);
         insureIndividualVisitDTO.setMedicalRegNo(medicalRegNo);
         insureIndividualVisitDTO.setIsOut(Constants.SF.S);
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(map).getData();
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         if (insureIndividualVisitDTO == null) {

@@ -4,6 +4,8 @@ import cn.hsa.platform.dao.MessageInfoDao;
 import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.runner.WebsocketRunnable;
+import cn.hsa.platform.service.MessageInfoService;
+import cn.hsa.platform.util.Constants;
 import cn.hsa.platform.utils.WebSocketUtils;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,8 +50,16 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
      */
     private static Map<String, Long> clientMap = new ConcurrentHashMap<>();
 
+    /**
+     * 任务map，存储future，用于停止队列任务
+     */
+    private static Map<String, ImContentModel> paramMap = new ConcurrentHashMap<>();
+
     @Resource
     private MessageInfoDao messageInfoDao;
+
+    @Resource
+    private MessageInfoService messageInfoService;
 
     /**
      * 客户端发送给服务端的消息
@@ -68,23 +79,64 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             String key = ctx.channel().id().asLongText();
             //存储channel的id和用户的主键
             clientMap.put(key, messageRequest.getUnionId());
+            // 存储客户端请求参数
+            paramMap.put(key,messageRequest);
             log.info("接受客户端的消息......" + ctx.channel().remoteAddress() + "-参数[" + messageRequest.getUnionId() + "]");
 
             if (!channelMap.containsKey(key)) {
                 //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
-                Future future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest), 0, 10, TimeUnit.SECONDS);
+                Future future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
                 //存储客户端和服务的通信的Chanel
                 channelMap.put(key, ctx.channel());
                 //存储每个channel中的future，保证每个channel中有一个定时任务在执行
                 futureMap.put(key, future);
+                if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
+//                    MessageInfoModel param = new MessageInfoModel();
+//                    param.setDeptId(messageRequest.getDeptId());
+//                    param.setReceiverId(messageRequest.getUnionId() + "");
+//                    param.setHospCode(messageRequest.getHospCode());
+//                    List<MessageInfoModel> messageInfoModel = messageInfoDao.queryUnReadMessageInfoList(param);
+//                    // 查询系统消息
+//                    List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);
+//                    messageInfoModel.addAll(sysMessageInfoList);
+                    List<MessageInfoModel> messageInfoModels = messageInfoService.getUnReadMsgList(getParam(messageRequest));
+                    ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
+                    log.info("首次连接业务处理业务逻辑参数为:{}" + JSON.toJSONString(messageInfoModels));
+                }
             } else {
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
                 // 主动通信业务在此处填写
-                MessageInfoModel param =new MessageInfoModel();
-                param.setDeptId("1");
-                param.setHospCode("1000001");
-                List<MessageInfoModel> messageInfoModel =messageInfoDao.queryMessageInfoByType(param);
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModel)));
+                if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
+//                    MessageInfoModel param = new MessageInfoModel();
+//                    param.setDeptId(messageRequest.getDeptId());
+//                    param.setReceiverId(messageRequest.getUnionId()+"");
+//                    param.setHospCode(messageRequest.getHospCode());
+//                    List<MessageInfoModel> messageInfoModel = messageInfoDao.queryMessageInfoByType(param);
+//                    // 查询系统消息
+//                    List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);
+//                    messageInfoModel.addAll(sysMessageInfoList);
+                    List<MessageInfoModel> messageInfoModels = messageInfoService.getMessageInfoList(getParam(messageRequest));
+//                    if (messageInfoModel != null && messageInfoModel.size() > 0) {
+//                        List<String> ids = new ArrayList<>();
+//                        String hospCode = messageInfoModel.get(0).getHospCode();
+//                        for (MessageInfoModel infoModel : messageInfoModel) {
+//                            ids.add(infoModel.getId());
+//                            infoModel.setCount(infoModel.getCount()+1); // 发送次数+1
+//                        }
+//                        if (ids != null && ids.size() > 0) {
+//                            messageInfoDao.updateMssageInfoBatchByMsgId(messageInfoModel);
+//                        }
+//                    }
+                    ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
+                    log.info("主动业务处理业务逻辑参数为:{}"+JSON.toJSONString(messageInfoModels));
+                    messageInfoService.updateMessageInfoList(messageInfoModels);
+                }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
+//                       MessageInfoModel messageInfoModel =new MessageInfoModel();
+//                       messageInfoModel.setId(messageRequest.getMsgId());
+//                       messageInfoModel.setHospCode(messageRequest.getHospCode());
+//                       messageInfoModel.setStatusCode(Constants.MSGZT.MSG_YD);
+                       messageInfoDao.updateMssageInfoById(getParam(messageRequest));
+                }
             }
 
         } catch (Exception e) {
@@ -94,7 +146,22 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 
     }
 
-
+    public MessageInfoModel getParam(ImContentModel messageRequest){
+        if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
+            MessageInfoModel param = new MessageInfoModel();
+            param.setDeptId(messageRequest.getDeptId());
+            param.setReceiverId(messageRequest.getUnionId() + "");
+            param.setHospCode(messageRequest.getHospCode());
+            return param;
+        }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
+            MessageInfoModel messageInfoModel =new MessageInfoModel();
+            messageInfoModel.setId(messageRequest.getMsgId());
+            messageInfoModel.setHospCode(messageRequest.getHospCode());
+            messageInfoModel.setStatusCode(Constants.MSGZT.MSG_YD);
+            return messageInfoModel;
+        }
+        return new MessageInfoModel();
+    }
 
     /**
      * 客户端掉线时的操作
@@ -153,6 +220,10 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 
     public static Map<String, Long> getClientMap() {
         return clientMap;
+    }
+
+    public static Map<String, ImContentModel> getClientParamMap() {
+        return paramMap;
     }
 
 }

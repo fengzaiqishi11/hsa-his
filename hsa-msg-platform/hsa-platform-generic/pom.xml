@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <start-class>cn.hsa.platform.HsaGenericApplication</start-class>
+        <start-class>cn.hsa.platform.HsaPlatformGenericApplication</start-class>
     </properties>
 
     <dependencies>

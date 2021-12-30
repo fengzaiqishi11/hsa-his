@@ -3764,14 +3764,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             resultmap.put("mapZFY",mapZFY);
             return resultmap;
         }
+        boolean flag = true;
         for (int i = 0; i < mapMz.size(); i++) {
             for (int j = 0; j < mapGh.size(); j++) {
                 if(mapMz.get(i).getBfcId().equals(mapGh.get(j).getBfcId())){
+                    flag = false;
                     mapMz.get(i).setTotalPrice(BigDecimalUtils.add(mapMz.get(i).getTotalPrice(),mapGh.get(j).getTotalPrice()));
                     mapMz.get(i).setPreferentialPrice(BigDecimalUtils.add(mapMz.get(i).getPreferentialPrice(),mapGh.get(j).getPreferentialPrice()));
                     mapMz.get(i).setRealityPrice(BigDecimalUtils.add(mapMz.get(i).getRealityPrice(),mapGh.get(j).getRealityPrice()));
                 }
             }
+        }
+        if(flag){
+            mapMz.addAll(mapGh);
         }
         //收费明细
         resultmap.put("mapMz",mapMz);

@@ -238,12 +238,7 @@
             <groupId>cn.hsa.hsaf.adapt</groupId>
             <artifactId>hsaf-generic-fsstore</artifactId>
         </dependency>
-        <!--websocket-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
+
         <!-- session存储 -->
         <dependency>
             <groupId>org.springframework.session</groupId>

@@ -3,6 +3,7 @@ package cn.hsa.module.interf.statement.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -511,5 +512,16 @@ public interface PatientCostLedgerService {
    */
   @GetMapping("/service/outpt/statement/queryMzMonthlyReport")
   WrapperResponse<PageDTO> queryMzMonthlyReport(Map<String, Object> paraMap);
+  /**
+   * @Menthod getoutptMonthDaily
+   * @Desrciption  查询门诊月结报表
+   * @Param OutptCostDTO
+   * @Author yuelong.chen
+   * @Date   2021/12/24 12:14
+   * @Return List<OutptCostDTO>
+   *
+   * @return*/
+  @GetMapping("/service/outpt/statement/queryoutptMonthDaily")
+  WrapperResponse<Map<String, List<OutptCostDTO>>> queryoutptMonthDaily(Map map);
 }
 

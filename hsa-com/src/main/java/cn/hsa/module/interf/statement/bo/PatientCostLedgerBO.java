@@ -2,6 +2,7 @@ package cn.hsa.module.interf.statement.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
@@ -439,4 +440,15 @@ public interface PatientCostLedgerBO {
    * @Return
    */
   PageDTO queryMzMonthlyReport(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod getoutptMonthDaily
+   * @Desrciption  查询门诊月结报表
+   * @Param OutptCostDTO
+   * @Author yuelong.chen
+   * @Date   2021/12/24 12:14
+   * @Return List<OutptCostDTO>
+   *
+   * @return*/
+  Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO);
 }

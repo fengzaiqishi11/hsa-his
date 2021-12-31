@@ -1495,7 +1495,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureIndividualVisitDTO.setIsOut(Constants.SF.S);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(map).getData();
-
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         if (insureIndividualVisitDTO == null) {
             throw new RuntimeException("未查询到医保登记信息，请先进行医保登记！");
         }

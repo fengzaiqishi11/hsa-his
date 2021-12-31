@@ -358,9 +358,15 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
       inptAdviceDTO.setContent(dto.getContent());
       inptAdviceDTO.setSourceIaId(dto.getSourceIaId());
       inptAdviceDTO.setLastExecTime(dto.getExecTime());
+      // 如果是否阳性不为空  则为主医嘱产生的皮试医嘱 是否阳性，皮试结果全部默认为空
       if(!StringUtils.isEmpty(dto.getIsPositive())){
         String content = inptAdviceDTO.getContent().substring(0,inptAdviceDTO.getContent().lastIndexOf("("));
         inptAdviceDTO.setContent(content);
+      } else {
+        // 如果是正常主医嘱 重新查询数据库不需要回写是否阳性，皮试结果
+        InptAdviceDTO inptAdviceById = inptAdviceDao.getInptAdviceById(inptAdviceDTO);
+        inptAdviceDTO.setIsPositive(inptAdviceById.getIsPositive());
+        inptAdviceDTO.setSkinResultCode(inptAdviceById.getSkinResultCode());
       }
       list.add(inptAdviceDTO);
     });
@@ -368,12 +374,10 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
     int aCount = inptAdviceDao.updateInptAdviceBatch(list);
     if(!ListUtils.isEmpty(adviceList)){
       for (int i = 0; i < adviceList.size(); i++) {
-        if("1".equals(adviceList.get(i).getIsSkin())) {
           String content = adviceList.get(i).getContent().substring(0,adviceList.get(i).getContent().lastIndexOf("("));
           adviceList.get(i).setContent(content);
           adviceList.get(i).setIsPositive(null);
           inptAdviceExecDao.updateIsPositive(adviceList);
-        }
       }
     }
   }

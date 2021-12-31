@@ -86,4 +86,15 @@ public interface EmrQualityAgingService {
      **/
     @GetMapping("/service/emr/emrqualityaging/queryEmrQualityListById")
     WrapperResponse<List<EmrQualityAgingDTO>> queryEmrQualityListById(Map map);
+
+    /**
+     * @Description: 病历书写提醒
+     * @param map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date 2021/11/29 9:19
+     * @Return WrapperResponse<Boolean>
+     */
+    @PostMapping("/service/emr/emrArchiveLogging/queryUnwriteEmrList")
+    WrapperResponse<Boolean> queryUnwriteEmrList(Map map);
 }

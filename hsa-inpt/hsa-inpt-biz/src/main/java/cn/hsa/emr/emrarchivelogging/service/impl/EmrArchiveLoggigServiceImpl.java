@@ -100,4 +100,18 @@ public class EmrArchiveLoggigServiceImpl extends HsafService implements EmrArchi
 	public WrapperResponse<Boolean> outHospInsertEmrArchiveLogging(Map map) {
 		return WrapperResponse.success(emrArchiveLoggingBO.insertOutHospEmrArchiveLogging(map));
 	}
+
+	/**
+	 * @Description: 病人出院七天未归档信息写入消息表
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/11/25 9:16
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> insertOutHospEmrArchiveLogging(Map map) {
+		return WrapperResponse.success(emrArchiveLoggingBO.insertOutHospEmrArchiveMsg(map));
+	}
+
 }

@@ -16,5 +16,13 @@ public interface Handler {
      */
     boolean doHandler(TaskInfo taskInfo);
 
+    /**
+     * 统一处理的handler接口
+     *
+     * @param taskInfo
+     * @return
+     */
+    boolean doHandlerUpdate(TaskInfo taskInfo);
+
 
 }

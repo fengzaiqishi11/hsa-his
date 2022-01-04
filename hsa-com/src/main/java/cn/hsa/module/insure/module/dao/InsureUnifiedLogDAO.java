@@ -48,4 +48,15 @@ public interface InsureUnifiedLogDAO {
      * @Return
     **/
     InsureFunctionLogDO selectInsureUnifiedLog(Map<String, Object> map);
+    
+    /**
+     * @Method 
+     * @Desrciption  
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2022/1/4 10:29
+     * @Return 
+    **/
+    InsureFunctionLogDO selectFunctionLogById(InsureFunctionLogDO insureFunctionLogDO);
 }

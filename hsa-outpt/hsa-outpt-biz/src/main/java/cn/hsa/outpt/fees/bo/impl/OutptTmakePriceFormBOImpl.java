@@ -172,6 +172,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
+    @Resource
+    private SysParameterService getSysParameterService_consumer;
+
 
     /**
      * @param outptVisitDTO 请求参数
@@ -1005,9 +1008,32 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         /**
          * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         * 增加参数控制  零费用报销是否让走医保结算
          */
         if(BigDecimalUtils.equals(akb067,akc264)){
-            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            resultMap.put("hospCode",hospCode);
+            resultMap.put("code","HOSP_APPR_FLAG");
+            String cashPayValue = "";
+            SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(resultMap).getData();
+            if(parameterDTO !=null){
+                String value = parameterDTO.getValue();
+                if(StringUtils.isNotEmpty(value)){
+                    Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+                    for (String key : stringObjectMap.keySet()) {
+                        if ("cashPay".equals(key)) {
+                            cashPayValue = MapUtils.get(stringObjectMap,key);
+                            break;
+                        }
+                    }
+                    if(!"1".equals(cashPayValue)){
+                        throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                    }
+                }else{
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
+            }else{
+                throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            }
         }
 
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付

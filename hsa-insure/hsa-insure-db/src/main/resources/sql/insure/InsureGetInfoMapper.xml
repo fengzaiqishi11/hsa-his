@@ -1607,6 +1607,9 @@
         from insure_individual_visit
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
+        <if test="insureSettleId != null and insureSettleId != ''">
+            and insure_settle_id =#{insureSettleId}
+        </if>
     </select>
     <select id="selectBldInfo" resultType="java.util.Map">
         select id, hosp_code, visit_id, medical_reg_no, bld_cat, bld_amt,

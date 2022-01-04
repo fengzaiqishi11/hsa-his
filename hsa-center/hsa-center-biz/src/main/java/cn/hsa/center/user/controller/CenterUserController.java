@@ -7,7 +7,6 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.user.dto.CenterUserDTO;
 import cn.hsa.module.center.user.service.CenterUserService;
 import cn.hsa.util.MD5Utils;
-import cn.hsa.util.ServletUtils;
 import cn.hsa.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;

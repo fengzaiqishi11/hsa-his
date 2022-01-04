@@ -1234,7 +1234,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 acctPay = new BigDecimal(0.00);
             }else{
                 acctPay = BigDecimalUtils.convert(acctPayObject.toString()); // 个人账户支出
-
             }/**
              * 结算成功以后 更新基金信息
              */
@@ -1259,20 +1258,20 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
                         insureIndividualFundDTO.setInscpScpAmt(null);
                     } else {
-                        insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
+                        insureIndividualFundDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString()));
                     }
                     // 符合政策范围金额
                     // 本次可支付限额金额
                     if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
                         insureIndividualFundDTO.setCrtPaybLmtAmt(null);
                     } else {
-                        insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+                        insureIndividualFundDTO.setCrtPaybLmtAmt(BigDecimalUtils.convert(MapUtils.get(item, "crt_payb_lmt_amt").toString()));
                     }
                     if (MapUtils.isEmpty(item, "fund_payamt")) {
                         insureIndividualFundDTO.setFundPayamt(null);
                     } else {
                         // 基金支付金额
-                        insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+                        insureIndividualFundDTO.setFundPayamt(BigDecimalUtils.convert(MapUtils.get(item, "fund_payamt").toString()));
                     }
                     // 基金支付类型名称
                     insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));

@@ -9,10 +9,14 @@ import cn.hsa.module.center.user.service.CenterUserService;
 import cn.hsa.util.MD5Utils;
 import cn.hsa.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -169,7 +173,6 @@ public class CenterUserController extends CenterBaseController {
         return centerUserService_consumer.updateActivePassword(id);
     }
 
-
     /**
      * @Method: changePassWord()
      * @Description: 用户修改密码
@@ -185,7 +188,6 @@ public class CenterUserController extends CenterBaseController {
                 StringUtils.isEmpty(centerUserDTO.getNewPassword()) ) {
             return WrapperResponse.error(-1,"参数不能为空",null);
         }
-
         // 获取用户信息
         CenterUserDTO centerUser = getData(centerUserService_consumer.getByCode(userId));
 
@@ -213,6 +215,6 @@ public class CenterUserController extends CenterBaseController {
         changePassWordParam.put("oldPassWord",centerUserDTO.getOldPassWord());
         changePassWordParam.put("newPasswordByMd5",newPasswordByMd5);
         changePassWordParam.put("id",centerUser.getId());
-        return centerUserService_consumer.changePassWord(changePassWordParam);
+        return centerUserService_consumer.updatePassWord(changePassWordParam);
     }
 }

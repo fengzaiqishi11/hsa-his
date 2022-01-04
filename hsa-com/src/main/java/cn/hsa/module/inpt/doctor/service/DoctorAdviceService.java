@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.doctor.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -241,4 +242,15 @@ public interface DoctorAdviceService {
      **/
     @GetMapping("/service/inpt/doctorAdviceController/getZyAdviceByVisitId")
     WrapperResponse<List<InptAdviceDTO>> getZyAdviceByVisitId(Map map);
+
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询未提交医嘱信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-01 10:29
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/queryUnsubmitAdviceList")
+    WrapperResponse<Boolean> queryUnsubmitAdviceList(Map map);
 }

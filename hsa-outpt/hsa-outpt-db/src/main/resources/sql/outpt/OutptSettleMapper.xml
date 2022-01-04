@@ -545,10 +545,10 @@
             and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.settle_no = #{keyword} )
         </if>
         <if test="startTime != null and startTime != ''">
-            and a.settle_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s')
+            and a.settle_time &gt;= #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-            and a.settle_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+            and a.settle_time &lt;= #{endTime}
         </if>
         <if test="chargeId != null and chargeId != ''">
             and a.crte_id = #{chargeId}
@@ -611,10 +611,10 @@
             or b.cert_no LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="startTime != null and startTime != ''">
-            and a.settle_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d %H:%i:%s')
+            and a.settle_time &gt;= #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-            and a.settle_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%s')
+            and a.settle_time &lt;= #{endTime}
         </if>
         <if test="doctorId != null and doctorId != ''">
             and b.doctor_id = #{doctorId}

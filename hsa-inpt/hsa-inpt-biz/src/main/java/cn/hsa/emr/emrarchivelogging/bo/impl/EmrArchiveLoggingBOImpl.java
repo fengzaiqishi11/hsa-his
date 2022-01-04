@@ -6,18 +6,22 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrarchivelogging.bo.EmrArchiveLoggingBO;
 import cn.hsa.module.emr.emrarchivelogging.dao.EmrArchiveLoggingDAO;
 import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
 import cn.hsa.module.emr.emrpatient.dao.EmrPatientDAO;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.module.emr.message.dao.MessageInfoDAO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.emr.emrarchivelogging.bo.impl
@@ -37,6 +41,12 @@ public class EmrArchiveLoggingBOImpl extends HsafBO implements EmrArchiveLogging
 
 	@Resource
 	private EmrPatientDAO emrPatientDAO;
+
+	@Resource
+	private SysParameterService sysParameterService_consumer;
+
+	@Resource
+	MessageInfoDAO messageInfoDAO;
 	/**
 	 * @Description: 新增病人病历归档记录, 新增只会在设置为归档时才会增，如果有未审核完成病历，不允许归档
 	 * 1.校验传入的就诊id的病历是否全部完成审核
@@ -251,5 +261,87 @@ public class EmrArchiveLoggingBOImpl extends HsafBO implements EmrArchiveLogging
 			// 执行批量新增操作，批量归档
 			return emrArchiveLoggingDAO.insertEmrArchiveLoggingDO(archiveLoggingDTOList);
 		}
+	}
+
+	/**
+	 * @Description: 病人出院7天未归档信息写入消息表
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/11/25 9:20
+	 * @Return boolean
+	 */
+	@Override
+	public boolean insertOutHospEmrArchiveMsg(Map param) {
+		String hospCode =(String) param.get("hospCode");
+		String name = (String) param.get("crteName");
+		String crteId = (String) param.get("crteId");
+		Map openParam = new HashMap();
+		openParam.put("hospCode", hospCode);
+		openParam.put("code", "MSG_OPEN");
+		// 是否开启消息推送 lly 2021-12-02
+		SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+		if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+			Map paramMap = new HashMap();
+			paramMap.put("hospCode", param.get("hospCode"));
+			paramMap.put("code", "XXTS_SETTING");
+			SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+			ConfigInfoDO configInfoDO = null;
+			if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+				configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(), "emrMsg");
+			}
+			if (configInfoDO ==null){
+				return false;
+			}
+			// 取出未归档病人信息
+			List<EmrArchiveLoggingDTO> archiveLoggingDTOS = emrArchiveLoggingDAO.getZYEmrNoArchivedInfo(param);
+			if (archiveLoggingDTOS != null && archiveLoggingDTOS.size() > 0) {
+				List<MessageInfoDTO> messageInfoDTOList = new ArrayList<>();
+				for (EmrArchiveLoggingDTO archiveLoggingDTO : archiveLoggingDTOS) {
+					MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+					messageInfoDTO.setId(SnowflakeUtils.getId());
+					messageInfoDTO.setHospCode(hospCode);
+					messageInfoDTO.setSourceId("");
+					messageInfoDTO.setVisitId(archiveLoggingDTO.getVisitId());
+					messageInfoDTO.setType(Constants.MSG_TYPE.MSG_BL);
+					messageInfoDTO.setContent(archiveLoggingDTO.getPatientName() + "等病人的病历未归档，请及时归档");
+					if (configInfoDO != null) {
+						messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+						messageInfoDTO.setLevel(configInfoDO.getLevel());
+						messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+						messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+						Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+						Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+						messageInfoDTO.setStartTime(startTime);
+						messageInfoDTO.setEndTime(endTime);
+						messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+						messageInfoDTO.setUrl(configInfoDO.getUrl());
+					}
+					messageInfoDTO.setCrteName(name);
+					messageInfoDTO.setCrteTime(DateUtils.getNow());
+					messageInfoDTO.setCrteId(crteId);
+					messageInfoDTOList.add(messageInfoDTO);
+				}
+				if (messageInfoDTOList != null && messageInfoDTOList.size() > 0) {
+//					return messageInfoDAO.insertMessageInfoBatch(messageInfoDTOList) > 0;
+					// 获取医院kafka 的IP与端口
+					Map<String, Object> sysMap = new HashMap<>();
+					sysMap.put("hospCode", hospCode);
+					sysMap.put("code", "KAFKA_MSG_IP");
+					SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+					if (sys == null || sys.getValue() == null) {
+					    return true;
+					}
+					String server = sys.getValue();
+					// 1. 创建一个kafka生产者
+					String producerTopic = Constants.MSG_TOPIC.producerTopicKey;//生产者消息推送Topic
+					KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+					String message = JSONObject.toJSONString(messageInfoDTOList);
+					KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+					return  true;
+				}
+			}
+		}
+        return true;
 	}
 }

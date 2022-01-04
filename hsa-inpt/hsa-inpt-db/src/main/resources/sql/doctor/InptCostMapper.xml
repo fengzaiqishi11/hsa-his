@@ -498,10 +498,10 @@
             )
         </if>
         <if test="startTime != null">
-            and t.crte_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
+            and t.cost_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d')
         </if>
         <if test="stopTime != null">
-            and t.crte_time &lt;= DATE_ADD(STR_TO_DATE(#{stopTime},'%Y-%m-%d'),INTERVAL 1 day)
+            and t.cost_time &lt;= DATE_ADD(STR_TO_DATE(#{stopTime},'%Y-%m-%d'),INTERVAL 1 day)
         </if>
         <if test="visitId != null and visitId !=''">
             AND t.visit_id = #{visitId}

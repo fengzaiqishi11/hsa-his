@@ -20,5 +20,10 @@
             <artifactId>hsa-platform-common</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hsa.platform</groupId>
+            <artifactId>hsa-platform-support</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 </project>

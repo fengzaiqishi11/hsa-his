@@ -1,17 +1,12 @@
 package cn.hsa.search.controller;
 
-import cn.hsa.base.PageDTO;
-import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
-import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.search.service.NationStandardDrugService;
-import com.github.pagehelper.PageHelper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
-@RequestMapping("search")
+@RequestMapping("/center/search")
 public class NationStandardController {
 
     @Resource

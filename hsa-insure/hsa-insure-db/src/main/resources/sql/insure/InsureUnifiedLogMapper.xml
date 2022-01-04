@@ -62,5 +62,13 @@
         where hosp_code =#{hospCode} and visit_id =#{visitId} and msg_info =#{msgInfo}
         and code =#{code} and is_hospital =#{isHospital} order by crte_time asc limit 1;
     </select>
+    <select id="selectFunctionLogById" resultType="cn.hsa.module.insure.module.entity.InsureFunctionLogDO">
+        select id, hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params,
+               code, crte_id, crte_name,
+               crte_time, error_msg, is_hospital, status, medis_code
+        from insure_function_log
+        where id =#{id} and hosp_code = #{hospCode}
+        order by crte_time desc limit 1
+    </select>
 
 </mapper>

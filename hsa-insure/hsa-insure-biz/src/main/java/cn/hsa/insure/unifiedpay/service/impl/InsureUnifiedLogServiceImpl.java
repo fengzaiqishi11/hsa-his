@@ -59,4 +59,19 @@ public class InsureUnifiedLogServiceImpl extends HsafService implements InsureUn
     public WrapperResponse<Boolean> insertInsureFunctionLog(Map<String,Object> map) {
         return WrapperResponse.success(insureUnifiedLogBO.insertInsureFunctionLog(map));
     }
+
+    /**
+     * @param map
+     * @Method selectInsureLogs
+     * @Desrciption his日志转医保日志入参
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/4 9:37
+     * @Return
+     */
+    @Override
+    public WrapperResponse<String> selectInsureLogs(Map<String, Object> map) {
+        InsureFunctionLogDO insureFunctionLogDO = MapUtils.get(map,"insureFunctionLogDO");
+        return WrapperResponse.success(insureUnifiedLogBO.selectInsureLogs(insureFunctionLogDO));
+    }
 }

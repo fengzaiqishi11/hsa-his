@@ -565,7 +565,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             Date timeSlotDate = DateUtils.parse(timeSlot,"yyyy-MM-dd");
             if(ListUtils.isEmpty(recordTimeList)){
                 dayOps[i] = "";
-            }else if ((outTime.getTime() - timeSlotDate.getTime()) > 0){
+            }else if ((timeSlotDate.getTime() - outTime.getTime()) > 0){
                 // 记录时间大于出院时间默认为空
                 dayOps[i] = "";
             }else{

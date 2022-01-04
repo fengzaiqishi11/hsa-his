@@ -232,7 +232,8 @@
         select c.*,
         ifnull((select num from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockNum,
         (select unit_code from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code) stockUnionCode,
-        ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy
+        ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy,
+        total * price as totalPrice
         from (
             select a.item_code itemCode,a.item_id itemId,a.item_name itemName,a.spec,a.price,a.unit_code unitCode,b.phar_id,a.split_ratio splitRatio,
             ifnull(sum(a.dosage),0) dosage,ifnull(sum(a.num),0) total,a.hosp_code,ifnull(sum(a.split_num),0) splitNum,a.split_unit_code splitUnitCode,

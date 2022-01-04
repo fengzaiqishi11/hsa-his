@@ -1081,6 +1081,7 @@
         LEFT JOIN base_rate e ON a.rate_id = e.id
         WHERE 1=1 AND
         a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}
+        and a.total_price != 0
         <if test="isCheck != null and isCheck != ''">
             AND d.is_check = #{isCheck}
         </if>

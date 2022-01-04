@@ -3750,33 +3750,27 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      * @return*/
     @Override
     public Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO) {
-         Map<String, List<OutptCostDTO>> resultmap = new HashMap<>();
+        Map<String, OutptCostDTO> resultmap = new HashMap<>();
         //门诊收入
         List<OutptCostDTO> mapMz = patientCostLedgerDAO.queryoutptMonthDailybyMz(outptCostDTO);
         //门诊挂号
         List<OutptCostDTO> mapGh = patientCostLedgerDAO.queryoutptMonthDailybyGh(outptCostDTO);
         //总费用
         List<OutptCostDTO> mapZFY = patientCostLedgerDAO.queryoutptMonthDailybyZFY(outptCostDTO);
-        if(ListUtils.isEmpty(mapGh)){
-            //收费明细
-            resultmap.put("mapMz",mapMz);
-            //收费总额
-            resultmap.put("mapZFY",mapZFY);
-            return resultmap;
-        }
-        for (int i = 0; i < mapMz.size(); i++) {
-            for (int j = 0; j < mapGh.size(); j++) {
-                if(mapMz.get(i).getBfcId().equals(mapGh.get(j).getBfcId())){
-                    mapMz.get(i).setTotalPrice(BigDecimalUtils.add(mapMz.get(i).getTotalPrice(),mapGh.get(j).getTotalPrice()));
-                    mapMz.get(i).setPreferentialPrice(BigDecimalUtils.add(mapMz.get(i).getPreferentialPrice(),mapGh.get(j).getPreferentialPrice()));
-                    mapMz.get(i).setRealityPrice(BigDecimalUtils.add(mapMz.get(i).getRealityPrice(),mapGh.get(j).getRealityPrice()));
-                }
+        mapMz.addAll(mapGh);
+        for (OutptCostDTO opc:mapMz) {
+            if(resultmap.containsKey(opc.getBfcId())){
+                resultmap.get(opc.getBfcId()).setTotalPrice(BigDecimalUtils.add(resultmap.get(opc.getBfcId()).getTotalPrice(),opc.getTotalPrice()));
+                resultmap.get(opc.getBfcId()).setPreferentialPrice(BigDecimalUtils.add(resultmap.get(opc.getBfcId()).getPreferentialPrice(),opc.getPreferentialPrice()));
+                resultmap.get(opc.getBfcId()).setRealityPrice(BigDecimalUtils.add(resultmap.get(opc.getBfcId()).getRealityPrice(),opc.getRealityPrice()));
+            }else {
+                resultmap.put(opc.getBfcId(),opc);
             }
         }
-        //收费明细
-        resultmap.put("mapMz",mapMz);
-        //收费总额
-        resultmap.put("mapZFY",mapZFY);
-        return resultmap;
+        List<OutptCostDTO> list = resultmap.values().stream().collect(Collectors.toList());
+        Map<String, List<OutptCostDTO>> map = new HashMap<>();
+        map.put("mapMz",list);
+        map.put("mapZFY",mapZFY);
+        return map;
     }
 }

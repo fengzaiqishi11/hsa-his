@@ -1935,7 +1935,7 @@
         select count(id) num from outpt_cost a
         where FIND_IN_SET(op_id,#{ids}) and a.settle_code = '2' and a.settle_id is not null  and a.hosp_code = #{hospCode}
         <if test="visitId != null and visitId != ''">
-            and a.visit_id #{visitId}
+            and a.visit_id = #{visitId}
         </if>
     </select>
 

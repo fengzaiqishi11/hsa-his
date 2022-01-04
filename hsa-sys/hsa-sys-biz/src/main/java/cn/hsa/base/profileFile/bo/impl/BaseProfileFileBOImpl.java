@@ -361,7 +361,7 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 &&(outptProfileFileDTO.getTotalOut()+outptProfileFileDTO.getTotalIn())>1)){
             throw new AppException("当前档案病人已经就诊，不允许删除！");
         }
-        if(!"0".equals(baseProfileFileDAO.queryPatient(profileId))){
+        if(!"0".equals(baseProfileFileDAO.queryPatient(profileId,outptProfileFileDTO.getCertNo()))){
                 throw new AppException("当前档案病人正在就诊，不允许删除！");
         }
         return baseProfileFileDAO.deleteProfileFile(map);

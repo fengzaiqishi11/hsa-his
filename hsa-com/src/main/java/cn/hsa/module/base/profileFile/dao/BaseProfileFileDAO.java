@@ -2,6 +2,7 @@ package cn.hsa.module.base.profileFile.dao;
 
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -116,7 +117,7 @@ public interface BaseProfileFileDAO {
      * @Date   2021/11/23 12:57
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
-    String queryPatient(String profileId);
+    String queryPatient(@Param("profileId") String profileId,@Param("certNo") String certNo);
 
     OutptProfileFileDTO queryProfileFile(String profileId);
 }

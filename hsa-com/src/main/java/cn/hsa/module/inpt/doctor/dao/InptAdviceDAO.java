@@ -867,4 +867,41 @@ public interface InptAdviceDAO {
      * @param adviceDTOList
      */
     void updateStopAndCheckInfo(List<InptAdviceDTO> adviceDTOList);
+
+    List<BaseAdviceDTO> getLongIllnessAdviceByAdviceId(@Param("longAdviceDTOList") List<InptAdviceDTO> inptAdviceDTOList);
+
+    List<BaseAdviceDTO> getShortIllnessAdviceByAdviceId(@Param("shortAdviceDTOList") List<InptAdviceDTO> inptAdviceDTOList);
+
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询未提交医嘱信息
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-01 09:58
+     * @Return: List<InptVisitDTO>
+     **/
+    List<InptVisitDTO> queryUnsubmitAdviceList(Map map);
+
+    /**
+     * @Menthod: queryRejectAdviceList
+     * @Desrciption: 查询已拒收医嘱信息
+     * @Param: medicalAdviceDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-02 10:40
+     * @Return: List<InptVisitDTO>
+     **/
+    List<InptVisitDTO> queryRejectAdviceList(Map param);
+
+    /**
+     * @Menthod: querySubmitAdviceList
+     * @Desrciption: 查询提交医嘱信息
+     * @Param: medicalAdviceDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-02 14:44
+     * @Return: List<InptVisitDTO>
+     **/
+    List<InptVisitDTO> querySubmitAdviceList(Map param);
 }

@@ -125,4 +125,20 @@ public class SysParameterServiceImpl extends HsafService implements SysParameter
     public WrapperResponse<Map<String, SysParameterDTO>> getParameterByCodeList(Map map) {
         return WrapperResponse.success(sysParameterBO.getParameterByCodeList(MapUtils.get(map,"hospCode"), MapUtils.get(map,"codeList")));
     }
+
+    /**
+    * @Menthod getIsReallyPwd
+    * @Desrciption 校验密码是否正确
+    *
+    * @Param
+    * [map]
+    *
+    * @Author jiahong.yang
+    * @Date   2021/12/20 14:07
+    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+    **/
+    @Override
+    public WrapperResponse<Map> getIsReallyPwd(Map map) {
+      return WrapperResponse.success(sysParameterBO.getIsReallyPwd(map));
+    }
 }

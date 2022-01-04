@@ -134,20 +134,25 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
         BigDecimal totalCost = new BigDecimal(0);//退费费用合计
         List<InptCostDTO> toReds = new ArrayList<>();//充红数据集合
         List<InptCostDTO> normals = new ArrayList<>();//正常数据集合
-
         if(ListUtils.isEmpty(inptCostDTOs)){
             throw new AppException("退费保存失败,参数错误");
         }
         if (inptCostDTOs.stream().filter(cost -> cost.getBackNum().compareTo(BigDecimal.valueOf(0)) <= 0).collect(Collectors.toList()).size() > 0) {
             throw new AppException("退费数量小于等于0不能退费");
         }
+        String comkey = new StringBuilder(hospCode).append(deptId).append(Constants.INPT_DISPENSE_TF_REDIS_KEY).toString();
+        if (redisUtils.hasKey(comkey)) {
+          throw new AppException("药房有人正在发药,请稍后!");
+        }
         //生成redis结算Key，医院编码 + 证件号码 + 划价收费KEY
         String visitId = inptCostDTOs.get(0).getVisitId();
         String key = new StringBuilder(hospCode).append("ZYTF").append(StringUtils.isEmpty(visitId)).append(Constants.OUTPT_FEES_REDIS_KEY).toString();
         if (StringUtils.isNotEmpty(redisUtils.get(key))) {
-            throw  new AppException("当前患者正在退费,请稍后操作");
+            throw new AppException("当前患者正在退费,请稍后操作");
         }
         try {
+            // 锁住退费，发药防止两个并发操作
+            redisUtils.set(comkey, deptId, 600);
             // 使用redis锁病人，并设置自动过期时间600秒，防止异常情况没有结算成功且redis不会自动清除的问题
             redisUtils.set(key, visitId, 600);
             //退费费用ID
@@ -420,6 +425,12 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             //更新患者的合计费用 20210520 liuliyun婴儿费用退费不用更新大人总费用
             //if (StringUtils.isNotEmpty(queryBaby)&&queryBaby.equals("N")) {
             inptVisitDAO.updateTotalCost(inptVisitDTO);
+            // 更新手术费用
+            if(StringUtils.isNotEmpty(inptCostDTOs.get(0).getIsSs()) && Constants.SF.S.equals(inptCostDTOs.get(0).getIsSs())){
+                InptCostDTO updateCost = inptCostDTOs.get(0);
+                updateCost.setSourceDeptId(deptId);
+                inptCostDAO.updateOperInfoRecord(updateCost);
+            }
             //}
 
             /***
@@ -443,6 +454,7 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
         } catch (Exception e) {
             throw e;
         } finally {
+            redisUtils.del(comkey);//删除结算key
             redisUtils.del(key);//删除结算key
         }
         return true;

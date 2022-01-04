@@ -302,6 +302,13 @@ public interface Constants {
     String INPT_DISPENSE_REDIS_KEY = "inpt_dispense";
 
     /**
+     * @Desrciption 住院发药退费组合key
+     * @Author zhangguorui
+     * @Date 2021/11/22 15:41
+     */
+    String INPT_DISPENSE_TF_REDIS_KEY = "inpt_dispense_tf";
+
+    /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
      * @Author Ou·Mr
      * @Date 2020/8/31 15:47
@@ -1123,5 +1130,50 @@ public interface Constants {
     class HZLX {
         public static final String CGHZ = "0"; // 常规会诊
         public static final String JHZ = "1"; // 急会诊
+    }
+
+    /**
+     * 消息主题（MSG_TYPE）
+     */
+    class MSG_TYPE {
+        public static final String MSG_XT = "1"; // 系统消息
+        public static final String MSG_YZ = "2"; // 医嘱提醒
+        public static final String MSG_BL = "3"; // 病历提醒
+        public static final String MSG_SF = "4"; // 收费提醒
+        public static final String MSG_AC = "5"; // 安床提醒
+    }
+
+    /**
+     * 消息状态（MSGZT）
+     */
+    class MSGZT {
+        public static final String MSG_WD = "1"; // 未读
+        public static final String MSG_YD = "2"; // 已读
+    }
+
+    /**
+     * 病历超时基准时间
+     */
+    class EMRTIME {
+        public static final String EMRTIME_RY = "1"; // 入院时间
+        public static final String EMRTIME_CY = "2"; // 出院时间
+        public static final String EMRTIME_ZK = "3"; // 转科时间
+        public static final String EMRTIME_SS = "4"; // 手术时间
+        public static final String EMRTIME_YZ = "5"; // 医嘱时间
+    }
+
+    /**
+     * 医嘱状态
+     */
+    class YZ_TYPE {
+        public static final String YZ_TYPE_WTJ = "1"; // 未提交
+        public static final String YZ_TYPE_YTJ = "2"; // 提交
+        public static final String YZ_TYPE_JS = "3"; // 拒收
+        public static final String YZ_TYPE_HS= "4"; // 核收
+    }
+
+    class MSG_TOPIC{
+        public static final String producerTopicKey = "msg_product_topic";
+        public static final String consumerTopicKey = "msg_consumer_topic";
     }
 }

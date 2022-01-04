@@ -26,10 +26,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'MZ' IN
@@ -50,10 +50,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'ZY' IN
@@ -74,10 +74,10 @@
             and DATE_FORMAT(settle_time,'%Y-%m-%d') = #{searchDate}
         </if>
         <if test="startDate != null and startDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and settle_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and DATE_FORMAT(settle_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and settle_time &lt;= #{endDate}
         </if>
         <if test="searchTypeList != null and searchTypeList.size > 0">
             and 'GH' IN
@@ -1111,6 +1111,7 @@
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
+        and ma.document_sta &lt;&gt; '01'
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
@@ -1249,7 +1250,7 @@
         and pd.item_id = bd.id
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
-        AND ma.type_code = #{typeCode}
+        and ma.document_sta &lt;&gt; '01'
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
@@ -1532,10 +1533,10 @@
         on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
         <if test="startDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') >= #{startDate}
+            and a.in_time >= #{startDate}
         </if>
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.in_time &lt;= #{endDate}
         </if>
         <if test="deptId != null and deptId != ''">
             and a.in_dept_id = #{deptId}
@@ -1552,7 +1553,7 @@
         inpt_visit a
         where a.hosp_code = #{hospCode}
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.in_time &lt;= #{endDate}
         </if>
         GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
         ) t2

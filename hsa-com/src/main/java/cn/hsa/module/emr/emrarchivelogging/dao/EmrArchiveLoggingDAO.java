@@ -115,4 +115,6 @@ public interface EmrArchiveLoggingDAO {
 	 * @Return
 	 */
 	List<EmrArchiveLoggingDTO> getZYEmrFilePatientsNoArchived(Map param);
+
+	List<EmrArchiveLoggingDTO> getZYEmrNoArchivedInfo(Map param);
 }

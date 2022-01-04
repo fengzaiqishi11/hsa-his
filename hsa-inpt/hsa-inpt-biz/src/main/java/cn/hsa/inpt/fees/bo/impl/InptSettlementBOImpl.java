@@ -1234,7 +1234,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 acctPay = new BigDecimal(0.00);
             }else{
                 acctPay = BigDecimalUtils.convert(acctPayObject.toString()); // 个人账户支出
-
             }/**
              * 结算成功以后 更新基金信息
              */
@@ -1259,20 +1258,20 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
                         insureIndividualFundDTO.setInscpScpAmt(null);
                     } else {
-                        insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
+                        insureIndividualFundDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString()));
                     }
                     // 符合政策范围金额
                     // 本次可支付限额金额
                     if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
                         insureIndividualFundDTO.setCrtPaybLmtAmt(null);
                     } else {
-                        insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+                        insureIndividualFundDTO.setCrtPaybLmtAmt(BigDecimalUtils.convert(MapUtils.get(item, "crt_payb_lmt_amt").toString()));
                     }
                     if (MapUtils.isEmpty(item, "fund_payamt")) {
                         insureIndividualFundDTO.setFundPayamt(null);
                     } else {
                         // 基金支付金额
-                        insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+                        insureIndividualFundDTO.setFundPayamt(BigDecimalUtils.convert(MapUtils.get(item, "fund_payamt").toString()));
                     }
                     // 基金支付类型名称
                     insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));
@@ -1416,6 +1415,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             returnMap.put("lastSettle", list.get(0).get("lastSettle"));
             returnMap.put("creditPrice", list.get(0).get("creditPrice"));
             returnMap.put("bedName", list.get(0).get("bedName"));
+            returnMap.put("seriousPrice",list.get(0).get("seriousPrice"));
             //费用列表 // 暂时保留2021年4月12日11:00:57 官红强
             Map<String, Object> detailMap = new HashMap<>();
             for (Map<String, Object> map : list) {
@@ -1494,7 +1494,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         insureIndividualVisitDTO.setIsOut(Constants.SF.S);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(map).getData();
-
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         if (insureIndividualVisitDTO == null) {
             throw new RuntimeException("未查询到医保登记信息，请先进行医保登记！");
         }
@@ -1569,7 +1569,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 item.put("crteName",crteName);
                 item.put("psnNo",psnNo);
                 item.put("medisCode",medisCode);
+                item.put("insureSettleId",null);
                 item.put("crteTime",DateUtils.getNow());
+                Object cum = item.get("cum");
+                if (cum == null || StringUtils.isEmpty(cum.toString())) {
+                    item.put("cum",0);
+                }
             });
             inptVisitDAO.deletePatientSumInfo(map);
             inptVisitDAO.insertPatientSumInfo(resultDataMap);

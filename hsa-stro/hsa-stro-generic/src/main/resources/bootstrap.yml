@@ -10,6 +10,10 @@ spring:
     allow-bean-definition-overriding: true
   application:
     name: hsa-stro
+  #springboot 接口第一次访问都很慢，因为dispatcherServlet不是一开始就加载的
+  mvc:
+    servlet:
+      load-on-startup: 1
   cloud:
     nacos:
       config:

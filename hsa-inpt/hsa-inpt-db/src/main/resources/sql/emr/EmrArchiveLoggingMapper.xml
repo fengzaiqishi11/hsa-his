@@ -80,6 +80,9 @@
         <if test="outStartDate != null and outStartDate != ''">
             and v.out_time &gt;= STR_TO_DATE(#{outStartDate},'%Y-%m-%d')
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and v.in_dept_id =#{inDeptId}
+        </if>
         order by v.in_time desc
     </select>
 
@@ -117,6 +120,9 @@
         <if test="outStartDate != null and outStartDate != ''">
             and v.out_time &gt;= STR_TO_DATE(#{outStartDate},'%Y-%m-%d')
         </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and v.in_dept_id =#{inDeptId}
+        </if>
         order by v.in_time desc
     </select>
 
@@ -151,5 +157,21 @@
         from inpt_visit v left join emr_archive_logging e on v.id = e.visit_id
         where v.hosp_code = #{hospCode}
         and v.status_code ='7' and DATEDIFF(NOW(),v.out_time)>7 and (e.archive_state ='0' or e.archive_state is null)
+    </select>
+
+    <!-- 查询出院7天未归档信息-->
+    <select id="getZYEmrNoArchivedInfo" resultType="cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO">
+        select v.id as visitId,v.hosp_code as hospCode, v.in_dept_name as inDeptName,
+        v.name as patientName, v.age as patientAge,
+        v.age_unit_code as patientNldw, v.gender_code as patientSex ,
+        v.in_time as ryDate, v.out_time as cyDate, v.in_no,
+        v.bed_name as bedName, e.archive_name, e.archive_option,
+        e.archive_state, e.archive_time
+        from inpt_visit v
+        left join emr_archive_logging e on v.id = e.visit_id and e.hosp_code = #{hospCode}
+        where v.hosp_code = #{hospCode}
+        and v.status_code ='7'
+        and DATEDIFF(NOW(),v.out_time)>7
+        and (e.archive_state ='0' or e.archive_state is null)
     </select>
 </mapper>

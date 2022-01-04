@@ -22,11 +22,16 @@
             GROUP BY ss.visit_id, ss.hosp_code
             ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
         </if>
+        <!--病案是否已写-->
+        <if test="isLoadMris == '0'.toString() or isLoadMris == '1'.toString()">
+          left join mris_base_info mris on a.hosp_code = mris.hosp_code and a.id = mris.visit_id
+        </if>
         WHERE a.hosp_code = #{hospCode}
         <if test="keyword != null and keyword !=''">
             and (
             a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
             or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            or a.in_profile LIKE CONCAT('%',#{keyword},'%')
             )
         </if>
         <if test="zgbrQuery != '2'.toString()">
@@ -49,6 +54,14 @@
         <!--liuliyun 20211022 病案首页添加主管医生过滤-->
         <if test='zgbrQuery =="1"'>
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <!--已写病案-->
+        <if test="isLoadMris == '1'.toString()">
+            and mris.id is not null and mris.id !=''
+        </if>
+        <!--未写病案-->
+        <if test="isLoadMris == '0'.toString()">
+            and (mris.id is null or mris.id ='')
         </if>
         order by a.in_time desc
     </select>

@@ -12,6 +12,7 @@ import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.drawMedicine.bo.DrawMedicineBO;
+import cn.hsa.module.inpt.medical.bo.MedicalAdviceBO;
 import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.phar.pharapply.service.PharApplyService;
@@ -120,10 +121,12 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
           medicalAdviceDTO.setSfTqly("1");
           medicalAdviceDTO.setIds(adviceIds);
           adviceMap.put("medicalAdviceDTO", medicalAdviceDTO);
+          MedicalAdviceBO bean = SpringUtils.getBean(MedicalAdviceBO.class);
+          bean.modifyLongCost(medicalAdviceDTO);
           medicalAdviceService_consumer.longCost(adviceMap);
           //回写提前领药天数为0
           adviceMap.put("advanceDays", "0");
-          this.saveAdvanceTakeMedicine(adviceMap,"ypy");
+          saveAdvanceTakeMedicine(adviceMap,"ypy");
           // 提交独立事务
           transactionManager.commit(status);
         }catch (RuntimeException e){

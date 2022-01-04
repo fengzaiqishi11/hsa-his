@@ -35,5 +35,6 @@ public class MsgTempRecordDTO extends MsgTempRecordDO implements Serializable {
     private String inDeptName;   //入院科室
     private List<String> ids;
     private String content; //医嘱内容
+    private String inDeptId; // 科室id
 
 }

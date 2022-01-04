@@ -769,6 +769,12 @@
                a.num, a.num_unit_code numUnitCode, a.total_num totalNum, a.use_code useCode
         from outpt_cost a
         where a.opd_id = #{opdId} and a.hosp_code = #{hospCode}
+        <if test="opId != null and opId != ''">
+            and a.op_id = #{opId}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and a.visit_id = #{visitId}
+        </if>
     </select>
 
     <!--  获取处方费用-->
@@ -1928,6 +1934,9 @@
     <select id="checkIsPrescribeSettle" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select count(id) num from outpt_cost a
         where FIND_IN_SET(op_id,#{ids}) and a.settle_code = '2' and a.settle_id is not null  and a.hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and a.visit_id #{visitId}
+        </if>
     </select>
 
     <!--

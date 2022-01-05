@@ -32,6 +32,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -444,7 +445,29 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                  * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
                  */
                 if(BigDecimalUtils.equals(akb067,akc264)){
-                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                    isInsureUnifiedMap.put("hospCode",hospCode);
+                    isInsureUnifiedMap.put("code","HOSP_APPR_FLAG");
+                    String cashPayValue = "";
+                    SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+                    if(parameterDTO !=null){
+                        String value = parameterDTO.getValue();
+                        if(StringUtils.isNotEmpty(value)){
+                            Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+                            for (String k : stringObjectMap.keySet()) {
+                                if ("cashPay".equals(k)) {
+                                    cashPayValue = MapUtils.get(stringObjectMap,k);
+                                    break;
+                                }
+                            }
+                            if(!"1".equals(cashPayValue)){
+                                throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                            }
+                        }else{
+                            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                        }
+                    }else {
+                        throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                    }
                 }
                 BigDecimal ake026 = BigDecimalUtils.convert(inptInsureResult.get("ake026"));//企业补充医疗保险基金支付
                 BigDecimal ake029 = BigDecimalUtils.convert(inptInsureResult.get("ake029"));//大额医疗费用补助基金支付
@@ -1234,7 +1257,6 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 acctPay = new BigDecimal(0.00);
             }else{
                 acctPay = BigDecimalUtils.convert(acctPayObject.toString()); // 个人账户支出
-
             }/**
              * 结算成功以后 更新基金信息
              */
@@ -1259,20 +1281,20 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     if (MapUtils.isEmpty(item, "inscp_scp_amt")) {
                         insureIndividualFundDTO.setInscpScpAmt(null);
                     } else {
-                        insureIndividualFundDTO.setInscpScpAmt(MapUtils.get(item, "inscp_scp_amt"));
+                        insureIndividualFundDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(item, "inscp_scp_amt").toString()));
                     }
                     // 符合政策范围金额
                     // 本次可支付限额金额
                     if (MapUtils.isEmpty(item, "crt_payb_lmt_amt")) {
                         insureIndividualFundDTO.setCrtPaybLmtAmt(null);
                     } else {
-                        insureIndividualFundDTO.setCrtPaybLmtAmt(MapUtils.get(item, "crt_payb_lmt_amt"));
+                        insureIndividualFundDTO.setCrtPaybLmtAmt(BigDecimalUtils.convert(MapUtils.get(item, "crt_payb_lmt_amt").toString()));
                     }
                     if (MapUtils.isEmpty(item, "fund_payamt")) {
                         insureIndividualFundDTO.setFundPayamt(null);
                     } else {
                         // 基金支付金额
-                        insureIndividualFundDTO.setFundPayamt(MapUtils.get(item, "fund_payamt"));
+                        insureIndividualFundDTO.setFundPayamt(BigDecimalUtils.convert(MapUtils.get(item, "fund_payamt").toString()));
                     }
                     // 基金支付类型名称
                     insureIndividualFundDTO.setFundPayTypeName(MapUtils.get(item, "fund_pay_type_name"));

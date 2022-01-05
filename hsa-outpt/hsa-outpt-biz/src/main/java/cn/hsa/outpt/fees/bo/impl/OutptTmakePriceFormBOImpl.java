@@ -172,6 +172,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
+    @Resource
+    private SysParameterService getSysParameterService_consumer;
+
 
     /**
      * @param outptVisitDTO 请求参数
@@ -657,7 +660,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     private OutptSettleDO saveOutptSettle(OutptVisitDTO outptVisitDTO, String settleId, String id,
                                           BigDecimal totalPrice, BigDecimal realityPrice, BigDecimal selfPrice, BigDecimal miPrice, String oneSettleId) {
         SysParameterDO sysParameterDO = getSysParameter(outptVisitDTO.getHospCode(), Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
-        BigDecimal roundingCost = BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice); //舍入费用
+        BigDecimal roundingCost = new BigDecimal(0);
+        if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+            roundingCost = outptVisitDTO.getTruncPrice();
+        } else {
+            roundingCost = BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice); //舍入费用
+        }
         // 生成结算数据，保存门诊结算表
         OutptSettleDO outptSettleDO = new OutptSettleDO();
         outptSettleDO.setId(settleId);//id
@@ -1005,9 +1013,32 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         /**
          * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         * 增加参数控制  零费用报销是否让走医保结算
          */
         if(BigDecimalUtils.equals(akb067,akc264)){
-            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            resultMap.put("hospCode",hospCode);
+            resultMap.put("code","HOSP_APPR_FLAG");
+            String cashPayValue = "";
+            SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(resultMap).getData();
+            if(parameterDTO !=null){
+                String value = parameterDTO.getValue();
+                if(StringUtils.isNotEmpty(value)){
+                    Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+                    for (String key : stringObjectMap.keySet()) {
+                        if ("cashPay".equals(key)) {
+                            cashPayValue = MapUtils.get(stringObjectMap,key);
+                            break;
+                        }
+                    }
+                    if(!"1".equals(cashPayValue)){
+                        throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                    }
+                }else{
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
+            }else{
+                throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            }
         }
 
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
@@ -1315,7 +1346,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 5、 保存结算信息（支付方式与各方式金额）
             boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1, tempCardPrice);
             if (isChange) {
-                throw new AppException("支付失败；本次账户支付金额小于当前支付金额！");
+                throw new AppException("支付失败；本次账户支付金额小于当前按医院配置的舍入规则计算后的应付金额！");
             }
 
             // 6、 根据费用信息修改本次结算的费用状态
@@ -1328,7 +1359,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             OutptSettleDO outptSettleDO = new OutptSettleDO();//修改参数
             outptSettleDO.setId(settleId);//结算id
             SysParameterDO sysParameterDO = getSysParameter(hospCode, Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
-            BigDecimal ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+            BigDecimal ssje = new BigDecimal(0);
+            if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+                ssje = BigDecimalUtils.subtract(realityPrice, outptVisitDTO.getTruncPrice());
+            } else {
+                ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+            }
             outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
             outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是

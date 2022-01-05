@@ -384,6 +384,10 @@ public class OutptDoctorPrescribeController extends BaseController {
     paramMap.put("hospCode",sysUserDTO.getHospCode());
     //处方明细ID
     paramMap.put("opdId", req.getParameter("opdId"));
+    // 处方ID
+    paramMap.put("opId",req.getParameter("opId"));
+    // 就诊Id
+    paramMap.put("visitId",req.getParameter("visitId"));
     return outptDoctorPrescribeService_consumer.getPrescribeDetailExt(paramMap);
   }
 

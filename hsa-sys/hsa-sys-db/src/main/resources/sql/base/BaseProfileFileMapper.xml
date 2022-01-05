@@ -444,9 +444,9 @@
     </select>
     <select id="queryPatient" resultType="java.lang.String">
         SELECT COUNT(1) FROM(
-         SELECT id ,register_no as `profile` FROM outpt_visit where profile_id = #{profileId} and is_visit = '0'
+         SELECT id ,register_no as `profile` FROM outpt_visit where cert_no = #{certNo} and profile_id = #{profileId} and is_visit = '0'
         UNION all
-        SELECT id ,in_no as `profile` from inpt_visit where profile_id =  #{profileId}and status_code not in ('0','8')) a
+        SELECT id ,in_no as `profile` from inpt_visit where cert_no = #{certNo} and profile_id =  #{profileId}and status_code not in ('0','8')) a
     </select>
     <select id="queryProfileFile" resultType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
         select

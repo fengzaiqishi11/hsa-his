@@ -462,10 +462,10 @@
             and ifnull(c.insureSettleId,'-1') = '-1'
         </if>
         <if test="startDate != null and startDate != '' ">
-            and date(b.settle_time) &gt;= date(#{startDate})
+            and b.settle_time &gt;= #{startDate}
         </if>
         <if test="endDate != null and endDate != ''">
-            and date(b.settle_time) &lt;= date(#{endDate})
+            and b.settle_time &lt;= #{endDate}
         </if>
         order by a.crte_time
     </select>

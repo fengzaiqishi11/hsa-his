@@ -598,7 +598,8 @@
         c.card_no as cardNo,
         b.profile_id as profileId,
         b.is_phys as isPhys,
-        a.credit_price as creditPrice
+        a.credit_price as creditPrice,
+        a.trunc_price as truncPrice
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id

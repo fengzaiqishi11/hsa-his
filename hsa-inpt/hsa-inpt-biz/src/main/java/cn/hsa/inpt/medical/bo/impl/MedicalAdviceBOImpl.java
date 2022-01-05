@@ -323,13 +323,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //更新住院病人表(inpt_visit)  护理级别(nursing_code)、膳食类型(diet_type)、病情标识(Illness_code)
             updateInpVIsitInfo(inptVisitDTOList);
 
+            //判断是否存在停同类、停非同类以及停自身的医嘱(新开医嘱)
+            stopAdvice(medicalAdviceDTO, adviceIds,stopAdviceList);
+
             // 医嘱停嘱核收-->膳食/护理/危重修改 add luoyong 2021-12-28
             if (!ListUtils.isEmpty(stopAdviceList)) {
                 this.updateStopInptVisitBizType(stopAdviceList);
             }
-
-            //判断是否存在停同类、停非同类以及停自身的医嘱(新开医嘱)
-            stopAdvice(medicalAdviceDTO, adviceIds,stopAdviceList);
 
             //退费，取消执行记录，退药
             changeReturnCost(medicalAdviceDTO, stopAdviceList);

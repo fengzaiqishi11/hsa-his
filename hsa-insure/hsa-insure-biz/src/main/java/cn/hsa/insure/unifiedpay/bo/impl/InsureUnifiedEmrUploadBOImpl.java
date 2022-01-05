@@ -1,8 +1,11 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.emr.emrpatientrecord.entity.EmrPatientRecordDO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -63,6 +66,9 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
+
+    @Resource
+    private BaseDeptService baseDeptService;
     
     /**
      * @Method updateInsureUnifiedElec
@@ -643,22 +649,24 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         Map<String, Object> detailMap = null;
         if(inptVisit!=null){
             detailMap =new HashMap<>();
-            detailMap.put("mdtrt_sn",medicalRegNo); // 就医流水号
-            detailMap.put("mdtrt_id",inptVisit.getVisitId()); // 就诊ID
-            detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(个人电脑号)
+            detailMap.put("mdtrt_sn",inptVisit.getVisitId()); // 就医流水号
+            detailMap.put("mdtrt_id",medicalRegNo); // 医保就诊ID（医保必填）
+            detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(医保必填)
             detailMap.put("mdtrtsn",inptVisit.getInNo()); // 住院号
             detailMap.put("name",inptVisit.getName()); // 姓名
             detailMap.put("gend",inptVisit.getGenderCode()); // 性别
             detailMap.put("age",inptVisit.getAge()); // 年龄
-            detailMap.put("adm_rec_no",""); // 入院记录流水号
-            detailMap.put("wardarea_name",inptVisit.getInWardId()); // 病区名称
+            detailMap.put("adm_rec_no",inptVisit.getVisitId()); // 入院记录流水号
+
+            BaseDeptDTO inwardInfo = this.getInwardInfo(inptVisit.getInWardId(), inptVisit.getHospCode());
+            detailMap.put("wardarea_name",inwardInfo.getName()); // 病区名称
             detailMap.put("dept_code",inptVisit.getInDeptId()); // 科室编码
             detailMap.put("dept_name",inptVisit.getInDeptName()); // 科室名称
-            detailMap.put("bedno",inptVisit.getBedName()); // 住院号
+            detailMap.put("bedno",inptVisit.getBedName()); // 病床号
             detailMap.put("adm_time",inptVisit.getInTime()); // 入院时间
             detailMap.put("illhis_stte_name",inptVisit.getName()); // 病史陈述者姓名
             detailMap.put("illhis_stte_rltl","-"); // 陈述者与患者关系代码
-            detailMap.put("stte_rele","-"); // 陈述内容是否可靠标识
+            detailMap.put("stte_rele","1"); // 陈述内容是否可靠标识
             detailMap.put("chfcomp","-"); // 主诉
             detailMap.put("dise_now","-"); // 现病史
             detailMap.put("hlcon","-");  // 健康状况
@@ -1154,6 +1162,21 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("vali_flag",Constants.SF.S);//有效标志
         }
         return  diseinfoMap;
+    }
+
+    // 获取病区信息
+    private BaseDeptDTO getInwardInfo(String deptId,String hospCode) {
+        Map<String,Object> selectMap = new HashMap<>();
+        BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+        baseDeptDTO.setId(deptId);
+        baseDeptDTO.setHospCode(hospCode);
+        selectMap.put("hospCode",hospCode);
+        selectMap.put("baseDeptDTO",baseDeptDTO);
+        WrapperResponse<BaseDeptDTO> wr = baseDeptService.getById(selectMap);
+        if (wr != null && wr.getData() != null) {
+            baseDeptDTO = wr.getData();
+        }
+        return baseDeptDTO;
     }
 
 }

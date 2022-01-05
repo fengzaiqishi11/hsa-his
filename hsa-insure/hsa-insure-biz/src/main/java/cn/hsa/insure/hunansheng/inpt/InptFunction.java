@@ -589,6 +589,8 @@ public class InptFunction {
 
         Map<String,Object> httpParam = new HashMap<>();
         httpParam.put("function_id",Constant.HuNanSheng.INPT.BIZC131255);//功能号
+        httpParam.put("corp_id",insureIndividualVisitDTO.getAab001());// 单位ID
+        httpParam.put("corp_name",insureIndividualVisitDTO.getBka008());// 单位名称
         httpParam.put("oper_staffid",inptVisitDTO.getUserCode());//员工号
         httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码

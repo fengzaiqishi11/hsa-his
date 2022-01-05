@@ -848,6 +848,10 @@
         SELECT
         (select iib.baa301 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
         as baa301,
+        (select iib.aab001 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
+        as aab001,
+        (select iib.bka008 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
+        as bka008,
         (select iib.akc252 from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code)
         as akc252,
         (select iib.card_iden from insure_individual_basic iib where iiv.mib_id = iib.id and iiv.hosp_code =

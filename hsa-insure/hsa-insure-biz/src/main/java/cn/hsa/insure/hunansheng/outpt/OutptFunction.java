@@ -272,6 +272,8 @@ public class OutptFunction {
         //入参Map
         Map<String, Object> httpParam = new HashMap<>();
         httpParam.put("function_id", Constant.HuNanSheng.OUTPT.BIZC131104); // 功能号
+        httpParam.put("corp_id",insureIndividualVisitDTO.getAab001()); // 单位编码
+        httpParam.put("corp_name",insureIndividualVisitDTO.getBka008()); // 单位名称
         httpParam.put("serial_no",serialNo); // 就医登记号
         httpParam.put("fee_batch","1"); // 费用批次
         httpParam.put("oper_staffid","000");//员工号

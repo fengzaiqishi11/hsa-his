@@ -522,7 +522,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             BigDecimal miPrice = new BigDecimal(0); //统筹支付金额
             // 2022年1月5日11:01:11 退费重收时默认 将优惠后金额保留到2位小数，
             if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
-                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_UP); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入
+                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_DOWN); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入,直接丢掉
             }
             BigDecimal selfPrice = realityPrice; //个人需支付金额
             Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
@@ -1275,7 +1275,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 4、 校验个人支付金额，是否与本次结算的费用一致，不一致表示费用出现了问题
             // 2022年1月5日11:01:11 退费重收时默认 将优惠后金额保留到2位小数，
             if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
-                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_UP); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入
+                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_DOWN); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入
             }
             if (!BigDecimalUtils.equals(realityPrice, outptSettleDTO1.getRealityPrice())) {
                  throw new AppException("支付失败，该患者费用信息错误，请刷新后重试。");

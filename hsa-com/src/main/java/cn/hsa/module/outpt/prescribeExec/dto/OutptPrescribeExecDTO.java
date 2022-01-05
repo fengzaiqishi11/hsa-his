@@ -122,5 +122,7 @@ public class OutptPrescribeExecDTO extends OutptPrescribeExecDO {
     private String sourceId;
     //结算ID
     private String settleId;
+    // 患者信息
+    private String patientInfo;
 
 }

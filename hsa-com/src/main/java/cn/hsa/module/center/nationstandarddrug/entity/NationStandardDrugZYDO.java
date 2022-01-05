@@ -6,13 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 
 /**
  * @Package_name: cn.hsa.module.center.nationstandarddrug.entity
  * @Class_name: NationStandardDrugZYDO
- * @Describe: 国家标准药品（中药）数据实体
+ * @Describe: 国家标准药品（中药）数据实体  @Document 注解表示该实体类可以用来存入es的文档类型
  * @Author: yangjiahong
  * @Email: jiahong.yang@powersi.com
  * @Date: 2021/1/26 9:26
@@ -23,12 +25,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Document(indexName = "nation_standard_tcm_drug")
 public class NationStandardDrugZYDO extends PageDO implements Serializable {
 
   private static final long serialVersionUID = -6756941019684364943L;
   /**
    * 主键
    */
+  @Id
   private String id;
 
   /**

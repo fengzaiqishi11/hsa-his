@@ -1,12 +1,18 @@
 package cn.hsa.emr.emrElement.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrelement.bo.EmrElementBO;
 import cn.hsa.module.emr.emrelement.dao.EmrElementDAO;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
+import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +33,9 @@ import java.util.*;
 public class EmrElementBOImpl extends HsafBO implements EmrElementBO {
   @Resource
   private EmrElementDAO emrElementDAO;
+
+  @Resource
+  private SysCodeService sysCodeService_consumer;
 
   /**
   * @Menthod getById
@@ -242,5 +251,50 @@ public class EmrElementBOImpl extends HsafBO implements EmrElementBO {
   @Override
   public List<TreeMenuNode> getEmrElementTree(EmrElementDTO emrElementDTO) {
     return emrElementDAO.getEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @Menthod getEmrElementTree
+   * @Desrciption 获取电子病历元素树(医保使用)
+   *
+   * @Param
+   * [emrElementDTO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return java.util.List<cn.hsa.base.TreeMenuNode>
+   **/
+  @Override
+  public List<TreeMenuNode> getInsureEmrElementTree(EmrElementDTO emrElementDTO) {
+    return emrElementDAO.getInsureEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @param emrElementDTO
+   * @Menthod getInsureDictEmrElementTree
+   * @Desrciption 获取系统码表中电子病历元素树(医保使用)
+   * @Param [emrElementDTO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.TreeMenuNode>>
+   */
+  @Override
+  public List<TreeMenuNode> getInsureDictEmrElementTree(EmrElementDTO emrElementDTO) {
+    return emrElementDAO.getInsureDictEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod queryInsureEmrElementMatchInfo
+   * @Desrciption 获取元素匹配关系(医保使用)
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.EmrElementMatchDO>>
+   */
+  @Override
+  public PageDTO queryInsureEmrElementMatchInfo(EmrElementMatchDO emrElementMatchDO) {
+    PageHelper.startPage(emrElementMatchDO.getPageNo(), emrElementMatchDO.getPageSize());
+    return PageDTO.of(emrElementDAO.queryInsureEmrElementMatchInfoPage(emrElementMatchDO));
   }
 }

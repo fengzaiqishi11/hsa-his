@@ -142,4 +142,21 @@ public class EmrQualityAgingController extends BaseController {
 	}
 
 
+	/**
+	 * @Description: 查询病历未书写提醒信息
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2021/11/29 9:17
+	 * @Return WrapperResponse<Boolean>
+	 */
+	@PostMapping("/queryUnwriteEmrList")
+	public WrapperResponse<Boolean> queryUnwriteEmrList(HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		Map map=new HashMap();
+		map.put("hospCode",sysUserDTO.getHospCode());
+		map.put("crteName",sysUserDTO.getName());
+		map.put("crteId",sysUserDTO.getId());
+		return emrQualityAgingService_consumer.queryUnwriteEmrList(map);
+	}
+
 }

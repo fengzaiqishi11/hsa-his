@@ -4,10 +4,12 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -301,5 +303,20 @@ public class DoctorAdviceServiceImpl extends HsafService implements DoctorAdvice
     @Override
     public WrapperResponse<List<InptAdviceDTO>> getZyAdviceByVisitId(Map map) {
         return WrapperResponse.success(doctorAdviceBO.getZyAdviceByVisitId(MapUtils.get(map, "inptVisitDTO")));
+    }
+
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询未提交医嘱信息
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-01 10:33
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> queryUnsubmitAdviceList(Map map) {
+        doctorAdviceBO.insertUnsubmitAdviceList(map, Constants.YZ_TYPE.YZ_TYPE_WTJ);
+        return WrapperResponse.success(true);
     }
 }

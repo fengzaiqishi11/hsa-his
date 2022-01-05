@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <start-class>cn.hsa.platform.HsaGenericApplication</start-class>
+        <start-class>cn.hsa.platform.HsaPlatformGenericApplication</start-class>
     </properties>
 
     <dependencies>
@@ -125,13 +125,13 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
-                    <excludes>
-                        <exclude>*.properties</exclude>
-                        <exclude>config/**/*.properties</exclude>
-                    </excludes>
-                </configuration>
+<!--                <configuration>-->
+<!--                    &lt;!&ndash;所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置&ndash;&gt;-->
+<!--                    <excludes>-->
+<!--                        <exclude>*.properties</exclude>-->
+<!--                        <exclude>config/**/*.properties</exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
             </plugin>
         </plugins>
 

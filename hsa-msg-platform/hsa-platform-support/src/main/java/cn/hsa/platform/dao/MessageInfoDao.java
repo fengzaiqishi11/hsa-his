@@ -47,6 +47,11 @@ public interface MessageInfoDao extends BaseMapper<MessageInfoModel> {
    List<MessageInfoModel> queryMessageInfoByType(MessageInfoModel messageInfoDTO);
 
    /**
+    * 查询自己未读消息列表
+    */
+   List<MessageInfoModel> queryUnReadMessageInfoList(MessageInfoModel messageInfoDTO);
+
+   /**
     * 批量更新消息
     */
    int updateMssageInfoBatch(MessageInfoModel messageInfoDTO);
@@ -55,6 +60,18 @@ public interface MessageInfoDao extends BaseMapper<MessageInfoModel> {
     * 根据消息id批量更新消息
     */
    int updateMssageInfoBatchById(MessageInfoModel messageInfoDTO);
+
+   int updateMssageInfoBatchByMsgId(List<MessageInfoModel> messageInfoModels);
+
+   int updateMssageInfoById(MessageInfoModel messageInfoDTO);
+
+
+   /**
+    * 查询历史消息列表
+    */
+   List<MessageInfoModel> queryHistoryMessageInfoList(MessageInfoModel messageInfoDTO);
+
+   List<MessageInfoModel> querySysMessageInfoList(MessageInfoModel messageInfoDTO);
 
 
 

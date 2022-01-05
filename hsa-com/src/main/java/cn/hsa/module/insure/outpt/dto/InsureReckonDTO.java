@@ -44,4 +44,6 @@ public class InsureReckonDTO extends InsureReckonDO implements Serializable {
 
     // 清算状态
     private String clrStas;
+
+    private String insutype;
 }

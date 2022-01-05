@@ -1,11 +1,12 @@
 package cn.hsa.platform.domain;
 
-import cn.hsa.platform.dto.ImContentModel;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -62,10 +63,14 @@ public class MessageInfoModel  implements Serializable {
 	/**
 	 * 开始时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 	/**
 	 * 结束时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 	/**
 	 * 间隔时间
@@ -87,6 +92,8 @@ public class MessageInfoModel  implements Serializable {
 	/**
      * 创建时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date crteTime;
 	/**
 	 * 创建人
@@ -100,7 +107,13 @@ public class MessageInfoModel  implements Serializable {
 	/**
 	 * 最后执行时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastTime;
 
+	/**
+	 * 已推送次数
+	 */
+	private int count;
 
 }

@@ -1083,4 +1083,16 @@
         where bm.hosp_code = #{hospCode} and bm.is_valid = #{isValid}
     </select>
 
+    <select id="queryAllInsureMaterialsInfo" parameterType="java.util.Map" resultType="cn.hsa.module.base.bmm.dto.BaseMaterialDTO">
+        select
+            bm.id, bm.hosp_code, bm.type_code, bm.bfc_code, bm.code,bm.nation_code,
+            bm.name, bm.spec, bm.price, bm.unit_code, bm.split_ratio, bm.split_unit_code,
+            bm.split_price,bm.is_supp_curtain, bm.use_code, bm.remark, bm.prod_code,
+            bm.reg_cert_no,bm.pym, bm.wbm, bm.is_valid, bm.crte_id, bm.crte_name,
+            bm.crte_time,bm.other_name,bm.last_buy_price,bm.last_split_buy_price,
+            bm.avg_buy_price,bm.avg_sell_price,bm.model
+        from base_material bm
+        where bm.hosp_code = #{hospCode} and bm.is_valid = #{isValid} and ifnull(bm.type_code,'a') != '3'
+    </select>
+
 </mapper>

@@ -497,12 +497,20 @@ public class InsureReckonBOImpl extends HsafBO implements InsureReckonBO {
         Map<String,Object> dataMap = new HashMap<>();
         dataMap.put("fixmedinsCode",insureConfigurationDTO.getOrgCode());	 // 医疗机构编码
         dataMap.put("stmtBegndate",insureReckonDTO.getBegndate()); // 对账开始时间
+        dataMap.put("clrType",insureReckonDTO.getClrType());
+        dataMap.put("clrOptins",insureReckonDTO.getClrOptins());
+        dataMap.put("insutype",insureReckonDTO.getInsutype());
         dataMap.put("stmtEnddate",insureReckonDTO.getEnddate()); // 对账结束时间
         Map<String,Object> inptMap = new HashMap<>();
         inptMap.put("data",dataMap);
         Map<String,Object> resultMap = this.invokingUpay(hospCode, insureRegCode, "3699", dataMap);
         Map<String,Object> outptMap =  (Map)resultMap.get("output");
-        List<Map<String,Object>> resultList = MapUtils.get(outptMap,"data");
+        Map<String,Object> map = JSONObject.parseObject(MapUtils.get(outptMap,"data").toString(), Map.class);
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        if (!MapUtils.isEmpty(map)) {
+            resultList.add(map);
+        }
+
         return PageDTO.of(resultList);
     }
 

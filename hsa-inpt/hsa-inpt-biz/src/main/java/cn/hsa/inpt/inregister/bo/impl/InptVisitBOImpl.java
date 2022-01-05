@@ -10,6 +10,9 @@ import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
+import cn.hsa.module.emr.message.dao.MessageInfoDAO;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.advancepay.bo.InptAdvancePayBO;
 import cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
@@ -34,6 +37,7 @@ import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -101,6 +105,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     private BaseProfileFileService baseProfileFileService_consumer;
     @Resource
     private InsureIndividualCostService insureIndividualCostService_consumer;
+
+    @Resource
+    private MessageInfoDAO messageInfoDAO;
 
     /**
      * @Method queryRegisteredPage
@@ -1357,10 +1364,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             countMap.put("certNo",inptVisitDTO.getCertNo());
             List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
             int inCnt= inptVisitDAO.getInCnt(countMap);
-            if (inCnt ==0){
-                inCnt=1;
-            }
             if (info == null|| info.size() ==0) {
+                if (inCnt ==0){
+                    inCnt=1;
+                }
                 orderNo = extend.getInProfile()+"-00"+inCnt;
             }else {
                 inCnt = inCnt + 1;
@@ -1390,7 +1397,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (i <= 0) {
             throw new AppException("登记失败");
         }
-
+        // 入院登记信息写入消息
+        insertUnInbedPatientList(inptVisitDTO);
         // 修改转入院标志
         if (StringUtils.isNotEmpty(inptVisitDTO.getOutptId())) {
             updateTranInCode(inptVisitDTO);
@@ -1763,5 +1771,79 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         return true;
     }*/
+    /**
+     * @Method: insertUnInbedPatientList
+     * @Description: 入院登记写入消息
+     * @Param: inptVisitDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021/12/02 15:53
+     * @Return: cn.hsa.module.inpt.doctor.dto.InptVisitDTO
+     **/
+    public List<MessageInfoDTO> insertUnInbedPatientList(InptVisitDTO inptVisitDTO) {
+        String hospCode =inptVisitDTO.getHospCode();
+        String name = inptVisitDTO.getCrteName();
+        String crteId = inptVisitDTO.getCrteId();
+        Map openParam = new HashMap();
+        openParam.put("hospCode", inptVisitDTO.getHospCode());
+        openParam.put("code", "MSG_OPEN");
+        // 是否开启消息推送 lly 2021-12-02
+        SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
+        List<MessageInfoDTO> messageInfoDTOList = new ArrayList<>();
+        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+            Map paramMap = new HashMap();
+            paramMap.put("hospCode", hospCode);
+            paramMap.put("code", "XXTS_SETTING");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+            ConfigInfoDO configInfoDO = null;
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(),"inHospitalMsg");
+            }
+            if (configInfoDO ==null){
+                return new ArrayList<>();
+            }
+            if (inptVisitDTO != null&& configInfoDO!=null) {
+                MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                messageInfoDTO.setId(SnowflakeUtils.getId());
+                messageInfoDTO.setHospCode(hospCode);
+                messageInfoDTO.setSourceId("");
+                messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                messageInfoDTO.setLevel(configInfoDO.getLevel());
+                messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+                messageInfoDTO.setType(Constants.MSG_TYPE.MSG_AC);
+                messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);
+                messageInfoDTO.setContent(inptVisitDTO.getName() + "已办理入院登记，请及时安床");
+                Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+                Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+                messageInfoDTO.setStartTime(startTime);
+                messageInfoDTO.setEndTime(endTime);
+                messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+                messageInfoDTO.setUrl(configInfoDO.getUrl());
+                messageInfoDTO.setCrteName(name);
+                messageInfoDTO.setCrteTime(DateUtils.getNow());
+                messageInfoDTO.setCrteId(crteId);
+                messageInfoDTOList.add(messageInfoDTO);
+                //messageInfoDAO.insertMessageInfoBatch(messageInfoDTOList);
+                // 获取医院kafka 的IP与端口
+                Map<String, Object> sysMap = new HashMap<>();
+                sysMap.put("hospCode", hospCode);
+                sysMap.put("code", "KAFKA_MSG_IP");
+                SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+                if (sys == null || sys.getValue() == null) {  // 调用统一支付平台
+                   return messageInfoDTOList;
+                }
+                String server = sys.getValue();
+                // 1. 创建一个kafka生产者
+                String producerTopic = Constants.MSG_TOPIC.producerTopicKey;//生产者消息推送Topic
+                KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+                String message = JSONObject.toJSONString(messageInfoDTOList);
+                KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+            }
+        }
+        return messageInfoDTOList;
+    }
+
 
 }

@@ -316,4 +316,6 @@ public interface InsureItemMatchDAO {
     List<InsureItemMatchDTO> queryUnMacthAllDtoPage(InsureItemMatchDTO insureItemMatchDTO);
 
     int deleteInsureItemInfos(InsureItemMatchDTO insureItemMatchDTO);
+
+    List<BaseMaterialDTO> queryAllInsureMaterialsInfo(Map selectMap);
 }

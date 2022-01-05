@@ -1857,6 +1857,16 @@
 		sum( hosp_jm_price ) AS hosp_jm_price
 		FROM
 		inpt_settle
+		where
+			1=1
+			<!--结算开始时间-->
+			<if test="js_start_time != null and js_start_time !=''">
+				and  settle_time &gt;= date(#{js_start_time})
+			</if>
+			<!--结算结束时间-->
+			<if test="js_end_time != null and js_end_time !=''">
+				and settle_time &lt;= date(#{js_end_time})
+			</if>
 		GROUP BY
 		hosp_code,visit_id
 		) settle ON visit.hosp_code = settle.hosp_code and visit.id = settle.visit_id

@@ -232,7 +232,8 @@
             result_detail AS resultDetail,
             reference_value AS referenceValue,
             result_unit AS resultUnit,
-            crte_time AS crteTime
+            crte_time AS crteTime,
+            mr.is_positive as isPositive
         FROM
             medic_result mr
         WHERE

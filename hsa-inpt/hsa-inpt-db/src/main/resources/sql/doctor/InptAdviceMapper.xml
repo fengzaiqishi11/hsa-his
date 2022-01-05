@@ -1023,7 +1023,7 @@
     <select id="getFtlAdvices" resultMap="InptAdviceMap">
         select
          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
-         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0' and is_check ='1'
         and (is_stop_check='0' or is_stop_check is null)
         and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code!=#{typeCode}  and id &lt; #{id}
     </select>
@@ -1032,7 +1032,7 @@
     <select id="getTlAdvices" resultMap="InptAdviceMap">
         select
          id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no, iatd_id, in_dept_id, exec_dept_id, dept_id, group_no, group_seq_no, type_code, sign_code, start_exec_num, end_exec_num, bfc_id, item_code, item_id, item_name, content, spec, prep_code, dosage, dosage_unit_code, usage_code, rate_id, speed_code, num, unit_code, price, total_price, total_num, total_num_unit_code, herb_num, use_days, use_code, is_skin, is_positive, herb_note_code, phar_id, remark, plan_stop_time, technology_no, herb_use_code, is_give, exec_id, exec_name, second_exec_id, second_exec_name, long_start_time, last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time
-         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0'
+         from inpt_advice where hosp_code=#{hospCode} and visit_id=#{visitId} and is_long='0' and is_check ='1'
         and (is_stop_check='0' or is_stop_check is null)
         and DATE_FORMAT(long_start_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{longStartTime},'%Y-%m-%d') and type_code=#{typeCode}  and id &lt; #{id}
     </select>
@@ -1081,6 +1081,7 @@
         LEFT JOIN base_rate e ON a.rate_id = e.id
         WHERE 1=1 AND
         a.hosp_code = #{hospCode}  AND a.visit_Id = #{visitId}
+        and a.total_price != 0
         <if test="isCheck != null and isCheck != ''">
             AND d.is_check = #{isCheck}
         </if>
@@ -1398,7 +1399,7 @@
             and b.id=#{visitId}
         </if>
         <if test="deptId != null and deptId != ''">
-            and a.exec_dept_id = #{deptId}
+            and a.in_dept_id = #{deptId}
         </if>
 
         <!-- 提前领药修改,为了不影响长期医嘱加了判断, -->
@@ -1872,6 +1873,65 @@
         order by a.check_time  desc limit 10000) aa group by aa.bizType,aa.visitId,hospCode
 	</select>
 
+    <select id="getLongIllnessAdviceByAdviceId" parameterType="java.util.List" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        SELECT
+            b.name,
+            b.biz_type as bizType,
+            b.biz_code as bizCode,
+            a.visit_id as visitId,
+            a.hosp_code as hospCode
+        FROM
+            inpt_advice a,base_advice b
+        WHERE
+            1=1
+          and a.item_id = b.id
+          AND ifnull(b.biz_type,'') !=''
+          AND ifnull(b.biz_code,'') !=''
+          and a.cancel_id is null
+          and a.is_stop ='1'
+          and a.is_submit ='1'
+          and a.is_reject = '0'
+          and a.is_check='1'
+          and a.id in
+          <foreach collection="longAdviceDTOList" open="(" close=")" item="item" separator=",">
+              #{item.id}
+          </foreach>
+          and a.visit_id in
+          <foreach collection="longAdviceDTOList" open="(" close=")" item="item" separator=",">
+              #{item.visitId}
+          </foreach>
+          order by a.check_time desc
+    </select>
+
+    <select id="getShortIllnessAdviceByAdviceId" parameterType="java.util.List" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        SELECT
+        b.name,
+        b.biz_type as bizType,
+        b.biz_code as bizCode,
+        a.visit_id as visitId,
+        a.hosp_code as hospCode
+        FROM
+        inpt_advice a,base_advice b
+        WHERE
+        1=1
+        and a.item_id = b.id
+        AND ifnull(b.biz_type,'') !=''
+        AND ifnull(b.biz_code,'') !=''
+        and a.cancel_id is null
+        and a.is_submit ='1'
+        and a.is_reject = '0'
+        and a.is_check='1'
+        and a.id in
+        <foreach collection="shortAdviceDTOList" open="(" close=")" item="item" separator=",">
+            #{item.id}
+        </foreach>
+        and a.visit_id in
+        <foreach collection="shortAdviceDTOList" open="(" close=")" item="item" separator=",">
+            #{item.visitId}
+        </foreach>
+        order by a.check_time desc
+    </select>
+
     <insert id="insertMedicineAdvanceAdvice" parameterType="list">
         insert into inpt_medicine_advance_advice (id,advance_id,advice_id,hosp_code)
         values
@@ -1959,7 +2019,7 @@
         --         医嘱开始时间小于等于当前时间
         and date(a.long_start_time) &lt;= date(#{endDate})
         and date(ifnull(a.last_exec_time,a.long_start_time)) &lt; date(#{endDate})
-        and a.exec_dept_id = #{deptId}
+        and a.in_dept_id = #{deptId}
         and ifnull(a.advance_days,'0') = '0'
         and A.use_code in ('1','4')
 
@@ -2149,4 +2209,60 @@
         </foreach>
     </update>
 
+    <!--查询未提交医嘱信息-->
+    <select id="queryUnsubmitAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where is_submit ='0'
+        and is_reject ='0'
+        and a.hosp_code =#{hospCode}
+        group by v.id
+    </select>
+
+    <!--查询已拒收医嘱信息-->
+    <select id="queryRejectAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where a.hosp_code =#{hospCode} and
+        a.id in
+        <foreach collection="iatIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        /*拒收*/
+        <if test="type !=null and type =='3'">
+            and a.is_reject ='1'
+        </if>
+        /*提交*/
+        <if test="type !=null and type =='2'">
+            and a.is_reject ='0' and  a.is_submit ='1'
+        </if>
+        group by v.zg_doctor_id,v.in_dept_id
+    </select>
+
+    <!--查询已提交医嘱信息-->
+    <select id="querySubmitAdviceList" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select v.name as name,
+        v.zg_doctor_name,
+        a.item_name as itemName,
+        v.in_dept_id,
+        v.zg_doctor_id,
+        v.id
+        from inpt_advice a
+        join inpt_visit v on v.id = a.visit_id and v.hosp_code =#{hospCode}
+        where a.hosp_code =#{hospCode} and  find_in_set(a.id,#{ids})
+        and a.is_reject ='0' and  a.is_submit ='1'
+        group by v.zg_doctor_id,v.in_dept_id
+    </select>
 </mapper>

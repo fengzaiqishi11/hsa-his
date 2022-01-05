@@ -96,4 +96,8 @@ public class PharInReceiveDetailDTO extends PharInReceiveDetailDO implements Ser
      * 顺序号
      */
     private String seqNo;
+    /**
+     * 总金额
+     */
+    private BigDecimal totalPrice;
 }

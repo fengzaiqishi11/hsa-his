@@ -2,14 +2,14 @@ package cn.hsa.insure.module.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.insure.module.bo.InsureUnifiedLogBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureUnifiedLogDAO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,9 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
     private InsureUnifiedLogDAO insureUnifiedLogDAO;
 
     @Resource
-    private InsureConfigurationDAO insureConfigurationDAO;
+    private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
+
+
 
     /**
      * @param insureFunctionLogDO
@@ -126,5 +128,44 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             System.out.println(e.getMessage());
         }
         return functionLog;
+    }
+
+    /**
+     * @param insureFunctionLogDO
+     * @Method selectInsureLogs
+     * @Desrciption his日志转医保日志入参
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/4 9:37
+     * @Return
+     */
+    @Override
+    public String selectInsureLogs(InsureFunctionLogDO insureFunctionLogDO) {
+        insureFunctionLogDO = insureUnifiedLogDAO.selectFunctionLogById(insureFunctionLogDO);
+        if(insureFunctionLogDO ==null){
+            return "";
+        }
+        String hospCode = insureFunctionLogDO.getHospCode();
+        String inParams = insureFunctionLogDO.getInParams();
+        Map<String,Object> map = JSONObject.parseObject(inParams, Map.class);
+        String insureRegCode = "";
+        if(!MapUtils.isEmpty(map)){
+            for(String key : map.keySet()){
+                if("insur_code".equals(key)){
+                    insureRegCode = MapUtils.get(map,key);
+                }
+                if("msgid".equals(key)){
+                    String msgid = MapUtils.get(map,key);
+                    map.put("msgid",msgid.substring(0,msgid.length()-2)+"RC");
+                }
+            }
+        }
+        InsureConfigurationDTO insureInsureConfiguration = insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, insureRegCode);
+        if(insureInsureConfiguration == null){
+            throw new AppException("未获取到医保配置机构信息");
+        }
+        String inputParams = JSONObject.toJSONString(map);
+        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureInsureConfiguration.getUrl(),inputParams);
+        return resultJson;
     }
 }

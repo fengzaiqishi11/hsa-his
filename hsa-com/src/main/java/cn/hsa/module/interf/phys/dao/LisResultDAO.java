@@ -1,9 +1,7 @@
 package cn.hsa.module.interf.phys.dao;
 
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
-import cn.hsa.module.medic.result.dto.MedicalResultDTO;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Map;

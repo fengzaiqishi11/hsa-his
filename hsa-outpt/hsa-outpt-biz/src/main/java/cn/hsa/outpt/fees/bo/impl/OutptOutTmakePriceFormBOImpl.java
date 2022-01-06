@@ -491,6 +491,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         outptVisitDTOFee.setOutptCostDTOList(costDTOList);
         outptVisitDTOFee.setCrteName(crteName);
         outptVisitDTOFee.setCrteId(crteId);
+        outptVisitDTOFee.setTfcsMark("tfcs"); // 退费重收标记
+        outptVisitDTOFee.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
         Map setteleParam = new HashMap();
         setteleParam.put("hospCode",hospCode);
         setteleParam.put("outptVisitDTO",outptVisitDTOFee);
@@ -508,6 +510,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         OutptVisitDTO visitDTO = (OutptVisitDTO) chargeMap.get("outptVisit");
         visitDTO.setCrteId(crteId);
         visitDTO.setCrteName(crteName);
+        visitDTO.setTfcsMark("tfcs"); // 退费重收标记
+        visitDTO.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
 
         // 2021年9月1日15:25:54 在院支付方式上扣除费用  1、先查询原支付方式 ===========官红强==start===========================================================================
         List<OutptPayDTO> oldOutptPayList = outptPayDAO.selectOutptPatByVisitIdAndSettleId(selectMap);

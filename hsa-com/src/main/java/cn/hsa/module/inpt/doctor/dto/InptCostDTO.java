@@ -87,6 +87,8 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String splitUnitCode;
     //拆零数量
     private BigDecimal splitNum;
+    //单位
+    private String unitCode;
     //计费日期
     private String costDate;
     //打印标志

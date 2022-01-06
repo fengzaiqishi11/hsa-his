@@ -138,10 +138,10 @@
         (select ifnull(sum(split_num),0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockNum,
         (select ifnull(stock_occupy,0) from stro_stock where item_code=a.item_code and item_id=a.item_id and biz_id=a.phar_id and hosp_code=a.hosp_code) stockOccupy,
         (select bed_name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) bedName,
-        (select seq_no from base_bed where base_bed.visit_id=a.visit_id and hosp_code=a.hosp_code) seqNo,
+        (select bd.seq_no from base_bed bd where bd.visit_id=a.visit_id and bd.hosp_code=a.hosp_code and bd.status_code = '1') seqNo,
         (select name from inpt_visit where id=a.visit_id and hosp_code=a.hosp_code) name,ifnull(a.dosage,0) dosage,a.dosage_unit_code dosageUnitCode,
-        (concat(a.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=a.gender_code and e.c_code='XB'),'岁') ), '/',a.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=a.age_unit_code and hosp_code=a.hosp_code),'')))) patientInfo,
+        (concat(a.name, '/',(ifnull((case a.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'岁') ), '/',a.age,
+        (ifnull((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end),'')))) patientInfo,
         a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,a.split_ratio splitRatio,
         (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName,
         a.in_no
@@ -232,7 +232,8 @@
         select c.*,
         ifnull((select num from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockNum,
         (select unit_code from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code) stockUnionCode,
-        ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy
+        ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy,
+        total * price as totalPrice
         from (
             select a.item_code itemCode,a.item_id itemId,a.item_name itemName,a.spec,a.price,a.unit_code unitCode,b.phar_id,a.split_ratio splitRatio,
             ifnull(sum(a.dosage),0) dosage,ifnull(sum(a.num),0) total,a.hosp_code,ifnull(sum(a.split_num),0) splitNum,a.split_unit_code splitUnitCode,

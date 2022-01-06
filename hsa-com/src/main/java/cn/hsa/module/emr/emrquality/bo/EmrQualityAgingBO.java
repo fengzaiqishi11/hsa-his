@@ -75,4 +75,14 @@ public interface EmrQualityAgingBO {
      * @Return PageDTO
      **/
     List<EmrQualityAgingDTO> queryEmrQualityListById(Map map);
+
+    /**
+     * @Description: 病人病历未书写提醒
+     * @Param:
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com.cn
+     * @Date 2021/6/22 14:54
+     * @Return
+     */
+    boolean insertUnwriteEmrList(Map param);
 }

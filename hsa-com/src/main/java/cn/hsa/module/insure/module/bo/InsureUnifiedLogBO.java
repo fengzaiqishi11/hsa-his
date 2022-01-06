@@ -36,4 +36,15 @@ public interface InsureUnifiedLogBO {
      * @Return
      **/
     boolean insertInsureFunctionLog(Map<String,Object> map);
+
+    /**
+     * @param insureFunctionLogDO
+     * @Method selectInsureLogs
+     * @Desrciption his日志转医保日志入参
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/4 9:37
+     * @Return
+     */
+    String selectInsureLogs(InsureFunctionLogDO insureFunctionLogDO);
 }

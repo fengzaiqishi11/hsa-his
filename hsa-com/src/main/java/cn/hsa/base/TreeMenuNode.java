@@ -54,4 +54,7 @@ public class TreeMenuNode implements Serializable {
     private String visitId;
     // liuliyun 20210623
     private Integer validTime; // 电子病历时效性
+    private String emrElementId; // emr_element 表主键ID
+    private String sysCodeDetailId; // sys_code_detail 表主键ID
+    private String name;
 }

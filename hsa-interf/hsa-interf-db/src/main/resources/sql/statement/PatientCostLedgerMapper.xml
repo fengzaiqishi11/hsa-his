@@ -5832,7 +5832,8 @@
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             id as item_id,
-            IFNULL( usual_name, good_name ) AS item_name, code as itemCode
+            IFNULL( usual_name, good_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5843,7 +5844,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            name as item_name, code as itemCode
+            name as item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5853,7 +5855,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            IFNULL( name, other_name ) AS item_name, code as itemCode
+            IFNULL( name, other_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, '' as splitRatio, '' as splitUnitCode
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -7901,6 +7904,35 @@
         and ors.settle_time &lt;= #{endDate}
         </if>
         ) A
+    </select>
+    <!--按住院科室统计手术费用-->
+    <select id="queryOperCostListGroupByDept" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO">
+            select
+            t.in_dept_id as deptId,t.in_dept_name as deptName,t.id as visitId,
+            ifnull(ics.reality_price, ifnull(B.reality_price, 0)) as realityPrice,
+            ifnull(B.bfc_id,'0') as bfcId,
+            ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+            ),'其他')
+            as bfcName
+                from
+                inpt_settle a
+                inner join inpt_cost b on a.id = b.settle_id and a.hosp_code = b.hosp_code and b.dept_id =#{deptId}
+                inner join inpt_cost_settle ics on b.id=ics.cost_id
+                inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = b.visit_id
+                where
+                a.hosp_code = #{hospCode}
+                and a.is_settle = '1'
+                and b.settle_code = '2'
+                and a.status_code = '0'
+        <if test="settleStartTime != null and settleStartTime !=''">
+            and a.settle_time &gt;= #{settleStartTime}
+        </if>
+        <if test="settleEndTime != null and settleEndTime !=''">
+            and a.settle_time &lt;= #{settleEndTime}
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and t.in_dept_id = #{inDeptId}
+        </if>
     </select>
 
 </mapper>

@@ -413,7 +413,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("orders_dr_code", null); // TODO 受单医生编码
                 costInfoMap.put("orders_dr_name", null); // TODO 受单医生姓名
                 String lmtUserFlag = MapUtils.get(map, "lmtUserFlag");
-
+                String insureItemType = MapUtils.get(map, "insureItemType");
+                String isReimburse = MapUtils.get(map, "isReimburse");
                 /**
                  * hnSpecial:'1' 表示海南
                  * huNanSpecial:'1' 表示湖南
@@ -428,16 +429,32 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                         costInfoMap.put("hosp_appr_flag", "2");
                 }
 
+                // 湖南省 hosp_appr_flag 用法接口新加 西药中成药 + 湖南 + 限制级
+                // 当药品本身是限制用药时，医院审批标志传0走住院自付比例，传1时走门诊自付比例 2全自费
+                if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
+                        (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
+                    switch (isReimburse) {
+                        case Constants.SF.S:
+                            costInfoMap.put("hosp_appr_flag", "1");
+                            break;
+                        case Constants.SF.F:
+                            costInfoMap.put("hosp_appr_flag", "2");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
                 // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销
-                if ("1".equals(huNanSpecial) && isCompound && "103".equals(MapUtils.get(map, "insureItemType"))) {
+                if ("1".equals(huNanSpecial) && isCompound && "103".equals(insureItemType)) {
                     costInfoMap.put("hosp_appr_flag", "1");
                     costInfoMap.put("tcmdrug_used_way","1");
-                } else if ("1".equals(huNanSpecial) && !isCompound && "103".equals(MapUtils.get(map, "insureItemType"))) {
+                } else if ("1".equals(huNanSpecial) && !isCompound && "103".equals(insureItemType)) {
                     costInfoMap.put("hosp_appr_flag", "0");
                     costInfoMap.put("tcmdrug_used_way","2");
                 }else if("1".equals(huNanSpecial) && "0".equals(lmtUserFlag)){
                     costInfoMap.put("hosp_appr_flag", "0");
-                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(MapUtils.get(map, "insureItemType"))) {
+                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(insureItemType)) {
                     // 广州的102是中药饮片
                     costInfoMap.put("hosp_appr_flag", "1");
                     costInfoMap.put("tcmdrug_used_way","1");

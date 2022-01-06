@@ -59,6 +59,13 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
     @Override
     public PageDTO queryBackCostSurePage(InptCostDTO inptCostDTO) {
         PageHelper.startPage(inptCostDTO.getPageNo(), inptCostDTO.getPageSize());
+        // 时间不能为空
+//        if (inptCostDTO.getStartTime() == null) {
+//            throw new RuntimeException("退费确认查询起始时间不能为空");
+//        }
+//        if (inptCostDTO.getStopTime() == null) {
+//            throw new RuntimeException("退费确认查询结束时间不能为空");
+//        }
         List<InptCostDTO> inptCostDTOS = inptCostDAO.queryBackCostSurePage(inptCostDTO);
 
         return PageDTO.of(inptCostDTOS);

@@ -141,4 +141,5 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String phone; // 联系电话
         private String visitNationCode;  // 就诊科别
         private BigDecimal  totalAdvance; // 累计预交金
+        private String aab001;// 单位ID
 }

@@ -1027,4 +1027,15 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
   List<OutptCostDTO> queryoutptMonthDailybyGh(OutptCostDTO outptCostDTO);
 
   List<OutptCostDTO> queryoutptMonthDailybyZFY(OutptCostDTO outptCostDTO);
+
+
+  /**
+   * @Menthod queryOperCostListGroupByDept
+   * @Desrciption 统计住院手术费用（按科室）
+   * @Param outptVisitDTO
+   * @Author liuliyun
+   * @Date   2021/12/28 10:52
+   * @Return List<Map>
+   **/
+  List<OutptCostAndReigsterCostDTO> queryOperCostListGroupByDept(InptVisitDTO inptVisitDTO);
 }

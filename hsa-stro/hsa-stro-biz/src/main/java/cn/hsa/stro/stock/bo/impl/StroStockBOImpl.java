@@ -1499,6 +1499,7 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
       for(StroStockDTO item : stroStockDTOS) {
         item.setCrteTime(DateUtils.getNow());
         item.setStockTime(stockTime);
+        item.setId(SnowflakeUtils.getId());
       }
       stroStockDao.insertStockTime(stroStockDTOS);
       return true;

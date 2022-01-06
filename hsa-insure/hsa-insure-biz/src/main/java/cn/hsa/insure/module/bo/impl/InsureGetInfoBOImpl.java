@@ -961,16 +961,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 resultDataMap.put("opspdiseinfo",mapList);
             }
             else{
-                // 4.查询住院诊断信息   得到住院诊断节点信息
-                diseaMap = handerInptDiagnose(map);
-                map.put("diseaseCount",MapUtils.get(diseaMap,"diseaseCount"));
                 // 5.查询手术操作信息   得到手术操作节点信息
                 infoRecordDTOList =  handerOperInfo(map);
                 map.put("operCount",infoRecordDTOList.size());
                 // 6.查询重症监护信息   得到重症监护信息节点
                 icuInfoMapList =  handerIcuInfo(map);
-
             }
+            // 4.查询住院诊断信息   得到住院诊断节点信息
+            diseaMap = handerInptDiagnose(map);
+            map.put("diseaseCount",MapUtils.get(diseaMap,"diseaseCount"));
             // 7.结算清单基本信息
             Map<String,Object> setlInfoMap =  handerBaseSetlInfo(map,setlinfo);
             // 输血信息
@@ -2153,44 +2152,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return list;
     }
-
-    /**
-     * @Method generateSettleNo
-     * @Desrciption 1.清单流水号：医保部门接到某定点医疗机构结算清单时自
-     * 动生成的流水号码。流水号码的设置为每家定点医疗机构单独生
-     * 成顺序码。
-     * 清单流水号为 9 位，由医保结算清单年度编码和顺序号两部
-     * 分组成。
-     * 第一部分：医保结算清单年度编码（2 位）。用于区分医保
-     * 结算清单赋码年度，使用数字表示。如“21”表示 2021 年度。
-     * 第二部分：顺序号编码（7 位）。用于反映某年度某定点医
-     * 疗机构上传医保结算清单的流水码，使用数字表示。如“0000001”
-     * 表示该年度每家定点医疗机构向医保部门上传的第一份医保结
-     * 算清单。
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/27 20:38
-     * @Return
-     **/
-    private String generateSettleNo(String str) {
-        int i = Integer.valueOf(str)+1;
-        //为了拼接字符串使用
-        StringBuffer sb = new StringBuffer();
-        //累加后转成字符串
-        String num = String.valueOf(i);
-        //补全前面缺失的0
-        for (int j = 0; j < 7 - num.length(); j++) {
-            sb.append("0");
-        }
-        if (num.length() <= 7) {
-            num = sb.toString() + num;
-
-        } else {
-            throw new AppException("无可用序列");
-        }
-        return num;
-    }
-
     /**
      * @Method getEmptyErr
      * @Desrciption
@@ -2216,75 +2177,4 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         return (T) map.get(key);
     }
 
-//
-//    public static void main(String[] args) {
-//        // 梁桂芳 (2)
-//        File file = new File("C:\\Users\\powersi\\Desktop\\zhuhai\\fee\\李直.txt");
-//        BufferedReader reader = null;
-//        StringBuffer sbf = new StringBuffer();
-//        try {
-//            reader = new BufferedReader(new FileReader(file));
-//            String tempStr;
-//            while ((tempStr = reader.readLine()) != null) {
-//                sbf.append(tempStr);
-//            }
-//            reader.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (reader != null) {
-//                try {
-//                    reader.close();
-//                } catch (IOException e1) {
-//                    e1.printStackTrace();
-//                }
-//            }
-//        }
-//        String str = sbf.toString();
-//        Map<String, Object> resultMap = JSONObject.parseObject(str, Map.class);
-//        List<Map<String, Object>> groupListMap = new ArrayList<>();
-//        List<Map<String, Object>> feeDetailMapList = MapUtils.get(resultMap, "output");
-//        Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
-//                collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
-//        Map<String, Object> pMap = null;
-//        for (String key : groupMap.keySet()) {
-//            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
-//            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
-//            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
-//            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
-//            BigDecimal otherClassFee = new BigDecimal(0.00) ; // 其他费用
-//            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
-//            if (iterator.hasNext()) {
-//                pMap = new HashMap<>();
-//                List<Map<String, Object>> listMap = groupMap.get(key);
-//                for (Map<String, Object> item : listMap) {
-//                    DecimalFormat df1 = new DecimalFormat("0.00");
-//                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
-//                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
-//                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
-//                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-//                    if("01".equals(MapUtils.get(item, "chrgitm_lv"))){
-//                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-//                    }
-//                    if("02".equals(MapUtils.get(item, "chrgitm_lv"))){
-//                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-//                    }
-//                    if("03".equals(MapUtils.get(item, "chrgitm_lv"))){
-//                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-//                    }
-//                }
-//                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee);
-//                pMap.put("amt", sumDetItemFeeSumamt);
-//                pMap.put("claa_sumfee", AClassFee);
-//                pMap.put("clab_amt", BClassFee);
-//                pMap.put("fulamt_ownpay_amt", CClassFee);
-//                pMap.put("oth_amt", otherClassFee);
-//                pMap.put("med_chrgitm", key);
-//                groupListMap.add(pMap);
-//            }
-//        }
-//        Object toJSON = JSONObject.toJSON(groupListMap);
-//        System.out.println(toJSON);
-//    }
 }

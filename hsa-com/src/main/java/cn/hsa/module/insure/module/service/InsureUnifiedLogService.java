@@ -41,4 +41,15 @@ public interface InsureUnifiedLogService {
      * @Return
      **/
     WrapperResponse<Boolean> insertInsureFunctionLog(Map<String,Object> map);
+
+    /**
+     * @Method selectInsureLogs
+     * @Desrciption  his日志转医保日志入参
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/1/4 9:37
+     * @Return
+     **/
+    WrapperResponse<String> selectInsureLogs(Map<String, Object> map);
 }

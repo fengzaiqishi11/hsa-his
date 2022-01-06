@@ -25,9 +25,11 @@
         <module>hsa-outpt</module>
         <!-- 住院医护子系统 -->
         <module>hsa-inpt</module>
-        <!--医保管理子系统-->
+        <!--  医保管理子系统 -->
         <module>hsa-insure</module>
                         <module>hsa-interf</module>
+        <!-- 消息推送平台 -->
+        <module>hsa-msg-platform</module>
 <!--         定时任务子系统-->
 <!--                        <module>hsa-cron</module>-->
 <!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
@@ -38,7 +40,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.9.RELEASE</version>
+        <version>2.3.12.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -53,7 +55,7 @@
         <java.version>1.8</java.version>
 
         <!--常用工具类-->
-        <lombok.version>1.18.8</lombok.version>
+        <lombok.version>1.18.14</lombok.version>
         <fastjson.version>1.2.60</fastjson.version>
         <guava.version>20.0</guava.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
@@ -69,8 +71,15 @@
         <!--Rest接口文档-->
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
 
-        <spring-boot.version>2.0.9.RELEASE</spring-boot.version>
-        <springframework.version>5.0.13.RELEASE</springframework.version>
+        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR10</spring-cloud.version>
+        <springframework.version>5.2.15.RELEASE</springframework.version>
+        <springframework.security.version>5.3.9.RELEASE</springframework.security.version>
+        <spring-session-data-redis.version>2.3.3.RELEASE</spring-session-data-redis.version>
+        <spring-data-redis.version>2.3.9.RELEASE</spring-data-redis.version>
+        <com-h2database-version>1.4.200</com-h2database-version>
+        <mysql-driver-version>5.1.48</mysql-driver-version>
+        <spring-boot-maven-plugin.version>2.3.1.RELEASE</spring-boot-maven-plugin.version>
 
         <druid.version>1.1.19</druid.version>
 
@@ -188,7 +197,7 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-redis</artifactId>
-                <version>2.0.14.RELEASE</version>
+                <version>${spring-data-redis.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.hsa.hsaf.adapt</groupId>
@@ -372,24 +381,39 @@
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox-swagger.version}</version>
             </dependency>
-
-            <!--注解依赖-->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-openfeign-core</artifactId>
-                <version>2.0.2.RELEASE</version>
-            </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>1.5.21</version>
             </dependency>
+            <!--注解依赖-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-openfeign-core</artifactId>
+                <version>2.2.7.RELEASE</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-context</artifactId>
-                <version>2.0.4.RELEASE</version>
+                <version>2.2.7.RELEASE</version>
+                <scope>provided</scope>
             </dependency>
-
+            <!-- spring cloud 基础依赖 https://spring.io/projects/spring-cloud
+             https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-Hoxton-Release-Notes
+             -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Hoxton.SR10</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- 搜索相关依赖 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                <version>2.3.12.RELEASE</version>
+            </dependency>
             <!--测试相关-->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -401,6 +425,7 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

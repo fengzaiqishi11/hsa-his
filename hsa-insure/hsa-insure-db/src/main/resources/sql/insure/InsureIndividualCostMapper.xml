@@ -538,7 +538,6 @@
         (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo,
         ic.doctor_name doctorName,
         ic.dept_id deptId,
-        ic.status_code statusCode,
         (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,
         ic.phar_id pharId,
         ic.is_dist isDist,

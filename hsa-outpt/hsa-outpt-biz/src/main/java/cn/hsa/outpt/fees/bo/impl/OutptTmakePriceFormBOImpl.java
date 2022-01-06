@@ -172,6 +172,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
+    @Resource
+    private SysParameterService getSysParameterService_consumer;
+
 
     /**
      * @param outptVisitDTO 请求参数
@@ -517,6 +520,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 6. 判断病人类型，如果是医保病人；做医保试算操作。
             Map<String, String> payinfo = new HashMap<String, String>();
             BigDecimal miPrice = new BigDecimal(0); //统筹支付金额
+            // 2022年1月5日11:01:11 退费重收时默认 将优惠后金额保留到2位小数，
+            if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_DOWN); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入,直接丢掉
+            }
             BigDecimal selfPrice = realityPrice; //个人需支付金额
             Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
             if (patientValueCode > 0) {
@@ -657,7 +664,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     private OutptSettleDO saveOutptSettle(OutptVisitDTO outptVisitDTO, String settleId, String id,
                                           BigDecimal totalPrice, BigDecimal realityPrice, BigDecimal selfPrice, BigDecimal miPrice, String oneSettleId) {
         SysParameterDO sysParameterDO = getSysParameter(outptVisitDTO.getHospCode(), Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
-        BigDecimal roundingCost = BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice); //舍入费用
+        BigDecimal roundingCost = new BigDecimal(0);
+        if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+            roundingCost = outptVisitDTO.getTruncPrice();
+        } else {
+            roundingCost = BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice); //舍入费用
+        }
         // 生成结算数据，保存门诊结算表
         OutptSettleDO outptSettleDO = new OutptSettleDO();
         outptSettleDO.setId(settleId);//id
@@ -1005,9 +1017,32 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
         /**
          * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
+         * 增加参数控制  零费用报销是否让走医保结算
          */
         if(BigDecimalUtils.equals(akb067,akc264)){
-            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            resultMap.put("hospCode",hospCode);
+            resultMap.put("code","HOSP_APPR_FLAG");
+            String cashPayValue = "";
+            SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(resultMap).getData();
+            if(parameterDTO !=null){
+                String value = parameterDTO.getValue();
+                if(StringUtils.isNotEmpty(value)){
+                    Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+                    for (String key : stringObjectMap.keySet()) {
+                        if ("cashPay".equals(key)) {
+                            cashPayValue = MapUtils.get(stringObjectMap,key);
+                            break;
+                        }
+                    }
+                    if(!"1".equals(cashPayValue)){
+                        throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                    }
+                }else{
+                    throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                }
+            }else{
+                throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+            }
         }
 
         BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
@@ -1238,6 +1273,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             OutptSettleDTO outptSettleDTO1 = outptSettleDAO.selectByPrimaryKey(settleId);//获取本次结算费用信息
             // 4、 校验个人支付金额，是否与本次结算的费用一致，不一致表示费用出现了问题
+            // 2022年1月5日11:01:11 退费重收时默认 将优惠后金额保留到2位小数，
+            if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+                realityPrice = realityPrice.setScale(2, BigDecimal.ROUND_HALF_DOWN); // 将计算后的优惠后总金额自动保留两位小数， 不四舍五入
+            }
             if (!BigDecimalUtils.equals(realityPrice, outptSettleDTO1.getRealityPrice())) {
                  throw new AppException("支付失败，该患者费用信息错误，请刷新后重试。");
             }
@@ -1315,7 +1354,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 5、 保存结算信息（支付方式与各方式金额）
             boolean isChange = this.saveOutptPays(outptPayDOList, hospCode, settleId, visitId, outptSettleDTO1, tempCardPrice);
             if (isChange) {
-                throw new AppException("支付失败；本次账户支付金额小于当前支付金额！");
+                throw new AppException("支付失败；本次账户支付金额小于当前按医院配置的舍入规则计算后的应付金额！");
             }
 
             // 6、 根据费用信息修改本次结算的费用状态
@@ -1328,7 +1367,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             OutptSettleDO outptSettleDO = new OutptSettleDO();//修改参数
             outptSettleDO.setId(settleId);//结算id
             SysParameterDO sysParameterDO = getSysParameter(hospCode, Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
-            BigDecimal ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+            BigDecimal ssje = new BigDecimal(0);
+            if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+                ssje = BigDecimalUtils.subtract(realityPrice, outptVisitDTO.getTruncPrice());
+            } else {
+                ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+            }
             outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
             outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
@@ -3611,7 +3655,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 结束号码
         Integer endNoInt = Integer.valueOf(endNo);
 
-        if (pjSize + currNoInt > endNoInt) {
+        if (pjSize + currNoInt > endNoInt + 1) {
             throw new AppException("门诊结算-发票打印:发票打印失败,当前需要打印[" + pjSize + "],目前发票票据数量不足,请进行重打补打操作!");
         }
 

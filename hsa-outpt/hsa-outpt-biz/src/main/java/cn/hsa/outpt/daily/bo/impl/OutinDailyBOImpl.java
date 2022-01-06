@@ -1048,6 +1048,23 @@ public class OutinDailyBOImpl implements OutinDailyBO {
 
                 // 门诊挂号 - 财务分类
                 List<Map<String, Object>> RT_0201 = outinDailyDAO.queryDailyByDailyNo(dto);
+                // 明细不平处理2021年12月23日11:25:57 ====== start
+                // 2021年12月23日11:08:15 将不在缴款单上的财务分类都计算到其他费用
+                BigDecimal huafenQiTa = new BigDecimal(0);
+                for (Map<String, Object> tempMap : RT_0201) {
+                    if (!"B".equals(tempMap.get("code")) && !"A".equals(tempMap.get("code")) && !"J".equals(tempMap.get("code"))) {
+                        huafenQiTa = BigDecimalUtils.add(huafenQiTa, (BigDecimal) tempMap.get("total_price"));
+                    }
+                }
+                // 更新其他费用，其他费用会加上不在缴款表示显示的财务分类
+                for (int i = 0; i < RT_0201.size(); i++) {
+                    if("I".equals(RT_0201.get(i).get("code"))) {
+                        Map<String, Object> qitaMap = RT_0201.get(i);
+                        qitaMap.put("total_price", BigDecimalUtils.add(huafenQiTa, (BigDecimal) qitaMap.get("total_price")));
+                        RT_0201.set(i, qitaMap);
+                    }
+                }
+
                 RT_0201 = RT_0201.stream().filter(map ->
                         ("A".equals(MapUtils.get(map, "code")) || "B".equals(MapUtils.get(map, "code")) ||
                                 "J".equals(MapUtils.get(map, "code")) || "I".equals(MapUtils.get(map, "code")) ||

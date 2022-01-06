@@ -5832,7 +5832,8 @@
     <select id="queryItemName" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             id as item_id,
-            IFNULL( usual_name, good_name ) AS item_name
+            IFNULL( usual_name, good_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5843,7 +5844,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            name as item_name
+            name as item_name, code as itemCode,
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -5853,7 +5855,8 @@
         UNION ALL
         SELECT
             id as item_id,
-            IFNULL( name, other_name ) AS item_name
+            IFNULL( name, other_name ) AS item_name, code as itemCode,
+            spec, price, unit_code as unitCode, '' as splitRatio, '' as splitUnitCode
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -6422,6 +6425,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         union all
         (SELECT
@@ -6560,6 +6566,9 @@
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and a.patient_code = #{patientCode}
         </if>)
         ORDER BY in_time desc ,px asc
     </select>
@@ -7750,6 +7759,180 @@
             )
         </if>
         order by a.out_time desc
+    </select>
+
+
+    <select id="queryMzMonthlyReport" resultType="java.util.Map">
+        select settleTime, sum(zfbr) as zfbr, sum(lxbr) as lxbr, sum(gsbr) as gsbr, sum(ysbr) as ysbr, sum(tcbr) as tcbr,
+        sum(zfbr) + sum(lxbr) + sum(gsbr) + sum(ysbr) + sum(tcbr) as hjje
+        from (
+        select DATE_FORMAT(s.settle_time, '%Y-%m-%d') settleTime,
+        sum(case when s.patient_code in ('-1', '0') then c.reality_price end) zfbr,
+        ifnull(sum(case when s.patient_code = '-2' then c.reality_price end),0) lxbr,
+        ifnull(sum(case when s.patient_code = '-3' then c.reality_price end),0) gsbr,
+        ifnull(sum(case when s.patient_code = '-4' then c.reality_price end), 0) ysbr,
+        ifnull(sum(case when s.patient_code = '-1' then c.preferential_price end),0) as tcbr
+        from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and c.settle_id = s.id
+        where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and #{endDate} and s.patient_code &lt;= '0' and s.is_settle = '1'
+        <if test="selectDeptIds != null and selectDeptIds.size()>0">
+            and c.dept_id in
+            <foreach collection="selectDeptIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="selectPharIds != null and selectPharIds.size()>0">
+            and c.phar_id in
+            <foreach collection="selectPharIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        GROUP BY settleTime
+
+        union all
+
+        select DATE_FORMAT(ss.settle_time, '%Y-%m-%d') settleTime,
+        ifnull(sum(ss.self_price),0) as zfbr,
+        0 as lxbr,
+        0 as gsbr,
+        0 as ysbr,
+        ifnull(sum(ss.mi_price),0) as tcbr
+        from outpt_settle ss where id in (
+            select distinct s.id
+            from outpt_cost c left join outpt_settle s on c.hosp_code= s.hosp_code and c.visit_id = s.visit_id and
+            c.settle_id = s.id
+            where c.item_code = #{itemType} and s.hosp_code = #{hospCode} and s.settle_time between #{startDate} and
+            #{endDate} and s.patient_code &gt; '0' and s.is_settle = '1'
+            <if test="selectDeptIds != null and selectDeptIds.size()>0">
+                and c.dept_id in
+                <foreach collection="selectDeptIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="selectPharIds != null and selectPharIds.size()>0">
+                and c.phar_id in
+                <foreach collection="selectPharIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        )
+        GROUP BY settleTime
+        ) a GROUP BY settleTime
+    </select>
+
+    <select id="queryoutptMonthDailybyGh" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+            bfc.CODE AS bfcCode,
+            bfc.id AS bfcId,
+            bfc.NAME as bfcName,
+            ifnull(sum( ord.total_price ),0) AS totalPrice,
+            ifnull(sum( ord.preferential_price ),0) AS preferentialPrice,
+            ifnull(sum( ord.reality_price  ),0) AS realityPrice
+        FROM
+            outpt_register_detail ord
+                LEFT JOIN outpt_register_settle ors ON ors.register_id = ord.register_id and ors.hosp_code = ord.hosp_code
+                left join base_finance_classify bfc on bfc.id = ord.bfc_id and bfc.hosp_code = ord.hosp_code
+        where ord.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            and ors.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and ors.settle_time &lt;= #{endDate}
+        </if>
+        GROUP BY ord.bfc_id
+
+    </select>
+    <select id="queryoutptMonthDailybyMz" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+            SELECT
+                bfc.code AS bfcCode,
+                bfc.id AS bfcId,
+                bfc.NAME as bfcName,
+                ifnull(sum( oc.total_price ),0) AS totalPrice,
+                ifnull(sum( oc.preferential_price ),0) AS preferentialPrice,
+                ifnull(sum( oc.reality_price  ),0) AS realityPrice
+            FROM
+                outpt_cost oc
+                    LEFT JOIN base_finance_classify bfc ON oc.bfc_id = bfc.id and oc.hosp_code = bfc.hosp_code
+                    left join outpt_settle os on os.id = oc.settle_id and oc.hosp_code = os.hosp_code
+            where os.is_settle= '1' and oc.settle_code = '2'
+        <if test="startDate != null">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+            and oc.hosp_code = #{hospCode}
+            GROUP BY
+                oc.bfc_id
+    </select>
+    <select id="queryoutptMonthDailybyZFY" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        SELECT
+        'ZFY' AS bfcCode,
+        '999' AS bfcId,
+        '总费用' as bfcName,
+        ''as preferentialPrice,
+        ifnull(sum( A.totalPrice ),0) AS totalPrice,
+        ifnull(sum( A.realityPrice),0) AS realityPrice
+        FROM
+        (
+        SELECT
+        os.total_price AS totalPrice,
+        os.reality_price AS realityPrice
+        FROM
+        outpt_settle os
+        WHERE
+        os.is_settle = '1'
+        and
+        os.hosp_code = #{hospCode}
+        <if test="startDate != null">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+        union all
+        SELECT
+        ors.total_price AS totalPrice,
+        ors.reality_price AS realityPrice
+        FROM
+        outpt_register_settle ors
+        WHERE
+            ors.hosp_code = #{hospCode}
+        <if test="startDate != null">
+        and ors.settle_time &gt;= #{startDate}
+         </if>
+        <if test="endDate != null ">
+        and ors.settle_time &lt;= #{endDate}
+        </if>
+        ) A
+    </select>
+    <!--按住院科室统计手术费用-->
+    <select id="queryOperCostListGroupByDept" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO">
+            select
+            t.in_dept_id as deptId,t.in_dept_name as deptName,t.id as visitId,
+            ifnull(ics.reality_price, ifnull(B.reality_price, 0)) as realityPrice,
+            ifnull(B.bfc_id,'0') as bfcId,
+            ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+            ),'其他')
+            as bfcName
+                from
+                inpt_settle a
+                inner join inpt_cost b on a.id = b.settle_id and a.hosp_code = b.hosp_code and b.dept_id =#{deptId}
+                inner join inpt_cost_settle ics on b.id=ics.cost_id
+                inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = b.visit_id
+                where
+                a.hosp_code = #{hospCode}
+                and a.is_settle = '1'
+                and b.settle_code = '2'
+                and a.status_code = '0'
+        <if test="settleStartTime != null and settleStartTime !=''">
+            and a.settle_time &gt;= #{settleStartTime}
+        </if>
+        <if test="settleEndTime != null and settleEndTime !=''">
+            and a.settle_time &lt;= #{settleEndTime}
+        </if>
+        <if test="inDeptId != null and inDeptId != ''">
+            and t.in_dept_id = #{inDeptId}
+        </if>
     </select>
 
 </mapper>

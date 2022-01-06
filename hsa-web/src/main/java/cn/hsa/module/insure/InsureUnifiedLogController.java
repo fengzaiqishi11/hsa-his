@@ -6,10 +6,9 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -44,4 +43,25 @@ public class InsureUnifiedLogController extends BaseController {
         map.put("insureFunctionLogDO",insureFunctionLogDO);
         return insureUnifiedLogService_consumer.queryPage(map);
     }
+    
+    /**
+     * @Method selectInsureLogs
+     * @Desrciption  his日志转医保日志入参
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2022/1/4 9:37 
+     * @Return 
+    **/
+    @PostMapping("/selectInsureLogs")
+    public WrapperResponse<String> selectInsureLogs(@RequestBody InsureFunctionLogDO insureFunctionLogDO, HttpServletRequest req, HttpServletResponse res){
+        Map<String,Object> map = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        map.put("hospCode", hospCode);
+        insureFunctionLogDO.setHospCode(hospCode);
+        map.put("insureFunctionLogDO",insureFunctionLogDO);
+        return insureUnifiedLogService_consumer.selectInsureLogs(map);
+    }
+
 }

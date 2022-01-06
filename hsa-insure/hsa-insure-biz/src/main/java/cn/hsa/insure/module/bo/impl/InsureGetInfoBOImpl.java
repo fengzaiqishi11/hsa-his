@@ -34,6 +34,10 @@ import org.springframework.stereotype.Component;
 import scala.App;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -286,11 +290,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         mapList.stream().forEach(item->{
             String typeCode = MapUtils.get(item,"diag_type");
             String isMain = MapUtils.getVS(item,"maindiag_flag");
+            String diagType = MapUtils.get(item,"diag_type");
             if(diagnoseList.contains(typeCode)){
                 item.put("adm_cond_type","4");
             }
             if("201".equals(typeCode) && "1".equals(isMain)){
                 item.put("maindiag_flag","0");
+            }
+            if("204".equals(diagType)){
+                item.put("diag_type","1");
             }
         });
         return mapList;
@@ -953,16 +961,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 resultDataMap.put("opspdiseinfo",mapList);
             }
             else{
-                // 4.查询住院诊断信息   得到住院诊断节点信息
-                diseaMap = handerInptDiagnose(map);
-                map.put("diseaseCount",MapUtils.get(diseaMap,"diseaseCount"));
                 // 5.查询手术操作信息   得到手术操作节点信息
                 infoRecordDTOList =  handerOperInfo(map);
                 map.put("operCount",infoRecordDTOList.size());
                 // 6.查询重症监护信息   得到重症监护信息节点
                 icuInfoMapList =  handerIcuInfo(map);
-
             }
+            // 4.查询住院诊断信息   得到住院诊断节点信息
+            diseaMap = handerInptDiagnose(map);
+            map.put("diseaseCount",MapUtils.get(diseaMap,"diseaseCount"));
             // 7.结算清单基本信息
             Map<String,Object> setlInfoMap =  handerBaseSetlInfo(map,setlinfo);
             // 输血信息
@@ -1629,8 +1636,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     if("03".equals(MapUtils.get(item, "chrgitm_lv"))){
                         CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
                     }
-                    otherClassFee = BigDecimalUtils.add(otherClassFee,BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee));
                 }
+                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt,AClassFee,BClassFee,CClassFee);
                 pMap.put("amt", sumDetItemFeeSumamt);
                 pMap.put("claaSumfee", AClassFee);
                 pMap.put("clabAmt", BClassFee);
@@ -2145,44 +2152,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return list;
     }
-
-    /**
-     * @Method generateSettleNo
-     * @Desrciption 1.清单流水号：医保部门接到某定点医疗机构结算清单时自
-     * 动生成的流水号码。流水号码的设置为每家定点医疗机构单独生
-     * 成顺序码。
-     * 清单流水号为 9 位，由医保结算清单年度编码和顺序号两部
-     * 分组成。
-     * 第一部分：医保结算清单年度编码（2 位）。用于区分医保
-     * 结算清单赋码年度，使用数字表示。如“21”表示 2021 年度。
-     * 第二部分：顺序号编码（7 位）。用于反映某年度某定点医
-     * 疗机构上传医保结算清单的流水码，使用数字表示。如“0000001”
-     * 表示该年度每家定点医疗机构向医保部门上传的第一份医保结
-     * 算清单。
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/27 20:38
-     * @Return
-     **/
-    private String generateSettleNo(String str) {
-        int i = Integer.valueOf(str)+1;
-        //为了拼接字符串使用
-        StringBuffer sb = new StringBuffer();
-        //累加后转成字符串
-        String num = String.valueOf(i);
-        //补全前面缺失的0
-        for (int j = 0; j < 7 - num.length(); j++) {
-            sb.append("0");
-        }
-        if (num.length() <= 7) {
-            num = sb.toString() + num;
-
-        } else {
-            throw new AppException("无可用序列");
-        }
-        return num;
-    }
-
     /**
      * @Method getEmptyErr
      * @Desrciption
@@ -2207,4 +2176,5 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         return (T) map.get(key);
     }
+
 }

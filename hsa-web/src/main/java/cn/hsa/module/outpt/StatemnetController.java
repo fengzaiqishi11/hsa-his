@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
+import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.statement.dto.IncomeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
@@ -893,5 +893,39 @@ public class StatemnetController extends BaseController {
     map.put("hospCode", userDTO.getHospCode());
     map.put("inptVisitDTO", inptVisitDTO);
     return patientCostLedgerService_consumer.getInptOperFinanceTitle(map);
+  }
+
+  /**
+   * @Description: 查询门诊财务月报表，按选定的时间区间，逐日统计药品或项目的自费收入，医保收入
+   * @Param:
+   * @Author: guanhongqiang
+   * @Email: hongqiang.guan@powersi.com.cn
+   * @Date 2021/12/20 14:22
+   * @Return
+   */
+  @RequestMapping("/queryMzMonthlyReport")
+  public WrapperResponse<PageDTO> queryMzMonthlyReport(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    return patientCostLedgerService_consumer.queryMzMonthlyReport(paraMap);
+  }
+
+  /**
+   * @Menthod getoutptMonthDaily
+   * @Desrciption  查询门诊月结报表
+   * @Param OutptCostDTO
+   * @Author yuelong.chen
+   * @Date   2021/12/24 12:14
+   * @Return List<OutptCostDTO>
+   *
+   * @return*/
+  @GetMapping("/queryoutptMonthDaily")
+  public WrapperResponse<Map<String, List<OutptCostDTO>>> queryoutptMonthDaily(OutptCostDTO outptCostDTO, HttpServletRequest req, HttpServletResponse res) {
+    Map map = new HashMap();
+    SysUserDTO userDTO = getSession(req, res);
+    map.put("hospCode", userDTO.getHospCode());
+    outptCostDTO.setHospCode(userDTO.getHospCode());
+    map.put("outptCostDTO", outptCostDTO);
+    return patientCostLedgerService_consumer.queryoutptMonthDaily(map);
   }
 }

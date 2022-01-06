@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
@@ -465,5 +466,23 @@ public class DoctorAdviceController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptVisitDTO", inptVisitDTO);
         return doctorAdviceService_consumer.getZyAdviceByVisitId(map);
+    }
+
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询未提交医嘱信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-12-01 10:29
+     * @Return:
+     **/
+    @GetMapping("/queryUnsubmitAdviceList")
+    public WrapperResponse<Boolean> queryUnsubmitAdviceList(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteName",sysUserDTO.getName());
+        map.put("crteId",sysUserDTO.getId());
+        return doctorAdviceService_consumer.queryUnsubmitAdviceList(map);
     }
 }

@@ -66,5 +66,14 @@ public interface EmrArchiveLoggingBO {
 	 */
 	boolean insertOutHospEmrArchiveLogging(Map param);
 
+	/**
+	 * @Description: 病人出院病历自动归档记录
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/6/22 14:54
+	 * @Return
+	 */
+	boolean insertOutHospEmrArchiveMsg(Map param);
 
 }

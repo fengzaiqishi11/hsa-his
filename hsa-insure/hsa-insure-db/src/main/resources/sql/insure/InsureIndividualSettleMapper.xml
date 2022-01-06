@@ -695,6 +695,9 @@
             <if test="behalfPay != null and behalfPay != ''">
                 behalf_pay,
             </if>
+            <if test="fertilityPay != null and fertilityPay != ''">
+                fertility_pay,
+            </if>
             <if test="psnPartAmt != null ">
                 psn_part_amt
             </if>
@@ -936,6 +939,9 @@
             </if>
             <if test="behalfPay != null and behalfPay != ''">
                 #{behalfPay,jdbcType=DECIMAL},
+            </if>
+            <if test="fertilityPay != null and fertilityPay != ''">
+                #{fertilityPay,jdbcType=DECIMAL},
             </if>
             <if test="psnPartAmt != null">
                 #{psnPartAmt,jdbcType=DECIMAL}
@@ -1391,6 +1397,19 @@
     <select id="queryOutptSettle" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
         select * from outpt_settle where visit_id =#{visitId} and hosp_code =#{hospCode} and  id = #{settleId}
         and status_code ='0'
+    </select>
+    <select id="selectInsureIndividualSettleById"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        select id, hosp_code, visit_id, settle_id, is_hospital, visit_no, discharge_dn_code,
+               insure_org_code, insure_reg_code, medicine_org_code, discharge_dn_name, discharged_date,
+               discharged_case, settleway, total_price, insure_price, plan_price, serious_price, civil_price,
+               retire_price, personal_price, person_price, hosp_price, before_settle, last_settle, rests_price,
+               assign_price, starting_price, top_price, plan_account_price, portion_price, state, settle_state,
+               costbatch, aka130, bka006, injury_borth_sn, is_account, remark, crte_id, crte_name, crte_time,
+               insureSettleId, medicalRegNo, ext03, ext04, ext05, ext06, ext07, ext08, ext09, ext10, omsgid,
+               oinfno, remote_msg_id, clr_type, clr_way, clr_optins from insure_individual_settle
+        where hosp_code = #{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+        and state ='0'
     </select>
 
     <!-- 修改数据 -->

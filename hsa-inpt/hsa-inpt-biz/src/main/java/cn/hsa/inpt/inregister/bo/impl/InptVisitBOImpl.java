@@ -1363,14 +1363,15 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             countMap.put("certCode",inptVisitDTO.getCertCode());
             countMap.put("certNo",inptVisitDTO.getCertNo());
             List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
-            int inCnt= inptVisitDAO.getInCnt(countMap);
+            int inCnt = 1;
             if (info == null|| info.size() ==0) {
-                if (inCnt ==0){
-                    inCnt=1;
-                }
+                inCnt = 1;
                 orderNo = extend.getInProfile()+"-00"+inCnt;
             }else {
-                inCnt = inCnt + 1;
+                if (info.get(0).get("total_in")!=null) {
+                    inCnt = (int) info.get(0).get("total_in");
+                    inCnt = inCnt + 1;
+                }
                 orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
             }
             inptVisitDTO.setInNo(orderNo);

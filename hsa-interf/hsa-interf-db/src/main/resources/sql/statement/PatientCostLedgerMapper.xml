@@ -7860,6 +7860,12 @@
         <if test="endDate != null ">
             and os.settle_time &lt;= #{endDate}
         </if>
+        <if test="SF != null and SF !='' and SF == '1'.toString()">
+            and os.patient_code != '0'
+        </if>
+        <if test="SF != null and SF !='' and SF == '0'.toString()">
+            and os.patient_code = '0'
+        </if>
             and oc.hosp_code = #{hospCode}
             GROUP BY
                 oc.bfc_id
@@ -7889,6 +7895,12 @@
         <if test="endDate != null">
             and os.settle_time &lt;= #{endDate}
         </if>
+        <if test="SF != null and SF !='' and SF == '1'.toString()">
+            and os.patient_code != '0'
+        </if>
+        <if test="SF != null and SF !='' and SF == '0'.toString()">
+            and os.patient_code = '0'
+        </if>
         union all
         SELECT
         ors.total_price AS totalPrice,
@@ -7902,6 +7914,9 @@
          </if>
         <if test="endDate != null ">
         and ors.settle_time &lt;= #{endDate}
+        </if>
+        <if test="SF != null and SF !='' and SF == '1'.toString()">
+            and ors.id = ''
         </if>
         ) A
     </select>

@@ -74,12 +74,18 @@
         update inpt_cost set is_ok = '1', ok_id = #{crteId}, ok_name = #{crteName}, ok_time = #{crteTime}
         where hosp_code = #{hospCode} and id in ( ${costIds} )
     </update>
-
+    <update id="saveOutPtMwdicalTechnologyConfirmCost" parameterType="java.util.Map">
+        update outpt_cost set is_technology_ok = '1', technology_ok_id = #{crteId}, technology_ok_name = #{crteName}, technology_ok_time = #{crteTime}
+        where hosp_code = #{hospCode} and id in ( ${costIds} )
+    </update>
     <update id="updateMedicalTechnologyConfirmCost" parameterType="java.util.Map">
         update inpt_cost set is_ok = '0', ok_id = null, ok_name = null, ok_time = null
         where hosp_code = #{hospCode} and id in ( ${costIds} )
     </update>
-
+    <update id="updateOutPtMedicalTechnologyConfirmCost" parameterType="java.util.Map">
+        update outpt_cost set is_technology_ok = '0', technology_ok_id = null, technology_ok_name = null, technology_ok_time = null
+        where hosp_code = #{hospCode} and id in ( ${costIds} )
+    </update>
     <!-- 根据就诊id查询确费状态为未确费的费用条数 -->
     <select id="getConfirmCost" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="java.lang.Integer">
         SELECT count(*)
@@ -98,5 +104,73 @@
         and c.is_ok = '0'
         and c.visit_id = #{id}
     </select>
-
+    <select id="getOutPutLISorPASSNeedConfirmCost"
+            resultType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO">
+        SELECT
+            c.id AS costId,
+            c.item_id AS itemId,
+            c.item_name AS itemName,
+            c.price,
+            c.num,
+            (c.price*c.num) as sumPrice,
+            v.NAME,
+            v.age,
+            v.age_unit_code,
+            v.visit_no as inNo,
+            d.NAME AS sourceDeptName,
+            c.crte_time,
+            v.gender_code,
+            c.hosp_code,
+            C.technology_ok_name AS technologyOkName,
+            C.technology_ok_time AS technologyOkTime,
+            CASE
+                WHEN c.is_technology_ok = '1' THEN
+                    '确费'
+                WHEN c.is_technology_ok = '0' THEN
+                    '未确费' ELSE '未确费'
+                END AS isOk
+        FROM
+            medic_apply ma,
+            outpt_prescribe_detail b,
+            outpt_cost c,
+            outpt_visit v,
+            base_dept d
+        WHERE
+            ma.opd_id = B.id
+          AND ma.visit_id = v.id
+          and ma.hosp_code = c.hosp_code
+          and ma.hosp_code = v.hosp_code
+          and ma.hosp_code = d.hosp_code
+          and ma.visit_id = b.visit_id
+          AND b.id = c.opd_id
+          AND d.id = c.dept_id
+        AND ma.hosp_code = #{hospCode}
+        AND ma.type_code = #{typeCode}
+          AND ma.is_inpt = '0'
+          AND c.status_code = '0'
+        <if test="execDeptId != null and execDeptId != ''">
+            and c.exec_dept_id = #{execDeptId}
+        </if>
+        <if test="sourceDeptId != null and sourceDeptId != ''">
+            and c.source_dept_id = #{sourceDeptId}
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and c.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and c.crte_time &lt;= #{endTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and v.name like concat('%', #{keyword}, '%' )
+        </if>
+        <if test="isOk != null and isOk == '0'.toString()">
+           and (c.is_technology_ok  IS NULL OR c.is_technology_ok = #{isOk})
+        </if>
+        <if test="isOk != null and isOk == '1'.toString()">
+            and c.is_technology_ok = #{isOk}
+        </if>
+    </select>
 </mapper>

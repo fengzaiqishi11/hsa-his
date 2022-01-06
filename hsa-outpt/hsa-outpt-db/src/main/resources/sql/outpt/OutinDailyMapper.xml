@@ -166,14 +166,14 @@
     <select id="queryOutptRegisterSettleAll" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_register_settle
-        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </select>
 
     <!-- 根据缴款开始、结束时间查询挂号结算记录 -->
     <select id="queryOutptRegisterSettle" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price
         from outpt_register_settle
-        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and crte_id = #{crteId} and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         group by status_code
     </select>
 
@@ -181,7 +181,7 @@
     <select id="queryOutptRegisterSettleByBillId" resultType="java.util.Map">
         SELECT count(distinct bill_no) num, CONCAT(min(CAST(bill_no as SIGNED)), '') start_no, CONCAT(max(CAST(bill_no as SIGNED)), '') end_no, sum(total_price) total_price, sum(preferential_price) preferential_price, sum(reality_price) reality_price, sum(card_price) card_price
         FROM outpt_register_settle
-        WHERE hosp_code = #{hospCode} AND crte_id = #{crteId} and bill_no is not null and settle_time between #{startTime} and #{endTime}
+        WHERE hosp_code = #{hospCode} AND crte_id = #{crteId} and bill_no is not null and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         group by bill_id
     </select>
 
@@ -189,7 +189,7 @@
     <select id="queryOutptRegisterDetail" resultType="java.util.Map">
         select ord.bfc_id, sum(ord.total_price) total_price, sum(ord.preferential_price) preferential_price, sum(ord.reality_price) reality_price, sum(ord.card_price) card_price
         from outpt_register_detail ord where ord.hosp_code = #{hospCode} and ord.status_code = '0' and ord.crte_id = #{crteId} and ord.register_id in (
-            select ors.register_id from outpt_register_settle ors where ors.hosp_code = ord.hosp_code and ors.crte_id = #{crteId} and ors.settle_time between #{startTime} and #{endTime}
+            select ors.register_id from outpt_register_settle ors where ors.hosp_code = ord.hosp_code and ors.crte_id = #{crteId} and ors.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         )
         group by ord.bfc_id
     </select>
@@ -197,7 +197,7 @@
     <!-- 根据挂号结算结算记录反查挂号支付方式表 -->
     <select id="queryOutptRegisterPay" resultType="java.util.Map">
         select pay_code, sum(price) total_price from outpt_register_pay orp where orp.hosp_code = #{hospCode} and orp.rs_id in (
-            select ors.id from outpt_register_settle ors where ors.hosp_code = orp.hosp_code and ors.crte_id =#{crteId} and ors.settle_time between #{startTime} and #{endTime}
+            select ors.id from outpt_register_settle ors where ors.hosp_code = orp.hosp_code and ors.crte_id =#{crteId} and ors.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         )
         group by pay_code
     </select>
@@ -206,13 +206,13 @@
     <select id="queryOutptSettleAll" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price, sum(credit_price) credit_price
         from outpt_settle
-        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </select>
 
     <!-- 门诊 - 结算表 -->
     <select id="queryOutptSettle" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(card_price) card_price from outpt_settle
-        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and is_settle = '1' and crte_id =#{crteId} and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         group by status_code
     </select>
 
@@ -221,7 +221,7 @@
         select oc.bfc_id, sum(oc.total_price) total_price, sum(oc.preferential_price) preferential_price, sum(oc.reality_price) reality_price,
         (select sum(card_price) from outpt_settle where hosp_code = #{hospCode} and id = oc.settle_id) card_price
         from outpt_cost oc where oc.hosp_code = #{hospCode} and oc.settle_id in (
-	        select os.id from outpt_settle os where os.hosp_code = oc.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	        select os.id from outpt_settle os where os.hosp_code = oc.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
 	    )
 	    group by oc.bfc_id
     </select>
@@ -230,15 +230,15 @@
     <select id="queryOutptSettleInvoice" resultType="java.util.Map">
         select count( osi.invoice_no) num, sum(osi.total_price) total_price,
 
-        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as zfnum,
-	    (select count(invoice_no) from outpt_settle_invoice where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as tfnum,
-        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as start_no,
-        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as end_no,
-        (select count(invoice_no) from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  between #{startTime} and #{endTime} )) as usenum
+        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  &gt; #{startTime} and settle_time &lt;= #{endTime} )) as zfnum,
+	    (select count(invoice_no) from outpt_settle_invoice where status_code = '2' and settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  &gt; #{startTime} and settle_time &lt;= #{endTime} )) as tfnum,
+        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  &gt; #{startTime} and settle_time &lt;= #{endTime} )) as start_no,
+        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  &gt; #{startTime} and settle_time &lt;= #{endTime} )) as end_no,
+        (select count(invoice_no) from outin_invoice_detail where settle_id in (SELECT os.id FROM outpt_settle os WHERE	os.hosp_code = osi.hosp_code AND os.is_settle = '1' AND os.crte_id = #{crteId} and os.settle_time  &gt; #{startTime} and settle_time &lt;= #{endTime} )) as usenum
 
         from outpt_settle_invoice osi
         where osi.hosp_code = #{hospCode} and osi.status_code = '0' and print_num &lt;&gt; 0 and osi.invoice_no is not null and osi.settle_id in (
-	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	        select os.id from outpt_settle os where os.hosp_code = osi.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
 	    )
 	    group by invoice_id
     </select>
@@ -246,7 +246,7 @@
     <!-- 门诊 - 支付方式表 -->
     <select id="queryOutptPay" resultType="java.util.Map">
         select op.pay_code, sum(op.price) total_price from outpt_pay op where op.hosp_code = #{hospCode} and op.settle_id in (
-	        select os.id from outpt_settle os where os.hosp_code = op.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime}
+	        select os.id from outpt_settle os where os.hosp_code = op.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
 	    )
 	    group by op.pay_code
     </select>
@@ -255,26 +255,26 @@
     <select id="queryOutptInsurePay" resultType="java.util.Map">
         select ifnull(sum(oip.insure_price), 0) as insure_price, ifnull(sum(oip.personal_price), 0) as personal_price, ifnull((sum(oip.insure_price) - sum(oip.personal_price)), 0) as total_price
         from insure_individual_settle oip where oip.hosp_code = #{hospCode} and oip.settle_id in
-        (select os.id from outpt_settle os where os.hosp_code = oip.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time between #{startTime} and #{endTime} )
+        (select os.id from outpt_settle os where os.hosp_code = oip.hosp_code and os.is_settle = '1' and os.crte_id =#{crteId} and os.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime} )
     </select>
 
     <!-- 住院 - 结算表 -->
     <select id="queryInptSettleAll" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price, sum(credit_price) credit_price from inpt_settle
-        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </select>
 
     <!-- 住院 - 结算表 -->
     <select id="queryInptSettle" resultType="java.util.Map">
         select status_code, sum(total_price) total_price, sum(ap_total_price) ap_total_price, sum(ap_offset_price) ap_offset_price, sum(mi_price) mi_price, sum(reality_price) reality_price, sum(trunc_price) trunc_price, sum(actual_price) actual_price, sum(settle_back_price) settle_back_price from inpt_settle
-        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+        where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         group by status_code
     </select>
 
     <!-- 住院 - 费用表 -->
     <select id="queryIntptCost" resultType="java.util.Map">
         select ic.bfc_id, sum(ic.total_price) total_price, sum(ic.preferential_price) preferential_price, sum(ic.reality_price) reality_price from inpt_cost ic where ic.hosp_code = #{hospCode} and ic.status_code = '0' and ic.settle_code = '2' and ic.settle_id in (
-            select iss.id from inpt_settle iss where iss.hosp_code = ic.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+            select iss.id from inpt_settle iss where iss.hosp_code = ic.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         )
         group by ic.bfc_id
     </select>
@@ -283,15 +283,15 @@
     <select id="queryInptSettleInvoice" resultType="java.util.Map">
         select count( isi.invoice_no) num, sum(isi.total_price) total_price,
 
-        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as zfnum,
-	    (select count(invoice_no) from inpt_settle_invoice where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as tfnum,
-        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as start_no,
-        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime} )) as end_no,
-        (select count(invoice_no) from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})) as usenum
+        (select count(invoice_no) from outin_invoice_detail where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime})) as zfnum,
+	    (select count(invoice_no) from inpt_settle_invoice where status_code = '2' and settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime})) as tfnum,
+        (select CONCAT(min(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime})) as start_no,
+        (select CONCAT(max(CAST(invoice_no as SIGNED)), '') from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime} )) as end_no,
+        (select count(invoice_no) from outin_invoice_detail where settle_id in (select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime})) as usenum
 
         from inpt_settle_invoice isi
         where isi.hosp_code = #{hospCode} and isi.status_code = '0' and print_num &lt;&gt; 0 and isi.invoice_no is not null and isi.settle_id in (
-            select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+            select iss.id from inpt_settle iss where iss.hosp_code = isi.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         )
         group by isi.invoice_id
     </select>
@@ -299,7 +299,7 @@
     <!-- 住院 - 支付方式表 -->
     <select id="queryInptPay" resultType="java.util.Map">
         select ip.pay_code, sum(ip.price) total_price from inpt_pay ip where ip.hosp_code = #{hospCode} and ip.settle_id in (
-            select iss.id from inpt_settle iss where iss.hosp_code = ip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime}
+            select iss.id from inpt_settle iss where iss.hosp_code = ip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
         )
         group by ip.pay_code
     </select>
@@ -308,7 +308,7 @@
     <select id="queryInptInsurePay" resultType="java.util.Map">
         select ifnull(sum(iip.insure_price), 0) as insure_price, ifnull(sum(iip.personal_price), 0) as personal_price, ifnull((sum(iip.insure_price) - sum(iip.personal_price)), 0) as total_price
         from insure_individual_settle iip where iip.hosp_code = #{hospCode} and iip.settle_id in
-        (select iss.id from inpt_settle iss where iss.hosp_code = iip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time between #{startTime} and #{endTime})
+        (select iss.id from inpt_settle iss where iss.hosp_code = iip.hosp_code and iss.is_settle = '1' and iss.crte_id =#{crteId} and iss.settle_time &gt; #{startTime} and settle_time &lt;= #{endTime})
     </select>
 
     <!-- 新增日结缴款主表 -->
@@ -368,27 +368,27 @@
 
     <!-- 修改挂号结算表日结缴款ID -->
     <update id="updateDailyIdByOutptRegisterSettle">
-        update outpt_register_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and settle_time between #{startTime} and #{endTime}
+        update outpt_register_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </update>
 
     <!-- 修改门诊结算表日结缴款ID -->
     <update id="updateDailyIdByOutptSettle">
-        update outpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+        update outpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </update>
 
     <!-- 修改住院结算表日结缴款ID -->
     <update id="updateDailyIdByInptSettle">
-        update inpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time between #{startTime} and #{endTime}
+        update inpt_settle set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and is_settle = '1' and settle_time &gt; #{startTime} and settle_time &lt;= #{endTime}
     </update>
 
     <!-- 修改住院预交金表日结缴款ID -->
     <update id="updateDailyIdByInptAdvancePay">
-        update inpt_advance_pay set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time between #{startTime} and #{endTime}
+        update inpt_advance_pay set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time &gt; #{startTime} and crte_time &lt;= #{endTime}
     </update>
 
     <!-- 修改一卡通异动表日结缴款ID -->
     <update id="updateDailyIdToBaseCardRechangeChargeDO">
-        update base_card_recharge_change set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time between #{startTime} and #{endTime}
+        update base_card_recharge_change set daily_settle_id = #{id} where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time &gt; #{startTime} and crte_time &lt;= #{endTime}
     </update>
 
     <!-- 根据日结单号、日结类型查询日结主表 -->
@@ -429,7 +429,7 @@
 
     <!-- 住院预交金 -->
     <select id="queryInptAdvancePay" resultType="cn.hsa.module.inpt.advancepay.entity.InptAdvancePayDO">
-        select * from inpt_advance_pay where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time between #{startTime} and #{endTime}
+        select * from inpt_advance_pay where hosp_code = #{hospCode} and crte_id =#{crteId} and crte_time &gt; #{startTime} and crte_time &lt;= #{endTime}
     </select>
 
     <!-- 住院预交金，支付方式 -->
@@ -656,7 +656,7 @@
 
     <!-- 一卡通充值、退款 -->
     <select id="queryBaseCardCZ" resultType="cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO">
-        select * from base_card_recharge_change where hosp_code = #{hospCode} and crte_id =#{crteId} and status_code in ('6','7') and crte_time between #{startTime} and #{endTime}
+        select * from base_card_recharge_change where hosp_code = #{hospCode} and crte_id =#{crteId} and status_code in ('6','7') and crte_time &gt; #{startTime} and crte_time &lt;= #{endTime}
     </select>
 
     <!-- 新增日结缴款一卡通支付方式表 -->

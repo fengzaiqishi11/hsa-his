@@ -1693,11 +1693,11 @@
             WHERE 1=1
             /*开始日期*/
             <if test="startDate != null and startDate != ''">
-                and b.crte_time &gt;= #{startDate}
+                and c.settle_time &gt;= #{startDate}
             </if>
             /*结束日期*/
             <if test="endDate != null and endDate != ''">
-                and b.crte_time  &lt;= #{endDate}
+                and c.settle_time  &lt;= #{endDate}
             </if>
             <if test="keyword != null and keyword != ''">
                 and b.item_name  like concat( #{keyword },'%')

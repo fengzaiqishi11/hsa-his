@@ -171,7 +171,9 @@
         (select c.name from base_finance_classify c where c.id = ic.bfc_id and c.hosp_code = #{hospCode}) as bfcName,
         ifnull(iic.item_code, ifnull(ic.nation_code, '')) as nationCode,
         ifnull(iic.item_name, ifnull(ic.nation_name, '')) as nationName,
-        iic.guest_ratio as guestRatio, iic.preselfpay_amt as preselfpayAmt
+        iic.guest_ratio as guestRatio, iic.preselfpay_amt as preselfpayAmt,
+        ifnull((case when iic.chrgItemLv = '01' then '甲类' when iic.chrgItemLv = '02' then '乙类' when iic.chrgItemLv = '03' then '丙类' else null end), '自费') as chrgItemLv,
+        ifnull(iic.item_code, '') as ybCode
         from inpt_cost ic left join insure_individual_cost iic on ic.id = iic.cost_id
         where ic.hosp_code = #{hospCode} and ic.cost_time is not null
             <if test="visitId != null and visitId != ''">
@@ -248,7 +250,9 @@
     (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode,
      ifnull(iic.item_code, ifnull(bd.nation_code, ifnull(bi.nation_code, ifnull(bm.nation_code, ifnull(ic.nation_code, ''))))) as nationCode,
      ifnull(iic.item_name, ifnull(bd.nation_name, ifnull(bi.nation_name, ifnull(bm.nation_name, ifnull(ic.nation_name, ''))))) as nationName,
-    ifnull(max(iic.guest_ratio), '') as guestRatio, ifnull(max(iic.preselfpay_amt), '') as preselfpayAmt
+    ifnull(max(iic.guest_ratio), '') as guestRatio, ifnull(max(iic.preselfpay_amt), '') as preselfpayAmt,
+    ifnull((case when iic.chrgItemLv = '01' then '甲类' when iic.chrgItemLv = '02' then '乙类' when iic.chrgItemLv = '03' then '丙类' else null end), '自费') as chrgItemLv,
+    ifnull(iic.item_code, '') as ybCode
       from
      inpt_cost ic
      left join

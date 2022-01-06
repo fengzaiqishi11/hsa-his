@@ -32,6 +32,7 @@ dubbo:
   protocol:
     name: dubbo
     port: 29007
+    payload: 107374182
   provider:
     threads: 1000
 

@@ -262,6 +262,10 @@ public class StringUtils {
     public static String createKey(String tableName, String hospCode,String id){
         return new StringBuilder(tableName).append("_"+hospCode+"_").append(id).toString();
     }
+
+    public static String createKey(String hospCode,String suffix){
+        return new StringBuilder().append(hospCode).append("_").append(suffix).toString();
+    }
     
     /**
      * @Method createMsgId

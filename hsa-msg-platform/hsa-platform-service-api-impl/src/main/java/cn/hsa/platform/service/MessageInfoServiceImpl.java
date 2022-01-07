@@ -51,6 +51,13 @@ public class MessageInfoServiceImpl implements MessageInfoService {
         return new ArrayList<>();
     }
 
+    /** 获取推送系统的消息
+     * method: getDeptMessageInfoList
+     * @param infoModel
+     * @Author: liuliyun
+     * @Date: 2021-12-16 08:56
+     * @return  List<MessageInfoModel>
+     */
     @Override
     public List<MessageInfoModel> getSysMessageInfoList(MessageInfoModel infoModel) {
         // 查询系统消息
@@ -61,10 +68,33 @@ public class MessageInfoServiceImpl implements MessageInfoService {
         return new ArrayList<>();
     }
 
+    /** 获取推送科室的消息
+     * method: getDeptMessageInfoList
+     * @param infoModel
+     * @Author: liuliyun
+     * @Date: 2021-12-16 08:56
+     * @return  List<MessageInfoModel>
+     */
     @Override
     public List<MessageInfoModel> getDeptMessageInfoList(MessageInfoModel infoModel) {
         if (infoModel!=null) {
             List<MessageInfoModel> messageInfoModels = messageInfoDao.queryMessageInfoByType(infoModel);
+            return messageInfoModels;
+        }
+        return new ArrayList<>();
+    }
+
+    /** 获取推送个人的消息
+     * method: queryPersonalMessageInfoByType
+     * @param infoModel
+     * @Author: liuliyun
+     * @Date: 2022-01-06 09:56
+     * @return  List<MessageInfoModel>
+     */
+    @Override
+    public List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel infoModel) {
+        if (infoModel!=null) {
+            List<MessageInfoModel> messageInfoModels = messageInfoDao.queryPersonalMessageInfoByType(infoModel);
             return messageInfoModels;
         }
         return new ArrayList<>();

@@ -50,5 +50,9 @@ public class ExaminationItem implements Serializable {
     private Date crteTime;
     /** 是否偏高偏低 **/
     private String isPositive;
+    /**
+     * 检验项目名称
+     */
+    private String adviceName;
 
 }

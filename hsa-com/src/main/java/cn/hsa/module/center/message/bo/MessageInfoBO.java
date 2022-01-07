@@ -1,9 +1,7 @@
-package cn.hsa.module.emr.message.bo;
+package cn.hsa.module.center.message.bo;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
-
-import java.util.List;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 
 /**
  * @Package_name: cn.hsa.module.message.bo
@@ -26,14 +24,6 @@ public interface MessageInfoBO {
    */
   Boolean insertMessageInfo(MessageInfoDTO messageInfoDTO);
 
-  /**
-   * 批量新增消息数据
-   * @Author liuliyun
-   * @Date 2021/11/26 16:23
-   * @param messageInfoDTOS 实例对象
-   * @return Boolean
-   */
-  Boolean insertMessageInfoBatch(List<MessageInfoDTO> messageInfoDTOS);
 
   /**
    * 修改消息数据
@@ -62,24 +52,6 @@ public interface MessageInfoBO {
    */
   Boolean deleteMessageInfoBatch(MessageInfoDTO messageInfoDTO);
 
-  /** queryMessageInfoByType
-   * 查询消息list
-   * @Author liuliyun
-   * @Date 2021/11/29 08:44
-   * @param messageInfoDTO 实例对象
-   * @return List<MessageInfoDTO>
-   */
-  List<MessageInfoDTO> queryMessageInfoByType(MessageInfoDTO messageInfoDTO);
-
-  /**updateMessageInfo
-   * 批量修改消息数据
-   * @Author liuliyun
-   * @Date 2021/12/03 14:23
-   * @param messageInfoDTO 实例对象
-   * @return Boolean
-   */
-  Boolean updateMessageInfoBatch(MessageInfoDTO messageInfoDTO);
-
   /**queryMessageInfoPage
    * 批量修改消息数据
    * @Author liuliyun
@@ -87,15 +59,15 @@ public interface MessageInfoBO {
    * @param messageInfoDTO 实例对象
    * @return Boolean
    */
-  PageDTO queryMessageInfoPage(MessageInfoDTO messageInfoDTO);
+  PageDTO queryMessageInfoByType(MessageInfoDTO messageInfoDTO);
 
-  /**updateMessageInfo
+  /**updateMssageInfoStatusById
    * 根据消息id修改消息数据
    * @Author liuliyun
    * @Date 2021/12/03 14:23
    * @param messageInfoDTO 实例对象
    * @return Boolean
    */
-  Boolean updateMssageInfoBatchById(MessageInfoDTO messageInfoDTO);
+  Boolean updateMssageInfoStatusById(MessageInfoDTO messageInfoDTO);
 
 }

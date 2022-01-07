@@ -1,6 +1,7 @@
 package cn.hsa.module.inpt.inspectionreport.dao;
 
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inspectionreport.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -88,4 +89,12 @@ public interface InspectionReportDAO {
        * @Date: 2021/6/29 16:27
     **/
     List<String> getAllParentDeptCode();
+
+    /**
+     * @description 根据住院号查询病人lis信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/1/4 14:45
+     **/
+    List<ExaminationItem> queryPatientAllMedicResult(InptVisitDTO inptVisitDTO);
 }

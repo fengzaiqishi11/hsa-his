@@ -152,7 +152,5 @@
     <!--会诊记录-->
     <dubbo:service interface="cn.hsa.module.inpt.consultation.service.InptConsultationApplyServcie" ref="inptConsultationService_provider"/>
 
-    <!--消息记录-->
-    <dubbo:service interface="cn.hsa.module.emr.message.service.MessageInfoService" ref="messageInfoService_provider"/>
 
 </beans>

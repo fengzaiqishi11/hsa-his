@@ -1,6 +1,6 @@
-package cn.hsa.module.emr.message.dao;
+package cn.hsa.module.center.message.dao;
 
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 
 import java.util.List;
 
@@ -21,10 +21,6 @@ public interface MessageInfoDAO {
    int insertMessageInfo(MessageInfoDTO messageInfoDTO);
 
    /**
-    * 批量新增消息
-    */
-   int insertMessageInfoBatch(List<MessageInfoDTO> messageInfoDTO);
-   /**
     * 更新消息
     */
    int updateMssageInfo(MessageInfoDTO messageInfoDTO);
@@ -44,14 +40,9 @@ public interface MessageInfoDAO {
    List<MessageInfoDTO> queryMessageInfoByType(MessageInfoDTO messageInfoDTO);
 
    /**
-    * 批量更新消息
+    * 根据消息id更新消息发布状态
     */
-   int updateMssageInfoBatch(MessageInfoDTO messageInfoDTO);
-
-   /**
-    * 根据消息id批量更新消息
-    */
-   int updateMssageInfoBatchById(MessageInfoDTO messageInfoDTO);
+   int updateMssageInfoStatusById(MessageInfoDTO messageInfoDTO);
 
 
 

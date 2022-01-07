@@ -27,8 +27,8 @@ import cn.hsa.module.base.drug.service.BaseDrugService;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.base.rate.service.BaseRateService;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDetailDAO;
@@ -172,8 +172,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     @Resource
     private OutptDoctorPrescribeService outptDoctorPrescribeService_consumer;
 
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
+//    @Resource
+//    private MessageInfoDAO messageInfoDAO;
 
 
     /**

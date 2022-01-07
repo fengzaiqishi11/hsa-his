@@ -380,7 +380,9 @@
         max( ov.age ) age,max( ov.age_unit_code ) age_unit_code,		max(ma.crte_time ) crte_time,
         max(ma.bar_code ) bar_code,
         max(ba.technology_code) technology_code,
-        '' as bed_name
+        '' as bed_name,
+        max(ma.print_time) printTime,
+        ifnull(max(ma.print_times), 0) printTimes
         from 	medic_apply ma
         JOIN outpt_prescribe_detail opd ON
         ma.opd_id  = opd.id
@@ -449,7 +451,9 @@
         max(ma.crte_time) crte_time,
         max(ma.bar_code) bar_code,
         max(ba.technology_code) technology_code,
-        max(iv.bed_name) bed_name
+        max(iv.bed_name) bed_name,
+        max(ma.print_time) printTime,
+        ifnull(max(ma.print_times), 0) printTimes
         FROM
 
         medic_apply ma
@@ -508,5 +512,88 @@
         </foreach>
     </update>
 
+    <!--取消合管-->
+    <update id="updateCancelMerge" parameterType="java.util.Map">
+        <foreach collection="medicalApplyDTOS" item="item" index="index" separator=";">
+            update medic_apply
+            set is_merge = #{item.isMerge},
+            merge_id = #{item.mergeId}
+            where hosp_code= #{item.hospCode} and id = #{item.id}
+        </foreach>
+    </update>
 
+    <!--根据合管ids查询出医技申请集合-->
+    <select id="queryMedicApplyByMergeIds" parameterType="java.util.Map" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
+        select
+            a.visit_id,
+            a.hosp_code,
+            a.type_code,
+            a.merge_id,
+            a.is_merge,
+            a.id,
+            a.document_sta,
+            a.apply_no,
+            a.bar_code,
+            a.crte_time,
+            a.print_time as printTime,
+            IFNULL(a.print_times, '0') as printTimes,
+            GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            visit.dept_name,
+            visit.visit_no,
+            visit.name,
+            visit.gender_code,
+            visit.age,
+            visit.age_unit_code,
+            '' bed_name,
+            ba.technology_code,
+            ba.container_code,
+            ba.specimen_code
+        from medic_apply a
+        join outpt_prescribe_detail b on a.opd_id = b.id and a.hosp_code = b.hosp_code
+        join base_advice ba on b.item_id = ba.id and b.hosp_code = ba.hosp_code
+        join outpt_visit visit on a.visit_id = visit.id and a.hosp_code = visit.hosp_code
+        where a.hosp_code = #{hospCode}
+          and a.merge_id in
+        <foreach collection="mergeIds" item="mergeId" open="(" close=")" separator=",">
+            #{mergeId}
+        </foreach>
+        group by a.merge_id
+
+        union all
+
+        select
+            a.visit_id,
+            a.hosp_code,
+            a.type_code,
+            a.merge_id,
+            a.is_merge,
+            a.id,
+            a.document_sta,
+            a.apply_no,
+            a.bar_code,
+            a.crte_time,
+            a.print_time as printTime,
+            IFNULL(a.print_times, '0') as printTimes,
+            GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            visit.in_dept_name as dept_name,
+            visit.in_no as visit_no,
+            visit.name,
+            visit.gender_code,
+            visit.age,
+            visit.age_unit_code,
+            visit.bed_name,
+            ba.technology_code,
+            ba.container_code,
+            ba.specimen_code
+        from medic_apply a
+        join inpt_advice b on a.order_no = b.order_no and a.hosp_code = b.hosp_code
+        join base_advice ba on b.item_id = ba.id and b.hosp_code = ba.hosp_code
+        join inpt_visit visit on a.visit_id = visit.id and a.hosp_code = visit.hosp_code
+        where a.hosp_code = #{hospCode}
+          and a.merge_id in
+        <foreach collection="mergeIds" item="mergeId" open="(" close=")" separator=",">
+            #{mergeId}
+        </foreach>
+        group by a.merge_id
+    </select>
 </mapper>

@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -174,4 +175,10 @@ public interface BaseAdviceDAO {
     * @Return int
     **/
     int updateWithPipePrint(Map<String,Object> paramMap);
+
+    // 根据合管ids查询出医技申请集合
+    List<MedicalApplyDTO> queryMedicApplyByMergeIds(Map<String, Object> paramMap);
+
+    // 取消合管
+    int updateCancelMerge(@Param("medicalApplyDTOS") List<MedicalApplyDTO> medicalApplyDTOS);
 }

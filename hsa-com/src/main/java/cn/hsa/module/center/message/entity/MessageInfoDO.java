@@ -1,4 +1,4 @@
-package cn.hsa.module.emr.message.entity;
+package cn.hsa.module.center.message.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,7 +24,7 @@ public class MessageInfoDO extends PageDO implements Serializable {
 
 	private static final long serialVersionUID = 512259041926817640L;
 	/**
-	 * 接收人id
+	 * 主键
 	 */
 	private String id;
 	/**
@@ -101,6 +101,11 @@ public class MessageInfoDO extends PageDO implements Serializable {
 	 * 最后执行时间
 	 */
 	private Date lastTime;
+
+	/**
+	 * 是否已发布
+	 */
+	private String isPublish;
 
 
 }

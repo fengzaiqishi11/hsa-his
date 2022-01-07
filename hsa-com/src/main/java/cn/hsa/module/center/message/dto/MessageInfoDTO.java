@@ -1,6 +1,6 @@
-package cn.hsa.module.emr.message.dto;
+package cn.hsa.module.center.message.dto;
 
-import cn.hsa.module.emr.message.entity.MessageInfoDO;
+import cn.hsa.module.center.message.entity.MessageInfoDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

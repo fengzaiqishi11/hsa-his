@@ -8,8 +8,8 @@ import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.bedlist.bo.BedListBO;
 import cn.hsa.module.inpt.bedlist.dao.BedListDAO;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
@@ -66,8 +66,8 @@ public class BedListBOImpl implements BedListBO {
     @Resource
     private SysParameterService sysParameterService_consumer;
 
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
+//    @Resource
+//    private MessageInfoDAO messageInfoDAO;
 
     /**
      * @Method queryPage

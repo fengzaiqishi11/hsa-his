@@ -12,8 +12,8 @@ import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.consultation.dao.InptConsultationApplyDAO;
 import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
@@ -113,11 +113,6 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     @Resource
     private InptConsultationApplyDAO inptConsultationApplyDAO;
 
-    /**
-     * 消息dao
-     */
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
     /**
     * @Method updateInptAdviceBatch
     * @Desrciption 批量更新医嘱

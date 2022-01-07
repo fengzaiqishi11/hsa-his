@@ -322,4 +322,28 @@
     <select id="getAllParentDeptCode" resultType="string">
         select code from base_dept where  up_dept_code is null
     </select>
+
+    <!--根据住院号查询所有lis结果-->
+    <select id="queryPatientAllMedicResult" resultType="cn.hsa.module.inpt.inspectionreport.dto.ExaminationItem">
+        SELECT
+            mr.advice_id AS adviceId,
+            mr.visit_id AS visitId,
+            mr.in_no AS inNo,
+            item_id AS itemId,
+            item_name AS itemName,
+            result,
+            apply_no as applyNo,
+            result_detail AS resultDetail,
+            reference_value AS referenceValue,
+            result_unit AS resultUnit,
+            DATE_FORMAT(crte_time,'%Y-%m-%d') AS crteTime,
+            mr.is_positive as isPositive,
+            (select item_name from inpt_advice_detail where id = mr.advice_id and hosp_code =#{hospCode}) as adviceName
+        FROM
+            medic_result mr
+        WHERE
+            mr.in_no = #{inNo} and hosp_code =#{hospCode}
+        ORDER BY
+            crte_time ASC
+    </select>
 </mapper>

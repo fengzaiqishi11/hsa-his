@@ -29,9 +29,6 @@ public class CacheServiceImpl extends HsafService implements CacheService {
      */
     @Resource
     private CenterCacheBO centerCacheBO;
-
-    private AtomicInteger dataSourceInitCount = new AtomicInteger(0);
-
     /***
      *  根据医院编码刷新redis缓存中的码表数据
      * @param map 参数 hospCode为必传参数
@@ -40,10 +37,7 @@ public class CacheServiceImpl extends HsafService implements CacheService {
     @SuppressWarnings("unchecked")
     @Override
     public WrapperResponse<Boolean> refreshCodeDetailsCacheByHospCode(Map<String,String> map) {
-        if(dataSourceInitCount.get() < 1){
-            // 初次使用先初始化数据源信息
-            centerCacheBO.refreshCenterHospitalDatasource();
-        }
+
         String hospCode = (String) Optional.ofNullable(MapUtils.get(map, "hospCode")).orElseThrow(()-> new AppException("必传医院编码不能为空!"));
 
         String codeCacheRedisKey = StringUtils.createKey(hospCode, Constants.REDISKEY.CODEDETAIL);
@@ -59,8 +53,6 @@ public class CacheServiceImpl extends HsafService implements CacheService {
 
     @Override
     public WrapperResponse<Boolean> refreshCenterHospitalDatasource() {
-        // 初始化次数+1
-        dataSourceInitCount.incrementAndGet();
         return centerCacheBO.refreshCenterHospitalDatasource();
     }
 }

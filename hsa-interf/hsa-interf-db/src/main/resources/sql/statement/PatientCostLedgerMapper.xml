@@ -7877,12 +7877,16 @@
         '总费用' as bfcName,
         ''as preferentialPrice,
         ifnull(sum( A.totalPrice ),0) AS totalPrice,
-        ifnull(sum( A.realityPrice),0) AS realityPrice
+        ifnull(sum( A.realityPrice),0) AS realityPrice,
+        ifnull(sum( A.miPrice),0) AS miPrice,
+        ifnull(sum( A.selfPrice),0) AS selfPrice
         FROM
         (
         SELECT
         os.total_price AS totalPrice,
-        os.reality_price AS realityPrice
+        os.reality_price AS realityPrice,
+        os.mi_price AS miPrice,
+        self_price as selfPrice
         FROM
         outpt_settle os
         WHERE
@@ -7904,7 +7908,9 @@
         union all
         SELECT
         ors.total_price AS totalPrice,
-        ors.reality_price AS realityPrice
+        ors.reality_price AS realityPrice,
+        0 as miPrice,
+        ors.reality_price as selfPrice
         FROM
         outpt_register_settle ors
         WHERE

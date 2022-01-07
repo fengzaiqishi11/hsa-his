@@ -1,13 +1,11 @@
-package cn.hsa.module.emr.message.service;
+package cn.hsa.module.center.message.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,16 +30,7 @@ public interface MessageInfoService {
     @PostMapping("/service/msg/message/insertMessageInfo")
     WrapperResponse<Boolean> insertMessageInfo(Map map);
 
-    /**
-     * @Menthod insertMessageInfoBatch
-     * @Desrciption 批量新增消息
-     * @param map
-     * @Author liuliyun
-     * @Date   2021/11/26 8:50
-     * @Return WrapperResponse<Boolean>
-     **/
-    @PostMapping("/service/msg/message/insertMessageInfoBatch")
-    WrapperResponse<Boolean> insertMessageInfoBatch(Map map);
+
 
     /**
      * @Menthod updateMessageInfo
@@ -79,15 +68,15 @@ public interface MessageInfoService {
 
 
     /**
-     * @Menthod updateMessageInfoBatch
-     * @Desrciption 批量更新消息
+     * @Menthod updateMssageInfoStatusById
+     * @Desrciption 根据消息id修改发布状态
      * @param map
      * @Author liuliyun
      * @Date   2021/12/03 14:21
      * @Return WrapperResponse<Boolean>
      **/
-    @PostMapping("/service/msg/message/updateMssageInfoBatchById")
-    WrapperResponse<Boolean> updateMssageInfoBatchById(Map map);
+    @PostMapping("/service/msg/message/updateMssageInfoStatusById")
+    WrapperResponse<Boolean> updateMssageInfoStatusById(Map map);
 
 
     /**@Menthod queryMessageInfoPage
@@ -97,17 +86,8 @@ public interface MessageInfoService {
      * @Date   2021/12/03 14:32
      * @Return WrapperResponse<PageDTO>
      **/
-    @GetMapping("/service/msg/message/queryMessageInfoPage")
-    WrapperResponse<PageDTO> queryMessageInfoPage(Map map);
+    @GetMapping("/service/msg/message/queryMessageInfoByType")
+    WrapperResponse<PageDTO> queryMessageInfoByType(Map map);
 
-    /**@Menthod queryMessageInfoList
-     * @Desrciption 查询消息列表
-     * @param map
-     * @Author liuliyun
-     * @Date   2021/12/03 15:04
-     * @Return WrapperResponse<PageDTO>
-     **/
-    @GetMapping("/service/msg/message/queryMessageInfoList")
-    WrapperResponse<List<MessageInfoDTO>> queryMessageInfoList(Map map);
 
 }

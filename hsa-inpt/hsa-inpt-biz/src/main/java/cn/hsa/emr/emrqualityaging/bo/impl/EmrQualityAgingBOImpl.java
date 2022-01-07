@@ -2,12 +2,12 @@ package cn.hsa.emr.emrqualityaging.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
 import cn.hsa.module.emr.emrquality.bo.EmrQualityAgingBO;
 import cn.hsa.module.emr.emrquality.dao.EmrQualityAgingDAO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityAgingDTO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -38,8 +38,6 @@ public class EmrQualityAgingBOImpl extends HsafBO implements EmrQualityAgingBO {
     @Resource
     private SysParameterService sysParameterService_consumer;
 
-    @Resource
-    MessageInfoDAO messageInfoDAO;
 
 
     @Override

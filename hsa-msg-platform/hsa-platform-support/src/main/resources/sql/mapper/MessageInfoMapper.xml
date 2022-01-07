@@ -142,7 +142,7 @@
         and send_count > count
         AND TIMESTAMPDIFF(Minute,ifnull(last_time,date_sub(NOW(),interval 1 day)),NOW()) > interval_time
         AND (status_code is null or status_code ='1')
-        and (find_in_set(dept_id,#{deptId}) or find_in_set(receiver_id,#{receiverId}))
+        and find_in_set(#{deptId},dept_id)
           <if test="type != null and type != ''">
               and type =#{type}
           </if>
@@ -234,7 +234,7 @@
         sys_msg
         WHERE
         hosp_code = #{hospCode}
-        and (find_in_set(dept_id,#{deptId}) or find_in_set(receiver_id,#{receiverId}))
+        and (find_in_set(#{deptId},dept_id) or find_in_set(#{receiverId},receiver_id))
         <if test="type != null and type != ''">
             and type =#{type}
         </if>
@@ -276,7 +276,7 @@
         and start_time &lt;= NOW()
         and send_count > count
         AND (status_code is null or status_code ='1')
-        and (find_in_set(dept_id,#{deptId}) or find_in_set(receiver_id,#{receiverId}))
+        and (find_in_set(#{deptId},dept_id) or find_in_set(#{receiverId},receiver_id))
         <if test="type != null and type != ''">
             and type =#{type}
         </if>
@@ -321,6 +321,50 @@
         and send_count > count
         AND TIMESTAMPDIFF(Minute,ifnull(last_time,date_sub(NOW(),interval 1 day)),NOW()) > interval_time
         AND (status_code is null or status_code ='1')
+    </select>
+
+    <!--查询推送个人消息-->
+    <select id="queryPersonalMessageInfoByType" resultMap="MessageInfoMap">
+        SELECT
+        id,
+        hosp_code,
+        source_id,
+        visit_id,
+        dept_id,
+        type,
+        content,
+        LEVEL,
+        receiver_id,
+        start_time,
+        end_time,
+        interval_time,
+        send_count,
+        status_code,
+        url,
+        last_time,
+        crte_time,
+        crte_name,
+        crte_id,
+        count
+        FROM
+        sys_msg
+        WHERE
+        hosp_code = #{hospCode}
+        AND end_time > NOW()
+        and start_time &lt;= NOW()
+        and send_count > count
+        AND TIMESTAMPDIFF(Minute,ifnull(last_time,date_sub(NOW(),interval 1 day)),NOW()) > interval_time
+        AND (status_code is null or status_code ='1')
+        and find_in_set(#{receiverId},receiver_id)
+        <if test="type != null and type != ''">
+            and type =#{type}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and status_code =#{statusCode}
+        </if>
+        <if test="level != null and level != ''">
+            and level =#{level}
+        </if>
     </select>
 
 </mapper>

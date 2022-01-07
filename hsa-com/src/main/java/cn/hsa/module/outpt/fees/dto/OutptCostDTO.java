@@ -184,4 +184,6 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+    // 是否医保类型
+    private String SF;
 }

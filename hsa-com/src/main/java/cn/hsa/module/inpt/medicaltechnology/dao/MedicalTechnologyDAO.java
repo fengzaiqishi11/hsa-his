@@ -21,8 +21,10 @@ public interface MedicalTechnologyDAO {
 
 	List<MedicalTechnologyDTO> getLISorPASSNeedConfirmCost(MedicalTechnologyDTO medicalTechnologyDTO);
 
-	int saveMwdicalTechnologyConfirmCost(Map<String, Object> map);
+	List<MedicalTechnologyDTO> getOutPutLISorPASSNeedConfirmCost(MedicalTechnologyDTO medicalTechnologyDTO);
 
+	int saveMwdicalTechnologyConfirmCost(Map<String, Object> map);
+	int saveOutPtMwdicalTechnologyConfirmCost(Map<String, Object> map);
 	/**
 	 * @Description: 取消医技确费
 	 * @Param:
@@ -32,7 +34,7 @@ public interface MedicalTechnologyDAO {
 	 * @Return
 	 */
 	int updateMedicalTechnologyConfirmCost(Map<String, Object> map);
-
+	int updateOutPtMedicalTechnologyConfirmCost(Map<String, Object> map);
 	/**
 	 * @Description: 查询当前患者就诊id未确费的费用数量
 	 * @Param:

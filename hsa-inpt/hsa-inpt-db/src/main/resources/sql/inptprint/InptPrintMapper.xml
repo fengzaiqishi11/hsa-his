@@ -265,7 +265,7 @@
       base_material bm
       on bm.id = ic.item_id and bm.hosp_code = ic.hosp_code
       left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id
-      left join inpt_visit iv on iv.hoap_code = ic.hosp_code and iv.id = ic.visit_id
+      left join inpt_visit iv on iv.hosp_code = ic.hosp_code and iv.id = ic.visit_id
     where ic.hosp_code = #{hospCode} and ic.cost_time is not null and ic.status_code ='0'
     <if test="visitId != null and visitId != ''">
       AND ic.visit_id = #{visitId}

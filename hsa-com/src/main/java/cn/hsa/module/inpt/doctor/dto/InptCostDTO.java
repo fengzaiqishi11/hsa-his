@@ -206,4 +206,7 @@ public class InptCostDTO extends InptCostDO implements Serializable {
 
     // 医保编码
     private String ybCode;
+
+    // 经治医生名称
+    private String jzDoctorName;
 }

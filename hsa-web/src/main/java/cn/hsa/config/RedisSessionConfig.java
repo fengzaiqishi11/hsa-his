@@ -8,6 +8,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 
@@ -61,5 +62,19 @@ public class RedisSessionConfig extends RedisHttpSessionConfiguration {
         poolConfig.setTestOnReturn(testOnReturn);
         connectionFactory.setPoolConfig(poolConfig);
         return connectionFactory;
+    }
+
+    /**
+     *  <p>自定义 Cookie序列化器，解决同一服务器不同应用串 Session的问题
+     *  <p> 注意 cookiePath需要与对应应用的servlet.context-path 保持一致,
+     *  <p>否则会出现验证码一直不正确导致无法登录的情况
+     * @see org.springframework.session.web.http.DefaultCookieSerializer
+     * @return org.springframework.session.web.http.DefaultCookieSerializer
+     */
+    @Bean
+    public DefaultCookieSerializer getDefaultCookieSerializer(){
+        DefaultCookieSerializer  cookieSerializer = new DefaultCookieSerializer();
+        cookieSerializer.setCookiePath("/hsa-web");
+        return cookieSerializer;
     }
 }

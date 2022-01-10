@@ -836,4 +836,8 @@
     <delete id="deleteDiagnoseByVisitId" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         delete from outpt_diagnose where hosp_code = #{hospCode} and visit_id = #{id}
     </delete>
+
+    <update id="updateOutptVisitCodeByid" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        update outpt_visit set patient_code =#{patientCode} where hosp_code =#{hospCode} and id =#{id}
+    </update>
 </mapper>

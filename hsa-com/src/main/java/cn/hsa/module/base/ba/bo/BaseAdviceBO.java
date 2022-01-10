@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -209,4 +210,28 @@ public interface BaseAdviceBO {
     * @Return java.lang.Boolean
     **/
     Boolean updateWithPipePrint(Map<String,Object> paramMap);
+
+    /**
+     * @Menthod: 取消合管
+     * @Desrciption: updateCancelMerge
+     * @Param: paramMap：{
+     *     mergeIds：合管主ids
+     * }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 11:47
+     * @Return:
+     **/
+    Boolean updateCancelMerge(Map<String,Object> paramMap);
+
+    /**
+     * @Menthod: updateMergePipePrint
+     * @Desrciption: 合管打印
+     * @Param: paramMap：{ mergeIds：合管主ids }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 17:11
+     * @Return:
+     **/
+    List<MedicalApplyDTO> updateMergePipePrint(Map<String,Object> paramMap);
 }

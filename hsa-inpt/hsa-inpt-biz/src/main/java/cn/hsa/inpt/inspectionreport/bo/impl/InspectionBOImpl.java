@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inspectionreport.bo.InspectionReportBO;
 import cn.hsa.module.inpt.inspectionreport.dao.InspectionReportDAO;
 import cn.hsa.module.inpt.inspectionreport.dto.*;
@@ -176,5 +177,10 @@ public class InspectionBOImpl extends HsafBO implements InspectionReportBO {
     @Override
     public PageDTO getHospitalInfo(Map<String, String> params) {
         return PageDTO.of(inspectionReportDAO.getHospitalInfo(params));
+    }
+
+    @Override
+    public List<ExaminationItem> queryPatientAllMedicResult(InptVisitDTO inptVisitDTO) {
+        return inspectionReportDAO.queryPatientAllMedicResult(inptVisitDTO);
     }
 }

@@ -18,6 +18,7 @@ public interface Constants {
         public static final String MSG_HQ = "1"; // 登录获取
         public static final String MSG_YD = "2"; // 消息已读
         public static final String MSG_LS = "3"; // 获取历史消息
+        public static final String MSG_XT = "4"; // 获取系统消息
     }
 
     class MSGZT{

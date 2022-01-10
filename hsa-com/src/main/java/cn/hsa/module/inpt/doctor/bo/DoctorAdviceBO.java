@@ -1,7 +1,7 @@
 package cn.hsa.module.inpt.doctor.bo;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 

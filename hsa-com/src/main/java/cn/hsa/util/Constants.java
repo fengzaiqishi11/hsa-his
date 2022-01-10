@@ -23,6 +23,12 @@ public interface Constants {
         public static final String ZZJGH = "3"; // 自助机挂号
     }
 
+    class LNDW{
+        public static final String S = "1"; // 岁
+        public static final String Y= "2"; // 月
+        public static final String Z= "3"; // 周
+        public static final String T = "4"; // 天
+    }
     /**
      * 证件类别（ZJLB）
      */

@@ -88,21 +88,21 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      */
     @Override
     public Map<String,Object> UP_2301(Map<String, Object> map) {
-        String code = map.get("code").toString();
         InptVisitDTO inptVisitDTO = MapUtils.get(map,"inptVisitDTO");
-        String crteName = map.get("crteName").toString();
-        String hospCode =  map.get("hospCode").toString();
+        String code = MapUtils.get(map,"code");
+        String crteName = MapUtils.get(map,"crteName");
+        String hospCode =  MapUtils.get(map,"hospCode");
         String isHalfSettle = MapUtils.get(map,"isHalfSettle");
         String feeStartDate = MapUtils.get(map,"feeStartDate");
         String feeEndDate = MapUtils.get(map,"feeEndDate");
-        Integer count = (Integer) map.get("count");
-        InsureIndividualVisitDTO insureIndividualVisitDTO  = (InsureIndividualVisitDTO) map.get("insureIndividualVisitDTO");
+        Integer count = MapUtils.get(map,"count");
+        InsureIndividualVisitDTO insureIndividualVisitDTO  = MapUtils.get(map,"insureIndividualVisitDTO");
         String insureRegCode = insureIndividualVisitDTO.getInsureOrgCode();
         String visitId = insureIndividualVisitDTO.getVisitId();
         map.put("visitId",visitId);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
 
-
+        // 查询是否有可传输费用
         Map<String, String> insureCostParam = new HashMap<String, String>();
         insureCostParam.put("hospCode", hospCode);//医院编码
         insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
@@ -115,84 +115,85 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureCostParam.put("feeStartDate", feeStartDate);
         insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算
         List<Map<String,Object>> insureCostList =  insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
-        if(ListUtils.isEmpty(insureCostList)){
-            throw new AppException("没有可以上传的的医保匹配费用数据");
+        if(ListUtils.isEmpty(insureCostList)) {
+            throw new AppException("没有可以上传的医保费用数据！");
         }
         // 查询有退费的数据集合,且未上传的的数据集合
         List<InptCostDTO> inptCostDTOList = insureIndividualCostDAO.queryBackInptFee(insureIndividualVisitDTO);
+
         // 查询已经上传的费用数据
         List<Map<String, Object>> individualCostDTOList = insureIndividualCostDAO.queryInsureInptCost(insureIndividualVisitDTO);
+
+        // 本次上传如果没有正常的费用数据,则不上传到医保，直接把退费的数据插入到医保费用表即可
         int num = 0;
-        /**
-         * 本次上传如果没有正常的费用数据,则不上传到医保，直接把退费的数据插入到医保费用表
-         */
-        if(!ListUtils.isEmpty(insureCostList)){
-            for(Map<String,Object> item : insureCostList){
-                if("0".equals(MapUtils.get(item,"statusCode"))){
-                    num++;
-                }else{
-                    continue;
+        if (!ListUtils.isEmpty(insureCostList)) {
+            for(Map<String,Object> item : insureCostList) {
+                String statusCode = MapUtils.get(item,"statusCode");
+                if(Constants.ZTBZ.ZC.equals(statusCode)) {
+                    num ++;
                 }
             }
         }
-        if(num ==0){
-            // 直接把全开，全退的费用保存到费用表 但是不进行调用医保的操作
-            insertNotUpLoadFee(insureCostList,inptVisitDTO);
+        // 直接把全开，全退的费用保存到费用表 但是不进行调用医保的操作
+        if (num == 0) {
+            this.insertNotUpLoadFee(insureCostList,inptVisitDTO);
             return map;
         }
-        else{
-            // 说明有正常的数据 需要调用医保接口
-            List<Map<String,Object>> list2 = new ArrayList<>();  // 处理
-            List<Map<String,Object>> list1 = new ArrayList<>();
-            List<Map<String,Object>> list3 = new ArrayList<>(); // 处理正负直接相抵的集合
-            if(!ListUtils.isEmpty(inptCostDTOList)){
+        List<Map<String,Object>> list1 = new ArrayList<>();
+        List<Map<String,Object>> list2 = new ArrayList<>();
+        List<Map<String,Object>> list3 = new ArrayList<>(); // 处理正负直接相抵的集合
+        /**
+         * 如果存在退费
+         * 1.开5个  已经上传医保  退了3  下次需要上传  -5  +3
+         * 2.开5个  没有上传医保  退了3  下次需要上传  +2
+         */
+
+        if(!ListUtils.isEmpty(inptCostDTOList)){
+            if(!ListUtils.isEmpty(individualCostDTOList)){
+                list2.addAll(insureCostList);
+            }else{
                 Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
                 // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
-                    for(Map<String,Object> item : insureCostList){
-                        if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"id"))){
-                            list3.add(item);
-                            continue;
-                        }
-                        else if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"oldCostId")) &&
-                                BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
-                            list3.add(item);
-                            continue;
-                        }
-                        else {
-                            list1.add(item);
-                        }
-                }
-                // 传退费对应的数据
-                if(!ListUtils.isEmpty(individualCostDTOList)){
-                    for(Map<String,Object> item : individualCostDTOList){
-                        if(collect.containsKey(MapUtils.get(item,"costId"))){
-                            list2.add(item);
-                        }
+                for(Map<String,Object> item : insureCostList){
+                    if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"id"))){
+                        list3.add(item);
+                        continue;
+                    }
+                    else if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"oldCostId")) &&
+                            BigDecimalUtils.less(MapUtils.get(item,"totalNum"),new BigDecimal(0.00))){
+                        list3.add(item);
+                        continue;
+                    }
+                    else {
+                        list1.add(item);
                     }
                 }
-
-                if(!ListUtils.isEmpty(list3)){
-                    insertNotUpLoadFee(list3,inptVisitDTO);
-                }
-                list2.addAll(list1);
-            }else{
-                list2.addAll(insureCostList);
             }
-            List<InptCostDO> inptCostDOList = insureIndividualCostDAO.queryInptFeeCost(map);
-            Map<String, InptCostDO> inptCostDOMap = inptCostDOList.stream().collect(Collectors.toMap(InptCostDO::getId,
-                    Function.identity(), (k1, k2) -> k1));
 
-            Boolean isCompound = false;
-            for(Map<String, Object> item : list2){
-                if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum")) &&
-                        inptCostDOMap.containsKey(MapUtils.get(item,"oldCostId"))){
-                    item.put("initFeedetlSn",inptCostDOMap.get(MapUtils.get(item,"oldCostId")).getFeedetlSn());
-                }
-
-                if ("103".equals(MapUtils.get(item,"insureItemType")) && "1".equals(MapUtils.get(item,"tcmdrugUsedWay"))) {
-                    isCompound = true;
-                }
+            if(!ListUtils.isEmpty(list3)){
+                insertNotUpLoadFee(list3,inptVisitDTO);
             }
+            list2.addAll(list1);
+        }
+        // 说明没有退费数据
+        else{
+            list2.addAll(insureCostList);
+        }
+        List<InsureIndividualCostDTO> individualCostDTOS = insureIndividualCostDAO.queryInptFeeCost(map);
+        Map<String, InsureIndividualCostDTO> inptCostDOMap = individualCostDTOS.stream().collect(Collectors.toMap(InsureIndividualCostDTO::getCostId,
+                Function.identity(), (k1, k2) -> k1));
+
+        Boolean isCompound = false;
+        for(Map<String, Object> item : list2){
+            if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum")) &&
+                    inptCostDOMap.containsKey(MapUtils.get(item,"oldCostId"))){
+                item.put("initFeedetlSn",inptCostDOMap.get(MapUtils.get(item,"oldCostId")).getFeedetlSn());
+            }
+
+            if ("103".equals(MapUtils.get(item,"insureItemType")) && "1".equals(MapUtils.get(item,"tcmdrugUsedWay"))) {
+                isCompound = true;
+            }
+        }
 
             String bka006 = insureIndividualVisitDTO.getBka006(); //待遇类型
             InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
@@ -490,7 +491,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             return map;
         }
 
-    }
     /**
      * @Method updateInsureCost
      * @Desrciption  费用传输以后：更新医保的反参数据
@@ -547,8 +547,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         insureIndividualCostDTO.setSettleId(null);
                         insureIndividualCostDTO.setIsHospital("1");
                         insureIndividualCostDTO.setItemType(MapUtils.get(feedetlSnObjectMap,"list_type"));
-                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"medins_list_code"));
-                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnMap,"medins_list_name"));
+                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"med_list_codg"));
+                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnObjectMap,"med_list_name"));
                         insureIndividualCostDTO.setCostId(MapUtils.get(feedetlSnObjectMap,"id"));//费用id
                         insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
                         insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop").toString()); // 自付比例

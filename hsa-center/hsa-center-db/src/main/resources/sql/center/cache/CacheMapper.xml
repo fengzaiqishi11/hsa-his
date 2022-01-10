@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.cache.dao.CacheDao">
+
+
+
+    <resultMap id="codeMaps" type="cn.hsa.module.sys.code.dto.SysCodeDTO">
+        <result property="cCode" column="cCode" jdbcType="INTEGER"/>
+        <collection property="sysCodeSelectDTOList" ofType="cn.hsa.module.sys.code.dto.SysCodeSelectDTO" javaType="java.util.List">
+            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="value" column="value" jdbcType="VARCHAR"/>
+            <result property="label" column="label" jdbcType="VARCHAR"/>
+            <result property="cName" column="cName" jdbcType="INTEGER"/>
+            <result property="cCode" column="cCode" jdbcType="VARCHAR"/>
+            <result property="showDefault" column="showDefault" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getByCode" parameterType="java.lang.String" resultMap="codeMaps">
+        select
+        b.name cName,b.code cCode,a.id id,a.name label,a.value value,b.show_default showDefault
+        from sys_code b join sys_code_detail a  on b.code=a.c_code and a.hosp_code=b.hosp_code and a.is_valid='1'
+        where b.is_valid='1' and b.hosp_code=#{hospCode}
+        <if test="codes!=null and codes.size()>0">
+            and b.code in
+            <foreach collection="codes" index="index" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        order by a.c_code,CAST(a.seq_no AS SIGNED)
+    </select>
+
+
+</mapper>

@@ -268,7 +268,7 @@
         <if test='zgbrQuery =="1"'>
             and v.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by v.in_time desc
+        order by v.bed_name+0 asc,v.in_time desc
     </select>
 
     <select id="selectOutptVisits" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">

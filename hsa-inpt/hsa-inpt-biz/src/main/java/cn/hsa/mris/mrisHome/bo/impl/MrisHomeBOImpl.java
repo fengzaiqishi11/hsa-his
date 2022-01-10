@@ -688,7 +688,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         //仅保存正面数据信息
         if("1".equals(dataSource)){
-            saveFrontData(mrisBaseInfoDTO);
+            saveUpdateFrontData(mrisBaseInfoDTO);
         }else{
             String mbiId = saveFrontData(mrisBaseInfoDTO);
             saveBackData(mrisBaseInfoDTO, mbiId);
@@ -779,6 +779,116 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         String mbiId = SnowflakeUtils.getId();
         mrisBaseInfoDTO.setId(mbiId);
         mrisHomeDAO.insertMrisBaseInfo(mrisBaseInfoDTO);
+
+        // 病案诊断信息保存
+        List<MrisDiagnoseDO> insertList = new ArrayList<MrisDiagnoseDO>();
+        List<MrisDiagnoseDO> diagnoseList = mrisBaseInfoDTO.getMrisDiagnoseDOList();
+        if (!ListUtils.isEmpty(diagnoseList)) {
+            for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
+                if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd101()) && StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd102())) {
+                    continue;
+                }
+
+                if ("1".equals(mrisDiagnoseDO.getDiseaseCode())) {
+                    mrisDiagnoseDO.setDiseaseName("主要诊断");
+                }else if ("2".equals(mrisDiagnoseDO.getDiseaseCode())){
+                    mrisDiagnoseDO.setDiseaseName("附属诊断");
+                } else {
+                    mrisDiagnoseDO.setDiseaseName("其他诊断");
+                }
+                if ("1".equals(mrisDiagnoseDO.getDiseaseCode2())) {
+                    mrisDiagnoseDO.setDiseaseName2("主要诊断");
+                } else if ("0".equals(mrisDiagnoseDO.getDiseaseCode2())){
+                    mrisDiagnoseDO.setDiseaseName2("其他诊断");
+                } else if ("2".equals(mrisDiagnoseDO.getDiseaseCode2())){
+                    mrisDiagnoseDO.setDiseaseName2("附属诊断");
+                }else {
+                    mrisDiagnoseDO.setDiseaseName2("");
+                }
+                mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                mrisDiagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
+                mrisDiagnoseDO.setMbiId(mbiId);
+                mrisDiagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                insertList.add(mrisDiagnoseDO);
+            }
+            if (!ListUtils.isEmpty(insertList)) {
+                mrisHomeDAO.insertMrisDiagnoseBatch(insertList);
+            }
+        }
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", mrisBaseInfoDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "SHOW_GDSBASY");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        // 存入分行表
+        List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
+        if (!ListUtils.isEmpty(diagnoseList)) {
+            for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
+                if(sysParameterDTO !=null&& "1".equals(sysParameterDTO.getValue())) {
+                    if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10())&&!"2".equals(mrisDiagnoseDO.getDiseaseCode())) {
+                        continue;
+                    }
+                }else {
+                    if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd101())) {
+                        continue;
+                    }
+                }
+                if ("1".equals(mrisDiagnoseDO.getDiseaseCode())) {
+                    mrisDiagnoseDO.setDiseaseName("主要诊断");
+                } else if ("2".equals(mrisDiagnoseDO.getDiseaseCode())){
+                    mrisDiagnoseDO.setDiseaseName("附属诊断");
+                } else {
+                    mrisDiagnoseDO.setDiseaseName("其他诊断");
+                }
+                mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                mrisDiagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
+                mrisDiagnoseDO.setMbiId(mbiId);
+                mrisDiagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                // 是否珠海
+                if(sysParameterDTO !=null&& "1".equals(sysParameterDTO.getValue())) {
+
+                }else {
+                    mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
+                    mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
+                    mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                }
+                insertDiagnoseList.add(mrisDiagnoseDO);
+                if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())){
+                    MrisDiagnoseDO diagnoseDO =new MrisDiagnoseDTO();
+                    if ("1".equals(mrisDiagnoseDO.getDiseaseCode2())) {
+                        diagnoseDO.setDiseaseName("主要诊断");
+                    } else {
+                        diagnoseDO.setDiseaseName("其他诊断");
+                    }
+                    diagnoseDO.setId(SnowflakeUtils.getId());
+                    diagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
+                    diagnoseDO.setMbiId(mbiId);
+                    diagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                    diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
+                    diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
+                    diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    insertDiagnoseList.add(diagnoseDO);
+                }
+            }
+            if (!ListUtils.isEmpty(insertDiagnoseList)) {
+                mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);
+            }
+        }
+        return mbiId;
+    }
+
+    /**保存正面数据信息(更新操作)
+     * @Method saveFrontData
+     * @Desrciption
+     * @param mrisBaseInfoDTO
+     * @Author liuliyun
+     * @Date   2021/1/7 9:47
+     * @Return java.lang.String
+     **/
+    private String saveUpdateFrontData(MrisBaseInfoDTO mrisBaseInfoDTO) {
+        // TODO 保存病案信息
+        // 病案基础信息保存
+        String mbiId = mrisBaseInfoDTO.getId();
+        mrisHomeDAO.updateMrisBaseInfo(mrisBaseInfoDTO);
 
         // 病案诊断信息保存
         List<MrisDiagnoseDO> insertList = new ArrayList<MrisDiagnoseDO>();
@@ -1168,7 +1278,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         //仅删除正面数据信息
         if("1".equals(dataSource)){
             // 删除基本信息表
-            mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);
+            // mrisHomeDAO.deleteMrisBaseInfoByVisitId(map);
             // 删除病案诊断信息
             mrisHomeDAO.deleteMrisDiagnoseByVisitId(map);
             // 删除分行病案诊断信息

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.message.dao.MessageInfoDAO">
+    <resultMap type="cn.hsa.module.center.message.entity.MessageInfoDO" id="MessageInfoMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="level" column="level" jdbcType="VARCHAR"/>
+        <result property="receiverId" column="receiver_id" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="sendCount" column="send_count" jdbcType="INTEGER"/>
+        <result property="isPublish" column="is_publish" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--单个新增-->
+    <insert id="insertMessageInfo">
+         insert into center_msg (id, type, content,	is_publish,	LEVEL, receiver_id,	start_time,	end_time, interval_time, send_count, url,
+	     crte_time,	crte_name, crte_id)
+         values (#{id},#{type}, #{content},#{isPublish}, #{level}, #{receiverId}, #{startTime}, #{endTime}, #{intervalTime},#{sendCount}, #{url}, #{crteTime}, #{crteName}, #{crteId})
+    </insert>
+
+    <update id="updateMssageInfo">
+        UPDATE center_msg
+        <set>
+            <if test="type !=null and type !=''">
+                type=#{type},
+            </if>
+            <if test="content !=null and content !=''">
+                content=#{content},
+            </if>
+            <if test="level !=null and level !=''">
+                level=#{level},
+            </if>
+            <if test="startTime !=null and startTime !=''">
+                start_time=#{startTime},
+            </if>
+            <if test="endTime !=null and endTime !=''">
+                end_time=#{endTime},
+            </if>
+            <if test="sendCount !=null and sendCount !=''">
+                send_count=#{sendCount},
+            </if>
+            <if test="url !=null and url !=''">
+                url=#{url},
+            </if>
+            <if test="crteTime !=null and crteTime !=''">
+                crte_time=#{crteTime},
+            </if>
+            <if test="crteName !=null and crteName !=''">
+                crte_name=#{crteName},
+            </if>
+            <if test="crteId !=null and crteId !=''">
+                crte_id=#{crteId},
+            </if>
+        </set>
+        where  id =#{id}
+    </update>
+
+    <select id="queryMessageInfoByType" resultMap="MessageInfoMap">
+        select id, type, content,	is_publish,	LEVEL, receiver_id,	start_time,	end_time, interval_time, send_count, url,
+        crte_time,	crte_name, crte_id
+        from center_msg
+        where type ='1'
+        <if test="isPublish != null and isPublish != ''">
+            and is_publish =#{is_publish}
+        </if>
+        <if test="level != null and level != ''">
+            and level =#{level}
+        </if>
+    </select>
+
+    <!--单个删除-->
+    <delete id="deleteMessageInfo">
+        delete from center_msg  where  id =#{id}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteMessageInfoBatch">
+        delete from center_msg
+        where  hosp_code =#{hospCode} and  id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--根据消息id更新消息发布状态-->
+    <update id="updateMssageInfoStatusById">
+        UPDATE center_msg
+        set is_publish =#{isPublish}
+        where id =#{id}
+    </update>
+
+</mapper>

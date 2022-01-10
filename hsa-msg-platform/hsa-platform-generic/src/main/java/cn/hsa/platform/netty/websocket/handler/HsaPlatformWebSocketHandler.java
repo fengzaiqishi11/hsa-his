@@ -3,6 +3,7 @@ package cn.hsa.platform.netty.websocket.handler;
 import cn.hsa.platform.dao.MessageInfoDao;
 import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
+import cn.hsa.platform.netty.websocket.runner.WebSysSocketRunnable;
 import cn.hsa.platform.netty.websocket.runner.WebsocketRunnable;
 import cn.hsa.platform.service.MessageInfoService;
 import cn.hsa.platform.util.Constants;
@@ -55,6 +56,11 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
      */
     private static Map<String, ImContentModel> paramMap = new ConcurrentHashMap<>();
 
+    /**
+     *  存储系统消息连接用户
+     */
+    private static Map<String, Channel> sysChannelMap = new ConcurrentHashMap<>();
+
     @Resource
     private MessageInfoDao messageInfoDao;
 
@@ -82,12 +88,19 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             // 存储客户端请求参数
             paramMap.put(key,messageRequest);
             log.info("接受客户端的消息......" + ctx.channel().remoteAddress() + "-参数[" + messageRequest.getUnionId() + "]");
-
-            if (!channelMap.containsKey(key)) {
-                //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
-                Future future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
-                //存储客户端和服务的通信的Chanel
-                channelMap.put(key, ctx.channel());
+            if (!channelMap.containsKey(key)&&!sysChannelMap.containsKey(key)) {
+                Future future =null;
+                // 存储系统消息连接用户
+                if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_XT.equals(messageRequest.getType())) {
+                    sysChannelMap.put(key, ctx.channel());
+                    //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
+                     future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebSysSocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
+                }else {
+                    //存储客户端和服务的通信的Chanel
+                    channelMap.put(key, ctx.channel());
+                    //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
+                    future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
+                }
                 //存储每个channel中的future，保证每个channel中有一个定时任务在执行
                 futureMap.put(key, future);
                 if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
@@ -177,6 +190,10 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             channelMap.remove(key);
             //移除和用户绑定的channel
             clientMap.remove(key);
+            //移除和用户绑定的参数
+            paramMap.remove(key);
+            //移除和系统消息用户绑定的channel
+            sysChannelMap.remove(key);
             //关闭掉线客户端的future
             Optional.ofNullable(futureMap.get(key)).ifPresent(future -> {
             future.cancel(true);
@@ -200,6 +217,10 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             channelMap.remove(key);
             //移除和用户绑定的channel
             clientMap.remove(key);
+            //移除和用户绑定的参数
+            paramMap.remove(key);
+            //移除和系统消息用户绑定的channel
+            sysChannelMap.remove(key);
             //移除定时任务
             Optional.ofNullable(futureMap.get(key)).ifPresent(future -> {
             future.cancel(true);
@@ -224,6 +245,10 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 
     public static Map<String, ImContentModel> getClientParamMap() {
         return paramMap;
+    }
+
+    public static Map<String, Channel> getSysChannelMap() {
+        return sysChannelMap;
     }
 
 }

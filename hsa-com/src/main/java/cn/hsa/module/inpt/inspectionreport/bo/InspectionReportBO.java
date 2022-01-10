@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.inspectionreport.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inspectionreport.dto.*;
 
 import java.util.List;
@@ -63,4 +64,12 @@ public interface InspectionReportBO {
      * @Date: 2021/5/19 18:20
      **/
     PageDTO getHospitalInfo(Map<String,String> params);
+
+    /**
+     * @description 根据住院号查询病人lis信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/1/4 14:45
+     **/
+    List<ExaminationItem> queryPatientAllMedicResult(InptVisitDTO inptVisitDTO);
 }

@@ -3751,12 +3751,18 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
     @Override
     public Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO) {
         Map<String, OutptCostDTO> resultmap = new HashMap<>();
+        Map<String, List<OutptCostDTO>> map = new HashMap<>();
         //门诊收入
         List<OutptCostDTO> mapMz = patientCostLedgerDAO.queryoutptMonthDailybyMz(outptCostDTO);
         //门诊挂号
         List<OutptCostDTO> mapGh = patientCostLedgerDAO.queryoutptMonthDailybyGh(outptCostDTO);
         //总费用
         List<OutptCostDTO> mapZFY = patientCostLedgerDAO.queryoutptMonthDailybyZFY(outptCostDTO);
+        if("1".equals(outptCostDTO.getSF())){
+            map.put("mapMz",mapMz);
+            map.put("mapZFY",mapZFY);
+            return map;
+        }
         mapMz.addAll(mapGh);
         for (OutptCostDTO opc:mapMz) {
             if(resultmap.containsKey(opc.getBfcId())){
@@ -3768,7 +3774,6 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             }
         }
         List<OutptCostDTO> list = resultmap.values().stream().collect(Collectors.toList());
-        Map<String, List<OutptCostDTO>> map = new HashMap<>();
         map.put("mapMz",list);
         map.put("mapZFY",mapZFY);
         return map;

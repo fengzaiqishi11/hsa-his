@@ -474,7 +474,7 @@
 
     <select id="queryEmrPatientDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO"
             parameterType="java.util.Map">
-        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,
+        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,ind.is_main,
                (select jz_doctor_name from inpt_visit iv where iv.id = ind.visit_id and iv.hosp_code = ind.hosp_code)  jzDoctorName
         from inpt_diagnose ind
                  left join base_disease bd on ind.disease_id = bd.id and ind.hosp_code = bd.hosp_code

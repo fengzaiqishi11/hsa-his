@@ -628,4 +628,20 @@
             </otherwise>
         </choose>
     </select>
+
+    <select id="queryHisEmrJosnInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            b.emr_json emrJson,
+            c.classify_code classifyCode,
+            ( SELECT NAME FROM emr_classify WHERE CODE = ( SELECT up_code FROM emr_classify WHERE CODE = c.classify_code LIMIT 1 ) LIMIT 1 ) AS classifyName
+        FROM
+            emr_patient a
+            LEFT JOIN emr_patient_record b ON a.patient_record_id = b.id
+            LEFT JOIN emr_classify_template c ON b.classify_template_id = c.id
+        WHERE
+            a.hosp_code = #{hospCode}
+          AND a.visit_id = #{visitId}
+          AND a.patient_record_id IS NOT NULL
+    </select>
+
 </mapper>

@@ -1,8 +1,10 @@
 package cn.hsa.module.emr.emrelement.service;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -91,4 +93,71 @@ public interface EmrElementServcie {
   @GetMapping("/service/emr/emrElement/getMenuTree")
   WrapperResponse<List<TreeMenuNode>> getEmrElementTree(Map map);
 
+  /**
+   * @Menthod getEmrElementTree
+   * @Desrciption 获取电子病历元素树(医保使用)
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.base.TreeMenuNode>>
+   **/
+  @GetMapping("/service/emr/emrElement/getInsureMenuTree")
+  WrapperResponse<List<TreeMenuNode>> getInsureEmrElementTree(Map map);
+
+  /**
+   * @Menthod getInsureDictEmrElementTree
+   * @Desrciption 获取系统码表中电子病历元素树(医保使用)
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.base.TreeMenuNode>>
+   **/
+  @GetMapping("/service/emr/emrElement/getInsureDictEmrElementTree")
+  WrapperResponse<List<TreeMenuNode>> getInsureDictEmrElementTree(Map map);
+
+  /**
+   * @Menthod queryInsureEmrElementMatchInfo
+   * @Desrciption 获取元素匹配关系(医保使用)
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.base.EmrElementMatchDO>>
+   **/
+  @GetMapping("/service/emr/emrElement/queryInsureEmrElementMatchInfo")
+  PageDTO queryInsureEmrElementMatchInfo(Map map);
+
+  /**
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  WrapperResponse<Boolean> saveInsureMatch(Map map);
+
+  /**
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  WrapperResponse<Boolean> deleteInsureMatch(Map map);
 }

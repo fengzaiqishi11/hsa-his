@@ -318,4 +318,14 @@ public interface EmrPatientService {
 	 */
 	@PostMapping("/service/emr/emrPatient/queryPatientEmrReportForm")
 	WrapperResponse<PageDTO> queryPatientEmrReportForm(Map map);
+
+	/**
+	 * @Description: 电子病历数据抓取
+	 * @Param:
+	 * @Author: 廖继广
+	 * @Email: jiguang.liao@powersi.com.cn
+	 * @Date 2022/01/06 14:32
+	 * @Return
+	 */
+    WrapperResponse<Boolean> updateHisEmrJosnInfo(Map map);
 }

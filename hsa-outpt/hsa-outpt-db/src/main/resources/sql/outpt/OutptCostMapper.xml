@@ -3261,7 +3261,6 @@
             ic.item_name itemName,
             ic.price price,
             ic.num num,
-            ic.item_code itemCode,
             ic.spec spec,
             ic.prep_code prepCode,
             ic.dosage dosage,

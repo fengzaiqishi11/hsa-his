@@ -1,5 +1,6 @@
 package cn.hsa.emr.emrElement.service.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
@@ -7,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrelement.bo.EmrElementBO;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
 import cn.hsa.module.emr.emrelement.service.EmrElementServcie;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -130,4 +132,81 @@ public class EmrElementServiceImpl extends HsafService implements EmrElementServ
     List<TreeMenuNode> treeMenuNodes = TreeUtils.buildByRecursive(emrElementBO.getEmrElementTree(emrElementDTO), "-1");
     return WrapperResponse.success(treeMenuNodes);
   }
+
+  /**
+   * @Menthod getEmrElementTree
+   * @Desrciption 获取电子病历元素树(医保使用)
+   *
+   * @Param
+   * [emrElementDTO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.base.TreeMenuNode>>
+   **/
+  @Override
+  public WrapperResponse<List<TreeMenuNode>> getInsureEmrElementTree(Map map) {
+    EmrElementDTO emrElementDTO = MapUtils.get(map,"emrElementDTO");
+    List<TreeMenuNode> treeMenuNodes = TreeUtils.buildByRecursive(emrElementBO.getInsureEmrElementTree(emrElementDTO), "-1");
+    return WrapperResponse.success(treeMenuNodes);
+  }
+
+  /**
+   * @param map
+   * @Menthod getInsureDictEmrElementTree
+   * @Desrciption 获取系统码表中电子病历元素树(医保使用)
+   * @Param [emrElementDTO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.TreeMenuNode>>
+   */
+  @Override
+  public WrapperResponse<List<TreeMenuNode>> getInsureDictEmrElementTree(Map map) {
+    EmrElementDTO emrElementDTO = MapUtils.get(map,"emrElementDTO");
+    List<TreeMenuNode> treeMenuNodes = TreeUtils.buildByRecursive(emrElementBO.getInsureDictEmrElementTree(emrElementDTO), "INSURE_EMR");
+    return WrapperResponse.success(treeMenuNodes);
+  }
+
+  /**
+   * @param map
+   * @Menthod queryInsureEmrElementMatchInfo
+   * @Desrciption 获取元素匹配关系(医保使用)
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.EmrElementMatchDO>>
+   */
+  @Override
+  public PageDTO queryInsureEmrElementMatchInfo(Map map) {
+    return emrElementBO.queryInsureEmrElementMatchInfo(MapUtils.get(map,"emrElementMatchDO"));
+  }
+
+  /**
+   * @param map
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> saveInsureMatch(Map map) {
+    return emrElementBO.saveInsureMatch(MapUtils.get(map,"emrElementMatchDO"));
+  }
+
+  /**
+   * @param map
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [map]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> deleteInsureMatch(Map map) {
+    return emrElementBO.deleteInsureMatch(map);
+  }
+
 }

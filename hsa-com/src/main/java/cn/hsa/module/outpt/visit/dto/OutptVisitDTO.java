@@ -256,4 +256,10 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String pracCertiNo;
     // 科别
     private String caty;
+
+    // 退费重收标记
+    private String tfcsMark;
+
+    // 退费时，原结算时舍入金额
+    private BigDecimal truncPrice;
 }

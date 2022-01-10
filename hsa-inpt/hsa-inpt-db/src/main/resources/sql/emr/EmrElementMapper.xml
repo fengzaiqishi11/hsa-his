@@ -28,6 +28,21 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <resultMap type="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" id="EmrElementMacthMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="emrElementId" column="emr_element_id" jdbcType="VARCHAR"/>
+        <result property="emrElementCode" column="emr_element_code" jdbcType="VARCHAR"/>
+        <result property="emrElementName" column="emr_element_name" jdbcType="VARCHAR"/>
+        <result property="insureEmrId" column="insure_emr_id" jdbcType="VARCHAR"/>
+        <result property="insureEmrCode" column="insure_emr_code" jdbcType="VARCHAR"/>
+        <result property="insureEmrName" column="insure_emr_name" jdbcType="VARCHAR"/>
+        <result property="insureUpValue" column="insure_up_value" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
     <!--查询单个-->
     <select id="getByIdorCode" resultMap="EmrElementMap">
         select
@@ -125,6 +140,29 @@
         values (#{id},#{hospCode}, #{upCode}, #{code}, #{name}, #{typeCode}, #{pym}, #{wbm}, #{isEnd}, #{isRequire}, '1', #{defaultVlaue}, #{minValue}, #{maxValue}, #{genderCode}, #{minAge}, #{maxAge}, #{patientCodeRef}, #{sysCodeRef}, #{sysCodeDefault}, #{crteId}, #{crteName}, #{crteTime},#{isSingleTemplate})
     </insert>
 
+    <!--新增 病历元素匹配-->
+    <insert id="saveInsureMatch" parameterType="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO">
+        INSERT INTO emr_element_match (
+            id, hosp_code, emr_element_id, emr_element_code, emr_element_name, insure_emr_id, insure_emr_code, insure_emr_name,
+            insure_up_value, crte_id, crte_name, crte_time
+        ) VALUES (
+                     #{id},
+                     #{hospCode},
+                     #{emrElementId},
+                     #{emrElementCode},
+                     #{emrElementName},
+                     #{insureEmrId},
+                     #{insureEmrCode},
+                     #{insureEmrName},
+                     #{insureUpValue},
+                     #{crteId},
+                     #{crteName},
+                     #{crteTime}
+                 )
+    </insert>
+
+
+
     <!-- 查找出同一父节点下最大的code-->
     <select id="getMaxCode" resultMap="EmrElementMap" parameterType="java.util.Map">
         select id, hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template
@@ -217,6 +255,29 @@
       select `code` id,name label,up_code as parentId from emr_element where hosp_code = #{hospCode}
     </select>
 
+    <!--获取元素树,医保匹配使用-->
+    <select id="getInsureEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
+        select id emrElementId,`code` id, code ,name , concat(name ,' 【',code,'】' ) label , up_code as parentId from emr_element where hosp_code = #{hospCode}
+    </select>
+
+    <!--获取医保码表元素树,医保匹配使用-->
+    <select id="getInsureDictEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
+        select id sysCodeDetailId,value as id,value,name, concat(name ,' 【',value,'】' ) label , ifnull(up_value,'INSURE_EMR') as parentId from sys_code_detail where hosp_code = #{hospCode} and c_code = 'INSURE_EMR'
+    </select>
+
+    <select id="queryInsureEmrElementMatchInfoPage" resultMap="EmrElementMacthMap">
+        select id,emr_element_id,emr_element_code,emr_element_name,insure_emr_id,insure_emr_code,insure_emr_name,crte_id,crte_name,crte_time  from emr_element_match
+        where hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (
+                 emr_element_code like concat('%',#{keyword},'%')
+                 or emr_element_name like concat('%',#{keyword},'%')
+                 or insure_emr_code like concat('%',#{keyword},'%')
+                 or insure_emr_name like concat('%',#{keyword},'%')
+                )
+       </if>
+    </select>
+
     <select id="getEmrElementTreeByCodes" resultType="cn.hsa.base.TreeMenuNode">
         select
         code as id,name as label,up_code as parentId,
@@ -239,6 +300,36 @@
         select count(*)
         from information_schema.COLUMNS
         where TABLE_SCHEMA = (select DATABASE()) and table_name=#{tableName}
+    </select>
+
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteInsureMatch" parameterType="java.util.Map">
+        DELETE FROM emr_element_match WHERE hosp_code = #{hospCode} and id IN
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectInsureEmrCode" parameterType="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" resultType="java.lang.Integer">
+        select count(*)
+        from emr_element_match
+        where hosp_code = #{hospCode} and insure_emr_code =#{insureEmrCode}
+    </select>
+
+    <select id="selectHospEmrUpCode" parameterType="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" resultType="java.lang.Integer">
+        select count(*)
+        from emr_element
+        where hosp_code = #{hospCode} and up_code =#{emrElementCode}
+    </select>
+
+    <select id="selectInsureEmrUpCode" parameterType="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" resultType="java.lang.Integer">
+        select count(*)
+        from sys_code_detail
+        where hosp_code = #{hospCode} and up_value =#{insureEmrCode}
+    </select>
+
+    <select id="queryInsureEmrElementMatchInfoAll" resultMap="EmrElementMacthMap">
+        select id,emr_element_id,emr_element_code,emr_element_name,insure_emr_id,insure_emr_code,insure_emr_name,crte_id,crte_name,crte_time  from emr_element_match
     </select>
 
 </mapper>

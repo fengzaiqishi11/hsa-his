@@ -42,6 +42,12 @@ public class MedicalTechnologyDTO extends PageDO implements Serializable {
 
 	private String itemId;
 
+	//门诊或者住院
+	private String clinicType;
+	//确费人
+	private String technologyOkName;
+	//确费时间
+	private String technologyOkTime;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date crteTime;

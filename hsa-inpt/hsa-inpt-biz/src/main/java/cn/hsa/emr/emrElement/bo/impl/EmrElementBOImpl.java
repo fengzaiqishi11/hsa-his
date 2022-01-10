@@ -1,12 +1,18 @@
 package cn.hsa.emr.emrElement.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.emr.emrelement.bo.EmrElementBO;
 import cn.hsa.module.emr.emrelement.dao.EmrElementDAO;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
+import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +33,9 @@ import java.util.*;
 public class EmrElementBOImpl extends HsafBO implements EmrElementBO {
   @Resource
   private EmrElementDAO emrElementDAO;
+
+  @Resource
+  private SysCodeService sysCodeService_consumer;
 
   /**
   * @Menthod getById
@@ -242,5 +251,100 @@ public class EmrElementBOImpl extends HsafBO implements EmrElementBO {
   @Override
   public List<TreeMenuNode> getEmrElementTree(EmrElementDTO emrElementDTO) {
     return emrElementDAO.getEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @Menthod getEmrElementTree
+   * @Desrciption 获取电子病历元素树(医保使用)
+   *
+   * @Param
+   * [emrElementDTO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return java.util.List<cn.hsa.base.TreeMenuNode>
+   **/
+  @Override
+  public List<TreeMenuNode> getInsureEmrElementTree(EmrElementDTO emrElementDTO) {
+    return emrElementDAO.getInsureEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @param emrElementDTO
+   * @Menthod getInsureDictEmrElementTree
+   * @Desrciption 获取系统码表中电子病历元素树(医保使用)
+   * @Param [emrElementDTO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.TreeMenuNode>>
+   */
+  @Override
+  public List<TreeMenuNode> getInsureDictEmrElementTree(EmrElementDTO emrElementDTO) {
+    return emrElementDAO.getInsureDictEmrElementTree(emrElementDTO);
+  }
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod queryInsureEmrElementMatchInfo
+   * @Desrciption 获取元素匹配关系(医保使用)
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.EmrElementMatchDO>>
+   */
+  @Override
+  public PageDTO queryInsureEmrElementMatchInfo(EmrElementMatchDO emrElementMatchDO) {
+    PageHelper.startPage(emrElementMatchDO.getPageNo(), emrElementMatchDO.getPageSize());
+    return PageDTO.of(emrElementDAO.queryInsureEmrElementMatchInfoPage(emrElementMatchDO));
+  }
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> saveInsureMatch(EmrElementMatchDO emrElementMatchDO) {
+
+    // 校验是否已经匹配
+    int count = emrElementDAO.selectInsureEmrCode(emrElementMatchDO);
+    if (count > 0) {
+       throw new AppException(emrElementMatchDO.getInsureEmrName() + "【" + emrElementMatchDO.getInsureEmrCode() + "】 已完成匹配！");
+    }
+
+    // 校验医院病历元素是否为末级元素
+    int hospCount = emrElementDAO.selectHospEmrUpCode(emrElementMatchDO);
+    if (hospCount > 0) {
+      throw new AppException("医院病历元素" + emrElementMatchDO.getEmrElementName() + "【" + emrElementMatchDO.getEmrElementCode() + "】 非末级元素！");
+    }
+
+    // 校验医院病历元素是否为末级元素
+    int insureCount = emrElementDAO.selectInsureEmrUpCode(emrElementMatchDO);
+    if (insureCount > 0) {
+      throw new AppException("医保病历元素" + emrElementMatchDO.getInsureEmrName() + "【" + emrElementMatchDO.getInsureEmrCode() + "】 非末级元素！");
+    }
+
+    // 新增匹配关系
+    emrElementMatchDO.setId(SnowflakeUtils.getId());
+    emrElementMatchDO.setCrteTime(DateUtils.getNow());
+    return WrapperResponse.success(emrElementDAO.saveInsureMatch(emrElementMatchDO) > 0);
+  }
+
+  /**
+   * @param map
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [map]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> deleteInsureMatch(Map map) {
+    return WrapperResponse.success(emrElementDAO.deleteInsureMatch(map) > 0);
   }
 }

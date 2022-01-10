@@ -589,6 +589,8 @@ public class InptFunction {
 
         Map<String,Object> httpParam = new HashMap<>();
         httpParam.put("function_id",Constant.HuNanSheng.INPT.BIZC131255);//功能号
+        httpParam.put("corp_id",insureIndividualVisitDTO.getAab001());// 单位ID
+        httpParam.put("corp_name",insureIndividualVisitDTO.getBka008());// 单位名称
         httpParam.put("oper_staffid",inptVisitDTO.getUserCode());//员工号
         httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码
@@ -771,6 +773,7 @@ public class InptFunction {
         httpParam.put("fin_disease_his","");//医疗机构疾病诊断（医疗机构疾病编码）
         httpParam.put("fin_disease1_his","");//医疗机构第一副诊断（医疗机构疾病编码）
         httpParam.put("fin_disease2_his","");//医疗机构第二副诊断（医疗机构疾病编码））
+        httpParam.put("aka999","1"); // 是否垫付伙食费(默认是)
 
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setRegCode(inptVisitDTO.getInsureOrgCode());

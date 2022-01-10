@@ -118,7 +118,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if(ListUtils.isEmpty(insureCostList)) {
             throw new AppException("没有可以上传的医保费用数据！");
         }
-        // 查询有退费的数据集合,且未上传的的数据集合
+
+        // 查询有退费且未上传的的费数据
         List<InptCostDTO> inptCostDTOList = insureIndividualCostDAO.queryBackInptFee(insureIndividualVisitDTO);
 
         // 查询已经上传的费用数据
@@ -134,6 +135,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 }
             }
         }
+
         // 直接把全开，全退的费用保存到费用表 但是不进行调用医保的操作
         if (num == 0) {
             this.insertNotUpLoadFee(insureCostList,inptVisitDTO);
@@ -195,277 +197,270 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             }
         }
 
-            String bka006 = insureIndividualVisitDTO.getBka006(); //待遇类型
-            InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-            insureConfigurationDTO.setHospCode(hospCode);
-            insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
-            insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
-            insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-            /**
-             * 公共入参
-             */
-            Map param = new HashMap();
-            param.put("infno", "2301");  //交易编号
-            param.put("msgid",StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode()));
-            param.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs()); //参保地医保区划分
-            param.put("medins_code", insureIndividualVisitDTO.getMedicineOrgCode()); //定点医药机构编号
-            param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-            param.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
-            /**
-             * 第一部分入参
-             */
-            Map<String,String> dataMap = new HashMap<>();
-            String insureRegisterNo = insureIndividualVisitDTO.getMedicalRegNo();
-            map.put("medicalRegNo",insureRegisterNo);
-            dataMap.put("medins_code",insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码
-            dataMap.put("psn_no",insureIndividualVisitDTO.getAac001()); //个人电脑号
-            dataMap.put("med_type",insureIndividualVisitDTO.getAka130()); //业务类型
-            dataMap.put("serial_no",insureRegisterNo); // 就医登记号
-            dataMap.put("opter",code); // 录入人工号
-            dataMap.put("opter_name",crteName); // 录入人姓名
-            dataMap.put("rxno ",""); //处方号
-            dataMap.put("bilg_dr_code",""); // 处方医生编号
-            dataMap.put("bilg_dr_name",""); // 处方医生姓名
-            map.put("code","HOSP_APPR_FLAG");
-            map.put("insureRegisterNo",insureRegisterNo);
-            String hospApprFlag ="";
-            String zhSpecial ="";
-            String hnFeedetlSn ="";
-            String huNanSpecial = "";
-            String guangZhouSpecial = "";
-            Map<String,Object> codeMap = new HashMap<>();
-            codeMap.put("code","HOSP_APPR_FLAG");
-            codeMap.put("hospCode",hospCode);
-            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(codeMap).getData();
-            if(sysParameterDTO !=null && !StringUtils.isEmpty(sysParameterDTO.getValue())){
-                String value = sysParameterDTO.getValue();
-                Map<String,Object> stringObjectMap = JSON.parseObject(value,Map.class);
-                if(stringObjectMap.containsKey(insureConfigurationDTO.getRegCode())){
-                    for(String key : stringObjectMap.keySet()){
-                        if(key.equals(insureConfigurationDTO.getRegCode())){ // 审批标识
-                            hospApprFlag = MapUtils.get(stringObjectMap,key);
-                        }
-                        if("zhSpecial".equals(key)){  // 珠海临时控制自费药的处理办法
-                            zhSpecial = MapUtils.get(stringObjectMap,key);
-                        }
-                        if("hnFeedetlSn".equals(key)){ // 湖南省特有的费流水号标识
-                            hnFeedetlSn = MapUtils.get(stringObjectMap,key);
-                        }
-                        if ("huNanSpecial".equals(key)) {
-                            huNanSpecial = MapUtils.get(stringObjectMap,key);
-                        }
-                        if ("guangZhouSpecial".equals(key)) {
-                            guangZhouSpecial = MapUtils.get(stringObjectMap,key);
-                        }
+        String bka006 = insureIndividualVisitDTO.getBka006(); //待遇类型
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        /**
+         * 公共入参
+         */
+        Map param = new HashMap();
+        param.put("infno", "2301");  //交易编号
+        param.put("msgid",StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode()));
+        param.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs()); //参保地医保区划分
+        param.put("medins_code", insureIndividualVisitDTO.getMedicineOrgCode()); //定点医药机构编号
+        param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
+        param.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
+        /**
+         * 第一部分入参
+         */
+        Map<String,String> dataMap = new HashMap<>();
+        String insureRegisterNo = insureIndividualVisitDTO.getMedicalRegNo();
+        map.put("medicalRegNo",insureRegisterNo);
+        dataMap.put("medins_code",insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码
+        dataMap.put("psn_no",insureIndividualVisitDTO.getAac001()); //个人电脑号
+        dataMap.put("med_type",insureIndividualVisitDTO.getAka130()); //业务类型
+        dataMap.put("serial_no",insureRegisterNo); // 就医登记号
+        dataMap.put("opter",code); // 录入人工号
+        dataMap.put("opter_name",crteName); // 录入人姓名
+        dataMap.put("rxno ",""); //处方号
+        dataMap.put("bilg_dr_code",""); // 处方医生编号
+        dataMap.put("bilg_dr_name",""); // 处方医生姓名
+        map.put("code","HOSP_APPR_FLAG");
+        map.put("insureRegisterNo",insureRegisterNo);
+        String hospApprFlag ="";
+        String zhSpecial ="";
+        String hnFeedetlSn ="";
+        String huNanSpecial = "";
+        String guangZhouSpecial = "";
+        Map<String,Object> codeMap = new HashMap<>();
+        codeMap.put("code","HOSP_APPR_FLAG");
+        codeMap.put("hospCode",hospCode);
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(codeMap).getData();
+        if(sysParameterDTO !=null && !StringUtils.isEmpty(sysParameterDTO.getValue())){
+            String value = sysParameterDTO.getValue();
+            Map<String,Object> stringObjectMap = JSON.parseObject(value,Map.class);
+            if(stringObjectMap.containsKey(insureConfigurationDTO.getRegCode())){
+                for(String key : stringObjectMap.keySet()){
+                    if(key.equals(insureConfigurationDTO.getRegCode())){ // 审批标识
+                        hospApprFlag = MapUtils.get(stringObjectMap,key);
+                    }
+                    if("zhSpecial".equals(key)){  // 珠海临时控制自费药的处理办法
+                        zhSpecial = MapUtils.get(stringObjectMap,key);
+                    }
+                    if("hnFeedetlSn".equals(key)){ // 湖南省特有的费流水号标识
+                        hnFeedetlSn = MapUtils.get(stringObjectMap,key);
+                    }
+                    if ("huNanSpecial".equals(key)) {
+                        huNanSpecial = MapUtils.get(stringObjectMap,key);
+                    }
+                    if ("guangZhouSpecial".equals(key)) {
+                        guangZhouSpecial = MapUtils.get(stringObjectMap,key);
                     }
                 }
             }
-            Integer k =1;
-            /**
-             * 第二部分入参
-             */
-            List<Map<String,Object>> mapList = new ArrayList<>();
-            BigDecimal sumBigDecimal = new BigDecimal(0.00);
-            String feeNum =  insureIndividualCostDAO.selectLastFeedSn(map); // 判读是否是第一次传输
-            for (Map<String, Object> item : list2) {
-                Map<String, Object> objectMap = new HashMap<>();
-                String pracCertiNo = MapUtils.get(item,"pracCertiNo");
-                String doctorName = MapUtils.get(item,"doctorName");
-                if(StringUtils.isEmpty(pracCertiNo)){
-                    throw new AppException("该" +doctorName+"医生的医师国家码没有维护,请去用户管理里面维护");
-                }
-                count++;
-                String feedetlSn = MapUtils.get(item,"id");
-                // 湖南省医保费用流水只能传15位  且费用明细流水号必须为非0的数字
-                if("1".equals(hnFeedetlSn)){
-                    if(StringUtils.isEmpty(feeNum)){
-                        objectMap.put("feedetl_sn",k) ; // 费用明细流水号
-                    }
-                    else{
-                        k = Integer.parseInt(feeNum);
-                        k+=2;
-                        feeNum = k.toString();
-                        objectMap.put("feedetl_sn",k) ; // 费用明细流水号
-                    }
-                    if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
-                        objectMap.put("init_feedetl_sn",Integer.valueOf(MapUtils.get(item,"initFeedetlSn"))) ;// 原费用流水号
-                    }
-                    else{
-                        objectMap.put("init_feedetl_sn","") ;// 原费用流水号
-                    }
+        }
+        Integer k =1;
+        /**
+         * 第二部分入参
+         */
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        BigDecimal sumBigDecimal = new BigDecimal(0.00);
+        String feeNum =  insureIndividualCostDAO.selectLastFeedSn(map); // 判读是否是第一次传输
+        for (Map<String, Object> item : list2) {
+            Map<String, Object> objectMap = new HashMap<>();
+            String pracCertiNo = MapUtils.get(item,"pracCertiNo");
+            String doctorName = MapUtils.get(item,"doctorName");
+            if(StringUtils.isEmpty(pracCertiNo)){
+                throw new AppException("该" +doctorName+"医生的医师国家码没有维护,请去用户管理里面维护");
+            }
+            count++;
+            String feedetlSn = MapUtils.get(item,"id");
+            // 湖南省医保费用流水只能传15位  且费用明细流水号必须为非0的数字
+            if("1".equals(hnFeedetlSn)){
+                if(StringUtils.isEmpty(feeNum)){
+                    objectMap.put("feedetl_sn",k) ; // 费用明细流水号
                 }
                 else{
-                    feedetlSn = feedetlSn.substring(1,19);
-                    objectMap.put("feedetl_sn",feedetlSn) ; // 费用明细流水号
-                    if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
-                        objectMap.put("init_feedetl_sn",MapUtils.get(item,"initFeedetlSn")) ;// 原费用流水号
-                    }
-                    else{
-                        objectMap.put("init_feedetl_sn","") ;// 原费用流水号
-                    }
+                    k = Integer.parseInt(feeNum);
+                    k+=2;
+                    feeNum = k.toString();
+                    objectMap.put("feedetl_sn",k) ; // 费用明细流水号
                 }
-                k=k+2;
-                objectMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());  // 就诊ID
-                objectMap.put("drord_no",MapUtils.get(item,"iatId"));  // 医嘱号
-                objectMap.put("psn_no",insureIndividualVisitDTO.getAac001()); // 人员编号
-                objectMap.put("med_type",insureIndividualVisitDTO.getAka130()); // 医疗类别 - - 业务类别
-                objectMap.put("fee_ocur_time",DateUtils.format((Date) item.get("costTime"),DateUtils.Y_M_DH_M_S));// 费用发生时间
-                objectMap.put("med_list_codg",item.get("insureItemCode") ==null?"":item.get("insureItemCode").toString());// 医疗目录编码
-                objectMap.put("medins_list_codg",item.get("hospItemCode")==null?"":item.get("hospItemCode").toString()); // 医药机构目录编码
-                objectMap.put("med_list_name", MapUtils.get(item,"insureItemName"));
-                BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);
-                objectMap.put("cnt",cnt);//  数量
-                BigDecimal price = BigDecimalUtils.scale((BigDecimal) item.get("price"), 4);
-                objectMap.put("pric",price);// 单价
-                DecimalFormat df1 = new DecimalFormat("0.00");
-                String realityPrice = df1.format(BigDecimalUtils.convert(item.get("realityPrice").toString()));
-                BigDecimal convertPrice = BigDecimalUtils.convert(realityPrice);
-                sumBigDecimal=BigDecimalUtils.add(sumBigDecimal,convertPrice);
-                objectMap.put("det_item_fee_sumamt",convertPrice); // 明细项目费用总额
-
-                objectMap.put("bilg_dept_codg",MapUtils.get(item,"deptId")); // 开单科室编码
-                objectMap.put("bilg_dept_name",MapUtils.get(item,"deptName")); // 开单科室名称
-
-                if(StringUtils.isEmpty(MapUtils.get(item,"pracCertiNo"))){
-                    objectMap.put("bilg_dr_codg",pracCertiNo); // 开单医生编码
-                }else{
-                    objectMap.put("bilg_dr_codg",MapUtils.get(item,"pracCertiNo")); // 开单医生编码
+                if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
+                    objectMap.put("init_feedetl_sn",Integer.valueOf(MapUtils.get(item,"initFeedetlSn"))) ;// 原费用流水号
                 }
-                if(StringUtils.isEmpty(MapUtils.get(item,"doctorName"))){
-                    objectMap.put("bilg_dr_name",doctorName); // 开单医师姓名
-                }else {
-                    objectMap.put("bilg_dr_name",MapUtils.get(item,"doctorName")); // 开单医师姓名
-                }
-                objectMap.put("acord_dept_codg",""); // 受单科室编码
-                objectMap.put("acord_dept_name",""); // 受单科室名称
-                objectMap.put("orders_dr_code",""); // 受单医生编码
-                objectMap.put("orders_dr_name",""); // 受单医生姓名
-                String isReimburse = MapUtils.get(item,"isReimburse");
-
-                /**
-                 * zhSpecial : '1' 珠海
-                 * huNanSpecial : '1' 湖南
-                 */
-                objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
-                // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
-                if("1".equals(zhSpecial) && "0".equals(isReimburse)) {
-                    objectMap.put("hosp_appr_flag", "0");
-                }
-
-                // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销
-                if (isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
-                    objectMap.put("hosp_appr_flag", "1");
-                    objectMap.put("tcmdrug_used_way","1");
-                } else if (!isCompound && "1".equals(huNanSpecial) && "103".equals(MapUtils.get(item,"insureItemType"))) {
-                    objectMap.put("hosp_appr_flag", "0");
-                    objectMap.put("tcmdrug_used_way","2");
-                }else if("1".equals(huNanSpecial) && "0".equals(isReimburse)){
-                    objectMap.put("hosp_appr_flag", "0");
-                } else if ("1".equals(guangZhouSpecial) && isCompound && "102".equals(MapUtils.get(map, "insureItemType"))) {
-                    // 广州的102是中药饮片
-                    objectMap.put("hosp_appr_flag", "1");
-                    objectMap.put("tcmdrug_used_way","1");
-                }
-
-                objectMap.put("etip_flag",Constants.SF.F); // 外检标志
-                objectMap.put("etip_hosp_code",""); // 外检医院编码
-                // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)
-                if("128".equals(bka006) || "129".equals(bka006) || "521".equals(bka006)){
-                    objectMap.put("matn_fee_flag",Constants.SF.S); // 生育费用标志
-                }else{
-                    objectMap.put("matn_fee_flag",Constants.SF.F); // 生育费用标志
-                }
-                objectMap.put("memo",""); // 备注
-                objectMap.put("lmtUserFlag",MapUtils.get(item,"lmtUserFlag")); // 项目药品类型
-                objectMap.put("list_type",MapUtils.get(item,"insureItemType")); // 项目药品类型
-                objectMap.put("medins_list_code",item.get("hospItemCode")==null?"":item.get("hospItemCode").toString()); // 医院药品项目编码
-                objectMap.put("medins_list_name",item.get("hospItemName")==null?"":item.get("hospItemName").toString()); // 医院药品项目名称
-                objectMap.put("drug_stand_code",MapUtils.get(item,"standardCode"));// 药品本位码
-                objectMap.put("drug_dosform",MapUtils.get(item,"prepCode"));  // 剂型
-                objectMap.put("prdr_name",""); // 厂家
-                objectMap.put("spec",MapUtils.get(item,"spec")); // 规格
-                objectMap.put("sin_dos_dscr",MapUtils.get(item,"dosageUnitCode"));// 计量单位
-                if(Constants.YYXZ.CYDY.equals(MapUtils.get(item,"useCode"))){
-                    objectMap.put("dscg_tkdrug_flag",Constants.SF.S); // 出院带药标志
-                    objectMap.put("dscg_tkdrug_days",MapUtils.get(item,"useDays"));//出院带药天数
-                }else{
-                    objectMap.put("dscg_tkdrug_flag",Constants.SF.F); // 出院带药标志
-                    objectMap.put("dscg_tkdrug_days","");//出院带药天数
-                }
-                objectMap.put("used_flag","");//用药标志
-                objectMap.put("opp_serial_fee",count + "");// 对应费用序列号
-                objectMap.put("opter",code);// 录入人工号
-                objectMap.put("opter_name",crteName);// 录入人姓名
-                objectMap.put("rxno",""); // 处方号
-                objectMap.put("feedetl_id",MapUtils.get(item,"id")); // 人员医疗费用明细ID
-                objectMap.put("chrgitm_lv",""); // 收费项目等级
-                objectMap.put("selt_date",""); //医患最终结算日期
-                objectMap.put("med_list_code",item.get("insureItemCode") ==null?"":item.get("insureItemCode").toString()); // 中心药品项目编码
-                objectMap.put("med_list_name",item.get("insureItemName")==null?"": item.get("insureItemName").toString());// 中心药品项目名称
-                objectMap.put("org_drug_code","");// 药监局药品编码
-                objectMap.put("fee_bchno","");// 费用批次
-                objectMap.put("refd_amt","");// 退费金额
-                objectMap.put("opt_time",DateUtils.format((Date) item.get("crteTime"),DateUtils.Y_M_DH_M_S));// 录入时间
-                objectMap.put("fund_stas","");// 费用冻结标志，用来表识参保人所在单位的基本医疗保险被冻结期间录入的费用。0：未冻结；1：已冻结；2：冻结已处理
-                objectMap.put("upload_time",DateUtils.format(DateUtils.getNow(),DateUtils.Y_M_DH_M_S));; // 费用上传时间
-                objectMap.put("city_selfpay_prop",""); //  城职对应待遇值（自付比例支付类型）
-                objectMap.put("work_stats","");// 是否在岗医师标识：0，非在岗；1，在岗
-                objectMap.put("out_time_flag","");// 超时标志，0未超时，1超时上传未申诉，2超时上传正在申诉，3超时上传申诉审核同意，4超时上传申诉审核不同意
-                objectMap.put("frqu_dscr","");//用药频次描述
-                objectMap.put("prd_days",""); // 用药周期天数
-                objectMap.put("medc_way_dscr",""); // 用药途径描述
-                objectMap.put("sin_dos","");//单次剂量
-                objectMap.put("sin_dosunt","");//单次剂量单位
-                objectMap.put("used_days",""); // 使用天数
-                objectMap.put("dismed_amt","");// 发药总量
-                objectMap.put("dismed_unt","");// 发药总量单位
-                objectMap.put("unchk_flag","");// 不进行审核标志
-                objectMap.put("unchk_memo",""); // 不进行审核说明
-                objectMap.put("visitId",visitId);
-                objectMap.put("hospCode",hospCode);
-                objectMap.put("id",MapUtils.get(item,"id")) ; //
-                mapList.add(objectMap);
-            }
-            System.out.println("费用明细总金额为:"+ sumBigDecimal);
-            System.out.println("费用传输的总数量为:" + mapList.size());
-            map.put("mapList",mapList);
-            String resultStr ="";
-            String url= insureConfigurationDTO.getUrl();
-            Map<String,Object> inputMap = new HashMap<>();
-            List<Map<String,Object>> listAllMap = new ArrayList<>();
-            if(mapList.size() > 100){
-                int toIndex =100;
-                for (int i = 0; i < mapList.size(); i += 100) {
-                    if (i + 100 > mapList.size()) {
-                        toIndex = mapList.size() - i;
-                    }
-                    List newList = mapList.subList(i, i + toIndex);
-                    inputMap.put("data", dataMap);
-                    inputMap.put("feedetail",newList);
-                    param.put("input", inputMap);
-                    String json = JSONObject.toJSONString(param);
-                    logger.info("统一支付平台住院费用传输入参:" + json);
-                    resultStr = HttpConnectUtil.unifiedPayPostUtil(url, json);
-                    if(StringUtils.isEmpty(resultStr)){
-                        throw new AppException("无法访问统一支付平台");
-                    }
-                    Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
-                    if ("999".equals(MapUtils.get(resultMap,"code"))) {
-                        throw new AppException((String) resultMap.get("msg"));
-                    }
-                    if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-                        throw new AppException((String) resultMap.get("err_msg"));
-                    }
-                    logger.info("统一支付平台住院费用传输回参:" + resultStr);
-                    Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
-                    List<Map<String,Object>> resultDataMap =  MapUtils.get(outptMap,"result");
-                    listAllMap.addAll(resultDataMap);
-                    insertInsureCost(resultDataMap,map, sumBigDecimal);
+                else{
+                    objectMap.put("init_feedetl_sn","") ;// 原费用流水号
                 }
             }
             else{
+                feedetlSn = feedetlSn.substring(1,19);
+                objectMap.put("feedetl_sn",feedetlSn) ; // 费用明细流水号
+                if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
+                    objectMap.put("init_feedetl_sn",MapUtils.get(item,"initFeedetlSn")) ;// 原费用流水号
+                }
+                else{
+                    objectMap.put("init_feedetl_sn","") ;// 原费用流水号
+                }
+            }
+            k=k+2;
+            objectMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());  // 就诊ID
+            objectMap.put("drord_no",MapUtils.get(item,"iatId"));  // 医嘱号
+            objectMap.put("psn_no",insureIndividualVisitDTO.getAac001()); // 人员编号
+            objectMap.put("med_type",insureIndividualVisitDTO.getAka130()); // 医疗类别 - - 业务类别
+            objectMap.put("fee_ocur_time",DateUtils.format((Date) item.get("costTime"),DateUtils.Y_M_DH_M_S));// 费用发生时间
+            objectMap.put("med_list_codg",item.get("insureItemCode") ==null?"":item.get("insureItemCode").toString());// 医疗目录编码
+            objectMap.put("medins_list_codg",item.get("hospItemCode")==null?"":item.get("hospItemCode").toString()); // 医药机构目录编码
+            objectMap.put("med_list_name", MapUtils.get(item,"insureItemName"));
+            BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);
+            objectMap.put("cnt",cnt);//  数量
+            BigDecimal price = BigDecimalUtils.scale((BigDecimal) item.get("price"), 4);
+            objectMap.put("pric",price);// 单价
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            String realityPrice = df1.format(BigDecimalUtils.convert(item.get("realityPrice").toString()));
+            BigDecimal convertPrice = BigDecimalUtils.convert(realityPrice);
+            sumBigDecimal=BigDecimalUtils.add(sumBigDecimal,convertPrice);
+            objectMap.put("det_item_fee_sumamt",convertPrice); // 明细项目费用总额
+            objectMap.put("bilg_dept_codg",MapUtils.get(item,"deptId")); // 开单科室编码
+            objectMap.put("bilg_dept_name",MapUtils.get(item,"deptName")); // 开单科室名称
+
+            if(StringUtils.isEmpty(MapUtils.get(item,"pracCertiNo"))){
+                objectMap.put("bilg_dr_codg",pracCertiNo); // 开单医生编码
+            }else{
+                objectMap.put("bilg_dr_codg",MapUtils.get(item,"pracCertiNo")); // 开单医生编码
+            }
+            if(StringUtils.isEmpty(MapUtils.get(item,"doctorName"))){
+                objectMap.put("bilg_dr_name",doctorName); // 开单医师姓名
+            }else {
+                objectMap.put("bilg_dr_name",MapUtils.get(item,"doctorName")); // 开单医师姓名
+            }
+            objectMap.put("acord_dept_codg",""); // 受单科室编码
+            objectMap.put("acord_dept_name",""); // 受单科室名称
+            objectMap.put("orders_dr_code",""); // 受单医生编码
+            objectMap.put("orders_dr_name",""); // 受单医生姓名
+            String isReimburse = MapUtils.get(item,"isReimburse");
+
+            /**
+             * zhSpecial : '1' 珠海
+             * huNanSpecial : '1' 湖南
+             */
+            objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
+            // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
+            if("1".equals(zhSpecial) && "0".equals(isReimburse)) {
+                objectMap.put("hosp_appr_flag", "0");
+            }
+
+            String insureItemType = MapUtils.get(item,"insureItemType");
+            String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");// 是否限制级用药
+            // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销（103-中药饮片）
+            if (isCompound && "1".equals(huNanSpecial) && Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(insureItemType)) {
+                objectMap.put("hosp_appr_flag", "1");
+                objectMap.put("tcmdrug_used_way","1");
+            } else if (!isCompound && "1".equals(huNanSpecial) && Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(insureItemType)) {
+                objectMap.put("hosp_appr_flag", "0");
+                objectMap.put("tcmdrug_used_way","2");
+            } else if("1".equals(huNanSpecial) && "0".equals(isReimburse)) {
+                objectMap.put("hosp_appr_flag", "0"); //
+            } else if ("1".equals(guangZhouSpecial) && isCompound && Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType)) {
+                // 广州的102是中药饮片
+                objectMap.put("hosp_appr_flag", "1");
+                objectMap.put("tcmdrug_used_way","1");
+            }
+
+            // 湖南省 hosp_appr_flag 用法接口新加 西药中成药 + 湖南 + 限制级
+            // 当药品本身是限制用药时，医院审批标志传0走住院自付比例，传1时走门诊自付比例
+            if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
+                    (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
+                switch (isReimburse) {
+                    case Constants.SF.S:
+                        objectMap.put("hosp_appr_flag", "0");
+                        break;
+                    case Constants.SF.F:
+                        objectMap.put("hosp_appr_flag", "2");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            objectMap.put("etip_flag",Constants.SF.F); // 外检标志
+            objectMap.put("etip_hosp_code",""); // 外检医院编码
+            // 生育住院 521  128 -生育平产(居民) 129生育剖宫产(居民)
+            if("128".equals(bka006) || "129".equals(bka006) || "521".equals(bka006)){
+                objectMap.put("matn_fee_flag",Constants.SF.S); // 生育费用标志
+            }else{
+                objectMap.put("matn_fee_flag",Constants.SF.F); // 生育费用标志
+            }
+            objectMap.put("memo",""); // 备注
+            objectMap.put("lmtUserFlag",MapUtils.get(item,"lmtUserFlag")); // 项目药品类型
+            objectMap.put("list_type",MapUtils.get(item,"insureItemType")); // 项目药品类型
+            objectMap.put("medins_list_code",item.get("hospItemCode")==null?"":item.get("hospItemCode").toString()); // 医院药品项目编码
+            objectMap.put("medins_list_name",item.get("hospItemName")==null?"":item.get("hospItemName").toString()); // 医院药品项目名称
+            objectMap.put("drug_stand_code",MapUtils.get(item,"standardCode"));// 药品本位码
+            objectMap.put("drug_dosform",MapUtils.get(item,"prepCode"));  // 剂型
+            objectMap.put("prdr_name",""); // 厂家
+            objectMap.put("spec",MapUtils.get(item,"spec")); // 规格
+            objectMap.put("sin_dos_dscr",MapUtils.get(item,"dosageUnitCode"));// 计量单位
+            if(Constants.YYXZ.CYDY.equals(MapUtils.get(item,"useCode"))){
+                objectMap.put("dscg_tkdrug_flag",Constants.SF.S); // 出院带药标志
+                objectMap.put("dscg_tkdrug_days",MapUtils.get(item,"useDays"));//出院带药天数
+            }else{
+                objectMap.put("dscg_tkdrug_flag",Constants.SF.F); // 出院带药标志
+                objectMap.put("dscg_tkdrug_days","");//出院带药天数
+            }
+            objectMap.put("used_flag","");//用药标志
+            objectMap.put("opp_serial_fee",count + "");// 对应费用序列号
+            objectMap.put("opter",code);// 录入人工号
+            objectMap.put("opter_name",crteName);// 录入人姓名
+            objectMap.put("rxno",""); // 处方号
+            objectMap.put("feedetl_id",MapUtils.get(item,"id")); // 人员医疗费用明细ID
+            objectMap.put("chrgitm_lv",""); // 收费项目等级
+            objectMap.put("selt_date",""); //医患最终结算日期
+            objectMap.put("med_list_code",item.get("insureItemCode") ==null?"":item.get("insureItemCode").toString()); // 中心药品项目编码
+            objectMap.put("med_list_name",item.get("insureItemName")==null?"": item.get("insureItemName").toString());// 中心药品项目名称
+            objectMap.put("org_drug_code","");// 药监局药品编码
+            objectMap.put("fee_bchno","");// 费用批次
+            objectMap.put("refd_amt","");// 退费金额
+            objectMap.put("opt_time",DateUtils.format((Date) item.get("crteTime"),DateUtils.Y_M_DH_M_S));// 录入时间
+            objectMap.put("fund_stas","");// 费用冻结标志，用来表识参保人所在单位的基本医疗保险被冻结期间录入的费用。0：未冻结；1：已冻结；2：冻结已处理
+            objectMap.put("upload_time",DateUtils.format(DateUtils.getNow(),DateUtils.Y_M_DH_M_S));; // 费用上传时间
+            objectMap.put("city_selfpay_prop",""); //  城职对应待遇值（自付比例支付类型）
+            objectMap.put("work_stats","");// 是否在岗医师标识：0，非在岗；1，在岗
+            objectMap.put("out_time_flag","");// 超时标志，0未超时，1超时上传未申诉，2超时上传正在申诉，3超时上传申诉审核同意，4超时上传申诉审核不同意
+            objectMap.put("frqu_dscr","");//用药频次描述
+            objectMap.put("prd_days",""); // 用药周期天数
+            objectMap.put("medc_way_dscr",""); // 用药途径描述
+            objectMap.put("sin_dos","");//单次剂量
+            objectMap.put("sin_dosunt","");//单次剂量单位
+            objectMap.put("used_days",""); // 使用天数
+            objectMap.put("dismed_amt","");// 发药总量
+            objectMap.put("dismed_unt","");// 发药总量单位
+            objectMap.put("unchk_flag","");// 不进行审核标志
+            objectMap.put("unchk_memo",""); // 不进行审核说明
+            objectMap.put("visitId",visitId);
+            objectMap.put("hospCode",hospCode);
+            objectMap.put("id",MapUtils.get(item,"id")) ; //
+            mapList.add(objectMap);
+        }
+        System.out.println("费用明细总金额为:"+ sumBigDecimal);
+        System.out.println("费用传输的总数量为:" + mapList.size());
+        map.put("mapList",mapList);
+        String resultStr ="";
+        String url= insureConfigurationDTO.getUrl();
+        Map<String,Object> inputMap = new HashMap<>();
+        List<Map<String,Object>> listAllMap = new ArrayList<>();
+        if(mapList.size() > 100){
+            int toIndex =100;
+            for (int i = 0; i < mapList.size(); i += 100) {
+                if (i + 100 > mapList.size()) {
+                    toIndex = mapList.size() - i;
+                }
+                List newList = mapList.subList(i, i + toIndex);
                 inputMap.put("data", dataMap);
-                inputMap.put("feedetail",mapList);
+                inputMap.put("feedetail",newList);
                 param.put("input", inputMap);
                 String json = JSONObject.toJSONString(param);
                 logger.info("统一支付平台住院费用传输入参:" + json);
@@ -486,11 +481,36 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 listAllMap.addAll(resultDataMap);
                 insertInsureCost(resultDataMap,map, sumBigDecimal);
             }
-            map.put("sumBigDecimal",sumBigDecimal);
-            map.put("listAllMap",listAllMap);
-            return map;
         }
+        else{
+            inputMap.put("data", dataMap);
+            inputMap.put("feedetail",mapList);
+            param.put("input", inputMap);
+            String json = JSONObject.toJSONString(param);
+            logger.info("统一支付平台住院费用传输入参:" + json);
+            resultStr = HttpConnectUtil.unifiedPayPostUtil(url, json);
+            if(StringUtils.isEmpty(resultStr)){
+                throw new AppException("无法访问统一支付平台");
+            }
+            Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
+            if ("999".equals(MapUtils.get(resultMap,"code"))) {
+                throw new AppException((String) resultMap.get("msg"));
+            }
+            if (!MapUtils.get(resultMap,"infcode").equals("0")) {
+                throw new AppException((String) resultMap.get("err_msg"));
+            }
+            logger.info("统一支付平台住院费用传输回参:" + resultStr);
+            Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
+            List<Map<String,Object>> resultDataMap =  MapUtils.get(outptMap,"result");
+            listAllMap.addAll(resultDataMap);
+            insertInsureCost(resultDataMap,map, sumBigDecimal);
+        }
+        map.put("sumBigDecimal",sumBigDecimal);
+        map.put("listAllMap",listAllMap);
+        return map;
 
+
+    }
     /**
      * @Method updateInsureCost
      * @Desrciption  费用传输以后：更新医保的反参数据

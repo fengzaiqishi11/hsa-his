@@ -269,4 +269,15 @@ public interface EmrPatientBO {
 	Boolean insertEmrPrint(EmrPatientPrintDO emrPatientPrintDO);
 
 	PageDTO queryPatientEmrReportForm(Map map);
+
+	/**
+	 * @param inptVisitDTO
+	 * @Description: 电子病历数据抓取
+	 * @Param:
+	 * @Author: 廖继广
+	 * @Email: jiguang.liao@powersi.com.cn
+	 * @Date 2022/01/06 14:32
+	 * @Return
+	 */
+	Boolean updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO);
 }

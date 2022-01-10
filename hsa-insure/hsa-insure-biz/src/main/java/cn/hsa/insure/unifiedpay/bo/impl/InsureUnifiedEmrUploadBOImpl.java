@@ -97,9 +97,6 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         paramMap.put("rxdrugdetail",detailMap);
         paramMap.put("mdtrtinfo",mdtrtInfoMap);
         paramMap.put("diseinfo",diseinfoMap);
-        if (1==1) {
-            throw new AppException("mapStr : " + paramMap.toString());
-        }
         Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_7101, paramMap);
         Map<String,Object> resultDataMap  = MapUtils.get(resultMap,"data");
         String hirXno = MapUtils.get(resultDataMap,"hi_rxno");
@@ -664,7 +661,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         detailMap.put("name",inptVisit.getName()); // 姓名
         detailMap.put("gend",inptVisit.getGenderCode()); // 性别
         detailMap.put("age",inptVisit.getAge()); // 年龄
-        detailMap.put("adm_rec_no",inptVisit.getId()); // 入院记录流水号
+        detailMap.put("adm_rec_no",inptVisit.getInNo()); // 入院记录流水号
         BaseDeptDTO inwardInfo = this.getInwardInfo(inptVisit.getInWardId(), inptVisit.getHospCode());
         if (inwardInfo == null) {
             inwardInfo.setName("住院病区");
@@ -789,9 +786,9 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         paramMap.put("diseinfo",diseInfoList.get("diagnoseList"));
         paramMap.put("coursrinfo",coursrinfoList);
         paramMap.put("oprninfo",operationInfoList);
-        paramMap.put("rescInfo",rescInfoList);
-        paramMap.put("dieInfo",dieInfoList);
-        paramMap.put("dscgoInfo",dscgoInfo);
+        paramMap.put("rescInfo",rescInfoList.get(0));
+        paramMap.put("dieInfo",dieInfoList.get(0));
+        paramMap.put("dscgoInfo",dscgoInfo.get(0));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_4701, paramMap);
         return true;
 

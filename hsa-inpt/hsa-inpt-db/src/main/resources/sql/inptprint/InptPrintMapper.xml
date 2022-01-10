@@ -171,7 +171,9 @@
         (select c.name from base_finance_classify c where c.id = ic.bfc_id and c.hosp_code = #{hospCode}) as bfcName,
         ifnull(iic.item_code, ifnull(ic.nation_code, '')) as nationCode,
         ifnull(iic.item_name, ifnull(ic.nation_name, '')) as nationName,
-        iic.guest_ratio as guestRatio, iic.preselfpay_amt as preselfpayAmt
+        iic.guest_ratio as guestRatio, iic.preselfpay_amt as preselfpayAmt,
+        ifnull((case when iic.chrgItemLv = '01' then '甲类' when iic.chrgItemLv = '02' then '乙类' when iic.chrgItemLv = '03' then '丙类' else null end), '自费') as chrgItemLv,
+        iic.item_code as ybCode
         from inpt_cost ic left join insure_individual_cost iic on ic.id = iic.cost_id
         where ic.hosp_code = #{hospCode} and ic.cost_time is not null
             <if test="visitId != null and visitId != ''">
@@ -248,7 +250,9 @@
     (select c.name from base_finance_classify c where c.id = max(bfc_id) and c.hosp_code = #{hospCode}) as bfcName ,bd.code as drugItemCode,bi.code as itemItemCode,bm.code as mateItemCode,
      ifnull(iic.item_code, ifnull(bd.nation_code, ifnull(bi.nation_code, ifnull(bm.nation_code, ifnull(ic.nation_code, ''))))) as nationCode,
      ifnull(iic.item_name, ifnull(bd.nation_name, ifnull(bi.nation_name, ifnull(bm.nation_name, ifnull(ic.nation_name, ''))))) as nationName,
-    ifnull(max(iic.guest_ratio), '') as guestRatio, ifnull(max(iic.preselfpay_amt), '') as preselfpayAmt
+    ifnull(max(iic.guest_ratio), '') as guestRatio, ifnull(max(iic.preselfpay_amt), '') as preselfpayAmt,
+    ifnull((case when iic.chrgItemLv = '01' then '甲类' when iic.chrgItemLv = '02' then '乙类' when iic.chrgItemLv = '03' then '丙类' else null end), '自费') as chrgItemLv,
+    ifnull(iic.item_code, '') as ybCode, ifnull(iv.jz_doctor_name, '') as jzDoctorName
       from
      inpt_cost ic
      left join
@@ -261,6 +265,7 @@
       base_material bm
       on bm.id = ic.item_id and bm.hosp_code = ic.hosp_code
       left join insure_individual_cost iic on ic.hosp_code = iic.hosp_code and ic.id = iic.cost_id
+      left join inpt_visit iv on iv.hoap_code = ic.hosp_code and iv.id = ic.visit_id
     where ic.hosp_code = #{hospCode} and ic.cost_time is not null and ic.status_code ='0'
     <if test="visitId != null and visitId != ''">
       AND ic.visit_id = #{visitId}
@@ -372,6 +377,7 @@
     <result property="isStopMyself" column="is_stop_myself" jdbcType="VARCHAR"/>
     <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
     <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--通过实体作为筛选条件查询医嘱信息-->
@@ -421,7 +427,7 @@
     a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time,ia.teach_doctor_id,ia.teach_doctor_name, a.stop_check_id, a.stop_check_name, a.stop_check_time,
     a.is_long, a.crte_id, a.crte_name, a.crte_time, a.is_in_print, a.is_stop_print, a.is_exec_print, a.is_skin_print, a.is_in_check_print,
     a.is_stop_check_print,a.seq_no,a.cancel_id,a.cancel_name,a.cancel_time,a.skin_result_code,
-    DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,ia.item_name,
+    DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,ia.item_name,ia.remark,
     ia.item_id,ia.item_code,ia.yylx,ia.type_code,ia.total_num,ia.total_num_unit_code,ia.use_code,ia.dosage,ia.dosage_unit_code, ia.herb_num,
     a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
     DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,

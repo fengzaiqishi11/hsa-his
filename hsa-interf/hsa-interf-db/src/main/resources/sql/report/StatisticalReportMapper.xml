@@ -1032,7 +1032,9 @@
         ma.document_sta,
         ma.medic_type,
         ib.NAME AS babyName,
-        ib.gender_code AS babyGenderCode
+        ib.gender_code AS babyGenderCode,
+        ia.crte_time as adviceTime,
+        '' as settleTime
         FROM
         medic_apply ma
         LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
@@ -1096,12 +1098,16 @@
         ma.document_sta,
         ma.medic_type,
         '' AS babyName,
-        '' AS babyGenderCode
+        '' AS babyGenderCode,
+        ma.crte_time as adviceTime,
+        os.settle_time as settleTime
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
         outpt_visit ov,
-        base_advice bd
+        base_advice bd,
+        outpt_prescribe op,
+        outpt_settle os
         WHERE
         ma.visit_id = ov.id
         and ma.hosp_code = ov.hosp_code
@@ -1112,14 +1118,16 @@
         and ma.is_inpt = '0'
         and ma.hosp_code = #{hospCode}
         and ma.document_sta &lt;&gt; '01'
+        and op.hosp_code = pd.hosp_code and op.id = pd.op_id
+        and os.hosp_code = op.hosp_code and os.id = op.settle_id
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
         <if test="startTime != null and startTime != ''">
-            and  ma.crte_time &gt; #{startTime}
+            and  os.settle_time &gt; #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-            and ma.crte_time &lt; #{endTime}
+            and os.settle_time &lt; #{endTime}
         </if>
         <if test="impDeptId != null and impDeptId != ''">
             and ma.imp_dept_id = #{impDeptId}
@@ -1171,7 +1179,9 @@
         ma.document_sta,
         ma.medic_type,
         ib.NAME AS babyName,
-        ib.gender_code AS babyGenderCode
+        ib.gender_code AS babyGenderCode,
+        ia.crte_time as adviceTime,
+        '' as settleTime
         FROM
         medic_apply ma
         LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
@@ -1235,12 +1245,16 @@
         ma.document_sta,
         ma.medic_type,
         '' AS babyName,
-        '' AS babyGenderCode
+        '' AS babyGenderCode,
+        ma.crte_time as adviceTime,
+        os.settle_time as settleTime
         FROM
         medic_apply ma,
         outpt_prescribe_detail pd,
         outpt_visit ov,
-        base_advice bd
+        base_advice bd,
+        outpt_prescribe op,
+        outpt_settle os
         WHERE
         ma.visit_id = ov.id
         and ma.hosp_code = #{hospCode}
@@ -1251,14 +1265,16 @@
         AND bd.hosp_code = pd.hosp_code
         and ma.is_inpt = '0'
         and ma.document_sta &lt;&gt; '01'
+        and op.hosp_code = pd.hosp_code and op.id = pd.op_id
+        and os.hosp_code = op.hosp_code and os.id = op.settle_id
         <if test="typeCode != null and typeCode != ''">
             and ma.type_code = #{typeCode}
         </if>
         <if test="startTime != null and startTime != ''">
-            and  ma.crte_time &gt;= #{startTime}
+            and  os.settle_time &gt;= #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-            and ma.crte_time &lt;= #{endTime}
+            and os.settle_time &lt;= #{endTime}
         </if>
         <if test="impDeptId != null and impDeptId != ''">
             and ma.imp_dept_id = #{impDeptId}

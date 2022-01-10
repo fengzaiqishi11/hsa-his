@@ -3,6 +3,7 @@ package cn.hsa.module.emr.emrelement.dao;
 
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -136,6 +137,19 @@ public interface EmrElementDAO {
   **/
   List<TreeMenuNode> getEmrElementTree(EmrElementDTO emrElementDTO);
 
+  /**
+   * @Menthod getEmrElementTree
+   * @Desrciption 获取电子病历元素树(医保使用)
+   *
+   * @Param
+   * [emrElementDTO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/1/04 10:18
+   * @Return java.util.List<cn.hsa.base.TreeMenuNode>
+   **/
+  List<TreeMenuNode> getInsureEmrElementTree (EmrElementDTO emrElementDTO);
+
 
   /**
   * @Menthod getEmrElementTreeByCodes
@@ -169,4 +183,26 @@ public interface EmrElementDAO {
    * @Return
    */
   int getEmrPatientRecordColumns(@Param("tableName") String tableName);
+
+  /**
+   * @param emrElementDTO
+   * @Menthod getInsureDictEmrElementTree
+   * @Desrciption 获取系统码表中电子病历元素树(医保使用)
+   * @Param [emrElementDTO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return java.util.List < cn.hsa.base.TreeMenuNode>
+   */
+  List<TreeMenuNode> getInsureDictEmrElementTree(EmrElementDTO emrElementDTO);
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod queryInsureEmrElementMatchInfo
+   * @Desrciption 获取元素匹配关系(医保使用)
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/1/04 10:18
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.EmrElementMatchDO>>
+   */
+  List<EmrElementMatchDO> queryInsureEmrElementMatchInfoPage(EmrElementMatchDO emrElementMatchDO);
 }

@@ -201,4 +201,12 @@ public class InptCostDTO extends InptCostDO implements Serializable {
      */
     private BigDecimal preselfpayAmt;
 
+    // 医保报销类型
+    private String chrgItemLv;
+
+    // 医保编码
+    private String ybCode;
+
+    // 经治医生名称
+    private String jzDoctorName;
 }

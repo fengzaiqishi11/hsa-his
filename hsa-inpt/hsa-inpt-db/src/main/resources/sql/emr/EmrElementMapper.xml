@@ -28,6 +28,21 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <resultMap type="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" id="EmrElementMacthMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="emrElementId" column="emr_element_id" jdbcType="VARCHAR"/>
+        <result property="emrElementCode" column="emr_element_code" jdbcType="VARCHAR"/>
+        <result property="emrElementName" column="emr_element_name" jdbcType="VARCHAR"/>
+        <result property="insureEmrId" column="insure_emr_id" jdbcType="VARCHAR"/>
+        <result property="insureEmrCode" column="insure_emr_code" jdbcType="VARCHAR"/>
+        <result property="insureEmrName" column="insure_emr_name" jdbcType="VARCHAR"/>
+        <result property="insureUpValue" column="insure_up_value" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
     <!--查询单个-->
     <select id="getByIdorCode" resultMap="EmrElementMap">
         select
@@ -215,6 +230,20 @@
     <!--获取元素树-->
     <select id="getEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
       select `code` id,name label,up_code as parentId from emr_element where hosp_code = #{hospCode}
+    </select>
+
+    <!--获取元素树,医保匹配使用-->
+    <select id="getInsureEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
+        select id emrElementId,`code` id, code ,name , concat(name ,' 【',code,'】' ) label , up_code as parentId from emr_element where hosp_code = #{hospCode}
+    </select>
+
+    <!--获取医保码表元素树,医保匹配使用-->
+    <select id="getInsureDictEmrElementTree" resultType="cn.hsa.base.TreeMenuNode">
+        select id sysCodeDetailId,value as id,value,name, concat(name ,' 【',value,'】' ) label , ifnull(up_value,'INSURE_EMR') as parentId from sys_code_detail where hosp_code = #{hospCode} and c_code = 'INSURE_EMR'
+    </select>
+
+    <select id="queryInsureEmrElementMatchInfoPage" resultMap="EmrElementMacthMap">
+        select id,emr_element_id,emr_element_code,emr_element_name,insure_emr_id,insure_emr_code,insure_emr_name,crte_id,crte_name,crte_time  from emr_element_match where hosp_code = #{hospCode}
     </select>
 
     <select id="getEmrElementTreeByCodes" resultType="cn.hsa.base.TreeMenuNode">

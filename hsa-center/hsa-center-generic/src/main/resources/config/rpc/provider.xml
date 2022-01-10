@@ -64,6 +64,9 @@
     <!-- 信息中心子系统 -> 生产企业信息管理生产者 -->
     <dubbo:service interface="cn.hsa.module.sync.product.service.SyncProductService" ref="syncProductService_provider"/>
 
+    <!-- 信息中心子系统 -> 消息通知生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.message.service.MessageInfoService" ref="messageInfoService_provider"/>
+
     <!-- 信息中心子系统 -> 国家药品生产者 -->
     <dubbo:service interface="cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService" ref="nationStandardDrugService_provider"/>
      <!-- 信息中心子系统 -> 国家药品(中药)生产者 -->

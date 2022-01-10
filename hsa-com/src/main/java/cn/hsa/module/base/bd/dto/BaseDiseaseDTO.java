@@ -45,6 +45,8 @@ public class BaseDiseaseDTO extends BaseDiseaseDO implements Serializable {
     private Boolean isNationCode ;
     //是否需要上报
     private Boolean isNeedReport;
+    // 基础信息疾病查询
+    private String baseQuery;
 
 
 }

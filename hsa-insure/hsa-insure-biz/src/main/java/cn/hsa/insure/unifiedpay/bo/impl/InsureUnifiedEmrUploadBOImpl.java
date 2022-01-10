@@ -69,6 +69,9 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
     @Resource
     private BaseDeptService baseDeptService;
+
+    @Resource
+    private RedisUtils redisUtils;
     
     /**
      * @Method updateInsureUnifiedElec
@@ -644,100 +647,115 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      **/
     private Map<String, Object> queryAdminfoInfo(Map<String, Object> map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
-        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
-        Map<String, Object> detailMap = null;
-        if(inptVisit!=null){
-            detailMap =new HashMap<>();
-            detailMap.put("mdtrt_sn",inptVisit.getVisitId()); // 就医流水号
-            detailMap.put("mdtrt_id",medicalRegNo); // 医保就诊ID（医保必填）
-            detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(医保必填)
-            detailMap.put("mdtrtsn",inptVisit.getInNo()); // 住院号
-            detailMap.put("name",inptVisit.getName()); // 姓名
-            detailMap.put("gend",inptVisit.getGenderCode()); // 性别
-            detailMap.put("age",inptVisit.getAge()); // 年龄
-            detailMap.put("adm_rec_no",inptVisit.getVisitId()); // 入院记录流水号
+        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
 
-            BaseDeptDTO inwardInfo = this.getInwardInfo(inptVisit.getInWardId(), inptVisit.getHospCode());
-            detailMap.put("wardarea_name",inwardInfo.getName()); // 病区名称
-            detailMap.put("dept_code",inptVisit.getInDeptId()); // 科室编码
-            detailMap.put("dept_name",inptVisit.getInDeptName()); // 科室名称
-            detailMap.put("bedno",inptVisit.getBedName()); // 病床号
-            detailMap.put("adm_time",inptVisit.getInTime()); // 入院时间
-            detailMap.put("illhis_stte_name",inptVisit.getName()); // 病史陈述者姓名
-            detailMap.put("illhis_stte_rltl","-"); // 陈述者与患者关系代码
-            detailMap.put("stte_rele","1"); // 陈述内容是否可靠标识
-            detailMap.put("chfcomp","-"); // 主诉
-            detailMap.put("dise_now","-"); // 现病史
-            detailMap.put("hlcon","-");  // 健康状况
-            detailMap.put("dise_his","-"); // 疾病史
-            detailMap.put("ifet",""); // 患者传染性标志
-            detailMap.put("ifet_his","无"); // 传染病史
-            detailMap.put("prev_vcnt","-");  // 预防接种史
-            detailMap.put("oprn_his","-");  // 手术史
-            detailMap.put("bld_his","-"); // 输血史
-            detailMap.put("algs_his","-"); // 过敏史
-            detailMap.put("psn_his","-"); // 个人史
-            detailMap.put("mrg_his","-"); // 婚育史
-            detailMap.put("mena_his","-"); // 月经史
-            detailMap.put("fmhis","-"); // 家族史
-            detailMap.put("physexm_tprt",0); // 体温体格检查
-            detailMap.put("physexm_pule",0); // 体格检查 -- 脉率（次 /mi数字）
-            detailMap.put("physexm_vent_frqu","-"); // 呼吸频率
-            detailMap.put("physexm_systolic_pre","-"); //体格检查 -- 收缩压 （mmHg）
-            detailMap.put("physexm_dstl_pre","-"); // 体格检查 -- 舒张压 （mmHg）
-            detailMap.put("physexm_height",0); // 体格检查--身高（cm）
-            detailMap.put("physexm_wt",0); // 体格检查--体重（kg）
-            detailMap.put("physexm_ordn_stas","-"); // 体格检查 -- 一般状况 检查结果
-            detailMap.put("physexm_skin_musl","-"); // 体格检查 -- 皮肤和黏膜检查结果
-            detailMap.put("physexm_spef_lymph","-"); // 体格检查 -- 全身浅表淋巴结检查结果
-            detailMap.put("physexm_head","-");  // 体格检查 -- 头部及其器官检查结果
-            detailMap.put("physexm_neck","-"); // 体格检查 -- 颈部检查结果
-            detailMap.put("physexm_chst","-"); // 体格检查 -- 胸部检查结果
-            detailMap.put("physexm_abd","-"); // 体格检查 -- 腹部检查结果
-            detailMap.put("physexm_finger_exam","-"); // 体格检查 -- 肛门指诊检查结果描述
-            detailMap.put("physexm_genital_area","-"); // 体格检查 -- 外生殖器检查结果
-            detailMap.put("physexm_spin","-");   // 体格检查 -- 脊柱检查结果
-            detailMap.put("physexm_all_fors","-"); // 体格检查 -- 四肢检查结果
-            detailMap.put("nersys","-");  // 体格检查 -- 神经系统检查结果
-            detailMap.put("spcy_info","-"); // 专科情况
-            detailMap.put("asst_exam_rslt","-"); // 辅助检查结果
-            detailMap.put("tcm4d_rslt",null); // 中医“四诊”观察结果描述
-            detailMap.put("syddclft",null); // 辨证分型代码
-            detailMap.put("syddclft_name",null); // 辩证分型名称
-            detailMap.put("prnp_trt",null); // 治则治法
-            detailMap.put("rec_doc_code",inptVisit.getOutptDoctorId()); // 接诊医生编号
-            detailMap.put("rec_doc_name",inptVisit.getOutptDoctorName()); // 接诊医生姓名
-            detailMap.put("ipdr_code",inptVisit.getZzDoctorId()); // 住院医师编号
-            detailMap.put("ipdr_name",inptVisit.getZzDoctorName()); // 住院医师姓名
-            detailMap.put("chfdr_code",inptVisit.getZgDoctorId()); // 主任医师编号
-            detailMap.put("chfdr_name",inptVisit.getZzDoctorName()); // 主任医师姓名
-            detailMap.put("chfpdr_code",inptVisit.getJzDoctorId()); // 主诊医师代码
-            detailMap.put("chfpdr_name",inptVisit.getJzDoctorName()); // 主诊医师姓名
-            detailMap.put("main_symp",inptVisit.getDiseaseName()); // 主要症状
-            detailMap.put("adm_rea",inptVisit.getInRemark()); // 入院原因
-            detailMap.put("adm_way",inptVisit.getInModeCode()); // 入院途径
-            detailMap.put("apgr","-"); // 评分值
-            detailMap.put("diet_info","-"); // 饮食情况
-            detailMap.put("growth_deg","-"); // 发育情况
-            detailMap.put("slep_info","-"); // 睡眠状况
-            detailMap.put("sp_info","-"); // 特殊情况
-            detailMap.put("mind_info","-"); // 心理状态
-            detailMap.put("nurt","-"); // 营养状态
-            detailMap.put("self_ablt","-"); // 自理能力
-            detailMap.put("nurscare_obsv_item_name","-"); // 护理观察项目名称
-            detailMap.put("smoke","-"); // 吸烟标志
-            detailMap.put("stop_smok_days",0); // 停止吸烟天数
-            detailMap.put("smok_info","-"); // 吸烟状况
-            detailMap.put("smok_day",0); // 日吸烟量（支）
-            detailMap.put("drnk",""); // 饮酒标志
-            detailMap.put("drnk_frqu",""); // 饮酒频率
-            detailMap.put("drnk_day",0); // 日饮酒量（mL）
-            detailMap.put("eval_time",DateUtils.format(DateUtils.Y_M_DH_M_S)); // 评估日期时间
-            detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
-            detailMap.put("vali_flag",Constants.SF.S); // 有效标志
+        if(inptVisit == null) {
+            throw new AppException("未查询到患者就诊信息！");
         }
-        return detailMap;
+        Map<String, Object> detailMap = new HashMap<>();
+        detailMap.put("mdtrt_sn",inptVisit.getVisitId()); // 就医流水号
+        detailMap.put("mdtrt_id",medicalRegNo); // 医保就诊ID（医保必填）
+        detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(医保必填)
+        detailMap.put("mdtrtsn",inptVisit.getInNo()); // 住院号
+        detailMap.put("name",inptVisit.getName()); // 姓名
+        detailMap.put("gend",inptVisit.getGenderCode()); // 性别
+        detailMap.put("age",inptVisit.getAge()); // 年龄
+        detailMap.put("adm_rec_no",inptVisit.getVisitId()); // 入院记录流水号
+        BaseDeptDTO inwardInfo = this.getInwardInfo(inptVisit.getInWardId(), inptVisit.getHospCode());
+        detailMap.put("wardarea_name",inwardInfo.getName()); // 病区名称
+        detailMap.put("dept_code",inptVisit.getInDeptId()); // 科室编码
+        detailMap.put("dept_name",inptVisit.getInDeptName()); // 科室名称
+        detailMap.put("bedno",inptVisit.getBedName()); // 病床号
+        detailMap.put("adm_time",inptVisit.getInTime()); // 入院时间
+        detailMap.put("rec_doc_code",inptVisit.getOutptDoctorId()); // 接诊医生编号
+        detailMap.put("rec_doc_name",inptVisit.getOutptDoctorName()); // 接诊医生姓名
+        detailMap.put("ipdr_code",inptVisit.getZzDoctorId()); // 住院医师编号
+        detailMap.put("ipdr_name",inptVisit.getZzDoctorName()); // 住院医师姓名
+        detailMap.put("chfdr_code",inptVisit.getZgDoctorId()); // 主任医师编号
+        detailMap.put("chfdr_name",inptVisit.getZzDoctorName()); // 主任医师姓名
+        detailMap.put("chfpdr_code",inptVisit.getJzDoctorId()); // 主诊医师代码
+        detailMap.put("chfpdr_name",inptVisit.getJzDoctorName()); // 主诊医师姓名
+        detailMap.put("main_symp",inptVisit.getDiseaseName()); // 主要症状
+        detailMap.put("adm_rea",inptVisit.getInRemark()); // 入院原因
+        detailMap.put("adm_way",inptVisit.getInModeCode()); // 入院途径
+
+        detailMap.put("illhis_stte_name",inptVisit.getName()); // 病史陈述者姓名
+        detailMap.put("illhis_stte_rltl","-"); // 陈述者与患者关系代码
+        detailMap.put("stte_rele","1"); // 陈述内容是否可靠标识
+        detailMap.put("chfcomp","-"); // 主诉
+        detailMap.put("dise_now","-"); // 现病史
+        detailMap.put("hlcon","-");  // 健康状况
+        detailMap.put("dise_his","-"); // 疾病史
+        detailMap.put("ifet",""); // 患者传染性标志
+        detailMap.put("ifet_his","无"); // 传染病史
+        detailMap.put("prev_vcnt","-");  // 预防接种史
+        detailMap.put("oprn_his","-");  // 手术史
+        detailMap.put("bld_his","-"); // 输血史
+        detailMap.put("algs_his","-"); // 过敏史
+        detailMap.put("psn_his","-"); // 个人史
+        detailMap.put("mrg_his","-"); // 婚育史
+        detailMap.put("mena_his","-"); // 月经史
+        detailMap.put("fmhis","-"); // 家族史
+        detailMap.put("physexm_tprt",0); // 体温体格检查
+        detailMap.put("physexm_pule",0); // 体格检查 -- 脉率（次 /mi数字）
+        detailMap.put("physexm_vent_frqu","-"); // 呼吸频率
+        detailMap.put("physexm_systolic_pre","-"); //体格检查 -- 收缩压 （mmHg）
+        detailMap.put("physexm_dstl_pre","-"); // 体格检查 -- 舒张压 （mmHg）
+        detailMap.put("physexm_height",0); // 体格检查--身高（cm）
+        detailMap.put("physexm_wt",0); // 体格检查--体重（kg）
+        detailMap.put("physexm_ordn_stas","-"); // 体格检查 -- 一般状况 检查结果
+        detailMap.put("physexm_skin_musl","-"); // 体格检查 -- 皮肤和黏膜检查结果
+        detailMap.put("physexm_spef_lymph","-"); // 体格检查 -- 全身浅表淋巴结检查结果
+        detailMap.put("physexm_head","-");  // 体格检查 -- 头部及其器官检查结果
+        detailMap.put("physexm_neck","-"); // 体格检查 -- 颈部检查结果
+        detailMap.put("physexm_chst","-"); // 体格检查 -- 胸部检查结果
+        detailMap.put("physexm_abd","-"); // 体格检查 -- 腹部检查结果
+        detailMap.put("physexm_finger_exam","-"); // 体格检查 -- 肛门指诊检查结果描述
+        detailMap.put("physexm_genital_area","-"); // 体格检查 -- 外生殖器检查结果
+        detailMap.put("physexm_spin","-");   // 体格检查 -- 脊柱检查结果
+        detailMap.put("physexm_all_fors","-"); // 体格检查 -- 四肢检查结果
+        detailMap.put("nersys","-");  // 体格检查 -- 神经系统检查结果
+        detailMap.put("spcy_info","-"); // 专科情况
+        detailMap.put("asst_exam_rslt","-"); // 辅助检查结果
+        detailMap.put("tcm4d_rslt",null); // 中医“四诊”观察结果描述
+        detailMap.put("syddclft",null); // 辨证分型代码
+        detailMap.put("syddclft_name",null); // 辩证分型名称
+        detailMap.put("prnp_trt",null); // 治则治法
+        detailMap.put("apgr","-"); // 评分值
+        detailMap.put("diet_info","-"); // 饮食情况
+        detailMap.put("growth_deg","-"); // 发育情况
+        detailMap.put("slep_info","-"); // 睡眠状况
+        detailMap.put("sp_info","-"); // 特殊情况
+        detailMap.put("mind_info","-"); // 心理状态
+        detailMap.put("nurt","-"); // 营养状态
+        detailMap.put("self_ablt","-"); // 自理能力
+        detailMap.put("nurscare_obsv_item_name","-"); // 护理观察项目名称
+        detailMap.put("smoke","-"); // 吸烟标志
+        detailMap.put("stop_smok_days",0); // 停止吸烟天数
+        detailMap.put("smok_info","-"); // 吸烟状况
+        detailMap.put("smok_day",0); // 日吸烟量（支）
+        detailMap.put("drnk",""); // 饮酒标志
+        detailMap.put("drnk_frqu",""); // 饮酒频率
+        detailMap.put("drnk_day",0); // 日饮酒量（mL）
+        detailMap.put("eval_time",DateUtils.format(DateUtils.Y_M_DH_M_S)); // 评估日期时间
+        detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
+        detailMap.put("vali_flag",Constants.SF.S); // 有效标志
+
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        Map<String,Object> adminfoMap = MapUtils.get(insureEmrInfo,"adminfo");
+
+        // 合并，有值的后面会覆盖前面的
+        Map<String, Object> combineResultMap = new HashMap();
+        combineResultMap.putAll(detailMap);
+        combineResultMap.putAll(adminfoMap);
+        return combineResultMap;
+    }
+
+
+    private String getRedisKey (InptVisitDTO inptVisit) {
+        return inptVisit.getHospCode() + "_" + inptVisit.getVisitId() + "_insureEmrInfo" ;
     }
 
     /**
@@ -754,19 +772,19 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         Map<String,Object>  adminfoInfo = queryAdminfoInfo(map); // 入院信息
         Map<String,Object>  diseInfoList= queryDiagnoseInfo(map); // 诊断信息
-        Map<String,Object>  coursrinfoList= queryEmrCoursrInfo(map); // 病程记录信息
-        Map<String,Object> operationInfoList = queryEmrOperationInfo(map); // 手术信息
-        Map<String,Object>  rescInfo = queryEmrRescInfo(map); // 抢救信息
-        Map<String,Object>  dieInfo = queryEmrDieInfo(map); // 死亡记录
-        Map<String,Object> dscgoInfo = queryEmrDscgoInfo(map); // 出院小结
+        List<Map<String,Object>>  coursrinfoList = queryEmrCoursrInfo(map); // 病程记录信息
+        List<Map<String,Object>> operationInfoList = queryEmrOperationInfo(map); // 手术信息
+        List<Map<String,Object>>  rescInfoList = queryEmrRescInfo(map); // 抢救信息
+        List<Map<String,Object>>  dieInfoList = queryEmrDieInfo(map); // 死亡记录
+        List<Map<String,Object>> dscgoInfo = queryEmrDscgoInfo(map); // 出院小结
 
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("adminfoInfo",adminfoInfo);
         paramMap.put("diseinfo",diseInfoList.get("diagnoseList"));
         paramMap.put("coursrinfo",coursrinfoList);
-        paramMap.put("oprninfo",operationInfoList.get("operationInfoList"));
-        paramMap.put("rescInfo",rescInfo);
-        paramMap.put("dieInfo",dieInfo);
+        paramMap.put("oprninfo",operationInfoList);
+        paramMap.put("rescInfo",rescInfoList);
+        paramMap.put("dieInfo",dieInfoList);
         paramMap.put("dscgoInfo",dscgoInfo);
         Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_4701, paramMap);
         return true;
@@ -826,10 +844,14 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author liuliyun
      * @Date   2021/8/21 15:39
      * @return*/
-    private Map<String, Object> queryEmrOperationInfo(Map<String, Object> map) {
+    private List<Map<String, Object>> queryEmrOperationInfo(Map<String, Object> map) {
         List<OperInfoRecordDO> diagnoseDTOS = MapUtils.get(map,"operInfoRecordInfos");
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
         Map<String, Object> diseinfoMap = null;
         List<Map<String,Object>> operationInfoList = new ArrayList<>();
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        List<Map<String,Object>> coursrinfoList = MapUtils.get(insureEmrInfo,"oprninfo");
         if(!ListUtils.isEmpty(diagnoseDTOS)){
             for(int i=0;i<diagnoseDTOS.size();i++){
                 OperInfoRecordDO operInfoRecordDO=diagnoseDTOS.get(i);
@@ -894,7 +916,18 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 diseinfoMap.put("oprn_selv","无"); // 是否择期手术
                 diseinfoMap.put("canc_oprn","无"); // 是否择取消手术
                 diseinfoMap.put("vali_flag",Constants.SF.S); //有效标志
-                operationInfoList.add(diseinfoMap);
+
+                if (!coursrinfoList.isEmpty()) {
+                    for (Map<String,Object> courMap : coursrinfoList) {
+                        // 合并，有值的后面会覆盖前面的
+                        Map<String, Object> combineResultMap = new HashMap();
+                        combineResultMap.putAll(diseinfoMap);
+                        combineResultMap.putAll(courMap);
+                        operationInfoList.add(combineResultMap);
+                    }
+                } else {
+                    operationInfoList.add(diseinfoMap);
+                }
             }
         } else {
             diseinfoMap  = new HashMap<>();
@@ -960,8 +993,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("vali_flag",Constants.SF.S); //有效标志
             operationInfoList.add(diseinfoMap);
         }
-        map.put("operationInfoList",operationInfoList);
-        return map;
+
+        return operationInfoList;
     }
 
     /**
@@ -971,12 +1004,12 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author liuliyun
      * @Date   2021/8/21 14:52
      * @return*/
-    private Map<String, Object> queryEmrCoursrInfo(Map<String, Object> map) {
+    private List<Map<String, Object>> queryEmrCoursrInfo(Map<String, Object> map) {
         EmrPatientRecordDO diagnoseDTO = MapUtils.get(map,"courseRecord");
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
         Map<String, Object> diseinfoMap = null;
-        List<Map<String,Object>> diagnoseList = new ArrayList<>();
-        if(diagnoseDTO!=null){
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        if(diagnoseDTO != null) {
                 diseinfoMap  = new HashMap<>();
                 diseinfoMap.put("dept_code",inptVisit.getInDeptId());//	科室代码
                 diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
@@ -1006,8 +1039,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 diseinfoMap.put("ipdr_name",inptVisit.getZzDoctorName());//	住院医师姓名
                 diseinfoMap.put("prnt_doc_name",inptVisit.getZgDoctorName());//	上级医师姓名
                 diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
-                diagnoseList.add(diseinfoMap);
-        }else {
+        } else {
             diseinfoMap  = new HashMap<>();
             diseinfoMap.put("dept_code","无");//	科室代码
             diseinfoMap.put("dept_name","无");//	科室名称
@@ -1037,7 +1069,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("prnt_doc_name","无");//	上级医师姓名
             diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
         }
-        return diseinfoMap;
+
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        List<Map<String,Object>> coursrinfoList = MapUtils.get(insureEmrInfo,"coursrinfo");
+        if (!coursrinfoList.isEmpty()) {
+            for (Map<String,Object> courMap : coursrinfoList) {
+                // 合并，有值的后面会覆盖前面的
+                Map<String, Object> combineResultMap = new HashMap();
+                combineResultMap.putAll(diseinfoMap);
+                combineResultMap.putAll(courMap);
+                resultList.add(combineResultMap);
+            }
+        } else {
+            resultList.add(diseinfoMap);
+        }
+        return resultList;
     }
 
     /**
@@ -1048,7 +1095,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Date   2021/8/21 17:05
      * @Return
      **/
-    private Map<String, Object> queryEmrRescInfo(Map<String, Object> map) {
+    private List<Map<String, Object>> queryEmrRescInfo(Map<String, Object> map) {
+        List<Map<String,Object>> resultList = new ArrayList<>();
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
         Map<String, Object> diseinfoMap = null;
         if (inptVisit!=null){
@@ -1080,7 +1128,23 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("dr_name","无");//	医师姓名
             diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
         }
-        return  diseinfoMap;
+
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        List<Map<String,Object>> coursrinfoList = MapUtils.get(insureEmrInfo,"rescinfo");
+        if (!coursrinfoList.isEmpty()) {
+            for (Map<String,Object> courMap : coursrinfoList) {
+                // 合并，有值的后面会覆盖前面的
+                Map<String, Object> combineResultMap = new HashMap();
+                combineResultMap.putAll(diseinfoMap);
+                combineResultMap.putAll(courMap);
+                resultList.add(combineResultMap);
+            }
+        } else {
+            resultList.add(diseinfoMap);
+        }
+
+        return  resultList;
     }
 
     /**
@@ -1091,8 +1155,9 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Date   2021/8/21 17:20
      * @Return
      **/
-    private Map<String, Object> queryEmrDieInfo(Map<String, Object> map) {
+    private List<Map<String, Object>> queryEmrDieInfo(Map<String, Object> map) {
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
+        List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String, Object> diseinfoMap = null;
         if (inptVisit!=null){
             diseinfoMap  = new HashMap<>();
@@ -1117,7 +1182,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("sign_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	签字日期时间
             diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
         }
-        return  diseinfoMap;
+
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        List<Map<String,Object>> dieinfoList = MapUtils.get(insureEmrInfo,"dieinfo");
+        if (!dieinfoList.isEmpty()) {
+            for (Map<String,Object> dieMap : dieinfoList) {
+                // 合并，有值的后面会覆盖前面的
+                Map<String, Object> combineResultMap = new HashMap();
+                combineResultMap.putAll(diseinfoMap);
+                combineResultMap.putAll(dieMap);
+                resultList.add(combineResultMap);
+            }
+        } else {
+            resultList.add(diseinfoMap);
+        }
+        return  resultList;
     }
 
     /**
@@ -1128,7 +1208,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Date   2021/8/21 17:35
      * @Return
      **/
-    private Map<String, Object> queryEmrDscgoInfo(Map<String, Object> map) {
+    private List<Map<String, Object>> queryEmrDscgoInfo(Map<String, Object> map) {
+        List<Map<String,Object>> resultList = new ArrayList<>();
         EmrPatientRecordDO outRecord = MapUtils.get(map,"outRecord");
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisit");
         Map<String, Object> diseinfoMap = null;
@@ -1161,7 +1242,22 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("oth_imp_info","无");//	其他重要信息
             diseinfoMap.put("vali_flag",Constants.SF.S);//有效标志
         }
-        return  diseinfoMap;
+
+        String redisKey = this.getRedisKey(inptVisit) ;
+        Map<String,String> insureEmrInfo = redisUtils.get(redisKey);
+        List<Map<String,Object>> dscginfoList = MapUtils.get(insureEmrInfo,"dscginfo");
+        if (!dscginfoList.isEmpty()) {
+            for (Map<String,Object> dscginfoMap : dscginfoList) {
+                // 合并，有值的后面会覆盖前面的
+                Map<String, Object> combineResultMap = new HashMap();
+                combineResultMap.putAll(diseinfoMap);
+                combineResultMap.putAll(dscginfoMap);
+                resultList.add(combineResultMap);
+            }
+        } else {
+            resultList.add(diseinfoMap);
+        }
+        return  resultList;
     }
 
     // 获取病区信息

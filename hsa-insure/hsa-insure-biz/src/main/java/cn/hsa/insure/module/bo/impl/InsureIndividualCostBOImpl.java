@@ -228,7 +228,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                 insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
                 insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
                 insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
-                insureIndividualCostDO.setGuestRatio((String)item.get("deductible"));//自付比例
+                insureIndividualCostDO.setGuestRatio("0");//自付比例
                 insureIndividualCostDO.setPrimaryPrice((BigDecimal)item.get("realityPrice"));//原费用
                 insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
                 insureIndividualCostDO.setOrderNo(count+"");//顺序号

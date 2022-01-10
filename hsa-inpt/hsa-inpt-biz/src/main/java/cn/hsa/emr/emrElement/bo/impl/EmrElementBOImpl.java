@@ -297,4 +297,54 @@ public class EmrElementBOImpl extends HsafBO implements EmrElementBO {
     PageHelper.startPage(emrElementMatchDO.getPageNo(), emrElementMatchDO.getPageSize());
     return PageDTO.of(emrElementDAO.queryInsureEmrElementMatchInfoPage(emrElementMatchDO));
   }
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> saveInsureMatch(EmrElementMatchDO emrElementMatchDO) {
+
+    // 校验是否已经匹配
+    int count = emrElementDAO.selectInsureEmrCode(emrElementMatchDO);
+    if (count > 0) {
+       throw new AppException(emrElementMatchDO.getInsureEmrName() + "【" + emrElementMatchDO.getInsureEmrCode() + "】 已完成匹配！");
+    }
+
+    // 校验医院病历元素是否为末级元素
+    int hospCount = emrElementDAO.selectHospEmrUpCode(emrElementMatchDO);
+    if (hospCount > 0) {
+      throw new AppException("医院病历元素" + emrElementMatchDO.getEmrElementName() + "【" + emrElementMatchDO.getEmrElementCode() + "】 非末级元素！");
+    }
+
+    // 校验医院病历元素是否为末级元素
+    int insureCount = emrElementDAO.selectInsureEmrUpCode(emrElementMatchDO);
+    if (insureCount > 0) {
+      throw new AppException("医保病历元素" + emrElementMatchDO.getInsureEmrName() + "【" + emrElementMatchDO.getInsureEmrCode() + "】 非末级元素！");
+    }
+
+    // 新增匹配关系
+    emrElementMatchDO.setId(SnowflakeUtils.getId());
+    emrElementMatchDO.setCrteTime(DateUtils.getNow());
+    return WrapperResponse.success(emrElementDAO.saveInsureMatch(emrElementMatchDO) > 0);
+  }
+
+  /**
+   * @param map
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [map]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @Override
+  public WrapperResponse<Boolean> deleteInsureMatch(Map map) {
+    return WrapperResponse.success(emrElementDAO.deleteInsureMatch(map) > 0);
+  }
 }

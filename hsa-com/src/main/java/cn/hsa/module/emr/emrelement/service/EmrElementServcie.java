@@ -98,7 +98,7 @@ public interface EmrElementServcie {
    * @Desrciption 获取电子病历元素树(医保使用)
    *
    * @Param
-   * [emrElementDTO]
+   * [map]
    *
    * @Author jiguang.liao
    * @Date   2022/1/04 10:18
@@ -112,7 +112,7 @@ public interface EmrElementServcie {
    * @Desrciption 获取系统码表中电子病历元素树(医保使用)
    *
    * @Param
-   * [emrElementDTO]
+   * [map]
    *
    * @Author jiguang.liao
    * @Date   2022/1/04 10:18
@@ -126,7 +126,7 @@ public interface EmrElementServcie {
    * @Desrciption 获取元素匹配关系(医保使用)
    *
    * @Param
-   * [emrElementMatchDO]
+   * [map]
    *
    * @Author jiguang.liao
    * @Date   2022/1/04 10:18
@@ -134,4 +134,30 @@ public interface EmrElementServcie {
    **/
   @GetMapping("/service/emr/emrElement/queryInsureEmrElementMatchInfo")
   PageDTO queryInsureEmrElementMatchInfo(Map map);
+
+  /**
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  WrapperResponse<Boolean> saveInsureMatch(Map map);
+
+  /**
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [map]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  WrapperResponse<Boolean> deleteInsureMatch(Map map);
 }

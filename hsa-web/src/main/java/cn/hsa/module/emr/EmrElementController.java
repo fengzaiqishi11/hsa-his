@@ -187,5 +187,46 @@ public class EmrElementController extends BaseController {
     return WrapperResponse.success(emrElementServcie_consumer.queryInsureEmrElementMatchInfo(map));
   }
 
+  /**
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [emrElementMatchDO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  @PostMapping("/saveInsureMatch")
+  public WrapperResponse<Boolean> saveInsureMatch(@RequestBody EmrElementMatchDO emrElementMatchDO, HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    emrElementMatchDO.setHospCode(sysUserDTO.getHospCode());
+    emrElementMatchDO.setCrteId(sysUserDTO.getId());
+    emrElementMatchDO.setCrteName(sysUserDTO.getName());
+    Map map = new HashMap();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("emrElementMatchDO", emrElementMatchDO);
+    return emrElementServcie_consumer.saveInsureMatch(map);
+  }
 
+  /**
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   *
+   * @Param
+   * [emrElementMatchDO]
+   *
+   * @Author jiguang.liao
+   * @Date   2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   **/
+  @PostMapping("/deleteInsureMatch")
+  public WrapperResponse<Boolean> deleteInsureMatch(@RequestBody List<String> ids, HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map map = new HashMap();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("ids", ids);
+    return emrElementServcie_consumer.deleteInsureMatch(map);
+  }
 }

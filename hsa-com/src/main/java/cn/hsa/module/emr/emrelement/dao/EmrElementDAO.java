@@ -205,4 +205,34 @@ public interface EmrElementDAO {
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.base.EmrElementMatchDO>>
    */
   List<EmrElementMatchDO> queryInsureEmrElementMatchInfoPage(EmrElementMatchDO emrElementMatchDO);
+
+  /**
+   * @param emrElementMatchDO
+   * @Menthod saveInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [emrElementMatchDO]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return
+   */
+  int saveInsureMatch(EmrElementMatchDO emrElementMatchDO);
+
+  /**
+   * @param map
+   * @Menthod deleteInsureMatch
+   * @Desrciption 保存病历元素匹配信息
+   * @Param [map]
+   * @Author jiguang.liao
+   * @Date 2022/01/05 10:50
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  int deleteInsureMatch(Map map);
+
+  int selectInsureEmrCode(EmrElementMatchDO emrElementMatchDO);
+
+  int selectHospEmrUpCode(EmrElementMatchDO emrElementMatchDO);
+
+  int selectInsureEmrUpCode(EmrElementMatchDO emrElementMatchDO);
+
+  List<EmrElementMatchDO> queryInsureEmrElementMatchInfoAll();
 }

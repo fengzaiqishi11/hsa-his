@@ -1,6 +1,7 @@
 package cn.hsa.module.emr.emrelement.entity;
 
 import cn.hsa.base.PageDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,5 +62,9 @@ public class EmrElementMatchDO extends PageDO implements java.io.Serializable {
     private String crteName;
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date crteTime;
+
+    /** 查询条件 */
+    private String keyword;
 }

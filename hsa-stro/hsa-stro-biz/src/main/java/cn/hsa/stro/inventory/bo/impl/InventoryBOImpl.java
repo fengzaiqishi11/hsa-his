@@ -236,10 +236,10 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
       }
       String redisKey = new StringBuilder(inventoryDTO.getHospCode()).append(inventoryDTO.getBizId()).
         append(Constants.STRO_INVENTORY_TF_REDIS_KEY).toString();
+      if (!redisUtils.setIfAbsent(redisKey,inventoryDTO.getId(),600)){
+        throw new AppException("盘点正在进行,请稍等!");
+      }
       try {
-        if (!redisUtils.setIfAbsent(redisKey,inventoryDTO.getId(),600)){
-          throw new AppException("盘点正在进行,请稍后!");
-        }
         //审核流程
         if ("1".equals(inventoryDTO.getAuditCode())) {
           //常用数据

@@ -5,7 +5,6 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.inpt.drawMedicine.bo.impl.DrawMedicineBOImpl;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
-import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -17,7 +16,6 @@ import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -640,7 +638,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
         inptCostDTO.setBabyId(inptBabyDTO1.getId());
         // 获取婴儿费用
         Map babyCost = queryBabyCost(inptCostDTO);
-        if (babyCost.isEmpty()){
+        if (babyCost == null || babyCost.isEmpty()){
           continue;
         }
         totalCost = BigDecimalUtils.add(totalCost, (BigDecimal) babyCost.get("total"));

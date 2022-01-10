@@ -316,7 +316,7 @@ public interface Constants {
 
     /**
      * @Desrciption 盘点key
-     * @Author zhangguorui
+     * @Author jiahong.yang
      * @Date 2021/11/22 15:41
      */
     String STRO_INVENTORY_TF_REDIS_KEY = "INVENTORY_ONLY";

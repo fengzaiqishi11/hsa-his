@@ -35,10 +35,10 @@
             <if test="level !=null and level !=''">
                 level=#{level},
             </if>
-            <if test="startTime !=null and startTime !=''">
+            <if test="startTime !=null">
                 start_time=#{startTime},
             </if>
-            <if test="endTime !=null and endTime !=''">
+            <if test="endTime !=null">
                 end_time=#{endTime},
             </if>
             <if test="sendCount !=null and sendCount !=''">
@@ -47,7 +47,7 @@
             <if test="url !=null and url !=''">
                 url=#{url},
             </if>
-            <if test="crteTime !=null and crteTime !=''">
+            <if test="crteTime !=null">
                 crte_time=#{crteTime},
             </if>
             <if test="crteName !=null and crteName !=''">
